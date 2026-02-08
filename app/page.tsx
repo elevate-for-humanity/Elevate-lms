@@ -134,7 +134,7 @@ export default function HomePage() {
             </div>
             
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
-              <div className="relative h-28 sm:h-32 md:h-36">
+              <div className="relative h-24 sm:h-28 md:h-32">
                 <Image src="/images/students-new/student-3.jpg" alt="Choose program" fill className="object-cover object-top" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">2</div>
               </div>

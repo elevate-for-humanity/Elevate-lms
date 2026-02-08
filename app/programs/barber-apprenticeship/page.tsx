@@ -108,38 +108,6 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      {/* EARN WHILE YOU LEARN */}
-      <section className="py-16 bg-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-black mb-4">Earn While You Learn</h2>
-            <p className="text-xl text-black max-w-3xl mx-auto">
-              As a barber apprentice, you work in a real barbershop and get paid while completing your training hours.
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
-              <div className="w-16 h-16 bg-brand-red-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">1</div>
-              <h3 className="text-xl font-bold text-black mb-3">Get Placed in a Shop</h3>
-              <p className="text-black">We match you with an approved partner barbershop where you'll train under a licensed barber.</p>
-            </div>
-            
-            <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
-              <div className="w-16 h-16 bg-brand-red-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">2</div>
-              <h3 className="text-xl font-bold text-black mb-3">Work & Earn</h3>
-              <p className="text-black">You work alongside experienced barbers, serve real clients, and earn money from day one.</p>
-            </div>
-            
-            <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
-              <div className="w-16 h-16 bg-brand-red-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">3</div>
-              <h3 className="text-xl font-bold text-black mb-3">Complete 2,000 Hours</h3>
-              <p className="text-black">Track your hours digitally, complete online coursework, and graduate ready for your state license.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* GALLERY STRIP */}
       <section className="max-w-5xl mx-auto px-6 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

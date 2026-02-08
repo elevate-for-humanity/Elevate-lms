@@ -14,14 +14,14 @@ const programs = [
   { 
     name: 'Skilled Trades', 
     href: '/programs/skilled-trades', 
-    image: '/images/trades/hero-program-hvac.jpg', 
+    image: '/images/skilled-trades-vibrant.jpg', 
     description: 'HVAC, Electrical, Welding, Plumbing training',
     duration: '12-16 weeks'
   },
   { 
     name: 'Technology', 
     href: '/programs/technology', 
-    image: '/images/technology/cybersecurity-hero.jpg', 
+    image: '/images/technology/program-it-support-training.jpg', 
     description: 'IT Support, Cybersecurity certifications',
     duration: '10-14 weeks'
   },

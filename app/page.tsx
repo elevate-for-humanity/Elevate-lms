@@ -59,32 +59,7 @@ export default function HomePage() {
       <section className="relative h-[100svh] min-h-[500px] sm:h-[80vh] sm:min-h-[500px] sm:max-h-[700px]">
         <HomeHeroVideo />
         
-        <div className="relative z-10 h-full flex items-center">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-xl">
-              <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-white leading-tight mb-4 sm:mb-6">
-                Your Future Starts Here
-              </h1>
-              <p className="text-base sm:text-lg md:text-xl text-white mb-6 sm:mb-8">
-                Free career training for eligible Indiana residents. Get certified and hired in weeks.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <Link 
-                  href="/programs"
-                  className="bg-brand-red-600 text-white px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-brand-red-700 transition-colors text-center"
-                >
-                  Explore Programs
-                </Link>
-                <Link 
-                  href="/wioa-eligibility"
-                  className="bg-white text-slate-900 px-6 py-3 sm:px-8 sm:py-4 rounded-lg font-semibold text-base sm:text-lg hover:bg-slate-100 transition-colors text-center"
-                >
-                  Check Eligibility
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
+        
       </section>
 
       {/* ===== PARTNERS ===== */}

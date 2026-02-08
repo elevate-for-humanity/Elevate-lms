@@ -72,27 +72,9 @@ export default async function BarberApprenticeshipPage() {
   const stats = await getProgramStats();
   
   return (
-    <main className="min-h-screen bg-white text-gray-900">
-      {/* BREADCRUMBS */}
-      <div className="bg-gray-50 border-b">
-        <div className="max-w-7xl mx-auto px-6 py-3">
-          <Breadcrumbs
-            items={[
-              { label: 'Programs', href: '/programs' },
-              { label: 'Barber Apprenticeship' },
-            ]}
-          />
-        </div>
-      </div>
-
-      {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/barber-guide.mp4" 
-        title="Barber Program Guide" 
-      />
-
-      {/* VIDEO HERO */}
-      <section className="relative min-h-screen flex items-center">
+    <main className="min-h-screen bg-white text-black">
+      {/* VIDEO HERO - Clean, no text overlay */}
+      <section className="relative h-[60vh] min-h-[400px] max-h-[500px]">
         <video
           autoPlay
           loop
@@ -103,64 +85,87 @@ export default async function BarberApprenticeshipPage() {
         >
           <source src="/videos/barber-training.mp4" type="video/mp4" />
         </video>
+      </section>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-28 md:py-32">
-          <div className="max-w-3xl">
-            <div className="flex flex-wrap gap-2 mb-6">
-              <span className="px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-full">
-                USDOL Registered
-              </span>
-            </div>
-            <h1 className="text-4xl md:text-6xl font-extrabold leading-tight text-white drop-shadow-lg">
-              Barber Apprenticeship
-              <span className="block text-white/90">Built for real shop skills and real hours.</span>
-            </h1>
-            <p className="mt-6 text-lg md:text-xl text-white drop-shadow-md">
-              Train at approved partner sites, track hours in your dashboard, and complete the pathway with structured support.
-            </p>
-            <p className="mt-2 text-sm text-white/70">
-              Payment plans and employer-sponsored funding options available.
-            </p>
+      {/* Avatar Guide */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-black mb-3">Learn About the Barber Program</h2>
+            <p className="text-lg text-black">Watch our guide explain the apprenticeship process</p>
+          </div>
+          <div className="rounded-2xl overflow-hidden shadow-xl">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="w-full"
+            >
+              <source src="/videos/avatars-heygen/avatar-5.mp4" type="video/mp4" />
+            </video>
+          </div>
+        </div>
+      </section>
 
-            <div className="mt-10 flex flex-col sm:flex-row gap-4">
+      {/* CTA BUTTONS */}
+      <section className="py-12 bg-white">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center">
+            <h2 className="text-3xl font-bold text-black mb-4">Ready to Start Your Barber Career?</h2>
+            <p className="text-lg text-black mb-8">Apply now or request more information about the program</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/programs/barber-apprenticeship/apply"
-                className="rounded-2xl bg-purple-600 text-white px-8 py-4 font-semibold shadow-lg hover:bg-purple-700 transition text-center"
+                className="bg-brand-red-600 text-white px-10 py-5 rounded-lg font-semibold text-xl hover:bg-brand-red-700 transition-colors"
               >
-                Enroll & Pay
+                Apply Now
               </Link>
               <Link
                 href="/inquiry?program=barber-apprenticeship"
-                className="rounded-2xl bg-white text-slate-900 px-8 py-4 font-semibold shadow-lg hover:bg-gray-100 transition text-center"
+                className="bg-white border-2 border-brand-red-600 text-brand-red-600 px-10 py-5 rounded-lg font-semibold text-xl hover:bg-gray-50 transition-colors"
               >
                 Request Information
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="mt-10 grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <div className="rounded-2xl bg-white/90 px-5 py-4 text-gray-900">
-                <div className="text-2xl font-bold">{stats.totalHours.toLocaleString()}</div>
-                <div className="text-sm text-gray-600">Hours required</div>
-              </div>
-              <div className="rounded-2xl bg-white/90 px-5 py-4 text-gray-900">
-                <div className="text-2xl font-bold">Milady</div>
-                <div className="text-sm text-gray-600">Related instruction</div>
-              </div>
-              <div className="rounded-2xl bg-white/90 px-5 py-4 text-gray-900">
-                <div className="text-2xl font-bold">${stats.tuition?.toLocaleString() || '5,250'}</div>
-                <div className="text-sm text-gray-600">Program tuition</div>
-              </div>
-              <div className="rounded-2xl bg-white/90 px-5 py-4 text-gray-900">
-                <div className="text-2xl font-bold">Hybrid</div>
-                <div className="text-sm text-gray-600">Apprenticeship + Online</div>
-              </div>
+      {/* EARN WHILE YOU LEARN */}
+      <section className="py-16 bg-white">
+        <div className="max-w-6xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-black mb-4">Earn While You Learn</h2>
+            <p className="text-xl text-black max-w-3xl mx-auto">
+              As a barber apprentice, you work in a real barbershop and get paid while completing your training hours.
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-3 gap-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+              <div className="w-16 h-16 bg-brand-red-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">1</div>
+              <h3 className="text-xl font-bold text-black mb-3">Get Placed in a Shop</h3>
+              <p className="text-black">We match you with an approved partner barbershop where you'll train under a licensed barber.</p>
+            </div>
+            
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+              <div className="w-16 h-16 bg-brand-red-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">2</div>
+              <h3 className="text-xl font-bold text-black mb-3">Work & Earn</h3>
+              <p className="text-black">You work alongside experienced barbers, serve real clients, and earn money from day one.</p>
+            </div>
+            
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+              <div className="w-16 h-16 bg-brand-red-600 rounded-full flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">3</div>
+              <h3 className="text-xl font-bold text-black mb-3">Complete 2,000 Hours</h3>
+              <p className="text-black">Track your hours digitally, complete online coursework, and graduate ready for your state license.</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* GALLERY STRIP */}
-      <section className="max-w-5xl mx-auto px-6 -mt-10 pb-10">
+      <section className="max-w-5xl mx-auto px-6 pb-10">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {[IMAGES.gallery1, IMAGES.gallery2, IMAGES.gallery3].map((src, idx) => (
             <div key={src} className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
@@ -176,7 +181,7 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       {/* WHAT IS THIS PROGRAM */}
-      <section className="max-w-7xl mx-auto px-6 py-20">
+      <section id="overview" className="max-w-7xl mx-auto px-6 py-20 scroll-mt-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900">What Is a Barber Apprenticeship?</h2>
@@ -212,7 +217,7 @@ export default async function BarberApprenticeshipPage() {
               </div>
               <div className="flex justify-between border-b border-blue-100 pb-3">
                 <span className="text-gray-600">Program Tuition</span>
-                <span className="font-bold text-slate-900">${stats.tuition?.toLocaleString() || '5,250'}</span>
+                <span className="font-bold text-slate-900">${stats.tuition?.toLocaleString() || '4,980'}</span>
               </div>
               <div className="flex justify-between border-b border-blue-100 pb-3">
                 <span className="text-gray-600">Payment Options</span>
@@ -228,7 +233,7 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       {/* WHO SHOULD APPLY */}
-      <section className="bg-slate-50 py-20">
+      <section id="requirements" className="bg-white py-20 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-slate-900 text-center">Who Should Apply</h2>
           <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
@@ -312,7 +317,7 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       {/* WHAT YOU'LL LEARN */}
-      <section className="py-20 bg-white">
+      <section id="curriculum" className="py-20 bg-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-slate-900 text-center">What You&apos;ll Learn</h2>
           <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
@@ -320,7 +325,7 @@ export default async function BarberApprenticeshipPage() {
           </p>
           
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-slate-50 rounded-2xl p-6">
+            <div className="bg-white rounded-2xl p-6">
               <h3 className="font-bold text-slate-900 mb-4">Cutting & Styling</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li>• Clipper techniques and fades</li>
@@ -330,7 +335,7 @@ export default async function BarberApprenticeshipPage() {
                 <li>• Line-ups and edge work</li>
               </ul>
             </div>
-            <div className="bg-slate-50 rounded-2xl p-6">
+            <div className="bg-white rounded-2xl p-6">
               <h3 className="font-bold text-slate-900 mb-4">Shaving & Grooming</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li>• Straight razor shaving</li>
@@ -340,7 +345,7 @@ export default async function BarberApprenticeshipPage() {
                 <li>• Sanitation protocols</li>
               </ul>
             </div>
-            <div className="bg-slate-50 rounded-2xl p-6">
+            <div className="bg-white rounded-2xl p-6">
               <h3 className="font-bold text-slate-900 mb-4">Business & Safety</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li>• Client consultation</li>
@@ -355,8 +360,8 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="max-w-7xl mx-auto px-6 py-20 bg-blue-600">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white text-center">How the Program Works</h2>
+      <section id="how-it-works" className="max-w-7xl mx-auto px-6 py-20 bg-white scroll-mt-20">
+        <h2 className="text-3xl md:text-4xl font-bold mb-4 text-black text-center">How the Program Works</h2>
         <p className="text-lg text-blue-100 text-center mb-12 max-w-2xl mx-auto">
           From enrollment to licensure in 4 clear steps.
         </p>
@@ -365,16 +370,16 @@ export default async function BarberApprenticeshipPage() {
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl font-black text-blue-600">1</span>
             </div>
-            <h3 className="font-bold text-white text-lg mb-2">Enroll & Pay</h3>
+            <h3 className="font-bold text-black text-lg mb-2">Enroll & Pay</h3>
             <p className="text-blue-100 text-sm">
-              Complete application, pay deposit ($500), and get matched with a host barbershop.
+              Complete application and get matched with a host barbershop.
             </p>
           </div>
           <div className="text-center">
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl font-black text-blue-600">2</span>
             </div>
-            <h3 className="font-bold text-white text-lg mb-2">Start Training</h3>
+            <h3 className="font-bold text-black text-lg mb-2">Start Training</h3>
             <p className="text-blue-100 text-sm">
               Begin hands-on training at your assigned shop. Access Milady online curriculum.
             </p>
@@ -383,7 +388,7 @@ export default async function BarberApprenticeshipPage() {
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl font-black text-blue-600">3</span>
             </div>
-            <h3 className="font-bold text-white text-lg mb-2">Track Hours</h3>
+            <h3 className="font-bold text-black text-lg mb-2">Track Hours</h3>
             <p className="text-blue-100 text-sm">
               Log hours digitally in your dashboard. Complete 2,000 hours of training.
             </p>
@@ -392,7 +397,7 @@ export default async function BarberApprenticeshipPage() {
             <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl font-black text-blue-600">4</span>
             </div>
-            <h3 className="font-bold text-white text-lg mb-2">Get Licensed</h3>
+            <h3 className="font-bold text-black text-lg mb-2">Get Licensed</h3>
             <p className="text-blue-100 text-sm">
               Take the Indiana state exam. Receive your barber license and start your career.
             </p>
@@ -401,7 +406,7 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       {/* VALUE PROPS */}
-      <section className="bg-gray-50 py-24">
+      <section className="bg-white py-24">
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-3xl md:text-4xl font-bold text-brand-blue-900">Professional training, clean compliance.</h2>
@@ -411,7 +416,7 @@ export default async function BarberApprenticeshipPage() {
             <ul className="mt-8 space-y-4 text-lg text-gray-700">
               <li>• Approved training sites + hour verification</li>
               <li>• Digital clock-in/out and progress tracking</li>
-              <li>• Payment options (deposit + weekly)</li>
+              <li>• Payment options available</li>
               <li>• Related instruction through Milady (Milady emails you access)</li>
             </ul>
           </div>
@@ -421,70 +426,80 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
+      {/* HOST SHOP HERO BANNER */}
+      <section className="relative h-[40vh] min-h-[300px] max-h-[400px]">
+        <Image
+          src="/images/barber/gallery-1.jpg"
+          alt="Become a Host Barbershop"
+          fill
+          className="object-cover"
+        />
+      </section>
+
       {/* PARTNERSHIP SECTION */}
-      <section className="py-20 bg-blue-900 text-white">
+      <section id="partner-shops" className="py-20 bg-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <span className="px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full">
+              <span className="px-4 py-2 bg-brand-red-600 text-white text-sm font-bold rounded-full">
                 For Barbershop Owners
               </span>
-              <h2 className="mt-6 text-3xl md:text-4xl font-bold">
+              <h2 className="mt-6 text-3xl md:text-4xl font-bold text-black">
                 Become a Host Barbershop Partner
               </h2>
-              <p className="mt-4 text-lg text-blue-100">
+              <p className="mt-4 text-lg text-black">
                 Join our network of approved training sites and help shape the next generation of licensed barbers. 
                 We handle the paperwork, you provide the real-world training.
               </p>
               
               <div className="mt-8 space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">1</span>
                   </div>
                   <div>
-                    <h3 className="font-semibold">Access Trained Apprentices</h3>
-                    <p className="text-blue-200 text-sm">Get motivated learners ready to contribute to your shop</p>
+                    <h3 className="font-semibold text-black">Access Trained Apprentices</h3>
+                    <p className="text-gray-700 text-sm">Get motivated learners ready to contribute to your shop</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">2</span>
                   </div>
                   <div>
-                    <h3 className="font-semibold">We Handle Compliance</h3>
-                    <p className="text-blue-200 text-sm">Documentation, hour tracking, and state requirements managed for you</p>
+                    <h3 className="font-semibold text-black">We Handle Compliance</h3>
+                    <p className="text-gray-700 text-sm">Documentation, hour tracking, and state requirements managed for you</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">3</span>
                   </div>
                   <div>
-                    <h3 className="font-semibold">Build Your Legacy</h3>
-                    <p className="text-blue-200 text-sm">Train future barbers and strengthen the profession</p>
+                    <h3 className="font-semibold text-black">Build Your Legacy</h3>
+                    <p className="text-gray-700 text-sm">Train future barbers and strengthen the profession</p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
-                  href="/programs/barber-apprenticeship/host-shops"
-                  className="rounded-2xl bg-white text-blue-900 px-8 py-4 font-semibold hover:bg-blue-50 transition"
+                  href="/partners/barbershop-apprenticeship"
+                  className="rounded-2xl bg-brand-red-600 text-white px-8 py-4 font-semibold hover:bg-brand-red-700 transition"
                 >
                   Learn More
                 </Link>
                 <Link
-                  href="/forms/host-shop-inquiry"
-                  className="rounded-2xl bg-transparent border-2 border-white text-white px-8 py-4 font-semibold hover:bg-white/10 transition"
+                  href="/partners/barbershop-apprenticeship/apply"
+                  className="rounded-2xl bg-white border-2 border-brand-red-600 text-brand-red-600 px-8 py-4 font-semibold hover:bg-gray-50 transition"
                 >
-                  Partner Inquiry
+                  Apply as Partner Shop
                 </Link>
               </div>
             </div>
 
-            <div className="bg-white/10 rounded-2xl p-8">
-              <h3 className="text-xl font-bold mb-6">Host Shop Requirements</h3>
+            <div className="bg-gray-100 rounded-2xl p-8">
+              <h3 className="text-xl font-bold mb-6 text-black">Host Shop Requirements</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <svg className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
@@ -523,34 +538,34 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       {/* OUTCOMES */}
-      <section className="py-20 bg-slate-900">
+      <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white text-center">Career Outcomes</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-black text-center">Career Outcomes</h2>
           <p className="text-lg text-slate-400 text-center mb-12 max-w-2xl mx-auto">
             What happens after you complete the program and get licensed.
           </p>
           
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
             <div className="text-center">
-              <div className="text-5xl font-black text-white mb-2">$35K-$60K</div>
+              <div className="text-5xl font-black text-black mb-2">$35K-$60K</div>
               <p className="text-slate-400">Average annual income for Indiana barbers</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-black text-white mb-2">90%+</div>
+              <div className="text-5xl font-black text-black mb-2">90%+</div>
               <p className="text-slate-400">State exam pass rate for our apprentices</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-black text-white mb-2">Flexible</div>
+              <div className="text-5xl font-black text-black mb-2">Flexible</div>
               <p className="text-slate-400">Set your own schedule as a licensed barber</p>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-black text-white mb-2">Unlimited</div>
+              <div className="text-5xl font-black text-black mb-2">Unlimited</div>
               <p className="text-slate-400">Earning potential with your own clientele</p>
             </div>
           </div>
           
           <div className="bg-slate-800 rounded-2xl p-8 max-w-3xl mx-auto">
-            <h3 className="text-xl font-bold text-white mb-4 text-center">Career Paths After Licensure</h3>
+            <h3 className="text-xl font-bold text-black mb-4 text-center">Career Paths After Licensure</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
                 <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
@@ -561,11 +576,11 @@ export default async function BarberApprenticeshipPage() {
                 <span className="text-slate-300">Rent a chair and build clientele</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-brand-orange-500 rounded-full"></div>
                 <span className="text-slate-300">Open your own barbershop</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-brand-brand-orange-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-brand-red-500 rounded-full"></div>
                 <span className="text-slate-300">Mobile barbering services</span>
               </div>
             </div>
@@ -574,7 +589,7 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-slate-50">
+      <section id="faq" className="py-20 bg-white scroll-mt-20">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-slate-900 text-center">Frequently Asked Questions</h2>
           <p className="text-lg text-gray-600 text-center mb-12">
@@ -590,7 +605,7 @@ export default async function BarberApprenticeshipPage() {
                 </svg>
               </summary>
               <div className="px-6 pb-6 text-gray-600">
-                Total program tuition is ${stats.tuition?.toLocaleString() || '5,250'}. You pay a $500 deposit to enroll, then $100/week during training. 
+                Total program tuition is ${stats.tuition?.toLocaleString() || '4,980'}. You pay a $1,743 setup fee to enroll, then $65/week during training. 
                 Some employer-sponsored positions may cover part or all of the tuition. Payment plans are available.
               </div>
             </details>
@@ -690,19 +705,19 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-slate-900 text-white py-24">
+      <section className="bg-white text-white py-24">
         <div className="max-w-5xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold">Ready to Start Your Barber Career?</h2>
-          <p className="mt-4 text-lg text-white/90">
+          <p className="mt-4 text-lg text-black">
             Enroll today and begin your journey to becoming a licensed barber.
           </p>
-          <p className="mt-2 text-sm text-white/60">
-            $500 deposit to start. Payment plans available.
+          <p className="mt-2 text-sm text-gray-600">
+            $1,743 setup fee to start. Payment plans available.
           </p>
           <div className="mt-10 flex justify-center gap-4 flex-col sm:flex-row">
             <Link
               href="/programs/barber-apprenticeship/apply"
-              className="rounded-2xl bg-brand-brand-orange-600 text-white px-8 py-4 font-semibold hover:bg-brand-brand-orange-700 transition"
+              className="rounded-2xl bg-brand-red-600 text-white px-8 py-4 font-semibold hover:bg-brand-red-700 transition"
             >
               Enroll & Pay Now
             </Link>
@@ -713,7 +728,7 @@ export default async function BarberApprenticeshipPage() {
               Request Information
             </Link>
           </div>
-          <p className="mt-8 text-sm text-white/50">
+          <p className="mt-8 text-sm text-gray-500">
             Questions? Call (317) 314-3757 or email elevate4humanityedu@gmail.com
           </p>
         </div>

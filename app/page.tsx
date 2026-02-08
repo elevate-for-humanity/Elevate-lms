@@ -21,7 +21,7 @@ const programs = [
   { 
     name: 'Technology', 
     href: '/programs/technology', 
-    image: '/images/trades/hero-program-electrical.jpg', 
+    image: '/images/technology/hero-program-it-support.jpg', 
     description: 'IT Support, Cybersecurity certifications',
     duration: '10-14 weeks'
   },

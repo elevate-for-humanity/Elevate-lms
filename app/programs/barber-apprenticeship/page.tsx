@@ -184,7 +184,7 @@ export default async function BarberApprenticeshipPage() {
       <section id="overview" className="max-w-7xl mx-auto px-6 py-20 scroll-mt-20">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           <div>
-            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-slate-900">What Is a Barber Apprenticeship?</h2>
+            <h2 className="text-3xl md:text-4xl font-bold mb-6 text-black">What Is a Barber Apprenticeship?</h2>
             <p className="text-lg text-gray-700 mb-4">
               A barber apprenticeship is a state-approved pathway to becoming a licensed barber in Indiana. 
               Instead of attending a traditional barber school, you train directly in a working barbershop 
@@ -201,31 +201,31 @@ export default async function BarberApprenticeshipPage() {
             </p>
           </div>
           <div className="bg-blue-50 rounded-2xl p-8">
-            <h3 className="text-xl font-bold text-slate-900 mb-6">Program at a Glance</h3>
+            <h3 className="text-xl font-bold text-black mb-6">Program at a Glance</h3>
             <div className="space-y-4">
               <div className="flex justify-between border-b border-blue-100 pb-3">
                 <span className="text-gray-600">Total Hours Required</span>
-                <span className="font-bold text-slate-900">2,000 hours</span>
+                <span className="font-bold text-black">2,000 hours</span>
               </div>
               <div className="flex justify-between border-b border-blue-100 pb-3">
                 <span className="text-gray-600">Typical Duration</span>
-                <span className="font-bold text-slate-900">12-18 months</span>
+                <span className="font-bold text-black">12-18 months</span>
               </div>
               <div className="flex justify-between border-b border-blue-100 pb-3">
                 <span className="text-gray-600">Training Format</span>
-                <span className="font-bold text-slate-900">In-shop + Online</span>
+                <span className="font-bold text-black">In-shop + Online</span>
               </div>
               <div className="flex justify-between border-b border-blue-100 pb-3">
                 <span className="text-gray-600">Program Tuition</span>
-                <span className="font-bold text-slate-900">${stats.tuition?.toLocaleString() || '4,980'}</span>
+                <span className="font-bold text-black">${stats.tuition?.toLocaleString() || '4,980'}</span>
               </div>
               <div className="flex justify-between border-b border-blue-100 pb-3">
                 <span className="text-gray-600">Payment Options</span>
-                <span className="font-bold text-slate-900">Deposit + Weekly</span>
+                <span className="font-bold text-black">Deposit + Weekly</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Credential Earned</span>
-                <span className="font-bold text-slate-900">Indiana Barber License</span>
+                <span className="font-bold text-black">Indiana Barber License</span>
               </div>
             </div>
           </div>
@@ -235,7 +235,7 @@ export default async function BarberApprenticeshipPage() {
       {/* WHO SHOULD APPLY */}
       <section id="requirements" className="bg-white py-20 scroll-mt-20">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-slate-900 text-center">Who Should Apply</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-black text-center">Who Should Apply</h2>
           <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
             This program is designed for motivated individuals ready to commit to a career in barbering.
           </p>
@@ -319,14 +319,14 @@ export default async function BarberApprenticeshipPage() {
       {/* WHAT YOU'LL LEARN */}
       <section id="curriculum" className="py-20 bg-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-slate-900 text-center">What You&apos;ll Learn</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-black text-center">What You&apos;ll Learn</h2>
           <p className="text-lg text-gray-600 text-center mb-12 max-w-2xl mx-auto">
             Our curriculum covers everything you need to pass the state exam and succeed as a professional barber.
           </p>
           
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-2xl p-6">
-              <h3 className="font-bold text-slate-900 mb-4">Cutting & Styling</h3>
+              <h3 className="font-bold text-black mb-4">Cutting & Styling</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li>• Clipper techniques and fades</li>
                 <li>• Scissor cutting methods</li>
@@ -336,7 +336,7 @@ export default async function BarberApprenticeshipPage() {
               </ul>
             </div>
             <div className="bg-white rounded-2xl p-6">
-              <h3 className="font-bold text-slate-900 mb-4">Shaving & Grooming</h3>
+              <h3 className="font-bold text-black mb-4">Shaving & Grooming</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li>• Straight razor shaving</li>
                 <li>• Hot towel treatments</li>
@@ -346,7 +346,7 @@ export default async function BarberApprenticeshipPage() {
               </ul>
             </div>
             <div className="bg-white rounded-2xl p-6">
-              <h3 className="font-bold text-slate-900 mb-4">Business & Safety</h3>
+              <h3 className="font-bold text-black mb-4">Business & Safety</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
                 <li>• Client consultation</li>
                 <li>• Shop management basics</li>
@@ -498,7 +498,7 @@ export default async function BarberApprenticeshipPage() {
               </div>
             </div>
 
-            <div className="bg-gray-100 rounded-2xl p-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8">
               <h3 className="text-xl font-bold mb-6 text-black">Host Shop Requirements</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
@@ -564,7 +564,7 @@ export default async function BarberApprenticeshipPage() {
             </div>
           </div>
           
-          <div className="bg-slate-800 rounded-2xl p-8 max-w-3xl mx-auto">
+          <div className="bg-white border border-gray-200 rounded-2xl p-8 max-w-3xl mx-auto">
             <h3 className="text-xl font-bold text-black mb-4 text-center">Career Paths After Licensure</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
@@ -591,14 +591,14 @@ export default async function BarberApprenticeshipPage() {
       {/* FAQ */}
       <section id="faq" className="py-20 bg-white scroll-mt-20">
         <div className="max-w-4xl mx-auto px-6">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-slate-900 text-center">Frequently Asked Questions</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-black text-center">Frequently Asked Questions</h2>
           <p className="text-lg text-gray-600 text-center mb-12">
             Everything you need to know about the Barber Apprenticeship program.
           </p>
           
           <div className="space-y-4">
             <details className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group">
-              <summary className="p-6 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
+              <summary className="p-6 cursor-pointer font-semibold text-black flex justify-between items-center">
                 How much does the program cost?
                 <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -611,7 +611,7 @@ export default async function BarberApprenticeshipPage() {
             </details>
             
             <details className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group">
-              <summary className="p-6 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
+              <summary className="p-6 cursor-pointer font-semibold text-black flex justify-between items-center">
                 How long does it take to complete?
                 <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -624,7 +624,7 @@ export default async function BarberApprenticeshipPage() {
             </details>
             
             <details className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group">
-              <summary className="p-6 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
+              <summary className="p-6 cursor-pointer font-semibold text-black flex justify-between items-center">
                 Do I get paid during the apprenticeship?
                 <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -637,7 +637,7 @@ export default async function BarberApprenticeshipPage() {
             </details>
             
             <details className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group">
-              <summary className="p-6 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
+              <summary className="p-6 cursor-pointer font-semibold text-black flex justify-between items-center">
                 Can I work another job while in the program?
                 <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -650,7 +650,7 @@ export default async function BarberApprenticeshipPage() {
             </details>
             
             <details className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group">
-              <summary className="p-6 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
+              <summary className="p-6 cursor-pointer font-semibold text-black flex justify-between items-center">
                 What if I have a criminal record?
                 <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -663,7 +663,7 @@ export default async function BarberApprenticeshipPage() {
             </details>
             
             <details className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group">
-              <summary className="p-6 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
+              <summary className="p-6 cursor-pointer font-semibold text-black flex justify-between items-center">
                 Where will I train?
                 <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -676,7 +676,7 @@ export default async function BarberApprenticeshipPage() {
             </details>
             
             <details className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group">
-              <summary className="p-6 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
+              <summary className="p-6 cursor-pointer font-semibold text-black flex justify-between items-center">
                 What is Milady and how does it work?
                 <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -689,7 +689,7 @@ export default async function BarberApprenticeshipPage() {
             </details>
             
             <details className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group">
-              <summary className="p-6 cursor-pointer font-semibold text-slate-900 flex justify-between items-center">
+              <summary className="p-6 cursor-pointer font-semibold text-black flex justify-between items-center">
                 What happens after I complete 2,000 hours?
                 <svg className="w-5 h-5 text-gray-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -723,7 +723,7 @@ export default async function BarberApprenticeshipPage() {
             </Link>
             <Link
               href="/inquiry?program=barber-apprenticeship"
-              className="rounded-2xl bg-white text-slate-900 px-8 py-4 font-semibold hover:bg-gray-100 transition"
+              className="rounded-2xl bg-white text-black px-8 py-4 font-semibold hover:bg-white border border-gray-200 transition"
             >
               Request Information
             </Link>

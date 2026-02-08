@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import HomeHeroVideo from './HomeHeroVideo';
-import RotatingHeroBanner from '@/components/RotatingHeroBanner';
 
 const programs = [
   { 
@@ -56,9 +55,6 @@ export default function HomePage() {
       <section className="relative h-[60vh] min-h-[400px] max-h-[600px]">
         <HomeHeroVideo />
       </section>
-
-      {/* ===== ROTATING BANNER ===== */}
-      <RotatingHeroBanner />
 
       {/* ===== PARTNERS ===== */}
       <section className="py-6 sm:py-8 bg-white border-b border-slate-200">

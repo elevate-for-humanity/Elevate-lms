@@ -117,7 +117,7 @@ export default function HomePage() {
                 href={program.href}
                 className="group bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-slate-200 hover:border-brand-red-300 hover:shadow-xl transition-all"
               >
-                <div className="aspect-[16/10] sm:aspect-[4/3] relative">
+                <div className="relative w-full h-48 sm:h-52 md:h-56">
                   <Image
                     src={program.image}
                     alt={program.name}

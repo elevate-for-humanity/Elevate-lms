@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import HomeHeroVideo from './HomeHeroVideo';
-import MarqueeBanner from '@/components/MarqueeBanner';
+import RotatingHeroBanner from '@/components/RotatingHeroBanner';
 
 const programs = [
   { 
@@ -52,20 +52,13 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
 
-      {/* ===== MARQUEE BANNER ===== */}
-      <MarqueeBanner />
-
-      {/* ===== VIDEO HERO ===== */}
-      <section className="relative h-[100svh] min-h-[500px] sm:h-[80vh] sm:min-h-[500px] sm:max-h-[700px]">
-        <HomeHeroVideo />
-        
-        
-      </section>
+      {/* ===== ROTATING HERO BANNER ===== */}
+      <RotatingHeroBanner />
 
       {/* ===== PARTNERS ===== */}
       <section className="py-6 sm:py-8 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-slate-500 text-xs sm:text-sm mb-4 sm:mb-6">APPROVED TRAINING PROVIDER</p>
+          <p className="text-center text-black font-bold text-sm sm:text-base mb-4 sm:mb-6">APPROVED TRAINING PROVIDER</p>
           <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 md:gap-12">
             <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={40} height={40} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />
             <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={40} height={40} className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12" />

@@ -48,9 +48,36 @@
 [functions]
   node_bundler = "esbuild"
   external_node_modules = [
+    # Image processing
     "sharp",
+    # AWS SDK
     "@aws-sdk/client-s3",
-    "@aws-sdk/s3-request-presigner"
+    "@aws-sdk/s3-request-presigner",
+    # Database
+    "pg",
+    "@supabase/supabase-js",
+    "@supabase/ssr",
+    # PDF generation
+    "pdfkit",
+    "pdf-lib",
+    "pdf-parse",
+    # Document generation
+    "docx",
+    # AI/ML
+    "openai",
+    # Payments
+    "stripe",
+    # Cache/Redis
+    "ioredis",
+    "redis",
+    # WebSocket
+    "socket.io",
+    "socket.io-client",
+    # Email
+    "@sendgrid/mail",
+    # Test-only (should not be bundled)
+    "puppeteer",
+    "playwright"
   ]
 
 # Social Media Scheduler - DISABLED due to AWS Lambda 4KB env var limit

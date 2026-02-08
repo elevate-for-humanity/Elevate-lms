@@ -108,30 +108,6 @@ export default async function BarberApprenticeshipPage() {
         </div>
       </section>
 
-      {/* CTA BUTTONS */}
-      <section className="py-12 bg-white">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-black mb-4">Ready to Start Your Barber Career?</h2>
-            <p className="text-lg text-black mb-8">Apply now or request more information about the program</p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/programs/barber-apprenticeship/apply"
-                className="bg-brand-red-600 text-white px-10 py-5 rounded-lg font-semibold text-xl hover:bg-brand-red-700 transition-colors"
-              >
-                Apply Now
-              </Link>
-              <Link
-                href="/inquiry?program=barber-apprenticeship"
-                className="bg-white border-2 border-brand-red-600 text-brand-red-600 px-10 py-5 rounded-lg font-semibold text-xl hover:bg-gray-50 transition-colors"
-              >
-                Request Information
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* EARN WHILE YOU LEARN */}
       <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-6">
@@ -427,69 +403,69 @@ export default async function BarberApprenticeshipPage() {
       </section>
 
       {/* PARTNERSHIP SECTION */}
-      <section id="partner-shops" className="py-20 bg-white scroll-mt-20">
+      <section id="partner-shops" className="py-20 bg-blue-900 text-white scroll-mt-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
-              <span className="px-4 py-2 bg-brand-red-600 text-white text-sm font-bold rounded-full">
+              <span className="px-4 py-2 bg-white/20 text-white text-sm font-bold rounded-full">
                 For Barbershop Owners
               </span>
-              <h2 className="mt-6 text-3xl md:text-4xl font-bold text-black">
+              <h2 className="mt-6 text-3xl md:text-4xl font-bold">
                 Become a Host Barbershop Partner
               </h2>
-              <p className="mt-4 text-lg text-black">
+              <p className="mt-4 text-lg text-blue-100">
                 Join our network of approved training sites and help shape the next generation of licensed barbers. 
                 We handle the paperwork, you provide the real-world training.
               </p>
               
               <div className="mt-8 space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">1</span>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-black">Access Trained Apprentices</h3>
-                    <p className="text-gray-700 text-sm">Get motivated learners ready to contribute to your shop</p>
+                    <h3 className="font-semibold">Access Trained Apprentices</h3>
+                    <p className="text-blue-200 text-sm">Get motivated learners ready to contribute to your shop</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">2</span>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-black">We Handle Compliance</h3>
-                    <p className="text-gray-700 text-sm">Documentation, hour tracking, and state requirements managed for you</p>
+                    <h3 className="font-semibold">We Handle Compliance</h3>
+                    <p className="text-blue-200 text-sm">Documentation, hour tracking, and state requirements managed for you</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white font-bold">3</span>
                   </div>
                   <div>
-                    <h3 className="font-semibold text-black">Build Your Legacy</h3>
-                    <p className="text-gray-700 text-sm">Train future barbers and strengthen the profession</p>
+                    <h3 className="font-semibold">Build Your Legacy</h3>
+                    <p className="text-blue-200 text-sm">Train future barbers and strengthen the profession</p>
                   </div>
                 </div>
               </div>
 
               <div className="mt-8 flex flex-wrap gap-4">
                 <Link
-                  href="/partners/barbershop-apprenticeship"
-                  className="rounded-2xl bg-brand-red-600 text-white px-8 py-4 font-semibold hover:bg-brand-red-700 transition"
+                  href="/programs/barber-apprenticeship/host-shops"
+                  className="rounded-2xl bg-white text-blue-900 px-8 py-4 font-semibold hover:bg-blue-50 transition"
                 >
                   Learn More
                 </Link>
                 <Link
-                  href="/partners/barbershop-apprenticeship/apply"
-                  className="rounded-2xl bg-white border-2 border-brand-red-600 text-brand-red-600 px-8 py-4 font-semibold hover:bg-gray-50 transition"
+                  href="/partner/apply"
+                  className="rounded-2xl bg-transparent border-2 border-white text-white px-8 py-4 font-semibold hover:bg-white/10 transition"
                 >
                   Apply as Partner Shop
                 </Link>
               </div>
             </div>
 
-            <div className="bg-gray-100 rounded-2xl p-8">
-              <h3 className="text-xl font-bold mb-6 text-black">Host Shop Requirements</h3>
+            <div className="bg-white/10 rounded-2xl p-8">
+              <h3 className="text-xl font-bold mb-6">Host Shop Requirements</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
                   <svg className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">

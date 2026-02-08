@@ -242,9 +242,6 @@ importers:
       pdfkit:
         specifier: 0.17.2
         version: 0.17.2
-      playwright:
-        specifier: ^1.57.0
-        version: 1.57.0
       qrcode:
         specifier: 1.5.4
         version: 1.5.4
@@ -444,6 +441,9 @@ importers:
       pg:
         specifier: ^8.16.3
         version: 8.16.3
+      playwright:
+        specifier: ^1.57.0
+        version: 1.57.0
       postcss:
         specifier: 8.4.49
         version: 8.4.49

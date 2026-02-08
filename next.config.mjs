@@ -50,11 +50,37 @@ const nextConfig = {
   // Server external packages - exclude heavy dependencies from the server bundle
   // These are loaded at runtime instead of being bundled, reducing Lambda size
   serverExternalPackages: [
+    // Image/media processing
     'tesseract.js',
     'sharp',
+    // PDF
     'pdf-parse',
+    'pdfkit',
+    'pdf-lib',
+    // AWS
     '@aws-sdk/client-s3',
     '@aws-sdk/s3-request-presigner',
+    // Database
+    'pg',
+    '@supabase/supabase-js',
+    '@supabase/ssr',
+    // AI
+    'openai',
+    // Payments
+    'stripe',
+    // Cache
+    'ioredis',
+    'redis',
+    // WebSocket
+    'socket.io',
+    'socket.io-client',
+    // Email
+    '@sendgrid/mail',
+    // Document generation
+    'docx',
+    // Test-only (should never be in server bundle)
+    'puppeteer',
+    'playwright',
   ],
 
   // Experimental features for better performance

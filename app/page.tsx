@@ -43,14 +43,6 @@ const programs = [
     duration: '12-18 months',
     salary: '$30,000 - $60,000'
   },
-  { 
-    name: 'Business', 
-    href: '/programs/business', 
-    image: '/images/business/program-tax-preparation.jpg', 
-    description: 'Tax preparation, entrepreneurship training',
-    duration: '6-10 weeks',
-    salary: '$35,000 - $55,000'
-  },
 ];
 
 export default function HomePage() {

@@ -64,7 +64,7 @@ async function getProgramStats() {
       completedCount: completedCount || 0,
     };
   } catch {
-    return { totalHours: 2000, tuition: 5250, enrolledCount: 0, completedCount: 0 };
+    return { totalHours: 2000, tuition: 4980, enrolledCount: 0, completedCount: 0 };
   }
 }
 

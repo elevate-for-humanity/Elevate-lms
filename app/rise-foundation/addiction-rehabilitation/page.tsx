@@ -83,7 +83,7 @@ export default async function AddictionRehabilitationPage() {
       </section>
 
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <Link href="/rise-foundation" className="text-purple-600 hover:text-purple-700 mb-8 inline-block">
+        <Link href="/rise-foundation" className="text-brand-red-600 hover:text-brand-red-700 mb-8 inline-block">
           ← Back to Rise Forward Foundation
         </Link>
 
@@ -104,7 +104,7 @@ export default async function AddictionRehabilitationPage() {
               <h3 className="font-bold text-red-800">Need Immediate Help?</h3>
               <p className="text-red-700">
                 If you or someone you know is in crisis, call the SAMHSA National Helpline: 
-                <a href="tel:1-800-662-4357" className="font-bold ml-1">1-800-662-4357</a>
+                <a href="/contact" className="font-bold ml-1">1-800-662-4357</a>
               </p>
             </div>
           </div>
@@ -176,7 +176,7 @@ export default async function AddictionRehabilitationPage() {
               Get Help Now
             </Link>
             <a 
-              href="tel:3173143757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 border border-teal-600 text-teal-600 px-6 py-3 rounded-lg font-semibold hover:bg-teal-50 transition"
             >
               <Phone className="w-5 h-5" />

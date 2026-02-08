@@ -104,7 +104,7 @@ export default function PrivacyPolicyPage() {
               <p className="text-slate-700">
                 <strong>Elevate for Humanity</strong><br />
                 Email: <a href="mailto:privacy@elevateforhumanity.org" className="text-blue-600 hover:underline">privacy@elevateforhumanity.org</a><br />
-                Phone: (317) 314-3757<br />
+                Phone: Contact Us<br />
                 Address: Indianapolis, IN
               </p>
             </div>

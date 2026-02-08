@@ -48,7 +48,7 @@ export default function ProgramPaymentOptions({
         }
       }
     } catch (error) {
-      alert('Payment failed. Please call 317-314-3757 for assistance.');
+      alert('Payment failed. Please call Contact Us for assistance.');
     }
   };
 
@@ -151,19 +151,19 @@ export default function ProgramPaymentOptions({
           onClick={() => setPaymentMethod('bnpl')}
           className={`w-full text-left p-6 rounded-lg border-2 transition ${
             paymentMethod === 'bnpl'
-              ? 'border-purple-600 bg-purple-50'
-              : 'border-gray-300 hover:border-purple-400'
+              ? 'border-brand-red-600 bg-brand-red-50'
+              : 'border-gray-300 hover:border-brand-red-400'
           }`}
         >
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3">
-              <CreditCard className="w-6 h-6 text-purple-600 flex-shrink-0 mt-1" />
+              <CreditCard className="w-6 h-6 text-brand-red-600 flex-shrink-0 mt-1" />
               <div>
                 <h4 className="font-bold text-lg mb-1">Pay in 4</h4>
                 <p className="text-sm text-black mb-2">
                   Split into 4 interest-free payments with Klarna, Afterpay, or Zip
                 </p>
-                <p className="text-2xl font-bold text-purple-600">
+                <p className="text-2xl font-bold text-brand-red-600">
                   ${bnplPayment}/payment
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
@@ -172,7 +172,7 @@ export default function ProgramPaymentOptions({
               </div>
             </div>
             {paymentMethod === 'bnpl' && (
-              <Circle className="w-6 h-6 text-purple-600" />
+              <Circle className="w-6 h-6 text-brand-red-600" />
             )}
           </div>
         </button>
@@ -216,10 +216,10 @@ export default function ProgramPaymentOptions({
           Questions about payment options?
         </p>
         <a
-          href="tel:3173143757"
+          href="/contact"
           className="text-orange-600 font-bold underline"
         >
-          Call 317-314-3757
+          Call Contact Us
         </a>
       </div>
     </div>

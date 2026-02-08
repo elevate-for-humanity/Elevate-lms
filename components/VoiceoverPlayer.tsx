@@ -129,7 +129,7 @@ export default function VoiceoverPlayer({
         {isPlaying && (
           <button
             onClick={stopVoiceover}
-            className="p-3 bg-brand-orange-500 text-white rounded-full shadow-lg hover:bg-brand-orange-600 transition-all"
+            className="p-3 bg-brand-blue-500 text-white rounded-full shadow-lg hover:bg-brand-blue-600 transition-all"
             title="Stop voiceover"
             aria-label="Stop voiceover"
           >

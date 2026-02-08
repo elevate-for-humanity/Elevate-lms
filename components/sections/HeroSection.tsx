@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 interface Badge {
   text: string;
-  color: string; // 'green' | 'blue' | 'orange' | 'purple'
+  color: string; // 'green' | 'blue' | 'orange' | 'brand-red'
 }
 
 interface CTAButton {
@@ -22,7 +22,7 @@ const badgeColors = {
   green: 'bg-green-500',
   blue: 'bg-blue-500',
   orange: 'bg-orange-500',
-  purple: 'bg-purple-500',
+  brand-red: 'bg-brand-red-500',
 };
 
 export function HeroSection({

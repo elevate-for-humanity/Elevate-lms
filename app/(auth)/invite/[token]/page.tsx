@@ -136,7 +136,7 @@ export default function AcceptInvitePage({
           <div className="text-center">
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100">
               <svg
-                className="h-10 w-10 text-brand-orange-600"
+                className="h-10 w-10 text-brand-blue-600"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"

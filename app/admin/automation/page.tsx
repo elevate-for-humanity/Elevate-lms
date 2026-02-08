@@ -79,7 +79,7 @@ export default async function AutomationLogPage() {
     { label: 'Emails Sent', value: emailsSent, icon: Mail, color: 'green' },
     { label: 'Emails Failed', value: emailsFailed, icon: XCircle, color: 'red' },
     { label: 'SMS Sent', value: smsSent, icon: Bell, color: 'blue' },
-    { label: 'Notifications', value: notificationCount, icon: Bell, color: 'purple' },
+    { label: 'Notifications', value: notificationCount, icon: Bell, color: 'brand-red' },
   ];
 
   const formatTime = (dateStr: string) => {
@@ -221,7 +221,7 @@ export default async function AutomationLogPage() {
         {/* Cron Job Status */}
         <div className="mt-8 bg-white rounded-xl shadow-sm p-6">
           <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <RefreshCw className="w-5 h-5 text-purple-500" />
+            <RefreshCw className="w-5 h-5 text-brand-red-500" />
             Scheduled Jobs
           </h2>
           <div className="grid md:grid-cols-3 gap-4">

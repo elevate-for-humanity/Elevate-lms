@@ -100,10 +100,10 @@ export default function FederalCompliancePage() {
         </section>
 
         {/* Title IX Section */}
-        <section className="mb-12 bg-purple-50 rounded-2xl p-8 border-2 border-purple-200">
+        <section className="mb-12 bg-brand-red-50 rounded-2xl p-8 border-2 border-brand-red-200">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center">
-              <Scale className="w-7 h-7 text-purple-600" />
+            <div className="w-14 h-14 bg-brand-red-100 rounded-xl flex items-center justify-center">
+              <Scale className="w-7 h-7 text-brand-red-600" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Title IX Compliance</h2>
@@ -140,7 +140,7 @@ export default function FederalCompliancePage() {
             <div className="bg-white rounded-lg p-4 mt-4">
               <p className="font-semibold text-gray-900">Title IX Coordinator Contact:</p>
               <p>Email: elevate4humanityedu@gmail.com</p>
-              <p>Phone: (317) 314-3757</p>
+              <p>Phone: Contact Us</p>
             </div>
           </div>
         </section>
@@ -235,7 +235,7 @@ export default function FederalCompliancePage() {
               <h3 className="font-bold text-lg mb-3">Internal Reporting</h3>
               <div className="space-y-2 text-gray-300">
                 <p className="flex items-center gap-2"><Mail className="w-4 h-4" /> elevate4humanityedu@gmail.com</p>
-                <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> (317) 314-3757</p>
+                <p className="flex items-center gap-2"><Phone className="w-4 h-4" /> Contact Us</p>
               </div>
               <Link href="/policies/grievance" className="inline-block mt-4 text-orange-400 hover:text-orange-300">
                 View Grievance Procedure →

@@ -9,7 +9,6 @@ import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 
@@ -102,10 +101,6 @@ export default async function Page() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/tax-guide.mp4" title="Tax Preparation Program Guide" />
-
-      {/* Pathway Disclosure */}
-      <PathwayDisclosure programName="Tax Preparation" programSlug="tax-preparation" />
 
       {/* Why Tax Preparation */}
       <section className="py-16 px-6 bg-white">
@@ -396,8 +391,8 @@ export default async function Page() {
           </div>
           <p className="mt-6">
             Call{' '}
-            <a href="tel:3173143757" className="font-bold underline">
-              317-314-3757
+            <a href="/contact" className="font-bold underline">
+              Contact Us
             </a>
           </p>
         </div>

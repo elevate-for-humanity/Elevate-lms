@@ -117,13 +117,13 @@ export default function LessonContent({
             <button
               onClick={handleMarkComplete}
               disabled={isCompleting}
-              className="px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 transition"
+              className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 transition"
             >
               {isCompleting ? 'Marking Complete...' : 'Mark as Complete'}
             </button>
           )}
           {lesson.completed && (
-            <div className="flex items-center gap-2 text-brand-green-600">
+            <div className="flex items-center gap-2 text-brand-blue-600">
               <svg
                 className="w-5 h-5"
                 fill="none"
@@ -145,7 +145,7 @@ export default function LessonContent({
         <button
           onClick={onNext}
           disabled={!onNext}
-          className="flex items-center gap-2 px-6 py-3 bg-brand-orange-600 text-white font-semibold rounded-lg hover:bg-brand-orange-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           <span>Next Lesson</span>
           <svg

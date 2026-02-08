@@ -32,7 +32,7 @@ export function Gamification({ points, level, achievements, streak }: Gamificati
         <CardContent className="p-6">
           <div className="flex items-center justify-between mb-4">
             <div>
-              <div className="text-3xl font-bold text-brand-orange-600">{points}</div>
+              <div className="text-3xl font-bold text-brand-blue-600">{points}</div>
               <div className="text-sm text-black">Total Points</div>
             </div>
             <div className="text-right">
@@ -83,7 +83,7 @@ export function Gamification({ points, level, achievements, streak }: Gamificati
                   }`}
                 >
                   <div className="flex justify-center mb-2">
-                    <div className={`p-3 rounded-full ${achievement.earned ? 'bg-brand-orange-600' : 'bg-gray-400'}`}>
+                    <div className={`p-3 rounded-full ${achievement.earned ? 'bg-brand-blue-600' : 'bg-gray-400'}`}>
                       <Icon className="text-white" size={24} />
                     </div>
                   </div>

@@ -430,7 +430,7 @@ Sarah Johnson IT Support         2025-01-22    sarah@email.com"
                 <div className="font-medium text-brand-success">
                   At-Risk Students
                 </div>
-                <div className="text-2xl font-bold text-brand-orange-600">
+                <div className="text-2xl font-bold text-brand-blue-600">
                   {processedData.analytics.atRiskCount}
                 </div>
               </div>

@@ -213,7 +213,7 @@ export function QuizBuilder() {
                         </div>
                         <button
                           onClick={() => removeQuestion(q.id)}
-                          className="text-brand-orange-600 hover:text-red-700"
+                          className="text-brand-blue-600 hover:text-red-700"
                         >
                           ✕
                         </button>

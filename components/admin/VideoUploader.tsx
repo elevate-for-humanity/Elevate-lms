@@ -186,7 +186,7 @@ export default function VideoUploader({
           {error && (
             <div className="bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-start gap-3">
-                <AlertCircle className="h-10 w-10 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-10 w-10 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-semibold text-red-900 mb-1">
                     Upload Failed

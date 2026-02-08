@@ -106,7 +106,7 @@ export default async function RiseFoundationPage() {
 
           <div className="grid md:grid-cols-3 gap-12">
             <div className="text-center">
-              <div className="w-20 h-20 bg-brand-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg
                   className="w-10 h-10 text-white"
                   fill="none"
@@ -131,7 +131,7 @@ export default async function RiseFoundationPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-20 h-20 bg-brand-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg
                   className="w-10 h-10 text-white"
                   fill="none"
@@ -156,7 +156,7 @@ export default async function RiseFoundationPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-20 h-20 bg-brand-orange-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                 <svg
                   className="w-10 h-10 text-white"
                   fill="none"
@@ -211,7 +211,7 @@ export default async function RiseFoundationPage() {
                   href="https://www.irs.gov/individuals/irs-tax-volunteers"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-brand-orange-600 font-semibold hover:underline"
+                  className="block text-brand-blue-600 font-semibold hover:underline"
                 >
                   IRS Volunteer Signup →
                 </a>
@@ -219,13 +219,13 @@ export default async function RiseFoundationPage() {
                   href="https://www.irs.gov/individuals/volunteers/link-learn-taxes"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-brand-orange-600 font-semibold hover:underline"
+                  className="block text-brand-blue-600 font-semibold hover:underline"
                 >
                   IRS Link & Learn Platform →
                 </a>
                 <Link
                   href="/programs/tax-preparation"
-                  className="block text-brand-orange-600 font-semibold hover:underline"
+                  className="block text-brand-blue-600 font-semibold hover:underline"
                 >
                   Our Tax Preparation Course →
                 </Link>
@@ -242,7 +242,7 @@ export default async function RiseFoundationPage() {
               </p>
               <Link
                 href="/students"
-                className="text-brand-orange-600 font-semibold hover:underline"
+                className="text-brand-blue-600 font-semibold hover:underline"
               >
                 Learn More →
               </Link>
@@ -259,7 +259,7 @@ export default async function RiseFoundationPage() {
               </p>
               <Link
                 href="/programs/barber-apprenticeship"
-                className="text-brand-orange-600 font-semibold hover:underline"
+                className="text-brand-blue-600 font-semibold hover:underline"
               >
                 Explore Apprenticeships →
               </Link>
@@ -275,7 +275,7 @@ export default async function RiseFoundationPage() {
               </p>
               <Link
                 href="/employers"
-                className="text-brand-orange-600 font-semibold hover:underline"
+                className="text-brand-blue-600 font-semibold hover:underline"
               >
                 Partner With Us →
               </Link>
@@ -297,7 +297,7 @@ export default async function RiseFoundationPage() {
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link
               href="/contact"
-              className="px-8 py-4 bg-brand-orange-600 text-white font-semibold rounded-lg hover:bg-brand-orange-600 transition text-lg"
+              className="px-8 py-4 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-600 transition text-lg"
             >
               Get Involved
             </Link>

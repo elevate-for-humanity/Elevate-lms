@@ -141,7 +141,7 @@ export default async function ApprenticeshipProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-green-100 text-brand-green-600 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-blue-100 text-brand-blue-600 mb-4">
                 <Briefcase className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-black mb-2">Real Experience</h3>
@@ -151,7 +151,7 @@ export default async function ApprenticeshipProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 text-purple-600 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-red-100 text-brand-red-600 mb-4">
                 <Award className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-black mb-2">Certifications</h3>
@@ -161,7 +161,7 @@ export default async function ApprenticeshipProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-brand-orange-600 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-brand-blue-600 mb-4">
                 <Clock className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-black mb-2">No Debt</h3>
@@ -209,7 +209,7 @@ export default async function ApprenticeshipProgramsPage() {
                     <span className="px-3 py-2 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full">
                       {program.duration}
                     </span>
-                    <span className="px-3 py-2 bg-brand-green-100 text-green-700 text-sm font-semibold rounded-full">
+                    <span className="px-3 py-2 bg-brand-blue-100 text-green-700 text-sm font-semibold rounded-full">
                       Paid Training
                     </span>
                   </div>

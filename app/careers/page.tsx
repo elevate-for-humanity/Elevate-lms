@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ModernLandingHero from '@/components/landing/ModernLandingHero';
-import PageAvatar from '@/components/PageAvatar';
 import {
   getActivePositions,
   formatSalaryRange,
@@ -131,10 +130,6 @@ export default async function CareersPage() {
       />
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Join Our Team" 
-      />
 
       {/* Mission Section */}
       <section className="py-16">
@@ -232,10 +227,10 @@ export default async function CareersPage() {
                             {position.department.name}
                           </span>
                         )}
-                        <span className="bg-brand-green-100 text-green-700 px-3 py-2 rounded-full">
+                        <span className="bg-brand-blue-100 text-green-700 px-3 py-2 rounded-full">
                           Remote
                         </span>
-                        <span className="bg-purple-100 text-purple-700 px-3 py-2 rounded-full">
+                        <span className="bg-brand-red-100 text-brand-red-700 px-3 py-2 rounded-full">
                           {getEmploymentTypeDisplay(position.employment_type)}
                         </span>
                         {(position.min_salary || position.max_salary) && (
@@ -364,7 +359,7 @@ export default async function CareersPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-orange-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-6">
@@ -377,7 +372,7 @@ export default async function CareersPage() {
             </p>
             <Link
               href="/contact"
-              className="inline-block bg-white text-brand-orange-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition"
+              className="inline-block bg-white text-brand-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-50 transition"
             >
               Contact Us
             </Link>

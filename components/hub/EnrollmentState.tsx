@@ -60,8 +60,8 @@ const statusConfig: Record<EnrollmentStatus, {
   },
   completed: { 
     label: 'Completed', 
-    color: 'text-purple-700', 
-    bgColor: 'bg-purple-100',
+    color: 'text-brand-red-700', 
+    bgColor: 'bg-brand-red-100',
     icon: Award 
   },
   graduated: { 

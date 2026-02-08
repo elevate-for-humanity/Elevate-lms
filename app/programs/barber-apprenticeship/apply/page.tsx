@@ -131,11 +131,11 @@ export default function BarberApprenticeshipApplyPage() {
       if (checkoutResponse.ok && checkoutData.url) {
         window.location.href = checkoutData.url;
       } else {
-        setError(checkoutData.error || 'Unable to create checkout. Please call (317) 314-3757.');
+        setError(checkoutData.error || 'Unable to create checkout. Please call Contact Us.');
         setLoading(false);
       }
     } catch {
-      setError('Unable to process. Please call (317) 314-3757.');
+      setError('Unable to process. Please call Contact Us.');
       setLoading(false);
     }
   };
@@ -177,7 +177,7 @@ export default function BarberApprenticeshipApplyPage() {
           
           {/* Left Column - Payment Calculator */}
           <div className="lg:col-span-2">
-            <div className="bg-brand-orange-600 rounded-2xl p-6 text-white sticky top-8">
+            <div className="bg-brand-blue-600 rounded-2xl p-6 text-white sticky top-8">
               <div className="flex items-center gap-3 mb-4">
                 <Calculator className="w-6 h-6" />
                 <h2 className="text-lg font-bold">Payment Calculator</h2>
@@ -279,10 +279,10 @@ export default function BarberApprenticeshipApplyPage() {
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                 <p className="text-red-800 font-medium">{error}</p>
                 <a 
-                  href="tel:317-314-3757" 
+                  href="/contact" 
                   className="inline-block mt-2 text-red-600 font-medium hover:underline"
                 >
-                  Call (317) 314-3757 for help
+                  Call Contact Us for help
                 </a>
               </div>
             )}
@@ -302,7 +302,7 @@ export default function BarberApprenticeshipApplyPage() {
                       required
                       value={formData.firstName}
                       onChange={(e) => updateField('firstName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="First name"
                     />
                   </div>
@@ -315,7 +315,7 @@ export default function BarberApprenticeshipApplyPage() {
                       required
                       value={formData.lastName}
                       onChange={(e) => updateField('lastName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="Last name"
                     />
                   </div>
@@ -331,7 +331,7 @@ export default function BarberApprenticeshipApplyPage() {
                     required
                     value={formData.email}
                     onChange={(e) => updateField('email', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -345,7 +345,7 @@ export default function BarberApprenticeshipApplyPage() {
                     required
                     value={formData.phone}
                     onChange={(e) => updateField('phone', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="(317) 555-0123"
                   />
                 </div>
@@ -397,7 +397,7 @@ export default function BarberApprenticeshipApplyPage() {
                         value="yes"
                         checked={formData.hasHostShop === 'yes'}
                         onChange={(e) => updateField('hasHostShop', e.target.value)}
-                        className="w-4 h-4 text-brand-orange-600"
+                        className="w-4 h-4 text-brand-blue-600"
                       />
                       <span className="text-gray-700">Yes, I have a shop</span>
                     </label>
@@ -408,7 +408,7 @@ export default function BarberApprenticeshipApplyPage() {
                         value="no"
                         checked={formData.hasHostShop === 'no'}
                         onChange={(e) => updateField('hasHostShop', e.target.value)}
-                        className="w-4 h-4 text-brand-orange-600"
+                        className="w-4 h-4 text-brand-blue-600"
                       />
                       <span className="text-gray-700">No, I need help finding one</span>
                     </label>
@@ -424,7 +424,7 @@ export default function BarberApprenticeshipApplyPage() {
                       type="text"
                       value={formData.hostShopName}
                       onChange={(e) => updateField('hostShopName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-orange-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="Name of the barbershop"
                     />
                   </div>
@@ -434,7 +434,7 @@ export default function BarberApprenticeshipApplyPage() {
                 <button
                   onClick={handlePayNow}
                   disabled={loading || !formData.email || !formData.firstName || !formData.lastName || !formData.phone}
-                  className="w-full py-4 bg-brand-orange-600 hover:bg-brand-orange-700 disabled:bg-gray-300 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
+                  className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-gray-300 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
                 >
                   {loading ? (
                     <>

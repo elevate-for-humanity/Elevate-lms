@@ -204,10 +204,10 @@ export default async function OngoingSupportPage() {
                 Contact Career Services
               </Link>
               <a
-                href="tel:+13173143757"
+                href="/contact"
                 className="flex items-center justify-center gap-2 text-pink-600 font-medium"
               >
-                <Phone className="w-4 h-4" /> (317) 314-3757
+                <Phone className="w-4 h-4" /> Contact Us
               </a>
             </div>
 

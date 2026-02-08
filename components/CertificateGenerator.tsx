@@ -27,7 +27,7 @@ export default function CertificateGenerator({
       <Card className="border-4 border-red-600">
         <CardContent className="p-12 text-center">
           <div className="mb-8">
-            <Award className="mx-auto text-brand-orange-600" size={64} />
+            <Award className="mx-auto text-brand-blue-600" size={64} />
           </div>
           <h1 className="text-4xl font-bold mb-4 text-black text-2xl md:text-3xl lg:text-4xl">
             Certificate of Completion
@@ -35,7 +35,7 @@ export default function CertificateGenerator({
           <div className="text-lg text-black mb-8">
             This certifies that
           </div>
-          <div className="text-3xl font-bold mb-8 text-brand-orange-600">
+          <div className="text-3xl font-bold mb-8 text-brand-blue-600">
             {studentName}
           </div>
           <div className="text-lg text-black mb-4">
@@ -65,7 +65,7 @@ export default function CertificateGenerator({
         </CardContent>
       </Card>
       <div className="flex gap-4 justify-center">
-        <Button onClick={handleDownload} className="bg-brand-orange-600 hover:bg-brand-orange-700">
+        <Button onClick={handleDownload} className="bg-brand-blue-600 hover:bg-brand-blue-700">
           <Download size={16} className="mr-2" />
           Download PDF
         </Button>

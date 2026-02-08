@@ -134,8 +134,8 @@ d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a
 
             {/* Jobs */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor"
+              <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-brand-red-600" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
 d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -239,7 +239,7 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 Ready to Take the First Step?
               </h3>
               <p className="text-black mb-6">
-                Call us at <a href="tel:3173143757" className="text-orange-600 font-bold hover:underline">317-314-3757</a> or apply online to get started today.
+                Call us at <a href="/contact" className="text-orange-600 font-bold hover:underline">Contact Us</a> or apply online to get started today.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link
@@ -249,7 +249,7 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   Apply Now
                 </Link>
                 <a
-                  href="tel:3173143757"
+                  href="/contact"
                   className="px-8 py-4 border-2 border-orange-600 text-orange-600 font-bold rounded-full hover:bg-orange-50 transition text-lg"
                 >
                   Call Us
@@ -289,10 +289,10 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     {ctaButtonText}
                   </Link>
                   <a
-                    href="tel:3173143757"
+                    href="/contact"
                     className="px-8 py-4 border-2 border-orange-600 text-orange-600 font-bold rounded-full hover:bg-orange-50 transition text-lg"
                   >
-                    Call 317-314-3757
+                    Call Contact Us
                   </a>
                 </div>
               </div>

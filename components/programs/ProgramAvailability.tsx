@@ -66,8 +66,8 @@ const STATUS_CONFIG: Record<AvailabilityStatus, {
   },
   coming_soon: {
     label: 'Launching',
-    color: 'text-purple-700',
-    bgColor: 'bg-purple-100',
+    color: 'text-brand-red-700',
+    bgColor: 'bg-brand-red-100',
     icon: Calendar,
     description: 'New program launching',
   },

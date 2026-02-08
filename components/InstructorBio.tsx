@@ -46,7 +46,7 @@ export function InstructorBio({
         {/* Info */}
         <div className="flex-1">
           <h2 className="text-2xl font-bold text-black">{name}</h2>
-          <p className="text-brand-orange-600 font-semibold mt-1">{title}</p>
+          <p className="text-brand-blue-600 font-semibold mt-1">{title}</p>
 
           {/* Stats */}
           <div className="flex gap-6 mt-4">

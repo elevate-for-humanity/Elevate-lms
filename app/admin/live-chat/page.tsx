@@ -56,7 +56,7 @@ export default function LiveChatPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -117,7 +117,7 @@ export default function LiveChatPage() {
             title="Satisfaction Rate"
             value="98%"
             icon={Circle}
-            color="purple"
+            color="brand-red"
           />
           <StatCard
             title="Total Conversations"
@@ -308,15 +308,15 @@ interface StatCardProps {
   title: string;
   value: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: 'blue' | 'green' | 'purple' | 'orange';
+  color: 'blue' | 'green' | 'brand-red' | 'orange';
 }
 
 function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
   const colorClasses = {
     blue: 'text-brand-blue-600',
-    green: 'text-brand-green-600',
-    purple: 'text-purple-600',
-    orange: 'text-brand-orange-600',
+    green: 'text-brand-blue-600',
+    brand-red: 'text-brand-red-600',
+    orange: 'text-brand-blue-600',
   };
 
   return (
@@ -338,7 +338,7 @@ interface FeatureItemProps {
 function FeatureItem({ title, description }: FeatureItemProps) {
   return (
     <div className="flex items-start space-x-3">
-      <Circle className="w-5 h-5 text-brand-green-600 mt-0.5 flex-shrink-0" />
+      <Circle className="w-5 h-5 text-brand-blue-600 mt-0.5 flex-shrink-0" />
       <div>
         <div className="font-medium text-black">{title}</div>
         <div className="text-sm text-black">{description}</div>

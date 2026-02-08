@@ -109,7 +109,7 @@ export default async function ProgramHolderOnboarding() {
             <ul className="space-y-3 text-black">
               <li className="flex items-start">
                 <Circle
-                  className="text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                  className="text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                   size={20}
                 />
                 <span>
@@ -119,7 +119,7 @@ export default async function ProgramHolderOnboarding() {
               </li>
               <li className="flex items-start">
                 <Circle
-                  className="text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                  className="text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                   size={20}
                 />
                 <span>
@@ -129,7 +129,7 @@ export default async function ProgramHolderOnboarding() {
               </li>
               <li className="flex items-start">
                 <Circle
-                  className="text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                  className="text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                   size={20}
                 />
                 <span>
@@ -139,7 +139,7 @@ export default async function ProgramHolderOnboarding() {
               </li>
               <li className="flex items-start">
                 <Circle
-                  className="text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                  className="text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                   size={20}
                 />
                 <span>
@@ -148,7 +148,7 @@ export default async function ProgramHolderOnboarding() {
               </li>
               <li className="flex items-start">
                 <Circle
-                  className="text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                  className="text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                   size={20}
                 />
                 <span>
@@ -481,10 +481,10 @@ export default async function ProgramHolderOnboarding() {
                 </a>{' '}
                 or call{' '}
                 <a
-                  href="tel:3173143757"
+                  href="/contact"
                   className="text-blue-700 font-semibold hover:underline"
                 >
-                  317-314-3757
+                  Contact Us
                 </a>{' '}
                 for immediate assistance.
               </p>

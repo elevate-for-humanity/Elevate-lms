@@ -222,7 +222,7 @@ export default function ProgramAnalytics() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Dropout Rate</span>
-                    <span className="text-2xl font-bold text-brand-orange-600">{program.dropoutRate.toFixed(1)}%</span>
+                    <span className="text-2xl font-bold text-brand-blue-600">{program.dropoutRate.toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Avg Completion Time</span>

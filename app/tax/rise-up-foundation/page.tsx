@@ -43,7 +43,7 @@ export default function RiseUpFoundationPage() {
       </div>
 
       <section className="rounded-2xl border bg-white p-8 shadow-sm">
-        <div className="inline-block px-3 py-2 rounded-full bg-brand-green-100 text-green-800 text-xs font-semibold mb-4">
+        <div className="inline-block px-3 py-2 rounded-full bg-brand-blue-100 text-green-800 text-xs font-semibold mb-4">
           FREE TAX HELP
         </div>
         <h1 className="text-4xl font-bold tracking-tight">
@@ -88,7 +88,7 @@ export default function RiseUpFoundationPage() {
             Learn about eligibility, what to bring, and how to schedule your
             appointment.
           </p>
-          <div className="mt-4 text-brand-green-600 font-semibold">
+          <div className="mt-4 text-brand-blue-600 font-semibold">
             Learn More →
           </div>
         </Link>
@@ -101,7 +101,7 @@ export default function RiseUpFoundationPage() {
           <p className="mt-2 text-black">
             Join our team of IRS-certified volunteers and help your community.
           </p>
-          <div className="mt-4 text-brand-green-600 font-semibold">
+          <div className="mt-4 text-brand-blue-600 font-semibold">
             Get Started →
           </div>
         </Link>
@@ -117,7 +117,7 @@ export default function RiseUpFoundationPage() {
             Complete IRS Link & Learn certification to become a volunteer tax
             preparer.
           </p>
-          <div className="mt-4 text-brand-green-600 font-semibold">
+          <div className="mt-4 text-brand-blue-600 font-semibold">
             Start Training →
           </div>
         </Link>
@@ -130,7 +130,7 @@ export default function RiseUpFoundationPage() {
           <p className="mt-2 text-black">
             Use the IRS locator to find nearby VITA sites and hours.
           </p>
-          <div className="mt-4 text-brand-green-600 font-semibold">
+          <div className="mt-4 text-brand-blue-600 font-semibold">
             Find Sites →
           </div>
         </Link>

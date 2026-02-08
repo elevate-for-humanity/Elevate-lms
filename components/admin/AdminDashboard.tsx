@@ -143,7 +143,7 @@ export default function AdminDashboard() {
                     Above target (70%)
                   </div>
                 ) : (
-                  <div className="flex items-center text-sm text-brand-orange-600">
+                  <div className="flex items-center text-sm text-brand-blue-600">
                     <AlertCircle className="mr-1 h-4 w-4" />
                     Below target (70%)
                   </div>
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
                     Above target (60%)
                   </div>
                 ) : (
-                  <div className="flex items-center text-sm text-brand-orange-600">
+                  <div className="flex items-center text-sm text-brand-blue-600">
                     <AlertCircle className="mr-1 h-4 w-4" />
                     Below target (60%)
                   </div>
@@ -212,7 +212,7 @@ export default function AdminDashboard() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Dropout Rate</span>
-                <span className="text-lg font-bold text-brand-orange-600">{metrics.dropoutRate.toFixed(1)}%</span>
+                <span className="text-lg font-bold text-brand-blue-600">{metrics.dropoutRate.toFixed(1)}%</span>
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-sm text-muted-foreground">Avg Completion Time</span>
@@ -255,7 +255,7 @@ export default function AdminDashboard() {
                 {metrics.completionRate >= 70 ? (
                   <Circle className="h-5 w-5 text-green-600" />
                 ) : (
-                  <AlertCircle className="h-5 w-5 text-brand-orange-600" />
+                  <AlertCircle className="h-5 w-5 text-brand-blue-600" />
                 )}
               </div>
               <div className="flex items-center justify-between">
@@ -263,7 +263,7 @@ export default function AdminDashboard() {
                 {metrics.placementRate >= 60 ? (
                   <Circle className="h-5 w-5 text-green-600" />
                 ) : (
-                  <AlertCircle className="h-5 w-5 text-brand-orange-600" />
+                  <AlertCircle className="h-5 w-5 text-brand-blue-600" />
                 )}
               </div>
               <div className="flex items-center justify-between">
@@ -271,7 +271,7 @@ export default function AdminDashboard() {
                 {metrics.retentionRate >= 75 ? (
                   <Circle className="h-5 w-5 text-green-600" />
                 ) : (
-                  <AlertCircle className="h-5 w-5 text-brand-orange-600" />
+                  <AlertCircle className="h-5 w-5 text-brand-blue-600" />
                 )}
               </div>
             </CardContent>
@@ -293,8 +293,8 @@ export default function AdminDashboard() {
                   <div className="mt-1">
                     {activity.type === 'enrollment' && <Users className="h-5 w-5 text-blue-600" />}
                     {activity.type === 'completion' && <GraduationCap className="h-5 w-5 text-green-600" />}
-                    {activity.type === 'placement' && <Briefcase className="h-5 w-5 text-purple-600" />}
-                    {activity.type === 'alert' && <AlertCircle className="h-5 w-5 text-brand-orange-600" />}
+                    {activity.type === 'placement' && <Briefcase className="h-5 w-5 text-brand-red-600" />}
+                    {activity.type === 'alert' && <AlertCircle className="h-5 w-5 text-brand-blue-600" />}
                   </div>
                   <div className="flex-1">
                     <p className="text-sm font-medium">{activity.message}</p>

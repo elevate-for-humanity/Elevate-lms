@@ -213,7 +213,7 @@ export default function LessonPage() {
             </div>
             <div className="w-full bg-slate-200 rounded-full h-2">
               <div
-                className="bg-brand-green-600 h-2 rounded-full transition-all"
+                className="bg-brand-blue-600 h-2 rounded-full transition-all"
                 style={{
                   width: `${(course?.completedLessons / course?.totalLessons) * 100}%`,
                 }}
@@ -236,7 +236,7 @@ export default function LessonPage() {
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                   l.completed
-                    ? 'bg-brand-green-100 text-brand-green-600'
+                    ? 'bg-brand-blue-100 text-brand-blue-600'
                     : l.id === lessonId
                       ? 'bg-blue-100 text-brand-blue-600'
                       : 'bg-slate-100 text-black'
@@ -291,8 +291,8 @@ export default function LessonPage() {
               onClick={markComplete}
               className={`px-6 py-3 rounded-lg font-semibold transition ${
                 isCompleted
-                  ? 'bg-brand-green-100 text-green-700 border-2 border-brand-green-600'
-                  : 'bg-brand-green-600 hover:bg-green-700 text-white'
+                  ? 'bg-brand-blue-100 text-green-700 border-2 border-brand-blue-600'
+                  : 'bg-brand-blue-600 hover:bg-green-700 text-white'
               }`}
             >
               {isCompleted ? '• Completed' : 'Mark as Complete'}

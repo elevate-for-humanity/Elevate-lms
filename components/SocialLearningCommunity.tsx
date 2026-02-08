@@ -101,7 +101,7 @@ export function SocialLearningCommunity() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-2 border-b-2 font-medium capitalize ${
-                  activeTab === tab ? 'border-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
+                  activeTab === tab ? 'border-red-600 text-brand-blue-600' : 'border-transparent text-gray-500'
                 }`}
               >
                 {tab}
@@ -157,7 +157,7 @@ export function SocialLearningCommunity() {
                         ))}
                       </div>
                       <div className="flex gap-4 text-sm text-black">
-                        <button className="hover:text-brand-orange-600">❤️ {post.likes}</button>
+                        <button className="hover:text-brand-blue-600">❤️ {post.likes}</button>
                         <button className="hover:text-blue-600">💬 {post.comments}</button>
                         <button className="hover:text-green-600">🔗 Share</button>
                       </div>
@@ -234,7 +234,7 @@ export function SocialLearningCommunity() {
               <p className="text-sm text-black mb-3">Posted by Alex Chen • 24 replies • Last activity 1 hour ago</p>
               <div className="flex gap-2">
                 <span className="px-2 py-2 bg-blue-100 text-blue-700 text-xs rounded">#React</span>
-                <span className="px-2 py-2 bg-purple-100 text-purple-700 text-xs rounded">#StateManagement</span>
+                <span className="px-2 py-2 bg-brand-red-100 text-brand-red-700 text-xs rounded">#StateManagement</span>
               </div>
             </Card>
             <Card className="p-6">

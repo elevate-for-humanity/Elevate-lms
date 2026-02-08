@@ -214,7 +214,7 @@ export default async function NewReportPage() {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <Link
                     href="/program-holder/reports"
-                    className="inline-flex items-center justify-center px-6 py-3 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-semibold rounded-lg transition-colors"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition-colors"
                   >
                     <Save className="h-5 w-5 mr-2" />
                     Save Report (Contact Support)

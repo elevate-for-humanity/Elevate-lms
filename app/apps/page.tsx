@@ -37,7 +37,7 @@ const apps = [
     name: 'Website Builder',
     description: 'Build professional training provider websites',
     icon: Layout,
-    color: 'purple',
+    color: 'brand-red',
     status: 'trial',
     href: '/apps/website-builder',
   },
@@ -46,7 +46,7 @@ const apps = [
 const colorClasses = {
   blue: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' },
   green: { bg: 'bg-green-100', text: 'text-green-600', border: 'border-green-200' },
-  purple: { bg: 'bg-purple-100', text: 'text-purple-600', border: 'border-purple-200' },
+  brand-red: { bg: 'bg-brand-red-100', text: 'text-brand-red-600', border: 'border-brand-red-200' },
 };
 
 export default function AppsPage() {
@@ -128,11 +128,11 @@ export default function AppsPage() {
               Apply Now
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Contact Us
             </a>
           </div>
         </div>

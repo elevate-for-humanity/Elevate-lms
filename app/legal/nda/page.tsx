@@ -160,7 +160,7 @@ export default function NDAPage() {
                 <br />
                 Email: elevate4humanityedu@gmail.com
                 <br />
-                Phone: (317) 314-3757
+                Phone: Contact Us
               </p>
             </div>
           </section>

@@ -138,7 +138,7 @@ export default function AvatarChatBar() {
       
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: data.message || data.response || "I'm here to help! Please try again or call (317) 314-3757.",
+        content: data.message || data.response || "I'm here to help! Please try again or call Contact Us.",
       }]);
 
       // Play video when assistant responds
@@ -150,7 +150,7 @@ export default function AvatarChatBar() {
     } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: "Connection issue. Please call (317) 314-3757 for immediate help.",
+        content: "Connection issue. Please call Contact Us for immediate help.",
       }]);
     } finally {
       setIsLoading(false);

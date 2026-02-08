@@ -79,7 +79,7 @@ export default function ReportContentButton({
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className={`flex items-center gap-2 text-black hover:text-brand-orange-600 transition-colors ${className}`}
+        className={`flex items-center gap-2 text-black hover:text-brand-blue-600 transition-colors ${className}`}
         title="Report content"
       >
         <Flag className="w-4 h-4" />
@@ -93,7 +93,7 @@ export default function ReportContentButton({
             <div className="flex items-center justify-between p-6 border-b">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                  <Flag className="w-5 h-5 text-brand-orange-600" />
+                  <Flag className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-black">
@@ -149,7 +149,7 @@ d="M5 13l4 4L19 7" />
                           value={r.value}
                           checked={reason === r.value}
                           onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setReason(e.target.value)}
-                          className="w-4 h-4 text-brand-orange-600 border-gray-300 focus:ring-red-500"
+                          className="w-4 h-4 text-brand-blue-600 border-gray-300 focus:ring-red-500"
                         />
                         <span className="text-sm text-black">{r.label}</span>
                       </label>
@@ -191,7 +191,7 @@ d="M5 13l4 4L19 7" />
                   <button
                     type="submit"
                     disabled={isSubmitting || !reason}
-                    className="flex-1 px-4 py-2 text-white bg-brand-orange-600 rounded-lg hover:bg-brand-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2 text-white bg-brand-blue-600 rounded-lg hover:bg-brand-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting ? 'Submitting...' : 'Submit Report'}
                   </button>

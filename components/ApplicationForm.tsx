@@ -132,7 +132,7 @@ export function ApplicationForm() {
                   type="tel"
                   value={formData.phone}
                   onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setFormData({...formData, phone: e.target.value})}
-                  placeholder="(317) 314-3757"
+                  placeholder="Contact Us"
                 />
               </div>
               <div className="md:col-span-2">

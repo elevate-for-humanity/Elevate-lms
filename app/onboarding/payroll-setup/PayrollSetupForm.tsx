@@ -116,7 +116,7 @@ export default function PayrollSetupForm({
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <Circle className="w-16 h-16 text-brand-green-600 mx-auto mb-4" />
+          <Circle className="w-16 h-16 text-brand-blue-600 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-black mb-2">
             Payroll Setup Complete!
           </h2>
@@ -137,8 +137,8 @@ export default function PayrollSetupForm({
       <div className="bg-white border-b border-slate-200">
         <div className="max-w-3xl mx-auto px-4 py-6">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-brand-green-100 rounded-lg">
-              <DollarSign className="w-6 h-6 text-brand-green-600" />
+            <div className="p-3 bg-brand-blue-100 rounded-lg">
+              <DollarSign className="w-6 h-6 text-brand-blue-600" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-black">

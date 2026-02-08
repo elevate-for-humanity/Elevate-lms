@@ -112,7 +112,7 @@ export function ResourceLibrary() {
               key={tag}
               onClick={() => setSelectedTag(tag)}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
-                selectedTag === tag ? 'bg-brand-orange-600 text-white' : 'bg-white text-black border'
+                selectedTag === tag ? 'bg-brand-blue-600 text-white' : 'bg-white text-black border'
               }`}
             >
               {tag}

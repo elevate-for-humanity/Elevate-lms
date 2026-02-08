@@ -105,7 +105,7 @@ export function HomeHero({ images }: HomeHeroProps) {
                 onClick={() => setIndex(i)}
                 className={
                   "h-1.5 w-6 rounded-full " +
-                  (i === index ? "bg-brand-orange-500" : "bg-slate-700")
+                  (i === index ? "bg-brand-blue-500" : "bg-slate-700")
                 }
                 aria-label={`Show hero image ${i + 1}`}
               />

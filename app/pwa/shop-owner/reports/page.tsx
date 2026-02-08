@@ -186,7 +186,7 @@ export default function ShopOwnerReportsPage() {
           label="Avg per Apprentice" 
           value={summary.avgHoursPerApprentice} 
           icon={TrendingUp}
-          color="bg-purple-500"
+          color="bg-brand-red-500"
         />
         <StatCard 
           label="Apprentices" 

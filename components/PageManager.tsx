@@ -197,7 +197,7 @@ export default function PageManager() {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-brand-orange-600 mb-2 text-2xl md:text-3xl lg:text-4xl">Page Manager</h1>
+        <h1 className="text-4xl font-bold text-brand-blue-600 mb-2 text-2xl md:text-3xl lg:text-4xl">Page Manager</h1>
         <p className="text-brand-text-muted">
           Manage, edit, and publish your AI-generated pages
         </p>

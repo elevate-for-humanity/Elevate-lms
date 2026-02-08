@@ -45,7 +45,7 @@ const DASHBOARDS = [
     href: '/program-holder/dashboard',
     icon: Building2,
     description: 'Training providers',
-    color: 'text-purple-600',
+    color: 'text-brand-red-600',
   },
   {
     name: 'Employer',
@@ -73,7 +73,7 @@ const DASHBOARDS = [
     href: '/ai-studio',
     icon: Sparkles,
     description: 'AI video & media',
-    color: 'text-purple-600',
+    color: 'text-brand-red-600',
   },
   {
     name: 'Delegate',

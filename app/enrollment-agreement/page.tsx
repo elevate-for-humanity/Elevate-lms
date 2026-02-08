@@ -49,7 +49,7 @@ export default function EnrollmentAgreementPage() {
             <p className="text-gray-700 mb-1">2EXCLUSIVE LLC-S dba Elevate for Humanity</p>
             <p className="text-gray-700 mb-1">8888 Keystone Crossing, Suite 1300</p>
             <p className="text-gray-700 mb-1">Indianapolis, IN 46240</p>
-            <p className="text-gray-700 mb-4">(317) 314-3757</p>
+            <p className="text-gray-700 mb-4">Contact Us</p>
             <p className="text-gray-700"><strong>Student:</strong> As identified in the enrollment application</p>
           </div>
         </section>
@@ -217,7 +217,7 @@ export default function EnrollmentAgreementPage() {
             <strong>Effective Date:</strong> January 2026
           </p>
           <p className="text-gray-600 text-sm mb-6">
-            Questions about this agreement? Contact us at (317) 314-3757 or elevate4humanityedu@gmail.com
+            Questions about this agreement? Contact us at Contact Us or elevate4humanityedu@gmail.com
           </p>
           <div className="flex flex-wrap gap-4 text-sm">
             <Link href="/disclosures" className="text-orange-600 hover:underline">Student Disclosures</Link>
@@ -239,11 +239,11 @@ export default function EnrollmentAgreementPage() {
               Apply Now
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Contact Us
             </a>
           </div>
         </div>

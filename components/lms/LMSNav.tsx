@@ -96,7 +96,7 @@ export default function LMSNav() {
             {/* Notifications */}
             <Button variant="ghost" size="icon" className="relative">
               <Bell className="h-5 w-5" />
-              <span className="absolute top-1 right-1 h-2 w-2 bg-brand-orange-500 rounded-full" />
+              <span className="absolute top-1 right-1 h-2 w-2 bg-brand-blue-500 rounded-full" />
             </Button>
             {/* User Menu */}
             <DropdownMenu>
@@ -128,7 +128,7 @@ export default function LMSNav() {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-brand-orange-600 cursor-pointer">
+                <DropdownMenuItem className="text-brand-blue-600 cursor-pointer">
                   <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </DropdownMenuItem>

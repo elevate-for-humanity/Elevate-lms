@@ -26,7 +26,7 @@ export function Hero() {
           </p>
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-black leading-tight">
             Build Real Careers<br className="hidden sm:block" />
-            <span className="text-brand-orange-600"> With Real Support</span>
+            <span className="text-brand-blue-600"> With Real Support</span>
           </h1>
           <p className="text-sm sm:text-base text-black max-w-3xl leading-relaxed">
             Welcome to Elevate For Humanity — where adult learners, returning citizens, and working families can build real careers with real support. Our programs are <strong>fully funded through WIOA, WRG, JRI, employer partnerships, apprenticeships, OJT and WEX</strong> — so you can train with no out-of-pocket cost.
@@ -47,7 +47,7 @@ export function Hero() {
           <div className="flex flex-wrap gap-3">
             <Link
               href="/apply"
-              className="px-5 py-2.5 rounded-full bg-brand-orange-600 text-white text-sm font-semibold shadow-sm hover:bg-brand-orange-700 transition-colors"
+              className="px-5 py-2.5 rounded-full bg-brand-blue-600 text-white text-sm font-semibold shadow-sm hover:bg-brand-blue-700 transition-colors"
             >
               Apply Now – It&apos;s Free
             </Link>
@@ -55,7 +55,7 @@ export function Hero() {
               href="https://www.indianacareerconnect.com"
               target="_blank"
               rel="noreferrer"
-              className="px-5 py-2.5 rounded-full border-2 border-white bg-white/10 backdrop-blur-sm text-white text-sm font-bold hover:bg-white hover:text-brand-orange-600 transition-colors shadow-lg"
+              className="px-5 py-2.5 rounded-full border-2 border-white bg-white/10 backdrop-blur-sm text-white text-sm font-bold hover:bg-white hover:text-brand-blue-600 transition-colors shadow-lg"
             >
               Schedule at Indiana Career Connect
             </a>
@@ -108,7 +108,7 @@ export function Hero() {
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="bg-white rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-sm font-bold">
                   1
                 </div>
                 <h3 className="font-semibold text-black">Schedule Your Appointment</h3>
@@ -119,7 +119,7 @@ export function Hero() {
                   href="https://www.indianacareerconnect.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-brand-orange-600 underline hover:text-red-700 font-semibold"
+                  className="text-brand-blue-600 underline hover:text-red-700 font-semibold"
                 >
                   www.IndianaCareerConnect.com
                 </a>
@@ -134,7 +134,7 @@ export function Hero() {
             </div>
             <div className="bg-white rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-sm font-bold">
                   2
                 </div>
                 <h3 className="font-semibold text-black">Get Approved for Free Training</h3>
@@ -154,7 +154,7 @@ export function Hero() {
             </div>
             <div className="bg-white rounded-lg p-4 shadow-sm">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white flex items-center justify-center text-sm font-bold">
+                <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white flex items-center justify-center text-sm font-bold">
                   3
                 </div>
                 <h3 className="font-semibold text-black">Start Your Training</h3>

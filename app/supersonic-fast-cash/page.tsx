@@ -102,7 +102,7 @@ export default function SupersonicFastCashPage() {
                 <div className="text-gray-300 text-sm">Fast Approval</div>
               </div>
               <div className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-                <Shield className="w-12 h-12 mx-auto mb-3 text-purple-400" />
+                <Shield className="w-12 h-12 mx-auto mb-3 text-brand-red-400" />
                 <div className="font-black text-xl text-white mb-1">0% Interest</div>
                 <div className="text-gray-300 text-sm">No Hidden Fees</div>
               </div>
@@ -229,7 +229,7 @@ export default function SupersonicFastCashPage() {
                 <Image src="/images/heroes/employer-partner-3.jpg" alt="DIY Tax Filing" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-red-600 transition-colors">
                   DIY Tax Filing
                 </h3>
                 <p className="text-gray-600 text-sm">
@@ -310,7 +310,7 @@ export default function SupersonicFastCashPage() {
                   <Phone className="w-8 h-8 text-red-400 flex-shrink-0" />
                   <div>
                     <h3 className="font-bold text-lg">Call Us</h3>
-                    <p className="text-blue-200">(317) 314-3757</p>
+                    <p className="text-blue-200">Contact Us</p>
                   </div>
                 </div>
               </div>
@@ -375,7 +375,7 @@ export default function SupersonicFastCashPage() {
               href="/supersonic-fast-cash/upload-documents"
               className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <Upload className="w-8 h-8 text-purple-600" />
+              <Upload className="w-8 h-8 text-brand-red-600" />
               <span className="font-semibold text-gray-900">Upload Documents</span>
             </Link>
             <Link
@@ -415,7 +415,7 @@ export default function SupersonicFastCashPage() {
             </Link>
           </div>
           <p className="mt-6 text-red-200 text-sm">
-            Or call us at <a href="tel:3173143757" className="underline font-bold text-white">(317) 314-3757</a>
+            Or call us at <a href="/contact" className="underline font-bold text-white">Contact Us</a>
           </p>
         </div>
       </section>

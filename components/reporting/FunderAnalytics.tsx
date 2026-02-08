@@ -39,7 +39,7 @@ const funderDescriptions: Record<string, string> = {
 const funderColors: Record<string, string> = {
   WIOA: 'bg-blue-100 text-blue-800 border-blue-300',
   WRG: 'bg-green-100 text-green-800 border-green-300',
-  JRI: 'bg-purple-100 text-purple-800 border-purple-300',
+  JRI: 'bg-brand-red-100 text-brand-red-800 border-brand-red-300',
   SEAL: 'bg-orange-100 text-orange-800 border-orange-300',
   Apprenticeship: 'bg-indigo-100 text-indigo-800 border-indigo-300',
   Other: 'bg-gray-100 text-black border-gray-300',
@@ -338,7 +338,7 @@ export default function FunderAnalytics() {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Dropout Rate</span>
-                    <span className="text-2xl font-bold text-brand-orange-600">{funder.dropoutRate.toFixed(1)}%</span>
+                    <span className="text-2xl font-bold text-brand-blue-600">{funder.dropoutRate.toFixed(1)}%</span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-medium">Avg Completion Time</span>

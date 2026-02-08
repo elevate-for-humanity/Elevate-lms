@@ -63,11 +63,11 @@ export default async function TaxPreparerTrainingPage() {
             <div className="text-black text-sm">Trainees</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-brand-green-600">0</div>
+            <div className="text-3xl font-bold text-brand-blue-600">0</div>
             <div className="text-black text-sm">Certified</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-brand-orange-600">0</div>
+            <div className="text-3xl font-bold text-brand-blue-600">0</div>
             <div className="text-black text-sm">In Progress</div>
           </div>
         </div>

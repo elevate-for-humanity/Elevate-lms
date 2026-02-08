@@ -118,23 +118,23 @@ export default async function PendingStudentsPage() {
             <div className="grid md:grid-cols-3 gap-6 mb-8">
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <UserPlus className="h-11 w-11 text-brand-orange-600" />
+                  <UserPlus className="h-11 w-11 text-brand-blue-600" />
                   <h3 className="text-sm font-medium text-black">
                     Pending Applications
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-brand-orange-600">
+                <p className="text-3xl font-bold text-brand-blue-600">
                   {count || 0}
                 </p>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <Circle className="h-11 w-11 text-brand-green-600" />
+                  <Circle className="h-11 w-11 text-brand-blue-600" />
                   <h3 className="text-sm font-medium text-black">
                     This Week
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-brand-green-600">
+                <p className="text-3xl font-bold text-brand-blue-600">
                   {pendingApplications?.filter((a) => {
                     const weekAgo = new Date();
                     weekAgo.setDate(weekAgo.getDate() - 7);
@@ -235,7 +235,7 @@ export default async function PendingStudentsPage() {
                           </td>
                           <td className="py-3 px-4">
                             <div className="flex gap-2">
-                              <button className="px-3 py-2 bg-brand-green-600 hover:bg-brand-green-700 text-white text-sm font-medium rounded transition-colors" aria-label="Action button">
+                              <button className="px-3 py-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-sm font-medium rounded transition-colors" aria-label="Action button">
                                 Accept
                               </button>
                               <button className="px-3 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-medium rounded transition-colors" aria-label="Action button">

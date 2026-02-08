@@ -419,7 +419,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
             {error && (
               <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-brand-orange-600" />
+                  <AlertCircle className="w-5 h-5 text-brand-blue-600" />
                   <p className="text-red-900">{error}</p>
                 </div>
                 <button
@@ -429,7 +429,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                     setPassed(false);
                     setError('');
                   }}
-                  className="mt-3 px-4 py-2 bg-brand-orange-600 text-white rounded hover:bg-brand-orange-700 transition text-sm"
+                  className="mt-3 px-4 py-2 bg-brand-blue-600 text-white rounded hover:bg-brand-blue-700 transition text-sm"
                 >
                   <RefreshCw className="w-4 h-4 inline mr-2" />
                   Retake Quiz
@@ -568,7 +568,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
             {/* Confidentiality Agreement Signature */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
               <div className="flex items-center gap-3 mb-6">
-                <Shield className="w-8 h-8 text-purple-600" />
+                <Shield className="w-8 h-8 text-brand-red-600" />
                 <h2 className="text-2xl font-bold text-black">
                   FERPA Confidentiality Agreement
                 </h2>
@@ -672,7 +672,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
             {error && (
               <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                 <div className="flex items-center gap-2">
-                  <AlertCircle className="w-5 h-5 text-brand-orange-600" />
+                  <AlertCircle className="w-5 h-5 text-brand-blue-600" />
                   <p className="text-red-900">{error}</p>
                 </div>
               </div>

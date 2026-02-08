@@ -65,7 +65,7 @@ export function MiladyAccessCard({
 
   if (isLoading) {
     return (
-      <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl">
+      <div className="bg-gradient-to-br from-brand-red-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl">
         <div className="flex items-center justify-center py-8">
           <Loader2 className="w-8 h-8 animate-spin" />
         </div>
@@ -79,15 +79,15 @@ export function MiladyAccessCard({
   const isNotProvisioned = accessInfo?.status === 'not_provisioned' && !miladyEnrolled;
 
   return (
-    <div className="bg-gradient-to-br from-purple-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl">
+    <div className="bg-gradient-to-br from-brand-red-600 to-indigo-700 rounded-2xl p-6 text-white shadow-xl">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
-            <BookOpen className="w-6 h-6 text-purple-600" />
+            <BookOpen className="w-6 h-6 text-brand-red-600" />
           </div>
           <div>
             <h3 className="text-xl font-bold">Milady Theory Training</h3>
-            <p className="text-purple-200 text-sm">Related Technical Instruction (RTI)</p>
+            <p className="text-brand-red-200 text-sm">Related Technical Instruction (RTI)</p>
           </div>
         </div>
         {miladyCompleted ? (
@@ -110,7 +110,7 @@ export function MiladyAccessCard({
       {/* License Code Display */}
       {accessInfo?.licenseCode && (
         <div className="bg-white/10 backdrop-blur rounded-lg p-4 mb-4">
-          <p className="text-purple-200 text-sm mb-2">Your License Code (included in program fee):</p>
+          <p className="text-brand-red-200 text-sm mb-2">Your License Code (included in program fee):</p>
           <div className="flex items-center gap-2">
             <code className="flex-1 bg-white/20 px-4 py-2 rounded font-mono text-lg tracking-wider">
               {accessInfo.licenseCode}
@@ -129,13 +129,13 @@ export function MiladyAccessCard({
       {/* Username Display */}
       {accessInfo?.username && (
         <div className="bg-white/10 backdrop-blur rounded-lg p-4 mb-4">
-          <p className="text-purple-200 text-sm mb-1">Your Milady Username:</p>
+          <p className="text-brand-red-200 text-sm mb-1">Your Milady Username:</p>
           <p className="font-mono text-lg">{accessInfo.username}</p>
         </div>
       )}
 
       {/* Status Message */}
-      <p className="text-purple-100 mb-6">
+      <p className="text-brand-red-100 mb-6">
         {miladyCompleted
           ? 'Congratulations! You have completed all theory coursework.'
           : isPendingApproval
@@ -161,7 +161,7 @@ export function MiladyAccessCard({
         ) : isNotProvisioned ? (
           <Link
             href="/programs/barber-apprenticeship"
-            className="flex-1 flex items-center justify-center gap-2 bg-white text-purple-700 font-bold py-3 px-6 rounded-xl hover:bg-purple-50 transition-all"
+            className="flex-1 flex items-center justify-center gap-2 bg-white text-brand-red-700 font-bold py-3 px-6 rounded-xl hover:bg-brand-red-50 transition-all"
           >
             Complete Enrollment
           </Link>
@@ -169,7 +169,7 @@ export function MiladyAccessCard({
           <button
             onClick={handleAccess}
             disabled={isPending && !accessInfo?.accessUrl}
-            className="flex-1 flex items-center justify-center gap-2 bg-white text-purple-700 font-bold py-3 px-6 rounded-xl hover:bg-purple-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 flex items-center justify-center gap-2 bg-white text-brand-red-700 font-bold py-3 px-6 rounded-xl hover:bg-brand-red-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ExternalLink className="w-5 h-5" />
             {isActive ? 'Open Milady RISE' : isPending ? 'Access Pending...' : 'Access Milady'}
@@ -178,9 +178,9 @@ export function MiladyAccessCard({
       </div>
 
       {/* Status Footer */}
-      <div className="mt-4 pt-4 border-t border-purple-500/30">
+      <div className="mt-4 pt-4 border-t border-brand-red-500/30">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-purple-200">Status:</span>
+          <span className="text-brand-red-200">Status:</span>
           <span className="font-semibold">
             {miladyCompleted
               ? '• Theory Complete'
@@ -193,8 +193,8 @@ export function MiladyAccessCard({
         </div>
         {accessInfo?.method && (
           <div className="flex items-center justify-between text-sm mt-1">
-            <span className="text-purple-200">Access Type:</span>
-            <span className="text-purple-100 capitalize">
+            <span className="text-brand-red-200">Access Type:</span>
+            <span className="text-brand-red-100 capitalize">
               {accessInfo.method === 'license_code' ? 'License Code' : accessInfo.method}
             </span>
           </div>

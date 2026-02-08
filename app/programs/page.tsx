@@ -12,7 +12,6 @@ export const metadata: Metadata = {
 };
 import { PathwayBlock } from '@/components/PathwayBlock';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
 import { createPublicClient } from '@/lib/supabase/public';
 
 // Cache for 10 minutes - program listings don't change frequently
@@ -186,22 +185,6 @@ export default async function ProgramsPage() {
       </section>
 
       {/* AVATAR */}
-      <PageAvatar videoSrc="/videos/avatars/orientation-guide.mp4" title="Program Guide" />
-
-      {/* PROGRAMS GRID - Consistent card sizes */}
-      <section className="py-16 lg:py-24 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <p className="text-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Training Categories</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Choose Your Career Path</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">Each program is designed to take you from beginner to job-ready.</p>
-          </div>
-          
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {categories.map((cat) => (
-              <Link key={cat.title} href={cat.href} className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 border border-slate-100">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img src={cat.image} alt={cat.title} className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-300" />
                 </div>
                 <div className="p-5">
                   <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">{cat.title}</h3>
@@ -361,8 +344,8 @@ export default async function ProgramsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
-            <Link href="tel:317-314-3757" className="inline-flex items-center gap-2 text-white border-2 border-white/50 px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/10 transition-all">
-              (317) 314-3757
+            <Link href="/contact" className="inline-flex items-center gap-2 text-white border-2 border-white/50 px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/10 transition-all">
+              Contact Us
             </Link>
           </div>
           <p className="text-blue-200 text-sm mt-4">

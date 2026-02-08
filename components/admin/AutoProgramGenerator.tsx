@@ -333,7 +333,7 @@ export function AutoProgramGenerator() {
       case 'deployed_local':
         return 'text-brand-info bg-brand-surface';
       case 'approved':
-        return 'text-purple-600 bg-brand-surface';
+        return 'text-brand-red-600 bg-brand-surface';
       case 'testing':
         return 'text-yellow-600 bg-yellow-100';
       case 'draft':
@@ -347,7 +347,7 @@ export function AutoProgramGenerator() {
     if (score >= 95) return 'text-brand-success';
     if (score >= 85) return 'text-brand-info';
     if (score >= 75) return 'text-yellow-600';
-    return 'text-brand-orange-600';
+    return 'text-brand-blue-600';
   };
 
   return (
@@ -386,7 +386,7 @@ export function AutoProgramGenerator() {
             <div className="text-sm text-brand-text-muted">States Covered</div>
           </div>
           <div className="bg-white border rounded-lg p-4">
-            <div className="text-2xl font-bold text-purple-600">
+            <div className="text-2xl font-bold text-brand-red-600">
               {nationalStats.partnerInstitutions}
             </div>
             <div className="text-sm text-brand-text-muted">
@@ -496,7 +496,7 @@ export function AutoProgramGenerator() {
                 <div className="text-sm font-medium text-brand-text">
                   Current Enrollment
                 </div>
-                <div className="text-lg font-bold text-purple-600">
+                <div className="text-lg font-bold text-brand-red-600">
                   {program.nationalAvailability.currentEnrollment.toLocaleString()}
                 </div>
                 <div className="text-xs text-brand-text-light">
@@ -553,7 +553,7 @@ export function AutoProgramGenerator() {
                   🚀 Deploy Nationally
                 </button>
               )}
-              <button className="text-sm bg-brand-surface text-purple-700 px-4 py-2 rounded hover:bg-purple-200">
+              <button className="text-sm bg-brand-surface text-brand-red-700 px-4 py-2 rounded hover:bg-brand-red-200">
                 🎓 Enroll Students
               </button>
               <button className="text-sm bg-brand-surface text-orange-700 px-4 py-2 rounded hover:bg-orange-200">

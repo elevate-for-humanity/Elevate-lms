@@ -127,7 +127,7 @@ export default async function StudentsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/admin/enrollments"
-              className="bg-brand-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-blue-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               View Enrollments
             </Link>
@@ -160,34 +160,34 @@ export default async function StudentsPage() {
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <GraduationCap className="h-11 w-11 text-brand-green-600" />
+                  <GraduationCap className="h-11 w-11 text-brand-blue-600" />
                   <h3 className="text-sm font-medium text-black">
                     Active Enrollments
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-brand-green-600">
+                <p className="text-3xl font-bold text-brand-blue-600">
                   {activeEnrollments || 0}
                 </p>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <TrendingUp className="h-11 w-11 text-purple-600" />
+                  <TrendingUp className="h-11 w-11 text-brand-red-600" />
                   <h3 className="text-sm font-medium text-black">
                     Completed
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-purple-600">
+                <p className="text-3xl font-bold text-brand-red-600">
                   {completedEnrollments || 0}
                 </p>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <Clock className="h-11 w-11 text-brand-orange-600" />
+                  <Clock className="h-11 w-11 text-brand-blue-600" />
                   <h3 className="text-sm font-medium text-black">
                     New (7 days)
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-brand-orange-600">
+                <p className="text-3xl font-bold text-brand-blue-600">
                   {recentStudents || 0}
                 </p>
               </div>
@@ -249,7 +249,7 @@ export default async function StudentsPage() {
                                         key={idx}
                                         className={`text-xs px-2 py-2 rounded ${
                                           enrollment.status === 'active'
-                                            ? 'bg-brand-green-100 text-green-700'
+                                            ? 'bg-brand-blue-100 text-green-700'
                                             : enrollment.status === 'completed'
                                               ? 'bg-blue-100 text-blue-700'
                                               : 'bg-gray-100 text-black'

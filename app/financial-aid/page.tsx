@@ -92,11 +92,11 @@ export default function FinancialAidPage() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="tel:317-314-3757"
+                href="/contact"
                 className="inline-flex items-center gap-2 bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
               >
                 <Phone className="w-4 h-4" />
-                Call (317) 314-3757
+                Call Contact Us
               </Link>
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function FinancialAidPage() {
             <Link href="/funding" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
               All Funding Options
             </Link>
-            <Link href="/programs/jri" className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors">
+            <Link href="/programs/jri" className="px-4 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium hover:bg-brand-red-200 transition-colors">
               JRI Programs
             </Link>
             <Link href="/how-it-works" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">

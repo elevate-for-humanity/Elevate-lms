@@ -44,11 +44,11 @@ export default function CheckoutButton({
       if (data.url) {
         window.location.href = data.url;
       } else {
-        alert('Error creating checkout session. Please try again or call (317) 314-3757.');
+        alert('Error creating checkout session. Please try again or call Contact Us.');
         setLoading(false);
       }
     } catch (error) { /* Error handled silently */ 
-      alert('Error creating checkout session. Please try again or call (317) 314-3757.');
+      alert('Error creating checkout session. Please try again or call Contact Us.');
       setLoading(false);
     }
   };

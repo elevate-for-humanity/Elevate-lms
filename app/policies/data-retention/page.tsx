@@ -121,7 +121,7 @@ export default function DataRetentionPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Employment and HR Records</h2>
             
-            <div className="bg-purple-50 rounded-xl p-6 border-2 border-purple-200 mb-6">
+            <div className="bg-brand-red-50 rounded-xl p-6 border-2 border-brand-red-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Employee Records</h3>
               <ul className="space-y-3 text-black">
                 <li><strong>Personnel Files:</strong> 7 years after employment ends</li>
@@ -279,7 +279,7 @@ export default function DataRetentionPage() {
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
               <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Phone:</strong> (317) 314-3757</li>
+              <li><strong>Phone:</strong> Contact Us</li>
               <li><strong>Mail:</strong> Privacy Officer, Elevate for Humanity</li>
               <li className="ml-6">3737 N Meridian St, Suite 200</li>
               <li className="ml-6">Indianapolis, IN 46208</li>

@@ -70,7 +70,7 @@ export default async function CommunityPage() {
       title: 'Events & Workshops',
       description: 'Join live sessions, webinars, and networking events',
       href: '/community/events',
-      color: 'bg-purple-500',
+      color: 'bg-brand-red-500',
     },
     {
       icon: Users,
@@ -123,7 +123,7 @@ export default async function CommunityPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative bg-purple-800 text-white overflow-hidden">
+      <section className="relative bg-brand-red-800 text-white overflow-hidden">
         <div className="absolute inset-0">
           <Image
             src="/images/community/community-hero.jpg"
@@ -424,11 +424,11 @@ export default async function CommunityPage() {
               Apply Now
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Contact Us
             </a>
           </div>
         </div>

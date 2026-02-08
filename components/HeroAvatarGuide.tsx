@@ -147,7 +147,7 @@ export default function HeroAvatarGuide({
       if (data.error) {
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: "I'm sorry, I encountered an issue. Please try again or call (317) 314-3757.",
+          content: "I'm sorry, I encountered an issue. Please try again or call Contact Us.",
         }]);
       } else {
         setMessages(prev => [...prev, {

@@ -104,7 +104,7 @@ function SamGovScreenshot({ variant }: { variant: string }) {
           {[
             { label: 'SAM Status', value: 'Active', icon: Circle, color: 'green' },
             { label: 'UEI Number', value: 'XKLT7YH2ABC1', icon: Building2, color: 'blue' },
-            { label: 'CAGE Code', value: '8ABC1', icon: Shield, color: 'purple' },
+            { label: 'CAGE Code', value: '8ABC1', icon: Shield, color: 'brand-red' },
             { label: 'Expires In', value: '287 days', icon: Calendar, color: 'orange' },
           ].map((stat, i) => (
             <div key={i} className="bg-white rounded-xl p-4 border">
@@ -255,7 +255,7 @@ function GrantsScreenshot({ variant }: { variant: string }) {
           {[
             { label: 'Matching Grants', value: '47', color: 'green' },
             { label: 'Saved', value: '12', color: 'blue' },
-            { label: 'Applications', value: '3', color: 'purple' },
+            { label: 'Applications', value: '3', color: 'brand-red' },
             { label: 'Total Awarded', value: '$250K', color: 'orange' },
           ].map((stat, i) => (
             <div key={i} className="bg-white rounded-lg p-4 border">
@@ -318,7 +318,7 @@ function WebsiteBuilderScreenshot({ variant }: { variant: string }) {
       <div className="bg-white border-b px-6 py-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-brand-red-600 rounded-lg flex items-center justify-center">
               <Layout className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -328,7 +328,7 @@ function WebsiteBuilderScreenshot({ variant }: { variant: string }) {
           </div>
           <div className="flex items-center gap-2">
             <button className="px-3 py-1.5 border rounded text-xs">Preview</button>
-            <button className="px-3 py-1.5 bg-purple-600 text-white rounded text-xs font-medium">Publish</button>
+            <button className="px-3 py-1.5 bg-brand-red-600 text-white rounded text-xs font-medium">Publish</button>
           </div>
         </div>
       </div>
@@ -424,7 +424,7 @@ export function AppScreenshotMobile({ app }: { app: 'sam-gov' | 'grants' | 'webs
   const colors = {
     'sam-gov': { bg: 'bg-blue-900', accent: 'blue' },
     'grants': { bg: 'bg-green-800', accent: 'green' },
-    'website-builder': { bg: 'bg-purple-900', accent: 'purple' },
+    'website-builder': { bg: 'bg-brand-red-900', accent: 'brand-red' },
   };
   
   const icons = {

@@ -34,7 +34,7 @@ export function UpcomingCalendar() {
     <div className="elevate-card">
       <div className="elevate-card-header">
         <div className="flex items-center gap-2">
-          <Calendar className="h-5 w-5 text-brand-orange-600" />
+          <Calendar className="h-5 w-5 text-brand-blue-600" />
           <h3 className="elevate-card-title">Upcoming Events</h3>
         </div>
       </div>
@@ -68,7 +68,7 @@ export function UpcomingCalendar() {
           </div>
         ))}
       </div>
-      <button className="w-full mt-4 text-center text-sm font-medium text-brand-orange-600 hover:text-red-700">
+      <button className="w-full mt-4 text-center text-sm font-medium text-brand-blue-600 hover:text-red-700">
         View Full Calendar →
       </button>
     </div>

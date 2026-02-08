@@ -318,8 +318,8 @@ export function BatchExportDialog({ isOpen, onClose }: BatchExportDialogProps) {
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Download className="w-5 h-5 text-purple-600" />
+            <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+              <Download className="w-5 h-5 text-brand-red-600" />
             </div>
             <div>
               <h3 className="text-lg font-semibold text-black">
@@ -357,7 +357,7 @@ export function BatchExportDialog({ isOpen, onClose }: BatchExportDialogProps) {
                     checked={selectedTables.includes(table.id)}
                     onChange={() => toggleTable(table.id)}
                     disabled={isExporting}
-                    className="mt-1 w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                    className="mt-1 w-4 h-4 text-brand-red-600 border-gray-300 rounded focus:ring-brand-red-500"
                   />
                   <div className="flex-1">
                     <div className="font-medium text-black">{table.label}</div>
@@ -381,7 +381,7 @@ export function BatchExportDialog({ isOpen, onClose }: BatchExportDialogProps) {
                   disabled={isExporting}
                   className={`p-3 border-2 rounded-lg transition-all ${
                     format === fmt
-                      ? 'border-purple-600 bg-purple-50 text-purple-900'
+                      ? 'border-brand-red-600 bg-brand-red-50 text-brand-red-900'
                       : 'border-gray-200 hover:border-gray-300 text-black'
                   } ${isExporting ? 'opacity-50 cursor-not-allowed' : ''}`}
                 >
@@ -408,7 +408,7 @@ export function BatchExportDialog({ isOpen, onClose }: BatchExportDialogProps) {
             <button
               onClick={handleExport}
               disabled={isExporting || selectedTables.length === 0}
-              className="flex items-center gap-2 px-6 py-2 text-white bg-purple-600 rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-2 text-white bg-brand-red-600 rounded-lg hover:bg-brand-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isExporting ? (
                 <>

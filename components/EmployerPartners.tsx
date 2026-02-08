@@ -83,7 +83,7 @@ const industryColors: Record<string, string> = {
   HVAC: 'bg-orange-100 text-orange-700',
   Beauty: 'bg-pink-100 text-pink-700',
   Transportation: 'bg-green-100 text-green-700',
-  Technology: 'bg-purple-100 text-purple-700',
+  Technology: 'bg-brand-red-100 text-brand-red-700',
   Retail: 'bg-yellow-100 text-yellow-700',
   Manufacturing: 'bg-gray-100 text-black',
   Pharmaceutical: 'bg-teal-100 text-teal-700',
@@ -138,7 +138,7 @@ export default function EmployerPartners() {
             <div className="text-black font-semibold">Placement Rate</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-            <div className="text-4xl font-bold text-purple-600 mb-2 text-2xl md:text-3xl lg:text-4xl">2,500+</div>
+            <div className="text-4xl font-bold text-brand-red-600 mb-2 text-2xl md:text-3xl lg:text-4xl">2,500+</div>
             <div className="text-black font-semibold">Graduates Hired</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-lg text-center">
@@ -291,7 +291,7 @@ export default function EmployerPartners() {
           </div>
 
           <div className="   rounded-xl p-8">
-            <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center mb-4">
+            <div className="w-12 h-12 bg-brand-red-600 rounded-lg flex items-center justify-center mb-4">
               <Briefcase className="w-6 h-6 text-white" />
             </div>
             <h3 className="text-xl font-bold text-black mb-3">

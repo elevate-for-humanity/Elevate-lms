@@ -107,7 +107,7 @@ export default async function CashAdvancesAdminPage() {
           <div className="text-sm font-medium text-black mb-1">
             Pending Review
           </div>
-          <div className="text-3xl font-bold text-brand-orange-600">
+          <div className="text-3xl font-bold text-brand-blue-600">
             {stats.pending}
           </div>
         </div>
@@ -116,7 +116,7 @@ export default async function CashAdvancesAdminPage() {
           <div className="text-sm font-medium text-black mb-1">
             Approved
           </div>
-          <div className="text-3xl font-bold text-brand-green-600">
+          <div className="text-3xl font-bold text-brand-blue-600">
             {stats.approved}
           </div>
         </div>
@@ -137,7 +137,7 @@ export default async function CashAdvancesAdminPage() {
         <div className="flex flex-wrap gap-3">
           <Link
             href="/admin/cash-advances/pending"
-            className="px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition"
+            className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
           >
             Review Pending ({stats.pending})
           </Link>
@@ -163,7 +163,7 @@ export default async function CashAdvancesAdminPage() {
         </div>
 
         {error && (
-          <div className="p-6 text-brand-orange-600">
+          <div className="p-6 text-brand-blue-600">
             Error loading applications: {error.message}
           </div>
         )}
@@ -213,7 +213,7 @@ export default async function CashAdvancesAdminPage() {
                         ${app.requested_amount?.toLocaleString()}
                       </div>
                       {app.approved_amount && (
-                        <div className="text-xs text-brand-green-600">
+                        <div className="text-xs text-brand-blue-600">
                           Approved: ${app.approved_amount.toLocaleString()}
                         </div>
                       )}
@@ -225,7 +225,7 @@ export default async function CashAdvancesAdminPage() {
                       <span
                         className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           app.status === 'approved'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-blue-100 text-green-800'
                             : app.status === 'pending'
                               ? 'bg-orange-100 text-orange-800'
                               : app.status === 'denied'
@@ -250,10 +250,10 @@ export default async function CashAdvancesAdminPage() {
                       </Link>
                       {app.status === 'pending' && (
                         <>
-                          <button className="text-brand-green-600 hover:text-green-900 mr-4" aria-label="Action button">
+                          <button className="text-brand-blue-600 hover:text-green-900 mr-4" aria-label="Action button">
                             Approve
                           </button>
-                          <button className="text-brand-orange-600 hover:text-red-900" aria-label="Action button">
+                          <button className="text-brand-blue-600 hover:text-red-900" aria-label="Action button">
                             Deny
                           </button>
                         </>
@@ -376,7 +376,7 @@ export default async function CashAdvancesAdminPage() {
                 <ul className="space-y-4">
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -394,7 +394,7 @@ export default async function CashAdvancesAdminPage() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -412,7 +412,7 @@ export default async function CashAdvancesAdminPage() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -430,7 +430,7 @@ export default async function CashAdvancesAdminPage() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -472,7 +472,7 @@ export default async function CashAdvancesAdminPage() {
               Ready to Get Started?
             </h2>
             <p className="text-base md:text-lg mb-8 text-blue-100">
-              Call (317) 314-3757 or apply online for a better career today.
+              Call Contact Us or apply online for a better career today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link

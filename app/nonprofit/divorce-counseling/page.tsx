@@ -83,7 +83,7 @@ export default async function DivorceCounselingPage() {
       </section>
 
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <Link href="/nonprofit" className="text-purple-600 hover:text-purple-700 mb-8 inline-block">
+        <Link href="/nonprofit" className="text-brand-red-600 hover:text-brand-red-700 mb-8 inline-block">
           ← Back to Selfish Inc.
         </Link>
 
@@ -159,7 +159,7 @@ export default async function DivorceCounselingPage() {
               Schedule Consultation
             </Link>
             <a 
-              href="tel:3173143757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 border border-rose-600 text-rose-600 px-6 py-3 rounded-lg font-semibold hover:bg-rose-50 transition"
             >
               <Phone className="w-5 h-5" />

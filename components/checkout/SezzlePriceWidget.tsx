@@ -21,7 +21,7 @@ interface SezzleConfigGroup {
   targetXPath: string;
   renderToPath?: string;
   urlMatch?: string;
-  theme?: 'light' | 'dark' | 'grayscale' | 'white' | 'white-flat' | 'purple-pill';
+  theme?: 'light' | 'dark' | 'grayscale' | 'white' | 'white-flat' | 'brand-red-pill';
   ignoredPriceElements?: string[];
   ignoredFormattedPriceText?: string[];
   alignment?: 'left' | 'center' | 'right' | 'auto';
@@ -50,7 +50,7 @@ interface SezzlePriceWidgetProps {
   // Simple mode props (when not using full config)
   price?: number;
   targetSelector?: string;
-  theme?: 'light' | 'dark' | 'grayscale' | 'white' | 'white-flat' | 'purple-pill';
+  theme?: 'light' | 'dark' | 'grayscale' | 'white' | 'white-flat' | 'brand-red-pill';
   alignment?: 'left' | 'center' | 'right' | 'auto';
   language?: string;
   minPrice?: number;

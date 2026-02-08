@@ -53,7 +53,7 @@ export default function AutomatedEnrollmentWorkflow() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Enrollments Today</h3>
-            <p className="text-3xl font-bold text-brand-orange-600">24</p>
+            <p className="text-3xl font-bold text-brand-blue-600">24</p>
             <p className="text-sm text-green-600">↑ 15% from yesterday</p>
           </Card>
 

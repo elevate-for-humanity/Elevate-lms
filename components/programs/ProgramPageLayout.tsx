@@ -24,7 +24,7 @@ interface ProgramPageLayoutProps {
   videoSrc: string;
   programs: Program[];
   stats: Stat[];
-  accentColor: 'blue' | 'orange' | 'purple' | 'green' | 'red';
+  accentColor: 'blue' | 'orange' | 'brand-red' | 'green' | 'red';
   ctaText: string;
   applyLink: string;
 }
@@ -42,11 +42,11 @@ const colorClasses = {
     ctaHover: 'hover:bg-orange-600',
     ctaText: 'text-orange-600',
   },
-  purple: {
-    badge: 'bg-purple-600',
-    cta: 'bg-purple-600',
-    ctaHover: 'hover:bg-purple-700',
-    ctaText: 'text-purple-600',
+  brand-red: {
+    badge: 'bg-brand-red-600',
+    cta: 'bg-brand-red-600',
+    ctaHover: 'hover:bg-brand-red-700',
+    ctaText: 'text-brand-red-600',
   },
   green: {
     badge: 'bg-green-600',

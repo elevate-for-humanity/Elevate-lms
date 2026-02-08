@@ -154,7 +154,7 @@ export default function DrakeDownloadPage() {
               </p>
               <div className="space-y-2 text-sm">
                 <div>📧 Email: <a href="mailto:supersonicfastcashllc@gmail.com" className="text-white hover:underline">supersonicfastcashllc@gmail.com</a></div>
-                <div>📞 Phone: <a href="tel:+13173143757" className="text-white hover:underline">(317) 314-3757</a></div>
+                <div>📞 Phone: <a href="/contact" className="text-white hover:underline">Contact Us</a></div>
               </div>
             </div>
           </div>
@@ -320,12 +320,12 @@ export default function DrakeDownloadPage() {
             href="/supersonic-fast-cash/training"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition"
           >
-            <Circle className="w-10 h-10 text-purple-600 mb-4" />
+            <Circle className="w-10 h-10 text-brand-red-600 mb-4" />
             <h3 className="font-bold text-lg mb-2">Our Training</h3>
             <p className="text-sm text-black mb-4">
               SupersonicFastCash tax preparation courses
             </p>
-            <span className="text-purple-600 font-semibold flex items-center gap-1">
+            <span className="text-brand-red-600 font-semibold flex items-center gap-1">
               Start Learning →
             </span>
           </Link>

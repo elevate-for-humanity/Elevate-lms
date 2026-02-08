@@ -197,10 +197,10 @@ function LoginForm() {
             <p>
               Need help? Call{' '}
               <a
-                href="tel:3173143757"
+                href="/contact"
                 className="text-brand-blue-600 font-semibold"
               >
-                317-314-3757
+                Contact Us
               </a>
             </p>
           </div>

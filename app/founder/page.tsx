@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 const credentials = [
   { icon: Shield, title: 'DOL Registered', desc: 'Apprenticeship Sponsor', color: 'blue' },
   { icon: Circle, title: 'WIOA Approved', desc: 'Training Provider', color: 'green' },
-  { icon: Building, title: 'Indiana DWD', desc: 'INTraining Provider', color: 'purple' },
+  { icon: Building, title: 'Indiana DWD', desc: 'INTraining Provider', color: 'brand-red' },
   { icon: GraduationCap, title: 'Indiana DOE', desc: 'State Recognized', color: 'indigo' },
   { icon: Heart, title: 'JRI Approved', desc: 'Justice Programs', color: 'red' },
   { icon: Award, title: 'Certiport CATC', desc: 'Testing Center', color: 'orange' },
@@ -218,8 +218,8 @@ export default function FounderPage() {
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <Award className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Excellence & Accountability</h3>
               <p className="text-slate-600 text-sm">

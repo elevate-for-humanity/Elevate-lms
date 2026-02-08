@@ -35,7 +35,7 @@ export function CourseCard({ course }: Props) {
         <p className="line-clamp-3 text-sm text-black">
           {course.shortDescription}
         </p>
-        <span className="mt-2 inline-flex items-center text-xs font-medium text-brand-orange-600 group-hover:underline">
+        <span className="mt-2 inline-flex items-center text-xs font-medium text-brand-blue-600 group-hover:underline">
           View program details
         </span>
       </div>

@@ -108,7 +108,7 @@ export function ProgressTrackingDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Overall Completion</h3>
-            <p className="text-3xl font-bold text-brand-orange-600">{overallProgress.completionRate}%</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{overallProgress.completionRate}%</p>
             <div className="w-full bg-gray-200 rounded-full h-2 mt-3">
               <div
                 className="   h-2 rounded-full"
@@ -137,7 +137,7 @@ export function ProgressTrackingDashboard() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Average Score</h3>
-            <p className="text-3xl font-bold text-purple-600">{overallProgress.averageScore}%</p>
+            <p className="text-3xl font-bold text-brand-red-600">{overallProgress.averageScore}%</p>
             <p className="text-sm text-green-600 mt-2">Above target</p>
           </Card>
 
@@ -205,7 +205,7 @@ export function ProgressTrackingDashboard() {
                     <p className="text-sm text-gray-500">Last activity: {course.lastActivity}</p>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-brand-orange-600">{course.progress}%</div>
+                    <div className="text-2xl font-bold text-brand-blue-600">{course.progress}%</div>
                     <span className={`inline-block mt-1 px-2 py-2 rounded text-xs font-medium ${
                       course.status === 'on-track' ? 'bg-green-100 text-green-700' :
                       course.status === 'behind' ? 'bg-yellow-100 text-yellow-700' :

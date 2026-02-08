@@ -105,7 +105,7 @@ export default async function AdminCoursesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -164,14 +164,14 @@ export default async function AdminCoursesPage() {
               <h3 className="text-sm font-medium text-black mb-2">
                 Published
               </h3>
-              <p className="text-3xl font-bold text-brand-green-600">
+              <p className="text-3xl font-bold text-brand-blue-600">
                 {publishedCount}
               </p>
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <h3 className="text-sm font-medium text-black mb-2">Drafts</h3>
-              <p className="text-3xl font-bold text-brand-orange-600">
+              <p className="text-3xl font-bold text-brand-blue-600">
                 {draftCount}
               </p>
             </div>
@@ -180,7 +180,7 @@ export default async function AdminCoursesPage() {
               <h3 className="text-sm font-medium text-black mb-2">
                 Total Enrollments
               </h3>
-              <p className="text-3xl font-bold text-purple-600">
+              <p className="text-3xl font-bold text-brand-red-600">
                 {enrollmentCounts?.length || 0}
               </p>
             </div>
@@ -250,7 +250,7 @@ export default async function AdminCoursesPage() {
                             ) : (
                               <div className="w-12 h-12 rounded bg-blue-100 flex items-center justify-center">
                                 <svg
-                                  className="w-6 h-6 text-purple-600"
+                                  className="w-6 h-6 text-brand-red-600"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -321,7 +321,7 @@ export default async function AdminCoursesPage() {
                           >
                             Edit
                           </Link>
-                          <button className="text-brand-orange-600 hover:text-red-700" aria-label="Action button">
+                          <button className="text-brand-blue-600 hover:text-red-700" aria-label="Action button">
                             Delete
                           </button>
                         </td>
@@ -399,7 +399,7 @@ export default async function AdminCoursesPage() {
                   <ul className="space-y-4">
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -417,7 +417,7 @@ export default async function AdminCoursesPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -435,7 +435,7 @@ export default async function AdminCoursesPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -453,7 +453,7 @@ export default async function AdminCoursesPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

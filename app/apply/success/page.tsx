@@ -147,11 +147,11 @@ export default async function ApplicationSuccessPage({
           <h3 className="font-semibold mb-4">Questions? Contact Us</h3>
           <div className="flex flex-col sm:flex-row gap-4">
             <a
-              href="tel:3173143757"
+              href="/contact"
               className="flex items-center gap-2 text-blue-600 hover:underline"
             >
               <Phone className="w-5 h-5" />
-              (317) 314-3757
+              Contact Us
             </a>
             <a
               href="mailto:elevate4humanityedu@gmail.com"

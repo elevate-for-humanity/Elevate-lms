@@ -35,7 +35,7 @@ export default function GlobalError({
   return (
     <html lang="en">
       <body>
-        <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50 px-4">
+        <div className="min-h-screen flex items-center justify-center bg-white px-4">
           <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-8 md:p-12 text-center">
             <div className="mb-8">
               <AlertTriangle className="h-20 w-20 text-red-600 mx-auto mb-6 animate-pulse" />
@@ -103,7 +103,7 @@ export default function GlobalError({
                 </a>
                 <span className="hidden sm:inline text-gray-400">•</span>
                 <a 
-                  href="tel:+13175551234" 
+                  href="/contact" 
                   className="text-orange-600 hover:text-orange-700 font-semibold hover:underline"
                 >
                   Call Support

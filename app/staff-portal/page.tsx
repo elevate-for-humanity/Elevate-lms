@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -37,18 +36,18 @@ export default function StaffPortalLanding() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-purple-900/60" />
+        <div className="absolute inset-0 bg-brand-red-900/60" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
-          <span className="text-purple-200 font-medium">Staff Portal</span>
+          <span className="text-brand-red-200 font-medium">Staff Portal</span>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Staff Management Portal</h1>
-          <p className="text-xl text-purple-100 max-w-2xl mb-8">
+          <p className="text-xl text-brand-red-100 max-w-2xl mb-8">
             Manage students, track enrollments, monitor progress, and access administrative tools.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/login?redirect=/staff-portal/dashboard" className="px-8 py-4 bg-white text-purple-600 font-bold rounded-lg hover:bg-purple-50">
+            <Link href="/login?redirect=/staff-portal/dashboard" className="px-8 py-4 bg-white text-brand-red-600 font-bold rounded-lg hover:bg-brand-red-50">
               Sign In
             </Link>
-            <Link href="/onboarding/staff" className="px-8 py-4 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-400">
+            <Link href="/onboarding/staff" className="px-8 py-4 bg-brand-red-500 text-white font-bold rounded-lg hover:bg-brand-red-400">
               Staff Onboarding
             </Link>
           </div>
@@ -56,10 +55,6 @@ export default function StaffPortalLanding() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Staff Welcome" 
-      />
 
       <section className="py-16 bg-slate-50">
         <div className="max-w-6xl mx-auto px-4">
@@ -85,7 +80,7 @@ export default function StaffPortalLanding() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Access Your Portal</h2>
           <p className="text-lg text-slate-600 mb-8">Sign in to access staff tools or complete onboarding if you are new.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/login?redirect=/staff-portal/dashboard" className="px-8 py-4 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700">Sign In</Link>
+            <Link href="/login?redirect=/staff-portal/dashboard" className="px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700">Sign In</Link>
             <Link href="/onboarding/staff" className="px-8 py-4 bg-slate-100 text-slate-900 font-bold rounded-lg hover:bg-slate-200">Staff Onboarding</Link>
           </div>
         </div>

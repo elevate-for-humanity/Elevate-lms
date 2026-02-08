@@ -73,8 +73,8 @@ export function SupersonicFooter() {
             <ul className="space-y-3">
               <li className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-gray-500" />
-                <a href="tel:+13173143757" className="text-gray-400 hover:text-white text-sm">
-                  (317) 314-3757
+                <a href="/contact" className="text-gray-400 hover:text-white text-sm">
+                  Contact Us
                 </a>
               </li>
               <li className="flex items-center gap-2">

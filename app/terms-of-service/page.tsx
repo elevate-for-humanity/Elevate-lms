@@ -89,7 +89,7 @@ export default function TermsOfServicePage() {
               <p className="text-slate-700">
                 <strong>Elevate for Humanity</strong><br />
                 Email: <a href="mailto:legal@elevateforhumanity.org" className="text-blue-600 hover:underline">legal@elevateforhumanity.org</a><br />
-                Phone: (317) 314-3757
+                Phone: Contact Us
               </p>
             </div>
           </section>

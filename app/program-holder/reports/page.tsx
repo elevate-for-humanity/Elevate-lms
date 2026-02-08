@@ -134,12 +134,12 @@ export default async function ReportsPage() {
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <Calendar className="h-11 w-11 text-brand-green-600" />
+                  <Calendar className="h-11 w-11 text-brand-blue-600" />
                   <h3 className="text-sm font-medium text-black">
                     This Month
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-brand-green-600">
+                <p className="text-3xl font-bold text-brand-blue-600">
                   {monthlyReports.length}
                 </p>
               </div>
@@ -154,12 +154,12 @@ export default async function ReportsPage() {
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <Download className="h-11 w-11 text-purple-600" />
+                  <Download className="h-11 w-11 text-brand-red-600" />
                   <h3 className="text-sm font-medium text-black">
                     Approved
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-purple-600">
+                <p className="text-3xl font-bold text-brand-red-600">
                   {approvedReports.length}
                 </p>
               </div>
@@ -173,7 +173,7 @@ export default async function ReportsPage() {
                 </h2>
                 <Link
                   href="/program-holder/reports/new"
-                  className="inline-flex items-center px-4 py-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-semibold rounded-lg transition-colors"
+                  className="inline-flex items-center px-4 py-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition-colors"
                 >
                   <Plus className="h-5 w-5 mr-2" />
                   New Report
@@ -218,7 +218,7 @@ export default async function ReportsPage() {
                             <span
                               className={`px-2 py-2 text-xs rounded ${
                                 report.status === 'approved'
-                                  ? 'bg-brand-green-100 text-green-800'
+                                  ? 'bg-brand-blue-100 text-green-800'
                                   : report.status === 'pending'
                                     ? 'bg-yellow-100 text-yellow-800'
                                     : 'bg-gray-100 text-black'
@@ -251,7 +251,7 @@ export default async function ReportsPage() {
                   </p>
                   <Link
                     href="/program-holder/reports/new"
-                    className="inline-flex items-center px-6 py-3 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-semibold rounded-lg transition-colors"
+                    className="inline-flex items-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition-colors"
                   >
                     <Plus className="h-5 w-5 mr-2" />
                     Submit Your First Report

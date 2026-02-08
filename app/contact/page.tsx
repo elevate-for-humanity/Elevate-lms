@@ -4,11 +4,10 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Mail, Phone, MapPin, Clock, Send, AlertCircle, Loader2, Circle } from 'lucide-react';
-import PageAvatar from '@/components/PageAvatar';
 import Turnstile from '@/components/Turnstile';
 
 const contactInfo = [
-  { icon: Phone, title: 'Phone', value: '(317) 314-3757', subtitle: 'Mon-Fri 8am-6pm EST', href: 'tel:317-314-3757' },
+  { icon: Phone, title: 'Phone', value: 'Contact Us', subtitle: 'Mon-Fri 8am-6pm EST', href: 'tel:Contact Us' },
   { icon: Mail, title: 'Email', value: 'elevate4humanityedu@gmail.com', subtitle: 'We respond within 24 hours', href: 'mailto:elevate4humanityedu@gmail.com' },
   { icon: MapPin, title: 'Address', value: 'Indianapolis, IN', subtitle: 'Central Indiana', href: null },
   { icon: Clock, title: 'Hours', value: 'Mon-Fri 8am-6pm', subtitle: 'Sat 9am-1pm EST', href: null },
@@ -83,10 +82,6 @@ export default function ContactPage() {
       </div>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Contact Us" 
-      />
 
       <div className="max-w-7xl mx-auto px-4 py-8 sm:py-10 md:py-12">
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-10 md:mb-12">
@@ -270,11 +265,11 @@ export default function ContactPage() {
               <p className="text-gray-600 mt-4">Multiple training locations available</p>
               <div className="mt-4 pt-4 border-t">
                 <a
-                  href="tel:317-314-3757"
+                  href="/contact"
                   className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
                 >
                   <Phone className="w-4 h-4" />
-                  Call (317) 314-3757
+                  Call Contact Us
                 </a>
               </div>
             </div>
@@ -288,7 +283,7 @@ export default function ContactPage() {
         <div className="space-y-4">
           {[
             { q: 'What are your office hours?', a: 'Our team is available Monday-Friday, 9am-5pm EST. You can leave a message anytime and we\'ll respond within 1-2 business days.' },
-            { q: 'How quickly will I get a response?', a: 'We typically respond to inquiries within 1-2 business days. For urgent matters, please call us directly at (317) 314-3757.' },
+            { q: 'How quickly will I get a response?', a: 'We typically respond to inquiries within 1-2 business days. For urgent matters, please call us directly at Contact Us.' },
             { q: 'Can I visit your office in person?', a: 'Yes, but please schedule an appointment first. Training locations vary by program. Call us to arrange a visit.' },
             { q: 'Who should I contact about enrollment?', a: 'For enrollment questions, select "Enrollment Questions" in the contact form or call us directly. Our enrollment team will assist you.' },
             { q: 'How do I check my application status?', a: 'Log into your student dashboard to check status, or call us with your name and the program you applied for.' },

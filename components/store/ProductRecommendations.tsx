@@ -29,7 +29,7 @@ const typeColors = {
   upgrade: 'bg-green-600',
   upsell: 'bg-orange-600',
   'cross-sell': 'bg-blue-600',
-  bundle: 'bg-purple-600',
+  bundle: 'bg-brand-red-600',
 };
 
 export default function ProductRecommendations({ productId, showAvatar = true }: ProductRecommendationsProps) {

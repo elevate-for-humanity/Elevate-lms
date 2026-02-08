@@ -313,7 +313,7 @@ export default async function ProgramHolderHandbookPage() {
               <strong>Email:</strong> elevate4humanityedu@gmail.com
             </li>
             <li>
-              <strong>Phone:</strong> (317) 314-3757
+              <strong>Phone:</strong> Contact Us
             </li>
             <li>
               <strong>Platform Support:</strong> Available through dashboard

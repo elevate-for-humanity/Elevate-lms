@@ -94,7 +94,7 @@ export function StudentStreakWidget() {
 
       <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
         <div
-          className="h-full rounded-full bg-brand-orange-500 transition-all"
+          className="h-full rounded-full bg-brand-blue-500 transition-all"
           style={{ width: `${pct}%` }}
         />
       </div>

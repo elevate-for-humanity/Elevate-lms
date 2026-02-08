@@ -42,12 +42,12 @@ async function getSubmissionsData() {
 function getStatusBadge(status: string) {
   const badges: Record<string, { color: string; text: string }> = {
     submitted: { color: 'bg-blue-100 text-blue-800', text: '🔵 Submitted' },
-    confirmed: { color: 'bg-purple-100 text-purple-800', text: '🟣 Confirmed' },
+    confirmed: { color: 'bg-brand-red-100 text-brand-red-800', text: '🟣 Confirmed' },
     under_review: {
       color: 'bg-yellow-100 text-yellow-800',
       text: '🟡 Under Review',
     },
-    awarded: { color: 'bg-brand-green-100 text-green-800', text: '🟢 Awarded' },
+    awarded: { color: 'bg-brand-blue-100 text-green-800', text: '🟢 Awarded' },
     rejected: { color: 'bg-red-100 text-red-800', text: '🔴 Rejected' },
     withdrawn: { color: 'bg-gray-100 text-black', text: '⚪ Withdrawn' },
   };
@@ -189,13 +189,13 @@ export default async function GrantSubmissionsPage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm p-6">
             <p className="text-sm text-slate-500 mb-1">Awarded</p>
-            <p className="text-3xl font-bold text-brand-green-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {stats.awarded}
             </p>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-6">
             <p className="text-sm text-slate-500 mb-1">Rejected</p>
-            <p className="text-3xl font-bold text-brand-orange-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {stats.rejected}
             </p>
           </div>
@@ -288,7 +288,7 @@ export default async function GrantSubmissionsPage() {
                             href={submission.portal_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-purple-600 hover:text-purple-700 font-medium"
+                            className="text-sm text-brand-red-600 hover:text-brand-red-700 font-medium"
                           >
                             Portal →
                           </a>
@@ -329,10 +329,10 @@ export default async function GrantSubmissionsPage() {
               Export Options
             </h2>
             <div className="flex gap-4">
-              <button className="bg-brand-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold" aria-label="Action button">
+              <button className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold" aria-label="Action button">
                 <BarChart className="w-5 h-5 inline-block" /> Export to Excel
               </button>
-              <button className="bg-brand-orange-600 text-white px-6 py-3 rounded-lg hover:bg-brand-orange-700 font-semibold" aria-label="Action button">
+              <button className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg hover:bg-brand-blue-700 font-semibold" aria-label="Action button">
                 📄 Export to PDF
               </button>
               <button className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg hover:bg-brand-blue-700 font-semibold" aria-label="Action button">

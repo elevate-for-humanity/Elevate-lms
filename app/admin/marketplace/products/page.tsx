@@ -146,7 +146,7 @@ export default async function AdminProductsPage() {
                   <button className="text-sm text-brand-blue-600 hover:underline" aria-label="Action button">
                     Edit
                   </button>
-                  <button className="text-sm text-brand-orange-600 hover:underline" aria-label="Action button">
+                  <button className="text-sm text-brand-blue-600 hover:underline" aria-label="Action button">
                     Archive
                   </button>
                 </div>

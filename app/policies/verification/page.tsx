@@ -47,7 +47,7 @@ export default function VerificationPage() {
                 </p>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+              <div className="bg-brand-red-50 rounded-lg p-6 border-2 border-brand-red-200">
                 <h3 className="text-xl font-bold text-black mb-3">Credential Verification</h3>
                 <p className="text-black">
                   Confirming authenticity of certificates and credentials for employers.
@@ -145,8 +145,8 @@ export default function VerificationPage() {
               <h4 className="text-lg font-bold text-black mb-3">Contact Registrar</h4>
               <ul className="list-disc pl-6 text-black space-y-2">
                 <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
-                <li><strong>Phone:</strong> (317) 314-3757</li>
-                <li><strong>Fax:</strong> (317) 314-3758</li>
+                <li><strong>Phone:</strong> Contact Us</li>
+                <li><strong>Fax:</strong> Contact Us</li>
                 <li><strong>Response Time:</strong> 1-2 business days</li>
               </ul>
             </div>
@@ -283,8 +283,8 @@ export default function VerificationPage() {
             <ul className="list-none mb-6 text-black space-y-2">
               <li><strong>Online Portal:</strong> www.elevateforhumanity.org/verify</li>
               <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Phone:</strong> (317) 314-3757</li>
-              <li><strong>Fax:</strong> (317) 314-3758</li>
+              <li><strong>Phone:</strong> Contact Us</li>
+              <li><strong>Fax:</strong> Contact Us</li>
               <li><strong>Mail:</strong> Registrar Office, Elevate for Humanity</li>
               <li className="ml-6">3737 N Meridian St, Suite 200</li>
               <li className="ml-6">Indianapolis, IN 46208</li>

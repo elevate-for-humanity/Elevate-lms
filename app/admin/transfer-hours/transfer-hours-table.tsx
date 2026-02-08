@@ -65,7 +65,7 @@ export function TransferHoursTable({
       case 'pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'approved':
-        return 'bg-brand-green-100 text-green-800';
+        return 'bg-brand-blue-100 text-green-800';
       case 'denied':
         return 'bg-red-100 text-red-800';
       default:
@@ -421,14 +421,14 @@ export function TransferHoursTable({
                   <button
                     onClick={handleDeny}
                     disabled={loading}
-                    className="px-6 py-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white rounded-lg font-medium disabled:opacity-50"
+                    className="px-6 py-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white rounded-lg font-medium disabled:opacity-50"
                   >
                     {loading ? 'Processing...' : 'Deny'}
                   </button>
                   <button
                     onClick={handleApprove}
                     disabled={loading}
-                    className="px-6 py-2 bg-brand-green-600 hover:bg-green-700 text-white rounded-lg font-medium disabled:opacity-50"
+                    className="px-6 py-2 bg-brand-blue-600 hover:bg-green-700 text-white rounded-lg font-medium disabled:opacity-50"
                   >
                     {loading ? 'Processing...' : 'Approve'}
                   </button>

@@ -62,7 +62,7 @@ export default async function PaymentCancelPage() {
               <li>💳 Try a different payment method</li>
               <li>
                 <Phone className="w-5 h-5 inline-block" /> Call us to discuss
-                payment plans: 317-314-3757
+                payment plans: Contact Us
               </li>
               <li>💬 Chat with our enrollment team</li>
             </ul>
@@ -71,7 +71,7 @@ export default async function PaymentCancelPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-brand-orange-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-orange-700 transition"
+              className="bg-brand-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               Try Again
             </Link>
@@ -87,15 +87,15 @@ export default async function PaymentCancelPage() {
             <p className="text-sm text-black">
               Questions? Contact us at{' '}
               <a
-                href="tel:317-314-3757"
-                className="text-brand-orange-600 hover:underline"
+                href="/contact"
+                className="text-brand-blue-600 hover:underline"
               >
-                317-314-3757
+                Contact Us
               </a>{' '}
               or{' '}
               <a
                 href="mailto:elevate4humanityedu@gmail.com"
-                className="text-brand-orange-600 hover:underline"
+                className="text-brand-blue-600 hover:underline"
               >
                 elevate4humanityedu@gmail.com
               </a>

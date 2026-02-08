@@ -135,7 +135,7 @@ export function ProgramPageTemplate({
           <h1 className="max-w-3xl text-4xl font-black leading-tight md:text-5xl text-white drop-shadow-2xl">
             {title}
             {subtitle && (
-              <span className="block text-xl md:text-2xl font-bold text-purple-300 mt-2">{subtitle}</span>
+              <span className="block text-xl md:text-2xl font-bold text-brand-red-300 mt-2">{subtitle}</span>
             )}
           </h1>
 
@@ -154,7 +154,7 @@ export function ProgramPageTemplate({
             )}
             <Link
               href={applyLink || `/apply?program=${slug}`}
-              className="inline-flex items-center justify-center rounded-xl bg-purple-600 px-8 py-4 text-lg font-bold text-white hover:bg-purple-700 transition-all shadow-xl"
+              className="inline-flex items-center justify-center rounded-xl bg-brand-red-600 px-8 py-4 text-lg font-bold text-white hover:bg-brand-red-700 transition-all shadow-xl"
             >
               Check Eligibility
             </Link>
@@ -173,22 +173,22 @@ export function ProgramPageTemplate({
         <div className="mx-auto max-w-6xl px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center p-4">
-              <Clock className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+              <Clock className="w-8 h-8 text-brand-red-600 mx-auto mb-2" />
               <p className="text-sm text-gray-500">Duration</p>
               <p className="text-lg font-bold text-gray-900">{duration}</p>
             </div>
             <div className="text-center p-4">
-              <MapPin className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+              <MapPin className="w-8 h-8 text-brand-red-600 mx-auto mb-2" />
               <p className="text-sm text-gray-500">Format</p>
               <p className="text-lg font-bold text-gray-900">{format}</p>
             </div>
             <div className="text-center p-4">
-              <DollarSign className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+              <DollarSign className="w-8 h-8 text-brand-red-600 mx-auto mb-2" />
               <p className="text-sm text-gray-500">Tuition</p>
               <p className="text-lg font-bold text-gray-900">${price.toLocaleString()}</p>
             </div>
             <div className="text-center p-4">
-              <Award className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+              <Award className="w-8 h-8 text-brand-red-600 mx-auto mb-2" />
               <p className="text-sm text-gray-500">Credential</p>
               <p className="text-lg font-bold text-gray-900">{outcomes.credential || 'Certificate'}</p>
             </div>
@@ -265,11 +265,11 @@ export function ProgramPageTemplate({
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Requirements</h2>
           
           <div className="max-w-3xl mx-auto">
-            <div className="bg-purple-50 border-2 border-purple-200 rounded-2xl p-8">
+            <div className="bg-brand-red-50 border-2 border-brand-red-200 rounded-2xl p-8">
               <ul className="space-y-4">
                 {requirements.map((req, i) => (
                   <li key={i} className="flex items-start gap-3 text-gray-800">
-                    <div className="w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+                    <div className="w-6 h-6 bg-brand-red-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                       {i + 1}
                     </div>
                     <span>{req}</span>
@@ -329,17 +329,17 @@ export function ProgramPageTemplate({
           <h2 className="text-3xl font-bold text-gray-900 mb-4">Investment</h2>
           <p className="text-gray-600 mb-8">Transparent pricing with flexible options</p>
           
-          <div className="bg-gradient-to-br from-purple-600 to-purple-800 rounded-3xl p-8 text-white shadow-2xl">
-            <p className="text-purple-200 text-sm uppercase tracking-wide mb-2">Program Tuition</p>
+          <div className="bg-gradient-to-br from-brand-red-600 to-brand-red-800 rounded-3xl p-8 text-white shadow-2xl">
+            <p className="text-brand-red-200 text-sm uppercase tracking-wide mb-2">Program Tuition</p>
             <p className="text-5xl font-black mb-4">${price.toLocaleString()}</p>
             {paymentPlan && (
-              <p className="text-purple-200 mb-6">{paymentPlan}</p>
+              <p className="text-brand-red-200 mb-6">{paymentPlan}</p>
             )}
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href={enrollLink || `/enroll/${slug}`}
-                className="bg-white text-purple-700 px-8 py-4 rounded-xl font-bold hover:bg-purple-50 transition"
+                className="bg-white text-brand-red-700 px-8 py-4 rounded-xl font-bold hover:bg-brand-red-50 transition"
               >
                 Enroll & Pay
               </Link>
@@ -363,7 +363,7 @@ export function ProgramPageTemplate({
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={applyLink || `/apply?program=${slug}`}
-              className="bg-purple-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-purple-700 transition inline-flex items-center justify-center"
+              className="bg-brand-red-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-red-700 transition inline-flex items-center justify-center"
             >
               <FileText className="mr-2 w-5 h-5" /> Apply Now
             </Link>

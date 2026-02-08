@@ -218,7 +218,7 @@ export function LearningBarrierAnalyzer() {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return 'text-brand-orange-600 bg-brand-surface border-red-200';
+        return 'text-brand-blue-600 bg-brand-surface border-red-200';
       case 'high':
         return 'text-orange-600 bg-brand-surface border-orange-200';
       case 'medium':
@@ -316,7 +316,7 @@ export function LearningBarrierAnalyzer() {
               <div className="mb-4">
                 <div className="flex items-center text-sm text-brand-text-muted mb-2">
                   <span className="font-medium">👥 Affected Students:</span>
-                  <span className="ml-2 font-bold text-brand-orange-600">
+                  <span className="ml-2 font-bold text-brand-blue-600">
                     {barrier.affectedStudents}
                   </span>
                 </div>
@@ -438,7 +438,7 @@ export function LearningBarrierAnalyzer() {
                               ? 'bg-green-500'
                               : student.performanceScore >= 70
                                 ? 'bg-yellow-500'
-                                : 'bg-brand-orange-500'
+                                : 'bg-brand-blue-500'
                           }`}
                           style={{ width: `${student.performanceScore}%` }}
                         />

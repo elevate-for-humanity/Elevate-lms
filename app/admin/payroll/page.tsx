@@ -130,7 +130,7 @@ export default function AdminPayroll() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -246,14 +246,14 @@ export default function AdminPayroll() {
                     <td className="px-6 py-4">
                       ${payroll.hourly_rate.toFixed(2)}
                     </td>
-                    <td className="px-6 py-4 font-bold text-brand-green-600">
+                    <td className="px-6 py-4 font-bold text-brand-blue-600">
                       ${payroll.gross_pay.toFixed(2)}
                     </td>
                     <td className="px-6 py-4">
                       <span
                         className={`px-3 py-2 rounded-full text-xs font-semibold ${
                           payroll.status === 'paid'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-blue-100 text-green-800'
                             : 'bg-yellow-100 text-yellow-800'
                         }`}
                       >

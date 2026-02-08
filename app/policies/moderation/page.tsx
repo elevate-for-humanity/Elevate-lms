@@ -145,7 +145,7 @@ export default function ModerationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>
@@ -292,7 +292,7 @@ export default function ModerationPage() {
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
               <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Phone:</strong> (317) 314-3757</li>
+              <li><strong>Phone:</strong> Contact Us</li>
               <li><strong>Report Button:</strong> Available on all content</li>
               <li><strong>Response Time:</strong> 24-48 hours for most reports</li>
             </ul>

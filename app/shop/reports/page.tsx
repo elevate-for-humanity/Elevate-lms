@@ -126,30 +126,30 @@ export default function ShopReportsPage() {
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Users className="w-6 h-6 text-brand-green-600" />
+              <Users className="w-6 h-6 text-brand-blue-600" />
               <h3 className="text-sm font-medium text-black">
                 Active Students
               </h3>
             </div>
-            <p className="text-3xl font-bold text-brand-green-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {new Set(reports.map((r) => r.student_name)).size}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Clock className="w-6 h-6 text-purple-600" />
+              <Clock className="w-6 h-6 text-brand-red-600" />
               <h3 className="text-sm font-medium text-black">Total Hours</h3>
             </div>
-            <p className="text-3xl font-bold text-purple-600">
+            <p className="text-3xl font-bold text-brand-red-600">
               {reports.reduce((sum, r) => sum + r.hours, 0)}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Calendar className="w-6 h-6 text-brand-orange-600" />
+              <Calendar className="w-6 h-6 text-brand-blue-600" />
               <h3 className="text-sm font-medium text-black">This Month</h3>
             </div>
-            <p className="text-3xl font-bold text-brand-orange-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {
                 reports.filter((r) => {
                   const date = new Date(r.created_at);
@@ -245,7 +245,7 @@ export default function ShopReportsPage() {
                       <span
                         className={`px-2 py-2 text-xs rounded ${
                           report.status === 'approved'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-blue-100 text-green-800'
                             : report.status === 'pending'
                               ? 'bg-yellow-100 text-yellow-800'
                               : 'bg-gray-100 text-black'

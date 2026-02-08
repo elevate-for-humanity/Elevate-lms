@@ -257,7 +257,7 @@ export default function SurveyModal({
             <h4 className="text-xl font-semibold text-black mb-2">
               {currentQuestion.question}
               {currentQuestion.required && (
-                <span className="text-brand-orange-600 ml-1">*</span>
+                <span className="text-brand-blue-600 ml-1">*</span>
               )}
             </h4>
             {currentQuestion.type === 'checkbox' && (

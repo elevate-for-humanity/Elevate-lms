@@ -6,7 +6,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageAvatar from '@/components/PageAvatar';
 import { 
   Circle, Clock, DollarSign, Award, ArrowRight, 
   Heart, Users, BookOpen, Stethoscope, Phone, Calendar
@@ -79,10 +78,6 @@ export default function CNACertificationPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/healthcare-guide.mp4" 
-        title="CNA Program Guide" 
-      />
 
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
@@ -147,7 +142,7 @@ export default function CNACertificationPage() {
               <div className="text-slate-400 text-sm">Included</div>
             </div>
             <div>
-              <Users className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+              <Users className="w-8 h-8 text-brand-red-400 mx-auto mb-2" />
               <div className="text-2xl font-bold text-white">High</div>
               <div className="text-slate-400 text-sm">Job Demand</div>
             </div>
@@ -272,8 +267,8 @@ export default function CNACertificationPage() {
             <Link href="/apply" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
-            <a href="tel:+13173143757" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
-              <Phone className="w-5 h-5" /> (317) 314-3757
+            <a href="/contact" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
+              <Phone className="w-5 h-5" /> Contact Us
             </a>
           </div>
         </div>

@@ -33,7 +33,7 @@ d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 
         </a>
         <a
           href={`sms:${CONTACT_INFO.phone.tel}`}
-          className={`inline-flex items-center gap-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition font-semibold ${sizeClasses[size]}`}
+          className={`inline-flex items-center gap-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold ${sizeClasses[size]}`}
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
@@ -66,7 +66,7 @@ d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 
   return (
     <a
       href={`sms:${CONTACT_INFO.phone.tel}`}
-      className={`inline-flex items-center gap-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition font-semibold ${sizeClasses[size]} ${className}`}
+      className={`inline-flex items-center gap-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold ${sizeClasses[size]} ${className}`}
     >
       <svg className="h-4 w-4" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">

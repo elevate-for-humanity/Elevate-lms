@@ -195,7 +195,7 @@ export default function BookAppointment() {
       }
     } catch (error) { /* Error handled silently */ 
       logger.error('Booking error:', error);
-      alert('Booking failed. Please call 317-314-3757 for assistance.');
+      alert('Booking failed. Please call Contact Us for assistance.');
     }
   };
 
@@ -573,7 +573,7 @@ export default function BookAppointment() {
                     })
                   }
                   className="w-full px-4 py-3 border rounded-lg"
-                  placeholder="(317) 314-3757"
+                  placeholder="Contact Us"
                 />
               </div>
 

@@ -5,7 +5,6 @@ export const revalidate = 86400;
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
-import PageAvatar from '@/components/PageAvatar';
 import {
   Heart,
   Circle,
@@ -86,41 +85,6 @@ export default function JRIProgramsPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/orientation-guide.mp4" title="JRI Programs Guide" />
-
-      {/* What is JRI */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mb-6">
-                What is the Justice Reinvestment Initiative?
-              </h2>
-              <div className="space-y-4 text-lg text-slate-600">
-                <p>
-                  The Justice Reinvestment Initiative (JRI) is an Indiana state-funded program 
-                  designed to reduce recidivism by providing free career training and support 
-                  services to individuals who have been involved in the criminal justice system.
-                </p>
-                <p>
-                  JRI recognizes that stable employment is one of the most important factors 
-                  in preventing re-offense. By investing in job training, education, and 
-                  wraparound support, JRI helps participants build sustainable careers and 
-                  become contributing members of their communities.
-                </p>
-                <p>
-                  Elevate for Humanity is a proud JRI-approved training provider, offering 
-                  a range of career programs specifically designed for justice-involved 
-                  individuals.
-                </p>
-              </div>
-            </div>
-            <div className="bg-white rounded-2xl p-8 shadow-xl">
-              <h3 className="text-xl font-bold text-slate-900 mb-6">JRI at a Glance</h3>
-              <div className="space-y-6">
-                <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Shield className="w-6 h-6 text-green-600" />
                   </div>
                   <div>
                     <h4 className="font-bold text-slate-900">State-Funded</h4>
@@ -137,8 +101,8 @@ export default function JRIProgramsPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <Users className="w-6 h-6 text-purple-600" />
+                  <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <Users className="w-6 h-6 text-brand-red-600" />
                   </div>
                   <div>
                     <h4 className="font-bold text-slate-900">Support Services</h4>

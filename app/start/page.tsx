@@ -16,7 +16,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Find Your Pathway | Start Your Career Training Journey',
-  description: 'Call (317) 314-3757 or apply online for a new career. Explore training programs, check eligibility for funding, and connect with employers in Indiana.',
+  description: 'Call Contact Us or apply online for a new career. Explore training programs, check eligibility for funding, and connect with employers in Indiana.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/start',
   },
@@ -44,7 +44,7 @@ const DEFAULT_PATHWAYS = [
     description: 'Check if you qualify for WIOA, WRG, or other funding assistance.',
     icon: Briefcase,
     href: '/funding',
-    color: 'purple',
+    color: 'brand-red',
   },
   {
     title: 'I Have a Background (Second Chance)',
@@ -106,14 +106,14 @@ export default async function StartPage() {
   const colorClasses: Record<string, string> = {
     blue: 'bg-blue-50 border-blue-200 hover:border-blue-400',
     green: 'bg-green-50 border-green-200 hover:border-green-400',
-    purple: 'bg-purple-50 border-purple-200 hover:border-purple-400',
+    brand-red: 'bg-brand-red-50 border-brand-red-200 hover:border-brand-red-400',
     amber: 'bg-amber-50 border-amber-200 hover:border-amber-400',
   };
 
   const iconColorClasses: Record<string, string> = {
     blue: 'text-blue-600',
     green: 'text-green-600',
-    purple: 'text-purple-600',
+    brand-red: 'text-brand-red-600',
     amber: 'text-amber-600',
   };
 
@@ -133,7 +133,7 @@ export default async function StartPage() {
             Find Your Pathway
           </h1>
           <p className="text-xl md:text-2xl text-blue-100 mb-8">
-            Call (317) 314-3757 or apply online for a new career. We'll help you find the right program and funding.
+            Call Contact Us or apply online for a new career. We'll help you find the right program and funding.
           </p>
         </div>
       </section>
@@ -286,11 +286,11 @@ export default async function StartPage() {
               Apply Now
             </Link>
             <a
-              href="tel:3173143757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition"
             >
               <Phone className="w-5 h-5" />
-              (317) 314-3757
+              Contact Us
             </a>
           </div>
         </div>

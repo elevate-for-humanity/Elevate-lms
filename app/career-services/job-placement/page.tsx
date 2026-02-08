@@ -28,19 +28,19 @@ export default function JobPlacementPage() {
       <section className="max-w-6xl mx-auto px-6 py-16">
         <div className="grid md:grid-cols-4 gap-8 text-center">
           <div>
-            <div className="text-4xl font-black text-brand-orange-600 mb-2">Active</div>
+            <div className="text-4xl font-black text-brand-blue-600 mb-2">Active</div>
             <div className="text-gray-600">Employer Network</div>
           </div>
           <div>
-            <div className="text-4xl font-black text-brand-orange-600 mb-2">Included</div>
+            <div className="text-4xl font-black text-brand-blue-600 mb-2">Included</div>
             <div className="text-gray-600">Job Placement</div>
           </div>
           <div>
-            <div className="text-4xl font-black text-brand-orange-600 mb-2">Full</div>
+            <div className="text-4xl font-black text-brand-blue-600 mb-2">Full</div>
             <div className="text-gray-600">Support Services</div>
           </div>
           <div>
-            <div className="text-4xl font-black text-brand-orange-600 mb-2">Free</div>
+            <div className="text-4xl font-black text-brand-blue-600 mb-2">Free</div>
             <div className="text-gray-600">For All Graduates</div>
           </div>
         </div>
@@ -55,9 +55,9 @@ export default function JobPlacementPage() {
         </p>
 
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-orange-600 transition">
-            <div className="w-12 h-12 bg-brand-orange-100 rounded-xl flex items-center justify-center mb-4">
-              <Briefcase className="w-6 h-6 text-brand-orange-600" />
+          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-blue-600 transition">
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+              <Briefcase className="w-6 h-6 text-brand-blue-600" />
             </div>
             <h3 className="text-xl font-bold text-black mb-3">Direct Employer Connections</h3>
             <p className="text-gray-600 mb-4">
@@ -79,7 +79,7 @@ export default function JobPlacementPage() {
             </ul>
           </div>
 
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-orange-600 transition">
+          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-blue-600 transition">
             <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
               <Target className="w-6 h-6 text-brand-blue-600" />
             </div>
@@ -103,9 +103,9 @@ export default function JobPlacementPage() {
             </ul>
           </div>
 
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-orange-600 transition">
-            <div className="w-12 h-12 bg-brand-green-100 rounded-xl flex items-center justify-center mb-4">
-              <Handshake className="w-6 h-6 text-brand-green-600" />
+          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-blue-600 transition">
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+              <Handshake className="w-6 h-6 text-brand-blue-600" />
             </div>
             <h3 className="text-xl font-bold text-black mb-3">Interview Coordination</h3>
             <p className="text-gray-600 mb-4">
@@ -133,7 +133,7 @@ export default function JobPlacementPage() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   1
                 </div>
                 <div>
@@ -146,7 +146,7 @@ export default function JobPlacementPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   2
                 </div>
                 <div>
@@ -159,7 +159,7 @@ export default function JobPlacementPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   3
                 </div>
                 <div>
@@ -174,7 +174,7 @@ export default function JobPlacementPage() {
             </div>
             <div className="space-y-6">
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   4
                 </div>
                 <div>
@@ -187,7 +187,7 @@ export default function JobPlacementPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   5
                 </div>
                 <div>
@@ -200,7 +200,7 @@ export default function JobPlacementPage() {
                 </div>
               </div>
               <div className="flex gap-4">
-                <div className="w-12 h-12 bg-brand-orange-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0 text-xl">
                   6
                 </div>
                 <div>
@@ -255,8 +255,8 @@ export default function JobPlacementPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Healthcare</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
@@ -317,7 +317,7 @@ export default function JobPlacementPage() {
             </p>
             <Link
               href="/employers"
-              className="inline-flex items-center gap-2 bg-brand-orange-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-orange-700 transition"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-700 transition"
             >
               Partner With Us
               <ArrowRight className="w-5 h-5" />
@@ -422,7 +422,7 @@ export default function JobPlacementPage() {
         </div>
       </section>
 
-      <section className="bg-brand-orange-600 text-white py-16">
+      <section className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-4xl font-black mb-6 text-center">
             Success Stories

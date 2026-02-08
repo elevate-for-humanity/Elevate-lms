@@ -181,8 +181,8 @@ export default function GrantsPage() {
             {/* JRI */}
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-start gap-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <GraduationCap className="w-8 h-8 text-purple-600" />
+                <div className="w-16 h-16 bg-brand-red-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <GraduationCap className="w-8 h-8 text-brand-red-600" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">JRI (Justice Reinvestment Initiative)</h3>
@@ -258,8 +258,8 @@ export default function GrantsPage() {
           </p>
           <p className="text-slate-700">
             Call us at{' '}
-            <a href="tel:+13173143757" className="font-semibold text-blue-600 hover:underline">
-              (317) 314-3757
+            <a href="/contact" className="font-semibold text-blue-600 hover:underline">
+              Contact Us
             </a>{' '}
             or email{' '}
             <a href="mailto:elevate4humanityedu@gmail.com" className="font-semibold text-blue-600 hover:underline">

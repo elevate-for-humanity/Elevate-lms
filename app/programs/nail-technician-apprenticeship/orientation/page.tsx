@@ -51,9 +51,9 @@ export default function NailTechOrientationPage() {
               <h4 className="font-bold text-pink-900">On-the-Job Training (OJT)</h4>
               <p className="text-pink-800 text-sm">{config.ojtDescription}</p>
             </div>
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <h4 className="font-bold text-purple-900">Related Technical Instruction (RTI)</h4>
-              <p className="text-purple-800 text-sm">{config.rtiDescription}</p>
+            <div className="bg-brand-red-50 p-4 rounded-lg">
+              <h4 className="font-bold text-brand-red-900">Related Technical Instruction (RTI)</h4>
+              <p className="text-brand-red-800 text-sm">{config.rtiDescription}</p>
             </div>
           </div>
           <p className="text-sm text-slate-600 mt-4">

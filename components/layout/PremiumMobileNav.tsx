@@ -26,7 +26,7 @@ export function PremiumMobileNav() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="p-2 text-black hover:text-brand-orange-600 transition touch-manipulation"
+        className="p-2 text-black hover:text-brand-blue-600 transition touch-manipulation"
         aria-label="Open menu"
       >
         <Menu size={24} />
@@ -52,7 +52,7 @@ export function PremiumMobileNav() {
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-slate-200">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-orange-500 text-white text-xs font-black uppercase">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-blue-500 text-white text-xs font-black uppercase">
                     EFH
                   </div>
                   <span className="text-sm font-semibold text-black">
@@ -61,7 +61,7 @@ export function PremiumMobileNav() {
                 </div>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 text-black hover:text-brand-orange-600 transition touch-manipulation"
+                  className="p-2 text-black hover:text-brand-blue-600 transition touch-manipulation"
                   aria-label="Close navigation menu"
                 >
                   <X size={24} />
@@ -82,7 +82,7 @@ export function PremiumMobileNav() {
                       className={clsx(
                         'flex items-center gap-3 py-3 px-4 rounded-lg text-sm font-medium transition touch-manipulation',
                         isActive
-                          ? 'bg-orange-50 text-brand-orange-600'
+                          ? 'bg-orange-50 text-brand-blue-600'
                           : 'text-black hover:bg-slate-50'
                       )}
                     >
@@ -99,7 +99,7 @@ export function PremiumMobileNav() {
                 <Link
                   href="/apply"
                   onClick={() => setIsOpen(false)}
-                  className="block w-full py-3 px-4 bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-center font-semibold rounded-lg transition"
+                  className="block w-full py-3 px-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center font-semibold rounded-lg transition"
                 >
                   Apply Now
                 </Link>

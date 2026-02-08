@@ -94,7 +94,7 @@ export default async function EmployerPostingsPage() {
             Post a Job
           </a>
           <p className="text-slate-500 text-sm mt-4">
-            Or contact us at <a href="tel:317-314-3757" className="text-blue-600 hover:underline">317-314-3757</a> for assistance
+            Or contact us at <a href="/contact" className="text-blue-600 hover:underline">Contact Us</a> for assistance
           </p>
         </div>
       ) : (

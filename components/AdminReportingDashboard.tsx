@@ -36,8 +36,8 @@ export function AdminReportingDashboard() {
       change: '+3.1%',
       trend: 'up',
       icon: Award,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
+      color: 'text-brand-red-600',
+      bgColor: 'bg-brand-red-100',
     },
     {
       title: 'Revenue (MTD)',
@@ -45,7 +45,7 @@ export function AdminReportingDashboard() {
       change: '+15.7%',
       trend: 'up',
       icon: DollarSign,
-      color: 'text-brand-orange-600',
+      color: 'text-brand-blue-600',
       bgColor: 'bg-red-100',
     },
   ];
@@ -107,7 +107,7 @@ export function AdminReportingDashboard() {
                   <div className={`p-3 rounded-lg ${metric.bgColor}`}>
                     <Icon className={metric.color} size={24} />
                   </div>
-                  <span className={`text-sm font-semibold ${metric.trend === 'up' ? 'text-green-600' : 'text-brand-orange-600'}`}>
+                  <span className={`text-sm font-semibold ${metric.trend === 'up' ? 'text-green-600' : 'text-brand-blue-600'}`}>
                     {metric.change}
                   </span>
                 </div>
@@ -155,7 +155,7 @@ export function AdminReportingDashboard() {
           <CardContent>
             <div className="space-y-3">
               {programPerformance.slice(0, 5).map((program, index) => {
-                const colors = ['bg-brand-orange-600', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500', 'bg-blue-500'];
+                const colors = ['bg-brand-blue-600', 'bg-orange-500', 'bg-yellow-500', 'bg-green-500', 'bg-blue-500'];
                 const percentage = (program.revenue / 159150 * 100).toFixed(1);
                 return (
                   <div key={index}>

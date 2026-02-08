@@ -106,7 +106,7 @@ export function RequirementsChecklist({ requirements, enrollmentId }: Requiremen
         } else if (isOverdue) {
           borderColor = 'border-red-500';
           bgColor = 'bg-red-50';
-          iconColor = 'text-brand-orange-600';
+          iconColor = 'text-brand-blue-600';
         } else if (req.priority === 'urgent' || req.priority === 'high') {
           borderColor = 'border-yellow-500';
           bgColor = 'bg-yellow-50';
@@ -140,7 +140,7 @@ export function RequirementsChecklist({ requirements, enrollmentId }: Requiremen
                 </p>
               )}
               {req.due_date && (
-                <p className={`text-sm mb-2 ${isOverdue ? 'text-brand-orange-600 font-semibold' : 'text-black'}`}>
+                <p className={`text-sm mb-2 ${isOverdue ? 'text-brand-blue-600 font-semibold' : 'text-black'}`}>
                   Due: {new Date(req.due_date).toLocaleDateString('en-US', {
                     month: 'long',
                     day: 'numeric',

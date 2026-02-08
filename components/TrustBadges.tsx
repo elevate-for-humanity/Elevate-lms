@@ -44,8 +44,8 @@ export function TrustBadges() {
 
           {/* Data Security */}
           <div className="flex flex-col items-center text-center p-4">
-            <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-3">
-              <Lock className="w-8 h-8 text-purple-600" />
+            <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mb-3">
+              <Lock className="w-8 h-8 text-brand-red-600" />
             </div>
             <div className="text-sm font-semibold text-black">Secure</div>
             <div className="text-xs text-black">AES-256 Encrypted</div>

@@ -41,7 +41,7 @@ export default function IndustryPartnershipPortal() {
       joinedDate: '2023-01',
       contactPerson: 'Sarah Johnson',
       email: 'sarah@techsolutions.com',
-      phone: '(317) 314-3757',
+      phone: 'Contact Us',
     },
     {
       id: '2',
@@ -94,7 +94,7 @@ export default function IndustryPartnershipPortal() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-2 border-b-2 font-medium ${
-                  activeTab === tab ? 'border-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
+                  activeTab === tab ? 'border-red-600 text-brand-blue-600' : 'border-transparent text-gray-500'
                 }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -108,7 +108,7 @@ export default function IndustryPartnershipPortal() {
         {activeTab === 'overview' && (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="p-6">
-              <h3 className="text-2xl font-bold text-brand-orange-600">{partners.length}</h3>
+              <h3 className="text-2xl font-bold text-brand-blue-600">{partners.length}</h3>
               <p className="text-black">Active Partners</p>
             </Card>
             <Card className="p-6">
@@ -116,7 +116,7 @@ export default function IndustryPartnershipPortal() {
               <p className="text-black">Active Collaborations</p>
             </Card>
             <Card className="p-6">
-              <h3 className="text-2xl font-bold text-brand-orange-600">65</h3>
+              <h3 className="text-2xl font-bold text-brand-blue-600">65</h3>
               <p className="text-black">Total Participants</p>
             </Card>
           </div>

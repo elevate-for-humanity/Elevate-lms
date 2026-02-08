@@ -119,7 +119,7 @@ export default function AcademicIntegrityPage() {
             </p>
             <ul className="list-disc pl-6 mb-6 text-black space-y-2">
               <li>Email: elevate4humanityedu@gmail.com</li>
-              <li>Phone: (317) 314-3757</li>
+              <li>Phone: Contact Us</li>
               <li>In-person: Visit the Academic Affairs office</li>
               <li>Anonymous reporting available through student portal</li>
             </ul>
@@ -157,7 +157,7 @@ export default function AcademicIntegrityPage() {
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
               <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Phone:</strong> (317) 314-3757</li>
+              <li><strong>Phone:</strong> Contact Us</li>
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>
             </ul>
 

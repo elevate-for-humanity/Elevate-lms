@@ -57,7 +57,7 @@ export default function SiteLocatorPage() {
           href="https://irs.treasury.gov/freetaxprep/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-brand-blue-600 text-white font-semibold hover:bg-green-700 transition"
         >
           Open VITA Site Locator
           <svg
@@ -113,16 +113,16 @@ export default function SiteLocatorPage() {
             <p className="text-black mt-2">
               Phone:{' '}
               <a
-                href="tel:3173143757"
-                className="text-brand-green-600 hover:underline"
+                href="/contact"
+                className="text-brand-blue-600 hover:underline"
               >
-                317-314-3757
+                Contact Us
               </a>
               <br />
               Email:{' '}
               <a
                 href="mailto:elevate4humanityedu@gmail.com"
-                className="text-brand-green-600 hover:underline"
+                className="text-brand-blue-600 hover:underline"
               >
                 elevate4humanityedu@gmail.com
               </a>
@@ -145,7 +145,7 @@ export default function SiteLocatorPage() {
         </h2>
         <div className="space-y-4">
           <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold text-xl">1</span>
+            <span className="text-brand-blue-600 font-bold text-xl">1</span>
             <div>
               <h3 className="font-semibold">Check-In</h3>
               <p className="text-sm text-black">
@@ -154,7 +154,7 @@ export default function SiteLocatorPage() {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold text-xl">2</span>
+            <span className="text-brand-blue-600 font-bold text-xl">2</span>
             <div>
               <h3 className="font-semibold">Document Review</h3>
               <p className="text-sm text-black">
@@ -164,7 +164,7 @@ export default function SiteLocatorPage() {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold text-xl">3</span>
+            <span className="text-brand-blue-600 font-bold text-xl">3</span>
             <div>
               <h3 className="font-semibold">Tax Preparation</h3>
               <p className="text-sm text-black">
@@ -173,7 +173,7 @@ export default function SiteLocatorPage() {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold text-xl">4</span>
+            <span className="text-brand-blue-600 font-bold text-xl">4</span>
             <div>
               <h3 className="font-semibold">Quality Review</h3>
               <p className="text-sm text-black">
@@ -182,7 +182,7 @@ export default function SiteLocatorPage() {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold text-xl">5</span>
+            <span className="text-brand-blue-600 font-bold text-xl">5</span>
             <div>
               <h3 className="font-semibold">E-File</h3>
               <p className="text-sm text-black">
@@ -193,7 +193,7 @@ export default function SiteLocatorPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-green-600 p-6">
+      <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-blue-600 p-6">
         <h2 className="text-xl font-bold mb-3">Ready to Get Started?</h2>
         <p className="text-black mb-6">
           Call us to schedule your appointment or use the IRS locator to find
@@ -201,14 +201,14 @@ export default function SiteLocatorPage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a
-            href="tel:3173143757"
-            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
+            href="/contact"
+            className="px-6 py-3 rounded-lg bg-brand-blue-600 text-white font-semibold hover:bg-green-700 transition"
           >
-            Call 317-314-3757
+            Call Contact Us
           </a>
           <Link
             href="/tax/rise-up-foundation/free-tax-help"
-            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-green-50 transition"
+            className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-green-50 transition"
           >
             View Eligibility
           </Link>

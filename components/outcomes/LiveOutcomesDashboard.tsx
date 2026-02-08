@@ -112,7 +112,7 @@ export function LiveOutcomesDashboard({ initialData }: { initialData?: Partial<O
       value: completionRate,
       suffix: '%',
       icon: Target,
-      color: 'purple',
+      color: 'brand-red',
       description: 'Of enrolled students complete',
     },
     {
@@ -157,7 +157,7 @@ export function LiveOutcomesDashboard({ initialData }: { initialData?: Partial<O
   const colorClasses: Record<string, { bg: string; icon: string; text: string }> = {
     blue: { bg: 'bg-blue-50', icon: 'text-blue-600', text: 'text-blue-900' },
     green: { bg: 'bg-green-50', icon: 'text-green-600', text: 'text-green-900' },
-    purple: { bg: 'bg-purple-50', icon: 'text-purple-600', text: 'text-purple-900' },
+    brand-red: { bg: 'bg-brand-red-50', icon: 'text-brand-red-600', text: 'text-brand-red-900' },
     emerald: { bg: 'bg-emerald-50', icon: 'text-emerald-600', text: 'text-emerald-900' },
     amber: { bg: 'bg-amber-50', icon: 'text-amber-600', text: 'text-amber-900' },
     cyan: { bg: 'bg-cyan-50', icon: 'text-cyan-600', text: 'text-cyan-900' },

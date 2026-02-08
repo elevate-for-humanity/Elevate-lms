@@ -45,9 +45,9 @@ export default function ResponseSLAPage() {
                 <p className="text-black">During business hours (8 AM - 6 PM EST)</p>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+              <div className="bg-brand-red-50 rounded-lg p-6 border-2 border-brand-red-200">
                 <h3 className="text-xl font-bold text-black mb-3">Applications</h3>
-                <p className="text-3xl font-black text-purple-600 mb-2">2-3 Days</p>
+                <p className="text-3xl font-black text-brand-red-600 mb-2">2-3 Days</p>
                 <p className="text-black">Initial review and response</p>
               </div>
 
@@ -181,7 +181,7 @@ export default function ResponseSLAPage() {
               <li>Verify you provided correct contact information</li>
               <li>Follow up with the same department</li>
               <li>If no response after 2 follow-ups, escalate to supervisor</li>
-              <li>Contact main office: (317) 314-3757</li>
+              <li>Contact main office: Contact Us</li>
             </ol>
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Quality Standards</h2>
@@ -205,8 +205,8 @@ export default function ResponseSLAPage() {
               <li><strong>Admissions:</strong> elevate4humanityedu@gmail.com</li>
               <li><strong>Student Services:</strong> elevate4humanityedu@gmail.com</li>
               <li><strong>IT Support:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Phone:</strong> (317) 314-3757</li>
-              <li><strong>Emergency:</strong> (317) 314-3757 ext. 911</li>
+              <li><strong>Phone:</strong> Contact Us</li>
+              <li><strong>Emergency:</strong> Contact Us ext. 911</li>
             </ul>
 
             <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">

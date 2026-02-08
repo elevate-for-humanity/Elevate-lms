@@ -92,7 +92,7 @@ export default function LearningAnalyticsDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Study Time (hours)</h3>
-            <p className="text-3xl font-bold text-brand-orange-600">{learningMetrics.studyTime}</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{learningMetrics.studyTime}</p>
             <p className="text-sm text-green-600">↑ 12% from last period</p>
           </Card>
 
@@ -116,7 +116,7 @@ export default function LearningAnalyticsDashboard() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Predicted Final Grade</h3>
-            <p className="text-3xl font-bold text-purple-600">{learningMetrics.predictedGrade}</p>
+            <p className="text-3xl font-bold text-brand-red-600">{learningMetrics.predictedGrade}</p>
             <p className="text-sm text-black">Based on current trajectory</p>
           </Card>
 
@@ -165,10 +165,10 @@ export default function LearningAnalyticsDashboard() {
                 <p className="text-xs text-blue-600 mt-1">Highest scores achieved during this window</p>
               </div>
 
-              <div className="p-4 bg-purple-50 rounded">
-                <h4 className="font-semibold text-purple-900 mb-1">Preferred Learning Style</h4>
-                <p className="text-sm text-purple-700">Visual & Interactive</p>
-                <p className="text-xs text-purple-600 mt-1">Video content and hands-on exercises work best</p>
+              <div className="p-4 bg-brand-red-50 rounded">
+                <h4 className="font-semibold text-brand-red-900 mb-1">Preferred Learning Style</h4>
+                <p className="text-sm text-brand-red-700">Visual & Interactive</p>
+                <p className="text-xs text-brand-red-600 mt-1">Video content and hands-on exercises work best</p>
               </div>
 
               <div className="p-4 bg-orange-50 rounded">

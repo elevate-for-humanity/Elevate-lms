@@ -34,9 +34,9 @@ export function ComplianceBadges({
       )}
 
       {showWRG && (
-        <div className="flex items-center gap-2 px-4 py-2 bg-purple-50 border border-purple-200 rounded-full">
-          <DollarSign className="w-4 h-4 text-purple-700" />
-          <span className="text-sm font-semibold text-purple-900">WRG Eligible</span>
+        <div className="flex items-center gap-2 px-4 py-2 bg-brand-red-50 border border-brand-red-200 rounded-full">
+          <DollarSign className="w-4 h-4 text-brand-red-700" />
+          <span className="text-sm font-semibold text-brand-red-900">WRG Eligible</span>
         </div>
       )}
 

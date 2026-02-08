@@ -152,7 +152,7 @@ export default function AuditLogsPage() {
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <h3 className="text-sm font-medium text-black mb-2">Today</h3>
-            <p className="text-3xl font-bold text-brand-green-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {
                 logs.filter(
                   (l) =>
@@ -166,7 +166,7 @@ export default function AuditLogsPage() {
             <h3 className="text-sm font-medium text-black mb-2">
               Unique Users
             </h3>
-            <p className="text-3xl font-bold text-purple-600">
+            <p className="text-3xl font-bold text-brand-red-600">
               {new Set(logs.map((l) => l.user_id)).size}
             </p>
           </div>
@@ -174,7 +174,7 @@ export default function AuditLogsPage() {
             <h3 className="text-sm font-medium text-black mb-2">
               Resource Types
             </h3>
-            <p className="text-3xl font-bold text-brand-orange-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {new Set(logs.map((l) => l.resource_type)).size}
             </p>
           </div>

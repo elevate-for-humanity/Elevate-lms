@@ -42,22 +42,22 @@ export default function SezzlePaymentCard({
       className={`
         relative border-2 rounded-xl p-5 transition-all cursor-pointer
         ${selected 
-          ? 'border-purple-600 bg-purple-50 shadow-md' 
-          : 'border-gray-200 bg-white hover:border-purple-300 hover:shadow-sm'
+          ? 'border-brand-red-600 bg-brand-red-50 shadow-md' 
+          : 'border-gray-200 bg-white hover:border-brand-red-300 hover:shadow-sm'
         }
         ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
       `}
     >
       {/* Selection indicator */}
       {selected && (
-        <div className="absolute top-3 right-3 w-6 h-6 bg-purple-600 rounded-full flex items-center justify-center">
+        <div className="absolute top-3 right-3 w-6 h-6 bg-brand-red-600 rounded-full flex items-center justify-center">
           <Check className="w-4 h-4 text-white" />
         </div>
       )}
 
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-12 h-8 bg-purple-600 rounded flex items-center justify-center">
+        <div className="w-12 h-8 bg-brand-red-600 rounded flex items-center justify-center">
           <span className="text-white text-xs font-bold">Sezzle</span>
         </div>
         <div>
@@ -74,11 +74,11 @@ export default function SezzlePaymentCard({
               <span className="text-xs text-gray-500 mb-1">
                 {i === 0 ? 'Today' : `+${i * 2} wks`}
               </span>
-              <span className={`font-bold ${i === 0 ? 'text-purple-600' : 'text-gray-700'}`}>
+              <span className={`font-bold ${i === 0 ? 'text-brand-red-600' : 'text-gray-700'}`}>
                 ${installmentAmount}
               </span>
               {i === 0 && (
-                <span className="text-xs text-purple-600 mt-1">Due now</span>
+                <span className="text-xs text-brand-red-600 mt-1">Due now</span>
               )}
             </div>
           ))}
@@ -88,15 +88,15 @@ export default function SezzlePaymentCard({
       {/* Features */}
       <div className="flex flex-wrap gap-4 text-sm text-gray-600">
         <div className="flex items-center gap-1.5">
-          <CreditCard className="w-4 h-4 text-purple-500" />
+          <CreditCard className="w-4 h-4 text-brand-red-500" />
           <span>0% interest</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Calendar className="w-4 h-4 text-purple-500" />
+          <Calendar className="w-4 h-4 text-brand-red-500" />
           <span>6 weeks to pay</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <Shield className="w-4 h-4 text-purple-500" />
+          <Shield className="w-4 h-4 text-brand-red-500" />
           <span>No hard credit check</span>
         </div>
       </div>
@@ -120,11 +120,11 @@ export function SezzlePaymentBadge({ price }: { price: number }) {
   if (!isEligible) return null;
 
   return (
-    <div className="inline-flex items-center gap-2 bg-purple-50 border border-purple-200 rounded-full px-3 py-1.5">
-      <div className="w-14 h-5 bg-purple-600 rounded flex items-center justify-center">
+    <div className="inline-flex items-center gap-2 bg-brand-red-50 border border-brand-red-200 rounded-full px-3 py-1.5">
+      <div className="w-14 h-5 bg-brand-red-600 rounded flex items-center justify-center">
         <span className="text-white text-[10px] font-bold">Sezzle</span>
       </div>
-      <span className="text-sm text-purple-700">
+      <span className="text-sm text-brand-red-700">
         or 4 × <strong>${installmentAmount}</strong>
       </span>
     </div>
@@ -143,7 +143,7 @@ export function SezzleInfoTooltip() {
         onMouseEnter={() => setIsOpen(true)}
         onMouseLeave={() => setIsOpen(false)}
         onClick={() => setIsOpen(!isOpen)}
-        className="text-purple-600 hover:text-purple-700 underline text-sm"
+        className="text-brand-red-600 hover:text-brand-red-700 underline text-sm"
       >
         What is Sezzle?
       </button>
@@ -162,7 +162,7 @@ export function SezzleInfoTooltip() {
               href="https://sezzle.com/how-it-works" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-purple-600 hover:text-purple-700 text-sm"
+              className="text-brand-red-600 hover:text-brand-red-700 text-sm"
             >
               Learn more →
             </a>

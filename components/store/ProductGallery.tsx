@@ -35,7 +35,7 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
         )}
 
         {product.salePrice && (
-          <div className="absolute top-4 left-4 px-4 py-2 bg-brand-orange-600 text-white font-bold rounded-lg shadow-lg">
+          <div className="absolute top-4 left-4 px-4 py-2 bg-brand-blue-600 text-white font-bold rounded-lg shadow-lg">
             SALE
           </div>
         )}

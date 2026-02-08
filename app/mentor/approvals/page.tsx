@@ -220,7 +220,7 @@ export default async function MentorApprovalsPage({
         </button>
 
         <a
-          className="border border-slate-300 rounded px-4 py-2 text-sm font-semibold bg-brand-green-600 text-white hover:bg-green-700 transition"
+          className="border border-slate-300 rounded px-4 py-2 text-sm font-semibold bg-brand-blue-600 text-white hover:bg-green-700 transition"
           href={`/api/time/export?${qs.toString()}`}
           title="Download CSV export"
         >
@@ -290,7 +290,7 @@ export default async function MentorApprovalsPage({
                         e.status === 'SUBMITTED'
                           ? 'bg-yellow-100 text-yellow-800'
                           : e.status === 'APPROVED'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-blue-100 text-green-800'
                             : e.status === 'REJECTED'
                               ? 'bg-red-100 text-red-800'
                               : 'bg-slate-100 text-black'
@@ -307,7 +307,7 @@ export default async function MentorApprovalsPage({
                           ? 'bg-blue-100 text-blue-800'
                           : e.funding_phase === 'PRE_WIOA'
                             ? 'bg-slate-100 text-black'
-                            : 'bg-purple-100 text-purple-800'
+                            : 'bg-brand-red-100 text-brand-red-800'
                       }`}
                     >
                       {e.funding_phase}
@@ -347,7 +347,7 @@ export default async function MentorApprovalsPage({
                       }}
                     >
                       <button
-                        className="px-3 py-2 border border-brand-green-600 text-brand-green-600 rounded text-xs font-semibold hover:bg-green-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-3 py-2 border border-brand-blue-600 text-brand-blue-600 rounded text-xs font-semibold hover:bg-green-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={e.status !== 'SUBMITTED'}
                       >
                         Approve
@@ -361,7 +361,7 @@ export default async function MentorApprovalsPage({
                       }}
                     >
                       <button
-                        className="px-3 py-2 border border-red-600 text-brand-orange-600 rounded text-xs font-semibold hover:bg-red-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-3 py-2 border border-red-600 text-brand-blue-600 rounded text-xs font-semibold hover:bg-red-50 transition disabled:opacity-50 disabled:cursor-not-allowed"
                         disabled={e.status !== 'SUBMITTED'}
                       >
                         Reject

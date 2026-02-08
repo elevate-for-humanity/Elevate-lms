@@ -146,7 +146,7 @@ export default async function WIOAEligibilityPage() {
             <Link href="/financial-aid" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
               Financial Aid
             </Link>
-            <Link href="/jri" className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors">
+            <Link href="/jri" className="px-4 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium hover:bg-brand-red-200 transition-colors">
               JRI Programs
             </Link>
             <Link href="/how-it-works" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
@@ -283,10 +283,10 @@ export default async function WIOAEligibilityPage() {
                 Apply for Funded Training
               </Link>
               <a
-                href="tel:3173143757"
+                href="/contact"
                 className="border-2 border-green-600 text-green-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-green-50 transition text-center"
               >
-                Call (317) 314-3757
+                Call Contact Us
               </a>
             </div>
           </div>

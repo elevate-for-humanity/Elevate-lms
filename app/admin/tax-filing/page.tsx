@@ -118,7 +118,7 @@ export default async function TaxFilingAdminPage() {
           <div className="text-sm font-medium text-black mb-1">
             Pending Assignment
           </div>
-          <div className="text-3xl font-bold text-brand-orange-600">
+          <div className="text-3xl font-bold text-brand-blue-600">
             {stats.pending}
           </div>
         </div>
@@ -127,7 +127,7 @@ export default async function TaxFilingAdminPage() {
           <div className="text-sm font-medium text-black mb-1">
             Active Preparers
           </div>
-          <div className="text-3xl font-bold text-brand-green-600">
+          <div className="text-3xl font-bold text-brand-blue-600">
             {stats.activePreparers}
           </div>
         </div>
@@ -154,13 +154,13 @@ export default async function TaxFilingAdminPage() {
           </Link>
           <Link
             href="/admin/tax-filing/preparers"
-            className="px-4 py-2 bg-brand-green-600 text-white rounded-lg hover:bg-green-700 transition"
+            className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-green-700 transition"
           >
             Manage Preparers ({stats.totalPreparers})
           </Link>
           <Link
             href="/admin/tax-filing/training"
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+            className="px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 transition"
           >
             Training Management
           </Link>
@@ -180,7 +180,7 @@ export default async function TaxFilingAdminPage() {
         </div>
 
         {error && (
-          <div className="p-6 text-brand-orange-600">
+          <div className="p-6 text-brand-blue-600">
             Error loading applications: {error.message}
           </div>
         )}
@@ -233,9 +233,9 @@ export default async function TaxFilingAdminPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-black">
                       {app.preparer_id ? (
-                        <span className="text-brand-green-600">Assigned</span>
+                        <span className="text-brand-blue-600">Assigned</span>
                       ) : (
-                        <span className="text-brand-orange-600">
+                        <span className="text-brand-blue-600">
                           Unassigned
                         </span>
                       )}
@@ -244,7 +244,7 @@ export default async function TaxFilingAdminPage() {
                       <span
                         className={`px-2 py-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           app.status === 'completed'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-blue-100 text-green-800'
                             : app.status === 'filed'
                               ? 'bg-blue-100 text-blue-800'
                               : app.status === 'in_progress'
@@ -271,7 +271,7 @@ export default async function TaxFilingAdminPage() {
                         View
                       </Link>
                       {app.status === 'pending' && (
-                        <button className="text-brand-green-600 hover:text-green-900" aria-label="Action button">
+                        <button className="text-brand-blue-600 hover:text-green-900" aria-label="Action button">
                           Assign
                         </button>
                       )}
@@ -339,7 +339,7 @@ export default async function TaxFilingAdminPage() {
                   <ul className="space-y-4">
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -357,7 +357,7 @@ export default async function TaxFilingAdminPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -375,7 +375,7 @@ export default async function TaxFilingAdminPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -393,7 +393,7 @@ export default async function TaxFilingAdminPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

@@ -57,7 +57,7 @@ export function SupersonicHeader() {
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/book-appointment"
-                  className="block px-4 py-3 hover:bg-purple-50 hover:text-purple-600 rounded-lg transition-colors font-semibold"
+                  className="block px-4 py-3 hover:bg-brand-red-50 hover:text-brand-red-600 rounded-lg transition-colors font-semibold"
                 >
                   <Calendar className="w-5 h-5 inline-block" /> Book Appointment
                 </Link>
@@ -119,10 +119,10 @@ export function SupersonicHeader() {
 
           <div className="flex items-center gap-4">
             <a
-              href="tel:+13173143757"
+              href="/contact"
               className="hidden sm:block font-bold text-lg hover:text-red-400 transition-colors"
             >
-              <Phone className="w-5 h-5 inline-block" /> (317) 314-3757
+              <Phone className="w-5 h-5 inline-block" /> Contact Us
             </a>
             <Link
               href="/supersonic-fast-cash/apply"

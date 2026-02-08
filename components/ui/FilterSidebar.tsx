@@ -73,7 +73,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
           {totalSelectedCount > 0 && (
             <button
               onClick={onClearAll}
-              className="text-sm text-brand-orange-600 hover:text-blue-700 font-medium"
+              className="text-sm text-brand-blue-600 hover:text-blue-700 font-medium"
             >
               Clear all
             </button>
@@ -106,7 +106,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 <span className="font-medium text-black">
                   {group.label}
                   {groupSelections.length > 0 && (
-                    <span className="ml-2 text-sm text-brand-orange-600">
+                    <span className="ml-2 text-sm text-brand-blue-600">
                       ({groupSelections.length})
                     </span>
                   )}
@@ -136,7 +136,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                           onChange={(e) =>
                             onFilterChange(group.id, option.id, e.target.checked)
                           }
-                          className="h-4 w-4 text-brand-orange-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                          className="h-4 w-4 text-brand-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
                         />
                         <span className="flex-1 text-sm text-black group-hover:text-black">
                           {option.label}

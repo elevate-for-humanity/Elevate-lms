@@ -113,7 +113,7 @@ export default function VirtualCareerFair() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-2 border-b-2 font-medium ${
-                  activeTab === tab ? 'border-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
+                  activeTab === tab ? 'border-red-600 text-brand-blue-600' : 'border-transparent text-gray-500'
                 }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -165,7 +165,7 @@ export default function VirtualCareerFair() {
                     <div className="flex items-center gap-3 mb-2">
                       <span className={`px-3 py-2 rounded text-xs font-medium ${
                         session.type === 'workshop' ? 'bg-blue-100 text-blue-700' :
-                        session.type === 'panel' ? 'bg-purple-100 text-purple-700' :
+                        session.type === 'panel' ? 'bg-brand-red-100 text-brand-red-700' :
                         'bg-green-100 text-green-700'
                       }`}>
                         {session.type}

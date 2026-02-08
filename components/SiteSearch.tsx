@@ -228,7 +228,7 @@ export default function SiteSearch() {
       case 'program':
         return 'text-teal-600 bg-teal-50';
       case 'event':
-        return 'text-purple-600 bg-purple-50';
+        return 'text-brand-red-600 bg-brand-red-50';
       case 'article':
         return 'text-orange-600 bg-orange-50';
       default:

@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Circle, Clock, Users, DollarSign, FileText, Shield } from 'lucide-react';
 import { getOrientationConfig, formatCurrency } from '@/lms-data/orientationConfig';
-import PageAvatar from '@/components/PageAvatar';
 
 const config = getOrientationConfig('barber-apprenticeship')!;
 
@@ -52,9 +51,9 @@ export default function BarberOrientationPage() {
               <h4 className="font-bold text-blue-900">On-the-Job Training (OJT)</h4>
               <p className="text-blue-800 text-sm">{config.ojtDescription}</p>
             </div>
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <h4 className="font-bold text-purple-900">Related Technical Instruction (RTI)</h4>
-              <p className="text-purple-800 text-sm">{config.rtiDescription}</p>
+            <div className="bg-brand-red-50 p-4 rounded-lg">
+              <h4 className="font-bold text-brand-red-900">Related Technical Instruction (RTI)</h4>
+              <p className="text-brand-red-800 text-sm">{config.rtiDescription}</p>
             </div>
           </div>
           <p className="text-sm text-slate-600 mt-4">
@@ -196,10 +195,6 @@ export default function BarberOrientationPage() {
   return (
     <div className="min-h-screen bg-slate-100">
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Orientation Guide"
-      />
 
       {/* Progress Bar */}
       <div className="bg-white border-b sticky top-0 z-10">

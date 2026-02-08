@@ -80,7 +80,7 @@ export function InteractiveQuiz({
     return (
       <div className="bg-slate-800 rounded-lg p-8 text-center">
         <div className={`w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center ${
-          passed ? "bg-green-500/20" : "bg-brand-orange-500/20"
+          passed ? "bg-green-500/20" : "bg-brand-blue-500/20"
         }`}>
           {passed ? (
             <Circle className="w-12 h-12 text-green-400" />
@@ -179,7 +179,7 @@ export function InteractiveQuiz({
         <div className={`p-4 rounded-lg mb-6 ${
           JSON.stringify(answers[question.id]) === JSON.stringify(question.correct_answer)
             ? "bg-green-500/20 border border-green-500/50"
-            : "bg-brand-orange-500/20 border border-red-500/50"
+            : "bg-brand-blue-500/20 border border-red-500/50"
         }`}>
           <div className="flex items-start gap-3">
             {JSON.stringify(answers[question.id]) === JSON.stringify(question.correct_answer) ? (

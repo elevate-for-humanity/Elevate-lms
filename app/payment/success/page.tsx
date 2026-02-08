@@ -33,8 +33,8 @@ export default async function PaymentSuccessPage() {
     <div className="min-h-screen bg-zinc-900  to-white py-20">
       <div className="container mx-auto px-4 max-w-2xl text-center">
         <div className="bg-white rounded-2xl shadow-xl p-12">
-          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Circle className="w-12 h-12 text-brand-green-600" />
+          <div className="w-20 h-20 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Circle className="w-12 h-12 text-brand-blue-600" />
           </div>
 
           <h1 className="text-4xl font-bold text-black mb-4 text-2xl md:text-3xl lg:text-4xl">
@@ -71,7 +71,7 @@ export default async function PaymentSuccessPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/student/dashboard"
-              className="bg-brand-orange-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-orange-700 transition"
+              className="bg-brand-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               Go to Student Portal
             </Link>
@@ -87,15 +87,15 @@ export default async function PaymentSuccessPage() {
             <p className="text-sm text-black">
               Questions? Contact us at{' '}
               <a
-                href="tel:317-314-3757"
-                className="text-brand-orange-600 hover:underline"
+                href="/contact"
+                className="text-brand-blue-600 hover:underline"
               >
-                317-314-3757
+                Contact Us
               </a>{' '}
               or{' '}
               <a
                 href="mailto:elevate4humanityedu@gmail.com"
-                className="text-brand-orange-600 hover:underline"
+                className="text-brand-blue-600 hover:underline"
               >
                 elevate4humanityedu@gmail.com
               </a>

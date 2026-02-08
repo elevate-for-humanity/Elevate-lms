@@ -180,13 +180,13 @@ export default function SignInForm() {
             <label className="flex items-center">
               <input
                 type="checkbox"
-                className="w-4 h-4 text-brand-orange-600 border-slate-300 rounded focus:ring-orange-500"
+                className="w-4 h-4 text-brand-blue-600 border-slate-300 rounded focus:ring-orange-500"
               />
               <span className="ml-2 text-sm text-black">Remember me</span>
             </label>
             <Link
               href="/auth/forgot-password"
-              className="text-sm font-medium text-brand-orange-600 hover:text-brand-orange-700"
+              className="text-sm font-medium text-brand-blue-600 hover:text-brand-blue-700"
             >
               Forgot password?
             </Link>
@@ -195,7 +195,7 @@ export default function SignInForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 px-4 bg-brand-orange-600 text-white font-semibold rounded-lg hover:bg-brand-orange-700 focus:ring-4 focus:ring-orange-200 disabled:opacity-50 disabled:cursor-not-allowed transition"
+            className="w-full py-3 px-4 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 focus:ring-4 focus:ring-orange-200 disabled:opacity-50 disabled:cursor-not-allowed transition"
           >
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
@@ -263,7 +263,7 @@ export default function SignInForm() {
           Don't have an account?{' '}
           <Link
             href="/auth/signup"
-            className="font-medium text-brand-orange-600 hover:text-brand-orange-700"
+            className="font-medium text-brand-blue-600 hover:text-brand-blue-700"
           >
             Sign up for free
           </Link>

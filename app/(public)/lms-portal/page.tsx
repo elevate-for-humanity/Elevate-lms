@@ -18,7 +18,7 @@ export default function LMSPortalPublicPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-900 to-blue-700 text-white py-16 md:py-24">
+      <section className="bg-brand-blue-700 text-white py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-4 text-center">
           <BookOpen className="w-16 h-16 mx-auto mb-6 text-blue-300" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Learning Management System</h1>
@@ -67,7 +67,7 @@ export default function LMSPortalPublicPage() {
               <p className="text-slate-600">Earn industry-recognized certificates upon completing your training programs.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
-              <Users className="w-10 h-10 text-purple-600 mb-4" />
+              <Users className="w-10 h-10 text-brand-red-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Community</h3>
               <p className="text-slate-600">Connect with fellow students, join study groups, and participate in forums.</p>
             </div>

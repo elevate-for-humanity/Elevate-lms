@@ -117,7 +117,7 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-2xl font-bold">Hour Tracker</h3>
-            <p className="text-purple-100 text-sm mt-1">{programName}</p>
+            <p className="text-brand-red-100 text-sm mt-1">{programName}</p>
           </div>
           <Clock className="w-12 h-12 opacity-80" />
         </div>
@@ -137,7 +137,7 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
               </div>
               <button
                 onClick={handleClockOut}
-                className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg hover:scale-105"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg hover:scale-105"
               >
                 <Square className="w-5 h-5" />
                 Clock Out
@@ -148,7 +148,7 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
               <div className="text-black text-sm">Ready to log your training hours?</div>
               <button
                 onClick={handleClockIn}
-                className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg hover:scale-105"
+                className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all shadow-lg hover:scale-105"
               >
                 <Play className="w-5 h-5" />
                 Clock In
@@ -164,7 +164,7 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-black">Total Hours Completed</span>
-            <span className="text-2xl font-bold text-purple-600">
+            <span className="text-2xl font-bold text-brand-red-600">
               {totalHours.toFixed(1)} / {requiredHours}
             </span>
           </div>
@@ -194,9 +194,9 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
             </div>
             <div className="text-xs text-black">Last Session</div>
           </div>
-          <div className="bg-purple-50 rounded-xl p-4 text-center">
-            <Award className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-purple-600">
+          <div className="bg-brand-red-50 rounded-xl p-4 text-center">
+            <Award className="w-6 h-6 text-brand-red-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-brand-red-600">
               {progressPercentage >= 100 ? '•' : Math.ceil(hoursRemaining)}
             </div>
             <div className="text-xs text-black">To Complete</div>
@@ -214,13 +214,13 @@ export function HourTracker({ programName, requiredHours, studentId }: HourTrack
                   className="flex items-center justify-between bg-slate-50 rounded-lg p-3 text-sm"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-2 h-2 bg-purple-500 rounded-full" />
+                    <div className="w-2 h-2 bg-brand-red-500 rounded-full" />
                     <div>
                       <div className="font-semibold text-black">{session.activity}</div>
                       <div className="text-xs text-black">{session.date}</div>
                     </div>
                   </div>
-                  <div className="font-bold text-purple-600">{session.hours.toFixed(2)}h</div>
+                  <div className="font-bold text-brand-red-600">{session.hours.toFixed(2)}h</div>
                 </div>
               ))}
             </div>

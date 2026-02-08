@@ -23,7 +23,7 @@ interface ProgramCategoryPageProps {
   description: string;
   heroVideoSrc: string;
   heroPosterImage: string;
-  accentColor: 'blue' | 'orange' | 'green' | 'purple' | 'red' | 'teal';
+  accentColor: 'blue' | 'orange' | 'green' | 'brand-red' | 'red' | 'teal';
   programs: Program[];
   highlights?: string[];
   avatarVideoSrc?: string;
@@ -49,11 +49,11 @@ const colorClasses = {
     text: 'text-green-600',
     light: 'bg-green-50',
   },
-  purple: {
-    button: 'bg-purple-600 hover:bg-purple-700',
-    badge: 'bg-purple-600',
-    text: 'text-purple-600',
-    light: 'bg-purple-50',
+  brand-red: {
+    button: 'bg-brand-red-600 hover:bg-brand-red-700',
+    badge: 'bg-brand-red-600',
+    text: 'text-brand-red-600',
+    light: 'bg-brand-red-50',
   },
   red: {
     button: 'bg-red-600 hover:bg-red-700',

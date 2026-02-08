@@ -25,7 +25,7 @@ export default function JRIPage() {
         <li>Committed to program completion</li>
       </ul>
           <h2>Contact</h2>
-          <p>Email: elevate4humanityedu@gmail.com | Phone: (317) 314-3757</p>
+          <p>Email: elevate4humanityedu@gmail.com | Phone: Contact Us</p>
         </article>
       </div>
     </div>

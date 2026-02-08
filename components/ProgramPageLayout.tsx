@@ -93,7 +93,7 @@ export default function ProgramPageLayout({
             <div className="flex flex-wrap gap-4">
               <Link
                 href={ctaPrimary.href}
-                className="bg-brand-orange-600 text-white px-10 py-5 rounded-full font-bold hover:bg-brand-orange-700 text-xl shadow-2xl transition-all hover:scale-105"
+                className="bg-brand-blue-600 text-white px-10 py-5 rounded-full font-bold hover:bg-brand-blue-700 text-xl shadow-2xl transition-all hover:scale-105"
               >
                 {ctaPrimary.text}
               </Link>
@@ -251,13 +251,13 @@ d="M5 13l4 4L19 7" />
             <div className="flex flex-wrap gap-6 justify-center">
               <Link
                 href="/apply"
-                className="bg-white text-brand-orange-600 px-12 py-6 rounded-full font-bold hover:bg-gray-100 text-xl shadow-2xl transition-all hover:scale-105"
+                className="bg-white text-brand-blue-600 px-12 py-6 rounded-full font-bold hover:bg-gray-100 text-xl shadow-2xl transition-all hover:scale-105"
               >
                 Start Your Application
               </Link>
               <Link
                 href="/contact"
-                className="bg-transparent border-4 border-white text-white px-12 py-6 rounded-full font-bold hover:bg-white hover:text-brand-orange-600 text-xl shadow-2xl transition-all hover:scale-105"
+                className="bg-transparent border-4 border-white text-white px-12 py-6 rounded-full font-bold hover:bg-white hover:text-brand-blue-600 text-xl shadow-2xl transition-all hover:scale-105"
               >
                 Talk to an Advisor
               </Link>

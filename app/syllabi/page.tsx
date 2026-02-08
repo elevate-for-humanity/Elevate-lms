@@ -553,7 +553,7 @@ export default function SyllabiPage() {
                     {/* Learning Outcomes */}
                     <div className="mb-6">
                       <div className="flex items-center gap-2 mb-3">
-                        <Target className="w-5 h-5 text-brand-green-600" />
+                        <Target className="w-5 h-5 text-brand-blue-600" />
                         <h4 className="font-bold text-black">
                           Learning Outcomes
                         </h4>
@@ -565,7 +565,7 @@ export default function SyllabiPage() {
                       <ul className="space-y-2">
                         {course.learningOutcomes.map((outcome, idx) => (
                           <li key={idx} className="flex items-start gap-3">
-                            <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                            <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                             <span className="text-black">{outcome}</span>
                           </li>
                         ))}
@@ -575,7 +575,7 @@ export default function SyllabiPage() {
                     {/* Assessments */}
                     <div className="mb-6">
                       <div className="flex items-center gap-2 mb-3">
-                        <Award className="w-5 h-5 text-purple-600" />
+                        <Award className="w-5 h-5 text-brand-red-600" />
                         <h4 className="font-bold text-black">
                           Assessments & Grading
                         </h4>
@@ -586,7 +586,7 @@ export default function SyllabiPage() {
                             key={idx}
                             className="flex items-start gap-3 text-black"
                           >
-                            <span className="text-purple-600 font-bold">•</span>
+                            <span className="text-brand-red-600 font-bold">•</span>
                             <span>{assessment}</span>
                           </li>
                         ))}
@@ -636,7 +636,7 @@ export default function SyllabiPage() {
                   </Link>
                   <Link
                     href="/apply"
-                    className="px-6 py-3 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition font-medium"
+                    className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-medium"
                   >
                     Apply Now
                   </Link>
@@ -658,19 +658,19 @@ export default function SyllabiPage() {
           </p>
           <ul className="space-y-2 text-black">
             <li className="flex items-start gap-3">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Council on Occupational Education (COE) standards</span>
             </li>
             <li className="flex items-start gap-3">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Industry certification requirements</span>
             </li>
             <li className="flex items-start gap-3">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>State licensing board requirements</span>
             </li>
             <li className="flex items-start gap-3">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Employer and workforce development needs</span>
             </li>
           </ul>
@@ -694,10 +694,10 @@ export default function SyllabiPage() {
             </a>
             <span className="text-slate-400">|</span>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
-              317-314-3757
+              Contact Us
             </a>
           </div>
         </div>

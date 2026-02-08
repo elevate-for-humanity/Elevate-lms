@@ -247,7 +247,7 @@ export function FundingEligibilityQuiz() {
 
         {/* Contact */}
         <p className="text-center text-slate-600 mt-6">
-          Questions? Call us at <a href="tel:317-314-3757" className="text-blue-600 font-semibold">(317) 314-3757</a>
+          Questions? Call us at <a href="/contact" className="text-blue-600 font-semibold">Contact Us</a>
         </p>
       </div>
     );

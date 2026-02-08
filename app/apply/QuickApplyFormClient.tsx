@@ -138,7 +138,7 @@ Preferred Contact: ${form.preferredContact}`,
     } catch (err: any) {
       setErrorMessage(
         (err instanceof Error ? err.message : String(err)) ||
-          "We're having a temporary issue submitting this form. Please call 317-314-3757 or use the Quick Inquiry form while we fix this."
+          "We're having a temporary issue submitting this form. Please call Contact Us or use the Quick Inquiry form while we fix this."
       );
     } finally {
       setSubmitting(false);
@@ -150,8 +150,8 @@ Preferred Contact: ${form.preferredContact}`,
     return (
       <div className="space-y-6">
         <div className="text-center py-8">
-          <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Circle className="w-12 h-12 text-brand-green-600" />
+          <div className="w-20 h-20 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Circle className="w-12 h-12 text-brand-blue-600" />
           </div>
           <h2 className="text-3xl font-bold text-black mb-3">
             Application Received!
@@ -222,7 +222,7 @@ Preferred Contact: ${form.preferredContact}`,
               href="https://calendly.com/elevate-for-humanity/advisor-call"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-600 text-white font-bold rounded-lg hover:bg-brand-orange-700 transition shadow-lg"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition shadow-lg"
             >
               <Calendar className="w-5 h-5" />
               Schedule Call Now
@@ -254,15 +254,15 @@ Preferred Contact: ${form.preferredContact}`,
             <p className="text-sm text-black">
               Questions? Call us at{' '}
               <a
-                href="tel:3173143757"
-                className="font-bold text-brand-orange-600 hover:text-brand-orange-700"
+                href="/contact"
+                className="font-bold text-brand-blue-600 hover:text-brand-blue-700"
               >
-                (317) 314-3757
+                Contact Us
               </a>{' '}
               or email{' '}
               <a
                 href="mailto:elevate4humanityedu@gmail.com"
-                className="font-bold text-brand-orange-600 hover:text-brand-orange-700"
+                className="font-bold text-brand-blue-600 hover:text-brand-blue-700"
               >
                 elevate4humanityedu@gmail.com
               </a>
@@ -463,7 +463,7 @@ Preferred Contact: ${form.preferredContact}`,
         <button
           type="submit"
           disabled={submitting}
-          className="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-brand-orange-600 px-8 py-4 text-lg font-bold text-white shadow-lg hover:bg-brand-orange-700 hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          className="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-lg bg-brand-blue-600 px-8 py-4 text-lg font-bold text-white shadow-lg hover:bg-brand-blue-700 hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting ? (
             <>

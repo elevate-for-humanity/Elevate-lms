@@ -67,7 +67,7 @@ export default async function PaymentPage() {
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center">
                     <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
+                      className="w-5 h-5 text-brand-blue-600 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -83,7 +83,7 @@ export default async function PaymentPage() {
                   </li>
                   <li className="flex items-center">
                     <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
+                      className="w-5 h-5 text-brand-blue-600 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -99,7 +99,7 @@ export default async function PaymentPage() {
                   </li>
                   <li className="flex items-center">
                     <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
+                      className="w-5 h-5 text-brand-blue-600 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -132,7 +132,7 @@ export default async function PaymentPage() {
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center">
                     <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
+                      className="w-5 h-5 text-brand-blue-600 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -148,7 +148,7 @@ export default async function PaymentPage() {
                   </li>
                   <li className="flex items-center">
                     <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
+                      className="w-5 h-5 text-brand-blue-600 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -164,7 +164,7 @@ export default async function PaymentPage() {
                   </li>
                   <li className="flex items-center">
                     <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
+                      className="w-5 h-5 text-brand-blue-600 mr-2"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -181,7 +181,7 @@ export default async function PaymentPage() {
                 </ul>
                 <Link
                   href="/programs"
-                  className="block w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white text-center px-6 py-3 rounded-lg font-semibold transition-colors"
+                  className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-3 rounded-lg font-semibold transition-colors"
                 >
                   View Programs & Pay in 4
                 </Link>
@@ -189,7 +189,7 @@ export default async function PaymentPage() {
             </div>
 
             {/* Barber Program Payment */}
-            <div className="mt-12 bg-gradient-to-r from-orange-500 to-orange-600 rounded-lg shadow-lg p-8 text-white">
+            <div className="mt-12 bg-brand-red-600 rounded-lg shadow-lg p-8 text-white">
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
                   <h2 className="text-2xl font-bold mb-2">

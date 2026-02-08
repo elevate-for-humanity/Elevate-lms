@@ -166,15 +166,15 @@ export default function PaymentOptionsSelector({
     <div className="space-y-6">
       {/* Transfer Hours & Schedule Input */}
       {(showTransferHoursInput || showHoursPerWeekInput) && (
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-          <h3 className="font-semibold text-purple-900 mb-3 flex items-center gap-2">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
+          <h3 className="font-semibold text-brand-red-900 mb-3 flex items-center gap-2">
             <Calculator className="w-5 h-5" />
             Calculate Your Payment
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {showTransferHoursInput && (
               <div>
-                <label className="block text-sm font-medium text-purple-800 mb-1">
+                <label className="block text-sm font-medium text-brand-red-800 mb-1">
                   Transfer Hours (if any)
                 </label>
                 <input
@@ -182,22 +182,22 @@ export default function PaymentOptionsSelector({
                   value={transferHours || ''}
                   onChange={(e) => setTransferHours(parseInt(e.target.value) || 0)}
                   placeholder="0"
-                  className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 border border-brand-red-300 rounded-lg focus:ring-brand-red-500 focus:border-brand-red-500"
                   min="0"
                   max="1999"
                 />
-                <p className="text-xs text-purple-600 mt-1">Hours from previous barber school</p>
+                <p className="text-xs text-brand-red-600 mt-1">Hours from previous barber school</p>
               </div>
             )}
             {showHoursPerWeekInput && (
               <div>
-                <label className="block text-sm font-medium text-purple-800 mb-1">
+                <label className="block text-sm font-medium text-brand-red-800 mb-1">
                   Hours Per Week
                 </label>
                 <select
                   value={hoursPerWeek}
                   onChange={(e) => setHoursPerWeek(parseInt(e.target.value))}
-                  className="w-full px-3 py-2 border border-purple-300 rounded-lg focus:ring-purple-500 focus:border-purple-500"
+                  className="w-full px-3 py-2 border border-brand-red-300 rounded-lg focus:ring-brand-red-500 focus:border-brand-red-500"
                 >
                   <option value="25">25 hours/week (Part-time)</option>
                   <option value="30">30 hours/week</option>
@@ -239,7 +239,7 @@ export default function PaymentOptionsSelector({
             {options.weeksRemaining} weeks at {hoursPerWeek} hrs/week
           </span>
           {transferHours > 0 && (
-            <span className="flex items-center gap-1 text-purple-600">
+            <span className="flex items-center gap-1 text-brand-red-600">
               <Star className="w-4 h-4" />
               {transferHours} transfer hours applied
             </span>
@@ -506,7 +506,7 @@ function BNPLCard({
       onClick={onSelect}
       className={`border-2 rounded-lg p-4 cursor-pointer transition-all ${
         selected
-          ? 'border-purple-500 bg-purple-50'
+          ? 'border-brand-red-500 bg-brand-red-50'
           : 'border-gray-200 hover:border-gray-300'
       }`}
     >
@@ -515,7 +515,7 @@ function BNPLCard({
           <div className="flex items-center gap-2">
             <h4 className="font-semibold text-gray-900">{option.name}</h4>
             {option.interestFree && (
-              <span className="px-2 py-0.5 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+              <span className="px-2 py-0.5 bg-brand-red-100 text-brand-red-700 text-xs font-medium rounded-full">
                 0% Interest
               </span>
             )}
@@ -542,14 +542,14 @@ function BNPLCard({
       {/* Sezzle Logo */}
       <div className="mt-3 flex items-center gap-2">
         <img 
-          src="https://d34uoa9py2cgca.cloudfront.net/sezzle-logos/sezzle-logo-purple.svg" 
+          src="https://d34uoa9py2cgca.cloudfront.net/sezzle-logos/sezzle-logo-brand-red.svg" 
           alt="Sezzle" 
           className="h-5"
         />
       </div>
 
       {selected && (
-        <div className="mt-3 flex items-center gap-2 text-purple-600">
+        <div className="mt-3 flex items-center gap-2 text-brand-red-600">
           <Check className="w-5 h-5" />
           <span className="font-medium">Selected</span>
         </div>

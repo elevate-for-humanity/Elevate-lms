@@ -52,7 +52,7 @@ export default function VolunteerPage() {
         <div className="grid md:grid-cols-2 gap-6">
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <span className="text-brand-green-600 font-bold text-xl">•</span>
+              <span className="text-brand-blue-600 font-bold text-xl">•</span>
               <div>
                 <div className="font-semibold">Help Your Community</div>
                 <div className="text-sm text-black">
@@ -61,7 +61,7 @@ export default function VolunteerPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-brand-green-600 font-bold text-xl">•</span>
+              <span className="text-brand-blue-600 font-bold text-xl">•</span>
               <div>
                 <div className="font-semibold">Gain Valuable Skills</div>
                 <div className="text-sm text-black">
@@ -70,7 +70,7 @@ export default function VolunteerPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-brand-green-600 font-bold text-xl">•</span>
+              <span className="text-brand-blue-600 font-bold text-xl">•</span>
               <div>
                 <div className="font-semibold">IRS Certification</div>
                 <div className="text-sm text-black">
@@ -81,7 +81,7 @@ export default function VolunteerPage() {
           </div>
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <span className="text-brand-green-600 font-bold text-xl">•</span>
+              <span className="text-brand-blue-600 font-bold text-xl">•</span>
               <div>
                 <div className="font-semibold">Flexible Schedule</div>
                 <div className="text-sm text-black">
@@ -90,7 +90,7 @@ export default function VolunteerPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-brand-green-600 font-bold text-xl">•</span>
+              <span className="text-brand-blue-600 font-bold text-xl">•</span>
               <div>
                 <div className="font-semibold">Free Training</div>
                 <div className="text-sm text-black">
@@ -99,7 +99,7 @@ export default function VolunteerPage() {
               </div>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-brand-green-600 font-bold text-xl">•</span>
+              <span className="text-brand-blue-600 font-bold text-xl">•</span>
               <div>
                 <div className="font-semibold">Resume Builder</div>
                 <div className="text-sm text-black">
@@ -163,20 +163,20 @@ export default function VolunteerPage() {
         <h2 className="text-2xl font-bold mb-4">How to Get Started</h2>
         <div className="space-y-6">
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold text-lg">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold text-lg">
               1
             </div>
             <div>
               <h3 className="font-semibold text-lg">Express Interest</h3>
               <p className="text-black mt-1">
-                Call us at 317-314-3757 or email to express your interest in
+                Call us at Contact Us or email to express your interest in
                 volunteering.
               </p>
             </div>
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold text-lg">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold text-lg">
               2
             </div>
             <div>
@@ -191,7 +191,7 @@ export default function VolunteerPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold text-lg">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold text-lg">
               3
             </div>
             <div>
@@ -202,7 +202,7 @@ export default function VolunteerPage() {
               </p>
               <Link
                 href="/tax/rise-up-foundation/training"
-                className="text-brand-green-600 hover:underline text-sm mt-1 inline-block"
+                className="text-brand-blue-600 hover:underline text-sm mt-1 inline-block"
               >
                 View Training Details →
               </Link>
@@ -210,7 +210,7 @@ export default function VolunteerPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold text-lg">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold text-lg">
               4
             </div>
             <div>
@@ -223,7 +223,7 @@ export default function VolunteerPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold text-lg">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold text-lg">
               5
             </div>
             <div>
@@ -271,7 +271,7 @@ export default function VolunteerPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-green-600 p-6">
+      <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-blue-600 p-6">
         <h2 className="text-xl font-bold mb-3">Ready to Make a Difference?</h2>
         <p className="text-black mb-6">
           Join our team of dedicated volunteers and help your community this tax
@@ -279,14 +279,14 @@ export default function VolunteerPage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a
-            href="tel:3173143757"
-            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
+            href="/contact"
+            className="px-6 py-3 rounded-lg bg-brand-blue-600 text-white font-semibold hover:bg-green-700 transition"
           >
-            Call 317-314-3757
+            Call Contact Us
           </a>
           <a
             href="mailto:elevate4humanityedu@gmail.com"
-            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-green-50 transition"
+            className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-green-50 transition"
           >
             Email Us
           </a>

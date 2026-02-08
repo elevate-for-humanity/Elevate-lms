@@ -95,8 +95,8 @@ export default function FederalCompliancePage() {
           {/* FERPA Compliance */}
           <div className="mb-16">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <FileText className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <FileText className="w-6 h-6 text-brand-red-600" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold text-black mb-2">
@@ -262,7 +262,7 @@ export default function FederalCompliancePage() {
             </p>
             <div className="space-y-2 text-blue-900">
               <p><strong>Email:</strong> elevate4humanityedu@gmail.com</p>
-              <p><strong>Phone:</strong> (317) 314-3757</p>
+              <p><strong>Phone:</strong> Contact Us</p>
               <p><strong>Address:</strong> Indianapolis, IN</p>
             </div>
           </div>
@@ -309,10 +309,10 @@ export default function FederalCompliancePage() {
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="tel:3173143757"
+              href="/contact"
               className="inline-flex items-center gap-2 bg-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-800 transition border border-white/30"
             >
-              <Phone className="w-5 h-5" /> (317) 314-3757
+              <Phone className="w-5 h-5" /> Contact Us
             </a>
           </div>
         </div>

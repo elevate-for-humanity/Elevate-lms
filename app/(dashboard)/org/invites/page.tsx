@@ -316,7 +316,7 @@ export default function OrgInvitesPage() {
                           <span
                             className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
                               invite.status === 'accepted'
-                                ? 'bg-brand-green-100 text-green-800'
+                                ? 'bg-brand-blue-100 text-green-800'
                                 : invite.status === 'expired'
                                   ? 'bg-red-100 text-red-800'
                                   : 'bg-yellow-100 text-yellow-800'
@@ -342,7 +342,7 @@ export default function OrgInvitesPage() {
                               </button>
                               <button
                                 onClick={() => revokeInvite(invite.id)}
-                                className="text-brand-orange-600 hover:text-red-900"
+                                className="text-brand-blue-600 hover:text-red-900"
                               >
                                 Revoke
                               </button>

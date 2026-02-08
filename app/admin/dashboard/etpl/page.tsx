@@ -90,10 +90,10 @@ export default async function EtplDashboard() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-purple-200">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-brand-red-200">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <Circle className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center">
+                  <Circle className="w-6 h-6 text-brand-red-600" />
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-black">
@@ -208,7 +208,7 @@ export default async function EtplDashboard() {
 
           <div className="bg-white rounded-2xl p-6 shadow-lg">
             <div className="flex items-center gap-3 mb-4">
-              <Award className="w-6 h-6 text-purple-600" />
+              <Award className="w-6 h-6 text-brand-red-600" />
               <h2 className="text-xl font-bold text-black">
                 RAPIDS Tracking
               </h2>
@@ -232,7 +232,7 @@ export default async function EtplDashboard() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-black">Completed</span>
-                <span className="font-bold text-purple-600">
+                <span className="font-bold text-brand-red-600">
                   {rapids.completed}
                 </span>
               </div>
@@ -244,7 +244,7 @@ export default async function EtplDashboard() {
         {wotc.urgent > 0 && (
           <div className="bg-red-50 border-2 border-red-200 rounded-2xl p-6 mb-8">
             <div className="flex items-start gap-4">
-              <AlertCircle className="w-8 h-8 text-brand-orange-600 flex-shrink-0" />
+              <AlertCircle className="w-8 h-8 text-brand-blue-600 flex-shrink-0" />
               <div>
                 <h3 className="text-xl font-bold text-red-900 mb-2">
                   WOTC Deadline Alert
@@ -256,7 +256,7 @@ export default async function EtplDashboard() {
                 </p>
                 <Link
                   href="/admin/wotc"
-                  className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+                  className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
                 >
                   View WOTC Dashboard →
                 </Link>

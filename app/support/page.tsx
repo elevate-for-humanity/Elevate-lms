@@ -40,7 +40,7 @@ export default async function SupportPage() {
   const supportOptions = [
     { icon: MessageSquare, title: 'Live Chat', desc: 'Chat with our support team', href: '/support/chat', available: 'Mon-Fri 9am-5pm EST' },
     { icon: Mail, title: 'Email Support', desc: 'Send us a message', href: '/contact', available: 'Response within 24 hours' },
-    { icon: Phone, title: 'Phone Support', desc: 'Call (317) 314-3757', href: 'tel:+13173143757', available: 'Mon-Fri 9am-5pm EST' },
+    { icon: Phone, title: 'Phone Support', desc: 'Call Contact Us', href: 'tel:+13173143757', available: 'Mon-Fri 9am-5pm EST' },
     { icon: FileText, title: 'Help Center', desc: 'Browse help articles', href: '/help', available: 'Available 24/7' },
   ];
 
@@ -180,7 +180,7 @@ export default async function SupportPage() {
                 </svg>
               </summary>
               <div className="px-5 pb-5 text-gray-600">
-                For WIOA funding questions, contact your WorkOne case manager directly. For general funding questions, email us at elevate4humanityedu@gmail.com or call (317) 314-3757.
+                For WIOA funding questions, contact your WorkOne case manager directly. For general funding questions, email us at elevate4humanityedu@gmail.com or call Contact Us.
               </div>
             </details>
             
@@ -205,7 +205,7 @@ export default async function SupportPage() {
           <div className="flex flex-wrap gap-6 justify-center">
             <div className="text-white">
               <p className="text-sm text-slate-400">Phone</p>
-              <a href="tel:+13173143757" className="text-lg font-semibold hover:text-blue-400">(317) 314-3757</a>
+              <a href="/contact" className="text-lg font-semibold hover:text-blue-400">Contact Us</a>
             </div>
             <div className="text-white">
               <p className="text-sm text-slate-400">Email</p>

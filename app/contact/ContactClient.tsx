@@ -162,10 +162,10 @@ export default function ContactClient() {
                 ready to help you find the right program.
               </p>
               <a
-                href="tel:3173143757"
+                href="/contact"
                 className="inline-flex items-center justify-center bg-zinc-900   text-white px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-xl hover:scale-105 transition-all"
               >
-                317-314-3757
+                Contact Us
               </a>
             </div>
 
@@ -197,7 +197,7 @@ export default function ContactClient() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="bg-zinc-900   rounded-3xl p-12 shadow-2xl relative overflow-hidden">
             {/* Decorative elements */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-orange-600/20 rounded-full blur-3xl" />
+            <div className="absolute top-0 right-0 w-64 h-64 bg-brand-blue-600/20 rounded-full blur-3xl" />
 
             <div className="relative z-10">
               <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
@@ -209,7 +209,7 @@ export default function ContactClient() {
               </p>
               <Link
                 href="/login"
-                className="inline-flex items-center justify-center bg-white text-black px-10 py-4 rounded-2xl font-bold text-lg hover:bg-brand-orange-600 hover:text-white transition-all shadow-xl"
+                className="inline-flex items-center justify-center bg-white text-black px-10 py-4 rounded-2xl font-bold text-lg hover:bg-brand-blue-600 hover:text-white transition-all shadow-xl"
               >
                 Sign In to Portal
               </Link>

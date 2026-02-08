@@ -88,7 +88,7 @@ export function QuizSystem({
             {passed ? (
               <Circle className="w-12 h-12 text-green-600" />
             ) : (
-              <XCircle className="w-12 h-12 text-brand-orange-600" />
+              <XCircle className="w-12 h-12 text-brand-blue-600" />
             )}
           </div>
           <h2 className="text-3xl font-bold mb-2">
@@ -121,7 +121,7 @@ export function QuizSystem({
                   {isCorrect ? (
                     <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   ) : (
-                    <XCircle className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+                    <XCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   )}
                   <div className="flex-1">
                     <p className="font-semibold mb-2">

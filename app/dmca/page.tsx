@@ -126,10 +126,10 @@ export default async function DMCAPage() {
               <p className="text-black">
                 Phone:{' '}
                 <a
-                  href="tel:317-314-3757"
+                  href="/contact"
                   className="text-brand-blue-600 hover:underline"
                 >
-                  317-314-3757
+                  Contact Us
                 </a>
               </p>
             </div>
@@ -216,10 +216,10 @@ export default async function DMCAPage() {
               <p className="text-black">
                 Phone:{' '}
                 <a
-                  href="tel:317-314-3757"
+                  href="/contact"
                   className="text-brand-blue-600 hover:underline"
                 >
-                  317-314-3757
+                  Contact Us
                 </a>
               </p>
             </div>

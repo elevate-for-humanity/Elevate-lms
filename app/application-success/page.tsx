@@ -103,10 +103,10 @@ export default async function ApplicationSuccessPage() {
 
         <div className="space-y-3">
           <a
-            href="tel:13173143757"
+            href="/contact"
             className="block w-full rounded-xl bg-brand-blue-600 px-6 py-3 text-center font-semibold text-white hover:bg-brand-blue-700 transition-colors"
           >
-            Need help now? Call 317-314-3757
+            Need help now? Call Contact Us
           </a>
           <Link
             href="/"

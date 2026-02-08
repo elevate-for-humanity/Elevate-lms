@@ -82,7 +82,7 @@ export default async function TaxSelfPrepPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
               <Link
                 href="/supersonic-fast-cash"
-                className="px-12 py-5 bg-brand-orange-600 text-white font-bold text-xl rounded-full hover:bg-brand-orange-700 transition text-center shadow-2xl"
+                className="px-12 py-5 bg-brand-blue-600 text-white font-bold text-xl rounded-full hover:bg-brand-blue-700 transition text-center shadow-2xl"
               >
                 Start For Free →
               </Link>
@@ -123,7 +123,7 @@ export default async function TaxSelfPrepPage() {
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -137,7 +137,7 @@ export default async function TaxSelfPrepPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -151,7 +151,7 @@ export default async function TaxSelfPrepPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -191,7 +191,7 @@ export default async function TaxSelfPrepPage() {
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -205,7 +205,7 @@ export default async function TaxSelfPrepPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -219,7 +219,7 @@ export default async function TaxSelfPrepPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -242,8 +242,8 @@ export default async function TaxSelfPrepPage() {
               </div>
 
               {/* Premier - Most Popular */}
-              <div className="bg-white border-2 border-brand-orange-600 rounded-lg p-6 shadow-xl relative">
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-orange-600 text-white text-xs font-bold rounded-full">
+              <div className="bg-white border-2 border-brand-blue-600 rounded-lg p-6 shadow-xl relative">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-brand-blue-600 text-white text-xs font-bold rounded-full">
                   MOST POPULAR
                 </div>
                 <div className="text-center mb-6">
@@ -262,7 +262,7 @@ export default async function TaxSelfPrepPage() {
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -276,7 +276,7 @@ export default async function TaxSelfPrepPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -290,7 +290,7 @@ export default async function TaxSelfPrepPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -306,7 +306,7 @@ export default async function TaxSelfPrepPage() {
                 </div>
                 <Link
                   href="/tax-self-prep/start?plan=premier"
-                  className="block w-full px-6 py-3 bg-brand-orange-600 text-white font-bold text-center rounded-lg hover:bg-brand-orange-700 transition"
+                  className="block w-full px-6 py-3 bg-brand-blue-600 text-white font-bold text-center rounded-lg hover:bg-brand-blue-700 transition"
                 >
                   Start Premier
                 </Link>
@@ -332,7 +332,7 @@ export default async function TaxSelfPrepPage() {
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -346,7 +346,7 @@ export default async function TaxSelfPrepPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -360,7 +360,7 @@ export default async function TaxSelfPrepPage() {
                     </li>
                     <li className="flex items-start gap-2">
                       <svg
-                        className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5"
+                        className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -550,12 +550,12 @@ export default async function TaxSelfPrepPage() {
           </p>
           <Link
             href="/supersonic-fast-cash"
-            className="inline-block px-12 py-5 bg-brand-orange-600 text-white font-bold text-xl rounded-full hover:bg-brand-orange-700 transition shadow-2xl"
+            className="inline-block px-12 py-5 bg-brand-blue-600 text-white font-bold text-xl rounded-full hover:bg-brand-blue-700 transition shadow-2xl"
           >
             Start For Free →
           </Link>
           <p className="mt-6 text-sm opacity-90">
-            Questions? Chat with us 24/7 or call (317) 314-3757
+            Questions? Chat with us 24/7 or call Contact Us
           </p>
         </div>
       </section>
@@ -572,11 +572,11 @@ export default async function TaxSelfPrepPage() {
               Apply Now
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Contact Us
             </a>
           </div>
         </div>

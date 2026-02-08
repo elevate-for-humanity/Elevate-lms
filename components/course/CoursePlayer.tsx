@@ -72,7 +72,7 @@ export function CoursePlayer() {
         <div className="bg-black rounded-lg overflow-hidden aspect-video relative">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-white text-center">
-              <div className="w-20 h-20 rounded-full bg-brand-orange-600 flex items-center justify-center mx-auto mb-4 cursor-pointer hover:bg-brand-orange-700 transition-colors">
+              <div className="w-20 h-20 rounded-full bg-brand-blue-600 flex items-center justify-center mx-auto mb-4 cursor-pointer hover:bg-brand-blue-700 transition-colors">
                 {isPlaying ? (
                   <Pause
                     className="h-10 w-10"
@@ -102,7 +102,7 @@ export function CoursePlayer() {
                 )}
               </button>
               <div className="flex-1 h-1 bg-gray-600 rounded-full">
-                <div className="h-full w-1/3 bg-brand-orange-600 rounded-full" />
+                <div className="h-full w-1/3 bg-brand-blue-600 rounded-full" />
               </div>
               <span className="text-white text-sm">
                 8:30 / {currentLesson.duration}
@@ -155,19 +155,19 @@ export function CoursePlayer() {
           <div className="space-y-2">
             <button
               onClick={() => alert('Resource download Available Now!')}
-              className="flex items-center gap-2 text-brand-orange-600 hover:text-blue-700 text-sm w-full text-left"
+              className="flex items-center gap-2 text-brand-blue-600 hover:text-blue-700 text-sm w-full text-left"
             >
               📄 Cutting Techniques Guide.pdf
             </button>
             <button
               onClick={() => alert('Resource download Available Now!')}
-              className="flex items-center gap-2 text-brand-orange-600 hover:text-blue-700 text-sm w-full text-left"
+              className="flex items-center gap-2 text-brand-blue-600 hover:text-blue-700 text-sm w-full text-left"
             >
               📊 Practice Worksheet.pdf
             </button>
             <button
               onClick={() => alert('Resource download Available Now!')}
-              className="flex items-center gap-2 text-brand-orange-600 hover:text-blue-700 text-sm w-full text-left"
+              className="flex items-center gap-2 text-brand-blue-600 hover:text-blue-700 text-sm w-full text-left"
             >
               🎥 Bonus: Advanced Tips Video
             </button>
@@ -221,7 +221,7 @@ export function CoursePlayer() {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-brand-orange-600 h-2 rounded-full"
+              className="bg-brand-blue-600 h-2 rounded-full"
               style={{ width: '40%' }}
             />
           </div>

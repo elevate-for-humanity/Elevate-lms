@@ -22,9 +22,9 @@ const PATHWAY_CONFIG = {
     label: 'Employer-Sponsored',
     shortLabel: 'Employer',
     icon: Building2,
-    bgColor: 'bg-purple-100',
-    textColor: 'text-purple-700',
-    borderColor: 'border-purple-200',
+    bgColor: 'bg-brand-red-100',
+    textColor: 'text-brand-red-700',
+    borderColor: 'border-brand-red-200',
   },
   structured_tuition: {
     label: 'Structured Tuition',

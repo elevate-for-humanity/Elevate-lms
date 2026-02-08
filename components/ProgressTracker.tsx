@@ -31,7 +31,7 @@ export function ProgressTracker({ modules, overallProgress }: ProgressTrackerPro
           <div className="mb-4">
             <div className="flex items-center justify-between mb-2">
               <span className="font-semibold">Overall Progress</span>
-              <span className="text-2xl font-bold text-brand-orange-600">{overallProgress}%</span>
+              <span className="text-2xl font-bold text-brand-blue-600">{overallProgress}%</span>
             </div>
             <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
               <div
@@ -65,7 +65,7 @@ export function ProgressTracker({ modules, overallProgress }: ProgressTrackerPro
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-brand-orange-600 transition-all"
+                        className="h-full bg-brand-blue-600 transition-all"
                         style={{ width: `${module.progress}%` }}
                       />
                     </div>

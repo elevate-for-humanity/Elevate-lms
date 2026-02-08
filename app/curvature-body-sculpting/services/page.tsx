@@ -45,7 +45,7 @@ const services = [
     price: 'From $149/session',
     duration: '45 minutes',
     icon: Star,
-    color: 'purple',
+    color: 'brand-red',
     benefits: [
       'Stimulates collagen production',
       'Tightens loose skin',
@@ -134,7 +134,7 @@ const packages = [
 
 const colorClasses: Record<string, { bg: string; light: string; text: string }> = {
   pink: { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-600' },
-  purple: { bg: 'bg-purple-600', light: 'bg-purple-50', text: 'text-purple-600' },
+  brand-red: { bg: 'bg-brand-red-600', light: 'bg-brand-red-50', text: 'text-brand-red-600' },
   indigo: { bg: 'bg-indigo-600', light: 'bg-indigo-50', text: 'text-indigo-600' },
   green: { bg: 'bg-green-600', light: 'bg-green-50', text: 'text-green-600' },
   amber: { bg: 'bg-amber-600', light: 'bg-amber-50', text: 'text-amber-600' },
@@ -164,7 +164,7 @@ export default function ServicesPage() {
           </p>
           <Link
             href="/curvature-body-sculpting/book-appointment"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-purple-700 font-bold rounded-lg hover:bg-pink-50 transition"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-red-700 font-bold rounded-lg hover:bg-pink-50 transition"
           >
             <Calendar className="w-5 h-5" />
             Book Free Consultation
@@ -253,11 +253,11 @@ export default function ServicesPage() {
               <div
                 key={pkg.name}
                 className={`bg-white rounded-2xl p-6 ${
-                  pkg.popular ? 'ring-2 ring-purple-600 shadow-xl' : 'border'
+                  pkg.popular ? 'ring-2 ring-brand-red-600 shadow-xl' : 'border'
                 }`}
               >
                 {pkg.popular && (
-                  <span className="inline-block px-3 py-1 bg-purple-600 text-white text-xs font-bold rounded-full mb-4">
+                  <span className="inline-block px-3 py-1 bg-brand-red-600 text-white text-xs font-bold rounded-full mb-4">
                     Most Popular
                   </span>
                 )}
@@ -272,7 +272,7 @@ export default function ServicesPage() {
                   href="/curvature-body-sculpting/book-appointment"
                   className={`block text-center py-3 rounded-lg font-bold transition ${
                     pkg.popular
-                      ? 'bg-purple-600 text-white hover:bg-purple-700'
+                      ? 'bg-brand-red-600 text-white hover:bg-brand-red-700'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -293,7 +293,7 @@ export default function ServicesPage() {
           </p>
           <Link
             href="/curvature-body-sculpting/book-appointment"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-purple-700 font-bold rounded-lg hover:bg-pink-50 transition"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-red-700 font-bold rounded-lg hover:bg-pink-50 transition"
           >
             <Calendar className="w-5 h-5" />
             Book Free Consultation

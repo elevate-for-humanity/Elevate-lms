@@ -91,7 +91,7 @@ export function GuidedTour({
     return (
       <button
         onClick={startTour}
-        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 bg-purple-600 text-white rounded-full shadow-lg hover:bg-purple-700 transition-all"
+        className="fixed bottom-6 right-6 z-40 flex items-center gap-2 px-4 py-3 bg-brand-red-600 text-white rounded-full shadow-lg hover:bg-brand-red-700 transition-all"
         aria-label="Start guided tour"
       >
         <HelpCircle className="w-5 h-5" />
@@ -151,7 +151,7 @@ export function GuidedTour({
       {/* Highlight box */}
       {targetRect && (
         <div
-          className="fixed z-[9998] ring-4 ring-purple-500 ring-offset-4 rounded-lg pointer-events-none"
+          className="fixed z-[9998] ring-4 ring-brand-red-500 ring-offset-4 rounded-lg pointer-events-none"
           style={{
             top: targetRect.top - 4,
             left: targetRect.left - 4,
@@ -168,7 +168,7 @@ export function GuidedTour({
       >
         <div className="flex items-start justify-between mb-4">
           <div>
-            <span className="text-xs text-purple-600 font-medium">
+            <span className="text-xs text-brand-red-600 font-medium">
               Step {currentStep + 1} of {steps.length}
             </span>
             <h3 className="text-lg font-bold text-slate-900 mt-1">{step.title}</h3>
@@ -203,7 +203,7 @@ export function GuidedTour({
             )}
             <button
               onClick={handleNext}
-              className="flex items-center gap-1 px-4 py-2 text-sm bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+              className="flex items-center gap-1 px-4 py-2 text-sm bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700"
             >
               {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
               {currentStep < steps.length - 1 && <ChevronRight className="w-4 h-4" />}

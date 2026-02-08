@@ -48,7 +48,7 @@ export default function Page() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/contact"
-                className="bg-brand-orange-600 text-white px-8 py-4 rounded-full font-bold hover:bg-brand-orange-700 text-lg shadow-2xl transition-all"
+                className="bg-brand-blue-600 text-white px-8 py-4 rounded-full font-bold hover:bg-brand-blue-700 text-lg shadow-2xl transition-all"
               >
                 Contact Us - It's Free
               </Link>
@@ -79,7 +79,7 @@ export default function Page() {
           <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
-              <div className="w-16 h-16 bg-brand-orange-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
                 1
               </div>
               <h3 className="text-lg md:text-lg font-bold mb-4">
@@ -92,7 +92,7 @@ export default function Page() {
               </p>
               <Link
                 href="/contact"
-                className="text-brand-orange-600 font-semibold hover:underline"
+                className="text-brand-blue-600 font-semibold hover:underline"
               >
                 Contact Us →
               </Link>
@@ -114,17 +114,17 @@ export default function Page() {
               <p className="text-sm text-black">
                 Call us anytime:{' '}
                 <a
-                  href="tel:3173143757"
+                  href="/contact"
                   className="text-brand-blue-600 font-semibold"
                 >
-                  317-314-3757
+                  Contact Us
                 </a>
               </p>
             </div>
 
             {/* Step 3 */}
             <div className="bg-white rounded-2xl p-8 shadow-lg text-center">
-              <div className="w-16 h-16 bg-brand-green-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-6 text-white text-2xl font-bold">
                 3
               </div>
               <h3 className="text-lg md:text-lg font-bold mb-4">
@@ -137,7 +137,7 @@ export default function Page() {
               </p>
               <Link
                 href="/programs"
-                className="text-brand-green-600 font-semibold hover:underline"
+                className="text-brand-blue-600 font-semibold hover:underline"
               >
                 View Programs →
               </Link>
@@ -163,7 +163,7 @@ export default function Page() {
                 <ul className="space-y-4">
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -186,7 +186,7 @@ export default function Page() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -211,7 +211,7 @@ export default function Page() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -234,7 +234,7 @@ export default function Page() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"

@@ -155,7 +155,7 @@ export default function DiscussionsClient({
               onClick={() => setSortBy('recent')}
               className={`px-3 py-2 text-sm rounded-lg ${
                 sortBy === 'recent'
-                  ? 'bg-brand-orange-500 text-white'
+                  ? 'bg-brand-blue-500 text-white'
                   : 'bg-white text-black border border-slate-200'
               }`}
             >
@@ -165,7 +165,7 @@ export default function DiscussionsClient({
               onClick={() => setSortBy('popular')}
               className={`px-3 py-2 text-sm rounded-lg ${
                 sortBy === 'popular'
-                  ? 'bg-brand-orange-500 text-white'
+                  ? 'bg-brand-blue-500 text-white'
                   : 'bg-white text-black border border-slate-200'
               }`}
             >
@@ -205,7 +205,7 @@ export default function DiscussionsClient({
           <button
             type="submit"
             disabled={posting}
-            className="rounded-2xl bg-brand-orange-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-orange-600 disabled:opacity-60"
+            className="rounded-2xl bg-brand-blue-500 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-brand-blue-600 disabled:opacity-60"
           >
             {posting ? 'Posting…' : 'Post'}
           </button>

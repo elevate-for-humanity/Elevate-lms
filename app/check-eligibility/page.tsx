@@ -164,11 +164,11 @@ export default function CheckEligibilityPage() {
           <div className="mt-8 text-center">
             <p className="text-gray-600 mb-2">Questions about eligibility?</p>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:underline"
             >
               <Phone className="w-5 h-5" />
-              Call (317) 314-3757
+              Call Contact Us
             </a>
           </div>
         </div>

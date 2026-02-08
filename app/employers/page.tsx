@@ -12,7 +12,6 @@ import {
   Phone,
   Building2,
 } from 'lucide-react';
-import PageAvatar from '@/components/PageAvatar';
 
 export const metadata: Metadata = {
   title: 'For Employers | Elevate for Humanity',
@@ -64,11 +63,11 @@ export default function EmployersPage() {
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <a
-                href="tel:317-314-3757"
+                href="/contact"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-lg transition-colors"
               >
                 <Phone className="w-5 h-5" />
-                (317) 314-3757
+                Contact Us
               </a>
             </div>
           </div>
@@ -76,10 +75,6 @@ export default function EmployersPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Employer Partners" 
-      />
 
       {/* Quick Links */}
       <section className="py-6 bg-gray-50 border-b">
@@ -91,7 +86,7 @@ export default function EmployersPage() {
             <Link href="/ojt-and-funding" className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
               OJT & Funding
             </Link>
-            <Link href="/workforce-partners" className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors">
+            <Link href="/workforce-partners" className="px-4 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium hover:bg-brand-red-200 transition-colors">
               Workforce Partners
             </Link>
             <Link href="/programs" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
@@ -289,11 +284,11 @@ export default function EmployersPage() {
               <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-orange-700 text-white font-semibold rounded-full hover:bg-orange-800 transition-colors"
             >
               <Phone className="w-5 h-5" />
-              (317) 314-3757
+              Contact Us
             </a>
           </div>
         </div>

@@ -30,7 +30,7 @@ const credentials = [
     description: 'Workforce Innovation & Opportunity Act',
     id: null,
     icon: Circle,
-    color: 'purple',
+    color: 'brand-red',
   },
 ];
 
@@ -149,7 +149,7 @@ export function CredentialBadgeStrip({ className = '' }: { className?: string })
         </span>
         <span className="text-gray-300">|</span>
         <span className="inline-flex items-center gap-1 text-gray-700">
-          <Circle className="w-4 h-4 text-purple-600" />
+          <Circle className="w-4 h-4 text-brand-red-600" />
           WIOA
         </span>
       </div>

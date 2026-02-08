@@ -179,7 +179,7 @@ export function ARTrainingModules() {
                     <span>⏱️ {module.duration}</span>
                     <span className={`px-2 py-0.5 rounded text-xs ${
                       module.difficulty === 'beginner' ? 'bg-blue-100 text-blue-700' :
-                      module.difficulty === 'intermediate' ? 'bg-purple-100 text-purple-700' :
+                      module.difficulty === 'intermediate' ? 'bg-brand-red-100 text-brand-red-700' :
                       'bg-red-100 text-red-700'
                     }`}>
                       {module.difficulty}
@@ -226,7 +226,7 @@ export function ARTrainingModules() {
                       <div className="text-center">
                         <div className="text-8xl mb-4">🥽</div>
                         <p className="text-2xl font-bold mb-2">AR Experience Active</p>
-                        <p className="text-purple-200">Point your camera at a flat surface to begin</p>
+                        <p className="text-brand-red-200">Point your camera at a flat surface to begin</p>
                       </div>
                     </div>
 
@@ -249,7 +249,7 @@ export function ARTrainingModules() {
                       ].map((step, idx) => (
                         <div key={idx} className="flex items-center gap-3 p-3 bg-gray-50 rounded">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                            idx === 0 ? 'bg-brand-orange-600 text-white' : 'bg-gray-300 text-black'
+                            idx === 0 ? 'bg-brand-blue-600 text-white' : 'bg-gray-300 text-black'
                           }`}>
                             {idx + 1}
                           </div>

@@ -70,7 +70,7 @@ export default function EmployerWorkforceAnalytics() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Total Hires</h3>
-            <p className="text-3xl font-bold text-brand-orange-600">{metrics.totalHires}</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{metrics.totalHires}</p>
             <p className="text-sm text-green-600">↑ 15% from last period</p>
           </Card>
 
@@ -94,7 +94,7 @@ export default function EmployerWorkforceAnalytics() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Training Completion</h3>
-            <p className="text-3xl font-bold text-purple-600">{metrics.trainingCompletion}%</p>
+            <p className="text-3xl font-bold text-brand-red-600">{metrics.trainingCompletion}%</p>
             <p className="text-sm text-green-600">Above target</p>
           </Card>
 
@@ -143,7 +143,7 @@ export default function EmployerWorkforceAnalytics() {
                     <div className="flex-1">
                       <div className="bg-gray-200 rounded-full h-2">
                         <div
-                          className="bg-brand-orange-600 h-2 rounded-full"
+                          className="bg-brand-blue-600 h-2 rounded-full"
                           style={{ width: `${skill.demand}%` }}
                         />
                       </div>

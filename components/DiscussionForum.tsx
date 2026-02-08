@@ -67,7 +67,7 @@ export function DiscussionForum({
           <div className="flex justify-end">
             <Button
               onClick={handleSubmit}
-              className="bg-brand-orange-600 hover:bg-brand-orange-700"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700"
             >
               <MessageSquare size={16} className="mr-2" />
               Post Discussion
@@ -97,11 +97,11 @@ export function DiscussionForum({
                   </div>
                   <p className="text-black mb-4">{post.content}</p>
                   <div className="flex gap-4">
-                    <button className="flex items-center gap-2 text-black hover:text-brand-orange-600 transition">
+                    <button className="flex items-center gap-2 text-black hover:text-brand-blue-600 transition">
                       <ThumbsUp size={16} />
                       <span className="text-sm">{post.likes} Likes</span>
                     </button>
-                    <button className="flex items-center gap-2 text-black hover:text-brand-orange-600 transition">
+                    <button className="flex items-center gap-2 text-black hover:text-brand-blue-600 transition">
                       <Reply size={16} />
                       <span className="text-sm">{post.replies} Replies</span>
                     </button>

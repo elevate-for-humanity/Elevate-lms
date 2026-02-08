@@ -72,7 +72,7 @@ export default async function FeaturesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Get Started
             </Link>
@@ -116,8 +116,8 @@ export default async function FeaturesPage() {
 
             {/* Feature 2 */}
             <div className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-brand-green-100 rounded-lg mb-4">
-                <Users className="w-6 h-6 text-brand-green-600" />
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-brand-blue-100 rounded-lg mb-4">
+                <Users className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
                 1-on-1 Support
@@ -130,8 +130,8 @@ export default async function FeaturesPage() {
 
             {/* Feature 3 */}
             <div className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-lg mb-4">
-                <Award className="w-6 h-6 text-purple-600" />
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-brand-red-100 rounded-lg mb-4">
+                <Award className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
                 Industry Certifications
@@ -145,7 +145,7 @@ export default async function FeaturesPage() {
             {/* Feature 4 */}
             <div className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-orange-100 rounded-lg mb-4">
-                <Briefcase className="w-6 h-6 text-brand-orange-600" />
+                <Briefcase className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
                 Career Services
@@ -159,7 +159,7 @@ export default async function FeaturesPage() {
             {/* Feature 5 */}
             <div className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow">
               <div className="inline-flex items-center justify-center w-12 h-12 bg-red-100 rounded-lg mb-4">
-                <Clock className="w-6 h-6 text-brand-orange-600" />
+                <Clock className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
                 Flexible Schedule
@@ -241,7 +241,7 @@ export default async function FeaturesPage() {
               <ul className="space-y-3">
                 <li className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -259,7 +259,7 @@ export default async function FeaturesPage() {
                 </li>
                 <li className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -277,7 +277,7 @@ export default async function FeaturesPage() {
                 </li>
                 <li className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -295,7 +295,7 @@ export default async function FeaturesPage() {
                 </li>
                 <li className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -333,7 +333,7 @@ export default async function FeaturesPage() {
               <ul className="space-y-3">
                 <li className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -351,7 +351,7 @@ export default async function FeaturesPage() {
                 </li>
                 <li className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -370,7 +370,7 @@ export default async function FeaturesPage() {
                 </li>
                 <li className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -388,7 +388,7 @@ export default async function FeaturesPage() {
                 </li>
                 <li className="flex items-start">
                   <svg
-                    className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                    className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -439,7 +439,7 @@ export default async function FeaturesPage() {
             </Link>
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors border-2 border-white"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors border-2 border-white"
             >
               Contact Us
             </Link>

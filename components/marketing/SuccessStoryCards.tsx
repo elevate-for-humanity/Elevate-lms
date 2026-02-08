@@ -58,7 +58,7 @@ export default function SuccessStoryCards() {
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-zinc-900 mb-2">{story.name}</h3>
-                <p className="text-sm text-brand-orange-600 font-semibold mb-4">{story.program}</p>
+                <p className="text-sm text-brand-blue-600 font-semibold mb-4">{story.program}</p>
 
                 <div className="space-y-2 mb-4">
                   <div className="flex items-start gap-2">
@@ -83,7 +83,7 @@ export default function SuccessStoryCards() {
         <div className="text-center mt-12">
           <Link
             href="/success-stories"
-            className="inline-flex items-center gap-2 bg-brand-orange-600 text-white px-8 py-3 rounded-full font-bold hover:bg-brand-orange-700 transition"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-3 rounded-full font-bold hover:bg-brand-blue-700 transition"
           >
             Read More Success Stories
             <ArrowRight className="w-5 h-5" />

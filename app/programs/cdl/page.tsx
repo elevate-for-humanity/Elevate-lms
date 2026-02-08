@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import { 
@@ -388,7 +387,7 @@ export default function CDLProgramPage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-purple-100 text-purple-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+            <span className="inline-block bg-brand-red-100 text-brand-red-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Common Questions
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -449,7 +448,7 @@ export default function CDLProgramPage() {
               className="inline-flex items-center justify-center px-8 py-4 bg-orange-700 hover:bg-orange-600 text-white font-semibold rounded-full transition-all"
             >
               <Phone className="w-5 h-5 mr-2" />
-              Call (317) 555-0123
+              Contact Us
             </Link>
           </div>
         </div>

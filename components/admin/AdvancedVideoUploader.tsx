@@ -116,7 +116,7 @@ Apply today and start your journey.`;
           {/* Voiceover Options */}
           <div className="border-2 border-slate-200 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-4">
-              <Mic className="h-10 w-10 text-purple-600" />
+              <Mic className="h-10 w-10 text-brand-red-600" />
               <h3 className="text-lg font-bold text-black">2. Add Voiceover</h3>
             </div>
 
@@ -127,7 +127,7 @@ Apply today and start your journey.`;
                   onClick={() => setUseTextToSpeech(true)}
                   className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
                     useTextToSpeech
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-brand-red-600 text-white'
                       : 'bg-slate-100 text-black hover:bg-slate-200'
                   }`}
                 >
@@ -137,7 +137,7 @@ Apply today and start your journey.`;
                   onClick={() => setUseTextToSpeech(false)}
                   className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all ${
                     !useTextToSpeech
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-brand-red-600 text-white'
                       : 'bg-slate-100 text-black hover:bg-slate-200'
                   }`}
                 >
@@ -155,11 +155,11 @@ Apply today and start your journey.`;
                     onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setVoiceoverText(e.target.value)}
                     Content={defaultVoiceoverText}
                     rows={4}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-brand-red-500"
                   />
                   <button
                     onClick={() => setVoiceoverText(defaultVoiceoverText)}
-                    className="mt-2 text-sm text-purple-600 hover:underline"
+                    className="mt-2 text-sm text-brand-red-600 hover:underline"
                   >
                     Use default script
                   </button>
@@ -187,7 +187,7 @@ Apply today and start your journey.`;
                     type="file"
                     accept="audio/*"
                     onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setVoiceoverFile(e.target.files?.[0] || null)}
-                    className="w-full text-sm text-black file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100"
+                    className="w-full text-sm text-black file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-red-50 file:text-brand-red-700 hover:file:bg-brand-red-100"
                   />
                   {voiceoverFile && (
                     <p className="mt-2 text-sm text-green-600">
@@ -345,7 +345,7 @@ Apply today and start your journey.`;
           {error && (
             <div className="bg-red-50 border-2 border-red-200 rounded-lg p-6">
               <div className="flex items-start gap-4">
-                <AlertCircle className="h-10 w-10 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+                <AlertCircle className="h-10 w-10 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h4 className="font-bold text-red-900 mb-1">Processing Failed</h4>
                   <p className="text-sm text-red-700">{error}</p>
@@ -368,9 +368,9 @@ Apply today and start your journey.`;
             <li>• Web optimized</li>
           </ul>
         </div>
-        <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
-          <h4 className="font-bold text-purple-900 mb-3">🎤 AI Voiceover</h4>
-          <ul className="text-sm text-purple-700 space-y-1">
+        <div className="bg-brand-red-50 rounded-lg p-6 border-2 border-brand-red-200">
+          <h4 className="font-bold text-brand-red-900 mb-3">🎤 AI Voiceover</h4>
+          <ul className="text-sm text-brand-red-700 space-y-1">
             <li>• Natural voice synthesis</li>
             <li>• Professional quality</li>
             <li>• Adjustable volume</li>

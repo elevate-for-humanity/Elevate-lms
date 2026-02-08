@@ -125,7 +125,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
                 onClick={copyToClipboard}
                 className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded-lg transition w-full"
               >
-                <div className="w-8 h-8 bg-brand-orange-600 rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-brand-blue-600 rounded-lg flex items-center justify-center">
                   {copied ? (
                     <Check className="w-4 h-4 text-white" />
                   ) : (

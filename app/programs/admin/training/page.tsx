@@ -112,7 +112,7 @@ export default async function TrainingPage() {
                 <h3 className="text-sm font-medium text-black mb-2">
                   Active
                 </h3>
-                <p className="text-3xl font-bold text-brand-green-600">
+                <p className="text-3xl font-bold text-brand-blue-600">
                   {items?.filter((i) => i.status === 'active').length || 0}
                 </p>
               </div>
@@ -120,7 +120,7 @@ export default async function TrainingPage() {
                 <h3 className="text-sm font-medium text-black mb-2">
                   Recent
                 </h3>
-                <p className="text-3xl font-bold text-purple-600">
+                <p className="text-3xl font-bold text-brand-red-600">
                   {items?.filter((i) => {
                     const created = new Date(i.created_at);
                     const weekAgo = new Date();

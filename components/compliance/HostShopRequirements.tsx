@@ -109,7 +109,7 @@ export function HostShopRequirements({
       <div className="mx-auto max-w-4xl px-6">
         {/* Multi-Region Requirements Callout */}
         {showMultiRegion && (
-          <div className="mb-8 bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl p-6 text-white">
+          <div className="mb-8 bg-brand-red-600 rounded-2xl p-6 text-white">
             <div className="flex items-start gap-4">
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center flex-shrink-0">
                 <Globe className="w-6 h-6 text-white" />
@@ -120,7 +120,7 @@ export function HostShopRequirements({
                   Multi-Region Requirements
                   <span className="text-sm font-normal bg-white/20 px-2 py-0.5 rounded">Read Before Choosing a Shop</span>
                 </h3>
-                <p className="text-purple-100 mb-4">
+                <p className="text-brand-red-100 mb-4">
                   We are based in Indiana, but host site requirements vary by region (state licensing boards, 
                   workforce board policies, and employer eligibility standards). Your selected training region's 
                   rules determine which shops are eligible to host your apprenticeship. We verify each host site 
@@ -128,7 +128,7 @@ export function HostShopRequirements({
                 </p>
                 <ul className="space-y-2">
                   {MULTI_REGION_BULLETS.map((bullet, index) => (
-                    <li key={index} className="flex items-start gap-2 text-purple-100">
+                    <li key={index} className="flex items-start gap-2 text-brand-red-100">
                       <Circle className="w-4 h-4 text-green-300 flex-shrink-0 mt-0.5" />
                       <span>{bullet}</span>
                     </li>
@@ -189,13 +189,13 @@ export function HostShopRequirements({
             return (
               <div key={track} className="bg-white rounded-xl border border-slate-200 p-6">
                 <h3 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
-                  <UserCheck className="w-5 h-5 text-purple-600" />
+                  <UserCheck className="w-5 h-5 text-brand-red-600" />
                   {guidelines.title}
                 </h3>
                 <ul className="space-y-3">
                   {guidelines.requirements.map((req, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <ChevronRight className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                      <ChevronRight className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                       <span className="text-slate-700">{req}</span>
                     </li>
                   ))}

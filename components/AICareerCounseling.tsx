@@ -126,7 +126,7 @@ export default function AICareerCounseling() {
                     <div className={`flex ${message.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
                       <div className={`max-w-[80%] ${
                         message.sender === 'user'
-                          ? 'bg-brand-orange-600 text-white'
+                          ? 'bg-brand-blue-600 text-white'
                           : 'bg-gray-100 text-black'
                       } rounded-lg p-4`}>
                         <p className="text-sm">{message.content}</p>
@@ -205,7 +205,7 @@ export default function AICareerCounseling() {
                   <div key={idx} className="p-3 bg-gray-50 rounded-lg">
                     <div className="flex justify-between items-start mb-2">
                       <h4 className="font-semibold text-sm">{rec.title}</h4>
-                      <span className="text-xs font-bold text-brand-orange-600">{rec.matchScore}%</span>
+                      <span className="text-xs font-bold text-brand-blue-600">{rec.matchScore}%</span>
                     </div>
                     <p className="text-xs text-black mb-1">💰 {rec.salary}</p>
                     <p className="text-xs text-green-600">📈 {rec.growth}</p>
@@ -244,9 +244,9 @@ export default function AICareerCounseling() {
                     Complete Node.js course to qualify for 15 new job openings
                   </p>
                 </div>
-                <div className="p-3 bg-purple-50 rounded">
-                  <p className="font-semibold text-purple-900 mb-1">📈 Trend Alert</p>
-                  <p className="text-xs text-purple-700">
+                <div className="p-3 bg-brand-red-50 rounded">
+                  <p className="font-semibold text-brand-red-900 mb-1">📈 Trend Alert</p>
+                  <p className="text-xs text-brand-red-700">
                     React developers in your area earn 18% above average
                   </p>
                 </div>

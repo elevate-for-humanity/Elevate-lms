@@ -154,7 +154,7 @@ export default async function AdminShopsPage() {
 
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
             <div className="flex items-center gap-3">
-              <Circle className="w-8 h-8 text-brand-green-600" />
+              <Circle className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <div className="text-2xl font-bold text-black">
                   {shopsWithDocs.filter((s) => s.docsComplete).length}
@@ -180,7 +180,7 @@ export default async function AdminShopsPage() {
 
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
             <div className="flex items-center gap-3">
-              <Users className="w-8 h-8 text-purple-600" />
+              <Users className="w-8 h-8 text-brand-red-600" />
               <div>
                 <div className="text-2xl font-bold text-black">
                   {shopsWithDocs.reduce(
@@ -255,7 +255,7 @@ export default async function AdminShopsPage() {
                         <div
                           className={`flex items-center gap-1 px-2 py-2 rounded-full text-xs font-semibold ${
                             status.color === 'green'
-                              ? 'bg-brand-green-100 text-green-800'
+                              ? 'bg-brand-blue-100 text-green-800'
                               : status.color === 'yellow'
                                 ? 'bg-yellow-100 text-yellow-800'
                                 : 'bg-red-100 text-red-800'

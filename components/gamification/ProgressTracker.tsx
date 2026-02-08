@@ -33,9 +33,9 @@ export function ProgressTracker({
           <h3 className="text-xl font-bold text-black">Your Progress</h3>
           <p className="text-sm text-black">{programName}</p>
         </div>
-        <div className="flex items-center gap-2 px-4 py-2 bg-brand-orange-50 rounded-full">
-          <Trophy className="w-5 h-5 text-brand-orange-600" />
-          <span className="font-bold text-brand-orange-600">Level {level}</span>
+        <div className="flex items-center gap-2 px-4 py-2 bg-brand-blue-50 rounded-full">
+          <Trophy className="w-5 h-5 text-brand-blue-600" />
+          <span className="font-bold text-brand-blue-600">Level {level}</span>
         </div>
       </div>
 
@@ -84,7 +84,7 @@ export function ProgressTracker({
               <div className="flex-1">
                 <div className="flex items-center justify-between">
                   <h5 className="font-semibold text-black">{milestone.title}</h5>
-                  <span className="text-xs font-bold text-brand-orange-600">
+                  <span className="text-xs font-bold text-brand-blue-600">
                     +{milestone.points} pts
                   </span>
                 </div>
@@ -158,7 +158,7 @@ export function Leaderboard() {
               </div>
             </div>
             <div className="text-right">
-              <div className="font-bold text-brand-orange-600">{performer.points}</div>
+              <div className="font-bold text-brand-blue-600">{performer.points}</div>
               <div className="text-xs text-slate-500">points</div>
             </div>
           </div>
@@ -180,7 +180,7 @@ export function AchievementBadges({ badges }: { badges: string[] }) {
   const badgeIcons: Record<string, { icon: any; color: string; label: string }> = {
     'first-day': { icon: Star, color: 'bg-blue-500', label: 'First Day Complete' },
     'week-one': { icon: Target, color: 'bg-green-500', label: 'Week 1 Champion' },
-    'perfect-attendance': { icon: Award, color: 'bg-purple-500', label: 'Perfect Attendance' },
+    'perfect-attendance': { icon: Award, color: 'bg-brand-red-500', label: 'Perfect Attendance' },
     'skills-master': { icon: Trophy, color: 'bg-yellow-500', label: 'Skills Master' },
     'mentor': { icon: TrendingUp, color: 'bg-indigo-500', label: 'Peer Mentor' },
   };

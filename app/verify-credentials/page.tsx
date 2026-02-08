@@ -313,8 +313,8 @@ export default function VerifyCredentialsPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Phone</p>
-                    <a href="tel:3173143757" className="font-medium text-gray-900 hover:text-blue-600">
-                      (317) 314-3757
+                    <a href="/contact" className="font-medium text-gray-900 hover:text-blue-600">
+                      Contact Us
                     </a>
                   </div>
                 </div>

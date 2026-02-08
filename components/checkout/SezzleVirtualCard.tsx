@@ -76,19 +76,19 @@ export default function SezzleVirtualCard({
       </div>
 
       {/* Virtual Card */}
-      <div className="relative bg-gradient-to-br from-purple-600 via-purple-700 to-indigo-800 rounded-2xl p-6 text-white shadow-xl mb-6">
+      <div className="relative bg-gradient-to-br from-brand-red-600 via-brand-red-700 to-indigo-800 rounded-2xl p-6 text-white shadow-xl mb-6">
         {/* Card chip and logo */}
         <div className="flex justify-between items-start mb-8">
           <div className="w-12 h-9 bg-yellow-400/80 rounded-md" />
           <div className="text-right">
             <span className="text-lg font-bold">Sezzle</span>
-            <p className="text-xs text-purple-200">Virtual Card</p>
+            <p className="text-xs text-brand-red-200">Virtual Card</p>
           </div>
         </div>
 
         {/* Card Number */}
         <div className="mb-6">
-          <p className="text-xs text-purple-200 mb-1">Card Number</p>
+          <p className="text-xs text-brand-red-200 mb-1">Card Number</p>
           <div className="flex items-center gap-2">
             <span className="text-xl font-mono tracking-wider">
               {formatCardNumber(cardData.pan)}
@@ -115,13 +115,13 @@ export default function SezzleVirtualCard({
         {/* Card Details Row */}
         <div className="flex justify-between">
           <div>
-            <p className="text-xs text-purple-200 mb-1">Card Holder</p>
+            <p className="text-xs text-brand-red-200 mb-1">Card Holder</p>
             <p className="font-medium">
               {cardData.firstName} {cardData.lastName}
             </p>
           </div>
           <div>
-            <p className="text-xs text-purple-200 mb-1">Expires</p>
+            <p className="text-xs text-brand-red-200 mb-1">Expires</p>
             <div className="flex items-center gap-2">
               <span className="font-mono">{formatExpiry()}</span>
               <button
@@ -137,7 +137,7 @@ export default function SezzleVirtualCard({
             </div>
           </div>
           <div>
-            <p className="text-xs text-purple-200 mb-1">CVV</p>
+            <p className="text-xs text-brand-red-200 mb-1">CVV</p>
             <div className="flex items-center gap-2">
               <span className="font-mono">
                 {showCvv ? cardData.cvv : '•••'}
@@ -174,7 +174,7 @@ export default function SezzleVirtualCard({
           const cardDetails = `Card: ${cardData.pan}\nExpiry: ${formatExpiry()}\nCVV: ${cardData.cvv}\nName: ${cardData.firstName} ${cardData.lastName}`;
           copyToClipboard(cardDetails, 'all');
         }}
-        className="w-full py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium flex items-center justify-center gap-2 mb-4"
+        className="w-full py-3 bg-brand-red-600 hover:bg-brand-red-700 text-white rounded-lg font-medium flex items-center justify-center gap-2 mb-4"
       >
         {copiedField === 'all' ? (
           <>

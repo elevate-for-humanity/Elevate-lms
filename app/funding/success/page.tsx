@@ -38,7 +38,7 @@ export default async function FundingSuccessPage() {
 
       <div className="flex items-center justify-center px-4 py-12">
       <div className="max-w-2xl w-full text-center">
-        <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-green-600 rounded-full mb-6">
+        <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-blue-600 rounded-full mb-6">
           <Circle className="w-12 h-12 text-white" />
         </div>
 
@@ -58,7 +58,7 @@ export default async function FundingSuccessPage() {
 
           <div className="text-left space-y-4">
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                 •
               </div>
               <div>
@@ -72,7 +72,7 @@ export default async function FundingSuccessPage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                 •
               </div>
               <div>
@@ -86,7 +86,7 @@ export default async function FundingSuccessPage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <div className="flex-shrink-0 w-8 h-8 bg-brand-green-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
+              <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-sm">
                 •
               </div>
               <div>

@@ -61,7 +61,7 @@ function InquiryForm() {
         setLoading(false);
       }
     } catch (error) {
-      setError('An error occurred. Please try again or call 317-314-3757.');
+      setError('An error occurred. Please try again or call Contact Us.');
       setLoading(false);
     }
   };
@@ -80,7 +80,7 @@ function InquiryForm() {
         imageSrc="/hero-images/apply-hero.jpg"
         imageAlt="Apply Now"
         primaryCTA={{ text: "Start Application", href: "#application" }}
-        secondaryCTA={{ text: "Questions? Call Us", href: "tel:317-314-3757" }}
+        secondaryCTA={{ text: "Questions? Call Us", href: "tel:Contact Us" }}
         features={[
           "10-minute application with 2-3 day response",
           "Funded training through WIOA and state grants",

@@ -374,8 +374,8 @@ export default function SAMGovEligibilityPage() {
           </p>
           <p className="mb-2">
             <strong>Phone:</strong>{' '}
-            <a href="tel:+13173143757" className="text-blue-600 hover:text-blue-800">
-              (317) 314-3757
+            <a href="/contact" className="text-blue-600 hover:text-blue-800">
+              Contact Us
             </a>
           </p>
         </div>
@@ -433,8 +433,8 @@ export default function SAMGovEligibilityPage() {
             elevate4humanityedu@gmail.com
           </a>{' '}
           or call{' '}
-          <a href="tel:+13173143757" className="text-green-900 font-semibold hover:underline">
-            (317) 314-3757
+          <a href="/contact" className="text-green-900 font-semibold hover:underline">
+            Contact Us
           </a>.
         </p>
       </div>

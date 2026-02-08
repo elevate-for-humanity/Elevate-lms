@@ -43,7 +43,7 @@ export default async function WOTCAdminPage() {
     { label: 'Total Credits', value: `$${totalCredits.toLocaleString()}`, icon: DollarSign, color: 'green' },
     { label: 'Active Applications', value: activeCount.toString(), icon: FileText, color: 'blue' },
     { label: 'Pending Review', value: pendingCount.toString(), icon: Clock, color: 'yellow' },
-    { label: 'Approved This Month', value: approvedThisMonth.toString(), icon: Circle, color: 'purple' },
+    { label: 'Approved This Month', value: approvedThisMonth.toString(), icon: Circle, color: 'brand-red' },
   ];
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -58,7 +58,7 @@ export default async function WOTCAdminPage() {
           </div>
           <Link
             href="/admin/wotc/new"
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2"
+            className="px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 transition flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             New Application
@@ -87,17 +87,17 @@ export default async function WOTCAdminPage() {
               <input
                 type="text"
                 placeholder="Search applications..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
               />
             </div>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
+            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500">
               <option>All Categories</option>
               <option>Veteran</option>
               <option>SNAP Recipient</option>
               <option>Ex-Felon</option>
               <option>Long-term Unemployed</option>
             </select>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500">
+            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500">
               <option>All Status</option>
               <option>Pending</option>
               <option>Processing</option>
@@ -113,7 +113,7 @@ export default async function WOTCAdminPage() {
               <p className="text-gray-600 mb-6">Get started by creating your first WOTC application.</p>
               <Link
                 href="/admin/wotc/new"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 transition"
               >
                 <Plus className="w-4 h-4" />
                 Create Application
@@ -141,7 +141,7 @@ export default async function WOTCAdminPage() {
                     <td className="px-6 py-4">
                       <div className="flex flex-wrap gap-1">
                         {(app.target_groups || []).slice(0, 2).map((group: string, i: number) => (
-                          <span key={i} className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">
+                          <span key={i} className="px-2 py-1 bg-brand-red-100 text-brand-red-700 text-xs rounded-full">
                             {group}
                           </span>
                         ))}
@@ -172,7 +172,7 @@ export default async function WOTCAdminPage() {
                     <td className="px-6 py-4">
                       <Link
                         href={`/admin/wotc/${app.id}`}
-                        className="px-4 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition"
+                        className="px-4 py-2 bg-brand-red-600 text-white text-sm rounded-lg hover:bg-brand-red-700 transition"
                       >
                         View
                       </Link>

@@ -6,7 +6,6 @@ import { useEffect, useState, useRef } from 'react';
 
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
 
 interface Program {
   id: string;
@@ -91,13 +90,13 @@ export default function TechnologyProgramsPage() {
             <div className="flex flex-wrap gap-4">
               <Link 
                 href="/apply?program=technology"
-                className="inline-flex items-center justify-center bg-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-purple-700 transition-colors text-lg"
+                className="inline-flex items-center justify-center bg-brand-red-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-brand-red-700 transition-colors text-lg"
               >
                 Apply Now
               </Link>
               <Link 
                 href="/wioa-eligibility"
-                className="inline-flex items-center text-white text-lg border-b-2 border-white pb-1 hover:border-purple-400 hover:text-purple-400 transition-all duration-300"
+                className="inline-flex items-center text-white text-lg border-b-2 border-white pb-1 hover:border-brand-red-400 hover:text-brand-red-400 transition-all duration-300"
               >
                 Check Eligibility
               </Link>
@@ -107,10 +106,6 @@ export default function TechnologyProgramsPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/ai-tutor.mp4" 
-        title="Tech Guide" 
-      />
 
       {/* Breadcrumbs */}
       <Breadcrumbs />
@@ -122,7 +117,7 @@ export default function TechnologyProgramsPage() {
       <section className="py-16 lg:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-purple-600 font-semibold text-sm uppercase tracking-widest mb-3">Technology Programs</p>
+            <p className="text-brand-red-600 font-semibold text-sm uppercase tracking-widest mb-3">Technology Programs</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Choose Your Tech Path</h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">All programs are free for eligible participants through WIOA funding.</p>
           </div>
@@ -148,7 +143,7 @@ export default function TechnologyProgramsPage() {
                       role="img"
                       aria-label={program.name}
                     />
-                    <div className="absolute top-3 right-3 bg-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    <div className="absolute top-3 right-3 bg-brand-red-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
                       {program.duration_weeks ? `${program.duration_weeks} Weeks` : 'Flexible'}
                     </div>
                     {program.price === 0 && (
@@ -158,11 +153,11 @@ export default function TechnologyProgramsPage() {
                     )}
                   </div>
                   <div className="p-5">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-purple-600 transition-colors">
+                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-red-600 transition-colors">
                       {program.name}
                     </h3>
                     <p className="text-slate-600 text-sm mb-3 line-clamp-2">{program.description}</p>
-                    <span className="text-purple-600 font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <span className="text-brand-red-600 font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                       Learn More <span>→</span>
                     </span>
                   </div>
@@ -258,28 +253,28 @@ export default function TechnologyProgramsPage() {
             </div>
             
             <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h3 className="text-xl font-bold text-purple-600 mb-4">For Free Training (WIOA)</h3>
+              <h3 className="text-xl font-bold text-brand-red-600 mb-4">For Free Training (WIOA)</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-brand-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <span className="text-gray-700">Indiana resident</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-brand-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <span className="text-gray-700">Unemployed or underemployed</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-brand-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <span className="text-gray-700">OR receiving public assistance</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-brand-red-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                   </svg>
                   <span className="text-gray-700">OR veteran status</span>
@@ -354,14 +349,14 @@ export default function TechnologyProgramsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-purple-600">
+      <section className="py-16 bg-brand-red-600">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Tech Career?</h2>
-          <p className="text-purple-100 mb-8">Free training available for eligible Indiana residents.</p>
+          <p className="text-brand-red-100 mb-8">Free training available for eligible Indiana residents.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/apply?program=technology"
-              className="inline-block bg-white text-purple-600 px-8 py-4 font-semibold rounded-full hover:bg-purple-50 transition-colors"
+              className="inline-block bg-white text-brand-red-600 px-8 py-4 font-semibold rounded-full hover:bg-brand-red-50 transition-colors"
             >
               Apply Now
             </Link>

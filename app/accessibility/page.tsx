@@ -112,23 +112,23 @@ export default function AccessibilityPage() {
 
           <ul className="space-y-3 text-black">
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
               <span>Ensure proper heading structure and navigation</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
               <span>Provide text alternatives for images</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
               <span>Maintain sufficient color contrast</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
               <span>Support keyboard navigation</span>
             </li>
             <li className="flex items-start gap-3">
-              <div className="w-2 h-2 bg-brand-green-600 rounded-full mt-2 flex-shrink-0" />
+              <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
               <span>Ensure compatibility with screen readers</span>
             </li>
           </ul>
@@ -156,10 +156,10 @@ export default function AccessibilityPage() {
             <div className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-brand-blue-600" />
               <a
-                href="tel:+13173143757"
+                href="/contact"
                 className="text-brand-blue-600 hover:underline font-semibold"
               >
-                (317) 314-3757
+                Contact Us
               </a>
             </div>
           </div>

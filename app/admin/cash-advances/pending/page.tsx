@@ -66,7 +66,7 @@ export default async function PendingCashAdvancesPage() {
         {/* Stats */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-brand-orange-600">
+            <div className="text-3xl font-bold text-brand-blue-600">
               {pendingAdvances?.length || 0}
             </div>
             <div className="text-black">Pending Requests</div>

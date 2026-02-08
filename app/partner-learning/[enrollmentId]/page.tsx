@@ -91,7 +91,7 @@ export default async function PartnerLearningPage({ params }: Props) {
           
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-purple-600 text-sm font-medium mb-2">
+              <div className="flex items-center gap-2 text-brand-red-600 text-sm font-medium mb-2">
                 <Building2 className="w-4 h-4" />
                 Partner Course
               </div>
@@ -145,7 +145,7 @@ export default async function PartnerLearningPage({ params }: Props) {
               href={provider.portal_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-red-600 text-white font-medium rounded-lg hover:bg-brand-red-700 transition-colors"
             >
               Open Partner Portal
               <ExternalLink className="w-4 h-4" />
@@ -195,8 +195,8 @@ export default async function PartnerLearningPage({ params }: Props) {
         <div className="mt-8 text-center text-gray-500 text-sm">
           <p>
             Having trouble? Contact Elevate for Humanity support at{' '}
-            <a href="tel:317-314-3757" className="text-blue-600 hover:underline">
-              317-314-3757
+            <a href="/contact" className="text-blue-600 hover:underline">
+              Contact Us
             </a>
           </p>
         </div>

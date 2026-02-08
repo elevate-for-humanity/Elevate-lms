@@ -62,7 +62,7 @@ export default function DocumentsPage() {
         <div className="space-y-6">
           <div>
             <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-              <span className="text-brand-green-600">•</span>
+              <span className="text-brand-blue-600">•</span>
               Identification
             </h3>
             <ul className="space-y-2 pl-6">
@@ -91,7 +91,7 @@ export default function DocumentsPage() {
 
           <div>
             <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-              <span className="text-brand-green-600">•</span>
+              <span className="text-brand-blue-600">•</span>
               Income Documents
             </h3>
             <ul className="space-y-2 pl-6">
@@ -142,7 +142,7 @@ export default function DocumentsPage() {
 
           <div>
             <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-              <span className="text-brand-green-600">•</span>
+              <span className="text-brand-blue-600">•</span>
               Bank Information
             </h3>
             <ul className="space-y-2 pl-6">
@@ -163,7 +163,7 @@ export default function DocumentsPage() {
 
           <div>
             <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-              <span className="text-brand-green-600">•</span>
+              <span className="text-brand-blue-600">•</span>
               Prior Year Return
             </h3>
             <ul className="space-y-2 pl-6">
@@ -298,31 +298,31 @@ export default function DocumentsPage() {
         <h2 className="text-2xl font-bold mb-4">Preparation Tips</h2>
         <div className="space-y-3">
           <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold">•</span>
+            <span className="text-brand-blue-600 font-bold">•</span>
             <p className="text-black">
               Organize documents by category before your appointment
             </p>
           </div>
           <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold">•</span>
+            <span className="text-brand-blue-600 font-bold">•</span>
             <p className="text-black">
               Make copies of important documents for your records
             </p>
           </div>
           <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold">•</span>
+            <span className="text-brand-blue-600 font-bold">•</span>
             <p className="text-black">
               Bring a folder or envelope to keep everything together
             </p>
           </div>
           <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold">•</span>
+            <span className="text-brand-blue-600 font-bold">•</span>
             <p className="text-black">
               Double-check that all Social Security numbers are correct
             </p>
           </div>
           <div className="flex items-start gap-3">
-            <span className="text-brand-green-600 font-bold">•</span>
+            <span className="text-brand-blue-600 font-bold">•</span>
             <p className="text-black">
               Call ahead if you're missing any documents - we can advise
             </p>
@@ -330,7 +330,7 @@ export default function DocumentsPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-green-600 p-6">
+      <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-blue-600 p-6">
         <h2 className="text-xl font-bold mb-3">Questions About Documents?</h2>
         <p className="text-black mb-6">
           Not sure if you have everything? Call us and we'll help you prepare
@@ -338,14 +338,14 @@ export default function DocumentsPage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a
-            href="tel:3173143757"
-            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
+            href="/contact"
+            className="px-6 py-3 rounded-lg bg-brand-blue-600 text-white font-semibold hover:bg-green-700 transition"
           >
-            Call 317-314-3757
+            Call Contact Us
           </a>
           <Link
             href="/tax/rise-up-foundation/free-tax-help"
-            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-green-50 transition"
+            className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-green-50 transition"
           >
             Schedule Appointment
           </Link>

@@ -103,7 +103,7 @@ export default async function CreatorProductsPage() {
               const statusColors = {
                 draft: 'bg-gray-100 text-black',
                 pending_review: 'bg-yellow-100 text-yellow-700',
-                approved: 'bg-brand-green-100 text-green-700',
+                approved: 'bg-brand-blue-100 text-green-700',
                 rejected: 'bg-red-100 text-red-700',
                 archived: 'bg-gray-100 text-black',
               };

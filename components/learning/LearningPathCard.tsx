@@ -33,7 +33,7 @@ export function LearningPathCard({
       case "intermediate":
         return "text-yellow-400 bg-yellow-500/20";
       case "advanced":
-        return "text-red-400 bg-brand-orange-500/20";
+        return "text-red-400 bg-brand-blue-500/20";
     }
   };
 

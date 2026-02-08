@@ -69,7 +69,7 @@ export default function RevocationPage() {
               </ul>
             </div>
 
-            <div className="bg-purple-50 border-l-4 border-purple-400 p-6 mb-6">
+            <div className="bg-brand-red-50 border-l-4 border-brand-red-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Serious Misconduct</h3>
               <p className="text-black mb-2">Discovered after graduation:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -112,7 +112,7 @@ export default function RevocationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>
@@ -298,7 +298,7 @@ export default function RevocationPage() {
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
               <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Phone:</strong> (317) 314-3757</li>
+              <li><strong>Phone:</strong> Contact Us</li>
               <li><strong>Appeals:</strong> elevate4humanityedu@gmail.com</li>
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>
             </ul>

@@ -658,7 +658,7 @@ export default function ComprehensiveEnrollmentWizard({
           {error && (
             <div className="mt-6 bg-red-50 border border-red-200 rounded-lg p-4">
               <div className="flex items-start gap-2">
-                <AlertCircle className="w-5 h-5 text-brand-orange-600 mt-0.5 flex-shrink-0" />
+                <AlertCircle className="w-5 h-5 text-brand-blue-600 mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="font-semibold text-red-900">Error</p>
                   <p className="text-sm text-red-700 mt-1">{error}</p>

@@ -54,10 +54,10 @@ export default function CareerServicesContactPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-2">Call Us</h2>
               <p className="text-gray-600 mb-4">Speak directly with a career advisor</p>
               <a
-                href="tel:317-314-3757"
+                href="/contact"
                 className="text-2xl font-bold text-blue-600 hover:text-blue-700"
               >
-                (317) 314-3757
+                Contact Us
               </a>
               <p className="text-sm text-gray-500 mt-2">Mon-Fri, 9am-5pm EST</p>
             </div>
@@ -80,14 +80,14 @@ export default function CareerServicesContactPage() {
 
             {/* Schedule */}
             <div className="bg-gray-50 rounded-xl p-8 text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-8 h-8 text-brand-red-600" />
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Schedule Appointment</h2>
               <p className="text-gray-600 mb-4">Book a one-on-one session</p>
               <Link
                 href="/schedule"
-                className="inline-flex items-center text-lg font-bold text-purple-600 hover:text-purple-700"
+                className="inline-flex items-center text-lg font-bold text-brand-red-600 hover:text-brand-red-700"
               >
                 Book Now <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -201,7 +201,7 @@ export default function CareerServicesContactPage() {
               href="/career-services/career-counseling"
               className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition flex items-center"
             >
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-brand-red-100 rounded-full flex items-center justify-center mr-4">
                 <span className="text-2xl">🧭</span>
               </div>
               <div>

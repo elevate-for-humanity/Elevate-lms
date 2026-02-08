@@ -213,7 +213,7 @@ export function GuidedDemoChat() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-600 text-white px-6 py-4 rounded-full shadow-2xl hover:shadow-purple-500/25 hover:scale-105 transition-all"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-2 bg-gradient-to-r from-blue-600 to-blue-600 text-white px-6 py-4 rounded-full shadow-2xl hover:shadow-brand-red-500/25 hover:scale-105 transition-all"
       >
         <Play className="w-5 h-5" />
         <span className="font-semibold">Start Guided Demo</span>
@@ -261,7 +261,7 @@ export function GuidedDemoChat() {
       {!showStartPrompt && (
         <div className="h-1 bg-gray-200">
           <div
-            className="h-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-500"
+            className="h-full bg-gradient-to-r from-blue-500 to-brand-red-500 transition-all duration-500"
             style={{ width: `${((currentStep + 1) / DEMO_SCRIPT.length) * 100}%` }}
           />
         </div>
@@ -271,7 +271,7 @@ export function GuidedDemoChat() {
       <div className="h-80 overflow-y-auto p-4 space-y-3">
         {showStartPrompt ? (
           <div className="text-center py-8">
-            <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Play className="w-8 h-8 text-blue-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
@@ -295,7 +295,7 @@ export function GuidedDemoChat() {
                 className={`flex gap-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 {msg.role === 'bot' && (
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-brand-red-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-white text-xs font-bold">E</span>
                   </div>
                 )}
@@ -324,7 +324,7 @@ export function GuidedDemoChat() {
               value={userInput}
               onChange={(e) => setUserInput(e.target.value)}
               placeholder="Ask a question..."
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent text-sm"
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent text-sm"
             />
             <button
               type="submit"

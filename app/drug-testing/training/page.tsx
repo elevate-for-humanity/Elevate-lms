@@ -175,8 +175,8 @@ export default async function DrugTestingTrainingPage() {
               <p className="text-sm text-gray-600">Download your certificate immediately upon completion</p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Clock className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Clock className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="font-semibold mb-2">Self-Paced</h3>
               <p className="text-sm text-gray-600">Complete training on your schedule, 24/7 access</p>
@@ -201,8 +201,8 @@ export default async function DrugTestingTrainingPage() {
             <Link href="/contact" className="px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
               Contact Us
             </Link>
-            <a href="tel:3173143757" className="px-8 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
-              <Phone className="w-5 h-5" /> (317) 314-3757
+            <a href="/contact" className="px-8 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition-colors flex items-center justify-center gap-2">
+              <Phone className="w-5 h-5" /> Contact Us
             </a>
           </div>
         </div>

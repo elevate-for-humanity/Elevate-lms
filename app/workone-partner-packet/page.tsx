@@ -63,8 +63,8 @@ export default function WorkOnePartnerPacketPage() {
                 <div className="px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full">
                   <span className="text-sm font-bold text-blue-300">ETPL Approved</span>
                 </div>
-                <div className="px-4 py-2 bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 rounded-full">
-                  <span className="text-sm font-bold text-purple-300">WIOA | WRG Eligible</span>
+                <div className="px-4 py-2 bg-brand-red-500/20 backdrop-blur-sm border border-brand-red-400/30 rounded-full">
+                  <span className="text-sm font-bold text-brand-red-300">WIOA | WRG Eligible</span>
                 </div>
               </div>
 
@@ -286,10 +286,10 @@ export default function WorkOnePartnerPacketPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                <GraduationCap className="w-5 h-5 text-brand-red-600" />
               </div>
-              <span className="text-purple-600 font-semibold">Section 3</span>
+              <span className="text-brand-red-600 font-semibold">Section 3</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               ETPL-Approved Programs
@@ -408,9 +408,9 @@ export default function WorkOnePartnerPacketPage() {
             Contact our WorkOne liaison to set up your referral process or request additional information.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+13173143757" className="inline-flex items-center justify-center px-8 py-4 bg-white text-teal-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+            <a href="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-white text-teal-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">
               <Phone className="w-5 h-5 mr-2" />
-              (317) 314-3757
+              Contact Us
             </a>
             <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center justify-center px-8 py-4 bg-teal-700 text-white rounded-lg font-bold hover:bg-teal-800 transition-colors border-2 border-white/30">
               <Mail className="w-5 h-5 mr-2" />

@@ -3,7 +3,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Building2, BookOpen, Users, BarChart3, FileText, Settings } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageAvatar from '@/components/PageAvatar';
 
 export const metadata: Metadata = {
   title: 'Program Holder Portal | Elevate For Humanity',
@@ -82,10 +81,6 @@ export default function ProgramHolderLanding() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Program Holder Welcome" 
-      />
 
       {/* Features */}
       <section className="py-16 bg-slate-50">

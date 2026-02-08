@@ -310,12 +310,12 @@ export function FeatureAnnouncement({
       )}
 
       <h4 className="text-lg font-semibold mb-2">{title}</h4>
-      <p className="text-purple-100 mb-4">{description}</p>
+      <p className="text-brand-red-100 mb-4">{description}</p>
 
       {ctaText && ctaUrl && (
         <a
           href={ctaUrl}
-          className="inline-flex items-center gap-2 px-6 py-2 bg-white text-purple-600 font-semibold rounded-lg hover:bg-purple-50 transition-colors"
+          className="inline-flex items-center gap-2 px-6 py-2 bg-white text-brand-red-600 font-semibold rounded-lg hover:bg-brand-red-50 transition-colors"
         >
           {ctaText}
           <ChevronRight className="w-4 h-4" />

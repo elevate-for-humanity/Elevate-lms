@@ -81,10 +81,10 @@ export default function ServicesPage() {
             Upload Documents
           </Link>
           <a
-            href="tel:3173143757"
+            href="/contact"
             className="px-6 py-3 rounded-lg border font-semibold hover:bg-gray-50 transition"
           >
-            Call 317-314-3757
+            Call Contact Us
           </a>
         </div>
       </section>
@@ -122,8 +122,8 @@ export default function ServicesPage() {
         </div>
 
         <div className="rounded-2xl border-2 border-green-200 bg-white p-6 hover:shadow-lg transition">
-          <div className="w-12 h-12 rounded-full bg-brand-green-100 flex items-center justify-center mb-4">
-            <DollarSign className="w-6 h-6 text-brand-green-600" />
+          <div className="w-12 h-12 rounded-full bg-brand-blue-100 flex items-center justify-center mb-4">
+            <DollarSign className="w-6 h-6 text-brand-blue-600" />
           </div>
           <h2 className="text-xl font-bold text-black mb-2">
             Tax Refund Advance
@@ -134,29 +134,29 @@ export default function ServicesPage() {
           </p>
           <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>0% APR on $250-$1,000</span>
             </li>
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>No credit check required</span>
             </li>
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Same-day cash available</span>
             </li>
           </ul>
           <div className="mt-4 pt-4 border-t">
             <div className="text-sm text-black">Loan amounts</div>
-            <div className="text-2xl font-bold text-brand-green-600">
+            <div className="text-2xl font-bold text-brand-blue-600">
               $250-$7,500
             </div>
           </div>
         </div>
 
-        <div className="rounded-2xl border-2 border-purple-200 bg-white p-6 hover:shadow-lg transition">
-          <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-            <Briefcase className="w-6 h-6 text-purple-600" />
+        <div className="rounded-2xl border-2 border-brand-red-200 bg-white p-6 hover:shadow-lg transition">
+          <div className="w-12 h-12 rounded-full bg-brand-red-100 flex items-center justify-center mb-4">
+            <Briefcase className="w-6 h-6 text-brand-red-600" />
           </div>
           <h2 className="text-xl font-bold text-black mb-2">
             Business Tax Services
@@ -167,27 +167,27 @@ export default function ServicesPage() {
           </p>
           <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-red-600 flex-shrink-0 mt-0.5" />
               <span>All business entity types</span>
             </li>
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-red-600 flex-shrink-0 mt-0.5" />
               <span>Quarterly tax planning</span>
             </li>
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-red-600 flex-shrink-0 mt-0.5" />
               <span>Audit support included</span>
             </li>
           </ul>
           <div className="mt-4 pt-4 border-t">
             <div className="text-sm text-black">Starting at</div>
-            <div className="text-2xl font-bold text-purple-600">$299</div>
+            <div className="text-2xl font-bold text-brand-red-600">$299</div>
           </div>
         </div>
 
         <div className="rounded-2xl border-2 border-orange-200 bg-white p-6 hover:shadow-lg transition">
           <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center mb-4">
-            <Calculator className="w-6 h-6 text-brand-orange-600" />
+            <Calculator className="w-6 h-6 text-brand-blue-600" />
           </div>
           <h2 className="text-xl font-bold text-black mb-2">
             Bookkeeping Services
@@ -198,21 +198,21 @@ export default function ServicesPage() {
           </p>
           <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>QuickBooks setup & training</span>
             </li>
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Monthly reconciliation</span>
             </li>
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Financial reports</span>
             </li>
           </ul>
           <div className="mt-4 pt-4 border-t">
             <div className="text-sm text-black">Starting at</div>
-            <div className="text-2xl font-bold text-brand-orange-600">
+            <div className="text-2xl font-bold text-brand-blue-600">
               $199/mo
             </div>
           </div>
@@ -220,7 +220,7 @@ export default function ServicesPage() {
 
         <div className="rounded-2xl border-2 border-red-200 bg-white p-6 hover:shadow-lg transition">
           <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mb-4">
-            <FileText className="w-6 h-6 text-brand-orange-600" />
+            <FileText className="w-6 h-6 text-brand-blue-600" />
           </div>
           <h2 className="text-xl font-bold text-black mb-2">
             Amended Returns
@@ -231,21 +231,21 @@ export default function ServicesPage() {
           </p>
           <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Form 1040-X preparation</span>
             </li>
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Prior year corrections</span>
             </li>
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>IRS correspondence help</span>
             </li>
           </ul>
           <div className="mt-4 pt-4 border-t">
             <div className="text-sm text-black">Starting at</div>
-            <div className="text-2xl font-bold text-brand-orange-600">$149</div>
+            <div className="text-2xl font-bold text-brand-blue-600">$149</div>
           </div>
         </div>
 
@@ -359,10 +359,10 @@ export default function ServicesPage() {
             Upload Documents
           </Link>
           <a
-            href="tel:3173143757"
+            href="/contact"
             className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-gray-50 transition"
           >
-            Call 317-314-3757
+            Call Contact Us
           </a>
           <Link
             href="/supersonic-fast-cash"

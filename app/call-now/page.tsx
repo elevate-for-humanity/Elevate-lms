@@ -25,9 +25,9 @@ export default function CallNowPage() {
           <Phone className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Call Us Now</h1>
           <p className="text-xl text-green-100 mb-8">Speak with a team member about enrollment, programs, or support</p>
-          <a href="tel:+13173143757" className="inline-flex items-center gap-3 bg-white text-green-600 px-10 py-5 rounded-full font-bold text-2xl hover:bg-green-50 transition-colors">
+          <a href="/contact" className="inline-flex items-center gap-3 bg-white text-green-600 px-10 py-5 rounded-full font-bold text-2xl hover:bg-green-50 transition-colors">
             <Phone className="w-8 h-8" />
-            (317) 314-3757
+            Contact Us
           </a>
         </div>
       </section>

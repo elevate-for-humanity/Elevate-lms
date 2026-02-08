@@ -61,14 +61,14 @@ export default function ProductApprovalActions({
       <button
         onClick={handleApprove}
         disabled={loading}
-        className="bg-brand-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 text-sm"
+        className="bg-brand-blue-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 text-sm"
       >
         Approve
       </button>
       <button
         onClick={handleReject}
         disabled={loading}
-        className="bg-brand-orange-600 text-white px-4 py-2 rounded hover:bg-brand-orange-700 disabled:opacity-50 text-sm"
+        className="bg-brand-blue-600 text-white px-4 py-2 rounded hover:bg-brand-blue-700 disabled:opacity-50 text-sm"
       >
         Reject
       </button>

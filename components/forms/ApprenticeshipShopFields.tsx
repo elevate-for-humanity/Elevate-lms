@@ -68,12 +68,12 @@ export function ApprenticeshipShopFields({
   return (
     <div className="space-y-6">
       {/* Multi-Region Notice */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl p-5 text-white">
+      <div className="bg-brand-red-600 rounded-xl p-5 text-white">
         <div className="flex items-start gap-3">
           <Globe className="w-6 h-6 flex-shrink-0 mt-0.5" />
           <div>
             <h3 className="font-bold text-lg mb-2">Multi-Region Requirements</h3>
-            <p className="text-purple-100 text-sm">
+            <p className="text-brand-red-100 text-sm">
               We are based in Indiana, but apprenticeship and host-site requirements can vary by region 
               (state licensing rules, local workforce board policies, and employer eligibility standards). 
               Your selected region determines the host shop guidelines we apply.
@@ -90,7 +90,7 @@ export function ApprenticeshipShopFields({
         <select
           value={formData.trainingRegion}
           onChange={(e) => onChange({ trainingRegion: e.target.value, trainingRegionOther: '' })}
-          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
+          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-brand-red-500 ${
             errors.trainingRegion ? 'border-red-500' : 'border-slate-300'
           }`}
           required
@@ -118,7 +118,7 @@ export function ApprenticeshipShopFields({
             value={formData.trainingRegionOther}
             onChange={(e) => onChange({ trainingRegionOther: e.target.value })}
             placeholder="e.g., Ohio, Michigan, Kentucky"
-            className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
+            className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-brand-red-500 ${
               errors.trainingRegionOther ? 'border-red-500' : 'border-slate-300'
             }`}
             required={showOtherRegion}
@@ -137,7 +137,7 @@ export function ApprenticeshipShopFields({
         <select
           value={formData.programTrack}
           onChange={(e) => onChange({ programTrack: e.target.value, supervisorLicenseType: '' })}
-          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
+          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-brand-red-500 ${
             errors.programTrack ? 'border-red-500' : 'border-slate-300'
           }`}
           required
@@ -157,7 +157,7 @@ export function ApprenticeshipShopFields({
       {/* Shop Information Header */}
       <div className="border-t border-slate-200 pt-6">
         <h3 className="text-lg font-bold text-black flex items-center gap-2 mb-2">
-          <Building2 className="w-5 h-5 text-purple-600" />
+          <Building2 className="w-5 h-5 text-brand-red-600" />
           Host Shop Information
         </h3>
         <p className="text-sm text-slate-600 mb-4">
@@ -184,7 +184,7 @@ export function ApprenticeshipShopFields({
           value={formData.shopName}
           onChange={(e) => onChange({ shopName: e.target.value })}
           placeholder="Enter shop/salon name"
-          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
+          className={`w-full px-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-brand-red-500 ${
             errors.shopName ? 'border-red-500' : 'border-slate-300'
           }`}
           required
@@ -206,7 +206,7 @@ export function ApprenticeshipShopFields({
             value={formData.shopAddress}
             onChange={(e) => onChange({ shopAddress: e.target.value })}
             placeholder="Full street address, city, state, ZIP"
-            className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
+            className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-brand-red-500 ${
               errors.shopAddress ? 'border-red-500' : 'border-slate-300'
             }`}
             required
@@ -228,8 +228,8 @@ export function ApprenticeshipShopFields({
             type="tel"
             value={formData.shopPhone}
             onChange={(e) => onChange({ shopPhone: e.target.value })}
-            placeholder="(317) 314-3757"
-            className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
+            placeholder="Contact Us"
+            className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-brand-red-500 ${
               errors.shopPhone ? 'border-red-500' : 'border-slate-300'
             }`}
             required
@@ -252,7 +252,7 @@ export function ApprenticeshipShopFields({
             value={formData.ownerManagerName}
             onChange={(e) => onChange({ ownerManagerName: e.target.value })}
             placeholder="Shop owner or manager name"
-            className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
+            className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-brand-red-500 ${
               errors.ownerManagerName ? 'border-red-500' : 'border-slate-300'
             }`}
             required
@@ -275,7 +275,7 @@ export function ApprenticeshipShopFields({
             value={formData.supervisorName}
             onChange={(e) => onChange({ supervisorName: e.target.value })}
             placeholder="Licensed professional who will supervise you"
-            className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
+            className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-brand-red-500 ${
               errors.supervisorName ? 'border-red-500' : 'border-slate-300'
             }`}
             required
@@ -296,7 +296,7 @@ export function ApprenticeshipShopFields({
           <select
             value={formData.supervisorLicenseType}
             onChange={(e) => onChange({ supervisorLicenseType: e.target.value })}
-            className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-purple-500 ${
+            className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:ring-2 focus:ring-brand-red-500 ${
               errors.supervisorLicenseType ? 'border-red-500' : 'border-slate-300'
             }`}
             required
@@ -330,13 +330,13 @@ export function ApprenticeshipShopFields({
             ? 'bg-green-50 border-green-300' 
             : errors.regionAcknowledgment 
               ? 'bg-red-50 border-red-300' 
-              : 'bg-slate-50 border-slate-200 hover:border-purple-300'
+              : 'bg-slate-50 border-slate-200 hover:border-brand-red-300'
         }`}>
           <input
             type="checkbox"
             checked={formData.regionAcknowledgment}
             onChange={(e) => onChange({ regionAcknowledgment: e.target.checked })}
-            className="mt-1 w-5 h-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+            className="mt-1 w-5 h-5 rounded border-slate-300 text-brand-red-600 focus:ring-brand-red-500"
             required
           />
           <span className="text-sm text-slate-700">
@@ -354,13 +354,13 @@ export function ApprenticeshipShopFields({
             ? 'bg-green-50 border-green-300' 
             : errors.shopAcknowledgment 
               ? 'bg-red-50 border-red-300' 
-              : 'bg-slate-50 border-slate-200 hover:border-purple-300'
+              : 'bg-slate-50 border-slate-200 hover:border-brand-red-300'
         }`}>
           <input
             type="checkbox"
             checked={formData.shopAcknowledgment}
             onChange={(e) => onChange({ shopAcknowledgment: e.target.checked })}
-            className="mt-1 w-5 h-5 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+            className="mt-1 w-5 h-5 rounded border-slate-300 text-brand-red-600 focus:ring-brand-red-500"
             required
           />
           <span className="text-sm text-slate-700">

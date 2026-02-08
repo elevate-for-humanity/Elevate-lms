@@ -104,11 +104,11 @@ export function ApprenticeProgressWidget({
   return (
     <div className="bg-white rounded-xl border-2 border-slate-200 shadow-sm overflow-hidden">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-4 text-white">
+      <div className="bg-brand-red-600 p-4 text-white">
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-bold">Apprenticeship Progress</h3>
-            <p className="text-purple-100 text-sm">{programName}</p>
+            <p className="text-brand-red-100 text-sm">{programName}</p>
           </div>
           <Clock className="w-8 h-8 opacity-80" />
         </div>
@@ -120,13 +120,13 @@ export function ApprenticeProgressWidget({
         <div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-semibold text-slate-700">Total Progress</span>
-            <span className="text-lg font-bold text-purple-600">
+            <span className="text-lg font-bold text-brand-red-600">
               {effectiveTotal.toFixed(1)} / {summary.required_hours} hrs
             </span>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-4 overflow-hidden">
             <div
-              className="bg-gradient-to-r from-purple-500 to-blue-500 h-full transition-all duration-500 rounded-full"
+              className="bg-gradient-to-r from-brand-red-500 to-blue-500 h-full transition-all duration-500 rounded-full"
               style={{ width: `${progressPercentage}%` }}
             />
           </div>
@@ -197,7 +197,7 @@ export function ApprenticeProgressWidget({
         <div className="flex gap-2 pt-2">
           <Link
             href="/apprentice/hours"
-            className="flex-1 flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
           >
             <Clock className="w-4 h-4" />
             Log Hours
@@ -264,7 +264,7 @@ export function ApprenticeProgressWidget({
           <div className="text-center pt-2">
             <Link
               href="/apprentice/transfer-hours"
-              className="text-sm text-purple-600 hover:text-purple-700 underline"
+              className="text-sm text-brand-red-600 hover:text-brand-red-700 underline"
             >
               Have prior training? Request transfer hours →
             </Link>

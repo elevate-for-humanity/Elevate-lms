@@ -67,7 +67,7 @@ export function StudyGroups() {
         </div>
         <Button
           onClick={() => setShowCreateModal(true)}
-          className="bg-brand-orange-600 hover:bg-brand-orange-700"
+          className="bg-brand-blue-600 hover:bg-brand-blue-700"
         >
           <Plus size={20} className="mr-2" />
           Create Group
@@ -107,7 +107,7 @@ export function StudyGroups() {
               </div>
 
               <div className="flex gap-2">
-                <Button className="flex-1 bg-brand-orange-600 hover:bg-brand-orange-700">
+                <Button className="flex-1 bg-brand-blue-600 hover:bg-brand-blue-700">
                   Join Group
                 </Button>
                 <Button variant="outline" size="sm">
@@ -178,7 +178,7 @@ defaultChecked />
                 >
                   Cancel
                 </Button>
-                <Button className="flex-1 bg-brand-orange-600 hover:bg-brand-orange-700">
+                <Button className="flex-1 bg-brand-blue-600 hover:bg-brand-blue-700">
                   Create Group
                 </Button>
               </div>

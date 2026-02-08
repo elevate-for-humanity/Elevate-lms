@@ -88,7 +88,7 @@ export function RealTimeCollaboration({
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Users className="text-brand-orange-600" size={24} />
+              <Users className="text-brand-blue-600" size={24} />
               <CardTitle>Study Group ({activeUsers.length} online)</CardTitle>
             </div>
             <Button variant="outline" size="sm">
@@ -172,7 +172,7 @@ export function RealTimeCollaboration({
                 placeholder="Type a message..."
                 className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500"
               />
-              <Button onClick={sendMessage} className="bg-brand-orange-600 hover:bg-brand-orange-700">
+              <Button onClick={sendMessage} className="bg-brand-blue-600 hover:bg-brand-blue-700">
                 Send
               </Button>
             </div>

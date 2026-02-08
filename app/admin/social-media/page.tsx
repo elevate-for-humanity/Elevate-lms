@@ -117,7 +117,7 @@ export default function SocialMediaPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -169,7 +169,7 @@ export default function SocialMediaPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-2">
-              <Calendar className="w-8 h-8 text-brand-green-600" />
+              <Calendar className="w-8 h-8 text-brand-blue-600" />
             </div>
             <div className="text-2xl font-bold text-black">
               {campaigns.reduce((sum, c) => sum + c.postsScheduled, 0)}
@@ -179,7 +179,7 @@ export default function SocialMediaPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-2">
-              <Clock className="w-8 h-8 text-purple-600" />
+              <Clock className="w-8 h-8 text-brand-red-600" />
             </div>
             <div className="text-2xl font-bold text-black">3x Daily</div>
             <div className="text-sm text-black">Post Frequency</div>
@@ -187,7 +187,7 @@ export default function SocialMediaPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-2">
-              <TrendingUp className="w-8 h-8 text-brand-orange-600" />
+              <TrendingUp className="w-8 h-8 text-brand-blue-600" />
             </div>
             <div className="text-2xl font-bold text-black">4</div>
             <div className="text-sm text-black">Connected Platforms</div>
@@ -285,7 +285,7 @@ export default function SocialMediaPage() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           campaign.status === 'active'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-blue-100 text-green-800'
                             : campaign.status === 'paused'
                               ? 'bg-yellow-100 text-yellow-800'
                               : 'bg-gray-100 text-black'
@@ -350,7 +350,7 @@ export default function SocialMediaPage() {
                       className={`p-2 rounded-lg transition-colors ${
                         campaign.status === 'active'
                           ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                          : 'bg-brand-green-100 text-green-700 hover:bg-green-200'
+                          : 'bg-brand-blue-100 text-green-700 hover:bg-green-200'
                       }`}
                       title={
                         campaign.status === 'active' ? 'Pause' : 'Activate'
@@ -414,7 +414,7 @@ export default function SocialMediaPage() {
                   <ul className="space-y-4">
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -432,7 +432,7 @@ export default function SocialMediaPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -450,7 +450,7 @@ export default function SocialMediaPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -468,7 +468,7 @@ export default function SocialMediaPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -554,7 +554,7 @@ function PlatformCard({
       <div className="flex items-center justify-between mb-3">
         <Icon className={`w-8 h-8 text-${color}-600`} />
         {connected && (
-          <span className="inline-flex items-center px-2 py-2 rounded-full text-xs font-medium bg-brand-green-100 text-green-800">
+          <span className="inline-flex items-center px-2 py-2 rounded-full text-xs font-medium bg-brand-blue-100 text-green-800">
             ● Connected
           </span>
         )}
@@ -573,7 +573,7 @@ interface ScheduleSlotProps {
 
 function ScheduleSlot({ time, status, campaign }: ScheduleSlotProps) {
   const statusColors = {
-    completed: 'bg-brand-green-100 text-green-800',
+    completed: 'bg-brand-blue-100 text-green-800',
     upcoming: 'bg-blue-100 text-blue-800',
     scheduled: 'bg-gray-100 text-black',
   };

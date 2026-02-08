@@ -64,7 +64,7 @@ export function OnboardingFlow({ steps, onComplete }: OnboardingFlowProps) {
           <div className="relative">
             <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-brand-orange-600 transition-all duration-300"
+                className="h-full bg-brand-blue-600 transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -74,9 +74,9 @@ export function OnboardingFlow({ steps, onComplete }: OnboardingFlowProps) {
                   key={step.id}
                   className={`flex items-center gap-2 text-xs ${
                     index === currentStep
-                      ? 'text-brand-orange-600 font-semibold'
+                      ? 'text-brand-blue-600 font-semibold'
                       : completedSteps.has(index)
-                      ? 'text-brand-orange-600'
+                      ? 'text-brand-blue-600'
                       : 'text-slate-400'
                   }`}
                 >
@@ -126,7 +126,7 @@ export function OnboardingFlow({ steps, onComplete }: OnboardingFlowProps) {
 
           <button
             onClick={handleNext}
-            className="flex items-center gap-2 px-6 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition"
+            className="flex items-center gap-2 px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
           >
             {currentStep === steps.length - 1 ? 'Get Started' : 'Next'}
             <ChevronRight className="w-4 h-4" />
@@ -156,15 +156,15 @@ export function StudentOnboarding({ onComplete }: { onComplete: () => void }) {
           </div>
           <div className="grid grid-cols-3 gap-4 mt-6">
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-orange-600">12+</div>
+              <div className="text-3xl font-bold text-brand-blue-600">12+</div>
               <div className="text-sm text-black">Programs</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-orange-600">100%</div>
+              <div className="text-3xl font-bold text-brand-blue-600">100%</div>
               <div className="text-sm text-black">Free</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-brand-orange-600">85%</div>
+              <div className="text-3xl font-bold text-brand-blue-600">85%</div>
               <div className="text-sm text-black">Job Placement</div>
             </div>
           </div>
@@ -182,19 +182,19 @@ export function StudentOnboarding({ onComplete }: { onComplete: () => void }) {
           </p>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
-              <Check className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+              <Check className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>View your enrolled courses and progress</span>
             </li>
             <li className="flex items-start gap-3">
-              <Check className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+              <Check className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Access upcoming assignments and deadlines</span>
             </li>
             <li className="flex items-start gap-3">
-              <Check className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+              <Check className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Track your achievements and certificates</span>
             </li>
             <li className="flex items-start gap-3">
-              <Check className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+              <Check className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Message instructors and classmates</span>
             </li>
           </ul>
@@ -215,9 +215,9 @@ export function StudentOnboarding({ onComplete }: { onComplete: () => void }) {
               <div className="font-semibold text-blue-900">Healthcare</div>
               <div className="text-sm text-blue-700">Medical Assistant, CNA, Home Health Aide</div>
             </div>
-            <div className="bg-purple-50 rounded-lg p-4">
-              <div className="font-semibold text-purple-900">Skilled Trades</div>
-              <div className="text-sm text-purple-700">HVAC, Building Maintenance</div>
+            <div className="bg-brand-red-50 rounded-lg p-4">
+              <div className="font-semibold text-brand-red-900">Skilled Trades</div>
+              <div className="text-sm text-brand-red-700">HVAC, Building Maintenance</div>
             </div>
             <div className="bg-orange-50 rounded-lg p-4">
               <div className="font-semibold text-orange-900">Transportation</div>

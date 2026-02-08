@@ -308,7 +308,7 @@ export default function WIOAComplianceDashboard() {
       case 'below':
       case 'non_compliant':
       case 'overdue':
-        return 'text-brand-orange-600 bg-brand-surface';
+        return 'text-brand-blue-600 bg-brand-surface';
       case 'upcoming':
         return 'text-brand-info bg-brand-surface';
       default:
@@ -319,7 +319,7 @@ export default function WIOAComplianceDashboard() {
   const getSeverityColor = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return 'text-brand-orange-600 bg-brand-surface border-red-200';
+        return 'text-brand-blue-600 bg-brand-surface border-red-200';
       case 'high':
         return 'text-orange-600 bg-brand-surface border-orange-200';
       case 'medium':
@@ -669,7 +669,7 @@ export default function WIOAComplianceDashboard() {
                         ? 'bg-green-500'
                         : area.score >= 80
                           ? 'bg-yellow-500'
-                          : 'bg-brand-orange-500'
+                          : 'bg-brand-blue-500'
                     }`}
                     style={{ width: `${area.score}%` }}
                   />

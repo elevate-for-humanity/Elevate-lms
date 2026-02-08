@@ -214,7 +214,7 @@ export function SCORMPlayer({
               {score !== null && (
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-black">Score:</span>
-                  <span className={`text-sm font-semibold ${isPassed ? 'text-green-600' : 'text-brand-orange-600'}`}>
+                  <span className={`text-sm font-semibold ${isPassed ? 'text-green-600' : 'text-brand-blue-600'}`}>
                     {score}%
                   </span>
                 </div>

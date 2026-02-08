@@ -31,7 +31,7 @@ const policies = [
     href: '/policies/wioa',
     description: 'Workforce Innovation and Opportunity Act compliance and equal access requirements.',
     icon: Users,
-    color: 'purple',
+    color: 'brand-red',
   },
   {
     title: 'Grievance Procedure',
@@ -73,7 +73,7 @@ const policies = [
 const colorClasses: Record<string, { bg: string; border: string; icon: string }> = {
   blue: { bg: 'bg-blue-50', border: 'border-blue-200', icon: 'text-blue-600' },
   green: { bg: 'bg-green-50', border: 'border-green-200', icon: 'text-green-600' },
-  purple: { bg: 'bg-purple-50', border: 'border-purple-200', icon: 'text-purple-600' },
+  brand-red: { bg: 'bg-brand-red-50', border: 'border-brand-red-200', icon: 'text-brand-red-600' },
   orange: { bg: 'bg-orange-50', border: 'border-orange-200', icon: 'text-orange-600' },
   rose: { bg: 'bg-rose-50', border: 'border-rose-200', icon: 'text-rose-600' },
   teal: { bg: 'bg-teal-50', border: 'border-teal-200', icon: 'text-teal-600' },
@@ -225,7 +225,7 @@ export default function EqualOpportunityPage() {
                 Email: <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">elevate4humanityedu@gmail.com</a>
               </p>
               <p className="text-gray-900">
-                Phone: <a href="tel:317-314-3757" className="text-blue-600 hover:underline">(317) 314-3757</a>
+                Phone: <a href="/contact" className="text-blue-600 hover:underline">Contact Us</a>
               </p>
               <p className="mt-4">
                 <Link href="/policies/grievance" className="text-blue-600 hover:underline text-sm font-medium">
@@ -278,10 +278,10 @@ export default function EqualOpportunityPage() {
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="tel:3173143757"
+              href="/contact"
               className="inline-flex items-center gap-2 bg-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-800 transition border border-white/30"
             >
-              <Phone className="w-5 h-5" /> (317) 314-3757
+              <Phone className="w-5 h-5" /> Contact Us
             </a>
             <Link
               href="/apply"

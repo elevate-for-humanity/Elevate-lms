@@ -37,8 +37,8 @@ export function StudentStatusBadge({
         return {
           icon: <AlertCircle className={size === 'sm' ? 'w-4 h-4' : size === 'lg' ? 'w-6 h-6' : 'w-5 h-5'} />,
           text: 'At Risk',
-          color: 'text-brand-orange-600',
-          bgColor: 'bg-brand-orange-600',
+          color: 'text-brand-blue-600',
+          bgColor: 'bg-brand-blue-600',
           lightBg: 'bg-red-100'
         };
       default:

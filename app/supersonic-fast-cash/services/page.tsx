@@ -158,10 +158,10 @@ export default async function ServicesPage() {
                     Schedule Consultation
                   </Link>
                   <Link
-                    href="tel:+13173143757"
+                    href="/contact"
                     className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    Call (317) 314-3757
+                    Call Contact Us
                   </Link>
                 </div>
               </div>
@@ -251,8 +251,8 @@ export default async function ServicesPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-brand-red-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
                 Fast Service
@@ -280,10 +280,10 @@ export default async function ServicesPage() {
               Book Appointment
             </Link>
             <Link
-              href="tel:+13173143757"
+              href="/contact"
               className="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-bold rounded hover:bg-orange-600 transition-colors border-2 border-white"
             >
-              Call (317) 314-3757
+              Call Contact Us
             </Link>
           </div>
         </div>

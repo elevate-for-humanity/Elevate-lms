@@ -50,7 +50,7 @@ export default async function StudentApplicationPage() {
             Start Your Career Journey
           </h1>
           <p className="text-base sm:text-lg text-black max-w-3xl">
-            Call (317) 314-3757 or apply online for a better future. This application helps
+            Call Contact Us or apply online for a better future. This application helps
             us understand your goals and match you with the right training
             program.
           </p>

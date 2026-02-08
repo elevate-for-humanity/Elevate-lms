@@ -14,8 +14,8 @@ export default function DrugTestingSuccessPage() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full bg-white rounded-lg shadow-lg p-8 text-center">
-        <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Circle className="w-12 h-12 text-brand-green-600" />
+        <div className="w-20 h-20 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+          <Circle className="w-12 h-12 text-brand-blue-600" />
         </div>
 
         <h1 className="text-3xl font-bold mb-4">Order Confirmed!</h1>
@@ -69,11 +69,11 @@ export default function DrugTestingSuccessPage() {
           <h3 className="font-bold mb-4">Need Help?</h3>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="tel:+13173143757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-bold hover:bg-brand-blue-700"
             >
               <Phone className="w-5 h-5" />
-              Call (317) 314-3757
+              Call Contact Us
             </a>
             <Link
               href="/contact"

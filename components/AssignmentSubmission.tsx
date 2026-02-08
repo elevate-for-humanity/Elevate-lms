@@ -95,7 +95,7 @@ export function AssignmentSubmission({
 
   const getFileIcon = (type: string) => {
     if (type.startsWith('image/')) return <ImageIcon size={20} className="text-blue-600" />;
-    if (type.startsWith('video/')) return <Video size={20} className="text-purple-600" />;
+    if (type.startsWith('video/')) return <Video size={20} className="text-brand-red-600" />;
     return <FileText size={20} className="text-black" />;
   };
 
@@ -206,7 +206,7 @@ export function AssignmentSubmission({
                   </div>
                   <button
                     onClick={() => removeFile(file.id)}
-                    className="p-2 text-brand-orange-600 hover:bg-red-50 rounded transition"
+                    className="p-2 text-brand-blue-600 hover:bg-red-50 rounded transition"
                   >
                     <X size={18} />
                   </button>
@@ -238,7 +238,7 @@ export function AssignmentSubmission({
         <Button
           onClick={handleSubmit}
           disabled={isSubmitting || files.length === 0}
-          className="flex-1 bg-brand-orange-600 hover:bg-brand-orange-700 py-6 text-lg"
+          className="flex-1 bg-brand-blue-600 hover:bg-brand-blue-700 py-6 text-lg"
         >
           {isSubmitting ? 'Submitting...' : 'Submit Assignment'}
         </Button>

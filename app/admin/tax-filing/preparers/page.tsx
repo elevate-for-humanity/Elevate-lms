@@ -69,14 +69,14 @@ export default async function TaxPreparersPage() {
             <div className="text-black text-sm">Total Preparers</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-brand-green-600">
+            <div className="text-3xl font-bold text-brand-blue-600">
               {preparers?.filter((p: Record<string, any>) => p.is_active)
                 .length || 0}
             </div>
             <div className="text-black text-sm">Active</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-purple-600">VITA</div>
+            <div className="text-3xl font-bold text-brand-red-600">VITA</div>
             <div className="text-black text-sm">Certified</div>
           </div>
         </div>
@@ -102,7 +102,7 @@ export default async function TaxPreparersPage() {
                       </h3>
                       <p className="text-sm text-black">{item.email}</p>
                       <div className="mt-2 flex gap-2">
-                        <span className="px-2 py-2 bg-brand-green-100 text-green-800 text-xs rounded">
+                        <span className="px-2 py-2 bg-brand-blue-100 text-green-800 text-xs rounded">
                           VITA Certified
                         </span>
                         <span className="px-2 py-2 bg-blue-100 text-blue-800 text-xs rounded">

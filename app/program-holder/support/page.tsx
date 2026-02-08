@@ -57,9 +57,9 @@ export default async function SupportPage() {
     {
       type: 'Phone',
       icon: Phone,
-      value: '317-314-3757',
+      value: 'Contact Us',
       description: 'Mon-Fri 9am-5pm EST',
-      href: 'tel:317-314-3757',
+      href: 'tel:Contact Us',
       color: 'green',
     },
   ];

@@ -4,7 +4,6 @@ export const revalidate = 86400;
 
 import Link from 'next/link';
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
-import PageAvatar from '@/components/PageAvatar';
 import Image from 'next/image';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
@@ -141,7 +140,7 @@ export default async function BeautyProgramsPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <Award className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+              <Award className="w-12 h-12 text-brand-red-600 mx-auto mb-4" />
               <h3 className="text-lg font-bold text-black mb-2">State Licensure</h3>
               <p className="text-gray-600 text-sm">
                 Programs meet state requirements for professional licensure

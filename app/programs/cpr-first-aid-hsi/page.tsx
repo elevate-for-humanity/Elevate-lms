@@ -6,7 +6,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageAvatar from '@/components/PageAvatar';
 import { 
   Circle, Clock, Award, ArrowRight, Heart, 
   Users, Shield, Phone, Calendar, Building, Briefcase
@@ -132,8 +131,8 @@ export default function CPRFirstAidPage() {
               <Link href="/contact" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
                 Schedule a Class <ArrowRight className="w-5 h-5" />
               </Link>
-              <a href="tel:+13173143757" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
-                <Phone className="w-5 h-5" /> (317) 314-3757
+              <a href="/contact" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
+                <Phone className="w-5 h-5" /> Contact Us
               </a>
             </div>
           </div>
@@ -141,10 +140,6 @@ export default function CPRFirstAidPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/healthcare-guide.mp4" 
-        title="CPR & First Aid Guide" 
-      />
 
       {/* Quick Stats */}
       <section className="py-8 bg-slate-900">
@@ -364,8 +359,8 @@ export default function CPRFirstAidPage() {
             <Link href="/contact" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Schedule a Class <ArrowRight className="w-5 h-5" />
             </Link>
-            <a href="tel:+13173143757" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
-              <Phone className="w-5 h-5" /> (317) 314-3757
+            <a href="/contact" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
+              <Phone className="w-5 h-5" /> Contact Us
             </a>
           </div>
         </div>

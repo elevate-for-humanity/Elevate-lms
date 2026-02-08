@@ -70,7 +70,7 @@ function FallbackChatWidget() {
       
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: data.reply || data.response || "I'm having trouble right now. Please call us at (317) 314-3757 for assistance.",
+        text: data.reply || data.response || "I'm having trouble right now. Please call us at Contact Us for assistance.",
         sender: 'bot',
         timestamp: new Date(),
       };
@@ -79,7 +79,7 @@ function FallbackChatWidget() {
     } catch (error) {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
-        text: "I'm having trouble connecting. Please call us at (317) 314-3757 or visit elevateforhumanity.org/apply to get started!",
+        text: "I'm having trouble connecting. Please call us at Contact Us or visit elevateforhumanity.org/apply to get started!",
         sender: 'bot',
         timestamp: new Date(),
       };

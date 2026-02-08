@@ -62,7 +62,7 @@ export default async function EmploymentPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/support"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Get Started
             </Link>
@@ -91,7 +91,7 @@ export default async function EmploymentPage() {
                 <ul className="space-y-3">
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -107,7 +107,7 @@ export default async function EmploymentPage() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -123,7 +123,7 @@ export default async function EmploymentPage() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -176,9 +176,9 @@ export default async function EmploymentPage() {
               </div>
 
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <svg
-                    className="w-6 h-6 text-brand-green-600"
+                    className="w-6 h-6 text-brand-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -196,9 +196,9 @@ export default async function EmploymentPage() {
               </div>
 
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center mb-4">
                   <svg
-                    className="w-6 h-6 text-purple-600"
+                    className="w-6 h-6 text-brand-red-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

@@ -83,13 +83,13 @@ export default async function TaxFilingApplicationsPage() {
             <div className="text-black text-sm">Total Applications</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-brand-orange-600">
+            <div className="text-3xl font-bold text-brand-blue-600">
               {pendingCount || 0}
             </div>
             <div className="text-black text-sm">Pending Review</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-brand-green-600">
+            <div className="text-3xl font-bold text-brand-blue-600">
               {completedCount || 0}
             </div>
             <div className="text-black text-sm">Completed</div>
@@ -100,7 +100,7 @@ export default async function TaxFilingApplicationsPage() {
               aria-label="Link"
               className="block"
             >
-              <div className="text-lg font-bold text-purple-600">+ New</div>
+              <div className="text-lg font-bold text-brand-red-600">+ New</div>
               <div className="text-black text-sm">Add Application</div>
             </Link>
           </div>
@@ -187,7 +187,7 @@ export default async function TaxFilingApplicationsPage() {
                         <span
                           className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             item.status === 'completed'
-                              ? 'bg-brand-green-100 text-green-800'
+                              ? 'bg-brand-blue-100 text-green-800'
                               : item.status === 'pending'
                                 ? 'bg-orange-100 text-orange-800'
                                 : 'bg-blue-100 text-blue-800'

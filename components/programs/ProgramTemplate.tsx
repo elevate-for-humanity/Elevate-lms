@@ -423,7 +423,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
       </section>
 
       {/* POST-COMPLETION PATHWAY */}
-      <section className="bg-gradient-to-r from-indigo-600 to-purple-600 py-12">
+      <section className="bg-gradient-to-r from-indigo-600 to-brand-red-600 py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold mb-8 text-white text-center">
             What Happens After Completion?
@@ -485,11 +485,11 @@ export function ProgramTemplate({ program }: { program: Program }) {
               {program.ctaPrimary.label}
             </Link>
             <a
-              href="tel:3173143757"
+              href="/contact"
               className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/20 border-2 border-white text-white px-10 py-5 rounded-xl font-bold text-lg transition"
             >
               <Phone className="w-5 h-5" />
-              (317) 314-3757
+              Contact Us
             </a>
             <a
               href="mailto:info@www.elevateforhumanity.org"
@@ -502,7 +502,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
 
           <div className="pt-8 border-t border-white/20">
             <p className="text-sm text-white/70">
-              Questions? Call us at (317) 314-3757 or email
+              Questions? Call us at Contact Us or email
               info@www.elevateforhumanity.org
             </p>
           </div>

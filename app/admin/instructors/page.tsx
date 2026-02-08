@@ -95,7 +95,7 @@ export default function InstructorsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/admin/instructors/performance"
-              className="bg-brand-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-blue-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               View Performance
             </Link>
@@ -123,19 +123,19 @@ export default function InstructorsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Award className="h-11 w-11 text-brand-green-600" />
+              <Award className="h-11 w-11 text-brand-blue-600" />
               <p className="text-sm text-black">Active</p>
             </div>
-            <p className="text-3xl font-bold text-brand-green-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {instructors.filter((i) => i.is_active).length}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center gap-3 mb-2">
-              <BookOpen className="h-11 w-11 text-purple-600" />
+              <BookOpen className="h-11 w-11 text-brand-red-600" />
               <p className="text-sm text-black">Total Courses</p>
             </div>
-            <p className="text-3xl font-bold text-purple-600">
+            <p className="text-3xl font-bold text-brand-red-600">
               {instructors.reduce(
                 (acc, i) => acc + (i.instructor_courses?.length || 0),
                 0
@@ -181,7 +181,7 @@ export default function InstructorsPage() {
               onClick={() => setFilter('active')}
               className={`px-4 py-2 rounded-lg font-medium ${
                 filter === 'active'
-                  ? 'bg-brand-green-600 text-white'
+                  ? 'bg-brand-blue-600 text-white'
                   : 'bg-gray-100 text-black'
               }`}
             >
@@ -257,7 +257,7 @@ export default function InstructorsPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {instructor.is_active ? (
-                        <span className="text-brand-green-600 text-sm font-medium bg-brand-green-100 px-3 py-2 rounded-full">
+                        <span className="text-brand-blue-600 text-sm font-medium bg-brand-blue-100 px-3 py-2 rounded-full">
                           Active
                         </span>
                       ) : (

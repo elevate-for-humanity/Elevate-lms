@@ -69,7 +69,7 @@ export default async function NewLeadPage() {
               <input
                 type="tel"
                 name="phone"
-                placeholder="(317) 314-3757"
+                placeholder="Contact Us"
                 className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
               />
             </div>

@@ -91,7 +91,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
         </div>
 
         {error && (
-          <p className="mt-2 text-sm text-brand-orange-600 flex items-center gap-1">
+          <p className="mt-2 text-sm text-brand-blue-600 flex items-center gap-1">
             <AlertCircle className="h-4 w-4" />
             {error}
           </p>

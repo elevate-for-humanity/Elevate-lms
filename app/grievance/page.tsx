@@ -40,7 +40,7 @@ export default function GrievancePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -172,10 +172,10 @@ export default function GrievancePage() {
                 <p className="font-semibold text-black mb-2">Phone:</p>
                 <p className="text-black">
                   <a
-                    href="tel:+13173143757"
+                    href="/contact"
                     className="text-brand-blue-600 hover:underline"
                   >
-                    (317) 314-3757
+                    Contact Us
                   </a>
                 </p>
               </div>
@@ -215,10 +215,10 @@ export default function GrievancePage() {
               <br />
               Phone:{' '}
               <a
-                href="tel:+13173143757"
+                href="/contact"
                 className="text-brand-blue-600 hover:underline"
               >
-                (317) 314-3757
+                Contact Us
               </a>
               <br />
               Email:{' '}
@@ -256,7 +256,7 @@ export default function GrievancePage() {
                   <ul className="space-y-4">
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -274,7 +274,7 @@ export default function GrievancePage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -292,7 +292,7 @@ export default function GrievancePage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -310,7 +310,7 @@ export default function GrievancePage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

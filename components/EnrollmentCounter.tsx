@@ -196,7 +196,7 @@ export default function EnrollmentCounter() {
               {formatNumber(activeCount.get())}
             </motion.div>
             <div className="text-white/80 font-semibold">Current Students</div>
-            <div className="mt-4 flex items-center gap-2 text-purple-300 text-sm">
+            <div className="mt-4 flex items-center gap-2 text-brand-red-300 text-sm">
               <Users className="w-4 h-4" />
               <span>Learning right now</span>
             </div>

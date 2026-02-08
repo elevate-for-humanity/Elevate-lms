@@ -245,7 +245,7 @@ export function MainNav() {
             aria-label="Elevate For Humanity Home"
           >
             <div
-              className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-orange-500 text-white text-xs font-black uppercase"
+              className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-blue-500 text-white text-xs font-black uppercase"
               aria-hidden="true"
             >
               EFH
@@ -274,9 +274,9 @@ export function MainNav() {
             >
               <button
                 className={clsx(
-                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-orange-600',
+                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-blue-600',
                   pathname?.startsWith('/programs')
-                    ? 'text-brand-orange-600 font-semibold'
+                    ? 'text-brand-blue-600 font-semibold'
                     : 'text-black'
                 )}
                 onClick={handleProgramsClick}
@@ -301,9 +301,9 @@ export function MainNav() {
                         key={link.href}
                         href={link.href}
                         className={clsx(
-                          'block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-orange-600',
+                          'block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-blue-600',
                           pathname === link.href
-                            ? 'text-brand-orange-600 font-semibold bg-red-50'
+                            ? 'text-brand-blue-600 font-semibold bg-red-50'
                             : 'text-black'
                         )}
                       >
@@ -323,9 +323,9 @@ export function MainNav() {
             >
               <button
                 className={clsx(
-                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-orange-600',
+                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-blue-600',
                   pathname?.startsWith('/micro-classes')
-                    ? 'text-brand-orange-600 font-semibold'
+                    ? 'text-brand-blue-600 font-semibold'
                     : 'text-black'
                 )}
                 onClick={handleMicroClassesClick}
@@ -350,9 +350,9 @@ export function MainNav() {
                         key={link.href}
                         href={link.href}
                         className={clsx(
-                          'block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-orange-600',
+                          'block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-blue-600',
                           pathname === link.href
-                            ? 'text-brand-orange-600 font-semibold bg-red-50'
+                            ? 'text-brand-blue-600 font-semibold bg-red-50'
                             : 'text-black'
                         )}
                       >
@@ -372,9 +372,9 @@ export function MainNav() {
             >
               <button
                 className={clsx(
-                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-orange-600',
+                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-blue-600',
                   pathname?.startsWith('/funding')
-                    ? 'text-brand-orange-600 font-semibold'
+                    ? 'text-brand-blue-600 font-semibold'
                     : 'text-black'
                 )}
                 onClick={handleFundingClick}
@@ -399,9 +399,9 @@ export function MainNav() {
                         key={link.href}
                         href={link.href}
                         className={clsx(
-                          'block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-orange-600',
+                          'block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-blue-600',
                           pathname === link.href
-                            ? 'text-brand-orange-600 font-semibold bg-red-50'
+                            ? 'text-brand-blue-600 font-semibold bg-red-50'
                             : 'text-black'
                         )}
                       >
@@ -421,7 +421,7 @@ export function MainNav() {
             >
               <button
                 className={clsx(
-                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-orange-600',
+                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-blue-600',
                   'text-black'
                 )}
                 aria-expanded={resourcesOpen}
@@ -444,7 +444,7 @@ export function MainNav() {
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-orange-600 text-black"
+                        className="block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-blue-600 text-black"
                       >
                         {link.label}
                       </Link>
@@ -462,7 +462,7 @@ export function MainNav() {
             >
               <button
                 className={clsx(
-                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-orange-600',
+                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-blue-600',
                   'text-black'
                 )}
                 aria-expanded={servicesOpen}
@@ -485,7 +485,7 @@ export function MainNav() {
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-orange-600 text-black"
+                        className="block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-blue-600 text-black"
                       >
                         {link.label}
                       </Link>
@@ -503,7 +503,7 @@ export function MainNav() {
             >
               <button
                 className={clsx(
-                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-orange-600',
+                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-blue-600',
                   'text-black'
                 )}
                 aria-expanded={communityOpen}
@@ -526,7 +526,7 @@ export function MainNav() {
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-orange-600 text-black"
+                        className="block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-blue-600 text-black"
                       >
                         {link.label}
                       </Link>
@@ -544,7 +544,7 @@ export function MainNav() {
             >
               <button
                 className={clsx(
-                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-orange-600',
+                  'flex items-center gap-1 min-h-[44px] py-3 px-2 transition hover:text-brand-blue-600',
                   'text-black'
                 )}
                 aria-expanded={moreOpen}
@@ -567,7 +567,7 @@ export function MainNav() {
                       <Link
                         key={link.href}
                         href={link.href}
-                        className="block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-orange-600 text-black"
+                        className="block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-blue-600 text-black"
                       >
                         {link.label}
                         {link.badge && (
@@ -590,11 +590,11 @@ export function MainNav() {
             >
               <button
                 className={clsx(
-                  'flex items-center gap-1 transition hover:text-brand-orange-600',
+                  'flex items-center gap-1 transition hover:text-brand-blue-600',
                   pathname?.startsWith('/portal') ||
                     pathname?.startsWith('/lms') ||
                     pathname?.startsWith('/admin')
-                    ? 'text-brand-orange-600 font-semibold'
+                    ? 'text-brand-blue-600 font-semibold'
                     : 'text-black'
                 )}
                 aria-expanded={portalsOpen}
@@ -618,9 +618,9 @@ export function MainNav() {
                         key={link.href}
                         href={link.href}
                         className={clsx(
-                          'block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-orange-600',
+                          'block px-4 py-2 text-xs transition hover:bg-red-50 hover:text-brand-blue-600',
                           pathname === link.href
-                            ? 'text-brand-orange-600 font-semibold bg-red-50'
+                            ? 'text-brand-blue-600 font-semibold bg-red-50'
                             : 'text-black'
                         )}
                       >
@@ -641,9 +641,9 @@ export function MainNav() {
                   ? { target: '_blank', rel: 'noopener noreferrer' }
                   : {})}
                 className={clsx(
-                  'transition hover:text-brand-orange-600',
+                  'transition hover:text-brand-blue-600',
                   pathname?.startsWith(link.href)
-                    ? 'text-brand-orange-600 font-semibold'
+                    ? 'text-brand-blue-600 font-semibold'
                     : 'text-black'
                 )}
                 aria-current={
@@ -674,7 +674,7 @@ export function MainNav() {
             {/* Strong CTA – APPLY */}
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center rounded-full bg-brand-orange-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-brand-orange-700 transition"
+              className="inline-flex items-center justify-center rounded-full bg-brand-blue-600 px-4 py-2 text-xs font-bold text-white shadow-sm hover:bg-brand-blue-700 transition"
               aria-label="Apply for training or refer someone"
             >
               Apply Now
@@ -685,7 +685,7 @@ export function MainNav() {
           <div className="flex items-center gap-2 md:hidden">
             <Link
               href="/apply"
-              className="rounded-full bg-brand-orange-500 px-3 py-2.5 text-[11px] font-semibold hover:bg-brand-orange-600 transition-colors"
+              className="rounded-full bg-brand-blue-500 px-3 py-2.5 text-[11px] font-semibold hover:bg-brand-blue-600 transition-colors"
               style={{ color: '#FFFFFF' }}
             >
               Apply
@@ -716,7 +716,7 @@ export function MainNav() {
               {/* Header */}
               <div className="flex items-center justify-between p-6 border-b border-slate-200">
                 <div className="flex items-center gap-2">
-                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-orange-500 text-white text-xs font-black uppercase">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-brand-blue-500 text-white text-xs font-black uppercase">
                     EFH
                   </div>
                   <span className="text-sm font-semibold text-black">
@@ -725,7 +725,7 @@ export function MainNav() {
                 </div>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 text-black hover:text-brand-orange-600 transition touch-manipulation"
+                  className="p-2 text-black hover:text-brand-blue-600 transition touch-manipulation"
                   aria-label="Close navigation menu"
                 >
                   <X size={24} />
@@ -762,7 +762,7 @@ export function MainNav() {
                           className={clsx(
                             'block py-2 px-4 rounded-lg text-sm transition touch-manipulation',
                             pathname === link.href
-                              ? 'bg-red-50 text-brand-orange-600 font-medium'
+                              ? 'bg-red-50 text-brand-blue-600 font-medium'
                               : 'text-black hover:bg-slate-50'
                           )}
                           onClick={() => setMobileMenuOpen(false)}
@@ -800,7 +800,7 @@ export function MainNav() {
                           className={clsx(
                             'block py-2 px-4 rounded-lg text-sm transition touch-manipulation',
                             pathname === link.href
-                              ? 'bg-red-50 text-brand-orange-600 font-medium'
+                              ? 'bg-red-50 text-brand-blue-600 font-medium'
                               : 'text-black hover:bg-slate-50'
                           )}
                           onClick={() => setMobileMenuOpen(false)}
@@ -836,7 +836,7 @@ export function MainNav() {
                           className={clsx(
                             'block py-2 px-4 rounded-lg text-sm transition touch-manipulation',
                             pathname === link.href
-                              ? 'bg-red-50 text-brand-orange-600 font-medium'
+                              ? 'bg-red-50 text-brand-blue-600 font-medium'
                               : 'text-black hover:bg-slate-50'
                           )}
                           onClick={() => setMobileMenuOpen(false)}
@@ -859,7 +859,7 @@ export function MainNav() {
                     className={clsx(
                       'block py-3 px-4 rounded-lg text-sm font-medium transition touch-manipulation',
                       pathname?.startsWith(link.href)
-                        ? 'bg-red-50 text-brand-orange-600 border border-red-200'
+                        ? 'bg-red-50 text-brand-blue-600 border border-red-200'
                         : 'text-black hover:bg-slate-50 hover:text-black'
                     )}
                     onClick={() => setMobileMenuOpen(false)}
@@ -873,14 +873,14 @@ export function MainNav() {
               <div className="p-6 border-t border-slate-200 space-y-3">
                 <Link
                   href={STUDENT_PORTAL_URL}
-                  className="block py-3 px-4 text-center border-2 border-emerald-500 text-brand-orange-600 rounded-lg font-semibold hover:bg-red-50 transition touch-manipulation"
+                  className="block py-3 px-4 text-center border-2 border-emerald-500 text-brand-blue-600 rounded-lg font-semibold hover:bg-red-50 transition touch-manipulation"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Student Portal
                 </Link>
                 <Link
                   href="/apply"
-                  className="block py-3 px-4 text-center bg-brand-orange-500 text-white rounded-lg font-semibold hover:bg-brand-orange-600 transition shadow-lg touch-manipulation"
+                  className="block py-3 px-4 text-center bg-brand-blue-500 text-white rounded-lg font-semibold hover:bg-brand-blue-600 transition shadow-lg touch-manipulation"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Apply / Refer Now

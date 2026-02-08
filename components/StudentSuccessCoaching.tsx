@@ -89,7 +89,7 @@ export function StudentSuccessCoaching() {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`py-4 px-2 border-b-2 font-medium ${
-                  activeTab === tab ? 'border-red-600 text-brand-orange-600' : 'border-transparent text-gray-500'
+                  activeTab === tab ? 'border-red-600 text-brand-blue-600' : 'border-transparent text-gray-500'
                 }`}
               >
                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -104,7 +104,7 @@ export function StudentSuccessCoaching() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Card className="p-6">
               <h3 className="text-sm text-black mb-2">Coaching Sessions</h3>
-              <p className="text-3xl font-bold text-brand-orange-600">{sessions.length}</p>
+              <p className="text-3xl font-bold text-brand-blue-600">{sessions.length}</p>
               <p className="text-sm text-gray-500">1 upcoming</p>
             </Card>
             <Card className="p-6">

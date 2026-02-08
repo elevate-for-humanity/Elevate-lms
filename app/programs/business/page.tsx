@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface Program {
@@ -91,10 +90,6 @@ export default function BusinessPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/financial-guide.mp4" 
-        title="Business Guide" 
-      />
 
       {/* Pathway Disclosure */}
       <PathwayDisclosure programName="Business" programSlug="business" />

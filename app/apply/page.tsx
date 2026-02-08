@@ -6,7 +6,6 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { MessageSquare, GraduationCap, Phone, Clock, Circle, AlertCircle } from 'lucide-react';
-import PageAvatar from '@/components/PageAvatar';
 
 export const metadata: Metadata = {
   title: 'Apply | Elevate for Humanity',
@@ -68,10 +67,6 @@ export default async function ApplyPage({
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/apply-section-video.mp4" 
-        title="Start Your Journey" 
-      />
 
       {/* Eligibility Notice */}
       <section className="py-6 px-4 bg-amber-50 border-b border-amber-100">
@@ -260,11 +255,11 @@ export default async function ApplyPage({
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow"
             >
               <Phone className="w-5 h-5 text-blue-600" />
-              <span className="font-semibold text-slate-900">(317) 314-3757</span>
+              <span className="font-semibold text-slate-900">Contact Us</span>
             </a>
             <Link
               href="/contact"

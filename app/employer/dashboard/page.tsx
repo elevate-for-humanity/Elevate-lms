@@ -158,19 +158,19 @@ export default async function EmployerDashboardOrchestrated() {
             <div
               className={`rounded-lg shadow-sm border p-6 ${
                 apprenticeshipProgram
-                  ? 'bg-purple-50 border-purple-600'
+                  ? 'bg-brand-red-50 border-brand-red-600'
                   : 'bg-white border-slate-200'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
                 <TrendingUp
                   className={`h-11 w-11 ${
-                    apprenticeshipProgram ? 'text-purple-600' : 'text-slate-400'
+                    apprenticeshipProgram ? 'text-brand-red-600' : 'text-slate-400'
                   }`}
                 />
                 <span
                   className={`text-3xl font-bold ${
-                    apprenticeshipProgram ? 'text-purple-900' : 'text-black'
+                    apprenticeshipProgram ? 'text-brand-red-900' : 'text-black'
                   }`}
                 >
                   {apprenticeshipProgram ? '1' : '0'}
@@ -178,7 +178,7 @@ export default async function EmployerDashboardOrchestrated() {
               </div>
               <div
                 className={`text-sm ${
-                  apprenticeshipProgram ? 'text-purple-900' : 'text-black'
+                  apprenticeshipProgram ? 'text-brand-red-900' : 'text-black'
                 }`}
               >
                 Apprenticeship Programs
@@ -347,17 +347,17 @@ export default async function EmployerDashboardOrchestrated() {
 
           {/* Apprenticeship CTA */}
           {!apprenticeshipProgram && profile.verified && (
-            <div className="bg-purple-50 rounded-lg border-2 border-purple-600 p-6">
-              <h3 className="text-lg font-bold text-purple-900 mb-3">
+            <div className="bg-brand-red-50 rounded-lg border-2 border-brand-red-600 p-6">
+              <h3 className="text-lg font-bold text-brand-red-900 mb-3">
                 Build Your Talent Pipeline
               </h3>
-              <p className="text-purple-800 mb-4 text-sm">
+              <p className="text-brand-red-800 mb-4 text-sm">
                 Start an apprenticeship program and train workers specifically
                 for your needs.
               </p>
               <a
                 href="/employer/apprenticeship/new"
-                className="block w-full text-center px-4 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition"
+                className="block w-full text-center px-4 py-3 bg-brand-red-600 text-white rounded-lg font-semibold hover:bg-brand-red-700 transition"
               >
                 Learn More
               </a>
@@ -371,10 +371,10 @@ export default async function EmployerDashboardOrchestrated() {
               Our team is here to help you find the right candidates.
             </p>
             <a
-              href="tel:+13173143757"
+              href="/contact"
               className="block w-full text-center px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
             >
-              Call (317) 314-3757
+              Call Contact Us
             </a>
           </div>
 

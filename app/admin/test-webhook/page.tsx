@@ -80,7 +80,7 @@ export default function TestWebhookPage() {
           <button
             onClick={handleTest}
             disabled={loading || !studentId || !programId}
-            className="w-full px-6 py-3 bg-brand-green-600 text-white rounded-lg hover:bg-green-700 disabled:bg-slate-300 font-semibold"
+            className="w-full px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-green-700 disabled:bg-slate-300 font-semibold"
           >
             {loading ? 'Testing...' : 'Test Auto-Enrollment (No Payment)'}
           </button>

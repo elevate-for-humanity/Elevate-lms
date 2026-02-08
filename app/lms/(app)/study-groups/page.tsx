@@ -220,7 +220,7 @@ export default async function StudyGroupsPage() {
                       </div>
                     </div>
                     {group.role === 'admin' && (
-                      <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs font-medium rounded-full">
+                      <span className="px-2 py-1 bg-brand-red-100 text-brand-red-700 text-xs font-medium rounded-full">
                         Admin
                       </span>
                     )}

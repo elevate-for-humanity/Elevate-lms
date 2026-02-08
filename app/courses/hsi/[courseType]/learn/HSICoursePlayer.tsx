@@ -110,7 +110,7 @@ export function HSICoursePlayer({
                   </p>
                   <button
                     onClick={handleCompletion}
-                    className="px-4 py-2 bg-brand-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                    className="px-4 py-2 bg-brand-blue-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors"
                   >
                     • Mark as Complete
                   </button>
@@ -146,7 +146,7 @@ export function HSICoursePlayer({
                 <div className="pt-4">
                   <button
                     onClick={handleCompletion}
-                    className="px-6 py-3 bg-brand-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
+                    className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors"
                   >
                     • I've Completed the Course
                   </button>
@@ -159,7 +159,7 @@ export function HSICoursePlayer({
 
       {/* Completion Banner */}
       {completed && (
-        <div className="bg-brand-green-600 text-white px-6 py-4 shadow-lg">
+        <div className="bg-brand-blue-600 text-white px-6 py-4 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Circle className="w-6 h-6" />
@@ -173,7 +173,7 @@ export function HSICoursePlayer({
             </div>
             <button
               onClick={() => router.push('/student/courses')}
-              className="px-6 py-2 bg-white text-brand-green-600 font-semibold rounded-lg hover:bg-green-50 transition-colors"
+              className="px-6 py-2 bg-white text-brand-blue-600 font-semibold rounded-lg hover:bg-green-50 transition-colors"
             >
               Continue Learning
             </button>

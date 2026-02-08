@@ -19,7 +19,7 @@ export function WhatYouWillLearn({
       <ul className="grid md:grid-cols-2 gap-4">
         {items.map((item, index) => (
           <li key={index} className="flex items-start gap-3">
-            <Circle className="w-5 h-5 text-brand-orange-600 mt-0.5 flex-shrink-0" />
+            <Circle className="w-5 h-5 text-brand-blue-600 mt-0.5 flex-shrink-0" />
             <span className="text-black text-sm leading-relaxed">{item}</span>
           </li>
         ))}

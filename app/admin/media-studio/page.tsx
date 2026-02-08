@@ -182,7 +182,7 @@ export default function MediaStudioPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -273,7 +273,7 @@ export default function MediaStudioPage() {
               <button
                 onClick={optimizeImages}
                 disabled={selectedFiles.size === 0}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 disabled:opacity-50"
               >
                 <Sparkles className="w-4 h-4" />
                 Optimize
@@ -341,7 +341,7 @@ export default function MediaStudioPage() {
                     </button>
                     <button
                       onClick={() => handleDeleteClick(file.name)}
-                      className="text-xs py-2 px-2 bg-red-50 text-brand-orange-600 rounded hover:bg-red-100"
+                      className="text-xs py-2 px-2 bg-red-50 text-brand-blue-600 rounded hover:bg-red-100"
                     >
                       <Trash2 className="w-3 h-3" />
                     </button>
@@ -384,7 +384,7 @@ export default function MediaStudioPage() {
                     <td className="px-4 py-3 text-right">
                       <button
                         onClick={() => handleDeleteClick(file.name)}
-                        className="text-brand-orange-600 hover:text-red-700"
+                        className="text-brand-blue-600 hover:text-red-700"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>

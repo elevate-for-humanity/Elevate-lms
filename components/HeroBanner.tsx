@@ -37,7 +37,7 @@ export function HeroBanner({
             <div className="pt-2">
               <Link
                 href={ctaHref}
-                className="inline-flex rounded-lg bg-brand-orange-600 px-4 py-2 text-[11px] font-semibold text-white shadow hover:bg-brand-orange-700"
+                className="inline-flex rounded-lg bg-brand-blue-600 px-4 py-2 text-[11px] font-semibold text-white shadow hover:bg-brand-blue-700"
               >
                 {ctaLabel}
               </Link>

@@ -99,11 +99,11 @@ export default async function ConfirmationPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="tel:3173143757"
+                  href="/contact"
                   className="inline-flex items-center justify-center px-6 py-3 bg-slate-900 text-white font-semibold rounded-lg hover:bg-slate-800 transition-colors"
                 >
                   <Phone className="w-4 h-4 mr-2" />
-                  317-314-3757
+                  Contact Us
                 </a>
                 <a
                   href="mailto:elevate4humanityedu@gmail.com"

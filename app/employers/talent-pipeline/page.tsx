@@ -325,10 +325,10 @@ export default async function TalentPipelinePage() {
               Contact Our Team
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-orange-600 transition-all"
             >
-              Call 317-314-3757
+              Call Contact Us
             </a>
           </div>
         </div>

@@ -184,7 +184,7 @@ export default function RapidsAdminPage() {
                       {program.totalHours.toLocaleString()} hrs
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-red-100 text-brand-red-800">
                         {program.fundingType === 'self_pay' ? 'Self-Pay' : program.fundingType}
                       </span>
                     </td>

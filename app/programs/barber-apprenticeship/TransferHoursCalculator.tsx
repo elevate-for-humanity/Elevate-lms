@@ -35,7 +35,7 @@ export function TransferHoursCalculator() {
   const { weekly, weeks } = calculateWeeklyPayment(hoursPerWeek, transferHours);
 
   return (
-    <div className="bg-gradient-to-br from-amber-500 to-amber-600 rounded-2xl p-6 text-white">
+    <div className="bg-brand-blue-600 rounded-2xl p-6 text-white">
       <div className="flex items-center gap-3 mb-4">
         <Calculator className="w-6 h-6" />
         <h3 className="text-lg font-bold">Transfer Hours Calculator</h3>

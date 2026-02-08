@@ -43,7 +43,7 @@ const DEMO_PATHS = [
     id: 'instructor',
     title: 'Instructor Demo',
     icon: GraduationCap,
-    color: 'purple',
+    color: 'brand-red',
     description: 'Experience the instructor view for course management and student tracking.',
     canDo: [
       'Browse course builder interface',
@@ -116,12 +116,12 @@ export default function DemoCenterPage() {
               const Icon = demo.icon;
               const colorClasses = {
                 blue: 'bg-blue-100 text-blue-600 border-blue-200',
-                purple: 'bg-purple-100 text-purple-600 border-purple-200',
+                brand-red: 'bg-brand-red-100 text-brand-red-600 border-brand-red-200',
                 green: 'bg-green-100 text-green-600 border-green-200',
               };
               const btnClasses = {
                 blue: 'bg-blue-600 hover:bg-blue-700',
-                purple: 'bg-purple-600 hover:bg-purple-700',
+                brand-red: 'bg-brand-red-600 hover:bg-brand-red-700',
                 green: 'bg-green-600 hover:bg-green-700',
               };
               

@@ -64,7 +64,7 @@ export default async function HireGraduatesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Get Started
             </Link>
@@ -95,7 +95,7 @@ export default async function HireGraduatesPage() {
                 <ul className="space-y-3">
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -111,7 +111,7 @@ export default async function HireGraduatesPage() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -127,7 +127,7 @@ export default async function HireGraduatesPage() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -180,9 +180,9 @@ export default async function HireGraduatesPage() {
               </div>
 
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <svg
-                    className="w-6 h-6 text-brand-green-600"
+                    className="w-6 h-6 text-brand-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -200,9 +200,9 @@ export default async function HireGraduatesPage() {
               </div>
 
               <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center mb-4">
                   <svg
-                    className="w-6 h-6 text-purple-600"
+                    className="w-6 h-6 text-brand-red-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -231,7 +231,7 @@ export default async function HireGraduatesPage() {
             {[
               { q: 'Is there a fee to hire graduates?', a: 'No. There is no recruiting fee or placement fee. We are funded by workforce development grants, not employer fees.' },
               { q: 'What training do graduates receive?', a: 'Graduates complete industry-recognized training programs with certifications. Programs include healthcare (CNA, MA), skilled trades (HVAC, welding), technology (IT, cybersecurity), and more.' },
-              { q: 'How do I request candidates?', a: 'Contact us through the form above or call (317) 314-3757. Tell us about your hiring needs and we\'ll match you with qualified candidates.' },
+              { q: 'How do I request candidates?', a: 'Contact us through the form above or call Contact Us. Tell us about your hiring needs and we\'ll match you with qualified candidates.' },
               { q: 'Can I interview candidates before hiring?', a: 'Yes. We provide candidate profiles and you conduct your own interviews. We facilitate introductions but hiring decisions are yours.' },
               { q: 'Do you provide ongoing support after hiring?', a: 'Yes. We offer retention support for both employers and new hires. If issues arise, our team can help mediate and provide additional resources.' },
               { q: 'What if a hire doesn\'t work out?', a: 'We work with you to understand what happened and can provide replacement candidates. Our goal is long-term successful placements.' },

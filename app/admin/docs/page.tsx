@@ -89,7 +89,7 @@ export default async function DocsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/admin/docs/mou"
-              className="bg-brand-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-blue-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               MOU Documents
             </Link>
@@ -121,7 +121,7 @@ export default async function DocsPage() {
                 <h3 className="text-sm font-medium text-black mb-2">
                   Active
                 </h3>
-                <p className="text-3xl font-bold text-brand-green-600">
+                <p className="text-3xl font-bold text-brand-blue-600">
                   {activeItems || 0}
                 </p>
               </div>
@@ -129,7 +129,7 @@ export default async function DocsPage() {
                 <h3 className="text-sm font-medium text-black mb-2">
                   Recent
                 </h3>
-                <p className="text-3xl font-bold text-purple-600">
+                <p className="text-3xl font-bold text-brand-red-600">
                   {items?.filter((i) => {
                     const created = new Date(i.created_at);
                     const weekAgo = new Date();

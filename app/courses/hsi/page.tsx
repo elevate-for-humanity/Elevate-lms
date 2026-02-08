@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Settings } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageAvatar from '@/components/PageAvatar';
 
 export const dynamic = 'force-dynamic';
 
@@ -108,7 +107,7 @@ export default async function HsiPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/programs/cpr-first-aid-hsi"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get CPR Certified
             </Link>
@@ -123,35 +122,31 @@ export default async function HsiPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/healthcare-guide.mp4" 
-        title="HSI Safety Training Guide" 
-      />
 
       {/* Stats Section */}
       <section className="py-12 bg-white border-b">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-bold text-brand-orange-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
+              <div className="text-4xl font-bold text-brand-blue-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
                 1,200+
               </div>
               <div className="text-black">Safety Courses</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-brand-orange-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
+              <div className="text-4xl font-bold text-brand-blue-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
                 100%
               </div>
               <div className="text-black">OSHA Compliant</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-brand-orange-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
+              <div className="text-4xl font-bold text-brand-blue-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
                 24/7
               </div>
               <div className="text-black">Online Access</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-brand-orange-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
+              <div className="text-4xl font-bold text-brand-blue-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
                 Free
               </div>
               <div className="text-black">WIOA Funded</div>
@@ -177,7 +172,7 @@ export default async function HsiPage() {
                   <div className="text-4xl mb-4 text-2xl md:text-3xl lg:text-4xl">
                     {category.icon}
                   </div>
-                  <h3 className="text-lg font-bold text-black mb-2 group-hover:text-brand-orange-600 transition-colors">
+                  <h3 className="text-lg font-bold text-black mb-2 group-hover:text-brand-blue-600 transition-colors">
                     {category.name}
                   </h3>
                   <p className="text-black text-sm mb-4">
@@ -187,7 +182,7 @@ export default async function HsiPage() {
                     <span className="text-sm text-black">
                       {category.count} courses
                     </span>
-                    <span className="text-brand-orange-600 font-semibold group-hover:translate-x-1 transition-transform">
+                    <span className="text-brand-blue-600 font-semibold group-hover:translate-x-1 transition-transform">
                       Explore →
                     </span>
                   </div>
@@ -209,7 +204,7 @@ export default async function HsiPage() {
               <div className="text-center">
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
-                    className="w-8 h-8 text-brand-orange-600"
+                    className="w-8 h-8 text-brand-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -230,7 +225,7 @@ export default async function HsiPage() {
               <div className="text-center">
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
-                    className="w-8 h-8 text-brand-orange-600"
+                    className="w-8 h-8 text-brand-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -251,7 +246,7 @@ export default async function HsiPage() {
               <div className="text-center">
                 <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <svg
-                    className="w-8 h-8 text-brand-orange-600"
+                    className="w-8 h-8 text-brand-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -288,7 +283,7 @@ export default async function HsiPage() {
             </p>
             <Link
               href="/contact"
-              className="inline-block bg-white text-brand-orange-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-50 transition-colors"
+              className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-red-50 transition-colors"
             >
               Apply Now - It's Free
             </Link>

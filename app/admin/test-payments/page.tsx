@@ -74,12 +74,12 @@ export default function TestPaymentsPage() {
                   Stripe API Key
                 </span>
                 {stripeConfigured ? (
-                  <span className="flex items-center gap-1 text-sm text-brand-green-600 font-medium">
+                  <span className="flex items-center gap-1 text-sm text-brand-blue-600 font-medium">
                     <Circle className="w-4 h-4" />
                     Configured
                   </span>
                 ) : (
-                  <span className="flex items-center gap-1 text-sm text-brand-orange-600 font-medium">
+                  <span className="flex items-center gap-1 text-sm text-brand-blue-600 font-medium">
                     <XCircle className="w-4 h-4" />
                     Not Configured
                   </span>
@@ -89,7 +89,7 @@ export default function TestPaymentsPage() {
                 <span className="text-sm font-medium text-black">
                   Checkout Endpoint
                 </span>
-                <span className="flex items-center gap-1 text-sm text-brand-green-600 font-medium">
+                <span className="flex items-center gap-1 text-sm text-brand-blue-600 font-medium">
                   <Circle className="w-4 h-4" />
                   Available
                 </span>
@@ -98,7 +98,7 @@ export default function TestPaymentsPage() {
                 <span className="text-sm font-medium text-black">
                   Webhook Handler
                 </span>
-                <span className="flex items-center gap-1 text-sm text-brand-green-600 font-medium">
+                <span className="flex items-center gap-1 text-sm text-brand-blue-600 font-medium">
                   <Circle className="w-4 h-4" />
                   Configured
                 </span>
@@ -114,7 +114,7 @@ export default function TestPaymentsPage() {
           </h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3 p-3 bg-green-50 rounded border border-green-200">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <div className="font-medium text-green-900">
                   Stripe Checkout Integration
@@ -125,7 +125,7 @@ export default function TestPaymentsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-green-50 rounded border border-green-200">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <div className="font-medium text-green-900">
                   Webhook Processing
@@ -136,7 +136,7 @@ export default function TestPaymentsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-green-50 rounded border border-green-200">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <div className="font-medium text-green-900">
                   Subscription Management

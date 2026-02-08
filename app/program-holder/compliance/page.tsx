@@ -175,7 +175,7 @@ export default async function CompliancePage() {
                   <div
                     className={`text-6xl font-bold ${
                       overallScore >= 90
-                        ? 'text-brand-green-600'
+                        ? 'text-brand-blue-600'
                         : overallScore >= 70
                           ? 'text-yellow-600'
                           : 'text-red-600'
@@ -186,7 +186,7 @@ export default async function CompliancePage() {
                   <div
                     className={`text-sm font-medium mt-2 ${
                       complianceStatus === 'compliant'
-                        ? 'text-brand-green-600'
+                        ? 'text-brand-blue-600'
                         : 'text-red-600'
                     }`}
                   >
@@ -202,7 +202,7 @@ export default async function CompliancePage() {
                 <div
                   className={`h-4 rounded-full transition-all ${
                     overallScore >= 90
-                      ? 'bg-brand-green-600'
+                      ? 'bg-brand-blue-600'
                       : overallScore >= 70
                         ? 'bg-yellow-600'
                         : 'bg-red-600'
@@ -232,10 +232,10 @@ export default async function CompliancePage() {
 
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <TrendingUp className="h-11 w-11 text-brand-green-600" />
+                  <TrendingUp className="h-11 w-11 text-brand-blue-600" />
                   <h3 className="font-semibold text-black">Reporting</h3>
                 </div>
-                <div className="text-3xl font-bold text-brand-green-600 mb-2">
+                <div className="text-3xl font-bold text-brand-blue-600 mb-2">
                   {Math.round(reportingScore)}%
                 </div>
                 <p className="text-sm text-black">
@@ -245,12 +245,12 @@ export default async function CompliancePage() {
 
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <Shield className="h-11 w-11 text-purple-600" />
+                  <Shield className="h-11 w-11 text-brand-red-600" />
                   <h3 className="font-semibold text-black">
                     Student Management
                   </h3>
                 </div>
-                <div className="text-3xl font-bold text-purple-600 mb-2">
+                <div className="text-3xl font-bold text-brand-red-600 mb-2">
                   {Math.round(studentScore)}%
                 </div>
                 <p className="text-sm text-black">
@@ -325,7 +325,7 @@ export default async function CompliancePage() {
               </Link>
               <Link
                 href="/program-holder/reports"
-                className="inline-flex items-center justify-center px-6 py-3 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-semibold rounded-lg transition-colors"
+                className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition-colors"
               >
                 Submit Reports
               </Link>

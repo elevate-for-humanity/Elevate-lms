@@ -2,7 +2,7 @@ interface StatStripProps {
   stats: Array<{
     value: string;
     label: string;
-    color?: "blue" | "green" | "orange" | "purple";
+    color?: "blue" | "green" | "orange" | "brand-red";
   }>;
   background?: "white" | "slate" | "dark";
 }
@@ -18,7 +18,7 @@ export function StatStrip({ stats, background = "slate" }: StatStripProps) {
       case "blue": return "text-blue-600";
       case "green": return "text-green-600";
       case "orange": return "text-orange-600";
-      case "purple": return "text-purple-600";
+      case "brand-red": return "text-brand-red-600";
       default: return background === "dark" ? "text-orange-400" : "text-blue-600";
     }
   };

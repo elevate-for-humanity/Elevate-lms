@@ -25,7 +25,7 @@ export function ProgramCard({ title, description, image, href }: ProgramCardProp
       <div className="p-6">
         <h3 className="text-xl font-semibold mb-2 text-black">{title}</h3>
         <p className="text-black text-sm mb-4">{description}</p>
-        <span className="text-brand-orange-600 text-sm font-medium inline-flex items-center gap-1">
+        <span className="text-brand-blue-600 text-sm font-medium inline-flex items-center gap-1">
           Learn More
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />

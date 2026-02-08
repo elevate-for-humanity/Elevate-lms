@@ -74,7 +74,7 @@ export default async function MobileAppPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="#install"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Install Now
             </a>
@@ -109,8 +109,8 @@ export default async function MobileAppPage() {
             </div>
 
             <div className="text-center p-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-green-100 rounded-full mb-4">
-                <Wifi className="w-8 h-8 text-brand-green-600" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-blue-100 rounded-full mb-4">
+                <Wifi className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
                 Works Offline
@@ -122,8 +122,8 @@ export default async function MobileAppPage() {
             </div>
 
             <div className="text-center p-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-purple-100 rounded-full mb-4">
-                <Bell className="w-8 h-8 text-purple-600" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-red-100 rounded-full mb-4">
+                <Bell className="w-8 h-8 text-brand-red-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
                 Push Notifications
@@ -136,7 +136,7 @@ export default async function MobileAppPage() {
 
             <div className="text-center p-6">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-orange-100 rounded-full mb-4">
-                <Zap className="w-8 h-8 text-brand-orange-600" />
+                <Zap className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
                 Lightning Fast
@@ -148,7 +148,7 @@ export default async function MobileAppPage() {
 
             <div className="text-center p-6">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
-                <Download className="w-8 h-8 text-brand-orange-600" />
+                <Download className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
                 No App Store Required
@@ -232,32 +232,32 @@ export default async function MobileAppPage() {
             </h3>
             <ol className="space-y-4 text-black">
               <li className="flex">
-                <span className="font-bold text-brand-green-600 mr-3">1.</span>
+                <span className="font-bold text-brand-blue-600 mr-3">1.</span>
                 <span>
                   Open <strong>www.elevateforhumanity.org</strong> in Chrome
                 </span>
               </li>
               <li className="flex">
-                <span className="font-bold text-brand-green-600 mr-3">2.</span>
+                <span className="font-bold text-brand-blue-600 mr-3">2.</span>
                 <span>
                   Tap the <strong>three dots menu</strong> in the top right
                 </span>
               </li>
               <li className="flex">
-                <span className="font-bold text-brand-green-600 mr-3">3.</span>
+                <span className="font-bold text-brand-blue-600 mr-3">3.</span>
                 <span>
                   Tap <strong>"Add to Home screen"</strong> or{' '}
                   <strong>"Install app"</strong>
                 </span>
               </li>
               <li className="flex">
-                <span className="font-bold text-brand-green-600 mr-3">4.</span>
+                <span className="font-bold text-brand-blue-600 mr-3">4.</span>
                 <span>
                   Tap <strong>"Install"</strong> or <strong>"Add"</strong>
                 </span>
               </li>
               <li className="flex">
-                <span className="font-bold text-brand-green-600 mr-3">5.</span>
+                <span className="font-bold text-brand-blue-600 mr-3">5.</span>
                 <span>
                   Find the Elevate icon in your app drawer and tap to open
                 </span>
@@ -286,7 +286,7 @@ export default async function MobileAppPage() {
             </a>
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors border-2 border-white"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors border-2 border-white"
             >
               Need Help?
             </Link>

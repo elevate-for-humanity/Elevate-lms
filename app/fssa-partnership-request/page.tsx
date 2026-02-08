@@ -113,7 +113,7 @@ export default function FSSAPartnershipRequestPage() {
               </p>
               <p className="text-black">
                 <Phone className="inline w-4 h-4 mr-2" />
-                317-314-3757
+                Contact Us
               </p>
               <p className="text-black">
                 <Mail className="inline w-4 h-4 mr-2" />
@@ -277,7 +277,7 @@ export default function FSSAPartnershipRequestPage() {
                     value={formData.phone}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="(317) 314-3757"
+                    placeholder="Contact Us"
                   />
                 </div>
 
@@ -383,7 +383,7 @@ export default function FSSAPartnershipRequestPage() {
             <strong>Prefer to call?</strong> Contact us directly:
           </p>
           <p className="text-lg font-semibold text-black">
-            317-314-3757 | elevate4humanityedu@gmail.com
+            Contact Us | elevate4humanityedu@gmail.com
           </p>
         </div>
       </div>

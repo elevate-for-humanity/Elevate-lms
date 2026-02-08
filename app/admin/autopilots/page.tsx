@@ -273,7 +273,7 @@ export default function AutopilotsPage() {
                                 status === 'running'
                                   ? 'bg-blue-100'
                                   : status === 'completed'
-                                    ? 'bg-brand-green-100'
+                                    ? 'bg-brand-blue-100'
                                     : status === 'failed'
                                       ? 'bg-red-100'
                                       : 'bg-gray-100'
@@ -284,9 +284,9 @@ export default function AutopilotsPage() {
                                   status === 'running'
                                     ? 'text-brand-blue-600'
                                     : status === 'completed'
-                                      ? 'text-brand-green-600'
+                                      ? 'text-brand-blue-600'
                                       : status === 'failed'
-                                        ? 'text-brand-orange-600'
+                                        ? 'text-brand-blue-600'
                                         : 'text-black'
                                 }`}
                               />
@@ -305,10 +305,10 @@ export default function AutopilotsPage() {
                             <Loader2 className="w-5 h-5 text-brand-blue-600 animate-spin" />
                           )}
                           {status === 'completed' && (
-                            <Circle className="w-5 h-5 text-brand-green-600" />
+                            <Circle className="w-5 h-5 text-brand-blue-600" />
                           )}
                           {status === 'failed' && (
-                            <XCircle className="w-5 h-5 text-brand-orange-600" />
+                            <XCircle className="w-5 h-5 text-brand-blue-600" />
                           )}
                         </div>
 

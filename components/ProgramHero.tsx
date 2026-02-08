@@ -52,7 +52,7 @@ export default function ProgramHero({
             {/* Quick Facts */}
             <div className="grid md:grid-cols-4 gap-6">
               <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
-                <div className="text-3xl font-bold text-purple-600 mb-2">{duration}</div>
+                <div className="text-3xl font-bold text-brand-red-600 mb-2">{duration}</div>
                 <div className="text-black">Program Duration</div>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6 text-center">

@@ -128,11 +128,11 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-black">Total Earnings</p>
-              <p className="text-3xl font-bold text-brand-orange-600 mt-2">
+              <p className="text-3xl font-bold text-brand-blue-600 mt-2">
                 ${stats?.totalEarnings?.toFixed(2) || '0.00'}
               </p>
             </div>
-            <DollarSign className="w-12 h-12 text-brand-orange-600 opacity-20" />
+            <DollarSign className="w-12 h-12 text-brand-blue-600 opacity-20" />
           </div>
         </div>
 
@@ -140,11 +140,11 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-black">Conversion Rate</p>
-              <p className="text-3xl font-bold text-purple-600 mt-2">
+              <p className="text-3xl font-bold text-brand-red-600 mt-2">
                 {stats?.conversionRate?.toFixed(1) || 0}%
               </p>
             </div>
-            <TrendingUp className="w-12 h-12 text-purple-600 opacity-20" />
+            <TrendingUp className="w-12 h-12 text-brand-red-600 opacity-20" />
           </div>
         </div>
       </div>
@@ -221,7 +221,7 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
 
           <div className="text-center">
             <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Gift className="w-8 h-8 text-brand-orange-600" />
+              <Gift className="w-8 h-8 text-brand-blue-600" />
             </div>
             <h4 className="font-semibold text-black mb-2">3. Earn Rewards</h4>
             <p className="text-sm text-black">

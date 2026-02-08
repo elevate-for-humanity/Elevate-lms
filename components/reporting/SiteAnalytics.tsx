@@ -249,7 +249,7 @@ export default function SiteAnalytics() {
                     {site.completionRate >= 70 ? (
                       <TrendingUp className="h-4 w-4 text-green-600" />
                     ) : (
-                      <TrendingDown className="h-4 w-4 text-brand-orange-600" />
+                      <TrendingDown className="h-4 w-4 text-brand-blue-600" />
                     )}
                   </div>
                 </div>
@@ -261,7 +261,7 @@ export default function SiteAnalytics() {
                     {site.placementRate >= 60 ? (
                       <TrendingUp className="h-4 w-4 text-green-600" />
                     ) : (
-                      <TrendingDown className="h-4 w-4 text-brand-orange-600" />
+                      <TrendingDown className="h-4 w-4 text-brand-blue-600" />
                     )}
                   </div>
                 </div>

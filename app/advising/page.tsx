@@ -36,12 +36,12 @@ export default function AdvisingPage() {
         setIsSubmitted(true);
       } else {
         alert(
-          'There was an error submitting your request. Please call us at 317-314-3757.'
+          'There was an error submitting your request. Please call us at Contact Us.'
         );
       }
     } catch (error) { /* Error handled silently */ 
       alert(
-        'There was an error submitting your request. Please call us at 317-314-3757.'
+        'There was an error submitting your request. Please call us at Contact Us.'
       );
     } finally {
       setIsSubmitting(false);
@@ -73,17 +73,17 @@ export default function AdvisingPage() {
           <p className="mt-4 text-sm text-black">
             <strong>Prefer to call?</strong> Reach us at{' '}
             <a
-              href="tel:3173143757"
+              href="/contact"
               className="text-indigo-600 font-semibold hover:underline"
             >
-              317-314-3757
+              Contact Us
             </a>
           </p>
         </header>
 
         {isSubmitted ? (
           <section className="rounded-2xl bg-green-50 p-8 shadow-sm ring-1 ring-green-200 text-center">
-            <div className="w-16 h-16 bg-brand-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg
                 className="w-8 h-8 text-white"
                 fill="none"
@@ -108,10 +108,10 @@ export default function AdvisingPage() {
             <p className="text-sm text-black">
               Need immediate assistance? Call us at{' '}
               <a
-                href="tel:3173143757"
+                href="/contact"
                 className="text-indigo-600 font-semibold hover:underline"
               >
-                317-314-3757
+                Contact Us
               </a>
             </p>
           </section>

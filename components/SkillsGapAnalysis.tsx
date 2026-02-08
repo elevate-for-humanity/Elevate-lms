@@ -152,7 +152,7 @@ export default function SkillsGapAnalysis() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Critical Gaps</h3>
-            <p className="text-3xl font-bold text-brand-orange-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {skillGaps.filter(g => g.priority === 'high').length}
             </p>
             <p className="text-sm text-black">Require immediate attention</p>
@@ -192,7 +192,7 @@ export default function SkillsGapAnalysis() {
                     </span>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-brand-orange-600">{gap.gap}%</div>
+                    <div className="text-2xl font-bold text-brand-blue-600">{gap.gap}%</div>
                     <p className="text-xs text-black">Gap</p>
                   </div>
                 </div>
@@ -269,7 +269,7 @@ export default function SkillsGapAnalysis() {
                                 className={`h-2 rounded-full ${
                                   level >= 70 ? 'bg-green-600' :
                                   level >= 50 ? 'bg-yellow-600' :
-                                  'bg-brand-orange-600'
+                                  'bg-brand-blue-600'
                                 }`}
                                 style={{ width: `${level}%` }}
                               />

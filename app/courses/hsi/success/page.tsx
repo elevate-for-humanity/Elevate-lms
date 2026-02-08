@@ -181,9 +181,9 @@ export default async function HSISuccessPage({
                 Questions about your enrollment or funding?
               </p>
               <div className="space-y-2">
-                <a href="tel:+13173143757" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                <a href="/contact" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
                   <Phone className="w-4 h-4" />
-                  (317) 314-3757
+                  Contact Us
                 </a>
                 <a href="mailto:elevateforhumanity@gmail.com" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
                   <Mail className="w-4 h-4" />
@@ -220,7 +220,7 @@ export default async function HSISuccessPage({
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/programs"
-              className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
             >
               Browse All Programs <ArrowRight className="w-5 h-5" />
             </Link>

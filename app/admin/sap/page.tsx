@@ -178,7 +178,7 @@ export default async function SAPMonitoringPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'good':
-        return 'bg-brand-green-100 text-green-800 border-green-200';
+        return 'bg-brand-blue-100 text-green-800 border-green-200';
       case 'warning':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'probation':
@@ -193,13 +193,13 @@ export default async function SAPMonitoringPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'good':
-        return <Circle className="w-5 h-5 text-brand-green-600" />;
+        return <Circle className="w-5 h-5 text-brand-blue-600" />;
       case 'warning':
         return <AlertTriangle className="w-5 h-5 text-yellow-600" />;
       case 'probation':
-        return <TrendingDown className="w-5 h-5 text-brand-orange-600" />;
+        return <TrendingDown className="w-5 h-5 text-brand-blue-600" />;
       case 'suspension':
-        return <AlertTriangle className="w-5 h-5 text-brand-orange-600" />;
+        return <AlertTriangle className="w-5 h-5 text-brand-blue-600" />;
       default:
         return null;
     }
@@ -251,8 +251,8 @@ export default async function SAPMonitoringPage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center justify-between mb-2">
-              <Circle className="w-8 h-8 text-brand-green-600" />
-              <span className="text-3xl font-bold text-brand-green-600">
+              <Circle className="w-8 h-8 text-brand-blue-600" />
+              <span className="text-3xl font-bold text-brand-blue-600">
                 {goodStanding}
               </span>
             </div>
@@ -283,8 +283,8 @@ export default async function SAPMonitoringPage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center justify-between mb-2">
-              <TrendingDown className="w-8 h-8 text-brand-orange-600" />
-              <span className="text-3xl font-bold text-brand-orange-600">
+              <TrendingDown className="w-8 h-8 text-brand-blue-600" />
+              <span className="text-3xl font-bold text-brand-blue-600">
                 {probation}
               </span>
             </div>
@@ -299,8 +299,8 @@ export default async function SAPMonitoringPage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center justify-between mb-2">
-              <AlertTriangle className="w-8 h-8 text-brand-orange-600" />
-              <span className="text-3xl font-bold text-brand-orange-600">
+              <AlertTriangle className="w-8 h-8 text-brand-blue-600" />
+              <span className="text-3xl font-bold text-brand-blue-600">
                 {suspension}
               </span>
             </div>
@@ -431,7 +431,7 @@ export default async function SAPMonitoringPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div
-                        className={`text-sm font-semibold ${student.meetsGPA ? 'text-brand-green-600' : 'text-brand-orange-600'}`}
+                        className={`text-sm font-semibold ${student.meetsGPA ? 'text-brand-blue-600' : 'text-brand-blue-600'}`}
                       >
                         {student.gpa.toFixed(2)}
                       </div>
@@ -441,7 +441,7 @@ export default async function SAPMonitoringPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div
-                        className={`text-sm font-semibold ${student.meetsAttendance ? 'text-brand-green-600' : 'text-brand-orange-600'}`}
+                        className={`text-sm font-semibold ${student.meetsAttendance ? 'text-brand-blue-600' : 'text-brand-blue-600'}`}
                       >
                         {student.attendanceRate.toFixed(1)}%
                       </div>
@@ -451,7 +451,7 @@ export default async function SAPMonitoringPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <div
-                        className={`text-sm font-semibold ${student.meetsCompletion ? 'text-brand-green-600' : 'text-brand-orange-600'}`}
+                        className={`text-sm font-semibold ${student.meetsCompletion ? 'text-brand-blue-600' : 'text-brand-blue-600'}`}
                       >
                         {student.completionRate.toFixed(1)}%
                       </div>
@@ -487,7 +487,7 @@ export default async function SAPMonitoringPage() {
         {warnings + probation + suspension > 0 && (
           <div className="mt-8 bg-orange-50 border border-orange-200 rounded-xl p-6">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="w-6 h-6 text-brand-orange-600 flex-shrink-0 mt-1" />
+              <AlertTriangle className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
               <div>
                 <h3 className="text-lg font-semibold text-orange-900 mb-2">
                   Action Required: {warnings + probation + suspension} Students

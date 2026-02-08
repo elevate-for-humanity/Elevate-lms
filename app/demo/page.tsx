@@ -41,7 +41,7 @@ const DEMO_TOURS = [
     title: 'Partner / Employer License',
     description: 'Employer portal for hiring, apprenticeship management, and workforce pipeline access. Ideal for employers and industry partners.',
     icon: Building2,
-    color: 'purple',
+    color: 'brand-red',
     features: [
       'Candidate pipeline access',
       'Apprenticeship tracking',
@@ -132,13 +132,13 @@ export default function DemoHubPage() {
                   border: 'hover:border-green-500',
                   cta: 'text-green-600',
                 },
-                purple: {
-                  bg: 'bg-purple-100',
-                  bgHover: 'group-hover:bg-purple-500',
-                  text: 'text-purple-600',
+                brand-red: {
+                  bg: 'bg-brand-red-100',
+                  bgHover: 'group-hover:bg-brand-red-500',
+                  text: 'text-brand-red-600',
                   textHover: 'group-hover:text-white',
-                  border: 'hover:border-purple-500',
-                  cta: 'text-purple-600',
+                  border: 'hover:border-brand-red-500',
+                  cta: 'text-brand-red-600',
                 },
                 blue: {
                   bg: 'bg-blue-100',
@@ -212,9 +212,9 @@ export default function DemoHubPage() {
               </Link>
               <Link
                 href="/demo/employer"
-                className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-purple-300 hover:bg-purple-50 transition"
+                className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-brand-red-300 hover:bg-brand-red-50 transition"
               >
-                <Building2 className="w-6 h-6 text-purple-600" />
+                <Building2 className="w-6 h-6 text-brand-red-600" />
                 <div>
                   <div className="font-semibold text-slate-900">Employer Portal</div>
                   <div className="text-sm text-slate-500">Hiring & apprentices</div>

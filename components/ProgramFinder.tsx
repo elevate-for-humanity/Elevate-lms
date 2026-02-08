@@ -307,7 +307,7 @@ export default function ProgramFinder() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 text-black">
-                        <TrendingUp className="w-5 h-5 text-purple-600" />
+                        <TrendingUp className="w-5 h-5 text-brand-red-600" />
                         <div>
                           <div className="text-xs text-gray-500">Job Demand</div>
                           <div className="font-semibold">{program.demand}</div>

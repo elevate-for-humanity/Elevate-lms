@@ -69,12 +69,12 @@ export function CourseLeaderboard({ courseId }: { courseId: string }) {
               <span className="font-medium text-black">{row.name}</span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-brand-orange-600">
+              <span className="font-semibold text-brand-blue-600">
                 {Math.round(row.progress)}%
               </span>
               <div className="h-1.5 w-20 overflow-hidden rounded-full bg-slate-200">
                 <div
-                  className="h-full rounded-full bg-brand-orange-500"
+                  className="h-full rounded-full bg-brand-blue-500"
                   style={{ width: `${Math.min(row.progress, 100)}%` }}
                 />
               </div>

@@ -248,7 +248,7 @@ function EnrollPaymentContent() {
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-gray-600" />
                     <span className="font-semibold text-gray-900">{PRICING.installment.label}</span>
-                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-brand-red-100 text-brand-red-700 px-2 py-0.5 rounded-full">
                       {PRICING.installment.savings}
                     </span>
                   </div>
@@ -320,7 +320,7 @@ function EnrollPaymentContent() {
 
         {/* Contact */}
         <p className="text-center text-gray-500 text-sm mt-6">
-          Questions? Call <a href="tel:317-314-3757" className="text-blue-600 underline">(317) 314-3757</a>
+          Questions? Call <a href="/contact" className="text-blue-600 underline">Contact Us</a>
         </p>
       </div>
     </div>

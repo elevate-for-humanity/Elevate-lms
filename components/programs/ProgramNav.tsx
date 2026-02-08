@@ -25,7 +25,7 @@ export function ProgramNav({ sections }: ProgramNavProps) {
           ))}
           <Link
             href="/apply"
-            className="px-4 py-2 text-sm font-bold text-white bg-brand-orange-600 hover:bg-brand-orange-700 rounded-lg transition whitespace-nowrap ml-auto"
+            className="px-4 py-2 text-sm font-bold text-white bg-brand-blue-600 hover:bg-brand-blue-700 rounded-lg transition whitespace-nowrap ml-auto"
           >
             Apply Now
           </Link>

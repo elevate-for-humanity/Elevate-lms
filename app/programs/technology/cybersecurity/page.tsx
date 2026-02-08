@@ -83,13 +83,13 @@ export default function CybersecurityPage() {
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/apply?program=cybersecurity"
-              className="inline-flex items-center justify-center bg-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-purple-700 transition-colors text-lg"
+              className="inline-flex items-center justify-center bg-brand-red-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-brand-red-700 transition-colors text-lg"
             >
               Apply Now
             </Link>
             <Link
               href="/wioa-eligibility"
-              className="inline-flex items-center justify-center border-2 border-purple-600 text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-purple-50 transition-colors text-lg"
+              className="inline-flex items-center justify-center border-2 border-brand-red-600 text-brand-red-600 px-8 py-4 rounded-full font-semibold hover:bg-brand-red-50 transition-colors text-lg"
             >
               Check Eligibility
             </Link>

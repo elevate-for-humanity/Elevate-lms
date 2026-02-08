@@ -185,10 +185,10 @@ export default async function TaxCareersPage() {
                 Apply Now
               </Link>
               <a
-                href="tel:3173143757"
+                href="/contact"
                 className="inline-block px-8 py-4 bg-white/10 text-white font-bold rounded-lg hover:bg-white/20 transition text-lg border-2 border-white text-center"
               >
-                Call 317-314-3757
+                Call Contact Us
               </a>
             </div>
           </div>
@@ -301,10 +301,10 @@ export default async function TaxCareersPage() {
                 Submit a Referral
               </a>
               <a
-                href="tel:3173143757"
+                href="/contact"
                 className="inline-block px-8 py-4 bg-white border-2 border-green-600 text-green-600 font-bold rounded-lg hover:bg-green-50 transition"
               >
-                Call 317-314-3757
+                Call Contact Us
               </a>
             </div>
           </div>
@@ -767,10 +767,10 @@ export default async function TaxCareersPage() {
             <p className="text-black">
               Questions? Call us at{' '}
               <a
-                href="tel:3173143757"
+                href="/contact"
                 className="text-green-600 font-bold underline"
               >
-                317-314-3757
+                Contact Us
               </a>{' '}
               or email{' '}
               <a

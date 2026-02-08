@@ -97,7 +97,7 @@ export default async function VideosPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/admin/videos/upload"
-              className="bg-brand-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center gap-2"
+              className="bg-brand-blue-600 hover:bg-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors flex items-center justify-center gap-2"
             >
               <Upload className="h-5 w-5" />
               Upload Video
@@ -131,23 +131,23 @@ export default async function VideosPage() {
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <Play className="h-11 w-11 text-brand-green-600" />
+                  <Play className="h-11 w-11 text-brand-blue-600" />
                   <h3 className="text-sm font-medium text-black">
                     Published
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-brand-green-600">
+                <p className="text-3xl font-bold text-brand-blue-600">
                   {publishedVideos || 0}
                 </p>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <Eye className="h-11 w-11 text-purple-600" />
+                  <Eye className="h-11 w-11 text-brand-red-600" />
                   <h3 className="text-sm font-medium text-black">
                     Total Views
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-purple-600">
+                <p className="text-3xl font-bold text-brand-red-600">
                   {videos?.reduce((acc, v) => acc + (v.view_count || 0), 0) ||
                     0}
                 </p>

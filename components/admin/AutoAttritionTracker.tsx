@@ -292,7 +292,7 @@ export function AutoAttritionTracker() {
   const getRiskColor = (riskLevel: string) => {
     switch (riskLevel) {
       case 'high':
-        return 'text-brand-orange-600 bg-brand-surface';
+        return 'text-brand-blue-600 bg-brand-surface';
       case 'medium':
         return 'text-yellow-600 bg-yellow-100';
       case 'low':
@@ -417,7 +417,7 @@ export function AutoAttritionTracker() {
               <p className="text-sm font-medium text-brand-text-muted">
                 Attrition Rate
               </p>
-              <p className="text-3xl font-bold text-brand-orange-600">
+              <p className="text-3xl font-bold text-brand-blue-600">
                 {metrics.overall.attritionRate.toFixed(1)}%
               </p>
             </div>
@@ -539,7 +539,7 @@ export function AutoAttritionTracker() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-2xl font-bold text-brand-orange-600">
+                  <div className="text-2xl font-bold text-brand-blue-600">
                     {student.riskScore}%
                   </div>
                   <div className="text-xs text-brand-text-light">
@@ -613,7 +613,7 @@ export function AutoAttritionTracker() {
                 <h4 className="font-semibold text-brand-text">
                   {factor.factor}
                 </h4>
-                <span className="text-lg font-bold text-brand-orange-600">
+                <span className="text-lg font-bold text-brand-blue-600">
                   {factor.impact}%
                 </span>
               </div>

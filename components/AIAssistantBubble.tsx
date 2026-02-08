@@ -48,7 +48,7 @@ export function AIAssistantBubble() {
       if (lowerInput.includes('guided') || lowerInput.includes('navigation') || lowerInput.includes('help')) {
         response = 'I can guide you through:\n\n• Applying for programs\n• Checking WIOA eligibility\n• Exploring training options\n• Finding funding sources\n\nWhat would you like to learn about?';
       } else if (lowerInput.includes('human') || lowerInput.includes('talk') || lowerInput.includes('person')) {
-        response = 'I\'d be happy to connect you with our team!\n\n📞 Call: 317-314-3757\n📧 Email: info@www.elevateforhumanity.org\n\nOr click here to schedule a call: [Contact Us](/contact)';
+        response = 'I\'d be happy to connect you with our team!\n\n📞 Call: Contact Us\n📧 Email: info@www.elevateforhumanity.org\n\nOr click here to schedule a call: [Contact Us](/contact)';
       } else if (lowerInput.includes('explore') || lowerInput.includes('own')) {
         response = 'Great! Here are some quick links:\n\n• [View Programs](/programs)\n• [Check Eligibility](/wioa-eligibility)\n• [Apply Now](/apply)\n• [About Us](/about)\n\nFeel free to ask if you need anything!';
       } else if (lowerInput.includes('program') || lowerInput.includes('training')) {
@@ -93,7 +93,7 @@ export function AIAssistantBubble() {
             </p>
             <button
               onClick={handleOpen}
-              className="text-xs bg-brand-orange-600 text-white px-3 py-2.5 rounded-md hover:bg-brand-orange-700 transition-colors font-medium"
+              className="text-xs bg-brand-blue-600 text-white px-3 py-2.5 rounded-md hover:bg-brand-blue-700 transition-colors font-medium"
             >
               Chat with me
             </button>
@@ -105,7 +105,7 @@ export function AIAssistantBubble() {
       {!isOpen && (
         <button
           onClick={handleOpen}
-          className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 flex bg-brand-orange-600 text-white rounded-full p-4 shadow-2xl hover:bg-brand-orange-700 transition-all hover:scale-110 focus:outline-none focus:ring-4 focus:ring-brand-orange-300"
+          className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 flex bg-brand-blue-600 text-white rounded-full p-4 shadow-2xl hover:bg-brand-blue-700 transition-all hover:scale-110 focus:outline-none focus:ring-4 focus:ring-brand-blue-300"
           aria-label="Open AI assistant"
         >
           <MessageCircle className="h-10 w-10" />
@@ -116,7 +116,7 @@ export function AIAssistantBubble() {
       {isOpen && (
         <div className="fixed bottom-0 right-0 md:bottom-6 md:right-6 z-50 w-full md:w-96 h-[80vh] md:h-[600px] bg-white md:rounded-2xl shadow-2xl flex flex-col border border-gray-200 transition-all duration-300 ease-out opacity-100 translate-y-0">
           {/* Header */}
-          <div className="bg-brand-orange-600 text-white p-4 rounded-t-2xl flex items-center justify-between">
+          <div className="bg-brand-blue-600 text-white p-4 rounded-t-2xl flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="bg-white/20 rounded-full p-2">
                 <MessageCircle className="h-5 w-5" />
@@ -145,14 +145,14 @@ export function AIAssistantBubble() {
                 <div
                   className={`max-w-[80%] rounded-2xl px-4 py-3 ${
                     message.role === 'user'
-                      ? 'bg-brand-orange-600 text-white'
+                      ? 'bg-brand-blue-600 text-white'
                       : 'bg-white text-black shadow-sm border border-gray-200'
                   }`}
                 >
                   {message.role === 'assistant' && (
                     <div className="flex items-center gap-2 mb-2">
-                      <div className="bg-brand-orange-100 rounded-full p-1">
-                        <MessageCircle className="h-3 w-3 text-brand-orange-600" />
+                      <div className="bg-brand-blue-100 rounded-full p-1">
+                        <MessageCircle className="h-3 w-3 text-brand-blue-600" />
                       </div>
                       <span className="text-xs font-semibold text-black">Assistant</span>
                     </div>
@@ -172,12 +172,12 @@ export function AIAssistantBubble() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-orange-500 focus:border-transparent text-sm"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent text-sm"
               />
               <button
                 onClick={handleSend}
                 disabled={!input.trim()}
-                className="bg-brand-orange-600 text-white rounded-full p-2 hover:bg-brand-orange-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-brand-blue-600 text-white rounded-full p-2 hover:bg-brand-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Send message"
               >
                 <Send className="h-5 w-5" />
@@ -185,8 +185,8 @@ export function AIAssistantBubble() {
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
               Need immediate help? Call{' '}
-              <a href="tel:317-314-3757" className="text-brand-orange-600 hover:underline font-medium">
-                317-314-3757
+              <a href="/contact" className="text-brand-blue-600 hover:underline font-medium">
+                Contact Us
               </a>
             </p>
           </div>

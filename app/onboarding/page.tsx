@@ -102,21 +102,21 @@ export default async function OnboardingPage() {
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start text-sm">
                   <Circle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
+                    className="text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5"
                     size={16}
                   />
                   <span>Access 30+ training programs</span>
                 </li>
                 <li className="flex items-start text-sm">
                   <Circle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
+                    className="text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5"
                     size={16}
                   />
                   <span>Free for eligible participants</span>
                 </li>
                 <li className="flex items-start text-sm">
                   <Circle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
+                    className="text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5"
                     size={16}
                   />
                   <span>Earn industry certifications</span>
@@ -146,28 +146,28 @@ export default async function OnboardingPage() {
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start text-sm">
                   <Circle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
+                    className="text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5"
                     size={16}
                   />
                   <span>Enroll and manage students</span>
                 </li>
                 <li className="flex items-start text-sm">
                   <Circle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
+                    className="text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5"
                     size={16}
                   />
                   <span>Track student progress</span>
                 </li>
                 <li className="flex items-start text-sm">
                   <Circle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
+                    className="text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5"
                     size={16}
                   />
                   <span>Generate compliance reports</span>
                 </li>
               </ul>
               <div className="text-center">
-                <span className="inline-flex items-center text-purple-700 font-semibold">
+                <span className="inline-flex items-center text-brand-red-700 font-semibold">
                   Learn More <ArrowRight className="ml-2" size={20} />
                 </span>
               </div>
@@ -190,21 +190,21 @@ export default async function OnboardingPage() {
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start text-sm">
                   <Circle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
+                    className="text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5"
                     size={16}
                   />
                   <span>Access trained candidates</span>
                 </li>
                 <li className="flex items-start text-sm">
                   <Circle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
+                    className="text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5"
                     size={16}
                   />
                   <span>Custom training programs</span>
                 </li>
                 <li className="flex items-start text-sm">
                   <Circle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
+                    className="text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5"
                     size={16}
                   />
                   <span>Workforce development</span>

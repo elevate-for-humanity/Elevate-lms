@@ -147,7 +147,7 @@ export default function NewSocialCampaignPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -433,7 +433,7 @@ export default function NewSocialCampaignPage() {
                     !campaign.name ||
                     campaign.platforms.length === 0
                   }
-                  className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>{generating ? 'Generating...' : 'Generate Posts'}</span>
@@ -547,7 +547,7 @@ export default function NewSocialCampaignPage() {
                 {generatedPosts.length > 0 && (
                   <div className="pt-4 border-t border-gray-200">
                     <div className="text-xs text-black mb-1">Status</div>
-                    <div className="text-sm font-medium text-brand-green-600">
+                    <div className="text-sm font-medium text-brand-blue-600">
                       • {generatedPosts.length} posts ready
                     </div>
                   </div>

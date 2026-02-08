@@ -38,7 +38,7 @@ export function CareerServicesHook({ programName, programSlug }: CareerServicesH
       title: 'Job Placement Support',
       description: 'Connect with employers actively hiring program graduates',
       href: '/career-services/job-placement',
-      color: 'purple',
+      color: 'brand-red',
     },
   ];
 
@@ -212,7 +212,7 @@ Notes: ${formData.get('notes') || 'None'}
                       type="tel"
                       name="phone"
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="(317) 314-3757"
+                      placeholder="Contact Us"
                     />
                   </div>
                   <div>

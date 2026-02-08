@@ -105,8 +105,8 @@ export default async function NotificationSettingsPage() {
           {/* Push Notifications */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Bell className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                <Bell className="w-5 h-5 text-brand-red-600" />
               </div>
               <div>
                 <h2 className="text-lg font-semibold text-gray-900">Push Notifications</h2>
@@ -153,7 +153,7 @@ export default async function NotificationSettingsPage() {
                   type="tel"
                   name="sms_phone"
                   defaultValue={prefs.sms_phone || ''}
-                  placeholder="(317) 314-3757"
+                  placeholder="Contact Us"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 />
               </div>

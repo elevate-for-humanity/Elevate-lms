@@ -216,7 +216,7 @@ export default function UserManagementTable({ users }: Props) {
                           // Handle delete
                         }
                       }}
-                      className="text-brand-orange-600 hover:text-red-900"
+                      className="text-brand-blue-600 hover:text-red-900"
                     >
                       Delete
                     </button>

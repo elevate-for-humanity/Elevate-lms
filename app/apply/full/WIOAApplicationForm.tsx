@@ -322,9 +322,9 @@ export default function WIOAApplicationForm() {
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm transition ${
                     currentStep > step.number
-                      ? 'bg-brand-green-600 text-white'
+                      ? 'bg-brand-blue-600 text-white'
                       : currentStep === step.number
-                        ? 'bg-brand-orange-600 text-white'
+                        ? 'bg-brand-blue-600 text-white'
                         : 'bg-slate-200 text-black'
                   }`}
                 >
@@ -349,7 +349,7 @@ export default function WIOAApplicationForm() {
                 <div
                   className={`h-1 flex-1 mx-2 transition ${
                     currentStep > step.number
-                      ? 'bg-brand-green-600'
+                      ? 'bg-brand-blue-600'
                       : 'bg-slate-200'
                   }`}
                 />
@@ -418,7 +418,7 @@ export default function WIOAApplicationForm() {
         {currentStep < 6 ? (
           <button
             onClick={nextStep}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-orange-600 text-white font-bold text-lg rounded-lg hover:bg-brand-orange-700 transition shadow-lg"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-blue-600 text-white font-bold text-lg rounded-lg hover:bg-brand-blue-700 transition shadow-lg"
           >
             Continue
             <ChevronRight className="w-5 h-5" />
@@ -427,7 +427,7 @@ export default function WIOAApplicationForm() {
           <button
             onClick={handleSubmit}
             disabled={submitting}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-green-600 text-white font-bold text-lg rounded-lg hover:bg-green-700 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-blue-600 text-white font-bold text-lg rounded-lg hover:bg-green-700 transition shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {submitting ? (
               <>
@@ -486,7 +486,7 @@ function Step1Eligibility({ formData, updateField }: any) {
               onClick={() => updateField(field, true)}
               className={`flex-1 px-4 py-3 rounded-lg font-semibold transition ${
                 formData[field] === true
-                  ? 'bg-brand-green-600 text-white'
+                  ? 'bg-brand-blue-600 text-white'
                   : 'bg-slate-100 text-black hover:bg-slate-200'
               }`}
             >
@@ -599,7 +599,7 @@ function Step2PersonalInfo({
                 type="checkbox"
                 checked={formData.race.includes(option)}
                 onChange={() => toggleArrayField('race', option)}
-                className="w-4 h-4 text-brand-orange-600"
+                className="w-4 h-4 text-brand-blue-600"
               />
               <span className="text-sm">{option}</span>
             </label>
@@ -650,7 +650,7 @@ function Step2PersonalInfo({
         <div className="flex gap-4">
           <button
             onClick={() => updateField('isVeteran', true)}
-            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition ${formData.isVeteran === true ? 'bg-brand-green-600 text-white' : 'bg-slate-100 text-black hover:bg-slate-200'}`}
+            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition ${formData.isVeteran === true ? 'bg-brand-blue-600 text-white' : 'bg-slate-100 text-black hover:bg-slate-200'}`}
           >
             Yes
           </button>
@@ -756,7 +756,7 @@ function Step3IncomeWIOA({ formData, updateField, toggleArrayField }: any) {
                 onChange={() =>
                   toggleArrayField('receivesPublicAssistance', option)
                 }
-                className="w-4 h-4 text-brand-orange-600"
+                className="w-4 h-4 text-brand-blue-600"
               />
               <span className="text-sm">{option}</span>
             </label>
@@ -796,7 +796,7 @@ function Step3IncomeWIOA({ formData, updateField, toggleArrayField }: any) {
         <div className="flex gap-4">
           <button
             onClick={() => updateField('hasJusticeInvolvement', true)}
-            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition ${formData.hasJusticeInvolvement === true ? 'bg-brand-green-600 text-white' : 'bg-slate-100 text-black hover:bg-slate-200'}`}
+            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition ${formData.hasJusticeInvolvement === true ? 'bg-brand-blue-600 text-white' : 'bg-slate-100 text-black hover:bg-slate-200'}`}
           >
             Yes
           </button>
@@ -898,7 +898,7 @@ function Step4Authorization({
                 type="checkbox"
                 checked={formData.barriers.includes(option)}
                 onChange={() => toggleArrayField('barriers', option)}
-                className="w-4 h-4 text-brand-orange-600"
+                className="w-4 h-4 text-brand-blue-600"
               />
               <span className="text-sm">{option}</span>
             </label>
@@ -927,7 +927,7 @@ function Step4Authorization({
         <div className="flex gap-4 mb-4">
           <button
             onClick={() => updateField('hasCaseManager', true)}
-            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition ${formData.hasCaseManager === true ? 'bg-brand-green-600 text-white' : 'bg-slate-100 text-black hover:bg-slate-200'}`}
+            className={`flex-1 px-4 py-3 rounded-lg font-semibold transition ${formData.hasCaseManager === true ? 'bg-brand-blue-600 text-white' : 'bg-slate-100 text-black hover:bg-slate-200'}`}
           >
             Yes
           </button>
@@ -1155,7 +1155,7 @@ function Step6Review({ formData, updateField }: any) {
             onChange={(e) =>
               updateField('consentBackgroundCheck', e.target.checked)
             }
-            className="w-5 h-5 text-brand-orange-600 mt-1"
+            className="w-5 h-5 text-brand-blue-600 mt-1"
             required
           />
           <div className="text-sm">
@@ -1174,7 +1174,7 @@ function Step6Review({ formData, updateField }: any) {
             type="checkbox"
             checked={formData.consentPhotoVideo}
             onChange={(e) => updateField('consentPhotoVideo', e.target.checked)}
-            className="w-5 h-5 text-brand-orange-600 mt-1"
+            className="w-5 h-5 text-brand-blue-600 mt-1"
           />
           <div className="text-sm">
             <strong className="text-black">Photo/Video Release</strong>
@@ -1192,7 +1192,7 @@ function Step6Review({ formData, updateField }: any) {
             onChange={(e) =>
               updateField('consentDataSharing', e.target.checked)
             }
-            className="w-5 h-5 text-brand-orange-600 mt-1"
+            className="w-5 h-5 text-brand-blue-600 mt-1"
             required
           />
           <div className="text-sm">
@@ -1212,7 +1212,7 @@ function Step6Review({ formData, updateField }: any) {
             onChange={(e) =>
               updateField('consentTextMessages', e.target.checked)
             }
-            className="w-5 h-5 text-brand-orange-600 mt-1"
+            className="w-5 h-5 text-brand-blue-600 mt-1"
           />
           <div className="text-sm">
             <strong className="text-black">Text Message Opt-In</strong>

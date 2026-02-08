@@ -157,7 +157,7 @@ export default function WorkOneLocator() {
                 Schedule Virtual Appointment
               </a>
               <a
-                href="tel:317-684-2400"
+                href="/contact"
                 className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-slate-50 transition-all shadow-lg border-2 border-slate-200"
               >
                 Call (317) 684-2400

@@ -63,10 +63,10 @@ export default function FranchisePage() {
                 View Franchise Packages
               </Link>
               <a
-                href="tel:3173143757"
+                href="/contact"
                 className="inline-block px-8 py-4 bg-white/10 text-white font-bold rounded-lg hover:bg-white/20 transition text-lg border-2 border-white text-center"
               >
-                Call 317-314-3757
+                Call Contact Us
               </a>
             </div>
           </div>
@@ -109,8 +109,8 @@ export default function FranchisePage() {
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                <TrendingUp className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mb-4">
+                <TrendingUp className="w-8 h-8 text-brand-red-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">High Profit Margins</h3>
               <p className="text-black">
@@ -132,7 +132,7 @@ export default function FranchisePage() {
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4">
-                <Users className="w-8 h-8 text-brand-orange-600" />
+                <Users className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">Marketing Support</h3>
               <p className="text-black">
@@ -309,7 +309,7 @@ export default function FranchisePage() {
             <div className="bg-white border-2 border-gray-300 rounded-xl p-8">
               <h3 className="text-2xl font-bold mb-4">Enterprise Package</h3>
               <div className="mb-6">
-                <div className="text-4xl font-bold text-purple-600 mb-2">
+                <div className="text-4xl font-bold text-brand-red-600 mb-2">
                   $75,000
                 </div>
                 <p className="text-sm text-black">One-time franchise fee</p>
@@ -320,47 +320,47 @@ export default function FranchisePage() {
                 <p className="font-bold mb-3">What's Included:</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">ALL 15+ training programs</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">
                       Complete curriculum & materials
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Use of DOL/DWD approvals</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">
                       Fully custom website & branding
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Full LMS platform</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Complete marketing system</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">6-week intensive training</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Dedicated account manager</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">On-site launch support</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Protected territory</span>
                   </li>
                 </ul>
@@ -368,13 +368,13 @@ export default function FranchisePage() {
 
               <Link
                 href="/franchise/apply?package=enterprise"
-                className="block w-full text-center px-6 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition"
+                className="block w-full text-center px-6 py-3 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition"
               >
                 Get Started
               </Link>
 
               <div className="mt-4 text-center">
-                <p className="text-sm font-bold text-purple-600">
+                <p className="text-sm font-bold text-brand-red-600">
                   Payment Plans Available
                 </p>
                 <p className="text-xs text-black">
@@ -475,10 +475,10 @@ export default function FranchisePage() {
               Request Franchise Information
             </Link>
             <a
-              href="tel:3173143757"
+              href="/contact"
               className="inline-block px-10 py-5 bg-white border-2 border-orange-600 text-orange-600 font-bold rounded-lg hover:bg-orange-50 transition text-lg"
             >
-              Call 317-314-3757
+              Call Contact Us
             </a>
           </div>
           <p className="mt-6 text-black">

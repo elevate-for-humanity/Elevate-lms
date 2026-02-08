@@ -76,10 +76,10 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                   Apply Now - Free Training
                 </Link>
                 <a
-                  href="tel:317-314-3757"
+                  href="/contact"
                   className="inline-block px-8 py-4 bg-transparent text-white font-bold rounded-full border-2 border-white hover:bg-white hover:text-orange-600 transition-all text-center text-lg"
                 >
-                  Call 317-314-3757
+                  Call Contact Us
                 </a>
               </div>
             </div>
@@ -242,8 +242,8 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
             <div className="bg-blue-800 rounded-lg p-6">
               <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">📞</div>
               <h3 className="font-bold mb-2">Call Us</h3>
-              <a href="tel:317-314-3757" className="text-blue-100 hover:text-white">
-                317-314-3757
+              <a href="/contact" className="text-blue-100 hover:text-white">
+                Contact Us
               </a>
             </div>
             <div className="bg-blue-800 rounded-lg p-6">

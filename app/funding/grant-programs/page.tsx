@@ -49,7 +49,7 @@ export default function GrantProgramsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors shadow-lg"
             >
               Apply for Free Training
             </Link>
@@ -117,7 +117,7 @@ export default function GrantProgramsPage() {
             </h3>
             <ul className="space-y-2">
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">
+                <span className="text-brand-blue-600 font-bold text-base">
                   •
                 </span>
                 <span className="text-black">
@@ -125,7 +125,7 @@ export default function GrantProgramsPage() {
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">
+                <span className="text-brand-blue-600 font-bold text-base">
                   •
                 </span>
                 <span className="text-black">
@@ -133,7 +133,7 @@ export default function GrantProgramsPage() {
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">
+                <span className="text-brand-blue-600 font-bold text-base">
                   •
                 </span>
                 <span className="text-black">
@@ -141,7 +141,7 @@ export default function GrantProgramsPage() {
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">
+                <span className="text-brand-blue-600 font-bold text-base">
                   •
                 </span>
                 <span className="text-black">
@@ -218,7 +218,7 @@ export default function GrantProgramsPage() {
 
                   <Link
                     href={`/programs/${program.slug}`}
-                    className="block w-full text-center bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+                    className="block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
                   >
                     Learn More
                   </Link>
@@ -238,7 +238,7 @@ export default function GrantProgramsPage() {
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-orange-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 1
               </div>
               <h3 className="text-lg font-bold mb-2">Apply to Program</h3>
@@ -249,7 +249,7 @@ export default function GrantProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-orange-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 2
               </div>
               <h3 className="text-lg font-bold mb-2">Check Eligibility</h3>
@@ -260,7 +260,7 @@ export default function GrantProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-orange-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                 3
               </div>
               <h3 className="text-lg font-bold mb-2">Start Training</h3>
@@ -274,7 +274,7 @@ export default function GrantProgramsPage() {
           <div className="text-center">
             <Link
               href="/apply"
-              className="inline-block bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Apply Now - It's Free
             </Link>
@@ -282,11 +282,11 @@ export default function GrantProgramsPage() {
               Questions?{' '}
               <Link
                 href="/contact"
-                className="text-brand-orange-600 hover:underline"
+                className="text-brand-blue-600 hover:underline"
               >
                 Contact us
               </Link>{' '}
-              or call us at (317) 314-3757
+              or call us at Contact Us
             </p>
           </div>
         </div>

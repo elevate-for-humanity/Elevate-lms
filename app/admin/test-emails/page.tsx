@@ -107,13 +107,13 @@ export default function TestEmailsPage() {
               <span className="text-sm font-medium text-black">
                 Configuration
               </span>
-              <span className="text-sm text-brand-green-600 font-medium">
+              <span className="text-sm text-brand-blue-600 font-medium">
                 • Configured
               </span>
             </div>
             <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
               <span className="text-sm font-medium text-black">API Key</span>
-              <span className="text-sm text-brand-green-600 font-medium">
+              <span className="text-sm text-brand-blue-600 font-medium">
                 • Set
               </span>
             </div>
@@ -150,7 +150,7 @@ export default function TestEmailsPage() {
               disabled={loading}
               className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-lg hover:border-orange-500 hover:bg-orange-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Send className="w-8 h-8 text-brand-orange-600" />
+              <Send className="w-8 h-8 text-brand-blue-600" />
               <div className="text-center">
                 <div className="font-semibold text-black">
                   Reminder Email
@@ -166,7 +166,7 @@ export default function TestEmailsPage() {
               disabled={loading}
               className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-lg hover:border-green-500 hover:bg-green-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Send className="w-8 h-8 text-brand-green-600" />
+              <Send className="w-8 h-8 text-brand-blue-600" />
               <div className="text-center">
                 <div className="font-semibold text-black">
                   Notification Email
@@ -186,7 +186,7 @@ export default function TestEmailsPage() {
           </h2>
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <div className="font-medium text-black">
                   Student Application
@@ -197,7 +197,7 @@ export default function TestEmailsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <div className="font-medium text-black">
                   Shop Partner Application
@@ -208,7 +208,7 @@ export default function TestEmailsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <div className="font-medium text-black">Contact Form</div>
                 <div className="text-black">
@@ -217,7 +217,7 @@ export default function TestEmailsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <div className="font-medium text-black">License Request</div>
                 <div className="text-black">
@@ -226,7 +226,7 @@ export default function TestEmailsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded">
-              <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <div className="font-medium text-black">Partner Inquiry</div>
                 <div className="text-black">

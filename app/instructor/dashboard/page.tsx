@@ -116,8 +116,8 @@ export default async function ProgramHolderDashboard() {
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-brand-green-100 flex items-center justify-center">
-                <Circle className="text-brand-green-600" size={24} />
+              <div className="w-12 h-12 rounded-full bg-brand-blue-100 flex items-center justify-center">
+                <Circle className="text-brand-blue-600" size={24} />
               </div>
               <div>
                 <p className="text-base md:text-lg font-bold text-black">
@@ -130,8 +130,8 @@ export default async function ProgramHolderDashboard() {
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                <Award className="text-purple-600" size={24} />
+              <div className="w-12 h-12 rounded-full bg-brand-red-100 flex items-center justify-center">
+                <Award className="text-brand-red-600" size={24} />
               </div>
               <div>
                 <p className="text-base md:text-lg font-bold text-black">
@@ -145,7 +145,7 @@ export default async function ProgramHolderDashboard() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                <Clock className="text-brand-orange-600" size={24} />
+                <Clock className="text-brand-blue-600" size={24} />
               </div>
               <div>
                 <p className="text-base md:text-lg font-bold text-black">
@@ -196,7 +196,7 @@ export default async function ProgramHolderDashboard() {
                           <span
                             className={`px-3 py-2 rounded-full text-xs font-medium ${
                               student.status === 'active'
-                                ? 'bg-brand-green-100 text-green-700'
+                                ? 'bg-brand-blue-100 text-green-700'
                                 : student.status === 'completed'
                                   ? 'bg-blue-100 text-blue-700'
                                   : 'bg-gray-100 text-black'
@@ -280,10 +280,10 @@ export default async function ProgramHolderDashboard() {
                 <div className="space-y-2">
                   <Link 
                     href="/community" 
-                    className="block w-full text-left px-4 py-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition border border-purple-200"
+                    className="block w-full text-left px-4 py-3 bg-brand-red-50 hover:bg-brand-red-100 rounded-lg transition border border-brand-red-200"
                   >
-                    <p className="font-medium text-purple-900">Community Hub</p>
-                    <p className="text-xs text-purple-700">Connect with students and instructors</p>
+                    <p className="font-medium text-brand-red-900">Community Hub</p>
+                    <p className="text-xs text-brand-red-700">Connect with students and instructors</p>
                   </Link>
                   <Link 
                     href="/lms/forums" 

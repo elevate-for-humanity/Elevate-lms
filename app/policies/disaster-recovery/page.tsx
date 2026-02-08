@@ -50,12 +50,12 @@ export default function DisasterRecoveryPage() {
             <p className="text-sm text-gray-600 m-0">Maximum acceptable downtime</p>
           </div>
 
-          <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+          <div className="bg-brand-red-50 rounded-lg p-6 border-2 border-brand-red-200">
             <div className="flex items-center gap-2 mb-2">
-              <Database className="w-5 h-5 text-purple-600" />
+              <Database className="w-5 h-5 text-brand-red-600" />
               <h3 className="text-lg font-bold text-black m-0">Recovery Point Objective (RPO)</h3>
             </div>
-            <p className="text-3xl font-black text-purple-600 mb-1">24 hours</p>
+            <p className="text-3xl font-black text-brand-red-600 mb-1">24 hours</p>
             <p className="text-sm text-gray-600 m-0">Maximum acceptable data loss</p>
           </div>
         </div>
@@ -192,7 +192,7 @@ export default function DisasterRecoveryPage() {
         </p>
         <ul className="list-none mb-6 text-black space-y-2 p-0">
           <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
-          <li><strong>Phone:</strong> (317) 314-3757</li>
+          <li><strong>Phone:</strong> Contact Us</li>
         </ul>
 
         <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">

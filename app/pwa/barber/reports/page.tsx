@@ -46,7 +46,7 @@ export default function BarberReportsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-purple-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-brand-red-500 animate-spin" />
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function BarberReportsPage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-slate-800 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-5 h-5 text-purple-400" />
+              <Clock className="w-5 h-5 text-brand-red-400" />
               <span className="text-slate-400 text-sm">Total Hours</span>
             </div>
             <p className="text-3xl font-bold text-white">{summary.totalHours}</p>
@@ -85,21 +85,21 @@ export default function BarberReportsPage() {
         </div>
 
         {/* Progress to Goal */}
-        <div className="bg-purple-500/20 border border-purple-500/30 rounded-xl p-4">
+        <div className="bg-brand-red-500/20 border border-brand-red-500/30 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Award className="w-5 h-5 text-purple-400" />
+              <Award className="w-5 h-5 text-brand-red-400" />
               <span className="text-white font-medium">Progress to 2,000 Hours</span>
             </div>
-            <span className="text-purple-300 font-bold">{summary.milestoneProgress}%</span>
+            <span className="text-brand-red-300 font-bold">{summary.milestoneProgress}%</span>
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-purple-500 rounded-full"
+              className="h-full bg-brand-red-500 rounded-full"
               style={{ width: `${summary.milestoneProgress}%` }}
             />
           </div>
-          <p className="text-purple-200 text-sm mt-2">
+          <p className="text-brand-red-200 text-sm mt-2">
             {2000 - summary.totalHours} hours remaining
           </p>
         </div>

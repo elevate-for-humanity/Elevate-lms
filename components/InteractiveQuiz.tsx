@@ -92,7 +92,7 @@ export function InteractiveQuiz({ questions, onComplete }: InteractiveQuizProps)
                     <Circle className="text-green-600" size={20} />
                   )}
                   {showFeedback && selectedAnswer === index && !isCorrect && (
-                    <XCircle className="text-brand-orange-600" size={20} />
+                    <XCircle className="text-brand-blue-600" size={20} />
                   )}
                 </div>
               </button>
@@ -118,14 +118,14 @@ export function InteractiveQuiz({ questions, onComplete }: InteractiveQuizProps)
             <Button
               onClick={handleSubmit}
               disabled={selectedAnswer === null}
-              className="bg-brand-orange-600 hover:bg-brand-orange-700"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700"
             >
               Submit Answer
             </Button>
           ) : (
             <Button
               onClick={handleNext}
-              className="bg-brand-orange-600 hover:bg-brand-orange-700"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700"
             >
               {isLastQuestion ? 'Finish Quiz' : 'Next Question'}
             </Button>

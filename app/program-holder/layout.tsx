@@ -110,7 +110,7 @@ export default async function ProgramHolderLayout({
               <div className="flex-shrink-0 flex items-center">
                 <Link
                   href="/program-holder/dashboard"
-                  className="text-xl font-bold text-brand-orange-600"
+                  className="text-xl font-bold text-brand-blue-600"
                 >
                   Program Holder Portal
                 </Link>

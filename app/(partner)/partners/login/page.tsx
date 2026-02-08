@@ -54,7 +54,7 @@ export default function PartnerLoginPage() {
           <button className="w-full rounded-xl p-3 border bg-brand-blue-600 text-white hover:bg-brand-blue-700 transition-colors" aria-label="Action button">
             Sign in
           </button>
-          {msg && <div className="text-sm text-brand-orange-600">{msg}</div>}
+          {msg && <div className="text-sm text-brand-blue-600">{msg}</div>}
         </div>
       </form>
     </div>

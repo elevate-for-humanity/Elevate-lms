@@ -71,11 +71,11 @@ export default function IntakePage() {
               Our enrollment team is here to assist you with the intake process.
             </p>
             <Link
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center gap-2 text-blue-600 font-medium"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Contact Us
             </Link>
           </div>
         </div>

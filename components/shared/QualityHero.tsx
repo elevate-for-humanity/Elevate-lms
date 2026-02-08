@@ -103,7 +103,7 @@ export function QualityHero({
                       px-8 py-4 rounded-lg text-lg font-semibold transition-colors text-center
                       ${
                         action.variant === 'primary'
-                          ? 'bg-brand-orange-600 hover:bg-brand-orange-700 text-white'
+                          ? 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white'
                           : 'bg-white hover:bg-slate-50 text-black border-2 border-slate-300'
                       }
                     `}

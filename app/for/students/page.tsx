@@ -87,7 +87,7 @@ export default function StudentsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-orange-600 text-white font-bold rounded-lg hover:bg-brand-orange-700 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition text-lg"
             >
               Apply Now
               <ArrowRight className="h-5 w-5" />

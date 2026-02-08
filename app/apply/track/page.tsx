@@ -43,7 +43,7 @@ const statusConfig = {
   },
   approved: {
     icon: Circle,
-    color: 'text-brand-green-600',
+    color: 'text-brand-blue-600',
     bg: 'bg-green-50',
     border: 'border-green-200',
     label: 'Approved',
@@ -51,7 +51,7 @@ const statusConfig = {
   },
   rejected: {
     icon: XCircle,
-    color: 'text-brand-orange-600',
+    color: 'text-brand-blue-600',
     bg: 'bg-red-50',
     border: 'border-red-200',
     label: 'Not Approved',
@@ -199,14 +199,14 @@ export default function TrackApplicationPage() {
 
             {error && (
               <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-sm text-brand-orange-600">{error}</p>
+                <p className="text-sm text-brand-blue-600">{error}</p>
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-brand-orange-600 text-white font-bold rounded-lg hover:bg-brand-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -335,7 +335,7 @@ export default function TrackApplicationPage() {
                 <div className="space-y-3 text-sm text-black">
                   <p>• Please respond to our advisor's message</p>
                   <p>• Check your email inbox and spam folder</p>
-                  <p>• Call us if you haven't heard from us: (317) 314-3757</p>
+                  <p>• Call us if you haven't heard from us: Contact Us</p>
                 </div>
               )}
 
@@ -351,7 +351,7 @@ export default function TrackApplicationPage() {
                 <div className="space-y-3 text-sm text-black">
                   <p>• Contact us to discuss alternative options</p>
                   <p>• We may have other programs that fit your needs</p>
-                  <p>• Call us at (317) 314-3757 for more information</p>
+                  <p>• Call us at Contact Us for more information</p>
                 </div>
               )}
             </div>
@@ -361,28 +361,28 @@ export default function TrackApplicationPage() {
         {/* Help Section */}
         <div className="grid md:grid-cols-2 gap-4">
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <Phone className="w-8 h-8 text-brand-orange-600 mb-3" />
+            <Phone className="w-8 h-8 text-brand-blue-600 mb-3" />
             <h3 className="font-bold text-black mb-2">Need Help?</h3>
             <p className="text-sm text-black mb-3">
               Call us Monday-Friday, 9am-5pm
             </p>
             <a
-              href="tel:3173143757"
-              className="inline-block text-brand-orange-600 hover:text-brand-orange-700 font-semibold text-sm"
+              href="/contact"
+              className="inline-block text-brand-blue-600 hover:text-brand-blue-700 font-semibold text-sm"
             >
-              (317) 314-3757
+              Contact Us
             </a>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <Mail className="w-8 h-8 text-brand-orange-600 mb-3" />
+            <Mail className="w-8 h-8 text-brand-blue-600 mb-3" />
             <h3 className="font-bold text-black mb-2">Email Us</h3>
             <p className="text-sm text-black mb-3">
               We respond within 24 hours
             </p>
             <a
               href="mailto:elevate4humanityedu@gmail.com"
-              className="inline-block text-brand-orange-600 hover:text-brand-orange-700 font-semibold text-sm"
+              className="inline-block text-brand-blue-600 hover:text-brand-blue-700 font-semibold text-sm"
             >
               elevate4humanityedu@gmail.com
             </a>

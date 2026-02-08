@@ -225,7 +225,7 @@ export default function AcceptableUsePage() {
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
               <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Phone:</strong> (317) 314-3757</li>
+              <li><strong>Phone:</strong> Contact Us</li>
               <li><strong>In-Person:</strong> IT Help Desk or Administrative Office</li>
               <li><strong>Anonymous:</strong> Use the online reporting form in student portal</li>
             </ul>
@@ -236,7 +236,7 @@ export default function AcceptableUsePage() {
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
               <li><strong>IT Help Desk:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Phone:</strong> (317) 314-3757 ext. 2</li>
+              <li><strong>Phone:</strong> Contact Us ext. 2</li>
               <li><strong>Hours:</strong> Monday-Friday, 8:00 AM - 6:00 PM EST</li>
               <li><strong>Location:</strong> Main Campus, Room 105</li>
             </ul>

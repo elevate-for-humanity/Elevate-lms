@@ -67,10 +67,10 @@ export default function SNAPETPartnerPage() {
                 View Capabilities
               </Link>
               <a
-                href="tel:3173143757"
+                href="/contact"
                 className="inline-block px-8 py-4 bg-white/10 text-white font-bold rounded-lg hover:bg-white/20 transition text-lg border-2 border-white text-center"
               >
-                Partner Inquiry: 317-314-3757
+                Partner Inquiry: Contact Us
               </a>
             </div>
           </div>
@@ -152,29 +152,29 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                <Image src="/images/icons/trending-up.png" alt="Icon" width={32} height={32} className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mb-4">
+                <Image src="/images/icons/trending-up.png" alt="Icon" width={32} height={32} className="w-8 h-8 text-brand-red-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">Verified Outcomes</h3>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Credential tracking system</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Job placement verification</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Wage gain documentation</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Employer partnerships</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Performance reporting dashboard</span>
                 </li>
               </ul>
@@ -371,7 +371,7 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="text-4xl font-bold text-purple-600 mb-2">85%</div>
+              <div className="text-4xl font-bold text-brand-red-600 mb-2">85%</div>
               <p className="font-bold mb-2">Job Placement Rate</p>
               <p className="text-sm text-black">
                 Verified employer connections
@@ -464,10 +464,10 @@ export default function SNAPETPartnerPage() {
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="tel:3173143757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-white text-blue-600 font-bold rounded-lg hover:bg-gray-50 transition text-lg"
             >
-              <Phone className="w-5 h-5" /> (317) 314-3757
+              <Phone className="w-5 h-5" /> Contact Us
             </a>
           </div>
           <p className="mt-6 text-blue-200">Elizabeth Greene, Founder & CEO</p>

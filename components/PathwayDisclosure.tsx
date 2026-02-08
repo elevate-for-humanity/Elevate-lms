@@ -82,7 +82,7 @@ export default function PathwayDisclosure({
           
           {/* Stage 3 */}
           <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-            <div className="w-8 h-8 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-sm mb-3">3</div>
+            <div className="w-8 h-8 bg-brand-red-100 text-brand-red-600 rounded-full flex items-center justify-center font-bold text-sm mb-3">3</div>
             <h3 className="font-semibold text-slate-900 text-sm mb-1">Internship & Placement</h3>
             <p className="text-xs text-slate-600">
               Employer-hosted placement to support employment transition.

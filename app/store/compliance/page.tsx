@@ -125,8 +125,8 @@ export default async function CompliancePage() {
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-                <FileText className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-brand-red-100 rounded-xl flex items-center justify-center mb-4">
+                <FileText className="w-8 h-8 text-brand-red-600" />
               </div>
               <h3 className="text-2xl font-bold mb-4">WCAG AA Accessibility</h3>
               <p className="text-gray-700 mb-4">
@@ -134,25 +134,25 @@ export default async function CompliancePage() {
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Screen reader compatible</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Keyboard navigation support</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Color contrast compliance</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Closed captions and transcripts</span>
                 </li>
               </ul>
               <Link
                 href="/store/compliance/wcag"
-                className="inline-flex items-center gap-2 text-purple-600 font-semibold hover:text-purple-700"
+                className="inline-flex items-center gap-2 text-brand-red-600 font-semibold hover:text-brand-red-700"
               >
                 View WCAG Documentation
                 <ExternalLink className="w-4 h-4" />

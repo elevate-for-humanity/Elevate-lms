@@ -68,7 +68,7 @@ export function EnrollmentPaymentWidget({
         <button
           onClick={() => handleCheckout("full")}
           disabled={loading}
-          className="inline-flex rounded-md bg-brand-orange-600 px-4 py-2 text-[11px] font-semibold text-white hover:bg-brand-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex rounded-md bg-brand-blue-600 px-4 py-2 text-[11px] font-semibold text-white hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? "Loading..." : "Pay in Full"}
         </button>

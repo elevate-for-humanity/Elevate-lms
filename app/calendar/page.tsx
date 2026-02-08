@@ -72,11 +72,11 @@ export default async function CalendarPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-purple-900/60" />
+        <div className="absolute inset-0 bg-brand-red-900/60" />
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 w-full">
             <h1 className="text-4xl font-bold text-white mb-2">My Calendar</h1>
-            <p className="text-purple-100">Your personal schedule and important dates</p>
+            <p className="text-brand-red-100">Your personal schedule and important dates</p>
           </div>
         </div>
       </section>
@@ -88,9 +88,9 @@ export default async function CalendarPage() {
               <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Sign in" fill className="object-cover" />
             </div>
             <div className="p-6 text-center">
-              <h2 className="text-lg font-semibold text-purple-900 mb-2">Sign in to see your schedule</h2>
-              <p className="text-purple-700 mb-4">View your enrolled classes, assignments, and deadlines.</p>
-              <Link href="/login?redirect=/calendar" className="inline-block bg-purple-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-purple-700">
+              <h2 className="text-lg font-semibold text-brand-red-900 mb-2">Sign in to see your schedule</h2>
+              <p className="text-brand-red-700 mb-4">View your enrolled classes, assignments, and deadlines.</p>
+              <Link href="/login?redirect=/calendar" className="inline-block bg-brand-red-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-brand-red-700">
                 Sign In
               </Link>
             </div>
@@ -120,7 +120,7 @@ export default async function CalendarPage() {
                             </div>
                           </div>
                           <div className="p-4 flex items-center">
-                            <Link href={`/courses/${enrollment.course?.id}`} className="text-purple-600 text-sm font-medium hover:underline">
+                            <Link href={`/courses/${enrollment.course?.id}`} className="text-brand-red-600 text-sm font-medium hover:underline">
                               View
                             </Link>
                           </div>
@@ -133,7 +133,7 @@ export default async function CalendarPage() {
                         </div>
                         <div className="p-6 text-center text-gray-500">
                           <p>No enrolled classes</p>
-                          <Link href="/programs" className="text-purple-600 font-medium hover:underline">Browse Programs</Link>
+                          <Link href="/programs" className="text-brand-red-600 font-medium hover:underline">Browse Programs</Link>
                         </div>
                       </div>
                     )}
@@ -177,7 +177,7 @@ export default async function CalendarPage() {
                   <h3 className="font-semibold text-gray-900">{program.name}</h3>
                   {program.schedule && <p className="text-sm text-gray-600 mt-1">{program.schedule}</p>}
                   {program.start_date && (
-                    <p className="text-xs text-purple-600 mt-2">
+                    <p className="text-xs text-brand-red-600 mt-2">
                       Starts: {new Date(program.start_date).toLocaleDateString()}
                     </p>
                   )}
@@ -195,7 +195,7 @@ export default async function CalendarPage() {
                   <Image src="/images/healthcare/healthcare-professional-portrait-2.jpg" alt="Events" fill className="object-cover" />
                 </div>
                 <div className="p-4 text-center">
-                  <span className="font-medium text-purple-700">View Public Events</span>
+                  <span className="font-medium text-brand-red-700">View Public Events</span>
                 </div>
               </Link>
             </div>

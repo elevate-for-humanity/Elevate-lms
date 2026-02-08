@@ -281,7 +281,7 @@ export default async function BusinessFinancialPage() {
           <h2 className="text-3xl font-bold mb-6">Next Steps</h2>
           <div className="space-y-4 text-left max-w-2xl mx-auto mb-8">
             <div className="flex items-start gap-4">
-              <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white font-bold flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white font-bold flex items-center justify-center flex-shrink-0">
                 1
               </div>
               <div>
@@ -292,7 +292,7 @@ export default async function BusinessFinancialPage() {
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white font-bold flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white font-bold flex items-center justify-center flex-shrink-0">
                 2
               </div>
               <div>
@@ -303,7 +303,7 @@ export default async function BusinessFinancialPage() {
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white font-bold flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white font-bold flex items-center justify-center flex-shrink-0">
                 3
               </div>
               <div>
@@ -314,7 +314,7 @@ export default async function BusinessFinancialPage() {
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white font-bold flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-full bg-brand-blue-600 text-white font-bold flex items-center justify-center flex-shrink-0">
                 4
               </div>
               <div>
@@ -327,7 +327,7 @@ export default async function BusinessFinancialPage() {
           </div>
           <Link
             href="/apply"
-            className="inline-block px-10 py-5 bg-brand-orange-600 hover:bg-brand-orange-600 text-white font-bold text-xl rounded-lg transition-all shadow-lg hover:shadow-xl"
+            className="inline-block px-10 py-5 bg-brand-blue-600 hover:bg-brand-blue-600 text-white font-bold text-xl rounded-lg transition-all shadow-lg hover:shadow-xl"
           >
             Apply Now
           </Link>

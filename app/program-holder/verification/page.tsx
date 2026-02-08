@@ -238,7 +238,7 @@ export default async function VerificationPage() {
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/program-holder/documents"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-semibold rounded-lg transition-colors"
+                  className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition-colors"
                 >
                   <Upload className="h-5 w-5 mr-2" />
                   Upload Documents
@@ -269,7 +269,7 @@ export default async function VerificationPage() {
                   Email Support
                 </a>
                 <a
-                  href="tel:317-314-3757"
+                  href="/contact"
                   className="inline-flex items-center text-blue-900 hover:text-blue-700 font-medium"
                 >
                   <Phone className="h-4 w-4 mr-2" />

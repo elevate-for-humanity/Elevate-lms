@@ -195,7 +195,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
               <Link
                 href={primaryUrl}
-                className="rounded-2xl bg-purple-600 text-white px-8 py-4 font-semibold shadow-lg hover:bg-purple-700 transition text-center"
+                className="rounded-2xl bg-brand-red-600 text-white px-8 py-4 font-semibold shadow-lg hover:bg-brand-red-700 transition text-center"
               >
                 {primaryCTA}
               </Link>
@@ -329,7 +329,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             <div className="space-y-8">
               {config.path.map((step, i) => (
                 <div key={i} className="flex gap-6 items-start">
-                  <div className="w-16 h-16 rounded-full bg-purple-600 text-white flex items-center justify-center text-2xl font-bold flex-shrink-0 relative z-10">
+                  <div className="w-16 h-16 rounded-full bg-brand-red-600 text-white flex items-center justify-center text-2xl font-bold flex-shrink-0 relative z-10">
                     {step.step}
                   </div>
                   <div className="pt-3">
@@ -349,7 +349,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
           <h2 className="text-3xl font-bold text-gray-900 mb-8">What You Receive</h2>
           <div className="bg-white rounded-2xl p-8 shadow-sm">
             <div className="flex items-start gap-4 mb-6">
-              <Award className="w-12 h-12 text-purple-600 flex-shrink-0" />
+              <Award className="w-12 h-12 text-brand-red-600 flex-shrink-0" />
               <div>
                 <h3 className="text-2xl font-bold text-gray-900">{config.credential.name}</h3>
                 <p className="mt-2 text-gray-600">{config.credential.description}</p>
@@ -431,7 +431,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
           <div className="mt-10 flex justify-center gap-4 flex-col sm:flex-row">
             <Link
               href={primaryUrl}
-              className="rounded-2xl bg-purple-600 text-white px-8 py-4 font-semibold hover:bg-purple-700 transition inline-flex items-center justify-center gap-2"
+              className="rounded-2xl bg-brand-red-600 text-white px-8 py-4 font-semibold hover:bg-brand-red-700 transition inline-flex items-center justify-center gap-2"
             >
               {primaryCTA}
               <ArrowRight className="w-5 h-5" />

@@ -86,21 +86,21 @@ export default async function CashAdvanceReportsPage() {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-brand-green-600">
+            <div className="text-3xl font-bold text-brand-blue-600">
               {approvedAdvances?.length || 0}
             </div>
             <div className="text-black text-sm">Approved</div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-brand-orange-600">
+            <div className="text-3xl font-bold text-brand-blue-600">
               {pendingAdvances?.length || 0}
             </div>
             <div className="text-black text-sm">Pending</div>
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-purple-600">
+            <div className="text-3xl font-bold text-brand-red-600">
               ${totalAmount.toFixed(2)}
             </div>
             <div className="text-black text-sm">Total Amount</div>
@@ -113,7 +113,7 @@ export default async function CashAdvanceReportsPage() {
             <h2 className="text-xl font-semibold text-black mb-4">
               Approval Rate
             </h2>
-            <div className="text-4xl font-bold text-brand-green-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
+            <div className="text-4xl font-bold text-brand-blue-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
               {allAdvances?.length
                 ? Math.round(
                     ((approvedAdvances?.length || 0) / allAdvances.length) * 100
@@ -150,10 +150,10 @@ export default async function CashAdvanceReportsPage() {
             <button className="px-4 py-2 bg-brand-blue-600 text-white rounded hover:bg-brand-blue-700" aria-label="Action button">
               Export to CSV
             </button>
-            <button className="px-4 py-2 bg-brand-green-600 text-white rounded hover:bg-green-700" aria-label="Action button">
+            <button className="px-4 py-2 bg-brand-blue-600 text-white rounded hover:bg-green-700" aria-label="Action button">
               Export to PDF
             </button>
-            <button className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700" aria-label="Action button">
+            <button className="px-4 py-2 bg-brand-red-600 text-white rounded hover:bg-brand-red-700" aria-label="Action button">
               Export to Excel
             </button>
           </div>

@@ -103,7 +103,7 @@ export default function AdminApprenticeships() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -135,13 +135,13 @@ export default function AdminApprenticeships() {
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-sm text-black">Active</p>
-            <p className="text-3xl font-bold text-brand-green-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {apprenticeships.filter((a) => a.status === 'active').length}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <p className="text-sm text-black">Pending Approvals</p>
-            <p className="text-3xl font-bold text-brand-orange-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {pendingApprovals.length}
             </p>
           </div>
@@ -182,7 +182,7 @@ export default function AdminApprenticeships() {
                   </div>
                   <button
                     onClick={() => approveHours(log.id)}
-                    className="bg-brand-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
+                    className="bg-brand-blue-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
                   >
                     Approve
                   </button>
@@ -299,7 +299,7 @@ export default function AdminApprenticeships() {
                         <span
                           className={`px-3 py-2 rounded-full text-xs font-semibold ${
                             apprenticeship.status === 'active'
-                              ? 'bg-brand-green-100 text-green-800'
+                              ? 'bg-brand-blue-100 text-green-800'
                               : apprenticeship.status === 'completed'
                                 ? 'bg-blue-100 text-blue-800'
                                 : 'bg-gray-100 text-black'
@@ -343,7 +343,7 @@ export default function AdminApprenticeships() {
                   <ul className="space-y-4">
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -361,7 +361,7 @@ export default function AdminApprenticeships() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -379,7 +379,7 @@ export default function AdminApprenticeships() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -397,7 +397,7 @@ export default function AdminApprenticeships() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

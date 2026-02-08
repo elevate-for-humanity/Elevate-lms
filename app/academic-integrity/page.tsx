@@ -110,7 +110,7 @@ export default async function AcademicIntegrityPage() {
             {/* Plagiarism */}
             <div className="border-l-4 border-red-500 pl-6">
               <h3 className="text-base sm:text-lg font-bold text-black mb-3 flex items-center gap-2">
-                <AlertTriangle className="w-6 h-6 text-brand-orange-600" />
+                <AlertTriangle className="w-6 h-6 text-brand-blue-600" />
                 Plagiarism
               </h3>
               <p className="text-black mb-3">
@@ -143,7 +143,7 @@ export default async function AcademicIntegrityPage() {
             {/* Cheating */}
             <div className="border-l-4 border-orange-500 pl-6">
               <h3 className="text-base sm:text-lg font-bold text-black mb-3 flex items-center gap-2">
-                <AlertTriangle className="w-6 h-6 text-brand-orange-600" />
+                <AlertTriangle className="w-6 h-6 text-brand-blue-600" />
                 Cheating
               </h3>
               <p className="text-black mb-3">
@@ -194,17 +194,17 @@ export default async function AcademicIntegrityPage() {
             </div>
 
             {/* Falsification */}
-            <div className="border-l-4 border-purple-500 pl-6">
+            <div className="border-l-4 border-brand-red-500 pl-6">
               <h3 className="text-base sm:text-lg font-bold text-black mb-3 flex items-center gap-2">
-                <FileText className="w-6 h-6 text-purple-600" />
+                <FileText className="w-6 h-6 text-brand-red-600" />
                 Falsification of Records
               </h3>
               <p className="text-black mb-3">
                 Altering or fabricating academic records or documentation.
               </p>
-              <div className="bg-purple-50 rounded-lg p-4">
-                <p className="font-semibold text-purple-900 mb-2">Examples:</p>
-                <ul className="space-y-2 text-purple-800 text-sm">
+              <div className="bg-brand-red-50 rounded-lg p-4">
+                <p className="font-semibold text-brand-red-900 mb-2">Examples:</p>
+                <ul className="space-y-2 text-brand-red-800 text-sm">
                   <li>• Forging signatures on documents</li>
                   <li>• Altering grades or transcripts</li>
                   <li>• Fabricating data or research results</li>
@@ -319,7 +319,7 @@ export default async function AcademicIntegrityPage() {
           <div className="grid md:grid-cols-2 gap-4 sm:p-6">
             <div className="bg-green-50 rounded-lg p-4 sm:p-6">
               <h3 className="font-bold text-green-900 mb-4 flex items-center gap-2">
-                <Circle className="w-6 h-6 text-brand-green-600" />
+                <Circle className="w-6 h-6 text-brand-blue-600" />
                 Do's
               </h3>
               <ul className="space-y-2 text-green-800 text-sm">
@@ -338,7 +338,7 @@ export default async function AcademicIntegrityPage() {
 
             <div className="bg-red-50 rounded-lg p-4 sm:p-6">
               <h3 className="font-bold text-red-900 mb-4 flex items-center gap-2">
-                <AlertTriangle className="w-6 h-6 text-brand-orange-600" />
+                <AlertTriangle className="w-6 h-6 text-brand-blue-600" />
                 Don'ts
               </h3>
               <ul className="space-y-2 text-red-800 text-sm">
@@ -417,7 +417,7 @@ export default async function AcademicIntegrityPage() {
               <li>• Contact the Dean of Students</li>
               <li>• Submit an anonymous report through the student portal</li>
               <li>• Email: elevate4humanityedu@gmail.com</li>
-              <li>• Phone: 317-314-3757</li>
+              <li>• Phone: Contact Us</li>
             </ul>
             <p className="text-blue-900 text-sm mt-4">
               <strong>Protection:</strong> Students who report violations in
@@ -508,11 +508,11 @@ export default async function AcademicIntegrityPage() {
               Apply Now
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Contact Us
             </a>
           </div>
         </div>

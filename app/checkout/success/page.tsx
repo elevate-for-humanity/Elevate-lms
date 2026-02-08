@@ -103,10 +103,10 @@ function SuccessContent({
               </a>{' '}
               or call{' '}
               <a
-                href="tel:+13173143757"
+                href="/contact"
                 className="text-blue-600 hover:underline"
               >
-                (317) 314-3757
+                Contact Us
               </a>
             </p>
           </div>

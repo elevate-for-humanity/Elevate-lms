@@ -124,23 +124,23 @@ export default async function TaxInformationPage() {
               </ul>
             </div>
 
-            <div className="bg-purple-50 rounded-lg p-8 border border-purple-200">
+            <div className="bg-brand-red-50 rounded-lg p-8 border border-brand-red-200">
               <h3 className="text-2xl font-bold text-black mb-4">Year-Round Planning</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Adjust withholding if needed</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Make quarterly estimated payments</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Contribute to retirement accounts</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Review tax situation after major life changes</span>
                 </li>
               </ul>

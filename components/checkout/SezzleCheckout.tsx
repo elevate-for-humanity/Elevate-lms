@@ -238,9 +238,9 @@ export default function SezzleCheckout({
       />
 
       {/* Payment Info */}
-      <div className="mb-4 p-4 bg-purple-50 border border-purple-200 rounded-lg">
+      <div className="mb-4 p-4 bg-brand-red-50 border border-brand-red-200 rounded-lg">
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-16 h-8 bg-purple-600 rounded flex items-center justify-center">
+          <div className="w-16 h-8 bg-brand-red-600 rounded flex items-center justify-center">
             <span className="text-white text-xs font-bold">Sezzle</span>
           </div>
           <div>
@@ -256,7 +256,7 @@ export default function SezzleCheckout({
               <div className="text-xs text-slate-500">
                 {num === 1 ? 'Today' : `+${(num - 1) * 2} weeks`}
               </div>
-              <div className="font-semibold text-purple-700">${paymentPerInstallment}</div>
+              <div className="font-semibold text-brand-red-700">${paymentPerInstallment}</div>
             </div>
           ))}
         </div>
@@ -273,7 +273,7 @@ export default function SezzleCheckout({
       {/* Loading State */}
       {isProcessing && (
         <div className="mt-4 text-center text-slate-600">
-          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-purple-600 mr-2" />
+          <div className="inline-block animate-spin rounded-full h-6 w-6 border-b-2 border-brand-red-600 mr-2" />
           Processing with Sezzle...
         </div>
       )}
@@ -293,11 +293,11 @@ export default function SezzleCheckout({
       {/* Terms */}
       <p className="mt-3 text-xs text-slate-500 text-center">
         By clicking the Sezzle button, you agree to Sezzle's{' '}
-        <a href="https://sezzle.com/terms" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+        <a href="https://sezzle.com/terms" target="_blank" rel="noopener noreferrer" className="text-brand-red-600 hover:underline">
           Terms of Service
         </a>{' '}
         and{' '}
-        <a href="https://sezzle.com/privacy" target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+        <a href="https://sezzle.com/privacy" target="_blank" rel="noopener noreferrer" className="text-brand-red-600 hover:underline">
           Privacy Policy
         </a>.
       </p>

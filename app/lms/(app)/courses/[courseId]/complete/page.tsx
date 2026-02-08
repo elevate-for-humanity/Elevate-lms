@@ -109,7 +109,7 @@ export default async function CompleteCourse({ params }: { params: Params }) {
 
             <button
               type="submit"
-              className="rounded-xl bg-brand-orange-600 px-6 py-3 font-semibold text-white hover:bg-brand-orange-700"
+              className="rounded-xl bg-brand-blue-600 px-6 py-3 font-semibold text-white hover:bg-brand-blue-700"
             >
               Mark Complete
             </button>

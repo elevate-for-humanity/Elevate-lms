@@ -35,8 +35,8 @@ export default function PartnerSupportPage() {
           </div>
           <div>
             Phone:{' '}
-            <a href="tel:+13173143757" className="text-blue-600">
-              317-314-3757
+            <a href="/contact" className="text-blue-600">
+              Contact Us
             </a>
           </div>
         </div>

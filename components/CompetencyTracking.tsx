@@ -90,7 +90,7 @@ export default function CompetencyTracking() {
 
   const levelColors: Record<string, string> = {
     beginner: 'bg-blue-100 text-blue-700',
-    intermediate: 'bg-purple-100 text-purple-700',
+    intermediate: 'bg-brand-red-100 text-brand-red-700',
     advanced: 'bg-orange-100 text-orange-700',
     expert: 'bg-red-100 text-red-700',
   };
@@ -114,7 +114,7 @@ export default function CompetencyTracking() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Total Competencies</h3>
-            <p className="text-3xl font-bold text-brand-orange-600">{competencies.length}</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{competencies.length}</p>
           </Card>
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Mastered</h3>
@@ -143,7 +143,7 @@ export default function CompetencyTracking() {
               onClick={() => setActiveCategory(category)}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
                 activeCategory === category
-                  ? 'bg-brand-orange-600 text-white'
+                  ? 'bg-brand-blue-600 text-white'
                   : 'bg-white text-black border hover:bg-gray-50'
               }`}
             >
@@ -172,7 +172,7 @@ export default function CompetencyTracking() {
                   </p>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-brand-orange-600">{competency.progress}%</div>
+                  <div className="text-3xl font-bold text-brand-blue-600">{competency.progress}%</div>
                   <p className="text-sm text-black">Progress</p>
                 </div>
               </div>
@@ -203,7 +203,7 @@ export default function CompetencyTracking() {
               <p className="text-sm text-black">Basic understanding and awareness</p>
             </div>
             <div>
-              <h4 className="font-semibold text-purple-700 mb-2">Intermediate</h4>
+              <h4 className="font-semibold text-brand-red-700 mb-2">Intermediate</h4>
               <p className="text-sm text-black">Can apply with guidance</p>
             </div>
             <div>

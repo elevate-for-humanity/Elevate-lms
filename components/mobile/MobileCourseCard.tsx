@@ -39,7 +39,7 @@ export default function MobileCourseCard({
             sizes="(max-width: 768px) 100vw, 50vw"
           />
           {progress > 0 && (
-            <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-2 rounded-full text-xs font-semibold text-brand-orange-600">
+            <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-2 rounded-full text-xs font-semibold text-brand-blue-600">
               {progress}%
             </div>
           )}
@@ -79,10 +79,10 @@ export default function MobileCourseCard({
         </div>
         {/* Action */}
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-brand-orange-600">
+          <span className="text-sm font-medium text-brand-blue-600">
             {progress > 0 ? 'Continue Learning' : 'Start Course'}
           </span>
-          <ChevronRight size={20} className="text-brand-orange-600" />
+          <ChevronRight size={20} className="text-brand-blue-600" />
         </div>
       </div>
     </Link>

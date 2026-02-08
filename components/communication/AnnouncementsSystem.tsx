@@ -63,13 +63,13 @@ export function AnnouncementsSystem({
       {/* Header */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-black flex items-center gap-2">
-          <Megaphone className="w-6 h-6 text-brand-orange-600" />
+          <Megaphone className="w-6 h-6 text-brand-blue-600" />
           Announcements
         </h2>
         {canCreate && (
           <button
             onClick={() => setIsCreating(!isCreating)}
-            className="px-4 py-2 bg-brand-orange-600 text-white rounded-lg hover:bg-brand-orange-700 transition"
+            className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
           >
             {isCreating ? 'Cancel' : 'New Announcement'}
           </button>
@@ -114,7 +114,7 @@ export function AnnouncementsSystem({
                   type="checkbox"
                   checked={newAnnouncement.isPinned}
                   onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setNewAnnouncement({ ...newAnnouncement, isPinned: e.target.checked })}
-                  className="rounded border-slate-300 text-brand-orange-600 focus:ring-emerald-500"
+                  className="rounded border-slate-300 text-brand-blue-600 focus:ring-emerald-500"
                 />
                 <Pin className="w-4 h-4 text-black" />
                 <span className="text-sm text-black">Pin to top</span>
@@ -125,7 +125,7 @@ export function AnnouncementsSystem({
                   type="checkbox"
                   checked={newAnnouncement.sendEmail}
                   onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setNewAnnouncement({ ...newAnnouncement, sendEmail: e.target.checked })}
-                  className="rounded border-slate-300 text-brand-orange-600 focus:ring-emerald-500"
+                  className="rounded border-slate-300 text-brand-blue-600 focus:ring-emerald-500"
                 />
                 <Mail className="w-4 h-4 text-black" />
                 <span className="text-sm text-black">Send email notification</span>
@@ -136,7 +136,7 @@ export function AnnouncementsSystem({
                   type="checkbox"
                   checked={newAnnouncement.sendPush}
                   onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setNewAnnouncement({ ...newAnnouncement, sendPush: e.target.checked })}
-                  className="rounded border-slate-300 text-brand-orange-600 focus:ring-emerald-500"
+                  className="rounded border-slate-300 text-brand-blue-600 focus:ring-emerald-500"
                 />
                 <Bell className="w-4 h-4 text-black" />
                 <span className="text-sm text-black">Send push notification</span>
@@ -147,7 +147,7 @@ export function AnnouncementsSystem({
                   type="checkbox"
                   checked={newAnnouncement.sendSMS}
                   onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setNewAnnouncement({ ...newAnnouncement, sendSMS: e.target.checked })}
-                  className="rounded border-slate-300 text-brand-orange-600 focus:ring-emerald-500"
+                  className="rounded border-slate-300 text-brand-blue-600 focus:ring-emerald-500"
                 />
                 <span className="text-sm text-black">Send SMS notification (if enabled)</span>
               </label>
@@ -155,7 +155,7 @@ export function AnnouncementsSystem({
 
             <button
               onClick={handleCreate}
-              className="w-full bg-brand-orange-600 text-white py-2 rounded-lg hover:bg-brand-orange-700 transition"
+              className="w-full bg-brand-blue-600 text-white py-2 rounded-lg hover:bg-brand-blue-700 transition"
             >
               Post Announcement
             </button>

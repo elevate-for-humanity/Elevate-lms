@@ -36,7 +36,7 @@ export function PortalPageLayout({
   videoSrc,
   posterSrc,
   gradientFrom = 'from-indigo-900/85',
-  gradientTo = 'to-purple-800/75',
+  gradientTo = 'to-brand-red-800/75',
   stats,
   actions,
   children,

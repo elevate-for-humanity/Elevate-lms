@@ -137,7 +137,7 @@ export default async function ShopOnboardingPage() {
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex items-start gap-3 flex-1">
                     {doc.approved ? (
-                      <Circle className="w-5 h-5 text-brand-green-600 mt-0.5 flex-shrink-0" />
+                      <Circle className="w-5 h-5 text-brand-blue-600 mt-0.5 flex-shrink-0" />
                     ) : (
                       <Clock className="w-5 h-5 text-slate-400 mt-0.5 flex-shrink-0" />
                     )}
@@ -155,13 +155,13 @@ export default async function ShopOnboardingPage() {
                         </div>
                       )}
                       {doc.approved && doc.approved_at && (
-                        <div className="text-xs text-brand-green-600 mt-2">
+                        <div className="text-xs text-brand-blue-600 mt-2">
                           • Approved on{' '}
                           {new Date(doc.approved_at).toLocaleDateString()}
                         </div>
                       )}
                       {!doc.approved && doc.uploaded_at && (
-                        <div className="text-xs text-brand-orange-600 mt-2">
+                        <div className="text-xs text-brand-blue-600 mt-2">
                           ⏳ Uploaded, pending sponsor approval
                         </div>
                       )}
@@ -208,7 +208,7 @@ export default async function ShopOnboardingPage() {
           <div className="space-y-3">
             <div className="flex items-center gap-3">
               {onboarding?.handbook_ack ? (
-                <Circle className="w-5 h-5 text-brand-green-600" />
+                <Circle className="w-5 h-5 text-brand-blue-600" />
               ) : (
                 <Clock className="w-5 h-5 text-slate-400" />
               )}
@@ -225,7 +225,7 @@ export default async function ShopOnboardingPage() {
 
             <div className="flex items-center gap-3">
               {onboarding?.reporting_trained ? (
-                <Circle className="w-5 h-5 text-brand-green-600" />
+                <Circle className="w-5 h-5 text-brand-blue-600" />
               ) : (
                 <Clock className="w-5 h-5 text-slate-400" />
               )}
@@ -242,7 +242,7 @@ export default async function ShopOnboardingPage() {
 
             <div className="flex items-center gap-3">
               {onboarding?.apprentice_supervisor_assigned ? (
-                <Circle className="w-5 h-5 text-brand-green-600" />
+                <Circle className="w-5 h-5 text-brand-blue-600" />
               ) : (
                 <Clock className="w-5 h-5 text-slate-400" />
               )}
@@ -259,7 +259,7 @@ export default async function ShopOnboardingPage() {
 
             <div className="flex items-center gap-3">
               {onboarding?.rapids_reporting_ready ? (
-                <Circle className="w-5 h-5 text-brand-green-600" />
+                <Circle className="w-5 h-5 text-brand-blue-600" />
               ) : (
                 <Clock className="w-5 h-5 text-slate-400" />
               )}
@@ -277,14 +277,14 @@ export default async function ShopOnboardingPage() {
         </div>
 
         {/* Sponsor of Record */}
-        <div className="bg-purple-50 border border-purple-200 rounded-xl p-6 mb-6">
-          <h3 className="text-lg font-bold text-purple-900 mb-3">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-xl p-6 mb-6">
+          <h3 className="text-lg font-bold text-brand-red-900 mb-3">
             Sponsor of Record
           </h3>
-          <p className="text-sm text-purple-900 mb-2">
+          <p className="text-sm text-brand-red-900 mb-2">
             Elevate for Humanity is the program brand operated by 2Exclusive LLC, the USDOL Registered Apprenticeship Sponsor of Record.
           </p>
-          <p className="text-sm text-purple-800">
+          <p className="text-sm text-brand-red-800">
             Partner training sites provide supervised practical training and validate training hours. Partners do not set wages, provide payroll services, or guarantee employment.
           </p>
         </div>

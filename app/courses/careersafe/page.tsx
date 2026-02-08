@@ -153,7 +153,7 @@ export default async function CareerSafePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -188,8 +188,8 @@ export default async function CareerSafePage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Circle className="w-8 h-8 text-brand-green-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Circle className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Funded</h3>
               <p className="text-black">
@@ -198,8 +198,8 @@ export default async function CareerSafePage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-brand-red-600" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Self-Paced</h3>
               <p className="text-black">
@@ -242,7 +242,7 @@ export default async function CareerSafePage() {
                         <Award className="w-4 h-4" />
                         <span>Certificate: {course.certificate}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm font-semibold text-brand-green-600">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-brand-blue-600">
                         <Circle className="w-4 h-4" />
                         <span>{course.price}</span>
                       </div>
@@ -329,7 +329,7 @@ export default async function CareerSafePage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all"
             >
               Apply Now
             </Link>

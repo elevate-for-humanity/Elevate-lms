@@ -36,7 +36,7 @@ const collaborationTools = [
     description: 'Collaborate on notes and study materials',
     icon: FileText,
     href: '/lms/collaborate/documents',
-    color: 'purple',
+    color: 'brand-red',
   },
   {
     title: 'Group Calendar',
@@ -109,12 +109,12 @@ export default async function CollaboratePage() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
                   tool.color === 'blue' ? 'bg-blue-100' :
                   tool.color === 'green' ? 'bg-green-100' :
-                  tool.color === 'purple' ? 'bg-purple-100' : 'bg-orange-100'
+                  tool.color === 'brand-red' ? 'bg-brand-red-100' : 'bg-orange-100'
                 }`}>
                   <tool.icon className={`w-6 h-6 ${
                     tool.color === 'blue' ? 'text-blue-600' :
                     tool.color === 'green' ? 'text-green-600' :
-                    tool.color === 'purple' ? 'text-purple-600' : 'text-orange-600'
+                    tool.color === 'brand-red' ? 'text-brand-red-600' : 'text-orange-600'
                   }`} />
                 </div>
                 <div className="flex-1">

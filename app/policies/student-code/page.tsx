@@ -47,7 +47,7 @@ export default function StudentCodePage() {
                 </p>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+              <div className="bg-brand-red-50 rounded-lg p-6 border-2 border-brand-red-200">
                 <h3 className="text-xl font-bold text-black mb-3">Responsibility</h3>
                 <p className="text-black">
                   Take ownership of your actions, decisions, and their consequences.
@@ -175,7 +175,7 @@ export default function StudentCodePage() {
             <ul className="list-disc pl-6 mb-6 text-black space-y-2">
               <li>Students, staff, or instructors</li>
               <li>Email: elevate4humanityedu@gmail.com</li>
-              <li>Phone: (317) 314-3757</li>
+              <li>Phone: Contact Us</li>
               <li>In-person to any staff member</li>
               <li>Anonymous reporting through student portal</li>
             </ul>
@@ -208,7 +208,7 @@ export default function StudentCodePage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>
@@ -321,9 +321,9 @@ export default function StudentCodePage() {
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
               <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Phone:</strong> (317) 314-3757</li>
+              <li><strong>Phone:</strong> Contact Us</li>
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>
-              <li><strong>Emergency:</strong> Call 911, then (317) 314-3757 ext. 911</li>
+              <li><strong>Emergency:</strong> Call 911, then Contact Us ext. 911</li>
             </ul>
 
             <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">

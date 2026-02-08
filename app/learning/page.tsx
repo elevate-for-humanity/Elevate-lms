@@ -80,7 +80,7 @@ export default async function LearningHubPage() {
               count="100+ courses"
             />
             <ResourceCard
-              icon={<NotebookPen className="w-12 h-12 text-purple-600" />}
+              icon={<NotebookPen className="w-12 h-12 text-brand-red-600" />}
               title="Workbooks"
               description="Interactive digital workbooks"
               href="/workbooks"
@@ -154,11 +154,11 @@ export default async function LearningHubPage() {
               Apply Now
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Contact Us
             </a>
           </div>
         </div>

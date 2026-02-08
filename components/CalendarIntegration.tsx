@@ -50,7 +50,7 @@ export function CalendarIntegration() {
       case 'class': return 'bg-blue-100 text-blue-700';
       case 'meeting': return 'bg-green-100 text-green-700';
       case 'deadline': return 'bg-red-100 text-red-700';
-      default: return 'bg-purple-100 text-purple-700';
+      default: return 'bg-brand-red-100 text-brand-red-700';
     }
   };
 
@@ -150,11 +150,11 @@ export function CalendarIntegration() {
                   <span>Meetings</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-brand-orange-500 rounded" />
+                  <div className="w-3 h-3 bg-brand-blue-500 rounded" />
                   <span>Deadlines</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-purple-500 rounded" />
+                  <div className="w-3 h-3 bg-brand-red-500 rounded" />
                   <span>Events</span>
                 </div>
               </div>

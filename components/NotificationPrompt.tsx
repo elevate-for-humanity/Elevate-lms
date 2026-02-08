@@ -53,7 +53,7 @@ export default function NotificationPrompt() {
       <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4">
         <div className="flex items-start gap-3">
           <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Bell size={20} className="text-brand-orange-600" />
+            <Bell size={20} className="text-brand-blue-600" />
           </div>
           <div className="flex-1">
             <h3 className="font-semibold text-black mb-1">Stay Updated</h3>
@@ -64,7 +64,7 @@ export default function NotificationPrompt() {
             <div className="flex items-center gap-2">
               <button
                 onClick={handleEnable}
-                className="px-4 py-2 bg-brand-orange-600 text-white font-medium text-sm rounded-lg hover:bg-brand-orange-700 active:scale-95 transition-transform"
+                className="px-4 py-2 bg-brand-blue-600 text-white font-medium text-sm rounded-lg hover:bg-brand-blue-700 active:scale-95 transition-transform"
               >
                 Enable Notifications
               </button>

@@ -64,7 +64,7 @@ export default function ActivityFeed() {
         return <BookOpen className="w-5 h-5 text-green-500" />;
       case 'group':
       case 'member':
-        return <Users className="w-5 h-5 text-purple-500" />;
+        return <Users className="w-5 h-5 text-brand-red-500" />;
       case 'event':
         return <Calendar className="w-5 h-5 text-orange-500" />;
       default:

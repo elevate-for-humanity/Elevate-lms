@@ -145,7 +145,7 @@ export default async function PlatformAppsPage() {
                     <h3 className="text-lg font-semibold text-black mb-2">
                       {app.name}
                     </h3>
-                    <div className="inline-flex items-center px-2 py-2 bg-brand-green-100 text-green-800 text-xs font-semibold rounded">
+                    <div className="inline-flex items-center px-2 py-2 bg-brand-blue-100 text-green-800 text-xs font-semibold rounded">
                       <Check className="w-3 h-3 mr-1" />
                       Core App
                     </div>
@@ -175,7 +175,7 @@ export default async function PlatformAppsPage() {
             {premiumApps.map((app) => (
               <div
                 key={app.id}
-                className="bg-white rounded-lg shadow-sm p-6 hover:shadow-lg transition-shadow border-2 border-purple-200"
+                className="bg-white rounded-lg shadow-sm p-6 hover:shadow-lg transition-shadow border-2 border-brand-red-200"
               >
                 <div className="flex items-start mb-4">
                   <span className="text-4xl mr-4">{app.icon}</span>
@@ -183,7 +183,7 @@ export default async function PlatformAppsPage() {
                     <h3 className="text-lg font-semibold text-black mb-2">
                       {app.name}
                     </h3>
-                    <div className="inline-flex items-center px-2 py-2 bg-purple-100 text-purple-800 text-xs font-semibold rounded">
+                    <div className="inline-flex items-center px-2 py-2 bg-brand-red-100 text-brand-red-800 text-xs font-semibold rounded">
                       Premium
                     </div>
                   </div>
@@ -239,16 +239,16 @@ export default async function PlatformAppsPage() {
                       </td>
                       <td className="px-6 py-4 text-center">
                         {app.enabledByDefault ? (
-                          <Check className="w-5 h-5 text-brand-green-600 mx-auto" />
+                          <Check className="w-5 h-5 text-brand-blue-600 mx-auto" />
                         ) : (
                           <span className="text-black">—</span>
                         )}
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <Check className="w-5 h-5 text-brand-green-600 mx-auto" />
+                        <Check className="w-5 h-5 text-brand-blue-600 mx-auto" />
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <Check className="w-5 h-5 text-brand-green-600 mx-auto" />
+                        <Check className="w-5 h-5 text-brand-blue-600 mx-auto" />
                       </td>
                     </tr>
                   ))}
@@ -278,7 +278,7 @@ export default async function PlatformAppsPage() {
             </Link>
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors border-2 border-white"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors border-2 border-white"
             >
               Talk to Sales
             </Link>

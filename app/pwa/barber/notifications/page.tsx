@@ -25,7 +25,7 @@ const NOTIFICATION_ICONS: Record<NotificationType, React.ReactNode> = {
   hours_rejected: <AlertCircle className="w-5 h-5 text-red-400" />,
   milestone: <Award className="w-5 h-5 text-amber-400" />,
   reminder: <Clock className="w-5 h-5 text-blue-400" />,
-  training: <BookOpen className="w-5 h-5 text-purple-400" />,
+  training: <BookOpen className="w-5 h-5 text-brand-red-400" />,
   system: <Bell className="w-5 h-5 text-slate-400" />,
 };
 
@@ -34,7 +34,7 @@ const NOTIFICATION_COLORS: Record<NotificationType, string> = {
   hours_rejected: 'bg-red-500/20',
   milestone: 'bg-amber-500/20',
   reminder: 'bg-blue-500/20',
-  training: 'bg-purple-500/20',
+  training: 'bg-brand-red-500/20',
   system: 'bg-slate-700',
 };
 
@@ -139,7 +139,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-purple-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-brand-red-500 animate-spin" />
       </div>
     );
   }
@@ -155,7 +155,7 @@ export default function NotificationsPage() {
             <div>
               <h1 className="text-xl font-bold text-white">Notifications</h1>
               {unreadCount > 0 && (
-                <p className="text-purple-400 text-sm">{unreadCount} unread</p>
+                <p className="text-brand-red-400 text-sm">{unreadCount} unread</p>
               )}
             </div>
           </div>
@@ -163,7 +163,7 @@ export default function NotificationsPage() {
             <button
               onClick={markAllAsRead}
               disabled={markingRead === 'all'}
-              className="text-purple-400 text-sm font-medium hover:text-purple-300 disabled:opacity-50"
+              className="text-brand-red-400 text-sm font-medium hover:text-brand-red-300 disabled:opacity-50"
             >
               {markingRead === 'all' ? 'Marking...' : 'Mark all read'}
             </button>
@@ -186,7 +186,7 @@ export default function NotificationsPage() {
               <div
                 key={notification.id}
                 className={`relative bg-slate-800 rounded-xl overflow-hidden ${
-                  !notification.read ? 'border-l-4 border-purple-500' : ''
+                  !notification.read ? 'border-l-4 border-brand-red-500' : ''
                 }`}
               >
                 {notification.actionUrl ? (

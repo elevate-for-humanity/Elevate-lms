@@ -115,7 +115,7 @@ function SignupFormContent() {
         <div className="text-center">
           <div className="mb-4">
             <svg
-              className="w-16 h-16 text-brand-green-600 mx-auto"
+              className="w-16 h-16 text-brand-blue-600 mx-auto"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"

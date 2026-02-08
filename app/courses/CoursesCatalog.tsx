@@ -306,7 +306,7 @@ export default function CoursesCatalog({
                       </div>
 
                       <div className="mt-4 pt-4 border-t">
-                        <span className="text-brand-green-600 font-semibold">
+                        <span className="text-brand-blue-600 font-semibold">
                           Funded
                         </span>
                       </div>

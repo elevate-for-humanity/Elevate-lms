@@ -124,7 +124,7 @@ export default function DisclosuresPage() {
                 <div className="space-y-3 text-gray-700">
                   <p><span className="font-semibold text-gray-900">Legal Name:</span> 2EXCLUSIVE LLC-S dba Elevate for Humanity</p>
                   <p><span className="font-semibold text-gray-900">Location:</span> Indianapolis, Indiana</p>
-                  <p><span className="font-semibold text-gray-900">Phone:</span> (317) 314-3757</p>
+                  <p><span className="font-semibold text-gray-900">Phone:</span> Contact Us</p>
                   <p><span className="font-semibold text-gray-900">Email:</span> elevate4humanityedu@gmail.com</p>
                   <p><span className="font-semibold text-gray-900">RAPIDS #:</span> 2025-IN-132301</p>
                 </div>
@@ -230,8 +230,8 @@ export default function DisclosuresPage() {
           {/* Academic Policies */}
           <div className="mb-12">
             <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                <GraduationCap className="w-5 h-5 text-brand-red-600" />
               </div>
               Academic Policies
             </h3>
@@ -247,15 +247,15 @@ export default function DisclosuresPage() {
                   <Link
                     key={policy.href}
                     href={policy.href}
-                    className="group bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-purple-500 hover:shadow-lg transition-all"
+                    className="group bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-brand-red-500 hover:shadow-lg transition-all"
                   >
-                    <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-purple-100 transition">
-                      <Icon className="w-6 h-6 text-purple-600" />
+                    <div className="w-12 h-12 bg-brand-red-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-brand-red-100 transition">
+                      <Icon className="w-6 h-6 text-brand-red-600" />
                     </div>
-                    <h4 className="font-semibold text-gray-900 group-hover:text-purple-600 transition">
+                    <h4 className="font-semibold text-gray-900 group-hover:text-brand-red-600 transition">
                       {policy.title}
                     </h4>
-                    <span className="text-sm text-gray-500 group-hover:text-purple-500 flex items-center gap-1 mt-2">
+                    <span className="text-sm text-gray-500 group-hover:text-brand-red-500 flex items-center gap-1 mt-2">
                       View Policy <ArrowRight className="w-3 h-3" />
                     </span>
                   </Link>
@@ -407,8 +407,8 @@ export default function DisclosuresPage() {
                   </div>
                   <div>
                     <p className="text-gray-400 text-sm">Phone</p>
-                    <a href="tel:317-314-3757" className="text-white hover:text-orange-400">
-                      (317) 314-3757
+                    <a href="/contact" className="text-white hover:text-orange-400">
+                      Contact Us
                     </a>
                   </div>
                 </div>

@@ -335,7 +335,7 @@ export function CopilotDeployment() {
       case 'inactive':
         return 'text-brand-text-muted bg-brand-surface-dark';
       case 'error':
-        return 'text-brand-orange-600 bg-brand-surface';
+        return 'text-brand-blue-600 bg-brand-surface';
       default:
         return 'text-brand-text-muted bg-brand-surface-dark';
     }
@@ -348,7 +348,7 @@ export function CopilotDeployment() {
       case 'intermediate':
         return 'text-yellow-600 bg-yellow-100';
       case 'advanced':
-        return 'text-brand-orange-600 bg-brand-surface';
+        return 'text-brand-blue-600 bg-brand-surface';
       default:
         return 'text-brand-text-muted bg-brand-surface-dark';
     }

@@ -144,7 +144,7 @@ export function AdaptiveLearningPath() {
                   <p className="text-black text-sm mb-3">{path.description}</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-brand-orange-600">{path.matchScore}%</div>
+                  <div className="text-3xl font-bold text-brand-blue-600">{path.matchScore}%</div>
                   <p className="text-xs text-black">Match</p>
                 </div>
               </div>
@@ -161,7 +161,7 @@ export function AdaptiveLearningPath() {
                     <span className="text-black">{course.title}</span>
                     <span className={`px-2 py-0.5 rounded text-xs ${
                       course.difficulty === 'beginner' ? 'bg-blue-100 text-blue-700' :
-                      course.difficulty === 'intermediate' ? 'bg-purple-100 text-purple-700' :
+                      course.difficulty === 'intermediate' ? 'bg-brand-red-100 text-brand-red-700' :
                       'bg-red-100 text-red-700'
                     }`}>
                       {course.difficulty}
@@ -197,7 +197,7 @@ export function AdaptiveLearningPath() {
                           <p className="text-sm text-black">{course.duration}</p>
                         </div>
                         <div className="text-right">
-                          <div className="text-xl font-bold text-brand-orange-600">{course.matchScore}%</div>
+                          <div className="text-xl font-bold text-brand-blue-600">{course.matchScore}%</div>
                           <p className="text-xs text-black">Match</p>
                         </div>
                       </div>

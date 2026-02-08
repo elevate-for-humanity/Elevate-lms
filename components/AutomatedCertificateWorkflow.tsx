@@ -86,9 +86,9 @@ export function AutomatedCertificateWorkflow() {
                   <p className="font-semibold text-blue-900">• Email delivery enabled</p>
                   <p className="text-sm text-blue-700">Certificates sent via email with verification link</p>
                 </div>
-                <div className="p-4 bg-purple-50 rounded">
-                  <p className="font-semibold text-purple-900">• Blockchain verification</p>
-                  <p className="text-sm text-purple-700">All certificates recorded on blockchain</p>
+                <div className="p-4 bg-brand-red-50 rounded">
+                  <p className="font-semibold text-brand-red-900">• Blockchain verification</p>
+                  <p className="text-sm text-brand-red-700">All certificates recorded on blockchain</p>
                 </div>
               </div>
             </Card>

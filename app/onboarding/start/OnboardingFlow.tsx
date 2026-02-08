@@ -99,12 +99,12 @@ export default function OnboardingFlow({
                         isCurrent
                           ? 'bg-blue-50 border-2 border-brand-blue-600'
                           : isComplete
-                            ? 'bg-green-50 border border-green-200 hover:bg-brand-green-100'
+                            ? 'bg-green-50 border border-green-200 hover:bg-brand-blue-100'
                             : 'bg-slate-50 border border-slate-200 hover:bg-slate-100'
                       }`}
                     >
                       {isComplete ? (
-                        <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                        <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                       ) : isCurrent ? (
                         <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                       ) : (
@@ -137,12 +137,12 @@ export default function OnboardingFlow({
                     currentStep === documents.length
                       ? 'bg-blue-50 border-2 border-brand-blue-600'
                       : payrollComplete
-                        ? 'bg-green-50 border border-green-200 hover:bg-brand-green-100'
+                        ? 'bg-green-50 border border-green-200 hover:bg-brand-blue-100'
                         : 'bg-slate-50 border border-slate-200 hover:bg-slate-100'
                   }`}
                 >
                   {payrollComplete ? (
-                    <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   ) : currentStep === documents.length ? (
                     <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   ) : (
@@ -264,7 +264,7 @@ function DocumentStep({
     return (
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
         <div className="text-center">
-          <Circle className="w-16 h-16 text-brand-green-600 mx-auto mb-4" />
+          <Circle className="w-16 h-16 text-brand-blue-600 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-black mb-2">
             {document.title}
           </h2>
@@ -383,8 +383,8 @@ function PayrollSetupStep({
   return (
     <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
       <div className="flex items-start gap-4 mb-6">
-        <div className="p-3 bg-brand-green-100 rounded-lg">
-          <DollarSign className="w-6 h-6 text-brand-green-600" />
+        <div className="p-3 bg-brand-blue-100 rounded-lg">
+          <DollarSign className="w-6 h-6 text-brand-blue-600" />
         </div>
         <div className="flex-1">
           <h2 className="text-xl font-bold text-black">Payroll Setup</h2>
@@ -396,7 +396,7 @@ function PayrollSetupStep({
 
       {currentStatus === 'PENDING' || currentStatus === 'ACTIVE' ? (
         <div className="text-center py-8">
-          <Circle className="w-16 h-16 text-brand-green-600 mx-auto mb-4" />
+          <Circle className="w-16 h-16 text-brand-blue-600 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-black mb-2">
             Payroll Setup Complete
           </h3>

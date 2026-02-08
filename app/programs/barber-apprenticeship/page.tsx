@@ -2,7 +2,6 @@
 export const dynamic = 'force-static';
 export const revalidate = 86400;
 
-import PageAvatar from '@/components/PageAvatar';
 import Image from "next/image";
 import Link from "next/link";
 import type { Metadata } from "next";
@@ -86,10 +85,6 @@ export default async function BarberApprenticeshipPage() {
       </div>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/barber-guide.mp4" 
-        title="Barber Program Guide" 
-      />
 
       {/* QUICK NAVIGATION */}
       <nav className="bg-white border-b sticky top-0 z-20 shadow-sm">
@@ -112,7 +107,7 @@ export default async function BarberApprenticeshipPage() {
               </Link>
               <Link
                 href="/programs/barber-apprenticeship/apply"
-                className="bg-brand-orange-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-orange-700 whitespace-nowrap"
+                className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-brand-blue-700 whitespace-nowrap"
               >
                 Apply Now
               </Link>
@@ -155,7 +150,7 @@ export default async function BarberApprenticeshipPage() {
             <div className="mt-10 flex flex-col sm:flex-row gap-4">
               <Link
                 href="/programs/barber-apprenticeship/apply"
-                className="rounded-2xl bg-brand-orange-600 text-white px-8 py-4 font-semibold shadow-lg hover:bg-brand-orange-700 transition text-center"
+                className="rounded-2xl bg-brand-blue-600 text-white px-8 py-4 font-semibold shadow-lg hover:bg-brand-blue-700 transition text-center"
               >
                 Enroll & Pay
               </Link>
@@ -446,7 +441,7 @@ export default async function BarberApprenticeshipPage() {
             </ul>
           </div>
           <div className="relative aspect-[4/3] max-w-md mx-auto rounded-2xl overflow-hidden shadow-lg">
-            <Image src={IMAGES.training} alt="Hands-on barber training" fill className="object-cover object-center" />
+            <Image src={IMAGES.training} alt="Hands-on barber training" fill sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw" className="object-cover object-center" />
           </div>
         </div>
       </section>
@@ -591,11 +586,11 @@ export default async function BarberApprenticeshipPage() {
                 <span className="text-slate-300">Rent a chair and build clientele</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-brand-orange-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-brand-blue-500 rounded-full"></div>
                 <span className="text-slate-300">Open your own barbershop</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-brand-brand-orange-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-brand-brand-blue-500 rounded-full"></div>
                 <span className="text-slate-300">Mobile barbering services</span>
               </div>
             </div>
@@ -732,7 +727,7 @@ export default async function BarberApprenticeshipPage() {
           <div className="mt-10 flex justify-center gap-4 flex-col sm:flex-row">
             <Link
               href="/programs/barber-apprenticeship/apply"
-              className="rounded-2xl bg-brand-brand-orange-600 text-white px-8 py-4 font-semibold hover:bg-brand-brand-orange-700 transition"
+              className="rounded-2xl bg-brand-brand-blue-600 text-white px-8 py-4 font-semibold hover:bg-brand-brand-blue-700 transition"
             >
               Enroll & Pay Now
             </Link>
@@ -744,7 +739,7 @@ export default async function BarberApprenticeshipPage() {
             </Link>
           </div>
           <p className="mt-8 text-sm text-white/50">
-            Questions? Call (317) 314-3757 or email elevate4humanityedu@gmail.com
+            Questions? Call Contact Us or email elevate4humanityedu@gmail.com
           </p>
         </div>
       </section>

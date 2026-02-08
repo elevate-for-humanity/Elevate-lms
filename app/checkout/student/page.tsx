@@ -56,7 +56,7 @@ export default function StudentCheckout() {
           <button
             onClick={handleCheckout}
             disabled={loading}
-            className="w-full rounded-xl bg-brand-orange-600 text-white px-6 py-4 font-bold hover:bg-brand-orange-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full rounded-xl bg-brand-blue-600 text-white px-6 py-4 font-bold hover:bg-brand-blue-600 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading
               ? 'Redirecting to secure checkout...'

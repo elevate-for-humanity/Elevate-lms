@@ -41,7 +41,7 @@ const services = [
     title: 'Mental Wellness (Selfish Inc.)',
     description: 'Free counseling, stress management, and holistic healing support.',
     icon: Heart,
-    color: 'purple',
+    color: 'brand-red',
     href: '/nonprofit/mental-wellness',
     benefits: [
       'Individual counseling',
@@ -80,7 +80,7 @@ const services = [
 
 const colorClasses: Record<string, { bg: string; text: string; border: string; light: string }> = {
   green: { bg: 'bg-green-600', text: 'text-green-600', border: 'border-green-200', light: 'bg-green-50' },
-  purple: { bg: 'bg-purple-600', text: 'text-purple-600', border: 'border-purple-200', light: 'bg-purple-50' },
+  brand-red: { bg: 'bg-brand-red-600', text: 'text-brand-red-600', border: 'border-brand-red-200', light: 'bg-brand-red-50' },
   blue: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
   amber: { bg: 'bg-amber-600', text: 'text-amber-600', border: 'border-amber-200', light: 'bg-amber-50' },
 };
@@ -122,7 +122,7 @@ export default function CommunityServicesPage() {
             </Link>
             <Link
               href="/nonprofit"
-              className="px-8 py-4 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition"
+              className="px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition"
             >
               Mental Wellness
             </Link>
@@ -141,7 +141,7 @@ export default function CommunityServicesPage() {
               <p className="text-gray-600 text-sm">Start at our VITA site for free tax preparation</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div>
+              <div className="w-16 h-16 bg-brand-red-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div>
               <h3 className="font-bold mb-2">Access Wellness Support</h3>
               <p className="text-gray-600 text-sm">Connect with Selfish Inc. for mental health services</p>
             </div>
@@ -220,7 +220,7 @@ export default function CommunityServicesPage() {
               <p className="text-slate-300 text-sm">Low-income, unemployed, underemployed, or facing barriers</p>
             </div>
             <div className="bg-white/10 rounded-xl p-6">
-              <h3 className="font-bold text-purple-400 mb-2">Mental Wellness</h3>
+              <h3 className="font-bold text-brand-red-400 mb-2">Mental Wellness</h3>
               <p className="text-slate-300 text-sm">Open to all community members</p>
             </div>
           </div>
@@ -242,11 +242,11 @@ export default function CommunityServicesPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <a
-              href="tel:3173143757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition"
             >
               <Phone className="w-5 h-5" />
-              (317) 314-3757
+              Contact Us
             </a>
             <Link
               href="/contact"

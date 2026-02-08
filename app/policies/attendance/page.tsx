@@ -120,7 +120,7 @@ export default function AttendancePage() {
                     </p>
                     <ul className="list-disc pl-6 text-black mt-2 space-y-1">
                       <li>Email to instructor</li>
-                      <li>Phone call to main office: (317) 314-3757</li>
+                      <li>Phone call to main office: Contact Us</li>
                       <li>Student portal absence reporting form</li>
                     </ul>
                   </div>
@@ -139,7 +139,7 @@ export default function AttendancePage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-red-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>
@@ -271,9 +271,9 @@ export default function AttendancePage() {
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
               <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Phone:</strong> (317) 314-3757</li>
+              <li><strong>Phone:</strong> Contact Us</li>
               <li><strong>Office Hours:</strong> Monday-Friday, 8:00 AM - 6:00 PM EST</li>
-              <li><strong>Emergency Line:</strong> (317) 314-3757 ext. 911 (after hours)</li>
+              <li><strong>Emergency Line:</strong> Contact Us ext. 911 (after hours)</li>
             </ul>
 
             <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">

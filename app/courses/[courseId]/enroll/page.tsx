@@ -104,8 +104,8 @@ export default function CourseEnrollPage({
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                  <Award className="h-10 w-10 text-purple-600" />
+                <div className="flex-shrink-0 w-12 h-12 bg-brand-red-100 rounded-full flex items-center justify-center">
+                  <Award className="h-10 w-10 text-brand-red-600" />
                 </div>
                 <div>
                   <h3 className="font-bold text-black mb-1">
@@ -242,10 +242,10 @@ export default function CourseEnrollPage({
         <div className="mt-8 text-center">
           <p className="text-black mb-2">Have questions?</p>
           <a
-            href="tel:317-314-3757"
+            href="/contact"
             className="text-xl font-bold text-orange-600 hover:text-orange-700"
           >
-            Call 317-314-3757
+            Call Contact Us
           </a>
         </div>
       </div>

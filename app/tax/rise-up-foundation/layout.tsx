@@ -3,7 +3,7 @@ import { Phone, Mail, MapPin } from 'lucide-react';
 
 function VITAHeader() {
   return (
-    <header className="bg-brand-green-700 text-white">
+    <header className="bg-brand-blue-700 text-white">
       <div className="max-w-7xl mx-auto px-6 py-4">
         <div className="flex items-center justify-between">
           <Link href="/tax/rise-up-foundation" className="text-2xl font-bold">
@@ -30,9 +30,9 @@ function VITAHeader() {
             </Link>
           </nav>
           <div className="flex items-center gap-4">
-            <a href="tel:3173143757" className="flex items-center gap-2 hover:text-green-200">
+            <a href="/contact" className="flex items-center gap-2 hover:text-green-200">
               <Phone className="w-4 h-4" />
-              <span className="hidden lg:inline">(317) 314-3757</span>
+              <span className="hidden lg:inline">Contact Us</span>
             </a>
           </div>
         </div>
@@ -74,7 +74,7 @@ function VITAFooter() {
             <ul className="space-y-3 text-sm text-black">
               <li className="flex items-start gap-2">
                 <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <a href="tel:3173143757" className="hover:text-white">(317) 314-3757</a>
+                <a href="/contact" className="hover:text-white">Contact Us</a>
               </li>
               <li className="flex items-start gap-2">
                 <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />

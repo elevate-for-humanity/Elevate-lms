@@ -180,7 +180,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 className="flex items-start gap-4 p-6 bg-slate-50 rounded-xl border border-slate-200"
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                  <Circle size={20} className="text-brand-orange-600" />
+                  <Circle size={20} className="text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-bold text-black mb-1">
@@ -215,7 +215,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                   >
                     <Briefcase
                       size={20}
-                      className="text-brand-orange-600 flex-shrink-0"
+                      className="text-brand-blue-600 flex-shrink-0"
                     />
                     <div>
                       <div className="font-bold text-black">
@@ -238,13 +238,13 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-black">Job Placement Rate</span>
-                    <span className="text-2xl font-bold text-brand-orange-600">
+                    <span className="text-2xl font-bold text-brand-blue-600">
                       {program.outcomes.jobPlacement}%
                     </span>
                   </div>
                   <div className="w-full bg-slate-200 rounded-full h-3">
                     <div
-                      className="bg-brand-orange-600 h-3 rounded-full"
+                      className="bg-brand-blue-600 h-3 rounded-full"
                       style={{ width: `${program.outcomes.jobPlacement}%` }}
                     />
                   </div>
@@ -270,13 +270,13 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 <div>
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-black">Student Satisfaction</span>
-                    <span className="text-2xl font-bold text-purple-600">
+                    <span className="text-2xl font-bold text-brand-red-600">
                       {program.outcomes.satisfaction}%
                     </span>
                   </div>
                   <div className="w-full bg-slate-200 rounded-full h-3">
                     <div
-                      className="bg-purple-600 h-3 rounded-full"
+                      className="bg-brand-red-600 h-3 rounded-full"
                       style={{ width: `${program.outcomes.satisfaction}%` }}
                     />
                   </div>
@@ -285,7 +285,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
 
               <div className="mt-8 p-4 bg-red-50 rounded-xl border border-red-200">
                 <div className="flex items-center gap-3 mb-2">
-                  <Award size={20} className="text-brand-orange-600" />
+                  <Award size={20} className="text-brand-blue-600" />
                   <span className="font-bold text-black">
                     Certification Included
                   </span>
@@ -311,7 +311,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
           <div className="grid gap-8 md:grid-cols-3">
             <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200">
               <div className="w-12 h-12 rounded-xl bg-red-100 flex items-center justify-center mb-4">
-                <Clock size={24} className="text-brand-orange-600" />
+                <Clock size={24} className="text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
                 Schedule
@@ -322,7 +322,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.schedule.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <Circle size={16} className="text-brand-orange-600" />
+                    <Circle size={16} className="text-brand-blue-600" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -348,8 +348,8 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
             </div>
 
             <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200">
-              <div className="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center mb-4">
-                <Users size={24} className="text-purple-600" />
+              <div className="w-12 h-12 rounded-xl bg-brand-red-100 flex items-center justify-center mb-4">
+                <Users size={24} className="text-brand-red-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
                 Support Services
@@ -360,7 +360,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.support.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <Circle size={16} className="text-purple-600" />
+                    <Circle size={16} className="text-brand-red-600" />
                     <span>{item}</span>
                   </li>
                 ))}

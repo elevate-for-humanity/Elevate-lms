@@ -59,29 +59,29 @@ export default function TrainingPage() {
           <h3 className="font-semibold text-lg mb-3">Training Includes:</h3>
           <ul className="space-y-2">
             <li className="flex items-start gap-2">
-              <span className="text-brand-green-600 font-bold">•</span>
+              <span className="text-brand-blue-600 font-bold">•</span>
               <span className="text-black">
                 Interactive lessons and videos
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-brand-green-600 font-bold">•</span>
+              <span className="text-brand-blue-600 font-bold">•</span>
               <span className="text-black">
                 Practice exercises and quizzes
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-brand-green-600 font-bold">•</span>
+              <span className="text-brand-blue-600 font-bold">•</span>
               <span className="text-black">Real-world tax scenarios</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-brand-green-600 font-bold">•</span>
+              <span className="text-brand-blue-600 font-bold">•</span>
               <span className="text-black">
                 Certification exam preparation
               </span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="text-brand-green-600 font-bold">•</span>
+              <span className="text-brand-blue-600 font-bold">•</span>
               <span className="text-black">
                 Reference materials and resources
               </span>
@@ -93,7 +93,7 @@ export default function TrainingPage() {
           href="https://linklearncertification.com/"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
+          className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-brand-blue-600 text-white font-semibold hover:bg-green-700 transition"
         >
           Open Link & Learn Taxes
           <svg
@@ -123,7 +123,7 @@ export default function TrainingPage() {
           <div className="rounded-lg border-2 border-green-200 p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-lg">Basic Certification</h3>
-              <span className="px-3 py-2 rounded-full bg-brand-green-100 text-green-800 text-xs font-semibold">
+              <span className="px-3 py-2 rounded-full bg-brand-blue-100 text-green-800 text-xs font-semibold">
                 RECOMMENDED FOR NEW VOLUNTEERS
               </span>
             </div>
@@ -159,10 +159,10 @@ export default function TrainingPage() {
             </div>
           </div>
 
-          <div className="rounded-lg border-2 border-purple-200 p-6">
+          <div className="rounded-lg border-2 border-brand-red-200 p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-lg">Advanced Certification</h3>
-              <span className="px-3 py-2 rounded-full bg-purple-100 text-purple-800 text-xs font-semibold">
+              <span className="px-3 py-2 rounded-full bg-brand-red-100 text-brand-red-800 text-xs font-semibold">
                 FOR EXPERIENCED VOLUNTEERS
               </span>
             </div>
@@ -184,7 +184,7 @@ export default function TrainingPage() {
         <h2 className="text-2xl font-bold mb-4">Training Timeline</h2>
         <div className="space-y-6">
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold">
               1
             </div>
             <div>
@@ -199,7 +199,7 @@ export default function TrainingPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold">
               2
             </div>
             <div>
@@ -215,7 +215,7 @@ export default function TrainingPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold">
               3
             </div>
             <div>
@@ -231,7 +231,7 @@ export default function TrainingPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold">
               4
             </div>
             <div>
@@ -247,7 +247,7 @@ export default function TrainingPage() {
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-green-600 text-white flex items-center justify-center font-bold">
+            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold">
               5
             </div>
             <div>
@@ -288,7 +288,7 @@ export default function TrainingPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-green-600 p-6">
+      <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-blue-600 p-6">
         <h2 className="text-xl font-bold mb-3">Ready to Start Training?</h2>
         <p className="text-black mb-6">
           Contact us to get your Link & Learn access code and begin your journey
@@ -296,14 +296,14 @@ export default function TrainingPage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a
-            href="tel:3173143757"
-            className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
+            href="/contact"
+            className="px-6 py-3 rounded-lg bg-brand-blue-600 text-white font-semibold hover:bg-green-700 transition"
           >
-            Call 317-314-3757
+            Call Contact Us
           </a>
           <a
             href="mailto:elevate4humanityedu@gmail.com"
-            className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-green-50 transition"
+            className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-green-50 transition"
           >
             Email for Access Code
           </a>

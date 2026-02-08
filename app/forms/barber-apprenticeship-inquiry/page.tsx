@@ -39,10 +39,10 @@ export default function BarberApprenticeshipInquiryPage() {
       if (response.ok) {
         setIsSubmitted(true);
       } else {
-        alert(result.error || 'There was an error submitting your inquiry. Please call (317) 314-3757 for assistance.');
+        alert(result.error || 'There was an error submitting your inquiry. Please call Contact Us for assistance.');
       }
     } catch {
-      alert('Unable to submit. Please call (317) 314-3757 for assistance.');
+      alert('Unable to submit. Please call Contact Us for assistance.');
     } finally {
       setIsSubmitting(false);
     }
@@ -61,7 +61,7 @@ export default function BarberApprenticeshipInquiryPage() {
           </p>
           <Link
             href="/programs/barber-apprenticeship"
-            className="inline-block bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition"
+            className="inline-block bg-brand-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-red-700 transition"
           >
             Return to Program Page
           </Link>
@@ -98,7 +98,7 @@ export default function BarberApprenticeshipInquiryPage() {
                 required
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
               />
             </div>
 
@@ -109,7 +109,7 @@ export default function BarberApprenticeshipInquiryPage() {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
               />
             </div>
 
@@ -119,7 +119,7 @@ export default function BarberApprenticeshipInquiryPage() {
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
               />
             </div>
 
@@ -129,7 +129,7 @@ export default function BarberApprenticeshipInquiryPage() {
                 type="text"
                 value={formData.city}
                 onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
               />
             </div>
 
@@ -141,14 +141,14 @@ export default function BarberApprenticeshipInquiryPage() {
                 value={formData.message}
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 placeholder="What would you like to know about the program?"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-red-500 focus:border-transparent"
               />
             </div>
 
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition disabled:opacity-50"
+              className="w-full bg-brand-red-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-red-700 transition disabled:opacity-50"
             >
               {isSubmitting ? 'Submitting...' : 'Submit Inquiry'}
             </button>

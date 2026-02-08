@@ -59,7 +59,7 @@ export function SMSNotificationSystem() {
                     type="tel"
                     value={phoneNumber}
                     onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setPhoneNumber(e.target.value)}
-                    placeholder="+1 (317) 314-3757"
+                    placeholder="+1 Contact Us"
                     className="w-full px-4 py-2 border rounded-lg"
                   />
                 </div>

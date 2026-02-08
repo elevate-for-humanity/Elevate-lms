@@ -5,7 +5,6 @@ export const revalidate = 86400;
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
 import type { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
@@ -68,7 +67,7 @@ export default async function NailTechnicianApprenticeshipPage() {
             <span className="px-3 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
               DOL Registered
             </span>
-            <span className="px-3 py-2 bg-purple-600 text-white text-sm font-bold rounded-full shadow-lg">
+            <span className="px-3 py-2 bg-brand-red-600 text-white text-sm font-bold rounded-full shadow-lg">
               Apprenticeship Sponsorship
             </span>
           </div>
@@ -94,10 +93,6 @@ export default async function NailTechnicianApprenticeshipPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/nail-tech-guide.mp4" title="Nail Technician Apprenticeship Guide" />
-
-      {/* Pathway Disclosure */}
-      <PathwayDisclosure programName="Nail Technician Apprenticeship" programSlug="nail-technician-apprenticeship" />
 
       {/* Program Description */}
       <section className="bg-white py-16">

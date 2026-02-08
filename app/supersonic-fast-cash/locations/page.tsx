@@ -80,10 +80,10 @@ export default async function LocationsPage() {
                       Phone
                     </div>
                     <a
-                      href="tel:+13173143757"
+                      href="/contact"
                       className="text-blue-600 hover:text-blue-700"
                     >
-                      (317) 314-3757
+                      Contact Us
                     </a>
                   </div>
                 </div>
@@ -213,8 +213,8 @@ export default async function LocationsPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="font-bold text-black mb-2">Document Upload</h3>
               <p className="text-sm text-black">
@@ -323,10 +323,10 @@ export default async function LocationsPage() {
               Book Appointment
             </Link>
             <Link
-              href="tel:+13173143757"
+              href="/contact"
               className="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-semibold rounded-lg hover:bg-blue-800 transition-colors border-2 border-white"
             >
-              Call (317) 314-3757
+              Call Contact Us
             </Link>
           </div>
         </div>

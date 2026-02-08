@@ -116,11 +116,11 @@ export default async function DemoPage() {
                 Call us directly to discuss your needs.
               </p>
               <a
-                href="tel:3173143757"
+                href="/contact"
                 className="inline-flex items-center gap-2 text-orange-600 font-medium hover:underline"
               >
                 <Phone className="w-5 h-5" />
-                (317) 314-3757
+                Contact Us
               </a>
             </div>
           </div>

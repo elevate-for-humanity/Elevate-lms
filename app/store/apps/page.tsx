@@ -45,7 +45,7 @@ const apps = [
     name: 'Website Builder for Training Providers',
     description: 'Build professional training websites with LMS integration, enrollment forms, and SEO tools.',
     icon: Layout,
-    color: 'purple',
+    color: 'brand-red',
     rating: 4.9,
     reviews: 156,
     price: 79,
@@ -56,7 +56,7 @@ const apps = [
 const colorClasses = {
   blue: { bg: 'bg-blue-100', text: 'text-blue-600', badge: 'bg-blue-600' },
   green: { bg: 'bg-green-100', text: 'text-green-600', badge: 'bg-green-600' },
-  purple: { bg: 'bg-purple-100', text: 'text-purple-600', badge: 'bg-purple-600' },
+  brand-red: { bg: 'bg-brand-red-100', text: 'text-brand-red-600', badge: 'bg-brand-red-600' },
 };
 
 export default function AppsPage() {

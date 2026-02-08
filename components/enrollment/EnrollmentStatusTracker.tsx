@@ -134,7 +134,7 @@ export function EnrollmentStatusTracker({
 
       {/* Help Text */}
       <p className="mt-4 text-xs text-slate-500">
-        Questions? Call <a href="tel:317-314-3757" className="text-blue-600 hover:underline">(317) 314-3757</a>
+        Questions? Call <a href="/contact" className="text-blue-600 hover:underline">Contact Us</a>
       </p>
     </div>
   );
@@ -153,7 +153,7 @@ export function EnrollmentStatusBadge({
     eligibility_review: { label: 'Eligibility Review', color: 'bg-amber-100 text-amber-700' },
     eligibility_confirmed: { label: 'Eligible', color: 'bg-green-100 text-green-700' },
     funding_approved: { label: 'Funding Approved', color: 'bg-green-100 text-green-700' },
-    enrolled: { label: 'Enrolled', color: 'bg-purple-100 text-purple-700' },
+    enrolled: { label: 'Enrolled', color: 'bg-brand-red-100 text-brand-red-700' },
     start_date_assigned: { label: 'Ready to Start', color: 'bg-green-100 text-green-700' },
     active: { label: 'Active', color: 'bg-green-100 text-green-700' },
   };

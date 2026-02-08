@@ -142,7 +142,7 @@ export default function DemosPage() {
             <Link href="/videos" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
               Training Videos
             </Link>
-            <Link href="/webinars" className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors">
+            <Link href="/webinars" className="px-4 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium hover:bg-brand-red-200 transition-colors">
               Webinars
             </Link>
             <Link href="/success-stories" className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
@@ -247,10 +247,10 @@ export default function DemosPage() {
               Schedule Demo
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 bg-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-600 transition-colors border border-blue-500"
             >
-              Call (317) 314-3757
+              Call Contact Us
             </a>
           </div>
         </div>
@@ -290,8 +290,8 @@ export default function DemosPage() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <ArrowRight className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center mb-4">
+                <ArrowRight className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Integration Options</h3>
               <p className="text-gray-600 text-sm">

@@ -208,7 +208,7 @@ export default function WorkbooksPage() {
               href="/lms/resources"
               className="block p-6 bg-white rounded-lg hover:shadow-md transition"
             >
-              <BookOpen className="w-8 h-8 text-brand-green-600 mb-3" />
+              <BookOpen className="w-8 h-8 text-brand-blue-600 mb-3" />
               <h3 className="font-bold text-black mb-2">
                 Course Materials
               </h3>
@@ -220,7 +220,7 @@ export default function WorkbooksPage() {
               href="/resources"
               className="block p-6 bg-white rounded-lg hover:shadow-md transition"
             >
-              <Download className="w-8 h-8 text-purple-600 mb-3" />
+              <Download className="w-8 h-8 text-brand-red-600 mb-3" />
               <h3 className="font-bold text-black mb-2">Download Center</h3>
               <p className="text-sm text-black">
                 Forms, guides, and documents
@@ -245,10 +245,10 @@ export default function WorkbooksPage() {
             </a>
             <span className="text-slate-400">|</span>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
-              317-314-3757
+              Contact Us
             </a>
           </div>
         </div>

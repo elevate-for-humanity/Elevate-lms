@@ -112,7 +112,7 @@ export default async function WrgPage() {
             </h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">
+                <span className="text-brand-blue-600 font-bold text-base">
                   •
                 </span>
                 <span className="text-black">
@@ -120,7 +120,7 @@ export default async function WrgPage() {
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">
+                <span className="text-brand-blue-600 font-bold text-base">
                   •
                 </span>
                 <span className="text-black">
@@ -128,7 +128,7 @@ export default async function WrgPage() {
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">
+                <span className="text-brand-blue-600 font-bold text-base">
                   •
                 </span>
                 <span className="text-black">
@@ -137,7 +137,7 @@ export default async function WrgPage() {
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-brand-green-600 font-bold text-base">
+                <span className="text-brand-blue-600 font-bold text-base">
                   •
                 </span>
                 <span className="text-black">
@@ -281,7 +281,7 @@ export default async function WrgPage() {
           <div className="mt-8 text-center">
             <Link
               href="/programs"
-              className="inline-block px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all"
+              className="inline-block px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-green-700 transition-all"
             >
               View All Programs
             </Link>
@@ -298,7 +298,7 @@ export default async function WrgPage() {
 
           <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
                 1
               </div>
               <div>
@@ -306,10 +306,10 @@ export default async function WrgPage() {
                 <p className="text-black">
                   Call{' '}
                   <a
-                    href="tel:3173143757"
-                    className="text-brand-green-600 font-bold"
+                    href="/contact"
+                    className="text-brand-blue-600 font-bold"
                   >
-                    317-314-3757
+                    Contact Us
                   </a>{' '}
                   or fill out our contact form. Tell us which program you're
                   interested in.
@@ -318,7 +318,7 @@ export default async function WrgPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
                 2
               </div>
               <div>
@@ -333,7 +333,7 @@ export default async function WrgPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
                 3
               </div>
               <div>
@@ -346,7 +346,7 @@ export default async function WrgPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
                 4
               </div>
               <div>
@@ -359,7 +359,7 @@ export default async function WrgPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-brand-green-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-base font-bold flex-shrink-0">
                 5
               </div>
               <div>
@@ -476,7 +476,7 @@ export default async function WrgPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-green-600 text-white text-center">
+      <section className="py-16 bg-brand-blue-600 text-white text-center">
         <div className="max-w-3xl mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Ready to Apply for WRG?
@@ -486,14 +486,14 @@ export default async function WrgPage() {
           </p>
           <Link
             href="/contact"
-            className="inline-block px-10 py-5 bg-white text-brand-green-600 font-bold rounded-lg hover:bg-gray-100 transition-all text-lg shadow-xl"
+            className="inline-block px-10 py-5 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-100 transition-all text-lg shadow-xl"
           >
             Check My Eligibility
           </Link>
           <p className="mt-6 text-black">
             Questions? Call{' '}
-            <a href="tel:3173143757" className="font-bold underline">
-              317-314-3757
+            <a href="/contact" className="font-bold underline">
+              Contact Us
             </a>
           </p>
         </div>

@@ -17,7 +17,7 @@ export const dynamic = 'force-dynamic';
 const categories = [
   { name: 'Enrollment', slug: 'Enrollment', color: 'bg-blue-100 text-blue-600' },
   { name: 'Programs', slug: 'Programs', color: 'bg-green-100 text-green-600' },
-  { name: 'Financial Aid', slug: 'Financial Aid', color: 'bg-purple-100 text-purple-600' },
+  { name: 'Financial Aid', slug: 'Financial Aid', color: 'bg-brand-red-100 text-brand-red-600' },
   { name: 'Account', slug: 'Account', color: 'bg-orange-100 text-orange-600' },
   { name: 'Career Services', slug: 'Career Services', color: 'bg-teal-100 text-teal-600' },
   { name: 'General', slug: 'General', color: 'bg-gray-100 text-gray-600' },
@@ -189,10 +189,10 @@ export default async function HelpCenterPage({
               Submit a Ticket
             </Link>
             <a
-              href="tel:+13173143757"
+              href="/contact"
               className="px-6 py-3 bg-gray-100 text-black font-semibold rounded-lg hover:bg-gray-200 transition"
             >
-              Call (317) 314-3757
+              Call Contact Us
             </a>
           </div>
         </div>

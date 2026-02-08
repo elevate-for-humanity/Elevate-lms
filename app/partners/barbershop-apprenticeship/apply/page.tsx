@@ -74,7 +74,7 @@ export default function BarbershopPartnerApplyPage() {
         setLoading(false);
       }
     } catch {
-      setError('Unable to submit. Please try again or call (317) 314-3757.');
+      setError('Unable to submit. Please try again or call Contact Us.');
       setLoading(false);
     }
   };

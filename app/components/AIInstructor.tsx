@@ -144,7 +144,7 @@ export default function AIInstructor({
               ) : (
                 <button
                   onClick={stopSpeaking}
-                  className="p-2 bg-brand-orange-600 text-white rounded-full hover:bg-brand-orange-700 transition-colors"
+                  className="p-2 bg-brand-blue-600 text-white rounded-full hover:bg-brand-blue-700 transition-colors"
                   title="Stop audio"
                 >
                   <svg

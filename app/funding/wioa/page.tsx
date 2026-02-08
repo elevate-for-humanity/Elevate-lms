@@ -91,7 +91,7 @@ export default async function WioaPage() {
 
           <ul className="space-y-3 mb-8">
             <li className="flex items-start gap-3">
-              <span className="text-brand-green-600 font-bold text-base">
+              <span className="text-brand-blue-600 font-bold text-base">
                 •
               </span>
               <span className="text-black">
@@ -99,7 +99,7 @@ export default async function WioaPage() {
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-brand-green-600 font-bold text-base">
+              <span className="text-brand-blue-600 font-bold text-base">
                 •
               </span>
               <span className="text-black">
@@ -108,7 +108,7 @@ export default async function WioaPage() {
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-brand-green-600 font-bold text-base">
+              <span className="text-brand-blue-600 font-bold text-base">
                 •
               </span>
               <span className="text-black">
@@ -117,7 +117,7 @@ export default async function WioaPage() {
               </span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="text-brand-green-600 font-bold text-base">
+              <span className="text-brand-blue-600 font-bold text-base">
                 •
               </span>
               <span className="text-black">
@@ -349,8 +349,8 @@ export default async function WioaPage() {
             <p className="text-orange-900 mb-4">
               <strong>Need help navigating the process?</strong> We work with
               WorkOne centers every day. Call us at{' '}
-              <a href="tel:3173143757" className="font-bold underline">
-                317-314-3757
+              <a href="/contact" className="font-bold underline">
+                Contact Us
               </a>{' '}
               and we'll guide you through it.
             </p>
@@ -436,8 +436,8 @@ export default async function WioaPage() {
           </div>
           <p className="mt-6 text-black">
             Questions? Call{' '}
-            <a href="tel:3173143757" className="font-bold underline">
-              317-314-3757
+            <a href="/contact" className="font-bold underline">
+              Contact Us
             </a>
           </p>
         </div>

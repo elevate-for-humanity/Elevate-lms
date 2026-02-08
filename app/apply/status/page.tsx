@@ -39,7 +39,7 @@ export default function ApplicationStatusPage() {
         setError(data.error || 'No application found with this email address.');
       }
     } catch (error) {
-      setError('Failed to check status. Please try again or call 317-314-3757.');
+      setError('Failed to check status. Please try again or call Contact Us.');
     } finally {
       setLoading(false);
     }
@@ -168,7 +168,7 @@ export default function ApplicationStatusPage() {
         )}
 
         <div className="mt-8 text-center text-gray-600">
-          <p>Need help? Call us at <a href="tel:317-314-3757" className="text-emerald-600 font-medium">317-314-3757</a></p>
+          <p>Need help? Call us at <a href="/contact" className="text-emerald-600 font-medium">Contact Us</a></p>
           <p className="mt-2">
             <Link href="/apply" className="text-emerald-600 hover:underline">Submit a new application</Link>
           </p>

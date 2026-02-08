@@ -151,7 +151,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
               <div className="aspect-square sm:aspect-[4/3] relative">
-                <Image src="/images/success-new/success-2.jpg" alt="Check eligibility" fill className="object-cover" />
+                <Image src="/images/success-new/success-2.jpg" alt="Check eligibility" fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 25vw" className="object-cover" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">1</div>
               </div>
               <div className="p-3 sm:p-4 md:p-5">
@@ -162,7 +162,7 @@ export default function HomePage() {
             
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
               <div className="aspect-square sm:aspect-[4/3] relative">
-                <Image src="/images/success-new/success-4.jpg" alt="Choose program" fill className="object-cover" />
+                <Image src="/images/success-new/success-4.jpg" alt="Choose program" fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 25vw" className="object-cover" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">2</div>
               </div>
               <div className="p-3 sm:p-4 md:p-5">
@@ -173,7 +173,7 @@ export default function HomePage() {
             
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
               <div className="aspect-square sm:aspect-[4/3] relative">
-                <Image src="/images/success-new/success-6.jpg" alt="Complete training" fill className="object-cover" />
+                <Image src="/images/success-new/success-6.jpg" alt="Complete training" fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 25vw" className="object-cover" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">3</div>
               </div>
               <div className="p-3 sm:p-4 md:p-5">
@@ -184,7 +184,7 @@ export default function HomePage() {
             
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
               <div className="aspect-square sm:aspect-[4/3] relative">
-                <Image src="/images/success-new/success-8.jpg" alt="Get hired" fill className="object-cover" />
+                <Image src="/images/success-new/success-8.jpg" alt="Get hired" fill sizes="(max-width: 640px) 50vw, (max-width: 1024px) 25vw, 25vw" className="object-cover" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">4</div>
               </div>
               <div className="p-3 sm:p-4 md:p-5">
@@ -206,13 +206,13 @@ export default function HomePage() {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3 md:gap-4">
             <div className="aspect-square relative rounded-xl sm:rounded-2xl overflow-hidden">
-              <Image src="/images/success-new/success-10.jpg" alt="Graduate" fill className="object-cover hover:scale-105 transition-transform duration-500" />
+              <Image src="/images/success-new/success-10.jpg" alt="Graduate" fill sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, 25vw" className="object-cover hover:scale-105 transition-transform duration-500" />
             </div>
             <div className="aspect-square relative rounded-xl sm:rounded-2xl overflow-hidden">
               <Image src="/images/success-new/success-11.jpg" alt="Graduate" fill className="object-cover hover:scale-105 transition-transform duration-500" />
             </div>
             <div className="aspect-square relative rounded-xl sm:rounded-2xl overflow-hidden">
-              <Image src="/images/success-new/success-12.jpg" alt="Graduate" fill className="object-cover hover:scale-105 transition-transform duration-500" />
+              <Image src="/images/success-new/success-12.jpg" alt="Graduate" fill sizes="(max-width: 640px) 50vw, (max-width: 768px) 50vw, 25vw" className="object-cover hover:scale-105 transition-transform duration-500" />
             </div>
             <div className="aspect-square relative rounded-xl sm:rounded-2xl overflow-hidden">
               <Image src="/images/success-new/success-13.jpg" alt="Graduate" fill className="object-cover hover:scale-105 transition-transform duration-500" />
@@ -242,10 +242,10 @@ export default function HomePage() {
               Check Eligibility
             </Link>
             <Link 
-              href="tel:317-314-3757"
+              href="/contact"
               className="border-2 border-white text-white px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5 rounded-lg font-bold text-base sm:text-lg hover:bg-white/10 transition-colors"
             >
-              Call (317) 314-3757
+              Contact Us
             </Link>
           </div>
         </div>

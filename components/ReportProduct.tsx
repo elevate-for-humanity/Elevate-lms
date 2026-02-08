@@ -113,7 +113,7 @@ export function ReportProduct({ productId }: { productId: string }) {
           <button
             onClick={send}
             disabled={loading}
-            className="bg-brand-orange-600 text-white px-4 py-2 rounded hover:bg-brand-orange-700 disabled:opacity-50"
+            className="bg-brand-blue-600 text-white px-4 py-2 rounded hover:bg-brand-blue-700 disabled:opacity-50"
           >
             {loading ? 'Submitting...' : 'Submit Report'}
           </button>

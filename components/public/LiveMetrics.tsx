@@ -105,7 +105,7 @@ export function LiveMetrics() {
       label: 'Total Enrollments',
       value: metrics.metrics.totalEnrollments.toLocaleString(),
       icon: TrendingUp,
-      color: 'purple',
+      color: 'brand-red',
       description: 'All-time course enrollments',
     },
     {
@@ -148,7 +148,7 @@ export function LiveMetrics() {
   const colorClasses: Record<string, string> = {
     blue: 'bg-blue-50 text-blue-600',
     green: 'bg-green-50 text-green-600',
-    purple: 'bg-purple-50 text-purple-600',
+    brand-red: 'bg-brand-red-50 text-brand-red-600',
     orange: 'bg-orange-50 text-orange-600',
     indigo: 'bg-indigo-50 text-indigo-600',
     yellow: 'bg-yellow-50 text-yellow-600',

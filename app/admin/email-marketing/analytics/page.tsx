@@ -159,7 +159,7 @@ export default function AnalyticsPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/contact"
-                className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+                className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
               >
                 Get Started Free
               </Link>
@@ -293,7 +293,7 @@ export default function AnalyticsPage() {
             title="Click Rate"
             value={`${data.overview.clickRate.toFixed(1)}%`}
             icon={MousePointerClick}
-            color="purple"
+            color="brand-red"
             trend={
               data.overview.clickRate > 8
                 ? 'up'
@@ -322,7 +322,7 @@ export default function AnalyticsPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-black">Total Opens</h3>
-              <Eye className="w-5 h-5 text-brand-green-600" />
+              <Eye className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div className="text-3xl font-bold text-black mb-2">
               {data.overview.totalOpens.toLocaleString()}
@@ -335,7 +335,7 @@ export default function AnalyticsPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-black">Total Clicks</h3>
-              <MousePointerClick className="w-5 h-5 text-purple-600" />
+              <MousePointerClick className="w-5 h-5 text-brand-red-600" />
             </div>
             <div className="text-3xl font-bold text-black mb-2">
               {data.overview.totalClicks.toLocaleString()}
@@ -348,7 +348,7 @@ export default function AnalyticsPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-black">Total Bounces</h3>
-              <AlertCircle className="w-5 h-5 text-brand-orange-600" />
+              <AlertCircle className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div className="text-3xl font-bold text-black mb-2">
               {data.overview.totalBounces.toLocaleString()}
@@ -390,7 +390,7 @@ export default function AnalyticsPage() {
                   <div className="flex items-center space-x-2 mb-1">
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-brand-green-600 h-2 rounded-full"
+                        className="bg-brand-blue-600 h-2 rounded-full"
                         style={{
                           width: `${(day.opens / Math.max(...data.timeline.map((d) => d.opens))) * 100}%`,
                         }}
@@ -403,7 +403,7 @@ export default function AnalyticsPage() {
                   <div className="flex items-center space-x-2">
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-purple-600 h-2 rounded-full"
+                        className="bg-brand-red-600 h-2 rounded-full"
                         style={{
                           width: `${(day.clicks / Math.max(...data.timeline.map((d) => d.clicks))) * 100}%`,
                         }}
@@ -474,7 +474,7 @@ export default function AnalyticsPage() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           campaign.openRate > 40
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-blue-100 text-green-800'
                             : campaign.openRate > 30
                               ? 'bg-yellow-100 text-yellow-800'
                               : 'bg-red-100 text-red-800'
@@ -487,7 +487,7 @@ export default function AnalyticsPage() {
                       <span
                         className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                           campaign.clickRate > 8
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-blue-100 text-green-800'
                             : campaign.clickRate > 5
                               ? 'bg-yellow-100 text-yellow-800'
                               : 'bg-red-100 text-red-800'
@@ -514,16 +514,16 @@ interface StatCardProps {
   title: string;
   value: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: 'blue' | 'green' | 'purple' | 'red';
+  color: 'blue' | 'green' | 'brand-red' | 'red';
   trend: 'up' | 'down' | null;
 }
 
 function StatCard({ title, value, icon: Icon, color, trend }: StatCardProps) {
   const colorClasses = {
     blue: 'text-brand-blue-600 bg-blue-50',
-    green: 'text-brand-green-600 bg-green-50',
-    purple: 'text-purple-600 bg-purple-50',
-    red: 'text-brand-orange-600 bg-red-50',
+    green: 'text-brand-blue-600 bg-green-50',
+    brand-red: 'text-brand-red-600 bg-brand-red-50',
+    red: 'text-brand-blue-600 bg-red-50',
   };
 
   return (
@@ -534,7 +534,7 @@ function StatCard({ title, value, icon: Icon, color, trend }: StatCardProps) {
         </div>
         {trend && (
           <div
-            className={`flex items-center space-x-1 ${trend === 'up' ? 'text-brand-green-600' : 'text-brand-orange-600'}`}
+            className={`flex items-center space-x-1 ${trend === 'up' ? 'text-brand-blue-600' : 'text-brand-blue-600'}`}
           >
             {trend === 'up' ? (
               <TrendingUp className="w-4 h-4" />

@@ -95,8 +95,8 @@ export default function BookAppointmentPage() {
 
           {status === 'success' ? (
             <div className="rounded-2xl border-2 border-green-200 bg-green-50 p-8 text-center">
-              <div className="w-16 h-16 rounded-full bg-brand-green-100 flex items-center justify-center mx-auto mb-4">
-                <Circle className="w-8 h-8 text-brand-green-600" />
+              <div className="w-16 h-16 rounded-full bg-brand-blue-100 flex items-center justify-center mx-auto mb-4">
+                <Circle className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h2 className="text-2xl font-bold text-black mb-2">
                 Appointment Request Received!
@@ -227,7 +227,7 @@ export default function BookAppointmentPage() {
                       setFormData({ ...formData, phone: e.target.value })
                     }
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="(317) 314-3757"
+                    placeholder="Contact Us"
                   />
                 </div>
               </div>
@@ -317,7 +317,7 @@ export default function BookAppointmentPage() {
                 <div className="rounded-lg bg-red-50 border border-red-200 p-4">
                   <p className="text-red-800 text-sm">
                     Something went wrong. Please try again or call us at
-                    317-314-3757.
+                    Contact Us.
                   </p>
                 </div>
               )}
@@ -349,10 +349,10 @@ export default function BookAppointmentPage() {
                 <div>
                   <div className="font-semibold text-sm">Phone</div>
                   <a
-                    href="tel:3173143757"
+                    href="/contact"
                     className="text-brand-blue-600 hover:underline"
                   >
-                    317-314-3757
+                    Contact Us
                   </a>
                 </div>
               </div>

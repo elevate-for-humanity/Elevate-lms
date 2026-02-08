@@ -27,7 +27,7 @@ export default function StudentPortalGradesPage() {
         </div>
         <div className="bg-white rounded-lg shadow p-6 text-center">
           <p className="text-sm text-gray-600 mb-1">Credits Earned</p>
-          <p className="text-4xl font-bold text-purple-600">72</p>
+          <p className="text-4xl font-bold text-brand-red-600">72</p>
         </div>
       </div>
 

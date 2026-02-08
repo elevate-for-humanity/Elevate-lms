@@ -155,7 +155,7 @@ export default async function NdsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -181,7 +181,7 @@ export default async function NdsPage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-8 h-8 text-brand-orange-600" />
+                <Award className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-2">DOT Required</h3>
               <p className="text-black">
@@ -190,8 +190,8 @@ export default async function NdsPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Circle className="w-8 h-8 text-brand-green-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Circle className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Funded</h3>
               <p className="text-black">
@@ -243,7 +243,7 @@ export default async function NdsPage() {
                         <Award className="w-4 h-4" />
                         <span>Certificate: {course.certificate}</span>
                       </div>
-                      <div className="flex items-center gap-2 text-sm font-semibold text-brand-green-600">
+                      <div className="flex items-center gap-2 text-sm font-semibold text-brand-blue-600">
                         <Circle className="w-4 h-4" />
                         <span>{course.price}</span>
                       </div>
@@ -253,7 +253,7 @@ export default async function NdsPage() {
                       href={course.enrollUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+                      className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
                     >
                       Enroll Now
                       <ExternalLink className="w-4 h-4" />
@@ -281,7 +281,7 @@ export default async function NdsPage() {
               <p className="text-black mb-4">
                 Includes all DOT-required training and compliance courses
               </p>
-              <span className="text-brand-orange-600 font-semibold">Learn More →</span>
+              <span className="text-brand-blue-600 font-semibold">Learn More →</span>
             </Link>
 
             <Link
@@ -294,7 +294,7 @@ export default async function NdsPage() {
               <p className="text-black mb-4">
                 Includes DOT drug testing procedures and compliance
               </p>
-              <span className="text-brand-orange-600 font-semibold">Learn More →</span>
+              <span className="text-brand-blue-600 font-semibold">Learn More →</span>
             </Link>
           </div>
         </div>
@@ -313,7 +313,7 @@ export default async function NdsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all"
             >
               Apply Now
             </Link>

@@ -190,7 +190,7 @@ export default function RoleSelectionCards({
             {/* Pay Model */}
             <div className="p-6 bg-green-50 border-b border-slate-200">
               <div className="flex items-center gap-2 mb-2">
-                <DollarSign className="w-5 h-5 text-brand-green-600" />
+                <DollarSign className="w-5 h-5 text-brand-blue-600" />
                 <span className="font-semibold text-black">Pay Model</span>
               </div>
               <p className="text-2xl font-bold text-green-700">
@@ -229,7 +229,7 @@ export default function RoleSelectionCards({
             {/* What You Can Do */}
             <div className="p-6 border-b border-slate-200">
               <h4 className="font-semibold text-black mb-3 flex items-center gap-2">
-                <Check className="w-5 h-5 text-brand-green-600" />
+                <Check className="w-5 h-5 text-brand-blue-600" />
                 What You Can Do
               </h4>
               <ul className="space-y-2">
@@ -238,7 +238,7 @@ export default function RoleSelectionCards({
                     key={idx}
                     className="flex items-start gap-2 text-sm text-black"
                   >
-                    <Check className="w-4 h-4 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                    <Check className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -248,7 +248,7 @@ export default function RoleSelectionCards({
             {/* What You Cannot Do */}
             <div className="p-6 border-b border-slate-200">
               <h4 className="font-semibold text-black mb-3 flex items-center gap-2">
-                <X className="w-5 h-5 text-brand-orange-600" />
+                <X className="w-5 h-5 text-brand-blue-600" />
                 What You Cannot Do
               </h4>
               <ul className="space-y-2">
@@ -257,7 +257,7 @@ export default function RoleSelectionCards({
                     key={idx}
                     className="flex items-start gap-2 text-sm text-black"
                   >
-                    <X className="w-4 h-4 text-brand-orange-600 flex-shrink-0 mt-0.5" />
+                    <X className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span>{item}</span>
                   </li>
                 ))}

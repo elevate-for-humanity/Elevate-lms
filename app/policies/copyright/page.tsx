@@ -207,7 +207,7 @@ export default function CopyrightPage() {
                 <li><strong>Mail:</strong> DMCA Agent, Elevate for Humanity</li>
                 <li className="ml-6">3737 N Meridian St, Suite 200</li>
                 <li className="ml-6">Indianapolis, IN 46208</li>
-                <li><strong>Phone:</strong> (317) 314-3757</li>
+                <li><strong>Phone:</strong> Contact Us</li>
               </ul>
             </div>
 
@@ -287,7 +287,7 @@ export default function CopyrightPage() {
               <li><strong>DMCA Notices:</strong> elevate4humanityedu@gmail.com</li>
               <li><strong>Permission Requests:</strong> elevate4humanityedu@gmail.com</li>
               <li><strong>Trademark Licensing:</strong> elevate4humanityedu@gmail.com</li>
-              <li><strong>Phone:</strong> (317) 314-3757</li>
+              <li><strong>Phone:</strong> Contact Us</li>
             </ul>
 
             <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">

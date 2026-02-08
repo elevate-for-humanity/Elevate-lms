@@ -79,7 +79,7 @@ export function PeerTutoringMarketplace() {
               onClick={() => setSelectedSubject(subject)}
               className={`px-4 py-2 rounded-lg text-sm font-medium ${
                 selectedSubject === subject
-                  ? 'bg-brand-orange-600 text-white'
+                  ? 'bg-brand-blue-600 text-white'
                   : 'bg-white text-black border hover:bg-gray-50'
               }`}
             >
@@ -118,7 +118,7 @@ export function PeerTutoringMarketplace() {
 
               <div className="mb-4 text-sm text-black">
                 <p>📅 {tutor.availability}</p>
-                <p className="font-bold text-brand-orange-600 text-lg mt-2">${tutor.hourlyRate}/hour</p>
+                <p className="font-bold text-brand-blue-600 text-lg mt-2">${tutor.hourlyRate}/hour</p>
               </div>
 
               <Button className="w-full">Book Session</Button>

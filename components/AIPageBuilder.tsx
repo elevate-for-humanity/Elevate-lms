@@ -174,7 +174,7 @@ export default function AIPageBuilder() {
   return (
     <div className="max-w-7xl mx-auto p-6">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-brand-orange-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
+        <h1 className="text-4xl font-bold text-brand-blue-600 mb-2 text-2xl md:text-3xl lg:text-4xl">
           AI Website Stylist
         </h1>
         <p className="text-brand-text-muted">

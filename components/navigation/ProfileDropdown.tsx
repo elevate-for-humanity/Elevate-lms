@@ -100,7 +100,7 @@ export function ProfileDropdown({
               Help & Support
             </Link>
             <button
-              className="flex items-center gap-3 px-4 py-2 text-sm text-brand-orange-600 hover:bg-red-50 w-full"
+              className="flex items-center gap-3 px-4 py-2 text-sm text-brand-blue-600 hover:bg-red-50 w-full"
               onClick={() => {
                 setIsOpen(false);
                 // Add logout logic here

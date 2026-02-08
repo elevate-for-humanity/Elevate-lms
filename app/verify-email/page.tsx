@@ -56,8 +56,8 @@ export default function VerifyEmailPage() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
         <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-orange-100 rounded-full mb-4">
-            <Mail className="w-8 h-8 text-brand-orange-600" />
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-blue-100 rounded-full mb-4">
+            <Mail className="w-8 h-8 text-brand-blue-600" />
           </div>
           <h1 className="text-2xl font-bold text-black mb-2">
             Verify Your Email

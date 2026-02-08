@@ -87,7 +87,7 @@ export default function NotificationsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -253,9 +253,9 @@ export default function NotificationsPage() {
                 >
                   <div className="flex items-start space-x-3">
                     {result.success ? (
-                      <Circle className="w-5 h-5 text-brand-green-600 mt-0.5" />
+                      <Circle className="w-5 h-5 text-brand-blue-600 mt-0.5" />
                     ) : (
-                      <AlertCircle className="w-5 h-5 text-brand-orange-600 mt-0.5" />
+                      <AlertCircle className="w-5 h-5 text-brand-blue-600 mt-0.5" />
                     )}
                     <div className="flex-1">
                       <h3

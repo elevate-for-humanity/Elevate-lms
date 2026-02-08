@@ -53,7 +53,7 @@ export default function EmployerProgramsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Programs" }]} />
-<div className="relative h-64 bg-purple-800">
+<div className="relative h-64 bg-brand-red-800">
         <Image
           src="/images/community/community-hero.jpg"
           alt="Employer programs"
@@ -63,7 +63,7 @@ export default function EmployerProgramsPage() {
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <h1 className="text-4xl font-bold text-white mb-4">Employer Programs</h1>
-            <p className="text-xl text-purple-200">Tax credits, apprenticeships, and workforce incentives</p>
+            <p className="text-xl text-brand-red-200">Tax credits, apprenticeships, and workforce incentives</p>
           </div>
         </div>
       </div>
@@ -73,7 +73,7 @@ export default function EmployerProgramsPage() {
           {[
             { icon: DollarSign, label: 'Total Savings Available', value: '$50,000+', color: 'green' },
             { icon: Users, label: 'Eligible Candidates', value: '2,500+', color: 'blue' },
-            { icon: Award, label: 'Active Programs', value: '4', color: 'purple' },
+            { icon: Award, label: 'Active Programs', value: '4', color: 'brand-red' },
             { icon: Clock, label: 'Avg. Processing Time', value: '2-4 weeks', color: 'orange' },
           ].map((stat, index) => (
             <div key={index} className="bg-white rounded-xl p-6 shadow-sm">
@@ -125,11 +125,11 @@ export default function EmployerProgramsPage() {
                   <div className="flex gap-4">
                     <Link
                       href={`/employer-portal/programs/${program.id}`}
-                      className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2"
+                      className="px-6 py-3 bg-brand-red-600 text-white rounded-lg hover:bg-brand-red-700 transition flex items-center gap-2"
                     >
                       Learn More <ArrowRight className="w-4 h-4" />
                     </Link>
-                    <button className="px-6 py-3 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition">
+                    <button className="px-6 py-3 border border-brand-red-600 text-brand-red-600 rounded-lg hover:bg-brand-red-50 transition">
                       Apply Now
                     </button>
                   </div>
@@ -139,15 +139,15 @@ export default function EmployerProgramsPage() {
           ))}
         </div>
 
-        <div className="mt-12 bg-purple-600 rounded-2xl p-8 text-white">
+        <div className="mt-12 bg-brand-red-600 rounded-2xl p-8 text-white">
           <div className="md:flex items-center justify-between">
             <div>
               <h3 className="text-2xl font-bold mb-2">Need Help Choosing a Program?</h3>
-              <p className="text-purple-200">Our team can analyze your hiring needs and recommend the best incentives.</p>
+              <p className="text-brand-red-200">Our team can analyze your hiring needs and recommend the best incentives.</p>
             </div>
             <Link
               href="/contact"
-              className="mt-4 md:mt-0 inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-600 rounded-lg hover:bg-gray-100 transition font-semibold"
+              className="mt-4 md:mt-0 inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-red-600 rounded-lg hover:bg-gray-100 transition font-semibold"
             >
               Schedule Consultation <ArrowRight className="w-4 h-4" />
             </Link>

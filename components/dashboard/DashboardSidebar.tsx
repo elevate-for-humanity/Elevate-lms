@@ -50,7 +50,7 @@ export function DashboardSidebar({
       {/* Quick Actions */}
       <div className="bg-white rounded-lg border border-slate-200 p-4">
         <h3 className="font-semibold text-black mb-3 flex items-center gap-2">
-          <Target className="w-4 h-4 text-brand-orange-600" />
+          <Target className="w-4 h-4 text-brand-blue-600" />
           Quick Actions
         </h3>
         <div className="space-y-2">
@@ -120,7 +120,7 @@ export function DashboardSidebar({
         </div>
         <Link
           href="/lms/calendar"
-          className="block mt-3 text-center text-sm text-brand-orange-600 hover:text-red-700 font-medium"
+          className="block mt-3 text-center text-sm text-brand-blue-600 hover:text-red-700 font-medium"
         >
           View Full Calendar →
         </Link>
@@ -129,7 +129,7 @@ export function DashboardSidebar({
       {/* Recent Activity */}
       <div className="bg-white rounded-lg border border-slate-200 p-4">
         <h3 className="font-semibold text-black mb-3 flex items-center gap-2">
-          <TrendingUp className="w-4 h-4 text-purple-600" />
+          <TrendingUp className="w-4 h-4 text-brand-red-600" />
           Recent Activity
         </h3>
         {recentActivity.length === 0 ? (
@@ -158,17 +158,17 @@ export function DashboardSidebar({
       {/* Notifications */}
       <div className="bg-white rounded-lg border border-slate-200 p-4">
         <h3 className="font-semibold text-black mb-3 flex items-center gap-2">
-          <Bell className="w-4 h-4 text-brand-orange-600" />
+          <Bell className="w-4 h-4 text-brand-blue-600" />
           Notifications
           {notifications > 0 && (
-            <span className="ml-auto bg-brand-orange-500 text-white text-xs px-2 py-0.5 rounded-full">
+            <span className="ml-auto bg-brand-blue-500 text-white text-xs px-2 py-0.5 rounded-full">
               {notifications}
             </span>
           )}
         </h3>
         <Link
           href="/lms/notifications"
-          className="block text-sm text-brand-orange-600 hover:text-red-700 font-medium"
+          className="block text-sm text-brand-blue-600 hover:text-red-700 font-medium"
         >
           View All Notifications →
         </Link>

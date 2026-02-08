@@ -228,7 +228,7 @@ export default async function CAREERSAFEPage() {
                   Mark.Sattele@careersafeonline.com
                 </a>
                 <a
-                  href="tel:(216) 926-6536"
+                  href="/contact"
                   className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700"
                 >
                   <Phone className="w-4 h-4" />
@@ -240,7 +240,7 @@ export default async function CAREERSAFEPage() {
             <div className="text-center">
               <div className="text-black mb-2">Customer Care</div>
               <a
-                href="tel:(888) 614-7233"
+                href="/contact"
                 className="text-2xl font-bold text-brand-blue-600 hover:text-brand-blue-700"
               >
                 (888) 614-7233

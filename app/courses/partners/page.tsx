@@ -89,7 +89,7 @@ export default async function PartnerCoursesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -190,7 +190,7 @@ export default async function PartnerCoursesPage() {
                               </span>
                             )}
                             {course.retail_price && (
-                              <span className="font-semibold text-brand-green-600">
+                              <span className="font-semibold text-brand-blue-600">
                                 ${course.retail_price}
                               </span>
                             )}
@@ -198,7 +198,7 @@ export default async function PartnerCoursesPage() {
 
                           {course.category && (
                             <div className="mb-4">
-                              <span className="px-2 py-2 bg-blue-100 text-purple-700 rounded text-xs">
+                              <span className="px-2 py-2 bg-blue-100 text-brand-red-700 rounded text-xs">
                                 {course.category}
                               </span>
                             </div>
@@ -272,7 +272,7 @@ export default async function PartnerCoursesPage() {
                   <ul className="space-y-4">
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -290,7 +290,7 @@ export default async function PartnerCoursesPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -308,7 +308,7 @@ export default async function PartnerCoursesPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -326,7 +326,7 @@ export default async function PartnerCoursesPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

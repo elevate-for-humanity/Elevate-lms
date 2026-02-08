@@ -87,7 +87,7 @@ function CheckoutForm({
       <button
         type="submit"
         disabled={!stripe || processing}
-        className="w-full bg-brand-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-brand-blue-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {processing ? (
           <>
@@ -173,7 +173,7 @@ export default function LicenseCheckoutPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-green-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
       </div>
     );
   }
@@ -282,7 +282,7 @@ export default function LicenseCheckoutPage() {
                           organizationName: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green-600 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent"
                       placeholder="Your Organization"
                     />
                   </div>
@@ -301,7 +301,7 @@ export default function LicenseCheckoutPage() {
                           contactName: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green-600 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent"
                       placeholder="Full name"
                     />
                   </div>
@@ -320,7 +320,7 @@ export default function LicenseCheckoutPage() {
                           email: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green-600 focus:border-transparent"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent"
                       placeholder="john@organization.org"
                     />
                   </div>
@@ -338,8 +338,8 @@ export default function LicenseCheckoutPage() {
                           phone: e.target.value,
                         })
                       }
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-green-600 focus:border-transparent"
-                      placeholder="(317) 314-3757"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent"
+                      placeholder="Contact Us"
                     />
                   </div>
 
@@ -355,7 +355,7 @@ export default function LicenseCheckoutPage() {
 
                   <button
                     type="submit"
-                    className="w-full bg-brand-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition"
+                    className="w-full bg-brand-blue-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition"
                   >
                     Continue to Payment
                   </button>

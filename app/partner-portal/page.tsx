@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server';
 
 import Link from 'next/link';
 import Image from 'next/image';
-import PageAvatar from '@/components/PageAvatar';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +63,7 @@ export default async function PartnerPortalPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Get Started
             </Link>
@@ -79,10 +78,6 @@ export default async function PartnerPortalPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/orientation-guide.mp4" 
-        title="Partner Welcome" 
-      />
 
       {/* Content Section */}
       <section className="py-16">
@@ -101,7 +96,7 @@ export default async function PartnerPortalPage() {
                 <ul className="space-y-3">
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -117,7 +112,7 @@ export default async function PartnerPortalPage() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -133,7 +128,7 @@ export default async function PartnerPortalPage() {
                   </li>
                   <li className="flex items-start">
                     <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
+                      className="w-6 h-6 text-brand-blue-600 mr-2 flex-shrink-0 mt-1"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -188,7 +183,7 @@ export default async function PartnerPortalPage() {
               </div>
 
               <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
-                <div className="relative h-32 bg-purple-600 flex items-center justify-center">
+                <div className="relative h-32 bg-brand-red-600 flex items-center justify-center">
                   <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>

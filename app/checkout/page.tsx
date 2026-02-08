@@ -59,7 +59,7 @@ export default async function CheckoutPage({
             Contact Us
           </a>
           <p className="text-center text-sm text-gray-500 mt-4">
-            Or call (317) 314-3757
+            Or call Contact Us
           </p>
         </div>
       </div>

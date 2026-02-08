@@ -17,7 +17,7 @@ export function CourseProgress({ current, total, className = '' }: CourseProgres
         <span className="text-black font-medium">
           {current} of {total} lessons complete
         </span>
-        <span className="text-brand-orange-600 font-semibold">{percentage}%</span>
+        <span className="text-brand-blue-600 font-semibold">{percentage}%</span>
       </div>
       <div className="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
         <div
@@ -26,7 +26,7 @@ export function CourseProgress({ current, total, className = '' }: CourseProgres
         />
       </div>
       {percentage === 100 && (
-        <div className="flex items-center gap-2 mt-2 text-brand-orange-600 text-sm font-medium">
+        <div className="flex items-center gap-2 mt-2 text-brand-blue-600 text-sm font-medium">
           <Circle className="w-4 h-4" />
           <span>Course completed!</span>
         </div>
@@ -43,7 +43,7 @@ interface LessonProgressIndicatorProps {
 export function LessonProgressIndicator({ completed, current }: LessonProgressIndicatorProps) {
   if (completed) {
     return (
-      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-orange-500 text-white">
+      <div className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-blue-500 text-white">
         <Circle className="w-4 h-4" />
       </div>
     );
@@ -52,7 +52,7 @@ export function LessonProgressIndicator({ completed, current }: LessonProgressIn
   if (current) {
     return (
       <div className="flex items-center justify-center w-6 h-6 rounded-full border-2 border-emerald-500 bg-red-50">
-        <div className="w-2 h-2 rounded-full bg-brand-orange-500" />
+        <div className="w-2 h-2 rounded-full bg-brand-blue-500" />
       </div>
     );
   }

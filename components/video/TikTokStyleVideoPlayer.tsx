@@ -324,7 +324,7 @@ label="English" />}
             onClick={onLike}
             className="flex flex-col items-center gap-1 text-white hover:scale-110 transition-transform"
           >
-            <div className={`w-12 h-12 rounded-full ${isLiked ? 'bg-brand-orange-500' : 'bg-white/20'} flex items-center justify-center backdrop-blur-sm`}>
+            <div className={`w-12 h-12 rounded-full ${isLiked ? 'bg-brand-blue-500' : 'bg-white/20'} flex items-center justify-center backdrop-blur-sm`}>
               <svg className="w-6 h-6" fill={isLiked ? 'white' : 'none'} stroke="white"
 viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}

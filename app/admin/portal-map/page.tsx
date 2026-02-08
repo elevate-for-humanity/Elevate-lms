@@ -687,7 +687,7 @@ export default function AdminPortalMapPage() {
     switch (status) {
       case 'active':
         return (
-          <span className="inline-flex items-center gap-1 px-2 py-2 text-xs font-medium text-green-700 bg-brand-green-100 rounded-full">
+          <span className="inline-flex items-center gap-1 px-2 py-2 text-xs font-medium text-green-700 bg-brand-blue-100 rounded-full">
             <Circle className="w-3 h-3" />
             Active
           </span>
@@ -765,7 +765,7 @@ export default function AdminPortalMapPage() {
             <div className="text-sm text-black">Total Routes</div>
           </div>
           <div className="bg-white rounded-lg shadow p-6">
-            <div className="text-2xl font-bold text-brand-green-600">
+            <div className="text-2xl font-bold text-brand-blue-600">
               {adminRoutes.filter((r) => r.status === 'active').length}
             </div>
             <div className="text-sm text-black">Active Features</div>

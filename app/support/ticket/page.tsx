@@ -263,8 +263,8 @@ function SubmitTicketContent() {
           <div className="mt-8 pt-8 border-t border-gray-200">
             <p className="text-sm text-gray-600 text-center">
               Need immediate help? Call us at{' '}
-              <a href="tel:+13173143757" className="text-blue-600 font-semibold hover:underline">
-                (317) 314-3757
+              <a href="/contact" className="text-blue-600 font-semibold hover:underline">
+                Contact Us
               </a>
             </p>
           </div>

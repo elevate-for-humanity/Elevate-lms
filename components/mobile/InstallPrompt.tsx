@@ -36,7 +36,7 @@ export default function InstallPrompt() {
             <div className="flex items-center gap-2">
               <button
                 onClick={handleInstall}
-                className="px-4 py-2 bg-white text-brand-orange-600 font-medium text-sm rounded-lg active:scale-95 transition-transform"
+                className="px-4 py-2 bg-white text-brand-blue-600 font-medium text-sm rounded-lg active:scale-95 transition-transform"
               >
                 Install
               </button>

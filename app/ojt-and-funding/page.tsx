@@ -20,7 +20,7 @@ const steps = [
 const benefits = [
   { icon: DollarSign, title: 'Day 1 Paycheck', color: 'green' },
   { icon: Briefcase, title: 'Real Job Skills', color: 'blue' },
-  { icon: Building2, title: 'Actual Employer', color: 'purple' },
+  { icon: Building2, title: 'Actual Employer', color: 'brand-red' },
   { icon: Award, title: 'Permanent Position', color: 'orange' },
 ];
 
@@ -73,7 +73,7 @@ export default function OJTAndFundingPage() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                   b.color === 'green' ? 'bg-green-500' : 
                   b.color === 'blue' ? 'bg-blue-500' : 
-                  b.color === 'purple' ? 'bg-purple-500' : 'bg-orange-500'
+                  b.color === 'brand-red' ? 'bg-brand-red-500' : 'bg-orange-500'
                 }`}>
                   <b.icon className="w-6 h-6 text-white" />
                 </div>
@@ -218,8 +218,8 @@ export default function OJTAndFundingPage() {
             <Link href="/apply" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
-            <a href="tel:+13173143757" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
-              Call (317) 314-3757
+            <a href="/contact" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
+              Call Contact Us
             </a>
           </div>
         </div>

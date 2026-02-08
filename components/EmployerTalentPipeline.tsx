@@ -57,7 +57,7 @@ export function EmployerTalentPipeline() {
   const stageColors: Record<string, string> = {
     sourced: 'bg-gray-100 text-black',
     screening: 'bg-blue-100 text-blue-700',
-    interview: 'bg-purple-100 text-purple-700',
+    interview: 'bg-brand-red-100 text-brand-red-700',
     offer: 'bg-orange-100 text-orange-700',
     hired: 'bg-green-100 text-green-700',
   };
@@ -75,7 +75,7 @@ export function EmployerTalentPipeline() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {stages.slice(1).map((stage) => (
             <Card key={stage} className="p-4 text-center">
-              <p className="text-2xl font-bold text-brand-orange-600">
+              <p className="text-2xl font-bold text-brand-blue-600">
                 {candidates.filter(c => c.stage === stage).length}
               </p>
               <p className="text-sm text-black capitalize">{stage}</p>
@@ -90,7 +90,7 @@ export function EmployerTalentPipeline() {
               onClick={() => setSelectedStage(stage)}
               className={`px-4 py-2 rounded-lg text-sm font-medium capitalize ${
                 selectedStage === stage
-                  ? 'bg-brand-orange-600 text-white'
+                  ? 'bg-brand-blue-600 text-white'
                   : 'bg-white text-black border hover:bg-gray-50'
               }`}
             >
@@ -114,7 +114,7 @@ export function EmployerTalentPipeline() {
                   <p className="text-sm text-gray-500">Graduates: {candidate.graduationDate}</p>
                 </div>
                 <div className="text-right">
-                  <div className="text-3xl font-bold text-brand-orange-600">{candidate.matchScore}%</div>
+                  <div className="text-3xl font-bold text-brand-blue-600">{candidate.matchScore}%</div>
                   <p className="text-sm text-black">Match Score</p>
                 </div>
               </div>

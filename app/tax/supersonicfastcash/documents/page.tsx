@@ -171,7 +171,7 @@ export default function DocumentUploadPage() {
                 setContactInfo({ ...contactInfo, phone: e.target.value })
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="(317) 314-3757"
+              placeholder="Contact Us"
             />
           </div>
         </div>
@@ -201,7 +201,7 @@ export default function DocumentUploadPage() {
           Accepted formats: PDF, JPG, PNG, DOC, DOCX (Max 10MB per file)
         </p>
         {(!contactInfo.name || !contactInfo.email || !contactInfo.phone) && (
-          <p className="text-sm text-brand-orange-600 mt-2">
+          <p className="text-sm text-brand-blue-600 mt-2">
             Please fill in your contact information above before uploading
           </p>
         )}
@@ -235,10 +235,10 @@ export default function DocumentUploadPage() {
                     <div className="text-sm text-black">Uploading...</div>
                   )}
                   {file.status === 'success' && (
-                    <Circle className="w-5 h-5 text-brand-green-600" />
+                    <Circle className="w-5 h-5 text-brand-blue-600" />
                   )}
                   {file.status === 'error' && (
-                    <AlertCircle className="w-5 h-5 text-brand-orange-600" />
+                    <AlertCircle className="w-5 h-5 text-brand-blue-600" />
                   )}
                   <button
                     onClick={() => removeFile(file.name)}
@@ -384,10 +384,10 @@ export default function DocumentUploadPage() {
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
           <a
-            href="tel:3173143757"
+            href="/contact"
             className="px-6 py-3 rounded-lg bg-brand-blue-600 text-white font-semibold hover:bg-brand-blue-700 transition"
           >
-            Call 317-314-3757
+            Call Contact Us
           </a>
           <Link
             href="/tax/book-appointment"

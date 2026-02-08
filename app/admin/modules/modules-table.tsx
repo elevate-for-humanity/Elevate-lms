@@ -60,9 +60,9 @@ export function ModulesTable({
       case 'scorm':
         return 'bg-blue-100 text-blue-800';
       case 'lesson':
-        return 'bg-brand-green-100 text-green-800';
+        return 'bg-brand-blue-100 text-green-800';
       case 'assessment':
-        return 'bg-purple-100 text-purple-800';
+        return 'bg-brand-red-100 text-brand-red-800';
       case 'external':
         return 'bg-yellow-100 text-yellow-800';
       default:
@@ -197,7 +197,7 @@ export function ModulesTable({
                   </td>
                   <td className="px-6 py-4">
                     {module.is_required ? (
-                      <span className="text-brand-green-600 font-medium">
+                      <span className="text-brand-blue-600 font-medium">
                         • Required
                       </span>
                     ) : (

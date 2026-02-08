@@ -76,7 +76,7 @@ export function ModuleBreakdown({ modules, className = '' }: ModuleBreakdownProp
               >
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <span className="text-sm font-semibold text-brand-orange-600">
+                    <span className="text-sm font-semibold text-brand-blue-600">
                       Module {index + 1}
                     </span>
                     <h3 className="font-semibold text-black">{module.title}</h3>
@@ -107,7 +107,7 @@ export function ModuleBreakdown({ modules, className = '' }: ModuleBreakdownProp
                     )}
                   </div>
                   {completedLessons > 0 && (
-                    <div className="mt-2 text-xs text-brand-orange-600 font-medium">
+                    <div className="mt-2 text-xs text-brand-blue-600 font-medium">
                       {completedLessons} of {totalLessons} lessons complete
                     </div>
                   )}

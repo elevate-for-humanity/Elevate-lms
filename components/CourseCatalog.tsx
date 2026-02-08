@@ -213,7 +213,7 @@ export function CourseCatalog() {
                   </span>
                   <span className={`px-2 py-2 text-xs rounded ${
                     course.level === 'beginner' ? 'bg-blue-100 text-blue-700' :
-                    course.level === 'intermediate' ? 'bg-purple-100 text-purple-700' :
+                    course.level === 'intermediate' ? 'bg-brand-red-100 text-brand-red-700' :
                     'bg-red-100 text-red-700'
                   }`}>
                     {course.level}
@@ -249,7 +249,7 @@ export function CourseCatalog() {
 
                 <div className="flex items-center justify-between pt-4 border-t">
                   <div>
-                    <p className="text-2xl font-bold text-brand-orange-600">${course.price}</p>
+                    <p className="text-2xl font-bold text-brand-blue-600">${course.price}</p>
                   </div>
                   <Button size="sm">Enroll Now</Button>
                 </div>

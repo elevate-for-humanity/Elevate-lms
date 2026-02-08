@@ -5,7 +5,6 @@ import { ArrowRight, Play, ShoppingBag, GraduationCap, BookOpen, Server, CreditC
 import { primaryCards, secondaryCards } from '@/lib/store/cards';
 import StoreClientWrapper from './StoreClientWrapper';
 import UniversalSearch from '@/components/search/UniversalSearch';
-import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 
@@ -77,10 +76,6 @@ export default function StorePage() {
         </section>
 
         {/* Avatar Guide */}
-        <PageAvatar 
-          videoSrc="/videos/avatars/store-assistant.mp4" 
-          title="Store Assistant" 
-        />
 
 
 

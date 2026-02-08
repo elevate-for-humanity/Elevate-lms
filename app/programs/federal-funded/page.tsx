@@ -139,7 +139,7 @@ export default async function FederalFundedProgramsPage() {
               </p>
               <Link
                 href="/wioa-eligibility"
-                className="text-brand-green-600 font-semibold hover:underline"
+                className="text-brand-blue-600 font-semibold hover:underline"
               >
                 Check Eligibility →
               </Link>
@@ -153,7 +153,7 @@ export default async function FederalFundedProgramsPage() {
               </p>
               <Link
                 href="/funding"
-                className="text-brand-green-600 font-semibold hover:underline"
+                className="text-brand-blue-600 font-semibold hover:underline"
               >
                 Learn More →
               </Link>
@@ -167,7 +167,7 @@ export default async function FederalFundedProgramsPage() {
               </p>
               <Link
                 href="/funding"
-                className="text-brand-green-600 font-semibold hover:underline"
+                className="text-brand-blue-600 font-semibold hover:underline"
               >
                 Learn More →
               </Link>
@@ -185,7 +185,7 @@ export default async function FederalFundedProgramsPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-green-100 text-brand-green-600 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-blue-100 text-brand-blue-600 mb-4">
                 <Circle className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-black mb-2">Tuition</h3>
@@ -203,7 +203,7 @@ export default async function FederalFundedProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 text-purple-600 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-red-100 text-brand-red-600 mb-4">
                 <Users className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-black mb-2">Support Services</h3>
@@ -213,7 +213,7 @@ export default async function FederalFundedProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-brand-orange-600 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-brand-blue-600 mb-4">
                 <Shield className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-black mb-2">No Payback</h3>
@@ -253,14 +253,14 @@ export default async function FederalFundedProgramsPage() {
                     {program.name}
                   </h3>
                   <div className="flex flex-wrap gap-2 mb-3">
-                    <span className="px-3 py-2 bg-brand-green-100 text-green-700 text-xs font-semibold rounded-full">
+                    <span className="px-3 py-2 bg-brand-blue-100 text-green-700 text-xs font-semibold rounded-full">
                       {program.duration}
                     </span>
                     <span className="px-3 py-2 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
                       $0 Cost
                     </span>
                   </div>
-                  <span className="inline-flex items-center font-semibold text-brand-green-600 group-hover:underline text-sm">
+                  <span className="inline-flex items-center font-semibold text-brand-blue-600 group-hover:underline text-sm">
                     Learn More →
                   </span>
                 </div>
@@ -302,13 +302,13 @@ export default async function FederalFundedProgramsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex px-8 py-4 bg-brand-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition text-lg"
+              className="inline-flex px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-green-700 transition text-lg"
             >
               Apply Now
             </Link>
             <Link
               href="/wioa-eligibility"
-              className="inline-flex px-8 py-4 bg-white border-2 border-brand-green-600 text-brand-green-600 font-bold rounded-lg hover:bg-green-50 transition text-lg"
+              className="inline-flex px-8 py-4 bg-white border-2 border-brand-blue-600 text-brand-blue-600 font-bold rounded-lg hover:bg-green-50 transition text-lg"
             >
               Check Eligibility
             </Link>

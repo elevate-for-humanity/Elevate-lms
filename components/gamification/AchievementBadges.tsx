@@ -35,7 +35,7 @@ const badges = [
     name: 'Perfect Score',
     description: 'Score 100% on a quiz',
     icon: Target,
-    color: 'bg-purple-500',
+    color: 'bg-brand-red-500',
     earned: false,
     earnedDate: null,
   },

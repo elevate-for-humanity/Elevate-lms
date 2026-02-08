@@ -360,7 +360,7 @@ export default function SchoolLicensePage() {
             </Link>
           </div>
           <p className="mt-8 text-orange-200">
-            Questions? Call (317) 314-3757
+            Questions? Call Contact Us
           </p>
         </div>
       </section>

@@ -99,7 +99,7 @@ export default function TaxServicesPage() {
             <Link href="/tax" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
               Locations
             </Link>
-            <Link href="/tax" className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors">
+            <Link href="/tax" className="px-4 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-medium hover:bg-brand-red-200 transition-colors">
               What to Bring
             </Link>
             <Link href="/tax/volunteer" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
@@ -319,8 +319,8 @@ export default function TaxServicesPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Audit Support</h3>
               <p className="text-gray-600">
@@ -396,8 +396,8 @@ export default function TaxServicesPage() {
             </Link>
 
             <div className="bg-white p-6 rounded-xl border-2 border-gray-200">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-lg flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">
                 IRS Resources
@@ -410,7 +410,7 @@ export default function TaxServicesPage() {
                   href="https://irs.treasury.gov/freetaxprep/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-sm text-purple-600 hover:underline"
+                  className="block text-sm text-brand-red-600 hover:underline"
                 >
                   IRS Free Tax Prep →
                 </a>
@@ -418,7 +418,7 @@ export default function TaxServicesPage() {
                   href="https://www.irs.gov/refunds"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-sm text-purple-600 hover:underline"
+                  className="block text-sm text-brand-red-600 hover:underline"
                 >
                   Where&apos;s My Refund? →
                 </a>
@@ -455,7 +455,7 @@ export default function TaxServicesPage() {
           </div>
           <p className="mt-8 text-blue-200">
             <Phone className="inline-block w-4 h-4 mr-2" />
-            Questions? Call us at (317) 314-3757
+            Questions? Call us at Contact Us
           </p>
         </div>
       </section>
@@ -472,11 +472,11 @@ export default function TaxServicesPage() {
               Apply Now
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Contact Us
             </a>
           </div>
         </div>

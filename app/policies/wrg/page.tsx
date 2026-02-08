@@ -28,7 +28,7 @@ export default function WRGPage() {
       <h2>Award Amount</h2>
       <p>Up to $7,500 per year for tuition and fees.</p>
       <h2>Contact</h2>
-      <p>Email: elevate4humanityedu@gmail.com | Phone: (317) 314-3757</p>
+      <p>Email: elevate4humanityedu@gmail.com | Phone: Contact Us</p>
         </article>
       </div>
     </div>

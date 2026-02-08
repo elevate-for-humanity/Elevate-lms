@@ -139,7 +139,7 @@ export default function ReportsDashboard({
               Total Enrollments
             </h3>
             <svg
-              className="w-8 h-8 text-brand-green-600"
+              className="w-8 h-8 text-brand-blue-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -155,7 +155,7 @@ export default function ReportsDashboard({
           <p className="text-3xl font-bold text-black">
             {stats.totalEnrollments}
           </p>
-          <p className="text-sm text-brand-green-600 mt-1">
+          <p className="text-sm text-brand-blue-600 mt-1">
             {stats.activeEnrollments} active
           </p>
         </div>
@@ -166,7 +166,7 @@ export default function ReportsDashboard({
               Completion Rate
             </h3>
             <svg
-              className="w-8 h-8 text-purple-600"
+              className="w-8 h-8 text-brand-red-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -193,7 +193,7 @@ export default function ReportsDashboard({
               Certificates Issued
             </h3>
             <svg
-              className="w-8 h-8 text-brand-orange-600"
+              className="w-8 h-8 text-brand-blue-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -328,7 +328,7 @@ export default function ReportsDashboard({
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           enrollment.status === 'active'
-                            ? 'bg-brand-green-100 text-green-800'
+                            ? 'bg-brand-blue-100 text-green-800'
                             : enrollment.status === 'completed'
                               ? 'bg-blue-100 text-blue-800'
                               : 'bg-yellow-100 text-yellow-800'
@@ -371,7 +371,7 @@ export default function ReportsDashboard({
           <h3 className="text-sm font-medium text-black mb-2">
             Pending Review
           </h3>
-          <p className="text-3xl font-bold text-brand-orange-600">
+          <p className="text-3xl font-bold text-brand-blue-600">
             {stats.pendingApplications}
           </p>
         </div>
@@ -379,7 +379,7 @@ export default function ReportsDashboard({
           <h3 className="text-sm font-medium text-black mb-2">
             Approval Rate
           </h3>
-          <p className="text-3xl font-bold text-brand-green-600">
+          <p className="text-3xl font-bold text-brand-blue-600">
             {stats.approvalRate}%
           </p>
         </div>

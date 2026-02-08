@@ -122,7 +122,7 @@ export default function AutomationPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
             >
               Get Started Free
             </Link>
@@ -177,7 +177,7 @@ export default function AutomationPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-2">
-              <Play className="w-8 h-8 text-brand-green-600" />
+              <Play className="w-8 h-8 text-brand-blue-600" />
             </div>
             <div className="text-2xl font-bold text-black">
               {workflows.filter((w) => w.status === 'active').length}
@@ -187,7 +187,7 @@ export default function AutomationPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-2">
-              <Mail className="w-8 h-8 text-purple-600" />
+              <Mail className="w-8 h-8 text-brand-red-600" />
             </div>
             <div className="text-2xl font-bold text-black">
               {workflows.reduce((sum, w) => sum + w.emails, 0)}
@@ -197,7 +197,7 @@ export default function AutomationPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-2">
-              <Users className="w-8 h-8 text-brand-orange-600" />
+              <Users className="w-8 h-8 text-brand-blue-600" />
             </div>
             <div className="text-2xl font-bold text-black">
               {workflows.reduce((sum, w) => sum + w.recipients, 0)}
@@ -238,7 +238,7 @@ export default function AutomationPage() {
               title="Course Reminders"
               description="Send reminders before class starts"
               icon={Zap}
-              color="purple"
+              color="brand-red"
               onClick={() =>
                 router.push(
                   '/admin/email-marketing/automation/new?template=reminder'
@@ -291,7 +291,7 @@ export default function AutomationPage() {
                         <span
                           className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                             workflow.status === 'active'
-                              ? 'bg-brand-green-100 text-green-800'
+                              ? 'bg-brand-blue-100 text-green-800'
                               : workflow.status === 'paused'
                                 ? 'bg-yellow-100 text-yellow-800'
                                 : 'bg-gray-100 text-black'
@@ -336,7 +336,7 @@ export default function AutomationPage() {
                         className={`p-2 rounded-lg transition-colors ${
                           workflow.status === 'active'
                             ? 'bg-yellow-100 text-yellow-700 hover:bg-yellow-200'
-                            : 'bg-brand-green-100 text-green-700 hover:bg-green-200'
+                            : 'bg-brand-blue-100 text-green-700 hover:bg-green-200'
                         }`}
                         title={
                           workflow.status === 'active' ? 'Pause' : 'Activate'
@@ -395,7 +395,7 @@ export default function AutomationPage() {
                   <ul className="space-y-4">
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -413,7 +413,7 @@ export default function AutomationPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -431,7 +431,7 @@ export default function AutomationPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -449,7 +449,7 @@ export default function AutomationPage() {
                     </li>
                     <li className="flex items-start">
                       <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                        className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -490,7 +490,7 @@ interface WorkflowTemplateProps {
   title: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: 'blue' | 'orange' | 'purple';
+  color: 'blue' | 'orange' | 'brand-red';
   onClick: () => void;
 }
 
@@ -503,8 +503,8 @@ function WorkflowTemplate({
 }: WorkflowTemplateProps) {
   const colorClasses = {
     blue: 'bg-blue-50 text-brand-blue-600 hover:bg-gray-100',
-    orange: 'bg-orange-50 text-brand-orange-600 hover:bg-orange-100',
-    purple: 'bg-purple-50 text-purple-600 hover:bg-purple-100',
+    orange: 'bg-orange-50 text-brand-blue-600 hover:bg-orange-100',
+    brand-red: 'bg-brand-red-50 text-brand-red-600 hover:bg-brand-red-100',
   };
 
   return (

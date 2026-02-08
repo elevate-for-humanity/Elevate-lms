@@ -63,7 +63,7 @@ function CheckoutForm({ product }: { product: any }) {
       <button
         type="submit"
         disabled={!stripe || processing}
-        className="w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold py-4 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold py-4 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {processing ? (
           <>
@@ -137,7 +137,7 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-orange-600 mx-auto mb-4" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4" />
           <p className="text-slate-600">Loading checkout...</p>
         </div>
       </div>
@@ -152,7 +152,7 @@ export default function CheckoutPage() {
           <Link
             href="/store"
             aria-label="Link"
-            className="text-brand-orange-600 hover:underline"
+            className="text-brand-blue-600 hover:underline"
           >
             Return to store
           </Link>
@@ -192,7 +192,7 @@ export default function CheckoutPage() {
                 <div className="border-t border-slate-200 pt-4">
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span className="text-brand-orange-600">
+                    <span className="text-brand-blue-600">
                       {product.priceDisplay}
                     </span>
                   </div>

@@ -103,7 +103,7 @@ export default async function ProductDetailPage({ params }: Props) {
                 <ul className="space-y-3 mb-8">
                   {product.features.map((feature, index) => (
                     <li key={index} className="flex items-start">
-                      <Check className="w-5 h-5 text-brand-green-600 mr-3 flex-shrink-0 mt-0.5" />
+                      <Check className="w-5 h-5 text-brand-blue-600 mr-3 flex-shrink-0 mt-0.5" />
                       <span className="text-black">{feature}</span>
                     </li>
                   ))}
@@ -165,7 +165,7 @@ export default async function ProductDetailPage({ params }: Props) {
 
                 <div className="space-y-4 mb-6">
                   <div className="flex items-start">
-                    <Shield className="w-5 h-5 text-brand-green-600 mr-3 flex-shrink-0 mt-0.5" />
+                    <Shield className="w-5 h-5 text-brand-blue-600 mr-3 flex-shrink-0 mt-0.5" />
                     <div>
                       <div className="font-semibold text-black">
                         License Type
@@ -189,7 +189,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   </div>
 
                   <div className="flex items-start">
-                    <Zap className="w-5 h-5 text-brand-orange-600 mr-3 flex-shrink-0 mt-0.5" />
+                    <Zap className="w-5 h-5 text-brand-blue-600 mr-3 flex-shrink-0 mt-0.5" />
                     <div>
                       <div className="font-semibold text-black">Support</div>
                       <div className="text-sm text-black">
@@ -217,7 +217,7 @@ export default async function ProductDetailPage({ params }: Props) {
                     <input type="hidden" name="productId" value={product.id} />
                     <button
                       type="submit"
-                      className="w-full bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors mb-4"
+                      className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors mb-4"
                     >
                       Purchase License
                     </button>

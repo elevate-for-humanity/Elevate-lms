@@ -185,7 +185,7 @@ export default function UnifiedChatAssistant({
       const errorMessage: Message = {
         id: `error_${Date.now()}`,
         role: 'assistant',
-        content: "I'm having trouble connecting right now. Please try again in a moment, or contact us at (317) 314-3757 for immediate assistance.",
+        content: "I'm having trouble connecting right now. Please try again in a moment, or contact us at Contact Us for immediate assistance.",
         timestamp: new Date(),
       };
       

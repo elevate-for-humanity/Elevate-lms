@@ -111,7 +111,7 @@ export default function CourseLeaderboardPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/contact"
-                className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
+                className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl"
               >
                 Get Started Free
               </Link>
@@ -148,7 +148,7 @@ export default function CourseLeaderboardPage() {
                     <ul className="space-y-4">
                       <li className="flex items-start">
                         <svg
-                          className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                          className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -166,7 +166,7 @@ export default function CourseLeaderboardPage() {
                       </li>
                       <li className="flex items-start">
                         <svg
-                          className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                          className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -185,7 +185,7 @@ export default function CourseLeaderboardPage() {
                       </li>
                       <li className="flex items-start">
                         <svg
-                          className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                          className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -203,7 +203,7 @@ export default function CourseLeaderboardPage() {
                       </li>
                       <li className="flex items-start">
                         <svg
-                          className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
+                          className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -284,7 +284,7 @@ export default function CourseLeaderboardPage() {
             <h1 className="text-4xl font-bold mb-4 text-2xl md:text-3xl lg:text-4xl">
               {course?.title}
             </h1>
-            <p className="text-base md:text-lg text-purple-100">
+            <p className="text-base md:text-lg text-brand-red-100">
               Course Leaderboard
             </p>
           </div>
@@ -302,7 +302,7 @@ export default function CourseLeaderboardPage() {
                   onClick={() => setTimeframe('week')}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     timeframe === 'week'
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-brand-red-600 text-white'
                       : 'bg-gray-100 text-black hover:bg-gray-200'
                   }`}
                 >
@@ -312,7 +312,7 @@ export default function CourseLeaderboardPage() {
                   onClick={() => setTimeframe('month')}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     timeframe === 'month'
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-brand-red-600 text-white'
                       : 'bg-gray-100 text-black hover:bg-gray-200'
                   }`}
                 >
@@ -322,7 +322,7 @@ export default function CourseLeaderboardPage() {
                   onClick={() => setTimeframe('all')}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     timeframe === 'all'
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-brand-red-600 text-white'
                       : 'bg-gray-100 text-black hover:bg-gray-200'
                   }`}
                 >
@@ -416,7 +416,7 @@ export default function CourseLeaderboardPage() {
                       </span>
                     )}
                   </div>
-                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-brand-orange-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
+                  <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-brand-blue-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold">
                     3
                   </div>
                 </div>
@@ -451,14 +451,14 @@ export default function CourseLeaderboardPage() {
                               : enstart.rank === 2
                                 ? 'text-black'
                                 : enstart.rank === 3
-                                  ? 'text-brand-orange-600'
+                                  ? 'text-brand-blue-600'
                                   : 'text-black'
                           }`}
                         >
                           #{enstart.rank}
                         </span>
                       </div>
-                      <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-12 h-12 bg-brand-red-100 rounded-full flex items-center justify-center flex-shrink-0">
                         {enstart.profiles?.avatar_url ? (
                           <Image
                             src={enstart.profiles.avatar_url}
@@ -469,7 +469,7 @@ export default function CourseLeaderboardPage() {
                             quality={100}
                           />
                         ) : (
-                          <span className="text-purple-600 font-semibold">
+                          <span className="text-brand-red-600 font-semibold">
                             {enstart.profiles?.full_name?.[0] || '?'}
                           </span>
                         )}
@@ -484,7 +484,7 @@ export default function CourseLeaderboardPage() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-purple-600">
+                        <p className="text-lg font-bold text-brand-red-600">
                           {enstart.points}
                         </p>
                         <p className="text-xs text-black">points</p>

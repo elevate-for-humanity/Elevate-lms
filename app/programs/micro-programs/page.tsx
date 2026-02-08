@@ -63,7 +63,7 @@ export default async function MicroProgramsPage() {
         ]}
       />
       {/* Hero */}
-      <section className="relative bg-purple-800 text-white px-6 sm:px-10 lg:px-12 py-20 lg:py-28">
+      <section className="relative bg-brand-red-800 text-white px-6 sm:px-10 lg:px-12 py-20 lg:py-28">
         <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
         <div className="mx-auto max-w-5xl text-center">
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
@@ -75,7 +75,7 @@ export default async function MicroProgramsPage() {
             Get Certified Fast
           </h1>
 
-          <p className="text-xl sm:text-2xl text-purple-100 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-xl sm:text-2xl text-brand-red-100 leading-relaxed max-w-3xl mx-auto">
             Short-term certifications you can complete in days or weeks. Perfect
             for adding credentials, meeting job requirements, or starting a new
             career path quickly.
@@ -128,7 +128,7 @@ export default async function MicroProgramsPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 text-purple-600 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-red-100 text-brand-red-600 mb-4">
                 <Clock className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-black mb-2">Fast Completion</h3>
@@ -148,7 +148,7 @@ export default async function MicroProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-green-100 text-brand-green-600 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-blue-100 text-brand-blue-600 mb-4">
                 <TrendingUp className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-black mb-2">Career Boost</h3>
@@ -158,7 +158,7 @@ export default async function MicroProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-brand-orange-600 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-orange-100 text-brand-blue-600 mb-4">
                 <Zap className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-black mb-2">Low Cost</h3>
@@ -184,7 +184,7 @@ export default async function MicroProgramsPage() {
               >
                 <div className="relative h-48 w-full overflow-hidden bg-white">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Zap className="w-16 h-16 text-purple-600" />
+                    <Zap className="w-16 h-16 text-brand-red-600" />
                   </div>
                 </div>
                 <div className="p-6">
@@ -192,14 +192,14 @@ export default async function MicroProgramsPage() {
                     {program.name}
                   </h3>
                   <div className="flex flex-wrap gap-2 mb-3">
-                    <span className="px-3 py-2 bg-purple-100 text-purple-700 text-xs font-semibold rounded-full">
+                    <span className="px-3 py-2 bg-brand-red-100 text-brand-red-700 text-xs font-semibold rounded-full">
                       {program.duration}
                     </span>
-                    <span className="px-3 py-2 bg-brand-green-100 text-green-700 text-xs font-semibold rounded-full">
+                    <span className="px-3 py-2 bg-brand-blue-100 text-green-700 text-xs font-semibold rounded-full">
                       Quick Start
                     </span>
                   </div>
-                  <span className="inline-flex items-center font-semibold text-purple-600 group-hover:underline text-sm">
+                  <span className="inline-flex items-center font-semibold text-brand-red-600 group-hover:underline text-sm">
                     Learn More →
                   </span>
                 </div>
@@ -217,7 +217,7 @@ export default async function MicroProgramsPage() {
           </h2>
 
           <div className="space-y-6">
-            <div className="bg-white rounded-xl border-2 border-purple-200 p-6">
+            <div className="bg-white rounded-xl border-2 border-brand-red-200 p-6">
               <h3 className="font-bold text-black mb-2">
                 You need a specific certification
               </h3>
@@ -227,7 +227,7 @@ export default async function MicroProgramsPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl border-2 border-purple-200 p-6">
+            <div className="bg-white rounded-xl border-2 border-brand-red-200 p-6">
               <h3 className="font-bold text-black mb-2">
                 You're exploring career options
               </h3>
@@ -237,7 +237,7 @@ export default async function MicroProgramsPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl border-2 border-purple-200 p-6">
+            <div className="bg-white rounded-xl border-2 border-brand-red-200 p-6">
               <h3 className="font-bold text-black mb-2">
                 You want to add skills fast
               </h3>
@@ -247,7 +247,7 @@ export default async function MicroProgramsPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-xl border-2 border-purple-200 p-6">
+            <div className="bg-white rounded-xl border-2 border-brand-red-200 p-6">
               <h3 className="font-bold text-black mb-2">
                 You need workforce readiness
               </h3>
@@ -292,7 +292,7 @@ export default async function MicroProgramsPage() {
           </p>
           <Link
             href="/apply"
-            className="inline-flex px-8 py-4 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition text-lg"
+            className="inline-flex px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition text-lg"
           >
             Apply Now
           </Link>

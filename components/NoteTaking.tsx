@@ -118,7 +118,7 @@ export function NoteTaking({ courseId, lessonId, videoTimestamp }: NoteTakingPro
           <button
             onClick={saveNote}
             disabled={saving || !currentNote.trim()}
-            className="flex items-center gap-2 px-4 py-2 bg-brand-orange-600 text-white text-sm rounded-lg hover:bg-brand-orange-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white text-sm rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="w-4 h-4" />
             {saving ? 'Saving...' : 'Save Note'}
@@ -149,7 +149,7 @@ export function NoteTaking({ courseId, lessonId, videoTimestamp }: NoteTakingPro
               <div className="flex items-start justify-between gap-2">
                 <div className="flex-1">
                   {note.timestamp && (
-                    <div className="flex items-center gap-1 text-xs text-brand-orange-600 font-medium mb-1">
+                    <div className="flex items-center gap-1 text-xs text-brand-blue-600 font-medium mb-1">
                       <Clock className="w-3 h-3" />
                       {formatTimestamp(note.timestamp)}
                     </div>
@@ -163,7 +163,7 @@ export function NoteTaking({ courseId, lessonId, videoTimestamp }: NoteTakingPro
                 </div>
                 <button
                   onClick={() => deleteNote(note.id)}
-                  className="text-slate-400 hover:text-brand-orange-600 text-xs"
+                  className="text-slate-400 hover:text-brand-blue-600 text-xs"
                 >
                   Delete
                 </button>

@@ -66,7 +66,7 @@ const SUPPORT_CATEGORIES = [
     title: 'Account & Billing',
     description: 'Account settings, enrollment, or payment questions',
     icon: FileText,
-    color: 'bg-purple-100 text-purple-600',
+    color: 'bg-brand-red-100 text-brand-red-600',
   },
   {
     title: 'Career Services',
@@ -206,13 +206,13 @@ export default async function SupportPage() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h3 className="font-bold text-slate-900 mb-4">Other Ways to Reach Us</h3>
               <div className="space-y-4">
-                <a href="tel:317-314-3757" className="flex items-center gap-3 text-slate-600 hover:text-blue-600">
+                <a href="/contact" className="flex items-center gap-3 text-slate-600 hover:text-blue-600">
                   <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                     <Phone className="w-5 h-5" />
                   </div>
                   <div>
                     <div className="font-medium text-slate-900">Phone Support</div>
-                    <div className="text-sm">(317) 314-3757</div>
+                    <div className="text-sm">Contact Us</div>
                   </div>
                 </a>
                 <a href="mailto:elevate4humanityedu@gmail.com" className="flex items-center gap-3 text-slate-600 hover:text-blue-600">
@@ -239,14 +239,14 @@ export default async function SupportPage() {
             </div>
 
             {/* AI Tutor */}
-            <div className="bg-purple-50 rounded-2xl border border-purple-200 p-6">
-              <h3 className="font-bold text-purple-900 mb-2">Need Course Help?</h3>
-              <p className="text-sm text-purple-800 mb-4">
+            <div className="bg-brand-red-50 rounded-2xl border border-brand-red-200 p-6">
+              <h3 className="font-bold text-brand-red-900 mb-2">Need Course Help?</h3>
+              <p className="text-sm text-brand-red-800 mb-4">
                 Our AI Tutor can help with course questions 24/7.
               </p>
               <Link
                 href="/lms/ai-tutor"
-                className="block w-full text-center bg-purple-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-purple-700 transition"
+                className="block w-full text-center bg-brand-red-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-brand-red-700 transition"
               >
                 Ask AI Tutor
               </Link>

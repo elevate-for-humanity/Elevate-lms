@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: 'Student Support | Elevate for Humani
 export default function StudentSupportPage() {
   const supportOptions = [
     { icon: MessageSquare, title: 'Live Chat', description: 'Chat with a support agent', action: 'Start Chat', href: '/support/chat' },
-    { icon: Phone, title: 'Phone Support', description: 'Call (317) 314-3757', action: 'Call Now', href: 'tel:317-314-3757' },
+    { icon: Phone, title: 'Phone Support', description: 'Call Contact Us', action: 'Call Now', href: 'tel:Contact Us' },
     { icon: Mail, title: 'Email Support', description: 'elevate4humanityedu@gmail.com', action: 'Send Email', href: 'mailto:elevate4humanityedu@gmail.com' },
     { icon: FileText, title: 'Help Articles', description: 'Browse our knowledge base', action: 'View Articles', href: '/help' },
   ];
@@ -16,7 +16,7 @@ export default function StudentSupportPage() {
   const faqs = [
     { q: 'How do I reset my password?', a: 'Click "Forgot Password" on the login page and follow the instructions sent to your email.' },
     { q: 'How do I access my courses?', a: 'Log in to your student portal and click on "My Courses" to see all enrolled courses.' },
-    { q: 'Who do I contact about financial aid?', a: 'Contact our financial aid office at elevate4humanityedu@gmail.com or call (317) 314-3757.' },
+    { q: 'Who do I contact about financial aid?', a: 'Contact our financial aid office at elevate4humanityedu@gmail.com or call Contact Us.' },
   ];
 
   return (

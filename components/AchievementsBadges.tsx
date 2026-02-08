@@ -77,7 +77,7 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
       <div className="flex items-center justify-between mb-6">
         <h3 className="text-2xl font-bold text-black">Achievements & Badges</h3>
         <div className="text-right">
-          <p className="text-3xl font-bold text-brand-orange-600">{earnedCount}/{totalCount}</p>
+          <p className="text-3xl font-bold text-brand-blue-600">{earnedCount}/{totalCount}</p>
           <p className="text-sm text-black">Badges Earned</p>
         </div>
       </div>
@@ -102,7 +102,7 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
           onClick={() => setFilter('all')}
           className={`px-4 py-2 text-sm rounded-lg transition ${
             filter === 'all'
-              ? 'bg-brand-orange-600 text-white'
+              ? 'bg-brand-blue-600 text-white'
               : 'bg-slate-100 text-black hover:bg-slate-200'
           }`}
         >
@@ -112,7 +112,7 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
           onClick={() => setFilter('earned')}
           className={`px-4 py-2 text-sm rounded-lg transition ${
             filter === 'earned'
-              ? 'bg-brand-orange-600 text-white'
+              ? 'bg-brand-blue-600 text-white'
               : 'bg-slate-100 text-black hover:bg-slate-200'
           }`}
         >
@@ -122,7 +122,7 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
           onClick={() => setFilter('locked')}
           className={`px-4 py-2 text-sm rounded-lg transition ${
             filter === 'locked'
-              ? 'bg-brand-orange-600 text-white'
+              ? 'bg-brand-blue-600 text-white'
               : 'bg-slate-100 text-black hover:bg-slate-200'
           }`}
         >
@@ -173,7 +173,7 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
               {/* Progress or Earned Date */}
               {isEarned ? (
                 <div className="text-center">
-                  <p className="text-xs text-brand-orange-600 font-medium">
+                  <p className="text-xs text-brand-blue-600 font-medium">
                     Earned {new Date(badge.earned_at!).toLocaleDateString()}
                   </p>
                 </div>
@@ -187,7 +187,7 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
                   </div>
                   <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-brand-orange-500"
+                      className="h-full bg-brand-blue-500"
                       style={{
                         width: `${(badge.progress / badge.requirement) * 100}%`,
                       }}
@@ -201,7 +201,7 @@ export function AchievementsBadges({ userId }: AchievementsBadgesProps) {
               {/* Earned Badge Indicator */}
               {isEarned && (
                 <div className="absolute top-2 right-2">
-                  <div className="w-6 h-6 bg-brand-orange-600 rounded-full flex items-center justify-center">
+                  <div className="w-6 h-6 bg-brand-blue-600 rounded-full flex items-center justify-center">
                     <Star className="w-4 h-4 text-white fill-white" />
                   </div>
                 </div>

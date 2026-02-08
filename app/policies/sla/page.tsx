@@ -188,7 +188,7 @@ export default function SLAPage() {
         <ul className="list-none mb-6 text-black space-y-2 p-0">
           <li><strong>General Support:</strong> elevate4humanityedu@gmail.com</li>
           <li><strong>Billing Questions:</strong> elevate4humanityedu@gmail.com</li>
-          <li><strong>Phone:</strong> (317) 314-3757</li>
+          <li><strong>Phone:</strong> Contact Us</li>
         </ul>
 
         <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">

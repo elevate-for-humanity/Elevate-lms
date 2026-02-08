@@ -79,7 +79,7 @@ export function AssignmentActivity({
           </span>
           <span>Points: {maxPoints}</span>
           {isOverdue && (
-            <span className="flex items-center gap-1 text-brand-orange-600">
+            <span className="flex items-center gap-1 text-brand-blue-600">
               <AlertCircle className="w-4 h-4" />
               Overdue
             </span>
@@ -122,7 +122,7 @@ export function AssignmentActivity({
                 />
                 <label
                   htmlFor="file-upload"
-                  className="cursor-pointer text-sm text-brand-orange-600 hover:text-red-700 font-medium"
+                  className="cursor-pointer text-sm text-brand-blue-600 hover:text-red-700 font-medium"
                 >
                   Click to upload
                 </label>
@@ -182,7 +182,7 @@ export function AssignmentActivity({
           <button
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="w-full bg-brand-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-orange-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition"
+            className="w-full bg-brand-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition"
           >
             {isSubmitting ? 'Submitting...' : 'Submit Assignment'}
           </button>
@@ -192,7 +192,7 @@ export function AssignmentActivity({
       {!canSubmit && (
         <div className="border-t border-slate-200 pt-6">
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-center">
-            <AlertCircle className="w-8 h-8 text-brand-orange-600 mx-auto mb-2" />
+            <AlertCircle className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
             <p className="text-red-800 font-medium">
               This assignment is overdue and no longer accepts submissions.
             </p>

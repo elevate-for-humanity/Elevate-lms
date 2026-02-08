@@ -14,7 +14,7 @@ export function Footer() {
               Free career training programs with job placement support for underserved communities.
             </p>
             <div className="flex gap-4">
-              <a href="tel:317-314-3757" className="text-gray-400 hover:text-white text-sm">(317) 314-3757</a>
+              <a href="/contact" className="text-gray-400 hover:text-white text-sm">Contact Us</a>
             </div>
           </div>
 

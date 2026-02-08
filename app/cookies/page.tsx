@@ -190,10 +190,10 @@ export default async function CookiesPage() {
               <p className="text-black mb-2">
                 Phone:{' '}
                 <a
-                  href="tel:317-314-3757"
+                  href="/contact"
                   className="text-brand-blue-600 hover:underline"
                 >
-                  317-314-3757
+                  Contact Us
                 </a>
               </p>
               <p className="text-black">

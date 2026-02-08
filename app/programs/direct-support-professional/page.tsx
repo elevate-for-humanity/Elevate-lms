@@ -11,7 +11,6 @@ import { Heart, Circle, Users, Award, Clock, DollarSign } from 'lucide-react';
 import { CompactHero } from '@/components/heroes/CompactHero';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 
@@ -70,7 +69,7 @@ export default async function Page() {
         headline="Direct Support Professional: Make a difference in people's lives"
         description="Funded DSP training. Help individuals with disabilities live independently and participate fully in their communities. 4-6 weeks, job placement included."
         primaryCTA={{ text: 'Start Eligibility & Choose This Program', href: '/apply' }}
-        secondaryCTA={{ text: 'Questions? Call Us', href: 'tel:317-314-3757' }}
+        secondaryCTA={{ text: 'Questions? Contact Us', href: 'tel:Contact Us' }}
       />
 
       {/* Funding Badge */}
@@ -81,32 +80,6 @@ export default async function Page() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/healthcare-guide.mp4" title="DSP Program Guide" />
-
-      {/* Program Overview */}
-      <section className="max-w-7xl mx-auto px-4 py-16">
-        <div className="grid md:grid-cols-2 gap-12">
-          <div>
-            <h2 className="text-3xl font-bold text-black mb-6">
-              Program Overview
-            </h2>
-            <p className="text-lg text-black mb-4">
-              Direct Support Professionals provide essential care and support to
-              individuals with intellectual and developmental disabilities. This
-              rewarding career helps people live independently and participate
-              fully in their communities.
-            </p>
-            <p className="text-lg text-black mb-4">
-              Our funded training program prepares you for immediate employment in
-              residential facilities, day programs, and community settings.
-            </p>
-            <div className="relative h-[300px] rounded-xl overflow-hidden mt-6">
-              <Image
-                src="/images/gallery/image1.jpg"
-                alt="DSP training session"
-                fill
-                className="object-cover"
-              />
             </div>
           </div>
           <div className="bg-blue-50 p-8 rounded-lg">
@@ -285,10 +258,10 @@ export default async function Page() {
               Start Eligibility & Choose This Program
             </Link>
             <Link
-              href="tel:317-314-3757"
+              href="/contact"
               className="px-8 py-4 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg transition-all text-center border-2 border-white"
             >
-              Questions? Call Us
+              Questions? Contact Us
             </Link>
           </div>
         </div>

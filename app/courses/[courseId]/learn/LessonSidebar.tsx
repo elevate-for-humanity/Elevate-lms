@@ -79,7 +79,7 @@ export default function LessonSidebar({
             </div>
             <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-brand-orange-600 transition-all duration-300"
+                className="h-full bg-brand-blue-600 transition-all duration-300"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -131,7 +131,7 @@ export default function LessonSidebar({
                           w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold
                           ${
                             isActive
-                              ? 'bg-brand-orange-600 text-white'
+                              ? 'bg-brand-blue-600 text-white'
                               : 'bg-slate-200 text-black'
                           }
                         `}
@@ -161,7 +161,7 @@ export default function LessonSidebar({
                     {/* Active Indicator */}
                     {isActive && (
                       <div className="flex-shrink-0">
-                        <div className="w-2 h-2 bg-brand-orange-600 rounded-full animate-pulse" />
+                        <div className="w-2 h-2 bg-brand-blue-600 rounded-full animate-pulse" />
                       </div>
                     )}
                   </div>

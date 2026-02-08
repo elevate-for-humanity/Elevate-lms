@@ -34,7 +34,7 @@ export function TaxCredentialingSection() {
           <Link
             href="https://apps.irs.gov/app/vita/"
             target="_blank"
-            className="mt-3 inline-flex rounded-md bg-brand-orange-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-brand-orange-700"
+            className="mt-3 inline-flex rounded-md bg-brand-blue-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-brand-blue-700"
           >
             Go to IRS Link &amp; Learn Taxes
           </Link>

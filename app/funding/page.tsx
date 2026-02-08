@@ -47,7 +47,7 @@ export default function FundingPage() {
       fullDescription: 'Training and support for successful reintegration.',
       href: '/jri',
       icon: Shield,
-      color: 'purple',
+      color: 'brand-red',
       category: 'Funding',
       image: '/images/business/team-1.jpg',
     },
@@ -320,12 +320,12 @@ export default function FundingPage() {
               <h3 className="font-bold text-gray-900 text-lg mb-2">Dedicated Support</h3>
               <p className="text-gray-600">
                 Our enrollment team is available to answer questions and guide you 
-                through the process. Call us at (317) 314-3757 anytime.
+                through the process. Call us at Contact Us anytime.
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-                <FileText className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-brand-red-100 rounded-xl flex items-center justify-center mb-4">
+                <FileText className="w-6 h-6 text-brand-red-600" />
               </div>
               <h3 className="font-bold text-gray-900 text-lg mb-2">Paperwork Assistance</h3>
               <p className="text-gray-600">
@@ -531,10 +531,10 @@ export default function FundingPage() {
             </a>{' '}
             or call{' '}
             <a
-              href="tel:+13173143757"
+              href="/contact"
               className="text-green-600 hover:underline font-semibold"
             >
-              (317) 314-3757
+              Contact Us
             </a>
           </p>
         </div>

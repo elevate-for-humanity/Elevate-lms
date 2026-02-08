@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import { 
@@ -254,7 +253,7 @@ export default function PlumbingProgramPage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-purple-100 text-purple-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">Common Questions</span>
+            <span className="inline-block bg-brand-red-100 text-brand-red-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">Common Questions</span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
           </div>
 

@@ -143,7 +143,7 @@ export default function CoursePlayer({
               </div>
               <div className="w-32 h-2 bg-slate-200 rounded-full overflow-hidden" role="progressbar" aria-valuenow={progressPercentage} aria-valuemin={0} aria-valuemax={100} aria-label="Course progress">
                 <div
-                  className="h-full bg-brand-orange-600 transition-all duration-300"
+                  className="h-full bg-brand-blue-600 transition-all duration-300"
                   style={{ width: `${progressPercentage}%` }}
                 />
               </div>

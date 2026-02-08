@@ -117,7 +117,7 @@ export function CoursePrerequisiteManagement() {
                       <p className="text-sm font-semibold text-black mb-1">Unlocks:</p>
                       <div className="flex flex-wrap gap-2">
                         {getPrerequisiteTitles(course.unlocks).map((title) => (
-                          <span key={title} className="px-2 py-2 bg-purple-100 text-purple-700 text-xs rounded">
+                          <span key={title} className="px-2 py-2 bg-brand-red-100 text-brand-red-700 text-xs rounded">
                             {title}
                           </span>
                         ))}

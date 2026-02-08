@@ -99,12 +99,12 @@ export default async function IntegrationsPage() {
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-purple-600" />
+                <div className="w-16 h-16 bg-brand-red-100 rounded-xl flex items-center justify-center">
+                  <Zap className="w-8 h-8 text-brand-red-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">Zapier</h3>
-                  <span className="px-3 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-bold">
+                  <span className="px-3 py-2 bg-brand-red-100 text-brand-red-800 rounded-full text-sm font-bold">
                     1000+ Apps
                   </span>
                 </div>
@@ -114,27 +114,27 @@ export default async function IntegrationsPage() {
               </p>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Google Sheets for reporting</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Slack notifications</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>Mailchimp email campaigns</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>HubSpot CRM sync</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                   <span>QuickBooks accounting</span>
                 </li>
               </ul>
-              <div className="bg-purple-50 rounded-lg p-4">
+              <div className="bg-brand-red-50 rounded-lg p-4">
                 <div className="font-bold mb-2">Setup Time</div>
                 <div className="text-gray-700">5-10 minutes per integration</div>
               </div>

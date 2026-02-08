@@ -28,8 +28,8 @@ export function BottomNav() {
               href={item.href}
               className={`flex flex-col items-center gap-1 py-2 px-3 transition ${
                 isActive
-                  ? 'text-brand-orange-600'
-                  : 'text-gray-600 hover:text-brand-orange-600'
+                  ? 'text-brand-blue-600'
+                  : 'text-gray-600 hover:text-brand-blue-600'
               }`}
             >
               <Icon size={24} />

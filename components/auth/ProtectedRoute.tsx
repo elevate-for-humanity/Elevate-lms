@@ -41,7 +41,7 @@ export default function ProtectedRoute({ children, requireRole }: Props) {
       <div className="section">
         <div className="container">
           <div className="card p-6 text-center">
-            <h2 className="text-xl font-semibold text-brand-orange-600">
+            <h2 className="text-xl font-semibold text-brand-blue-600">
               Access Denied
             </h2>
             <p className="mt-2 text-black">

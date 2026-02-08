@@ -111,7 +111,7 @@ export default function FERPAPage() {
       <p>
         <strong>Registrar's Office</strong><br />
         Email: elevate4humanityedu@gmail.com<br />
-        Phone: (317) 314-3757
+        Phone: Contact Us
       </p>
 
       <h2>File a Complaint</h2>

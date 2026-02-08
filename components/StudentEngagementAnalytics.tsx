@@ -59,7 +59,7 @@ export default function StudentEngagementAnalytics() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Active Students</h3>
-            <p className="text-3xl font-bold text-brand-orange-600">{metrics.activeStudents.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{metrics.activeStudents.toLocaleString()}</p>
             <p className="text-sm text-green-600">↑ 8% from last period</p>
           </Card>
 

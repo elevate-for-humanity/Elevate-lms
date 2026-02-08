@@ -75,7 +75,7 @@ export function FileUpload({ label, accept = '*', maxSize = 10, onUpload }: File
       ) : (
         <div className="flex items-center justify-between p-4 bg-slate-50 border border-slate-200 rounded-lg">
           <div className="flex items-center gap-3">
-            <FileText className="h-11 w-11 text-brand-orange-600" />
+            <FileText className="h-11 w-11 text-brand-blue-600" />
             <div>
               <div className="font-medium text-black">{file.name}</div>
               <div className="text-sm text-black">
@@ -85,7 +85,7 @@ export function FileUpload({ label, accept = '*', maxSize = 10, onUpload }: File
           </div>
           <div className="flex items-center gap-2">
             {uploading && (
-              <div className="text-sm text-brand-orange-600">Uploading...</div>
+              <div className="text-sm text-brand-blue-600">Uploading...</div>
             )}
             {uploaded && (
               <Circle className="h-5 w-5 text-green-600" />
@@ -103,7 +103,7 @@ export function FileUpload({ label, accept = '*', maxSize = 10, onUpload }: File
       )}
 
       {error && (
-        <p className="text-sm text-brand-orange-600">{error}</p>
+        <p className="text-sm text-brand-blue-600">{error}</p>
       )}
     </div>
   );

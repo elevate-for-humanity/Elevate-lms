@@ -69,7 +69,7 @@ export default async function PricingPage() {
               }`}
             >
               {product.recommended && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-orange-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">
                   Recommended
                 </div>
               )}
@@ -95,7 +95,7 @@ export default async function PricingPage() {
                 {product.features.map((feature, idx) => (
                   <li key={idx} className="flex items-start gap-2">
                     <Check
-                      className="text-brand-green-600 flex-shrink-0 mt-0.5"
+                      className="text-brand-blue-600 flex-shrink-0 mt-0.5"
                       size={20}
                     />
                     <span className="text-black text-sm">{feature}</span>
@@ -115,7 +115,7 @@ export default async function PricingPage() {
               {product.tier === 'student' && (
                 <Link
                   href="/checkout/student"
-                  className="block w-full text-center bg-brand-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-orange-600 transition"
+                  className="block w-full text-center bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-600 transition"
                 >
                   Get Started
                 </Link>
@@ -124,7 +124,7 @@ export default async function PricingPage() {
               {product.tier === 'career' && (
                 <Link
                   href="/checkout/career"
-                  className="block w-full text-center bg-brand-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-orange-600 transition"
+                  className="block w-full text-center bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-600 transition"
                 >
                   Get Started
                 </Link>
@@ -236,7 +236,7 @@ export default async function PricingPage() {
             </Link>
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-brand-orange-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-orange-600 transition"
+              className="inline-flex items-center justify-center bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 transition"
             >
               Apply to Enroll
             </Link>

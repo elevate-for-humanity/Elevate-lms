@@ -142,10 +142,10 @@ export default async function DocumentationPage() {
                     <FileText className="h-11 w-11 text-brand-blue-600" />
                   )}
                   {category.category === 'Guides' && (
-                    <BookOpen className="h-11 w-11 text-brand-green-600" />
+                    <BookOpen className="h-11 w-11 text-brand-blue-600" />
                   )}
                   {category.category === 'Policies' && (
-                    <FileCheck className="h-11 w-11 text-purple-600" />
+                    <FileCheck className="h-11 w-11 text-brand-red-600" />
                   )}
                   <h2 className="text-2xl font-bold text-black">
                     {category.category}

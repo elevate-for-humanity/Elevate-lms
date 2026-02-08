@@ -207,8 +207,8 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
             </div>
 
             {/* Step 2: Complete Training */}
-            <div className="relative bg-gradient-to-br from-purple-50 to-white rounded-2xl p-8 border border-purple-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-purple-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+            <div className="relative bg-gradient-to-br from-brand-red-50 to-white rounded-2xl p-8 border border-brand-red-100 shadow-sm">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-red-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 2
               </div>
               <div className="pt-4">
@@ -218,24 +218,24 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">Attend instructor-led classroom sessions</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">Complete hands-on clinical practice</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">Pass skills assessments and exams</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <Circle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">Earn your state certification</span>
                   </li>
                 </ul>
-                <div className="mt-6 pt-6 border-t border-purple-100">
-                  <div className="flex items-center gap-2 text-purple-600">
+                <div className="mt-6 pt-6 border-t border-brand-red-100">
+                  <div className="flex items-center gap-2 text-brand-red-600">
                     <Clock className="w-4 h-4" />
                     <span className="text-sm font-medium">{program.duration} program length</span>
                   </div>

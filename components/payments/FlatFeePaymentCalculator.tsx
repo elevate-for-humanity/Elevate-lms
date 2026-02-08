@@ -99,9 +99,9 @@ export function FlatFeePaymentCalculator({
 
   return (
     <div className="bg-white rounded-xl border-2 border-slate-200 shadow-lg overflow-hidden">
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 p-6 text-white">
+      <div className="bg-brand-red-600 p-6 text-white">
         <h2 className="text-xl font-bold">{programName}</h2>
-        <p className="text-purple-200 text-sm mt-1">DOL Registered Apprenticeship Sponsorship</p>
+        <p className="text-brand-red-200 text-sm mt-1">DOL Registered Apprenticeship Sponsorship</p>
       </div>
 
       <div className="p-6 space-y-6">
@@ -117,10 +117,10 @@ export function FlatFeePaymentCalculator({
         </div>
 
         {/* Program Fee Display */}
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-6 text-center">
-          <div className="text-sm text-purple-700 mb-1">Program Fee (Flat Rate)</div>
-          <div className="text-4xl font-black text-purple-600">${programFee.toLocaleString()}</div>
-          <p className="text-xs text-purple-600 mt-2">
+        <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-6 text-center">
+          <div className="text-sm text-brand-red-700 mb-1">Program Fee (Flat Rate)</div>
+          <div className="text-4xl font-black text-brand-red-600">${programFee.toLocaleString()}</div>
+          <p className="text-xs text-brand-red-600 mt-2">
             Fee applies regardless of transferred hours
           </p>
         </div>
@@ -137,7 +137,7 @@ export function FlatFeePaymentCalculator({
               inputMode="decimal"
               value={downPayment}
               onChange={(e) => handleDownPaymentChange(e.target.value)}
-              className="w-full pl-8 pr-4 py-4 text-2xl font-bold border-2 border-slate-300 rounded-lg focus:border-purple-500 focus:ring-2 focus:ring-purple-200 outline-none"
+              className="w-full pl-8 pr-4 py-4 text-2xl font-bold border-2 border-slate-300 rounded-lg focus:border-brand-red-500 focus:ring-2 focus:ring-brand-red-200 outline-none"
               placeholder="0.00"
             />
           </div>
@@ -186,7 +186,7 @@ export function FlatFeePaymentCalculator({
             </div>
             <div className="border-t border-slate-300 mt-3 pt-3 flex justify-between items-center">
               <span className="font-semibold text-slate-800">Remaining Balance</span>
-              <span className="text-xl font-bold text-purple-600">
+              <span className="text-xl font-bold text-brand-red-600">
                 ${balance.toLocaleString()}
               </span>
             </div>
@@ -207,8 +207,8 @@ export function FlatFeePaymentCalculator({
                   onClick={() => handleSelectPlan(plan.months)}
                   className={`p-4 rounded-lg border-2 text-left transition ${
                     selectedPlan === plan.months
-                      ? 'border-purple-600 bg-purple-50 ring-2 ring-purple-200'
-                      : 'border-slate-200 hover:border-purple-300 hover:bg-slate-50'
+                      ? 'border-brand-red-600 bg-brand-red-50 ring-2 ring-brand-red-200'
+                      : 'border-slate-200 hover:border-brand-red-300 hover:bg-slate-50'
                   }`}
                 >
                   <div className="text-lg font-bold text-slate-800">
@@ -217,7 +217,7 @@ export function FlatFeePaymentCalculator({
                   </div>
                   <div className="text-sm text-slate-600">{plan.label}</div>
                   {selectedPlan === plan.months && (
-                    <Circle className="w-5 h-5 text-purple-600 mt-2" />
+                    <Circle className="w-5 h-5 text-brand-red-600 mt-2" />
                   )}
                 </button>
               ))}
@@ -233,24 +233,24 @@ export function FlatFeePaymentCalculator({
 
         {/* Summary */}
         {isValid && (
-          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-            <h3 className="font-semibold text-purple-900 mb-2">Payment Summary</h3>
+          <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4">
+            <h3 className="font-semibold text-brand-red-900 mb-2">Payment Summary</h3>
             <div className="space-y-1 text-sm">
               <div className="flex justify-between">
-                <span className="text-purple-700">Today&apos;s Payment</span>
-                <span className="font-semibold text-purple-900">${downPaymentNum.toLocaleString()}</span>
+                <span className="text-brand-red-700">Today&apos;s Payment</span>
+                <span className="font-semibold text-brand-red-900">${downPaymentNum.toLocaleString()}</span>
               </div>
               {balance > 0 && selectedPlan && (
                 <div className="flex justify-between">
-                  <span className="text-purple-700">Monthly Payment</span>
-                  <span className="font-semibold text-purple-900">
+                  <span className="text-brand-red-700">Monthly Payment</span>
+                  <span className="font-semibold text-brand-red-900">
                     ${paymentPlans.find(p => p.months === selectedPlan)?.monthlyAmount.toLocaleString()}/mo × {selectedPlan}
                   </span>
                 </div>
               )}
-              <div className="border-t border-purple-200 pt-2 mt-2 flex justify-between">
-                <span className="font-semibold text-purple-900">Total Program Fee</span>
-                <span className="font-bold text-purple-900">${programFee.toLocaleString()}</span>
+              <div className="border-t border-brand-red-200 pt-2 mt-2 flex justify-between">
+                <span className="font-semibold text-brand-red-900">Total Program Fee</span>
+                <span className="font-bold text-brand-red-900">${programFee.toLocaleString()}</span>
               </div>
             </div>
           </div>
@@ -261,7 +261,7 @@ export function FlatFeePaymentCalculator({
           disabled={!isValid}
           className={`w-full py-4 rounded-lg font-bold text-lg transition ${
             isValid
-              ? 'bg-purple-600 hover:bg-purple-700 text-white'
+              ? 'bg-brand-red-600 hover:bg-brand-red-700 text-white'
               : 'bg-slate-200 text-slate-400 cursor-not-allowed'
           }`}
         >

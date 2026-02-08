@@ -8,7 +8,7 @@ export function AiNarratorSection() {
       <div className="grid gap-10 md:grid-cols-[3fr,2fr] items-center">
         {/* Left: Text */}
         <div className="space-y-4">
-          <p className="text-xs font-semibold uppercase tracking-wide text-brand-orange-600">
+          <p className="text-xs font-semibold uppercase tracking-wide text-brand-blue-600">
             AI Instructor
           </p>
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-black">

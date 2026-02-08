@@ -81,7 +81,7 @@ export default async function FerpaReportsPage() {
       name: 'Request Summary',
       description: 'Overview of access requests by type and status',
       icon: BarChart3,
-      color: 'purple',
+      color: 'brand-red',
     },
     {
       id: 'training',
@@ -159,7 +159,7 @@ export default async function FerpaReportsPage() {
               const colorClasses: Record<string, string> = {
                 blue: 'bg-blue-100 text-blue-600',
                 green: 'bg-green-100 text-green-600',
-                purple: 'bg-purple-100 text-purple-600',
+                brand-red: 'bg-brand-red-100 text-brand-red-600',
                 orange: 'bg-orange-100 text-orange-600',
                 red: 'bg-red-100 text-red-600',
                 indigo: 'bg-indigo-100 text-indigo-600',

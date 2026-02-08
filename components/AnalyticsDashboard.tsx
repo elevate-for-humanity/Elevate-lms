@@ -26,7 +26,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
       value: data.totalStudents.toLocaleString(),
       change: '+12%',
       icon: Users,
-      color: 'text-brand-orange-600',
+      color: 'text-brand-blue-600',
       bgColor: 'bg-red-100',
     },
     {
@@ -50,8 +50,8 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
       value: `${data.averageScore}%`,
       change: '+3%',
       icon: Award,
-      color: 'text-purple-600',
-      bgColor: 'bg-purple-100',
+      color: 'text-brand-red-600',
+      bgColor: 'bg-brand-red-100',
     },
     {
       title: 'Study Hours',
@@ -82,7 +82,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
       value: `$${data.totalRevenue.toLocaleString()}`,
       change: '+18%',
       icon: DollarSign,
-      color: 'text-brand-orange-600',
+      color: 'text-brand-blue-600',
       bgColor: 'bg-red-100',
     },
   ];
@@ -167,7 +167,7 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
             <div className="space-y-4">
               {recentActivity.map((activity, index) => (
                 <div key={index} className="flex gap-3">
-                  <div className="w-2 h-2 bg-brand-orange-600 rounded-full mt-2" />
+                  <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2" />
                   <div className="flex-1">
                     <div className="font-semibold text-sm">{activity.user}</div>
                     <div className="text-sm text-black">{activity.action}</div>

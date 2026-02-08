@@ -29,7 +29,7 @@ export function PageFlow({ currentStep = 'learn', nextStepHref = '/apply', nextS
                   <div
                     className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
                       step.active
-                        ? 'bg-brand-orange-600 text-white'
+                        ? 'bg-brand-blue-600 text-white'
                         : 'bg-white border-2 border-slate-300 text-slate-400'
                     }`}
                   >
@@ -37,7 +37,7 @@ export function PageFlow({ currentStep = 'learn', nextStepHref = '/apply', nextS
                   </div>
                   <div
                     className={`mt-2 text-xs text-center font-medium ${
-                      step.active ? 'text-brand-orange-600' : 'text-slate-500'
+                      step.active ? 'text-brand-blue-600' : 'text-slate-500'
                     }`}
                   >
                     {step.label}
@@ -55,7 +55,7 @@ export function PageFlow({ currentStep = 'learn', nextStepHref = '/apply', nextS
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href={nextStepHref}
-            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-orange-600 hover:bg-brand-orange-700 text-white font-bold rounded-lg transition"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold rounded-lg transition"
           >
             {nextStepLabel}
             <ArrowRight className="w-5 h-5" />
@@ -72,15 +72,15 @@ export function PageFlow({ currentStep = 'learn', nextStepHref = '/apply', nextS
         {/* Quick Links */}
         <div className="mt-6 text-center text-sm text-black">
           <span>Not sure if you qualify? </span>
-          <Link href="/funding" aria-label="Link" className="text-brand-orange-600 hover:underline font-semibold">
+          <Link href="/funding" aria-label="Link" className="text-brand-blue-600 hover:underline font-semibold">
             Check Eligibility
           </Link>
           <span className="mx-2">•</span>
-          <Link href="/how-it-works" aria-label="Link" className="text-brand-orange-600 hover:underline font-semibold">
+          <Link href="/how-it-works" aria-label="Link" className="text-brand-blue-600 hover:underline font-semibold">
             How It Works
           </Link>
           <span className="mx-2">•</span>
-          <Link href="/faq" aria-label="Link" className="text-brand-orange-600 hover:underline font-semibold">
+          <Link href="/faq" aria-label="Link" className="text-brand-blue-600 hover:underline font-semibold">
             FAQ
           </Link>
         </div>
@@ -108,11 +108,11 @@ export function ComplianceFooter() {
             WIOA, WRG, and JRI funding require meeting specific eligibility criteria. Contact us to verify your eligibility.
           </p>
           <div className="flex flex-wrap gap-4 mt-4">
-            <Link href="/privacy-policy" aria-label="Link" className="hover:text-brand-orange-600">Privacy Policy</Link>
-            <Link href="/terms-of-service" aria-label="Link" className="hover:text-brand-orange-600">Terms of Service</Link>
-            <Link href="/accessibility" aria-label="Link" className="hover:text-brand-orange-600">Accessibility</Link>
-            <Link href="/ferpa" aria-label="Link" className="hover:text-brand-orange-600">FERPA Notice</Link>
-            <Link href="/equal-opportunity" aria-label="Link" className="hover:text-brand-orange-600">Equal Opportunity</Link>
+            <Link href="/privacy-policy" aria-label="Link" className="hover:text-brand-blue-600">Privacy Policy</Link>
+            <Link href="/terms-of-service" aria-label="Link" className="hover:text-brand-blue-600">Terms of Service</Link>
+            <Link href="/accessibility" aria-label="Link" className="hover:text-brand-blue-600">Accessibility</Link>
+            <Link href="/ferpa" aria-label="Link" className="hover:text-brand-blue-600">FERPA Notice</Link>
+            <Link href="/equal-opportunity" aria-label="Link" className="hover:text-brand-blue-600">Equal Opportunity</Link>
           </div>
         </div>
       </div>

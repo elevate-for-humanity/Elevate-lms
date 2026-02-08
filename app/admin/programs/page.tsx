@@ -108,7 +108,7 @@ export default async function ProgramsPage() {
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-4">
               <h3 className="text-sm font-medium text-black mb-1">Active</h3>
-              <p className="text-base md:text-lg font-bold text-brand-green-600">
+              <p className="text-base md:text-lg font-bold text-brand-blue-600">
                 {activePrograms || 0}
               </p>
             </div>
@@ -116,7 +116,7 @@ export default async function ProgramsPage() {
               <h3 className="text-sm font-medium text-black mb-1">
                 Featured
               </h3>
-              <p className="text-base md:text-lg font-bold text-purple-600">
+              <p className="text-base md:text-lg font-bold text-brand-red-600">
                 {featuredPrograms || 0}
               </p>
             </div>

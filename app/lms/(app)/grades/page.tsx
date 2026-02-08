@@ -284,8 +284,8 @@ export default async function GradesPage() {
 
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Circle className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-brand-red-100 rounded-lg flex items-center justify-center">
+                <Circle className="w-5 h-5 text-brand-red-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">
@@ -427,15 +427,15 @@ export default async function GradesPage() {
                     Based on {stats.totalAssignments} graded assignments
                   </p>
                 </div>
-                <div className="p-4 bg-purple-50 rounded-xl">
+                <div className="p-4 bg-brand-red-50 rounded-xl">
                   <div className="flex items-center gap-3 mb-2">
-                    <Circle className="w-5 h-5 text-purple-600" />
-                    <span className="font-semibold text-purple-900">Quiz Average</span>
+                    <Circle className="w-5 h-5 text-brand-red-600" />
+                    <span className="font-semibold text-brand-red-900">Quiz Average</span>
                   </div>
-                  <div className="text-3xl font-bold text-purple-600">
+                  <div className="text-3xl font-bold text-brand-red-600">
                     {stats.avgQuizScore}%
                   </div>
-                  <p className="text-sm text-purple-700 mt-1">
+                  <p className="text-sm text-brand-red-700 mt-1">
                     Based on {stats.totalQuizzes} completed quizzes
                   </p>
                 </div>

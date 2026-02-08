@@ -225,7 +225,7 @@ export function LessonSidebar({
           <button
             type="button"
             onClick={handleAddBookmark}
-            className="rounded-full bg-brand-orange-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-brand-orange-700"
+            className="rounded-full bg-brand-blue-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-brand-blue-700"
           >
             + Add
           </button>
@@ -367,7 +367,7 @@ export function LessonSidebar({
             <button
               type="button"
               onClick={handleAskQuestion}
-              className="w-full rounded-full bg-brand-orange-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-brand-orange-700"
+              className="w-full rounded-full bg-brand-blue-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-brand-blue-700"
             >
               Post question
             </button>

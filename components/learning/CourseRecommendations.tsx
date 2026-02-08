@@ -26,7 +26,7 @@ export function CourseRecommendations({ recommendations }: CourseRecommendations
       case "trending":
         return <TrendingUp className="w-5 h-5 text-orange-400" />;
       case "personalized":
-        return <Sparkles className="w-5 h-5 text-purple-400" />;
+        return <Sparkles className="w-5 h-5 text-brand-red-400" />;
       default:
         return <Sparkles className="w-5 h-5 text-slate-400" />;
     }

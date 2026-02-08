@@ -191,7 +191,7 @@ export default function SolutionsPage() {
                   <ul className="space-y-3 mb-8">
                     {solution.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-2">
-                        <Circle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                        <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                         <span className="text-sm text-black">
                           {feature}
                         </span>
@@ -250,13 +250,13 @@ export default function SolutionsPage() {
             Questions About Our Programs?
           </h2>
           <p className="text-base md:text-lg text-slate-300 mb-8">
-            Call us at (317) 314-3757 or schedule a walkthrough of our platform.
+            Call us at Contact Us or schedule a walkthrough of our platform.
             We'll show you exactly how enrollment, tracking, and reporting works.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/demo/admin"
-              className="inline-flex items-center justify-center bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition shadow-xl"
+              className="inline-flex items-center justify-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition shadow-xl"
             >
               Try Interactive Demo
             </Link>
@@ -282,11 +282,11 @@ export default function SolutionsPage() {
               Apply Now
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="/contact"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Contact Us
             </a>
           </div>
         </div>

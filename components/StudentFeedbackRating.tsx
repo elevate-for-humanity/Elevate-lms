@@ -126,7 +126,7 @@ export function StudentFeedbackRating() {
             <Card className="p-6">
               <h3 className="font-bold mb-4">Overall Rating</h3>
               <div className="text-center mb-4">
-                <p className="text-5xl font-bold text-brand-orange-600 text-3xl md:text-4xl lg:text-5xl">{avgRating.toFixed(1)}</p>
+                <p className="text-5xl font-bold text-brand-blue-600 text-3xl md:text-4xl lg:text-5xl">{avgRating.toFixed(1)}</p>
                 <div className="flex justify-center my-2">
                   {[...Array(5)].map((_, i) => (
                     <span key={i} className={`text-2xl ${i < Math.round(avgRating) ? 'text-yellow-500' : 'text-gray-300'}`}>

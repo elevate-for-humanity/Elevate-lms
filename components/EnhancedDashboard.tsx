@@ -107,7 +107,7 @@ export default function EnhancedDashboard({ role, userId }: DashboardProps) {
 
         <div className="bg-white border border-slate-200 rounded-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <Award className="w-8 h-8 text-purple-600" />
+            <Award className="w-8 h-8 text-brand-red-600" />
             <span className="text-2xl font-bold text-black">
               {stats.achievements}
             </span>

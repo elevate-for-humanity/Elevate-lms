@@ -7,9 +7,7 @@ const R2_URL = process.env.NEXT_PUBLIC_R2_URL;
 
 export default function HomeHeroVideo() {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const audioStartedRef = useRef(false);
   const videoSrc = R2_URL ? `${R2_URL}/videos/hero-home-fast.mp4` : '/videos/hero-home-fast.mp4';
 
   useEffect(() => {
@@ -27,24 +25,12 @@ export default function HomeHeroVideo() {
       }
     };
 
-    const tryPlayAudio = async () => {
-      if (audioStartedRef.current || !audioRef.current) return;
-      try {
-        await audioRef.current.play();
-        audioStartedRef.current = true;
-      } catch {
-        // Autoplay blocked - will try on interaction
-      }
-    };
-
     playVideo();
-    tryPlayAudio();
     
     const handleInteraction = () => {
       if (!isPlaying) {
         playVideo();
       }
-      tryPlayAudio();
     };
 
     video.addEventListener('loadeddata', playVideo);
@@ -64,12 +50,6 @@ export default function HomeHeroVideo() {
       document.removeEventListener('scroll', handleInteraction);
       clearTimeout(timeout1);
       clearTimeout(timeout2);
-      // Stop audio on unmount (page navigation)
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
-      audioStartedRef.current = false;
     };
   }, [isPlaying]);
 
@@ -97,10 +77,6 @@ export default function HomeHeroVideo() {
       >
         <source src={videoSrc} type="video/mp4" />
       </video>
-      {/* Voiceover audio - plays on page load or first interaction */}
-      <audio ref={audioRef} preload="auto">
-        <source src="/videos/home-welcome.mp3" type="audio/mpeg" />
-      </audio>
     </>
   );
 }

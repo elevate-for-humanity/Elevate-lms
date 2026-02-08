@@ -43,6 +43,14 @@ const programs = [
     duration: '12-18 months',
     salary: '$30,000 - $60,000'
   },
+  { 
+    name: 'Business', 
+    href: '/programs/business', 
+    image: '/images/business/program-tax-preparation.jpg', 
+    description: 'Tax preparation, entrepreneurship training',
+    duration: '6-10 weeks',
+    salary: '$35,000 - $55,000'
+  },
 ];
 
 export default function HomePage() {
@@ -243,7 +251,7 @@ export default function HomePage() {
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow border border-slate-100">
               <div className="aspect-[16/9] relative">
                 <Image 
-                  src="/images/trades/program-hvac-technician.jpg" 
+                  src="/images/healthcare/hero-healthcare-professionals.jpg" 
                   alt="Next Level Jobs" 
                   fill 
                   className="object-cover"

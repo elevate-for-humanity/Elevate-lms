@@ -123,7 +123,7 @@ export default function HomePage() {
           
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
-              <div className="aspect-square sm:aspect-[4/3] relative">
+              <div className="relative h-28 sm:h-32 md:h-36">
                 <Image src="/images/students-new/student-5.jpg" alt="Check eligibility" fill className="object-cover" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">1</div>
               </div>
@@ -134,7 +134,7 @@ export default function HomePage() {
             </div>
             
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
-              <div className="aspect-square sm:aspect-[4/3] relative">
+              <div className="relative h-28 sm:h-32 md:h-36">
                 <Image src="/images/students-new/student-3.jpg" alt="Choose program" fill className="object-cover" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">2</div>
               </div>
@@ -145,7 +145,7 @@ export default function HomePage() {
             </div>
             
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
-              <div className="aspect-square sm:aspect-[4/3] relative">
+              <div className="relative h-28 sm:h-32 md:h-36">
                 <Image src="/images/students-new/student-22.jpg" alt="Complete training" fill className="object-cover" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">3</div>
               </div>
@@ -156,7 +156,7 @@ export default function HomePage() {
             </div>
             
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
-              <div className="aspect-square sm:aspect-[4/3] relative">
+              <div className="relative h-28 sm:h-32 md:h-36">
                 <Image src="/images/students-new/student-25.jpg" alt="Get hired" fill className="object-cover" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">4</div>
               </div>

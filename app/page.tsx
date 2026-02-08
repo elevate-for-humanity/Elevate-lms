@@ -7,42 +7,42 @@ const programs = [
   { 
     name: 'Healthcare', 
     href: '/programs/healthcare', 
-    image: '/images/healthcare-vibrant.jpg', 
+    image: '/images/healthcare/healthcare-professional-portrait-1.jpg', 
     description: 'CNA, Medical Assistant, Phlebotomy certifications',
     duration: '8-12 weeks'
   },
   { 
     name: 'Skilled Trades', 
     href: '/programs/skilled-trades', 
-    image: '/images/skilled-trades-vibrant.jpg', 
+    image: '/images/trades/hero-program-hvac.jpg', 
     description: 'HVAC, Electrical, Welding, Plumbing training',
     duration: '12-16 weeks'
   },
   { 
     name: 'Technology', 
     href: '/programs/technology', 
-    image: '/images/technology-vibrant.jpg', 
+    image: '/images/trades/hero-program-electrical.jpg', 
     description: 'IT Support, Cybersecurity certifications',
     duration: '10-14 weeks'
   },
   { 
     name: 'CDL Training', 
     href: '/programs/cdl', 
-    image: '/images/cdl-vibrant.jpg', 
+    image: '/images/trades/hero-program-cdl.jpg', 
     description: 'Class A and Class B commercial driving',
     duration: '3-6 weeks'
   },
   { 
     name: 'Barbering', 
     href: '/programs/barber-apprenticeship', 
-    image: '/images/barber/gallery-3.jpg', 
+    image: '/images/barber/hero.jpg', 
     description: 'Licensed barber apprenticeship program',
     duration: '12-18 months'
   },
   { 
     name: 'Business', 
     href: '/programs/business', 
-    image: '/images/business-vibrant.jpg', 
+    image: '/images/business-hero-new.jpg', 
     description: 'Tax preparation, entrepreneurship training',
     duration: '6-10 weeks'
   },

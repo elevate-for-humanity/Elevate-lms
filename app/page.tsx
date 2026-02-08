@@ -52,7 +52,12 @@ export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
 
-      {/* ===== ROTATING HERO BANNER ===== */}
+      {/* ===== VIDEO HERO ===== */}
+      <section className="relative h-[60vh] min-h-[400px] max-h-[600px]">
+        <HomeHeroVideo />
+      </section>
+
+      {/* ===== ROTATING BANNER ===== */}
       <RotatingHeroBanner />
 
       {/* ===== PARTNERS ===== */}

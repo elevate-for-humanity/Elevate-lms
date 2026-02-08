@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import HomeHeroVideo from './HomeHeroVideo';
+import MarqueeBanner from '@/components/MarqueeBanner';
 
 const programs = [
   { 
@@ -50,6 +51,9 @@ const programs = [
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
+
+      {/* ===== MARQUEE BANNER ===== */}
+      <MarqueeBanner />
 
       {/* ===== VIDEO HERO ===== */}
       <section className="relative h-[100svh] min-h-[500px] sm:h-[80vh] sm:min-h-[500px] sm:max-h-[700px]">

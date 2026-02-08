@@ -155,7 +155,7 @@ export default function HomePage() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
               <div className="aspect-square sm:aspect-[4/3] relative">
-                <Image src="/images/success-new/success-2.jpg" alt="Check eligibility" fill className="object-cover" />
+                <Image src="/images/students-new/student-5.jpg" alt="Check eligibility" fill className="object-cover" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">1</div>
               </div>
               <div className="p-3 sm:p-4 md:p-5">
@@ -166,7 +166,7 @@ export default function HomePage() {
             
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
               <div className="aspect-square sm:aspect-[4/3] relative">
-                <Image src="/images/success-new/success-4.jpg" alt="Choose program" fill className="object-cover" />
+                <Image src="/images/students-new/student-10.jpg" alt="Choose program" fill className="object-cover" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">2</div>
               </div>
               <div className="p-3 sm:p-4 md:p-5">

@@ -145,8 +145,8 @@ export default function HomePage() {
             </div>
             
             <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
-              <div className="relative h-28 sm:h-32 md:h-36">
-                <Image src="/images/students-new/student-22.jpg" alt="Complete training" fill className="object-cover" />
+              <div className="relative h-24 sm:h-28 md:h-32">
+                <Image src="/images/students-new/student-7.jpg" alt="Complete training" fill className="object-cover" />
                 <div className="absolute top-2 left-2 sm:top-4 sm:left-4 w-8 h-8 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-sm sm:text-base">3</div>
               </div>
               <div className="p-3 sm:p-4 md:p-5">

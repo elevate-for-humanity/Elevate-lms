@@ -42,7 +42,7 @@ const programs = [
   { 
     name: 'Business', 
     href: '/programs/business', 
-    image: '/images/business-hero-new.jpg', 
+    image: '/images/business/professional-1.jpg', 
     description: 'Tax preparation, entrepreneurship training',
     duration: '6-10 weeks'
   },
@@ -117,7 +117,7 @@ export default function HomePage() {
                 href={program.href}
                 className="group bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-slate-200 hover:border-brand-red-300 hover:shadow-xl transition-all"
               >
-                <div className="relative w-full h-48 sm:h-52 md:h-56">
+                <div className="relative w-full h-36 sm:h-40 md:h-44">
                   <Image
                     src={program.image}
                     alt={program.name}

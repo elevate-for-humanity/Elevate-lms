@@ -28,7 +28,7 @@ const programs = [
   { 
     name: 'CDL Training', 
     href: '/programs/cdl', 
-    image: '/images/trades/hero-program-cdl.jpg', 
+    image: '/images/cdl-hero-new.jpg', 
     description: 'Class A and Class B commercial driving',
     duration: '3-6 weeks'
   },

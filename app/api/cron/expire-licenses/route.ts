@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { logger } from '@/lib/logger';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**

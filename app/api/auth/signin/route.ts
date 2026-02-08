@@ -57,6 +57,6 @@ export const POST = withRateLimit(
   { limiter: authRateLimit, skipOnMissing: true }
 );
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;

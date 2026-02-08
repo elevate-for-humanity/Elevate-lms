@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { getTenantContext } from '@/lib/tenant';
 import { logger } from '@/lib/logger';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 /**

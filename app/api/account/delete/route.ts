@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireApiAuth, APIAuthError } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 10;
 

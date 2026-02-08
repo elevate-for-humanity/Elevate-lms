@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const maxDuration = 60;
 import { toError, toErrorMessage } from '@/lib/safe';
 

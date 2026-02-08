@@ -1,6 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 

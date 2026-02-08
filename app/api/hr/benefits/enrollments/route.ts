@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';

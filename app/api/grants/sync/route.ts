@@ -4,7 +4,7 @@
  * Syncs grant opportunities from Grants.gov to local database
  */
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 

@@ -1,15 +1,10 @@
-// Force static generation for performance
-export const dynamic = 'force-static';
-export const revalidate = 86400;
-
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageAvatar from '@/components/PageAvatar';
 import { 
-  CheckCircle, Clock, DollarSign, Award, ArrowRight, 
-  Heart, Users, BookOpen, Stethoscope, Phone, Calendar
+  Clock, DollarSign, Award, ArrowRight, 
+  Users, BookOpen, GraduationCap, Phone
 } from 'lucide-react';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
@@ -78,12 +73,6 @@ const careers = [
 export default function CNACertificationPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/healthcare-guide.mp4" 
-        title="CNA Program Guide" 
-      />
-
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -95,8 +84,8 @@ export default function CNACertificationPage() {
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="relative h-[55vh] min-h-[450px]">
+      {/* Hero - Clean image only, no text */}
+      <section className="relative h-[50vh] min-h-[400px]">
         <Image 
           src="/images/healthcare/hero-programs-healthcare.jpg" 
           alt="CNA Training Program" 
@@ -104,27 +93,6 @@ export default function CNACertificationPage() {
           className="object-cover" 
           priority 
         />
-        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
-          <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
-              <Heart className="w-4 h-4" /> WIOA Funding Available
-            </div>
-            <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
-              CNA Certification
-            </h1>
-            <p className="text-xl text-white/90 max-w-xl mb-6">
-              Start your healthcare career in just 4-6 weeks. Free training, state certification, and job placement assistance.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link href="/apply" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
-                Apply Now <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
-                Check Eligibility
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Quick Stats */}
@@ -223,7 +191,7 @@ export default function CNACertificationPage() {
               'Reliable transportation',
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
+                <div className="w-6 h-6 bg-green-500 rounded-full flex-shrink-0" />
                 <span className="font-medium text-slate-700">{item}</span>
               </div>
             ))}

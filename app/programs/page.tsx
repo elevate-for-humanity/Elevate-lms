@@ -12,23 +12,12 @@ export const metadata: Metadata = {
 };
 import { PathwayBlock } from '@/components/PathwayBlock';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 
 // Cache for 10 minutes - program listings don't change frequently
 export const revalidate = 600;
 
-// Category image mapping
-const categoryImages: Record<string, string> = {
-  'Healthcare': '/images/prog-healthcare.jpg',
-  'Skilled Trades': '/images/prog-trades.jpg',
-  'Technology': '/images/prog-technology.jpg',
-  'CDL & Transportation': '/images/prog-cdl.jpg',
-  'Beauty & Barbering': '/images/prog-barber.jpg',
-  'Business & Finance': '/images/prog-business.jpg',
-  'Hospitality': '/images/prog-business.jpg',
-  'default': '/images/prog-hero-main.jpg',
-};
+
 
 // Normalize category names to consolidate duplicates (fallback if DB not updated)
 const categoryNormalization: Record<string, string> = {
@@ -64,7 +53,7 @@ const categoryNormalization: Record<string, string> = {
 };
 
 async function getCategories() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   
   // Get active programs grouped by category
   const { data: programs, error } = await supabase
@@ -81,17 +70,17 @@ async function getCategories() {
   if (!programs || programs.length === 0) {
     // Return default categories if no programs in database
     return [
-      { title: 'Healthcare', description: 'CNA, Medical Assistant, Phlebotomy training programs.', href: '/programs/healthcare', image: categoryImages['Healthcare'], programs: ['CNA Training', 'Medical Assistant', 'Phlebotomy'] },
-      { title: 'Skilled Trades', description: 'HVAC, Electrical, Welding, Plumbing training programs.', href: '/programs/skilled-trades', image: categoryImages['Skilled Trades'], programs: ['HVAC Technician', 'Electrical', 'Welding'] },
-      { title: 'Technology', description: 'IT Support, Cybersecurity, Web Development programs.', href: '/programs/technology', image: categoryImages['Technology'], programs: ['IT Support', 'Cybersecurity', 'Web Dev'] },
-      { title: 'CDL & Transportation', description: 'Commercial driving license training programs.', href: '/programs/cdl', image: categoryImages['CDL & Transportation'], programs: ['CDL Class A', 'CDL Class B'] },
-      { title: 'Beauty & Barbering', description: 'Barber apprenticeship and cosmetology programs.', href: '/programs/barber-apprenticeship', image: categoryImages['Beauty & Barbering'], programs: ['Barber Apprenticeship', 'Cosmetology'] },
-      { title: 'Business & Finance', description: 'Tax preparation and business training programs.', href: '/programs/business', image: categoryImages['Business & Finance'], programs: ['Tax Preparation', 'Business Admin'] },
+      { title: 'Healthcare', description: 'CNA, Medical Assistant, Phlebotomy training programs.', href: '/programs/healthcare', programs: ['CNA Training', 'Medical Assistant', 'Phlebotomy'] },
+      { title: 'Skilled Trades', description: 'HVAC, Electrical, Welding, Plumbing training programs.', href: '/programs/skilled-trades', programs: ['HVAC Technician', 'Electrical', 'Welding'] },
+      { title: 'Technology', description: 'IT Support, Cybersecurity, Web Development programs.', href: '/programs/technology', programs: ['IT Support', 'Cybersecurity', 'Web Dev'] },
+      { title: 'CDL & Transportation', description: 'Commercial driving license training programs.', href: '/programs/cdl', programs: ['CDL Class A', 'CDL Class B'] },
+      { title: 'Beauty & Barbering', description: 'Barber apprenticeship and cosmetology programs.', href: '/programs/barber-apprenticeship', programs: ['Barber Apprenticeship', 'Cosmetology'] },
+      { title: 'Business & Finance', description: 'Tax preparation and business training programs.', href: '/programs/business', programs: ['Tax Preparation', 'Business Admin'] },
     ];
   }
 
   // Group programs by category (with normalization to consolidate duplicates)
-  const categoryMap = new Map<string, { title: string; description: string; href: string; image: string; programs: string[] }>();
+  const categoryMap = new Map<string, { title: string; description: string; href: string; programs: string[] }>();
   
   for (const program of programs) {
     const rawCat = program.category || 'Other';
@@ -103,7 +92,6 @@ async function getCategories() {
         title: cat,
         description: `Explore ${cat.toLowerCase()} career opportunities.`,
         href: `/programs/${cat.toLowerCase().replace(/\s+/g, '-').replace(/&/g, '')}`,
-        image: categoryImages[cat] || categoryImages['default'],
         programs: [],
       });
     }
@@ -185,38 +173,33 @@ export default async function ProgramsPage() {
         </div>
       </section>
 
-      {/* AVATAR */}
-      <PageAvatar videoSrc="/videos/avatars/orientation-guide.mp4" title="Program Guide" />
-
-      {/* PROGRAMS GRID - Consistent card sizes */}
+      {/* PROGRAMS LIST - Clean text-based design */}
       <section className="py-16 lg:py-24 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <p className="text-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Training Categories</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Choose Your Career Path</h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">Each program is designed to take you from beginner to job-ready.</p>
           </div>
           
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-4">
             {categories.map((cat) => (
-              <Link key={cat.title} href={cat.href} className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 border border-slate-100">
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img src={cat.image} alt={cat.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                </div>
-                <div className="p-5">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">{cat.title}</h3>
-                  <p className="text-slate-600 text-sm mb-3">{cat.description}</p>
-                  <div className="flex flex-wrap gap-1.5 mb-3">
-                    {cat.programs.slice(0, 2).map((p, i) => (
-                      <span key={i} className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full">{p}</span>
-                    ))}
-                    {cat.programs.length > 2 && (
-                      <span className="text-xs bg-blue-100 text-blue-600 px-2 py-1 rounded-full">+{cat.programs.length - 2}</span>
-                    )}
+              <Link key={cat.title} href={cat.href} className="group block bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 hover:border-blue-300">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">{cat.title}</h3>
+                    <p className="text-slate-600 text-sm mb-3">{cat.description}</p>
+                    <div className="flex flex-wrap gap-2">
+                      {cat.programs.map((p, i) => (
+                        <span key={i} className="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded">{p}</span>
+                      ))}
+                    </div>
                   </div>
-                  <span className="text-blue-600 font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-                    Explore Programs <span>→</span>
-                  </span>
+                  <div className="flex-shrink-0 ml-4">
+                    <span className="text-blue-600 font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                      View →
+                    </span>
+                  </div>
                 </div>
               </Link>
             ))}

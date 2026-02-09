@@ -4,12 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SignatureCanvas } from '@/components/SignatureCanvas';
-<<<<<<< HEAD
 import { CheckCircle, Circle, AlertTriangle, FileText, Pen } from 'lucide-react';
-=======
-import { Circle, AlertTriangle, FileText, Pen } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
->>>>>>> d5f142eac (Add database integration to all components with createClient)
 
 interface Agreement {
   type: string;

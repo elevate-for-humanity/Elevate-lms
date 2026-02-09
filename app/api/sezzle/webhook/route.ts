@@ -15,8 +15,10 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { createEnrollmentFromPayment } from '@/lib/enrollment/create-enrollment';
+import { BARBER_PRICING } from '@/lib/programs/pricing';
 import crypto from 'crypto';
 
 interface SezzleWebhookEvent {
@@ -217,6 +219,45 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
 
   // If we have program info, create enrollment
   if (programId && customer?.email) {
+    // For barber program, create barber_subscriptions record
+    if (programSlug === 'barber-apprenticeship') {
+      try {
+        const adminClient = createAdminClient();
+        const amountPaidCents = capture?.amount?.amount_in_cents || 0;
+        const transferHours = parseInt(metadata?.transfer_hours || '0');
+        const hoursPerWeek = parseInt(metadata?.hours_per_week || '40');
+        const totalHoursRequired = BARBER_PRICING.totalHoursRequired || 2000;
+        const hoursRemaining = Math.max(0, totalHoursRequired - transferHours);
+        const weeksRemaining = Math.ceil(hoursRemaining / hoursPerWeek);
+
+        await adminClient.from('barber_subscriptions').insert({
+          customer_email: customer.email,
+          customer_name: `${customer.first_name || ''} ${customer.last_name || ''}`.trim(),
+          status: 'active',
+          full_tuition_amount: BARBER_PRICING.fullPrice,
+          amount_paid_at_checkout: amountPaidCents / 100,
+          remaining_balance: Math.max(0, (BARBER_PRICING.fullPrice * 100 - amountPaidCents) / 100),
+          payment_method: 'sezzle',
+          bnpl_provider: 'sezzle',
+          fully_paid: amountPaidCents >= BARBER_PRICING.fullPrice * 100,
+          weekly_payment_cents: 0, // Sezzle handles payments
+          weeks_remaining: weeksRemaining,
+          hours_per_week: hoursPerWeek,
+          transferred_hours_verified: transferHours,
+          payment_model: 'bnpl_sezzle',
+          created_at: new Date().toISOString(),
+        });
+
+        logger.info('Barber subscription created for Sezzle payment', {
+          customerEmail: customer.email,
+          orderUuid: order_uuid,
+          amountPaidCents,
+        });
+      } catch (dbError) {
+        logger.error('Failed to create barber_subscriptions record for Sezzle:', dbError);
+      }
+    }
+
     const result = await createEnrollmentFromPayment({
       studentId: studentId,
       programId: programId,

@@ -42,6 +42,10 @@ export async function POST(request: NextRequest) {
       host_shop_name,
       success_url,
       cancel_url,
+      // Payment options
+      payment_type = 'payment_plan', // 'payment_plan', 'pay_in_full', 'bnpl'
+      custom_setup_fee, // Custom setup fee amount (optional)
+      bnpl_provider, // 'affirm', 'klarna', 'afterpay', 'sezzle'
     } = body;
 
     // Validate required fields
@@ -85,11 +89,11 @@ export async function POST(request: NextRequest) {
         phone: customer_phone || undefined,
         metadata: {
           program: 'barber-apprenticeship',
-          application_id: application_id || '',
-          hours_per_week: hours_per_week.toString(),
-          transferred_hours: transferred_hours_verified.toString(),
-          weeks_remaining: calculation.weeksRemaining.toString(),
-          weekly_payment_cents: calculation.weeklyPaymentCents.toString(),
+          applicationId: application_id || '',
+          hoursPerWeek: hours_per_week.toString(),
+          transferHours: transferred_hours_verified.toString(),
+          weeksRemaining: calculation.weeksRemaining.toString(),
+          weeklyPaymentCents: calculation.weeklyPaymentCents.toString(),
         },
       });
       customerId = customer.id;
@@ -102,22 +106,69 @@ export async function POST(request: NextRequest) {
 
     const firstBillingDate = formatFirstBillingDate();
 
-    // Create Checkout Session for FULL TUITION with BNPL options
-    // If BNPL approved for full amount: no weekly invoices
-    // If BNPL partially approved or declined: webhook calculates remaining and schedules invoices
-    const session = await stripe.checkout.sessions.create({
+    // Calculate adjusted price based on transfer hours
+    const totalHoursRequired = BARBER_PRICING.totalHoursRequired || 2000;
+    const hoursRemaining = Math.max(0, totalHoursRequired - transferred_hours_verified);
+    const priceRatio = hoursRemaining / totalHoursRequired;
+    const adjustedFullPrice = Math.round(BARBER_PRICING.fullPrice * priceRatio);
+    const transferCredit = BARBER_PRICING.fullPrice - adjustedFullPrice;
+
+    // Calculate checkout amount based on payment type
+    let checkoutAmount: number;
+    let productName: string;
+    let productDescription: string;
+    const minSetupFee = Math.round(adjustedFullPrice * 0.35);
+    const weeksRemaining = Math.ceil(hoursRemaining / hours_per_week);
+
+    if (payment_type === 'pay_in_full') {
+      // Pay in full with 5% discount
+      checkoutAmount = Math.round(adjustedFullPrice * 0.95);
+      productName = 'Barber Apprenticeship - Full Payment (5% Discount)';
+      productDescription = transferred_hours_verified > 0
+        ? `Adjusted tuition with ${transferred_hours_verified} transfer hours credit. No weekly payments.`
+        : 'Complete program tuition paid in full. No weekly payments required.';
+    } else if (payment_type === 'bnpl') {
+      // BNPL - full adjusted amount, provider handles installments
+      checkoutAmount = adjustedFullPrice;
+      productName = 'Barber Apprenticeship - Full Tuition';
+      productDescription = transferred_hours_verified > 0
+        ? `Adjusted tuition ($${adjustedFullPrice}) with ${transferred_hours_verified} transfer hours. ${bnpl_provider || 'BNPL'} handles payments.`
+        : `Complete program tuition. ${bnpl_provider || 'BNPL provider'} handles your payment plan.`;
+    } else {
+      // Payment plan - custom or default setup fee (based on adjusted price)
+      const setupFee = custom_setup_fee 
+        ? Math.max(minSetupFee, Math.min(custom_setup_fee, adjustedFullPrice))
+        : Math.round(adjustedFullPrice * 0.35); // Default 35%
+      checkoutAmount = setupFee;
+      const remainingBalance = adjustedFullPrice - setupFee;
+      const weeklyPayment = weeksRemaining > 0 ? Math.round((remainingBalance / weeksRemaining) * 100) / 100 : 0;
+      productName = 'Barber Apprenticeship - Setup Fee';
+      productDescription = transferred_hours_verified > 0
+        ? `Setup fee. ${transferred_hours_verified} transfer hours applied. $${weeklyPayment}/week for ${weeksRemaining} weeks.`
+        : `Setup fee of $${setupFee}. Remaining $${remainingBalance} at $${weeklyPayment}/week for ${weeksRemaining} weeks.`;
+    }
+
+    // Determine which Payment Method Configuration to use based on environment
+    // Live mode: pmc_1SczlEIRNf5vPH3Ai841igCB (has Klarna, Afterpay, Cash App, Apple Pay, Google Pay)
+    // Test mode: requires a separate PMC configured in Stripe Dashboard for test mode
+    const isTestMode = process.env.STRIPE_SECRET_KEY?.startsWith('sk_test_');
+    const paymentMethodConfig = isTestMode
+      ? process.env.STRIPE_PMC_BARBER_TEST || undefined // Falls back to automatic if not set
+      : 'pmc_1SczlEIRNf5vPH3Ai841igCB';
+
+    // Create Checkout Session
+    const sessionConfig: Stripe.Checkout.SessionCreateParams = {
       customer: customerId,
-      mode: 'payment', // One-time payment with BNPL
-      payment_method_types: ['card', 'us_bank_account', 'affirm', 'klarna', 'afterpay_clearpay'],
+      mode: 'payment',
       line_items: [
         {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'Barber Apprenticeship - Full Tuition',
-              description: `Complete program tuition. If using Affirm/Klarna/Afterpay, they handle your payment plan.`,
+              name: productName,
+              description: productDescription,
             },
-            unit_amount: BARBER_PRICING.fullPrice * 100, // $4,980 in cents
+            unit_amount: checkoutAmount * 100, // Convert to cents
           },
           quantity: 1,
         },
@@ -127,18 +178,35 @@ export async function POST(request: NextRequest) {
       metadata: {
         program: 'barber-apprenticeship',
         programSlug: 'barber-apprenticeship',
-        checkout_type: 'barber_full_tuition',
-        full_tuition_cents: (BARBER_PRICING.fullPrice * 100).toString(),
-        application_id: application_id || '',
-        customer_name: customer_name || '',
-        customer_phone: customer_phone || '',
+        checkout_type: payment_type === 'pay_in_full' ? 'barber_pay_in_full' : 
+                       payment_type === 'bnpl' ? 'barber_bnpl' : 'barber_setup_fee',
+        payment_type: payment_type,
+        checkout_amount_cents: (checkoutAmount * 100).toString(),
+        // Original and adjusted pricing
+        original_price_cents: (BARBER_PRICING.fullPrice * 100).toString(),
+        adjusted_price_cents: (adjustedFullPrice * 100).toString(),
+        transfer_credit_cents: (transferCredit * 100).toString(),
+        // Setup fee info
+        custom_setup_fee: custom_setup_fee?.toString() || '',
+        min_setup_fee_cents: (minSetupFee * 100).toString(),
+        // Weekly payment info
+        weeks_remaining: weeksRemaining.toString(),
+        weekly_payment_cents: payment_type === 'payment_plan' 
+          ? Math.round(((adjustedFullPrice - checkoutAmount) / weeksRemaining) * 100).toString()
+          : '0',
+        // BNPL
+        bnpl_provider: bnpl_provider || '',
+        // Webhook expects camelCase field names
+        applicationId: application_id || '',
+        customerName: customer_name || '',
+        customerPhone: customer_phone || '',
         transferHours: transferred_hours_verified.toString(),
-        hours_per_week: hours_per_week.toString(),
-        weeks_remaining: calculation.weeksRemaining.toString(),
-        weekly_payment_cents: calculation.weeklyPaymentCents.toString(),
-        weekly_payment_dollars: calculation.weeklyPaymentDollars.toFixed(2),
-        has_host_shop: has_host_shop || '',
-        host_shop_name: host_shop_name || '',
+        hoursPerWeek: hours_per_week.toString(),
+        weeksRemaining: calculation.weeksRemaining.toString(),
+        weeklyPaymentCents: calculation.weeklyPaymentCents.toString(),
+        weeklyPaymentDollars: calculation.weeklyPaymentDollars.toFixed(2),
+        hasHostShop: has_host_shop || '',
+        hostShopName: host_shop_name || '',
       },
       custom_text: {
         submit: {
@@ -151,7 +219,17 @@ export async function POST(request: NextRequest) {
       },
       // Allow promotion codes
       allow_promotion_codes: true,
-    });
+    };
+
+    // Add payment method configuration if available
+    if (paymentMethodConfig) {
+      sessionConfig.payment_method_configuration = paymentMethodConfig;
+    } else {
+      // Fall back to automatic payment methods in test mode without PMC
+      sessionConfig.automatic_payment_methods = { enabled: true };
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     return NextResponse.json({
       url: session.url,

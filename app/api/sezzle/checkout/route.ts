@@ -61,6 +61,14 @@ export async function POST(request: NextRequest) {
       studentId,
       // Intent: AUTH (capture later) or CAPTURE (capture immediately)
       intent = 'CAPTURE',
+      // Custom URLs
+      cancelUrl,
+      successUrl,
+      // Barber-specific metadata
+      transferHours,
+      hoursPerWeek,
+      hasHostShop,
+      hostShopName,
     } = body;
 
     // Validate required fields
@@ -92,14 +100,23 @@ export async function POST(request: NextRequest) {
     // Generate a unique reference ID
     const referenceId = `EFH-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
+    // Determine redirect URLs - use custom if provided, otherwise default based on programSlug
+    const defaultCancelUrl = programSlug === 'barber-apprenticeship' 
+      ? `${siteUrl}/programs/barber-apprenticeship/apply?canceled=true&provider=sezzle`
+      : `${siteUrl}/enroll/payment?canceled=true&provider=sezzle&ref=${referenceId}`;
+    
+    const defaultSuccessUrl = programSlug === 'barber-apprenticeship'
+      ? `${siteUrl}/programs/barber-apprenticeship/apply/success?provider=sezzle&ref=${referenceId}`
+      : `${siteUrl}/enroll/success?provider=sezzle&ref=${referenceId}`;
+
     // Build session request
     const sessionRequest: SezzleSessionRequest = {
       cancel_url: {
-        href: `${siteUrl}/enroll/payment?canceled=true&provider=sezzle&ref=${referenceId}`,
+        href: cancelUrl || defaultCancelUrl,
         method: 'GET',
       },
       complete_url: {
-        href: `${siteUrl}/enroll/success?provider=sezzle&ref=${referenceId}`,
+        href: successUrl || defaultSuccessUrl,
         method: 'GET',
       },
       customer: {
@@ -161,6 +178,14 @@ export async function POST(request: NextRequest) {
           application_id: applicationId || '',
           enrollment_id: enrollmentId || '',
           student_id: studentId || '',
+          // Barber-specific metadata
+          transfer_hours: String(transferHours || 0),
+          hours_per_week: String(hoursPerWeek || 40),
+          has_host_shop: String(hasHostShop || ''),
+          host_shop_name: hostShopName || '',
+          customer_name: `${firstName} ${lastName}`,
+          customer_email: email,
+          customer_phone: phone || '',
         },
       },
     };

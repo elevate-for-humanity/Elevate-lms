@@ -1,531 +1,536 @@
-'use client';
-
-import { useState } from 'react';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { motion } from 'framer-motion';
 import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { FundingBadge } from '@/components/programs/FundingBadge';
 import { 
-  Clock, DollarSign, TrendingUp, CheckCircle, ArrowRight, 
-  Thermometer, Wind, Wrench, Award, Users, Calendar,
-  ChevronDown, ChevronUp, Play, Star, MapPin, Phone,
-  GraduationCap, Briefcase, Shield, Zap, Target, Heart
+  CheckCircle, 
+  Clock, 
+  DollarSign, 
+  GraduationCap,
+  Briefcase,
+  Monitor,
+  Users,
+  Award,
+  Building2,
+  ArrowRight
 } from 'lucide-react';
 
+export const metadata: Metadata = {
+  title: 'HVAC Technician Training | Free Funded Program | Elevate for Humanity',
+  description: 'Free HVAC technician training through Indiana Career Connect. Earn while you learn with OJT and internships. Online coursework plus hands-on training. WRG funded program.',
+  openGraph: {
+    title: 'HVAC Technician Training | Free Funded Program',
+    description: 'Free HVAC technician training through Indiana Career Connect. Earn while you learn with OJT and internships.',
+    images: ['/images/hvac/hvac-hero.jpg'],
+  },
+};
+
 export default function HVACProgramPage() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
-  const faqs = [
-    {
-      question: "Do I need any prior experience to enroll?",
-      answer: "No prior experience is required! Our HVAC program is designed for complete beginners. We start with the fundamentals and progressively build your skills. Whether you're changing careers or just starting out, we'll give you everything you need to succeed."
-    },
-    {
-      question: "How long does the program take to complete?",
-      answer: "The program runs 12-16 weeks depending on your schedule. We offer flexible morning, afternoon, and evening classes to fit around your life. Most students complete the program while working part-time."
-    },
-    {
-      question: "Is this program really free?",
-      answer: "Yes! If you qualify for WIOA (Workforce Innovation and Opportunity Act) funding, your tuition is 100% covered. This includes all materials, tools, certifications, and even job placement assistance. We help you apply for funding as part of the enrollment process."
-    },
-    {
-      question: "What certifications will I earn?",
-      answer: "You'll earn EPA Section 608 Certification (required by law to handle refrigerants), OSHA 10 Safety Certification, and our program completion certificate. These are industry-recognized credentials that employers actively seek."
-    },
-    {
-      question: "What kind of jobs can I get after completing the program?",
-      answer: "Graduates work as HVAC Technicians, Installation Specialists, Maintenance Technicians, and Service Technicians. Entry-level positions typically start at $18-22/hour, with experienced technicians earning $60,000-$80,000+ annually."
-    },
-    {
-      question: "Do you help with job placement?",
-      answer: "Absolutely! We have partnerships with over 50 local HVAC companies actively hiring our graduates. Our career services team helps with resume writing, interview prep, and direct introductions to employers. 85% of our graduates are employed within 30 days."
-    },
-    {
-      question: "What tools and equipment will I need?",
-      answer: "All tools and equipment are provided during training. Upon graduation, you'll receive a starter tool kit to begin your career. We also provide uniforms and safety gear during the program."
-    },
-    {
-      question: "Can I work while attending the program?",
-      answer: "Yes! Many of our students work part-time while completing the program. We offer flexible scheduling options including evening and weekend classes to accommodate working adults."
-    }
-  ];
-
-  const curriculum = [
-    {
-      week: "Weeks 1-2",
-      title: "HVAC Fundamentals",
-      topics: ["Heating and cooling principles", "System components and terminology", "Safety protocols and OSHA standards", "Basic electrical theory"],
-      project: "Identify and diagram a complete HVAC system"
-    },
-    {
-      week: "Weeks 3-4",
-      title: "Heating Systems",
-      topics: ["Furnace operation and maintenance", "Heat pump technology", "Gas and electric heating", "Combustion analysis"],
-      project: "Perform a complete furnace inspection and tune-up"
-    },
-    {
-      week: "Weeks 5-6",
-      title: "Cooling Systems",
-      topics: ["Air conditioning fundamentals", "Refrigeration cycle", "Compressor and condenser operation", "Evaporator coil maintenance"],
-      project: "Diagnose and repair a malfunctioning AC unit"
-    },
-    {
-      week: "Weeks 7-8",
-      title: "Refrigerant Handling",
-      topics: ["EPA 608 certification prep", "Refrigerant types and properties", "Recovery and recycling procedures", "Environmental regulations"],
-      project: "EPA 608 Certification Exam"
-    },
-    {
-      week: "Weeks 9-10",
-      title: "Installation Techniques",
-      topics: ["Ductwork design and installation", "Equipment sizing and selection", "Brazing and soldering", "System startup procedures"],
-      project: "Complete a mini-split installation"
-    },
-    {
-      week: "Weeks 11-12",
-      title: "Troubleshooting & Diagnostics",
-      topics: ["Systematic troubleshooting", "Electrical diagnostics", "Reading schematics", "Customer service skills"],
-      project: "Diagnose and repair multiple system faults"
-    },
-    {
-      week: "Weeks 13-14",
-      title: "Advanced Systems",
-      topics: ["Commercial HVAC overview", "Building automation basics", "Energy efficiency upgrades", "Smart thermostat integration"],
-      project: "Design an energy-efficient system upgrade"
-    },
-    {
-      week: "Weeks 15-16",
-      title: "Career Preparation",
-      topics: ["Resume and interview skills", "Industry certifications review", "Job search strategies", "Employer meet-and-greet"],
-      project: "Complete job shadowing and secure employment"
-    }
-  ];
-
-  const successStories = [
-    {
-      name: "Marcus Johnson",
-      role: "HVAC Service Technician",
-      company: "Comfort Systems USA",
-      quote: "I was working retail making $12/hour with no future. Six months after graduating, I'm earning $52,000 with full benefits. This program changed my life.",
-      salary: "$52,000/year",
-      timeToJob: "3 weeks"
-    },
-    {
-      name: "Sarah Mitchell",
-      role: "Installation Specialist",
-      company: "Johnson Controls",
-      quote: "As a single mom, I needed a career that could support my family. The flexible schedule let me train while my kids were in school. Now I have a real career.",
-      salary: "$48,000/year",
-      timeToJob: "2 weeks"
-    },
-    {
-      name: "David Chen",
-      role: "Lead Technician",
-      company: "Carrier Enterprise",
-      quote: "The hands-on training was incredible. I learned more in 16 weeks than I thought possible. The instructors really care about your success.",
-      salary: "$58,000/year",
-      timeToJob: "1 week"
-    }
-  ];
-
-  const stats = [
-    { value: "95%", label: "Job Placement Rate", icon: Briefcase },
-    { value: "$48K", label: "Average Starting Salary", icon: DollarSign },
-    { value: "16", label: "Weeks to Career", icon: Calendar },
-    { value: "500+", label: "Graduates Employed", icon: Users }
-  ];
-
   return (
-    <>
+    <main className="min-h-screen bg-white">
+      {/* VIDEO HERO - Clean, no text overlay */}
+      <section className="relative h-[50vh] min-h-[350px] max-h-[450px]">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover"
+          poster="/images/hvac/hvac-hero.jpg"
+        >
+          <source src="/videos/hvac-training.mp4" type="video/mp4" />
+        </video>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+      </section>
+
+      {/* Avatar Section */}
+      <PageAvatar 
+        videoSrc="/videos/avatars/hvac-guide.mp4" 
+        title="Learn About HVAC Training"
+      />
+
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs
+          items={[
             { label: 'Programs', href: '/programs' },
             { label: 'Skilled Trades', href: '/programs/skilled-trades' },
-            { label: 'HVAC Technician' }
-          ]} />
-        </div>
+            { label: 'HVAC Technician' },
+          ]}
+        />
       </div>
 
-      {/* Hero Section */}
-      <section className="relative bg-blue-800 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
-        
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
-          <div className="max-w-2xl">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
-            >
-              <FundingBadge type="funded" />
-              
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mt-6 mb-6 leading-tight">
-                Become a Certified
-                <span className="text-blue-400"> HVAC Technician</span>
-              </h1>
-              
-              <p className="text-xl text-blue-100 mb-8 leading-relaxed">
-                Launch your career in one of America's fastest-growing trades. 
-                Learn to install, maintain, and repair heating and cooling systems. 
-                <strong className="text-white"> 100% free with WIOA funding.</strong>
+      {/* Program Title & Quick Info */}
+      <section className="max-w-7xl mx-auto px-4 py-8">
+        <div className="text-center mb-12">
+          <span className="inline-block px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-semibold mb-4">
+            FREE FUNDED PROGRAM
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+            HVAC Technician Training
+          </h1>
+          <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            Launch your career in heating, ventilation, and air conditioning through Indiana Career Connect. 
+            100% funded for those who qualify.
+          </p>
+        </div>
+
+        {/* Quick Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+          <div className="bg-slate-50 rounded-xl p-6 text-center">
+            <DollarSign className="w-8 h-8 text-green-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-slate-900">$0</div>
+            <div className="text-sm text-slate-600">Tuition Cost*</div>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-6 text-center">
+            <Clock className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-slate-900">12-16</div>
+            <div className="text-sm text-slate-600">Weeks Training</div>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-6 text-center">
+            <Briefcase className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-slate-900">Paid</div>
+            <div className="text-sm text-slate-600">OJT & Internships</div>
+          </div>
+          <div className="bg-slate-50 rounded-xl p-6 text-center">
+            <Award className="w-8 h-8 text-orange-600 mx-auto mb-2" />
+            <div className="text-2xl font-bold text-slate-900">EPA 608</div>
+            <div className="text-sm text-slate-600">Certification</div>
+          </div>
+        </div>
+        <p className="text-center text-sm text-slate-500 mt-4">
+          *For eligible participants through Indiana Career Connect / WRG funding
+        </p>
+      </section>
+
+      {/* Indiana Career Connect Section */}
+      <section className="bg-blue-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <Image
+                src="/images/indiana-career-connect-logo.png"
+                alt="Indiana Career Connect"
+                width={200}
+                height={60}
+                className="mb-6 bg-white p-2 rounded"
+              />
+              <h2 className="text-3xl font-bold mb-4">
+                Funded Through Indiana Career Connect
+              </h2>
+              <p className="text-blue-100 text-lg mb-6">
+                This program is part of the Workforce Ready Grant (WRG) initiative, providing 
+                free training for in-demand careers. Indiana Career Connect helps Hoosiers 
+                access education and training at no cost.
               </p>
-
-              <div className="flex flex-wrap gap-4 mb-10">
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <Clock className="w-4 h-4 text-blue-400" />
-                  12-16 Weeks
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <DollarSign className="w-4 h-4 text-green-400" />
-                  $0 Tuition (WIOA)
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <TrendingUp className="w-4 h-4 text-yellow-400" />
-                  $48K+ Avg Salary
-                </span>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/inquiry?program=hvac"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-green-500 hover:bg-green-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-green-500/30"
-                >
-                  Apply Now
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Link>
-                <Link
-                  href="/wioa-eligibility"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-semibold rounded-full transition-all"
-                >
-                  Check Eligibility First
-                </Link>
-              </div>
-            </motion.div>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>100% tuition covered for eligible participants</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>Books, materials, and certification fees included</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>Supportive services available (transportation, childcare assistance)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                  <span>Career coaching and job placement support</span>
+                </li>
+              </ul>
+            </div>
+            <div className="relative h-80 rounded-2xl overflow-hidden">
+              <Image
+                src="/images/hvac/hvac-classroom.jpg"
+                alt="HVAC Training Classroom"
+                fill
+                className="object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center"
-              >
-                <stat.icon className="w-8 h-8 text-blue-600 mx-auto mb-2" />
-                <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
-                <div className="text-sm text-gray-500">{stat.label}</div>
-              </motion.div>
-            ))}
+      {/* How Training Works */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-slate-900 mb-4">
+            How the Training Works
+          </h2>
+          <p className="text-center text-slate-600 max-w-2xl mx-auto mb-12">
+            Our hybrid training model combines online learning with hands-on experience
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {/* Phase 1 */}
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                <Monitor className="w-6 h-6 text-blue-600" />
+              </div>
+              <div className="text-sm font-semibold text-blue-600 mb-2">PHASE 1</div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Online Coursework</h3>
+              <p className="text-slate-600 mb-4">
+                Start with foundational HVAC theory, safety protocols, and technical knowledge 
+                through our online learning platform. Study at your own pace from home.
+              </p>
+              <ul className="space-y-2 text-sm text-slate-600">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  HVAC fundamentals & theory
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Safety & EPA regulations
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Electrical basics
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Refrigeration principles
+                </li>
+              </ul>
+            </div>
+
+            {/* Phase 2 */}
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-orange-600" />
+              </div>
+              <div className="text-sm font-semibold text-orange-600 mb-2">PHASE 2</div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">Hands-On Labs</h3>
+              <p className="text-slate-600 mb-4">
+                Apply your knowledge in supervised lab environments with real HVAC equipment. 
+                Practice installations, repairs, and diagnostics.
+              </p>
+              <ul className="space-y-2 text-sm text-slate-600">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Equipment installation
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  System diagnostics
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Repair techniques
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  EPA 608 certification prep
+                </li>
+              </ul>
+            </div>
+
+            {/* Phase 3 */}
+            <div className="bg-white rounded-2xl p-8 shadow-sm">
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                <Briefcase className="w-6 h-6 text-green-600" />
+              </div>
+              <div className="text-sm font-semibold text-green-600 mb-2">PHASE 3</div>
+              <h3 className="text-xl font-bold text-slate-900 mb-3">OJT & Internship</h3>
+              <p className="text-slate-600 mb-4">
+                Earn while you learn through paid on-the-job training with local HVAC employers. 
+                Get real-world experience and build industry connections.
+              </p>
+              <ul className="space-y-2 text-sm text-slate-600">
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Paid work experience
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Employer mentorship
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Job placement support
+                </li>
+                <li className="flex items-center gap-2">
+                  <CheckCircle className="w-4 h-4 text-green-500" />
+                  Career advancement path
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Why HVAC Section */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-block bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              Why Choose HVAC?
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              A Career That's Always in Demand
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Every building needs heating and cooling. That means job security, great pay, and opportunities everywhere you go.
-            </p>
-          </div>
+      {/* Earn While You Learn */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="relative h-96 rounded-2xl overflow-hidden">
+              <Image
+                src="/images/hvac/hvac-technician-work.jpg"
+                alt="HVAC Technician at Work"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <h2 className="text-3xl font-bold text-slate-900 mb-4">
+                Earn While You Learn
+              </h2>
+              <p className="text-slate-600 text-lg mb-6">
+                Through our On-the-Job Training (OJT) and internship partnerships, you can 
+                earn money while gaining real-world experience. Our employer partners are 
+                actively hiring and ready to train.
+              </p>
+              
+              <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-6">
+                <h3 className="font-bold text-green-800 mb-2">OJT Benefits</h3>
+                <ul className="space-y-2 text-green-700">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5" />
+                    Paid training hours with employer partners
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5" />
+                    Wages subsidized through WRG funding
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5" />
+                    Direct path to full-time employment
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="w-5 h-5" />
+                    Build your professional network
+                  </li>
+                </ul>
+              </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="flex items-center gap-4 text-slate-600">
+                <Building2 className="w-8 h-8 text-blue-600" />
+                <div>
+                  <div className="font-semibold text-slate-900">15+ Employer Partners</div>
+                  <div className="text-sm">Ready to hire program graduates</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* HRI Section */}
+      <section className="py-16 bg-slate-900 text-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-bold mb-4">
+                High Road Initiative (HRI)
+              </h2>
+              <p className="text-slate-300 text-lg mb-6">
+                This program is part of Indiana's High Road Initiative, connecting 
+                training programs directly with employer needs. HRI ensures that 
+                the skills you learn are exactly what employers are looking for.
+              </p>
+              <ul className="space-y-4">
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Industry-Aligned Curriculum</div>
+                    <div className="text-slate-400 text-sm">Training designed with employer input</div>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Direct Employer Connections</div>
+                    <div className="text-slate-400 text-sm">Meet hiring managers during training</div>
+                  </div>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <CheckCircle className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="font-semibold">Career Pathway Support</div>
+                    <div className="text-slate-400 text-sm">Ongoing advancement opportunities</div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div className="relative h-80 rounded-2xl overflow-hidden">
+              <Image
+                src="/images/hvac/hvac-team.jpg"
+                alt="HVAC Team"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What You'll Learn */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">
+            What You'll Learn
+          </h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
-              {
-                icon: Shield,
-                title: "Recession-Proof Career",
-                description: "HVAC systems need maintenance regardless of the economy. People always need heat in winter and AC in summer."
-              },
-              {
-                icon: TrendingUp,
-                title: "Growing Industry",
-                description: "The Bureau of Labor Statistics projects 6% job growth through 2032 - faster than average for all occupations."
-              },
-              {
-                icon: DollarSign,
-                title: "Excellent Earning Potential",
-                description: "Start at $40-50K and grow to $70-80K+ with experience. Many technicians earn over $100K with overtime."
-              },
-              {
-                icon: Zap,
-                title: "No College Debt",
-                description: "Skip the 4-year degree and student loans. Start earning in months, not years, with zero debt."
-              },
-              {
-                icon: Target,
-                title: "Work Independence",
-                description: "Many HVAC techs work independently, managing their own schedules and building relationships with customers."
-              },
-              {
-                icon: Heart,
-                title: "Help People Daily",
-                description: "You'll be the hero who restores comfort to families and businesses. It's rewarding work that matters."
-              }
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow"
-              >
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <item.icon className="w-6 h-6 text-blue-600" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
-                <p className="text-gray-600">{item.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Curriculum Section */}
-      <section id="curriculum" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-block bg-green-100 text-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              What You'll Learn
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Comprehensive 16-Week Curriculum
-            </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              From fundamentals to advanced diagnostics, you'll gain the skills employers are looking for.
-            </p>
-          </div>
-
-          <div className="space-y-6">
-            {curriculum.map((module, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-slate-50 rounded-2xl p-6 lg:p-8"
-              >
-                <div className="flex flex-col lg:flex-row lg:items-start gap-6">
-                  <div className="flex-shrink-0">
-                    <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center text-white">
-                      <span className="text-sm font-bold">{module.week}</span>
-                    </div>
-                  </div>
-                  <div className="flex-grow">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">{module.title}</h3>
-                    <div className="grid md:grid-cols-2 gap-4 mb-4">
-                      {module.topics.map((topic, i) => (
-                        <div key={i} className="flex items-center gap-2">
-                          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                          <span className="text-gray-700">{topic}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="bg-blue-50 rounded-lg p-4 mt-4">
-                      <span className="text-sm font-semibold text-blue-700">Hands-On Project:</span>
-                      <span className="text-sm text-blue-600 ml-2">{module.project}</span>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+              { title: 'Heating Systems', items: ['Furnace installation', 'Heat pump systems', 'Boiler basics', 'Combustion analysis'] },
+              { title: 'Cooling Systems', items: ['AC installation', 'Refrigerant handling', 'Compressor service', 'Ductwork design'] },
+              { title: 'Ventilation', items: ['Air quality systems', 'Duct installation', 'Exhaust systems', 'Balancing airflow'] },
+              { title: 'Controls & Electrical', items: ['Thermostat wiring', 'Control boards', 'Electrical safety', 'Troubleshooting'] },
+            ].map((category, i) => (
+              <div key={i} className="bg-slate-50 rounded-xl p-6">
+                <h3 className="font-bold text-slate-900 mb-4">{category.title}</h3>
+                <ul className="space-y-2">
+                  {category.items.map((item, j) => (
+                    <li key={j} className="flex items-center gap-2 text-slate-600 text-sm">
+                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* Certifications */}
-      <section className="py-20 bg-blue-800 text-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-block bg-white/10 text-blue-300 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              Industry Credentials
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Certifications You'll Earn
-            </h2>
-            <p className="text-lg text-blue-200 max-w-2xl mx-auto">
-              Graduate with the credentials employers require - all included in your training.
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {[
-              {
-                title: "EPA Section 608",
-                description: "Federally required certification to purchase and handle refrigerants. Essential for any HVAC career.",
-                icon: Award
-              },
-              {
-                title: "OSHA 10 Safety",
-                description: "Occupational safety certification covering hazard recognition and prevention in the workplace.",
-                icon: Shield
-              },
-              {
-                title: "Program Certificate",
-                description: "Comprehensive completion certificate documenting your 400+ hours of hands-on training.",
-                icon: GraduationCap
-              }
-            ].map((cert, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center"
-              >
-                <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <cert.icon className="w-8 h-8 text-white" />
-                </div>
-                <h3 className="text-xl font-bold mb-2">{cert.title}</h3>
-                <p className="text-blue-200">{cert.description}</p>
-              </motion.div>
-            ))}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-slate-900 mb-4">
+            Certifications Included
+          </h2>
+          <p className="text-center text-slate-600 max-w-2xl mx-auto mb-12">
+            Graduate with industry-recognized credentials that employers value
+          </p>
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award className="w-8 h-8 text-blue-600" />
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">EPA 608 Certification</h3>
+              <p className="text-sm text-slate-600">Required for handling refrigerants</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award className="w-8 h-8 text-green-600" />
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">OSHA 10 Safety</h3>
+              <p className="text-sm text-slate-600">Workplace safety certification</p>
+            </div>
+            <div className="bg-white rounded-xl p-6 text-center shadow-sm">
+              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <GraduationCap className="w-8 h-8 text-purple-600" />
+              </div>
+              <h3 className="font-bold text-slate-900 mb-2">Program Certificate</h3>
+              <p className="text-sm text-slate-600">Elevate for Humanity completion</p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Success Stories */}
-      <section className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-block bg-yellow-100 text-yellow-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              Graduate Success
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Real People, Real Results
+      {/* Eligibility */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold text-center text-slate-900 mb-4">
+              Who Qualifies for Free Training?
             </h2>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-              Our graduates are building successful careers across Indiana. Here are some of their stories.
+            <p className="text-center text-slate-600 mb-8">
+              This program is funded through Indiana Career Connect for eligible participants
             </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {successStories.map((story, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="bg-slate-50 rounded-2xl p-8"
-              >
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="w-8 h-8 text-blue-600" />
+            
+            <div className="bg-blue-50 border border-blue-200 rounded-2xl p-8">
+              <h3 className="font-bold text-blue-900 mb-4">You may qualify if you:</h3>
+              <div className="grid md:grid-cols-2 gap-4">
+                {[
+                  'Are an Indiana resident',
+                  'Are 18 years or older',
+                  'Have a high school diploma or GED',
+                  'Are unemployed or underemployed',
+                  'Receive public assistance (SNAP, TANF, etc.)',
+                  'Are a veteran or military spouse',
+                  'Have a disability',
+                  'Are a single parent',
+                ].map((item, i) => (
+                  <div key={i} className="flex items-center gap-2 text-blue-800">
+                    <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                    {item}
                   </div>
-                  <div>
-                    <h3 className="font-bold text-gray-900">{story.name}</h3>
-                    <p className="text-sm text-gray-500">{story.role}</p>
-                    <p className="text-sm text-blue-600">{story.company}</p>
-                  </div>
-                </div>
-                <p className="text-gray-600 italic mb-6">"{story.quote}"</p>
-                <div className="flex justify-between text-sm">
-                  <div>
-                    <span className="text-gray-500">Salary:</span>
-                    <span className="font-semibold text-green-600 ml-1">{story.salary}</span>
-                  </div>
-                  <div>
-                    <span className="text-gray-500">Hired in:</span>
-                    <span className="font-semibold text-blue-600 ml-1">{story.timeToJob}</span>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+                ))}
+              </div>
+              <p className="text-sm text-blue-700 mt-6">
+                Not sure if you qualify? Complete our quick eligibility check to find out.
+              </p>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="py-20 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <span className="inline-block bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              Common Questions
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-lg text-gray-600">
-              Everything you need to know about our HVAC program.
-            </p>
-          </div>
-
-          <div className="space-y-4">
-            {faqs.map((faq, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-xl shadow-sm overflow-hidden"
-              >
-                <button
-                  onClick={() => setOpenFaq(openFaq === index ? null : index)}
-                  className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors"
-                >
-                  <span className="font-semibold text-gray-900 pr-4">{faq.question}</span>
-                  {openFaq === index ? (
-                    <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                  )}
-                </button>
-                {openFaq === index && (
-                  <div className="px-6 pb-5">
-                    <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
-                  </div>
-                )}
-              </motion.div>
-            ))}
+      {/* Career Outcomes */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">
+            Career Outcomes
+          </h2>
+          <div className="grid md:grid-cols-4 gap-6 max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="text-4xl font-bold text-blue-600 mb-2">$45K+</div>
+              <div className="text-slate-600">Average Starting Salary</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-green-600 mb-2">90%</div>
+              <div className="text-slate-600">Job Placement Rate</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-purple-600 mb-2">15%</div>
+              <div className="text-slate-600">Industry Growth Rate</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-bold text-orange-600 mb-2">500+</div>
+              <div className="text-slate-600">Local Job Openings</div>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-blue-600 text-white">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold mb-6">
-            Ready to Start Your HVAC Career?
+      <section className="py-20 bg-gradient-to-br from-blue-600 to-blue-800 text-white">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Start Your HVAC Career Today
           </h2>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-            Take the first step today. Check your eligibility for free WIOA-funded training and join our next class.
+          <p className="text-xl text-blue-100 mb-8">
+            Free training for those who qualify. No cost, no debt, just opportunity.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/inquiry?program=hvac"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-bold rounded-full hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg"
             >
-              Apply Now
+              Check Eligibility & Apply
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
-              href="tel:317-314-3757"
-              className="inline-flex items-center justify-center px-8 py-4 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-full transition-all"
+              href="/wioa-eligibility"
+              className="inline-flex items-center justify-center px-8 py-4 bg-blue-700 hover:bg-blue-600 text-white font-bold rounded-full transition-all border border-blue-500"
             >
-              <Phone className="w-5 h-5 mr-2" />
-              Call (317) 314-3757
+              Learn About Funding
             </Link>
           </div>
-          <p className="mt-8 text-blue-200 text-sm">
-            Classes starting soon • Limited seats available • No cost with WIOA funding
+          <p className="text-blue-200 text-sm mt-6">
+            Complete the online application in 5 minutes. We'll contact you within 24 hours.
           </p>
         </div>
       </section>
-    </>
+    </main>
   );
 }

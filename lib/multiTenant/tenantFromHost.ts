@@ -1,33 +1,10 @@
 // lib/multiTenant/tenantFromHost.ts
-import { createClient } from "@/lib/supabase/server";
+// NOTE: This file is used in root layout which may run in edge context.
+// DO NOT import @supabase/supabase-js here - it breaks Netlify edge functions.
+// Tenant lookup is disabled to prevent edge runtime crashes.
 
 export async function getTenantFromHost(host?: string) {
-  if (!host) return null;
-
-  const supabase = await createClient();
-  const normalized = host.toLowerCase().split(":")[0];
-
-  // Check for custom domain first
-  if (
-    !normalized.includes("www.elevateforhumanity.org") &&
-    normalized !== "localhost"
-  ) {
-    const { data: tenantByDomain } = await supabase
-      .from("tenants")
-      .select("*")
-      .eq("custom_domain", normalized)
-      .single();
-
-    if (tenantByDomain) return tenantByDomain;
-  }
-
-  // Fall back to subdomain matching
-  const [sub] = normalized.split(".");
-  const { data: tenantBySlug } = await supabase
-    .from("tenants")
-    .select("*")
-    .eq("slug", sub)
-    .single();
-
-  return tenantBySlug;
+  // Tenant lookup disabled - would require Supabase which breaks edge runtime
+  // For multi-tenant support, implement via API route called from client component
+  return null;
 }

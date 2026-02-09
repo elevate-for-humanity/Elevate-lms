@@ -15,9 +15,39 @@ interface PageAvatarProps {
 export default function PageAvatar({ videoSrc, voiceoverSrc, title, position = 'default', loop = false }: PageAvatarProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [isPlaying, setIsPlaying] = useState(!!voiceoverSrc);
-  const [isMuted, setIsMuted] = useState(!voiceoverSrc);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isMuted, setIsMuted] = useState(true);
   const audioStartedRef = useRef(false);
+  const unmuteAttemptedRef = useRef(false);
+
+  // Try to unmute video on first user interaction
+  useEffect(() => {
+    const tryUnmute = () => {
+      if (unmuteAttemptedRef.current) return;
+      unmuteAttemptedRef.current = true;
+      
+      const video = videoRef.current;
+      if (video) {
+        video.muted = false;
+        setIsMuted(false);
+      }
+      
+      if (voiceoverSrc && audioRef.current) {
+        audioRef.current.play().catch(() => {});
+      }
+    };
+
+    // Listen for user interaction to unmute
+    window.addEventListener('click', tryUnmute, { once: true });
+    window.addEventListener('touchstart', tryUnmute, { once: true });
+    window.addEventListener('scroll', tryUnmute, { once: true });
+
+    return () => {
+      window.removeEventListener('click', tryUnmute);
+      window.removeEventListener('touchstart', tryUnmute);
+      window.removeEventListener('scroll', tryUnmute);
+    };
+  }, [voiceoverSrc]);
 
   // Autoplay voiceover on page load
   useEffect(() => {
@@ -99,7 +129,7 @@ export default function PageAvatar({ videoSrc, voiceoverSrc, title, position = '
           className="w-full h-full object-cover"
           src={videoSrc}
           autoPlay
-          muted
+          muted={isMuted}
           loop={loop}
           playsInline
           preload="metadata"
@@ -131,7 +161,7 @@ export default function PageAvatar({ videoSrc, voiceoverSrc, title, position = '
               src={videoSrc}
               playsInline
               loop={loop}
-              muted
+              muted={isMuted}
               autoPlay
               preload="metadata"
               poster="/images/avatar-poster.jpg"

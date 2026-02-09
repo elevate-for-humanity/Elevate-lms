@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import PageAvatar from '@/components/PageAvatar';
-import { CheckCircle, DollarSign, Award, Briefcase, ArrowRight, GraduationCap, Users, Shield, Building2, BookOpen } from 'lucide-react';
+import { CheckCircle, DollarSign, Award, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'HVAC Technician Training | Free Through WRG | Elevate for Humanity',
@@ -56,7 +56,7 @@ export default function HVACProgramPage() {
             </div>
           </div>
           <div className="relative h-96 rounded-2xl overflow-hidden">
-            <Image src="/images/programs/hvac-technician.jpg" alt="HVAC Technician at Work" fill className="object-cover" />
+            <Image src="/images/hvac-technician.jpg" alt="HVAC Technician at Work" fill className="object-cover" />
           </div>
         </div>
       </section>
@@ -79,7 +79,7 @@ export default function HVACProgramPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative h-80 rounded-2xl overflow-hidden">
-              <Image src="/images/programs/classroom-training.jpg" alt="WRG Funded Training" fill className="object-cover" />
+              <Image src="/images/employers/partnership-meeting.jpg" alt="WRG Funded Training" fill className="object-cover" />
             </div>
             <div>
               <span className="text-green-400 font-semibold text-sm">HOW IT'S PAID FOR</span>
@@ -122,7 +122,7 @@ export default function HVACProgramPage() {
               </ul>
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden">
-              <Image src="/images/programs/employer-partnership.jpg" alt="Employer Partnership" fill className="object-cover" />
+              <Image src="/images/employers/partnership-handshake.jpg" alt="Employer Partnership" fill className="object-cover" />
             </div>
           </div>
         </div>
@@ -136,41 +136,53 @@ export default function HVACProgramPage() {
             <p className="text-slate-600 mt-2">Comprehensive training covering all aspects of HVAC work</p>
           </div>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <BookOpen className="w-12 h-12 text-blue-600 mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Online Foundation</h3>
-              <p className="text-slate-600 mb-4">Start with theory and fundamentals from home. Learn at your own pace with 24/7 access to our online platform.</p>
-              <ul className="space-y-2 text-slate-600 text-sm">
-                <li>• HVAC principles and theory</li>
-                <li>• Electrical fundamentals</li>
-                <li>• Refrigeration cycles</li>
-                <li>• Safety and EPA regulations</li>
-                <li>• System components</li>
-              </ul>
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+              <div className="relative h-48">
+                <Image src="/images/homepage/student-portal-interface.png" alt="Online Learning" fill className="object-cover" />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-slate-900 mb-3">Online Foundation</h3>
+                <p className="text-slate-600 mb-4">Start with theory and fundamentals from home. Learn at your own pace with 24/7 access to our online platform.</p>
+                <ul className="space-y-2 text-slate-600 text-sm">
+                  <li>• HVAC principles and theory</li>
+                  <li>• Electrical fundamentals</li>
+                  <li>• Refrigeration cycles</li>
+                  <li>• Safety and EPA regulations</li>
+                  <li>• System components</li>
+                </ul>
+              </div>
             </div>
-            <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <Users className="w-12 h-12 text-orange-600 mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Hands-On Labs</h3>
-              <p className="text-slate-600 mb-4">Practice on real equipment in our training facility. Work with actual HVAC systems under instructor guidance.</p>
-              <ul className="space-y-2 text-slate-600 text-sm">
-                <li>• Equipment installation</li>
-                <li>• System diagnostics</li>
-                <li>• Troubleshooting techniques</li>
-                <li>• Repair procedures</li>
-                <li>• EPA 608 exam prep</li>
-              </ul>
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+              <div className="relative h-48">
+                <Image src="/images/homepage/hvac-technician-training.png" alt="Hands-On Labs" fill className="object-cover" />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-slate-900 mb-3">Hands-On Labs</h3>
+                <p className="text-slate-600 mb-4">Practice on real equipment in our training facility. Work with actual HVAC systems under instructor guidance.</p>
+                <ul className="space-y-2 text-slate-600 text-sm">
+                  <li>• Equipment installation</li>
+                  <li>• System diagnostics</li>
+                  <li>• Troubleshooting techniques</li>
+                  <li>• Repair procedures</li>
+                  <li>• EPA 608 exam prep</li>
+                </ul>
+              </div>
             </div>
-            <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <Briefcase className="w-12 h-12 text-green-600 mb-4" />
-              <h3 className="text-xl font-bold text-slate-900 mb-3">Paid OJT</h3>
-              <p className="text-slate-600 mb-4">Earn wages while training with an employer partner. Real work experience that often leads to full-time employment.</p>
-              <ul className="space-y-2 text-slate-600 text-sm">
-                <li>• Paid hourly wages</li>
-                <li>• Real job site experience</li>
-                <li>• Employer mentorship</li>
-                <li>• Professional references</li>
-                <li>• Job offer potential</li>
-              </ul>
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+              <div className="relative h-48">
+                <Image src="/images/homepage/earn-while-you-learn.png" alt="Paid OJT" fill className="object-cover" />
+              </div>
+              <div className="p-6">
+                <h3 className="text-xl font-bold text-slate-900 mb-3">Paid OJT</h3>
+                <p className="text-slate-600 mb-4">Earn wages while training with an employer partner. Real work experience that often leads to full-time employment.</p>
+                <ul className="space-y-2 text-slate-600 text-sm">
+                  <li>• Paid hourly wages</li>
+                  <li>• Real job site experience</li>
+                  <li>• Employer mentorship</li>
+                  <li>• Professional references</li>
+                  <li>• Job offer potential</li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
@@ -181,7 +193,7 @@ export default function HVACProgramPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative h-80 rounded-2xl overflow-hidden">
-              <Image src="/images/programs/ojt-work.jpg" alt="On the Job Training" fill className="object-cover" />
+              <Image src="/images/hvac-technician-success.jpg" alt="On the Job Training" fill className="object-cover" />
             </div>
             <div>
               <span className="text-green-600 font-semibold text-sm">EARN WHILE YOU LEARN</span>
@@ -245,8 +257,11 @@ export default function HVACProgramPage() {
                 Need help? We can guide you through this process. Just mention it when you apply and we'll walk you through each step.
               </p>
             </div>
-            <div className="bg-white rounded-2xl p-8 shadow-lg border border-slate-200">
-              <Building2 className="w-12 h-12 text-purple-600 mb-4" />
+            <div className="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200">
+              <div className="relative h-48">
+                <Image src="/images/career-services/workshop.jpg" alt="Career Services Workshop" fill className="object-cover" />
+              </div>
+              <div className="p-8">
               <h3 className="text-xl font-bold text-slate-900 mb-4">What to Bring to Your Appointment</h3>
               <ul className="space-y-3 text-slate-600">
                 <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /><span>Government-issued photo ID</span></li>
@@ -261,39 +276,46 @@ export default function HVACProgramPage() {
                   WorkOne Office Locator <ArrowRight className="ml-2 w-4 h-4" />
                 </a>
               </div>
+              </div>
             </div>
           </div>
         </div>
       </section>
 
       {/* CERTIFICATIONS */}
-      <section className="py-16 bg-blue-900 text-white">
+      <section className="py-16 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold">Certifications You'll Earn</h2>
-            <p className="text-blue-200 mt-2">Industry-recognized credentials included in your training</p>
+            <p className="text-slate-400 mt-2">Industry-recognized credentials included in your training</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-            <div className="text-center">
-              <div className="w-20 h-20 bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-10 h-10 text-green-400" />
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            <div className="bg-slate-800 rounded-2xl overflow-hidden">
+              <div className="relative h-40">
+                <Image src="/images/certificates-hero.jpg" alt="EPA 608 Certification" fill className="object-cover" />
               </div>
-              <h3 className="font-bold text-lg mb-2">EPA 608 Certification</h3>
-              <p className="text-blue-200 text-sm">Required by federal law to work with refrigerants. We cover the exam fee.</p>
+              <div className="p-6 text-center">
+                <h3 className="font-bold text-lg mb-2">EPA 608 Certification</h3>
+                <p className="text-slate-400 text-sm">Required by federal law to work with refrigerants. We cover the exam fee.</p>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="w-20 h-20 bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-10 h-10 text-green-400" />
+            <div className="bg-slate-800 rounded-2xl overflow-hidden">
+              <div className="relative h-40">
+                <Image src="/images/homepage/emergency-health-safety-training.png" alt="OSHA 10 Safety" fill className="object-cover" />
               </div>
-              <h3 className="font-bold text-lg mb-2">OSHA 10 Safety</h3>
-              <p className="text-blue-200 text-sm">Industry-standard workplace safety certification recognized by all employers.</p>
+              <div className="p-6 text-center">
+                <h3 className="font-bold text-lg mb-2">OSHA 10 Safety</h3>
+                <p className="text-slate-400 text-sm">Industry-standard workplace safety certification recognized by all employers.</p>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="w-20 h-20 bg-blue-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <GraduationCap className="w-10 h-10 text-green-400" />
+            <div className="bg-slate-800 rounded-2xl overflow-hidden">
+              <div className="relative h-40">
+                <Image src="/images/homepage/certificate-of-completion.png" alt="Program Certificate" fill className="object-cover" />
               </div>
-              <h3 className="font-bold text-lg mb-2">Program Certificate</h3>
-              <p className="text-blue-200 text-sm">Completion certificate documenting your training hours and competencies.</p>
+              <div className="p-6 text-center">
+                <h3 className="font-bold text-lg mb-2">Program Certificate</h3>
+                <p className="text-slate-400 text-sm">Completion certificate documenting your training hours and competencies.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -346,9 +368,8 @@ export default function HVACProgramPage() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="py-20 bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+      <section className="py-20 bg-slate-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <Shield className="w-16 h-16 text-green-400 mx-auto mb-6" />
           <h2 className="text-3xl md:text-4xl font-bold mb-4">No Debt. No Risk. Real Career.</h2>
           <p className="text-xl text-slate-300 mb-8">Apply in 5 minutes. We verify your eligibility and handle your Indiana Career Connect enrollment.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">

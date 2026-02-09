@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState, useRef, useEffect } from 'react';
@@ -41,10 +43,28 @@ export default function AdvancedVideoPlayer({
   const [buffered, setBuffered] = useState(0);
   const [hasWatched, setHasWatched] = useState(false);
   const controlsTimeoutRef = useRef<NodeJS.Timeout>();
+  const supabase = createClient();
+
+  // Log video view to DB
+  const logVideoView = async (eventType: 'start' | 'progress' | 'complete', progress?: number) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('video_views')
+      .upsert({
+        user_id: user?.id,
+        video_src: src,
+        course_id: courseId,
+        lesson_id: lessonId,
+        event_type: eventType,
+        progress_percent: progress || 0,
+        watched_at: new Date().toISOString()
+      }, { onConflict: 'user_id,video_src' });
+  };
 
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
+    logVideoView('start');
 
     const handleTimeUpdate = () => {
       setCurrentTime(video.currentTime);

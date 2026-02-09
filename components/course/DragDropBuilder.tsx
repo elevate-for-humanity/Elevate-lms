@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState, useCallback } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -20,6 +22,35 @@ interface DragDropBuilderProps {
   courseId: string;
   initialModules?: CourseModule[];
   onSave?: (modules: CourseModule[]) => void;
+}
+
+// Hook to load and save modules from DB
+function useModulesDB(courseId: string, initialModules?: CourseModule[]) {
+  const [modules, setModules] = useState<CourseModule[]>(initialModules || []);
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function loadModules() {
+      const { data } = await supabase
+        .from('course_modules')
+        .select('id, title, type, duration, content, order')
+        .eq('course_id', courseId)
+        .order('order');
+      if (data && data.length > 0) setModules(data);
+    }
+    if (!initialModules?.length) loadModules();
+  }, [courseId, supabase, initialModules]);
+
+  const saveModuleOrder = async (newModules: CourseModule[]) => {
+    for (let i = 0; i < newModules.length; i++) {
+      await supabase
+        .from('course_modules')
+        .update({ order: i })
+        .eq('id', newModules[i].id);
+    }
+  };
+
+  return { modules, setModules, saveModuleOrder };
 }
 
 function SortableItem({ module, onEdit, onDelete }: { module: CourseModule; onEdit: (id: string) => void; onDelete: (id: string) => void }) {

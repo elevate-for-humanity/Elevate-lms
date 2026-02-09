@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState, useEffect } from 'react';
@@ -28,20 +30,52 @@ export default function NotificationPrompt() {
     checkPermission();
   }, []);
 
+  const supabase = createClient();
+
   const handleEnable = async () => {
     const manager = NotificationManager.getInstance();
     const granted = await manager.requestPermission();
 
     if (granted) {
       await manager.subscribeToPush();
+      
+      // Log notification opt-in to DB
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase
+        .from('notification_preferences')
+        .upsert({
+          user_id: user?.id,
+          push_enabled: true,
+          opted_in_at: new Date().toISOString()
+        }, { onConflict: 'user_id' });
+
+      // Log the event
+      await supabase
+        .from('notification_events')
+        .insert({
+          user_id: user?.id,
+          event_type: 'push_enabled',
+          timestamp: new Date().toISOString()
+        });
+
       setShow(false);
     }
   };
 
-  const handleDismiss = () => {
+  const handleDismiss = async () => {
     setShow(false);
     setDismissed(true);
     localStorage.setItem('notification-prompt-dismissed', 'true');
+
+    // Log dismissal to DB
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('notification_events')
+      .insert({
+        user_id: user?.id,
+        event_type: 'prompt_dismissed',
+        timestamp: new Date().toISOString()
+      });
   };
 
   if (!show || dismissed) {

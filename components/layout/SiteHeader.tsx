@@ -5,6 +5,9 @@ import Image from 'next/image';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { DashboardDropdown } from '@/components/navigation/DashboardDropdown';
+import { SearchBar } from '@/components/navigation/SearchBar';
+import { ProfileDropdown } from '@/components/navigation/ProfileDropdown';
 
 // STUDENT-FIRST NAVIGATION - Locked for 30 days
 // Only paths that move students toward enrollment
@@ -219,6 +222,8 @@ export default function SiteHeader() {
             role="navigation" 
             aria-label="Main navigation"
           >
+            <SearchBar className="mr-4 hidden xl:block" />
+            <DashboardDropdown className="mr-2" />
             {DESKTOP_NAV_LINKS.map((link) => (
               <div key={link.href} className="relative group">
                 <Link 
@@ -259,13 +264,17 @@ export default function SiteHeader() {
 
           {/* Right side actions */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Sign In / Dashboard - desktop only */}
-            <Link
-              href={user ? "/lms/dashboard" : "/login"}
-              className="hidden lg:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-            >
-              {user ? 'Dashboard' : 'Sign In'}
-            </Link>
+            {/* Profile Dropdown - shows when logged in */}
+            {user ? (
+              <ProfileDropdown className="hidden lg:block" />
+            ) : (
+              <Link
+                href="/login"
+                className="hidden lg:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              >
+                Sign In
+              </Link>
+            )}
 
             {/* Apply Now CTA */}
             <Link

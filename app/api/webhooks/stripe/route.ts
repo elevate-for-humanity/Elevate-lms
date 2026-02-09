@@ -207,6 +207,27 @@ export async function POST(request: NextRequest) {
         break;
       }
 
+      // ========== DONATION PROCESSING ==========
+      if (session.metadata?.type === 'donation') {
+        try {
+          const amount = parseFloat(session.metadata.amount || '0');
+          const donorEmail = session.customer_email || session.customer_details?.email;
+
+          await supabase.from('donations').insert({
+            stripe_session_id: session.id,
+            amount: amount,
+            donor_email: donorEmail,
+            status: 'completed',
+            created_at: new Date().toISOString(),
+          });
+
+          logger.info(`✅ Donation recorded: $${amount} from ${donorEmail || 'anonymous'}`);
+        } catch (err: any) {
+          console.error('[webhook] Error processing donation:', err);
+        }
+        break;
+      }
+
       // ========== APPRENTICESHIP ENROLLMENT (SELF-PAY) ==========
       // Payment moves student from applied → enrolled_pending_approval
       // Training access unlocks ONLY after admin approval (→ active)

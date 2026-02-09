@@ -1,7 +1,9 @@
 
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -15,9 +17,43 @@ interface Placement {
   };
 }
 
-export function ShopReportForm({ placements }: { placements: Placement[] }) {
+export function ShopReportForm({ placements: initialPlacements }: { placements: Placement[] }) {
   const router = useRouter();
-  const [placementId, setPlacementId] = useState(placements?.[0]?.id || '');
+  const supabase = createClient();
+  const [placements, setPlacements] = useState<Placement[]>(initialPlacements || []);
+  const [placementId, setPlacementId] = useState(initialPlacements?.[0]?.id || '');
+  const [previousReports, setPreviousReports] = useState<any[]>([]);
+
+  // Load placements and previous reports from DB
+  useEffect(() => {
+    async function loadData() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Load active placements for this shop
+      const { data: placementData } = await supabase
+        .from('apprentice_placements')
+        .select('id, profiles:apprentice_id (id, full_name)')
+        .eq('shop_user_id', user.id)
+        .eq('status', 'active');
+      
+      if (placementData && placementData.length > 0) {
+        setPlacements(placementData as any);
+        setPlacementId(placementData[0].id);
+      }
+
+      // Load previous reports for reference
+      const { data: reports } = await supabase
+        .from('shop_weekly_reports')
+        .select('id, week_start, week_end, hours_total, submitted_at')
+        .eq('submitted_by', user.id)
+        .order('submitted_at', { ascending: false })
+        .limit(5);
+      
+      if (reports) setPreviousReports(reports);
+    }
+    loadData();
+  }, [supabase]);
   const [weekStart, setWeekStart] = useState('');
   const [weekEnd, setWeekEnd] = useState('');
   const [hoursOjt, setHoursOjt] = useState('0');

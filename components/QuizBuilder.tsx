@@ -5,6 +5,7 @@ import React from 'react';
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { createClient } from '@/lib/supabase/client';
 
 interface Question {
   id: string;
@@ -57,6 +58,53 @@ export function QuizBuilder() {
   };
 
   const totalPoints = questions.reduce((sum, q) => sum + q.points, 0);
+  const [saving, setSaving] = useState(false);
+
+  const saveQuiz = async () => {
+    if (!quizTitle.trim() || questions.length === 0) return;
+    
+    setSaving(true);
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      const { data: quiz, error } = await supabase
+        .from('quizzes')
+        .insert({
+          title: quizTitle,
+          created_by: user?.id,
+          total_points: totalPoints,
+          question_count: questions.length,
+          status: 'draft',
+        })
+        .select('id')
+        .single();
+
+      if (error) throw error;
+
+      // Save questions
+      if (quiz) {
+        const questionRecords = questions.map((q, index) => ({
+          quiz_id: quiz.id,
+          question_type: q.type,
+          question_text: q.question,
+          options: q.options,
+          correct_answer: q.correctAnswer,
+          points: q.points,
+          order_index: index,
+        }));
+
+        await supabase.from('quiz_questions').insert(questionRecords);
+      }
+
+      alert('Quiz saved successfully!');
+    } catch (err) {
+      console.error('Error saving quiz:', err);
+      alert('Failed to save quiz');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -268,8 +316,8 @@ export function QuizBuilder() {
             <Card className="p-6">
               <h3 className="font-bold mb-4">Actions</h3>
               <div className="space-y-2">
-                <Button className="w-full" disabled={questions.length === 0}>
-                  Save Quiz
+                <Button className="w-full" disabled={questions.length === 0 || saving} onClick={saveQuiz}>
+                  {saving ? 'Saving...' : 'Save Quiz'}
                 </Button>
                 <Button variant="secondary" className="w-full">
                   Preview

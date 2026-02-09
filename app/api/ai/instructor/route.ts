@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import {
   getInstructorByProgramId,
   getInstructorById,
@@ -98,15 +99,30 @@ Keep responses concise (2-4 paragraphs max), practical, and encouraging. Focus o
         completion.choices[0]?.message?.content ||
         "I'm here to help. Please try asking your question again.";
 
+      // Log interaction to database
+      try {
+        const supabase = await createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        await supabase.from('ai_instructor_interactions').insert({
+          user_id: user?.id || null,
+          program_id: programId,
+          instructor_id: instructorId,
+          user_message: latest,
+          assistant_response: reply,
+        }).catch(() => {});
+      } catch {
+        // DB logging is non-critical
+      }
+
       return NextResponse.json({ text: reply });
     } catch (err: any) {
-      logger.error('OpenAI API error:', aiError);
+      logger.error('OpenAI API error:', err);
       return NextResponse.json(
         { message: 'AI service temporarily unavailable. Please try again.' },
         { status: 503 }
       );
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) {
     logger.error(
       'AI instructor route error:',
       error instanceof Error ? error : new Error(String(error))

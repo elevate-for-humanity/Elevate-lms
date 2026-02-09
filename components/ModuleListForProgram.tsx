@@ -1,149 +1,371 @@
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
+import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+import { 
+  Video, FileText, BookOpen, HelpCircle, Users, 
+  Eye, EyeOff, GripVertical, Loader2, Plus, 
+  ExternalLink, Clock, CheckCircle 
+} from 'lucide-react';
 
-import { useState } from "react";
-import type { CourseModule } from "@/lms-data/course-modules";
-import { scormPackages } from "@/lms-data/scorm";
+interface CourseModule {
+  id: string;
+  program_id: string;
+  title: string;
+  description?: string;
+  type: 'video' | 'pdf' | 'scorm' | 'quiz' | 'live' | 'lesson';
+  order_index: number;
+  duration_minutes?: number;
+  is_published: boolean;
+  scorm_package_id?: string;
+  content_url?: string;
+  created_at: string;
+  updated_at?: string;
+}
 
 interface Props {
   programId: string;
-  modules: CourseModule[];
+  modules?: CourseModule[];
+  editable?: boolean;
+  onModuleUpdate?: (module: CourseModule) => void;
 }
 
-type PublishMap = Record<string, boolean>;
+const TYPE_ICONS = {
+  video: Video,
+  pdf: FileText,
+  scorm: BookOpen,
+  quiz: HelpCircle,
+  live: Users,
+  lesson: BookOpen,
+};
 
-export function ModuleListForProgram({ programId, modules }: Props) {
-  const [published, setPublished] = useState<PublishMap>(() => {
-    const map: PublishMap = {};
-    for (const m of modules) {
-      map[m.id] = true;
+const TYPE_LABELS = {
+  video: 'Video',
+  pdf: 'PDF/Handout',
+  scorm: 'SCORM Package',
+  quiz: 'Quiz',
+  live: 'Live Session',
+  lesson: 'Lesson',
+};
+
+export function ModuleListForProgram({ 
+  programId, 
+  modules: initialModules,
+  editable = false,
+  onModuleUpdate 
+}: Props) {
+  const [modules, setModules] = useState<CourseModule[]>(initialModules || []);
+  const [loading, setLoading] = useState(!initialModules);
+  const [saving, setSaving] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  // Fetch modules from database
+  const fetchModules = useCallback(async () => {
+    if (initialModules) {
+      setModules(initialModules);
+      setLoading(false);
+      return;
     }
-    return map;
-  });
 
-  function togglePublish(id: string) {
-    setPublished((prev) => ({ ...prev, [id]: !prev[id] }));
+    const supabase = createClient();
+
+    try {
+      const { data, error: fetchError } = await supabase
+        .from('program_modules')
+        .select('*')
+        .eq('program_id', programId)
+        .order('order_index', { ascending: true });
+
+      if (fetchError) throw fetchError;
+
+      setModules(data || []);
+    } catch (err: any) {
+      console.error('Error fetching modules:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [programId, initialModules]);
+
+  useEffect(() => {
+    fetchModules();
+  }, [fetchModules]);
+
+  // Toggle publish status
+  const togglePublish = async (moduleId: string) => {
+    const module = modules.find(m => m.id === moduleId);
+    if (!module) return;
+
+    setSaving(moduleId);
+    const supabase = createClient();
+
+    try {
+      const newStatus = !module.is_published;
+
+      const { error: updateError } = await supabase
+        .from('program_modules')
+        .update({ 
+          is_published: newStatus,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', moduleId);
+
+      if (updateError) throw updateError;
+
+      // Update local state
+      const updatedModule = { ...module, is_published: newStatus };
+      setModules(prev => prev.map(m => m.id === moduleId ? updatedModule : m));
+      onModuleUpdate?.(updatedModule);
+
+      // Log activity
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('admin_activity_log').insert({
+          user_id: user.id,
+          action: newStatus ? 'module_published' : 'module_unpublished',
+          entity_type: 'program_module',
+          entity_id: moduleId,
+          metadata: { program_id: programId, module_title: module.title },
+        }).catch(() => {});
+      }
+    } catch (err: any) {
+      console.error('Error updating module:', err);
+      setError(err.message);
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  // Reorder modules (drag and drop would be implemented with a library)
+  const moveModule = async (moduleId: string, direction: 'up' | 'down') => {
+    const index = modules.findIndex(m => m.id === moduleId);
+    if (index === -1) return;
+    if (direction === 'up' && index === 0) return;
+    if (direction === 'down' && index === modules.length - 1) return;
+
+    const newIndex = direction === 'up' ? index - 1 : index + 1;
+    const newModules = [...modules];
+    const [removed] = newModules.splice(index, 1);
+    newModules.splice(newIndex, 0, removed);
+
+    // Update order indices
+    const updatedModules = newModules.map((m, i) => ({ ...m, order_index: i + 1 }));
+    setModules(updatedModules);
+
+    // Save to database
+    const supabase = createClient();
+    for (const m of updatedModules) {
+      await supabase
+        .from('program_modules')
+        .update({ order_index: m.order_index })
+        .eq('id', m.id)
+        .catch(() => {});
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        {error}
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-4">
       {modules.length === 0 ? (
-        <p className="text-xs text-slate-300">
-          No modules are defined for this program yet. You can add new modules
-          later by updating <code className="font-mono text-[10px]">lms-data/course-modules.ts</code> or
-          connecting this screen to Supabase.
-        </p>
+        <div className="text-center py-8 bg-slate-50 rounded-lg">
+          <BookOpen className="w-12 h-12 text-slate-300 mx-auto mb-4" />
+          <p className="text-slate-500 mb-4">
+            No modules defined for this program yet.
+          </p>
+          {editable && (
+            <Link
+              href={`/admin/programs/${programId}/modules/new`}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            >
+              <Plus className="w-4 h-4" />
+              Add First Module
+            </Link>
+          )}
+        </div>
       ) : (
-        <ol className="space-y-2 text-xs">
-          {modules.map((m) => {
-            const scorm =
-              m.type === "scorm"
-                ? scormPackages.find((p) => p.id === m.scormPackageId)
-                : undefined;
+        <ol className="space-y-3">
+          {modules.map((module, index) => {
+            const Icon = TYPE_ICONS[module.type] || BookOpen;
+            const isSaving = saving === module.id;
 
             return (
               <li
-                key={m.id}
-                className="rounded-lg border border-slate-800 bg-slate-950/80 p-3"
+                key={module.id}
+                className={`rounded-lg border p-4 transition-all ${
+                  module.is_published 
+                    ? 'bg-white border-slate-200' 
+                    : 'bg-slate-50 border-slate-300 opacity-75'
+                }`}
               >
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <p className="text-[11px] font-semibold text-slate-100">
-                      {m.order}. {m.title}
-                    </p>
-                    {m.description && (
-                      <p className="mt-0.5 text-[11px] text-slate-300">
-                        {m.description}
-                      </p>
-                    )}
-                    <p className="mt-1 text-[10px] text-slate-400">
-                      Type:{" "}
-                      <span className="uppercase">
-                        {m.type === "video" && "VIDEO (upload coming)"}
-                        {m.type === "pdf" && "PDF/HANDOUT"}
-                        {m.type === "scorm" && "PARTNER / SCORM"}
-                        {m.type === "quiz" && "QUIZ"}
-                        {m.type === "live" && "LIVE SESSION"}
-                      </span>
-                      {scorm && (
-                        <>
-                          {" "}
-                          • SCORM: <span>{scorm.title}</span>
-                        </>
-                      )}
-                    </p>
-                  </div>
-                  <div className="flex flex-col items-end gap-1 text-[11px]">
-                    <button
-                      type="button"
-                      onClick={() => togglePublish(m.id)}
-                      className={`rounded-md px-3 py-2.5 font-semibold ${
-                        published[m.id]
-                          ? "bg-green-600 text-white hover:bg-green-700"
-                          : "bg-slate-800 text-slate-100 hover:bg-slate-700"
-                      }`}
-                    >
-                      {published[m.id] ? "Published" : "Hidden (Draft)"}
-                    </button>
-                    {m.type === "scorm" && scorm && (
-                      <a
-                        href={`/student/scorm/${scorm.id}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-sky-300 underline"
+                <div className="flex items-start gap-4">
+                  {/* Drag Handle */}
+                  {editable && (
+                    <div className="flex flex-col gap-1 pt-1">
+                      <button
+                        onClick={() => moveModule(module.id, 'up')}
+                        disabled={index === 0}
+                        className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-30"
                       >
-                        Preview SCORM in new tab
-                      </a>
+                        ▲
+                      </button>
+                      <GripVertical className="w-4 h-4 text-slate-300" />
+                      <button
+                        onClick={() => moveModule(module.id, 'down')}
+                        disabled={index === modules.length - 1}
+                        className="p-1 text-slate-400 hover:text-slate-600 disabled:opacity-30"
+                      >
+                        ▼
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Module Icon */}
+                  <div className={`p-3 rounded-lg ${
+                    module.is_published ? 'bg-blue-100' : 'bg-slate-200'
+                  }`}>
+                    <Icon className={`w-5 h-5 ${
+                      module.is_published ? 'text-blue-600' : 'text-slate-500'
+                    }`} />
+                  </div>
+
+                  {/* Module Info */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-xs font-medium text-slate-400">
+                        Module {module.order_index}
+                      </span>
+                      <span className={`text-xs px-2 py-0.5 rounded-full ${
+                        module.is_published 
+                          ? 'bg-green-100 text-green-700' 
+                          : 'bg-slate-200 text-slate-600'
+                      }`}>
+                        {module.is_published ? 'Published' : 'Draft'}
+                      </span>
+                    </div>
+                    <h4 className="font-semibold text-slate-900">{module.title}</h4>
+                    {module.description && (
+                      <p className="text-sm text-slate-600 mt-1">{module.description}</p>
+                    )}
+                    <div className="flex items-center gap-4 mt-2 text-xs text-slate-500">
+                      <span className="flex items-center gap-1">
+                        <Icon className="w-3 h-3" />
+                        {TYPE_LABELS[module.type]}
+                      </span>
+                      {module.duration_minutes && (
+                        <span className="flex items-center gap-1">
+                          <Clock className="w-3 h-3" />
+                          {module.duration_minutes} min
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex flex-col items-end gap-2">
+                    {editable && (
+                      <button
+                        onClick={() => togglePublish(module.id)}
+                        disabled={isSaving}
+                        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
+                          module.is_published
+                            ? 'bg-green-600 text-white hover:bg-green-700'
+                            : 'bg-slate-200 text-slate-700 hover:bg-slate-300'
+                        } disabled:opacity-50`}
+                      >
+                        {isSaving ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : module.is_published ? (
+                          <Eye className="w-4 h-4" />
+                        ) : (
+                          <EyeOff className="w-4 h-4" />
+                        )}
+                        {module.is_published ? 'Published' : 'Draft'}
+                      </button>
+                    )}
+
+                    {module.type === 'scorm' && module.scorm_package_id && (
+                      <Link
+                        href={`/student/scorm/${module.scorm_package_id}`}
+                        target="_blank"
+                        className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                      >
+                        <ExternalLink className="w-3 h-3" />
+                        Preview SCORM
+                      </Link>
+                    )}
+
+                    {editable && (
+                      <Link
+                        href={`/admin/programs/${programId}/modules/${module.id}/edit`}
+                        className="text-xs text-slate-500 hover:text-slate-700"
+                      >
+                        Edit Module
+                      </Link>
                     )}
                   </div>
                 </div>
 
-                <div className="mt-2 grid gap-2 text-[11px] md:grid-cols-3">
-                  <div className="rounded-md bg-slate-900/80 p-2">
-                    <p className="font-semibold text-slate-100">
-                      Teaching Notes
-                    </p>
-                    <p className="mt-1 text-slate-300">
-                      Use this space in training with instructors to talk about
-                      how to introduce this topic, how long it usually takes,
-                      and common learner questions.
-                    </p>
+                {/* Module Details (expandable in future) */}
+                {editable && (
+                  <div className="mt-4 pt-4 border-t border-slate-100 grid md:grid-cols-3 gap-3 text-xs">
+                    <div className="bg-slate-50 rounded-lg p-3">
+                      <p className="font-semibold text-slate-700 mb-1">Teaching Notes</p>
+                      <p className="text-slate-500">
+                        Add instructor guidance for this module.
+                      </p>
+                    </div>
+                    <div className="bg-slate-50 rounded-lg p-3">
+                      <p className="font-semibold text-slate-700 mb-1">Attachments</p>
+                      <p className="text-slate-500">
+                        {module.content_url ? '1 file attached' : 'No files attached'}
+                      </p>
+                    </div>
+                    <div className="bg-slate-50 rounded-lg p-3">
+                      <p className="font-semibold text-slate-700 mb-1">Completion</p>
+                      <p className="text-slate-500">
+                        Track student progress here.
+                      </p>
+                    </div>
                   </div>
-                  <div className="rounded-md bg-slate-900/80 p-2">
-                    <p className="font-semibold text-slate-100">
-                      Attachments (Future)
-                    </p>
-                    <p className="mt-1 text-slate-300">
-                      Later, we&apos;ll connect this to file uploads (videos,
-                      slides, PDFs) and Supabase storage so you can attach
-                      materials directly from this screen.
-                    </p>
-                  </div>
-                  <div className="rounded-md bg-slate-900/80 p-2">
-                    <p className="font-semibold text-slate-100">
-                      Alignment & Funding
-                    </p>
-                    <p className="mt-1 text-slate-300">
-                      Note where this module connects to JRI, WEX/OJT, or
-                      credential partner outcomes so program holders can speak
-                      the same language with workforce boards and employers.
-                    </p>
-                  </div>
-                </div>
+                )}
               </li>
             );
           })}
         </ol>
       )}
 
-      <p className="mt-2 text-[11px] text-slate-400">
-        This view is{" "}
-        <span className="font-semibold">read-only for structure</span> right now
-        and uses <code className="font-mono text-[10px]">lms-data/course-modules.ts</code>. Next step is
-        connecting publish states and module edits to Supabase so changes are
-        saved to the database instead of just in the browser.
+      {editable && modules.length > 0 && (
+        <Link
+          href={`/admin/programs/${programId}/modules/new`}
+          className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-blue-500 hover:text-blue-600 transition-colors"
+        >
+          <Plus className="w-4 h-4" />
+          Add Module
+        </Link>
+      )}
+
+      <p className="text-xs text-slate-400 mt-4">
+        {modules.length} module{modules.length !== 1 ? 's' : ''} • 
+        {modules.filter(m => m.is_published).length} published
       </p>
     </div>
   );
 }
+
+export default ModuleListForProgram;

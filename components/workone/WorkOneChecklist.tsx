@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useEffect, useState } from 'react';
@@ -17,6 +19,7 @@ type Item = {
 export default function WorkOneChecklist() {
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
   async function seed() {
     await fetch('/api/workone/seed', {
@@ -28,6 +31,24 @@ export default function WorkOneChecklist() {
 
   async function load() {
     setLoading(true);
+    
+    // Direct DB query for checklist items
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase
+        .from('workone_checklist_items')
+        .select('id, step_key, step_label, status, notes, due_date, completed_at')
+        .eq('user_id', user.id)
+        .order('created_at');
+      
+      if (data && data.length > 0) {
+        setItems(data);
+        setLoading(false);
+        return;
+      }
+    }
+
+    // Fallback to API
     const res = await fetch('/api/workone/list');
     const json = await res.json().catch(() => ({}));
     setLoading(false);

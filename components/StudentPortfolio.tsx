@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 import Image from 'next/image';
 
@@ -37,19 +39,115 @@ interface Certificate {
 export function StudentPortfolio() {
   const [activeTab, setActiveTab] = useState<'projects' | 'skills' | 'certificates' | 'about'>('projects');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
-
-  const student = {
+  const [student, setStudent] = useState({
     name: 'Jordan Martinez',
     title: 'Full-Stack Developer',
-    bio: 'Passionate software developer with expertise in web technologies and a focus on creating user-centric applications. Currently pursuing advanced certifications in cloud computing and DevOps.',
+    bio: 'Passionate software developer with expertise in web technologies.',
     email: 'jordan.martinez@gmail.com',
     phone: '(317) 314-3757',
     location: 'San Francisco, CA',
-    linkedin: 'linkedin.com/in/jordanmartinez',
-    github: 'github.com/jordanmartinez',
-    portfolio: 'jordanmartinez.dev',
+    linkedin: '',
+    github: '',
+    portfolio: '',
     avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan',
-  };
+  });
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [skills, setSkills] = useState<Skill[]>([]);
+  const [certificates, setCertificates] = useState<Certificate[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Load portfolio data from database
+  React.useEffect(() => {
+    const loadPortfolio = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Fetch profile
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (profile) {
+          setStudent({
+            name: profile.full_name || 'Student',
+            title: profile.title || 'Student',
+            bio: profile.bio || '',
+            email: user.email || '',
+            phone: profile.phone || '',
+            location: profile.location || '',
+            linkedin: profile.linkedin_url || '',
+            github: profile.github_url || '',
+            portfolio: profile.portfolio_url || '',
+            avatar: profile.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`,
+          });
+        }
+
+        // Fetch projects
+        const { data: projectData } = await supabase
+          .from('portfolio_projects')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('completed_date', { ascending: false });
+
+        if (projectData) {
+          setProjects(projectData.map(p => ({
+            id: p.id,
+            title: p.title,
+            description: p.description,
+            category: p.category || 'web',
+            imageUrl: p.image_url || '/media/projects/default.jpg',
+            technologies: p.technologies || [],
+            completedDate: p.completed_date,
+            githubUrl: p.github_url,
+            liveUrl: p.live_url,
+            achievements: p.achievements || [],
+          })));
+        }
+
+        // Fetch skills
+        const { data: skillData } = await supabase
+          .from('user_skills')
+          .select('*')
+          .eq('user_id', user.id);
+
+        if (skillData) {
+          setSkills(skillData.map(s => ({
+            name: s.skill_name,
+            level: s.proficiency_level || 50,
+            category: s.category || 'technical',
+          })));
+        }
+
+        // Fetch certificates
+        const { data: certData } = await supabase
+          .from('certificates')
+          .select('*, training_programs(name)')
+          .eq('user_id', user.id);
+
+        if (certData) {
+          setCertificates(certData.map(c => ({
+            id: c.id,
+            title: (c.training_programs as any)?.name || c.program_name || 'Certificate',
+            issuer: 'Elevate for Humanity',
+            date: c.issued_at?.split('T')[0] || '',
+            credentialUrl: c.verification_url || `/verify/${c.id}`,
+          })));
+        }
+      } catch (err) {
+        console.error('Error loading portfolio:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPortfolio();
+  }, []);
 
   const projects: Project[] = [
     {

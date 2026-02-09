@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useState, useEffect, useRef } from 'react';
 
 interface StudentRecord {
   name: string;
@@ -22,9 +24,26 @@ export function CopilotAssistant() {
   const [parsedRecords, setParsedRecords] = useState<StudentRecord[]>([]);
   const [copilotMessages, setCopilotMessages] = useState<CopilotMessage[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
+  const supabase = createClient();
+  const sessionId = useRef(crypto.randomUUID());
+
+  // Log copilot usage to DB
+  const logCopilotAction = async (action: string, recordCount?: number) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('copilot_usage_log')
+      .insert({
+        admin_id: user?.id,
+        session_id: sessionId.current,
+        action,
+        record_count: recordCount,
+        timestamp: new Date().toISOString()
+      });
+  };
 
   const parseStudentData = (data: string) => {
     setIsProcessing(true);
+    logCopilotAction('parse_started');
     setCopilotMessages([
       {
         type: 'info',

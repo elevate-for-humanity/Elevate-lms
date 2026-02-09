@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState } from 'react';
@@ -38,6 +40,21 @@ export default function AutomaticCourseBuilder() {
   const [outline, setOutline] = useState<CourseOutline | null>(null);
   const [showPreview, setShowPreview] = useState(false);
   const router = useRouter();
+  const supabase = createClient();
+
+  // Log course generation to DB
+  const logCourseGeneration = async (status: 'started' | 'completed' | 'failed', courseData?: any) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('ai_course_generation_log')
+      .insert({
+        user_id: user?.id,
+        prompt,
+        status,
+        course_outline: courseData,
+        generated_at: new Date().toISOString()
+      });
+  };
 
   const generateCourse = async () => {
     if (!prompt.trim()) {
@@ -45,6 +62,7 @@ export default function AutomaticCourseBuilder() {
       return;
     }
 
+    await logCourseGeneration('started');
     setGenerating(true);
     setProgress(0);
     setCurrentStep('Analyzing your request...');

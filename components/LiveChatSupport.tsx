@@ -2,9 +2,10 @@
 
 import React from 'react';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { createClient } from '@/lib/supabase/client';
 
 interface Message {
   id: string;
@@ -24,8 +25,32 @@ export function LiveChatSupport() {
       timestamp: new Date().toLocaleTimeString(),
     },
   ]);
+  const [sessionId, setSessionId] = useState<string | null>(null);
 
-  const sendMessage = () => {
+  const initSession = useCallback(async () => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    const { data } = await supabase
+      .from('live_chat_sessions')
+      .insert({
+        user_id: user?.id || null,
+        status: 'active',
+        started_at: new Date().toISOString(),
+      })
+      .select('id')
+      .single();
+    
+    if (data) setSessionId(data.id);
+  }, []);
+
+  useEffect(() => {
+    if (isOpen && !sessionId) {
+      initSession();
+    }
+  }, [isOpen, sessionId, initSession]);
+
+  const sendMessage = async () => {
     if (!message.trim()) return;
 
     const newMessage: Message = {
@@ -38,15 +63,30 @@ export function LiveChatSupport() {
     setMessages([...messages, newMessage]);
     setMessage('');
 
-    // Simulate agent response
-    setTimeout(() => {
+    // Save to database
+    const supabase = createClient();
+    await supabase.from('live_chat_messages').insert({
+      session_id: sessionId,
+      sender: 'user',
+      content: message,
+    }).catch(() => {});
+
+    // Auto-response (would be replaced by real agent in production)
+    setTimeout(async () => {
       const agentResponse: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'agent',
-        text: 'Thank you for your message. An agent will respond shortly.',
+        text: 'Thank you for your message. An agent will respond shortly. For immediate help, call (317) 314-3757.',
         timestamp: new Date().toLocaleTimeString(),
       };
       setMessages(prev => [...prev, agentResponse]);
+      
+      await supabase.from('live_chat_messages').insert({
+        session_id: sessionId,
+        sender: 'agent',
+        content: agentResponse.text,
+        is_auto_response: true,
+      }).catch(() => {});
     }, 1000);
   };
 

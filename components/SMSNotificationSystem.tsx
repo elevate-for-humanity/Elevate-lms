@@ -2,9 +2,10 @@
 
 import React from 'react';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { createClient } from '@/lib/supabase/client';
 
 interface SMSTemplate {
   id: string;
@@ -16,27 +17,83 @@ interface SMSTemplate {
 export function SMSNotificationSystem() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [message, setMessage] = useState('');
+  const [templates, setTemplates] = useState<SMSTemplate[]>([]);
+  const [sending, setSending] = useState(false);
+  const [sentMessages, setSentMessages] = useState<any[]>([]);
 
-  const templates: SMSTemplate[] = [
-    {
-      id: '1',
-      name: 'Assignment Reminder',
-      message: 'Hi {name}, your assignment is due in 24 hours. Complete it at {link}',
-      type: 'reminder',
-    },
-    {
-      id: '2',
-      name: 'Class Starting',
-      message: 'Your class "{course}" starts in 15 minutes. Join now: {link}',
-      type: 'alert',
-    },
-    {
-      id: '3',
-      name: 'Certificate Ready',
-      message: 'Congratulations! Your certificate is ready. Download it here: {link}',
-      type: 'notification',
-    },
-  ];
+  const fetchTemplates = useCallback(async () => {
+    const supabase = createClient();
+    
+    const { data } = await supabase
+      .from('sms_templates')
+      .select('*')
+      .eq('is_active', true)
+      .order('name');
+
+    if (data) {
+      setTemplates(data.map(t => ({
+        id: t.id,
+        name: t.name,
+        message: t.template_text,
+        type: t.template_type || 'notification',
+      })));
+    } else {
+      // Fallback templates
+      setTemplates([
+        { id: '1', name: 'Assignment Reminder', message: 'Hi {name}, your assignment is due in 24 hours. Complete it at {link}', type: 'reminder' },
+        { id: '2', name: 'Class Starting', message: 'Your class "{course}" starts in 15 minutes. Join now: {link}', type: 'alert' },
+        { id: '3', name: 'Certificate Ready', message: 'Congratulations! Your certificate is ready. Download it here: {link}', type: 'notification' },
+      ]);
+    }
+
+    // Fetch recent sent messages
+    const { data: sent } = await supabase
+      .from('sms_messages')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(10);
+
+    if (sent) setSentMessages(sent);
+  }, []);
+
+  useEffect(() => {
+    fetchTemplates();
+  }, [fetchTemplates]);
+
+  const sendSMS = async () => {
+    if (!phoneNumber || !message) return;
+    
+    setSending(true);
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Log the SMS (actual sending would be via Twilio/etc)
+      await supabase.from('sms_messages').insert({
+        phone_number: phoneNumber,
+        message_text: message,
+        sent_by: user?.id,
+        status: 'queued',
+      });
+
+      // Call SMS API
+      await fetch('/api/sms/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone: phoneNumber, message }),
+      }).catch(() => {});
+
+      alert('SMS queued for delivery');
+      setPhoneNumber('');
+      setMessage('');
+      fetchTemplates();
+    } catch (err) {
+      console.error('SMS error:', err);
+      alert('Failed to send SMS');
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">

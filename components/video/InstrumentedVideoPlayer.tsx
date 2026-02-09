@@ -1,5 +1,7 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/client';
+
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Play, Pause, Volume2, VolumeX, Maximize, AlertCircle, RefreshCw } from 'lucide-react';
 import { VideoRecord, getVideoCacheUrl } from '@/lib/video/registry';
@@ -48,9 +50,29 @@ export default function InstrumentedVideoPlayer({
   const [showSoundOverlay, setShowSoundOverlay] = useState(false);
   const [sessionId] = useState(() => `vs_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`);
 
-  // Track playback events
+  const supabase = createClient();
+
+  // Track playback events - direct DB insert
   const trackEvent = useCallback(async (eventType: PlaybackEventType, extraData?: Record<string, unknown>) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Direct DB insert for video events
+      await supabase
+        .from('video_playback_events')
+        .insert({
+          event_type: eventType,
+          video_id: video.id,
+          user_id: user?.id,
+          page_slug: pageSlug,
+          current_time: videoRef.current?.currentTime,
+          duration: videoRef.current?.duration,
+          session_id: sessionId,
+          extra_data: extraData,
+          timestamp: new Date().toISOString()
+        });
+
+      // Also call API as fallback
       await fetch('/api/video/events', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -68,7 +90,7 @@ export default function InstrumentedVideoPlayer({
       // Silent fail for analytics
       console.debug('Failed to track video event', e);
     }
-  }, [video.id, pageSlug, sessionId]);
+  }, [video.id, pageSlug, sessionId, supabase]);
 
   // Handle autoplay with sound fallback
   useEffect(() => {

@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useState, useEffect } from 'react';
 import { AlertTriangle, CheckSquare, Square } from 'lucide-react';
 
 /**
@@ -14,19 +16,59 @@ interface BarberEnrollmentAcknowledgmentProps {
   onAcknowledge: (acknowledged: boolean) => void;
   acknowledged?: boolean;
   className?: string;
+  userId?: string;
+  programId?: string;
 }
 
 export function BarberEnrollmentAcknowledgment({ 
   onAcknowledge,
   acknowledged = false,
-  className = '' 
+  className = '',
+  userId,
+  programId
 }: BarberEnrollmentAcknowledgmentProps) {
   const [isChecked, setIsChecked] = useState(acknowledged);
+  const supabase = createClient();
 
-  const handleToggle = () => {
+  // Load existing acknowledgment from DB
+  useEffect(() => {
+    async function loadAcknowledgment() {
+      if (!userId) return;
+      const { data } = await supabase
+        .from('enrollment_acknowledgments')
+        .select('id, acknowledged, acknowledged_at')
+        .eq('user_id', userId)
+        .eq('acknowledgment_type', 'barber_enrollment')
+        .single();
+      if (data?.acknowledged) {
+        setIsChecked(true);
+        onAcknowledge(true);
+      }
+    }
+    loadAcknowledgment();
+  }, [userId, supabase, onAcknowledge]);
+
+  // Save acknowledgment to DB when checked
+  const saveAcknowledgment = async () => {
+    if (!userId) return;
+    await supabase
+      .from('enrollment_acknowledgments')
+      .upsert({
+        user_id: userId,
+        program_id: programId,
+        acknowledgment_type: 'barber_enrollment',
+        acknowledged: true,
+        acknowledged_at: new Date().toISOString()
+      }, { onConflict: 'user_id,acknowledgment_type' });
+  };
+
+  const handleToggle = async () => {
     const newValue = !isChecked;
     setIsChecked(newValue);
     onAcknowledge(newValue);
+    if (newValue) {
+      await saveAcknowledgment();
+    }
   };
 
   return (

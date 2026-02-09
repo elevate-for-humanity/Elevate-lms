@@ -2,6 +2,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import webpush from 'web-push';
 import { logger } from '@/lib/logger';
@@ -30,6 +31,22 @@ export async function POST(request: NextRequest) {
 
     // Send push notification
     await webpush.sendNotification(subscription, JSON.stringify(notification));
+
+    // Log notification to database
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from('push_notifications_log').insert({
+        sender_id: user?.id,
+        title: notification.title,
+        body: notification.body,
+        url: notification.url,
+        sent_at: new Date().toISOString(),
+        status: 'sent',
+      }).catch(() => {});
+    } catch {
+      // DB logging is non-critical
+    }
 
     return NextResponse.json({
       success: true,

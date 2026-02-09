@@ -14,6 +14,8 @@ import {
   type DocumentType 
 } from '@/lib/partner/types';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { SponsorshipInfoPanel } from '@/components/partner/SponsorshipInfoPanel';
+import { SponsorshipAcknowledgment } from '@/components/partner/SponsorshipAcknowledgment';
 
 const AVAILABLE_PROGRAMS = [
   { id: 'BARBER', name: 'Barber Apprenticeship', description: 'Host barber apprentices for hands-on training' },
@@ -199,6 +201,11 @@ export default function PartnerOnboardingPage() {
         </div>
 
         <div className="bg-white rounded-2xl shadow-xl p-8">
+          {/* Sponsorship Info */}
+          <div className="mb-6">
+            <SponsorshipInfoPanel variant="compact" />
+          </div>
+
           {error && (
             <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-center gap-3 text-red-700">
               <AlertCircle className="w-5 h-5" />

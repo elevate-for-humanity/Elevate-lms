@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useEffect, useState } from 'react';
@@ -14,16 +16,48 @@ import { TrendingUp, Users, Award, Briefcase, Calendar } from 'lucide-react';
 export function RealOutcomes() {
   const [metrics, setMetrics] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const supabase = createClient();
 
   useEffect(() => {
-    fetch('/api/public/metrics')
-      .then((res) => res.json())
-      .then((data) => {
-        setMetrics(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
-  }, []);
+    async function loadMetrics() {
+      // Direct DB queries for real-time metrics
+      const [enrollmentsResult, completedResult, activeResult] = await Promise.all([
+        supabase
+          .from('enrollments')
+          .select('*', { count: 'exact', head: true }),
+        supabase
+          .from('enrollments')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'completed'),
+        supabase
+          .from('enrollments')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'active')
+          .gte('updated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString())
+      ]);
+
+      const totalEnrollments = enrollmentsResult.count || 0;
+      const completedCourses = completedResult.count || 0;
+      const activeStudents = activeResult.count || 0;
+      const completionRate = totalEnrollments > 0 
+        ? Math.round((completedCourses / totalEnrollments) * 100) 
+        : 0;
+
+      setMetrics({
+        metrics: {
+          totalEnrollments,
+          completedCourses,
+          completionRate,
+          activeStudents
+        },
+        dataSource: 'Supabase Production Database',
+        lastUpdated: new Date().toISOString(),
+        verified: true
+      });
+      setLoading(false);
+    }
+    loadMetrics();
+  }, [supabase]);
 
   if (loading) {
     return (

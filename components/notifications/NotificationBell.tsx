@@ -1,5 +1,7 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/client';
+
 import { useState, useRef, useEffect } from 'react';
 import { Bell, Check, X } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/context';
@@ -28,8 +30,35 @@ export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>(MOCK_NOTIFICATIONS);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
 
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  // Load notifications from DB
+  useEffect(() => {
+    async function loadNotifications() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('notifications')
+        .select('id, title, message, read, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (data && data.length > 0) {
+        setNotifications(data.map(n => ({
+          id: n.id,
+          title: n.title,
+          message: n.message,
+          read: n.read,
+          createdAt: n.created_at
+        })));
+      }
+    }
+    loadNotifications();
+  }, [supabase]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -42,18 +71,37 @@ export function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const markAsRead = (id: string) => {
+  const markAsRead = async (id: string) => {
     setNotifications(prev => 
       prev.map(n => n.id === id ? { ...n, read: true } : n)
     );
+    // Update in DB
+    await supabase
+      .from('notifications')
+      .update({ read: true, read_at: new Date().toISOString() })
+      .eq('id', id);
   };
 
-  const markAllAsRead = () => {
+  const markAllAsRead = async () => {
     setNotifications(prev => prev.map(n => ({ ...n, read: true })));
+    // Update all in DB
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase
+        .from('notifications')
+        .update({ read: true, read_at: new Date().toISOString() })
+        .eq('user_id', user.id)
+        .eq('read', false);
+    }
   };
 
-  const dismissNotification = (id: string) => {
+  const dismissNotification = async (id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
+    // Delete from DB
+    await supabase
+      .from('notifications')
+      .delete()
+      .eq('id', id);
   };
 
   return (

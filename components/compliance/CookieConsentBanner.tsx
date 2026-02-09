@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState, useEffect } from 'react';
@@ -41,7 +43,7 @@ export default function CookieConsentBanner() {
     }
   }, []);
 
-  const applyCookiePreferences = (prefs: CookiePreferences) => {
+  const applyCookiePreferences = async (prefs: CookiePreferences) => {
     // Apply Google Analytics
     if (prefs.analytics && typeof window !== 'undefined' && (window as any).gtag) {
       (window as any).gtag('consent', 'update', {
@@ -57,9 +59,24 @@ export default function CookieConsentBanner() {
       }
     }
 
-    // Store preferences
+    // Store preferences locally
     localStorage.setItem('cookie_consent', JSON.stringify(prefs));
     localStorage.setItem('cookie_consent_date', new Date().toISOString());
+
+    // Log consent to database for compliance audit trail
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    await supabase
+      .from('cookie_consent_log')
+      .insert({
+        user_id: user?.id || null,
+        session_id: localStorage.getItem('session_id') || crypto.randomUUID(),
+        preferences: prefs,
+        ip_address: null, // Set server-side
+        user_agent: navigator.userAgent,
+        consented_at: new Date().toISOString()
+      });
   };
 
   const acceptAll = () => {

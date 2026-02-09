@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -38,12 +40,39 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [unreadMessages, setUnreadMessages] = useState(0);
+  const [courseCount, setCourseCount] = useState(0);
+  const supabase = createClient();
+
+  // Load user stats from DB
+  useEffect(() => {
+    async function loadUserStats() {
+      if (!user?.id) return;
+
+      // Load unread message count
+      const { count: msgCount } = await supabase
+        .from('messages')
+        .select('*', { count: 'exact', head: true })
+        .eq('recipient_id', user.id)
+        .eq('read', false);
+      setUnreadMessages(msgCount || 0);
+
+      // Load enrolled course count
+      const { count: enrollCount } = await supabase
+        .from('enrollments')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('status', 'active');
+      setCourseCount(enrollCount || 0);
+    }
+    loadUserStats();
+  }, [user?.id, supabase]);
 
   const navItems = [
     { href: '/lms/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-    { href: '/lms/courses', label: 'My Courses', icon: BookOpen },
+    { href: '/lms/courses', label: 'My Courses', icon: BookOpen, badge: courseCount > 0 ? courseCount : undefined },
     { href: '/lms/schedule', label: 'Schedule', icon: Calendar },
-    { href: '/lms/messages', label: 'Messages', icon: MessageSquare },
+    { href: '/lms/messages', label: 'Messages', icon: MessageSquare, badge: unreadMessages > 0 ? unreadMessages : undefined },
     { href: '/lms/certificates', label: 'Certificates', icon: Award },
   ];
 

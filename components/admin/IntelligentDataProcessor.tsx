@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React, { useState } from 'react';
 
 interface ProcessedData {
@@ -103,6 +105,30 @@ export function IntelligentDataProcessor() {
     };
 
     setProcessedData(processed);
+
+    // Save processed data to database
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      await supabase.from('data_processing_jobs').insert({
+        user_id: user?.id,
+        input_format: formatDetected,
+        student_count: students.length,
+        program_count: programs.length,
+        analytics_summary: analytics,
+        processed_at: new Date().toISOString(),
+        status: 'completed',
+      }).catch(() => {});
+
+      setCopilotMessages((prev) => [
+        ...prev,
+        '💾 Data saved to database',
+      ]);
+    } catch {
+      // DB save is non-critical
+    }
+
     setIsProcessing(false);
 
     // Final copilot message

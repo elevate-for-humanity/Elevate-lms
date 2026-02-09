@@ -3,22 +3,26 @@
 import React from 'react';
 
 import { useState, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 interface SimpleCaptchaProps {
   onVerify: (verified: boolean) => void;
   className?: string;
+  formId?: string;
 }
 
 /**
  * Simple math-based CAPTCHA to prevent automated form submissions.
  * More user-friendly than image CAPTCHAs and doesn't require external services.
  */
-export function SimpleCaptcha({ onVerify, className = '' }: SimpleCaptchaProps) {
+export function SimpleCaptcha({ onVerify, className = '', formId }: SimpleCaptchaProps) {
   const [num1, setNum1] = useState(0);
   const [num2, setNum2] = useState(0);
   const [userAnswer, setUserAnswer] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   const [error, setError] = useState('');
+  const [attempts, setAttempts] = useState(0);
+  const supabase = createClient();
 
   useEffect(() => {
     // Generate random numbers between 1 and 10
@@ -26,17 +30,34 @@ export function SimpleCaptcha({ onVerify, className = '' }: SimpleCaptchaProps) 
     setNum2(Math.floor(Math.random() * 10) + 1);
   }, []);
 
-  const handleVerify = () => {
+  // Log captcha attempt to DB for security monitoring
+  const logCaptchaAttempt = async (success: boolean) => {
+    await supabase
+      .from('captcha_attempts')
+      .insert({
+        form_id: formId,
+        success,
+        attempts: attempts + 1,
+        ip_address: null, // Set server-side
+        user_agent: navigator.userAgent,
+        attempted_at: new Date().toISOString()
+      });
+  };
+
+  const handleVerify = async () => {
     const correctAnswer = num1 + num2;
     const answer = parseInt(userAnswer);
+    setAttempts(prev => prev + 1);
 
     if (answer === correctAnswer) {
       setIsVerified(true);
       setError('');
+      await logCaptchaAttempt(true);
       onVerify(true);
     } else {
       setError('Incorrect answer. Please try again.');
       setIsVerified(false);
+      await logCaptchaAttempt(false);
       onVerify(false);
       // Generate new numbers
       setNum1(Math.floor(Math.random() * 10) + 1);

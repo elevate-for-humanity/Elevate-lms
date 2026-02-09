@@ -1,11 +1,14 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/client';
+
 import { useEffect, useRef, useCallback } from 'react';
 
 interface TurnstileProps {
   onVerify: (token: string) => void;
   onError?: () => void;
   onExpire?: () => void;
+  formId?: string;
 }
 
 declare global {
@@ -21,9 +24,39 @@ declare global {
 
 const SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY;
 
-export default function Turnstile({ onVerify, onError, onExpire }: TurnstileProps) {
+export default function Turnstile({ onVerify, onError, onExpire, formId }: TurnstileProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const widgetIdRef = useRef<string | null>(null);
+  const supabase = createClient();
+
+  // Log turnstile verification to DB
+  const logTurnstileEvent = async (eventType: 'verified' | 'error' | 'expired', token?: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('turnstile_verifications')
+      .insert({
+        user_id: user?.id,
+        form_id: formId,
+        event_type: eventType,
+        token_prefix: token?.substring(0, 20),
+        timestamp: new Date().toISOString()
+      });
+  };
+
+  const handleVerify = (token: string) => {
+    logTurnstileEvent('verified', token);
+    onVerify(token);
+  };
+
+  const handleError = () => {
+    logTurnstileEvent('error');
+    onError?.();
+  };
+
+  const handleExpire = () => {
+    logTurnstileEvent('expired');
+    onExpire?.();
+  };
 
   const renderWidget = useCallback(() => {
     if (!containerRef.current || !window.turnstile || !SITE_KEY) return;
@@ -35,9 +68,9 @@ export default function Turnstile({ onVerify, onError, onExpire }: TurnstileProp
 
     widgetIdRef.current = window.turnstile.render(containerRef.current, {
       sitekey: SITE_KEY,
-      callback: onVerify,
-      'error-callback': onError,
-      'expired-callback': onExpire,
+      callback: handleVerify,
+      'error-callback': handleError,
+      'expired-callback': handleExpire,
       theme: 'light',
     });
   }, [onVerify, onError, onExpire]);

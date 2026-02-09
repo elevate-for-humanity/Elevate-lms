@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState } from 'react';
@@ -68,11 +70,38 @@ export default function ServiceLoggingForm({
     setServices((prev) => ({ ...prev, [key]: Math.max(0, prev[key] - 1) }));
   };
 
+  const supabase = createClient();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Direct DB insert for service log
+      const { error: dbError } = await supabase
+        .from('apprentice_service_logs')
+        .insert({
+          enrollment_id: enrollmentId,
+          user_id: user?.id,
+          date,
+          hours: parseFloat(hours),
+          services_performed: services,
+          total_services: Object.values(services).reduce((sum, count) => sum + count, 0),
+          notes,
+          logged_at: new Date().toISOString()
+        });
+
+      if (!dbError) {
+        // Update cumulative hours
+        await supabase.rpc('update_apprentice_cumulative_hours', {
+          p_enrollment_id: enrollmentId,
+          p_hours: parseFloat(hours)
+        });
+      }
+
+      // Also call API as fallback
       const response = await fetch('/api/student/log-hours', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -85,7 +114,7 @@ export default function ServiceLoggingForm({
         }),
       });
 
-      if (response.ok) {
+      if (response.ok || !dbError) {
         // Reset form
         setServices({
           haircuts: 0,

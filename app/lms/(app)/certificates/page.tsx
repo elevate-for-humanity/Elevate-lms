@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { CertificatePreview } from '@/components/lms/CertificateTemplate';
+import CertificateDownload from '@/components/CertificateDownload';
 
 export const metadata: Metadata = {
   alternates: {
@@ -76,23 +77,10 @@ export default async function CertificatesPage() {
         {certificates && certificates.length > 0 ? (
           <div className="space-y-8">
             {certificates.map((cert) => (
-              <div key={cert.id} className="bg-white rounded-lg shadow-sm p-6">
-                <div className="mb-4">
-                  <h3 className="text-lg font-bold mb-1">
-                    {cert.courses?.title}
-                  </h3>
-                  <p className="text-sm text-black">
-                    Issued: {new Date(cert.issued_at).toLocaleDateString()} •
-                    Certificate #{cert.certificate_number}
-                  </p>
-                </div>
-                <CertificatePreview
-                  studentName={`${profile?.first_name || ''} ${profile?.last_name || ''}`}
-                  courseName={cert.courses?.title || 'Course'}
-                  completionDate={cert.issued_at}
-                  certificateNumber={cert.certificate_number}
-                />
-              </div>
+              <CertificateDownload
+                key={cert.id}
+                certificateId={cert.id}
+              />
             ))}
           </div>
         ) : (

@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from "react";
 import { ThumbsUp, MessageSquare, CheckCircle } from "lucide-react";
@@ -32,12 +34,45 @@ export function ThreadView({
   content,
   authorName,
   createdAt,
-  replies,
+  replies: initialReplies,
   onReply,
   onUpvote,
 }: ThreadViewProps) {
   const [replyContent, setReplyContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [replies, setReplies] = useState<Reply[]>(initialReplies);
+  const supabase = createClient();
+
+  // Load replies from DB and track thread view
+  useEffect(() => {
+    async function loadThreadData() {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Load fresh replies from DB
+      const { data: replyData } = await supabase
+        .from('forum_replies')
+        .select('id, user_id, content, upvotes, is_solution, created_at, profiles:user_id (full_name)')
+        .eq('thread_id', threadId)
+        .order('created_at', { ascending: true });
+
+      if (replyData) {
+        setReplies(replyData.map((r: any) => ({
+          ...r,
+          author_name: r.profiles?.full_name || 'Anonymous'
+        })));
+      }
+
+      // Log thread view
+      await supabase
+        .from('forum_thread_views')
+        .insert({
+          thread_id: threadId,
+          user_id: user?.id,
+          viewed_at: new Date().toISOString()
+        });
+    }
+    loadThreadData();
+  }, [threadId, supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +80,23 @@ export function ThreadView({
 
     setIsSubmitting(true);
     try {
+      // Direct DB insert for reply
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: newReply } = await supabase
+        .from('forum_replies')
+        .insert({
+          thread_id: threadId,
+          user_id: user?.id,
+          content: replyContent.trim(),
+          created_at: new Date().toISOString()
+        })
+        .select('id, user_id, content, upvotes, is_solution, created_at')
+        .single();
+
+      if (newReply) {
+        setReplies(prev => [...prev, { ...newReply, author_name: 'You' }]);
+      }
+
       await onReply(replyContent);
       setReplyContent("");
     } finally {

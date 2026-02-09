@@ -4,7 +4,7 @@ import React from 'react';
 import { sanitizeHtml } from '@/lib/sanitize';
 
 import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 interface AssetType {
   id: string;
@@ -124,6 +124,7 @@ export default function AssetGenerator() {
     setSaving(true);
 
     try {
+      const supabase = createClient();
       const { data: user } = await supabase.auth.getUser();
 
       const { data, error } = await supabase

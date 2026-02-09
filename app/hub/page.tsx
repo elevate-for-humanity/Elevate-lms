@@ -14,6 +14,7 @@ import {
 import AutomationFeed from '@/components/hub/AutomationFeed';
 import EnrollmentState from '@/components/hub/EnrollmentState';
 import CohortView from '@/components/hub/CohortView';
+import { HubNavigation } from '@/components/navigation/HubNavigation';
 
 export const metadata: Metadata = {
   title: 'Hub | Elevate for Humanity',
@@ -57,6 +58,7 @@ export default async function HubPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <HubNavigation />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">

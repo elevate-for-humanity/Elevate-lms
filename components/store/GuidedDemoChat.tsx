@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { MessageCircle, X, ChevronRight, Play, Pause, SkipForward } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface DemoStep {
   id: string;
@@ -11,6 +12,28 @@ interface DemoStep {
   highlight?: string;
   action?: string;
   delay?: number;
+}
+
+// Hook to log demo interactions
+function useDemoAnalytics() {
+  const supabase = createClient();
+  const sessionId = useRef(crypto.randomUUID());
+
+  const logDemoEvent = async (eventType: string, stepId?: string, data?: any) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('demo_analytics')
+      .insert({
+        session_id: sessionId.current,
+        user_id: user?.id,
+        event_type: eventType,
+        step_id: stepId,
+        extra_data: data,
+        timestamp: new Date().toISOString()
+      });
+  };
+
+  return { logDemoEvent, sessionId: sessionId.current };
 }
 
 const DEMO_SCRIPT: DemoStep[] = [

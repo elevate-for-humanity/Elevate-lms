@@ -1,12 +1,43 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import Link from 'next/link';
 import { useState } from 'react';
 
 export function ProgramBanner() {
   const [open, setOpen] = useState(false);
+  const supabase = createClient();
+
+  // Log banner view for analytics
+  useEffect(() => {
+    async function logBannerView() {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase
+        .from('program_banner_views')
+        .insert({
+          user_id: user?.id,
+          banner_type: 'workone_appointment',
+          viewed_at: new Date().toISOString()
+        });
+    }
+    logBannerView();
+  }, [supabase]);
+
+  // Log CTA clicks
+  const logCtaClick = async (ctaType: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('cta_clicks')
+      .insert({
+        user_id: user?.id,
+        cta_type: ctaType,
+        source: 'program_banner',
+        clicked_at: new Date().toISOString()
+      });
+  };
 
   return (
     <section className="rounded-2xl border bg-white p-4 md:p-5 shadow-sm">

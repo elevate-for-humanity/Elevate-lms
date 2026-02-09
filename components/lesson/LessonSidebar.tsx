@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useEffect, useState } from "react";
@@ -45,6 +47,44 @@ export function LessonSidebar({
   const [notes, setNotes] = useState<Note[]>([]);
   const [questions, setQuestions] = useState<Question[]>([]);
   const [loading, setLoading] = useState(true);
+  const supabase = createClient();
+
+  // Load lesson sidebar data from DB
+  useEffect(() => {
+    async function loadSidebarData() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Load bookmarks
+      const { data: bookmarkData } = await supabase
+        .from('lesson_bookmarks')
+        .select('id, label, position_seconds, created_at')
+        .eq('lesson_id', lessonId)
+        .eq('user_id', user.id)
+        .order('position_seconds');
+      if (bookmarkData) setBookmarks(bookmarkData);
+
+      // Load notes
+      const { data: noteData } = await supabase
+        .from('lesson_notes')
+        .select('id, body, position_seconds, created_at')
+        .eq('lesson_id', lessonId)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+      if (noteData) setNotes(noteData);
+
+      // Load questions
+      const { data: questionData } = await supabase
+        .from('lesson_questions')
+        .select('id, title, body, created_at, lesson_answers (id, body, created_at)')
+        .eq('lesson_id', lessonId)
+        .order('created_at', { ascending: false });
+      if (questionData) setQuestions(questionData);
+
+      setLoading(false);
+    }
+    loadSidebarData();
+  }, [lessonId, supabase]);
 
   // new note state
   const [noteBody, setNoteBody] = useState("");

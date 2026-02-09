@@ -1,5 +1,7 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/client';
+
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown, User as UserIcon, Settings, LogOut } from 'lucide-react';
@@ -20,8 +22,24 @@ interface UserMenuProps {
 
 export function UserMenu({ user, isLoading }: UserMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const [profile, setProfile] = useState<any>(null);
   const router = useRouter();
   const menuRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
+
+  // Load user profile from DB for avatar and display name
+  useEffect(() => {
+    async function loadProfile() {
+      if (!user?.id) return;
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url, role, email')
+        .eq('id', user.id)
+        .single();
+      if (data) setProfile(data);
+    }
+    loadProfile();
+  }, [user?.id, supabase]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {

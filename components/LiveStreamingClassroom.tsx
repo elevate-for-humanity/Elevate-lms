@@ -2,9 +2,10 @@
 
 import React from 'react';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { createClient } from '@/lib/supabase/client';
 
 interface Participant {
   id: string;
@@ -30,11 +31,57 @@ interface Poll {
   active: boolean;
 }
 
-export function LiveStreamingClassroom() {
+interface LiveStreamingClassroomProps {
+  sessionId?: string;
+}
+
+export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProps) {
   const [activePanel, setActivePanel] = useState<'chat' | 'participants' | 'polls'>('chat');
   const [handRaised, setHandRaised] = useState(false);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
 
-  const participants: Participant[] = [
+  const fetchSessionData = useCallback(async () => {
+    if (!sessionId) return;
+    
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    // Log attendance
+    if (user) {
+      await supabase.from('live_session_attendance').upsert({
+        session_id: sessionId,
+        user_id: user.id,
+        joined_at: new Date().toISOString(),
+      }).catch(() => {});
+    }
+
+    // Fetch participants
+    const { data: attendees } = await supabase
+      .from('live_session_attendance')
+      .select('*, profiles(full_name, avatar_url, role)')
+      .eq('session_id', sessionId);
+
+    if (attendees) {
+      const formatted: Participant[] = attendees.map(a => ({
+        id: a.user_id,
+        name: a.profiles?.full_name || 'Participant',
+        avatar: a.profiles?.avatar_url || '/images/default-avatar.png',
+        role: a.profiles?.role === 'instructor' ? 'instructor' : 'student',
+        handRaised: a.hand_raised || false,
+        muted: true,
+        videoOn: false,
+      }));
+      setParticipants(formatted);
+    }
+  }, [sessionId]);
+
+  useEffect(() => {
+    fetchSessionData();
+  }, [fetchSessionData]);
+
+  // Fallback participants for demo
+  const fallbackParticipants: Participant[] = [
     {
       id: '1',
       name: 'Dr. Emily Rodriguez',

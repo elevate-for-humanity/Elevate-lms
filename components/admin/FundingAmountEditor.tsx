@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 /**
  * Funding Amount Editor Component
@@ -28,6 +30,21 @@ export default function FundingAmountEditor({
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const router = useRouter();
+  const supabase = createClient();
+
+  // Log funding amount changes for audit
+  const logFundingChange = async (oldValues: any, newValues: any) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('funding_change_audit')
+      .insert({
+        admin_id: user?.id,
+        enrollment_id: enrollmentId,
+        old_values: oldValues,
+        new_values: newValues,
+        changed_at: new Date().toISOString()
+      });
+  };
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

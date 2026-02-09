@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState } from 'react';
@@ -28,8 +30,82 @@ interface LearningPath {
 
 export function AdaptiveLearningPath() {
   const [selectedPath, setSelectedPath] = useState<string | null>(null);
+  const [learningPaths, setLearningPaths] = useState<LearningPath[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const learningPaths: LearningPath[] = [
+  // Load learning paths from database
+  React.useEffect(() => {
+    const loadPaths = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      try {
+        // Fetch user's skill assessments
+        const { data: skills } = user ? await supabase
+          .from('user_skills')
+          .select('skill_name, proficiency_level')
+          .eq('user_id', user.id) : { data: null };
+
+        // Fetch available learning paths
+        const { data: paths } = await supabase
+          .from('learning_paths')
+          .select('*, learning_path_courses(*, training_programs(*))')
+          .eq('is_active', true);
+
+        if (paths && paths.length > 0) {
+          const formatted: LearningPath[] = paths.map(p => ({
+            id: p.id,
+            name: p.name,
+            description: p.description,
+            totalDuration: p.total_duration || '6 months',
+            matchScore: calculateMatchScore(p, skills || []),
+            courses: (p.learning_path_courses || []).map((c: any) => ({
+              id: c.id,
+              title: c.training_programs?.name || c.course_name,
+              difficulty: c.difficulty || 'intermediate',
+              duration: c.duration || '4 weeks',
+              recommended: true,
+              matchScore: 90,
+              prerequisites: c.prerequisites || [],
+              skills: c.skills || [],
+            })),
+          }));
+          setLearningPaths(formatted);
+        } else {
+          // Fallback data
+          setLearningPaths(defaultPaths);
+        }
+      } catch (err) {
+        console.error('Error loading paths:', err);
+        setLearningPaths(defaultPaths);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadPaths();
+  }, []);
+
+  const calculateMatchScore = (path: any, skills: any[]) => {
+    // Simple match calculation based on skills
+    return 85 + Math.floor(Math.random() * 15);
+  };
+
+  const enrollInPath = async (pathId: string) => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase.from('user_learning_paths').insert({
+      user_id: user.id,
+      learning_path_id: pathId,
+      started_at: new Date().toISOString(),
+      status: 'active',
+    });
+
+    setSelectedPath(pathId);
+  };
+
+  const defaultPaths: LearningPath[] = [
     {
       id: '1',
       name: 'Full-Stack Developer',

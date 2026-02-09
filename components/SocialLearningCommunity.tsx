@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
@@ -27,6 +29,54 @@ interface StudyGroup {
 
 export function SocialLearningCommunity() {
   const [activeTab, setActiveTab] = useState<'feed' | 'groups' | 'discussions'>('feed');
+  const [dbPosts, setDbPosts] = useState<Post[]>([]);
+  const [dbGroups, setDbGroups] = useState<StudyGroup[]>([]);
+  const supabase = createClient();
+
+  // Load community data from DB
+  useEffect(() => {
+    async function loadCommunityData() {
+      // Load posts
+      const { data: posts } = await supabase
+        .from('community_posts')
+        .select(`
+          id, content, created_at, likes_count, comments_count, tags,
+          profiles:user_id (full_name, avatar_url)
+        `)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      if (posts) {
+        setDbPosts(posts.map((p: any) => ({
+          id: p.id,
+          author: p.profiles?.full_name || 'Anonymous',
+          avatar: p.profiles?.avatar_url || '👤',
+          content: p.content,
+          timestamp: p.created_at,
+          likes: p.likes_count || 0,
+          comments: p.comments_count || 0,
+          tags: p.tags || []
+        })));
+      }
+
+      // Load study groups
+      const { data: groups } = await supabase
+        .from('study_groups')
+        .select('id, name, topic, next_session, study_group_members (count)')
+        .limit(10);
+
+      if (groups) {
+        setDbGroups(groups.map((g: any) => ({
+          id: g.id,
+          name: g.name,
+          members: g.study_group_members?.[0]?.count || 0,
+          topic: g.topic,
+          nextSession: g.next_session
+        })));
+      }
+    }
+    loadCommunityData();
+  }, [supabase]);
 
   const posts: Post[] = [
     {

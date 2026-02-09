@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/openai-client';
+import { createClient } from '@/lib/supabase/server';
 import { 
   MASTER_AVATAR_PROMPT, 
   getPageScript,
@@ -138,6 +139,21 @@ export async function POST(request: NextRequest) {
 
     const reply = completion.choices[0]?.message?.content || 
       "I can help with that. What specific information do you need?";
+
+    // Log interaction to database
+    try {
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from('avatar_chat_interactions').insert({
+        user_id: user?.id || null,
+        route: body.route || null,
+        user_message: message,
+        assistant_response: reply,
+        context: body.context || null,
+      }).catch(() => {});
+    } catch {
+      // DB logging is non-critical
+    }
 
     return NextResponse.json({ message: reply });
   } catch (error) {

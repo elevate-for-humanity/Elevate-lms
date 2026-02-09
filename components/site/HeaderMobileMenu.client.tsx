@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X, ChevronDown } from 'lucide-react';
 
@@ -17,6 +19,25 @@ interface HeaderMobileMenuProps {
 export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const supabase = createClient();
+
+  // Load user profile from DB when menu opens
+  useEffect(() => {
+    async function loadProfile() {
+      if (!isOpen) return;
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('full_name, avatar_url, role')
+          .eq('id', user.id)
+          .single();
+        if (data) setUserProfile(data);
+      }
+    }
+    loadProfile();
+  }, [isOpen, supabase]);
 
   return (
     <>

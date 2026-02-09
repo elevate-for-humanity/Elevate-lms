@@ -32,6 +32,8 @@ import { Gamification } from '@/components/Gamification';
 import { StudyGroups } from '@/components/StudyGroups';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { NextActionBanner } from '@/components/enrollment/NextActionBanner';
+import { OnboardingTour, dashboardTour } from '@/components/onboarding/OnboardingTour';
+import { ComplianceGate } from '@/components/compliance/ComplianceGate';
 
 function NextActionBannerWrapper() {
   return <NextActionBanner />;
@@ -123,6 +125,9 @@ export default async function StudentDashboardPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      {/* Onboarding Tour */}
+      <OnboardingTour steps={dashboardTour} tourKey="student-dashboard" />
+      
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

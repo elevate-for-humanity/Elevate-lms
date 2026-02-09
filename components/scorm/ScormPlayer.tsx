@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 // components/scorm/ScormPlayer.tsx
 
@@ -29,6 +31,22 @@ export function ScormPlayer({
     // Initialize SCORM API
     const api = initializeScormAPI(attemptId, version);
 
+    // Log SCORM attempt to database
+    const logAttempt = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      await supabase.from('scorm_attempts').upsert({
+        attempt_id: attemptId,
+        package_id: packageId,
+        user_id: user?.id,
+        scorm_version: version,
+        started_at: new Date().toISOString(),
+        status: 'in_progress',
+      }).catch(() => {});
+    };
+    logAttempt();
+
     // Handle iframe load
     const handleLoad = () => {
       setLoading(false);
@@ -51,7 +69,7 @@ export function ScormPlayer({
         iframe.removeEventListener('error', handleError);
       }
     };
-  }, [attemptId, version]);
+  }, [attemptId, version, packageId]);
 
   const contentUrl = `/api/scorm/content/${packageId}/${launchUrl}`;
 

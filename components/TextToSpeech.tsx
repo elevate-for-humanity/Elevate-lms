@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState, useEffect, useRef } from 'react';
@@ -8,16 +10,52 @@ interface TextToSpeechProps {
   text: string;
   autoPlay?: boolean;
   className?: string;
+  contentId?: string;
 }
 
-export default function TextToSpeech({ text, autoPlay = false, className = '' }: TextToSpeechProps) {
+export default function TextToSpeech({ text, autoPlay = false, className = '', contentId }: TextToSpeechProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null);
   const [rate, setRate] = useState(1);
   const [pitch, setPitch] = useState(1);
+  const [userPrefs, setUserPrefs] = useState<any>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const supabase = createClient();
+
+  // Load user TTS preferences from DB
+  useEffect(() => {
+    async function loadPreferences() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('accessibility_preferences')
+          .select('tts_rate, tts_pitch, tts_voice')
+          .eq('user_id', user.id)
+          .single();
+        if (data) {
+          setUserPrefs(data);
+          if (data.tts_rate) setRate(data.tts_rate);
+          if (data.tts_pitch) setPitch(data.tts_pitch);
+        }
+      }
+    }
+    loadPreferences();
+  }, [supabase]);
+
+  // Log TTS usage for analytics
+  const logTTSUsage = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('tts_usage_log')
+      .insert({
+        user_id: user?.id,
+        content_id: contentId,
+        text_length: text.length,
+        used_at: new Date().toISOString()
+      });
+  };
 
   useEffect(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {

@@ -4,7 +4,7 @@ import React from 'react';
 import { sanitizeHtml } from '@/lib/sanitize';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '../lib/supabase';
+import { createClient } from '@/lib/supabase/client';
 
 interface PageTemplate {
   name: string;
@@ -110,6 +110,7 @@ export default function AIPageBuilder() {
     setSaving(true);
 
     try {
+      const supabase = createClient();
       const { data: user } = await supabase.auth.getUser();
 
       const { data, error } = await supabase
@@ -152,6 +153,7 @@ export default function AIPageBuilder() {
     }
 
     try {
+      const supabase = createClient();
       const { error } = await supabase
         .from('generated_pages')
         .update({

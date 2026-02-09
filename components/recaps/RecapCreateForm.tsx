@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useMemo, useState } from 'react';
@@ -11,14 +13,32 @@ export default function RecapCreateForm() {
   const [transcript, setTranscript] = useState('');
   const [loading, setLoading] = useState(false);
   const [resultLink, setResultLink] = useState<string | null>(null);
+  const supabase = createClient();
   const canSubmit = useMemo(
     () => title.trim() && transcript.trim(),
     [title, transcript]
   );
 
+  // Log recap generation to DB
+  const logRecapGeneration = async (status: 'started' | 'completed' | 'failed', recapId?: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('recap_generation_log')
+      .insert({
+        user_id: user?.id,
+        title,
+        meeting_date: meetingDate || null,
+        status,
+        recap_id: recapId,
+        transcript_length: transcript.length,
+        generated_at: new Date().toISOString()
+      });
+  };
+
   async function onSubmit() {
     setLoading(true);
     setResultLink(null);
+    await logRecapGeneration('started');
 
     const res = await fetch('/api/recaps/generate', {
       method: 'POST',
@@ -35,6 +55,7 @@ export default function RecapCreateForm() {
     setLoading(false);
 
     if (!res.ok) {
+      await logRecapGeneration('failed');
       alert(json?.error || 'Failed to generate recap');
       return;
     }

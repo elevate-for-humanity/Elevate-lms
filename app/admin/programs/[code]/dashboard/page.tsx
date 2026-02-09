@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { ModuleListForProgram } from '@/components/ModuleListForProgram';
 
 export const metadata: Metadata = {
   title: 'Program Dashboard | Elevate For Humanity',
@@ -35,6 +36,7 @@ export default async function ProgramDashboardPage({ params }: { params: { code:
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Status</h3><p className="text-xl font-bold text-gray-900 mt-2">{program?.status || 'Active'}</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Program Details</h2><p className="text-gray-600">{program?.description || 'No description available'}</p></div>
+        <div className="bg-white rounded-lg shadow-sm border p-6 mt-6"><h2 className="text-lg font-semibold mb-4">Program Modules</h2><ModuleListForProgram programId={program?.id || params.code} editable={true} /></div>
       </div>
     </div>
   );

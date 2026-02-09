@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 import { memo } from 'react';
 
@@ -135,6 +137,7 @@ const QUIZ_QUESTIONS = [
 
 export default function FERPATrainingForm({ user, existingTraining }: FERPATrainingFormProps) {
   const router = useRouter();
+  const supabase = createClient();
   const signatureRef = useRef<SignatureCanvas>(null);
   const confidentialitySignatureRef = useRef<SignatureCanvas>(null);
 
@@ -144,6 +147,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
   const [passed, setPassed] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [trainingHistory, setTrainingHistory] = useState<any[]>([]);
 
   const [trainingAcknowledged, setTrainingAcknowledged] = useState(false);
   const [confidentialityAcknowledged, setConfidentialityAcknowledged] = useState(false);
@@ -151,6 +155,20 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
   const [confidentialitySignature, setConfidentialitySignature] = useState('');
 
   const totalSteps = 4;
+
+  // Load user's FERPA training history from DB
+  useEffect(() => {
+    async function loadTrainingHistory() {
+      if (!user?.id) return;
+      const { data } = await supabase
+        .from('ferpa_training')
+        .select('id, quiz_score, passed, completed_at, certificate_id')
+        .eq('user_id', user.id)
+        .order('completed_at', { ascending: false });
+      if (data) setTrainingHistory(data);
+    }
+    loadTrainingHistory();
+  }, [user?.id, supabase]);
 
   const calculateScore = () => {
     let correct = 0;

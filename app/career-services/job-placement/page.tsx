@@ -3,6 +3,7 @@ import { Metadata } from 'next';
 import { Briefcase, Building2, TrendingUp, ArrowRight, Users, Target, Award, Search, Handshake, CheckCircle } from 'lucide-react';
 import { CareerHero } from '../components/CareerHero';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { JobPlacementTracking } from '@/components/JobPlacementTracking';
 
 export const metadata: Metadata = {
   title: 'Job Placement Services | Elevate for Humanity',

@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState } from 'react';
@@ -27,14 +29,50 @@ interface Subscription {
 }
 
 export function SubscriptionManager() {
-  const [currentSubscription, setCurrentSubscription] = useState<Subscription>({
-    id: 'sub_123',
-    planName: 'Pro Plan',
-    status: 'active',
-    currentPeriodEnd: new Date('2024-04-15'),
-    cancelAtPeriodEnd: false,
-    price: 4999,
-  });
+  const [currentSubscription, setCurrentSubscription] = useState<Subscription | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Load subscription from database
+  React.useEffect(() => {
+    const loadSubscription = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      const { data } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .single();
+
+      if (data) {
+        setCurrentSubscription({
+          id: data.id,
+          planName: data.plan_name || 'Pro Plan',
+          status: data.status,
+          currentPeriodEnd: new Date(data.current_period_end),
+          cancelAtPeriodEnd: data.cancel_at_period_end || false,
+          price: data.price || 4999,
+        });
+      } else {
+        // Default for demo
+        setCurrentSubscription({
+          id: 'sub_123',
+          planName: 'Pro Plan',
+          status: 'active',
+          currentPeriodEnd: new Date('2024-04-15'),
+          cancelAtPeriodEnd: false,
+          price: 4999,
+        });
+      }
+      setLoading(false);
+    };
+    loadSubscription();
+  }, []);
 
   const plans: Plan[] = [
     {

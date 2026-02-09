@@ -2,12 +2,13 @@
 
 import React from 'react';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { X, ShoppingCart as CartIcon, Plus, Minus, Tag } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface CartItem {
   id: string;
@@ -18,34 +19,76 @@ interface CartItem {
 }
 
 export function ShoppingCart() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([
-    {
-      id: '1',
-      title: 'Advanced Web Development',
-      price: 29900,
-      image: '/media/courses/web-dev.jpg',
-      quantity: 1,
-    },
-    {
-      id: '2',
-      title: 'Data Analytics Bootcamp',
-      price: 39900,
-      image: '/media/courses/data-analytics.jpg',
-      quantity: 1,
-    },
-  ]);
-
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [promoCode, setPromoCode] = useState('');
   const [discount, setDiscount] = useState(0);
 
-  const updateQuantity = (id: string, change: number) => {
-    setCartItems(
-      cartItems.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + change) }
-          : item
-      )
+  const fetchCart = useCallback(async () => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      // Load from localStorage for guests
+      const localCart = localStorage.getItem('cart');
+      if (localCart) {
+        setCartItems(JSON.parse(localCart));
+      }
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const { data } = await supabase
+        .from('cart_items')
+        .select('*, products(name, price, image_url)')
+        .eq('user_id', user.id);
+
+      if (data) {
+        const items: CartItem[] = data.map(item => ({
+          id: item.product_id,
+          title: item.products?.name || 'Product',
+          price: item.products?.price || 0,
+          image: item.products?.image_url || '/media/courses/default.jpg',
+          quantity: item.quantity,
+        }));
+        setCartItems(items);
+      }
+    } catch (err) {
+      console.error('Error fetching cart:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchCart();
+  }, [fetchCart]);
+
+  const updateQuantity = async (id: string, change: number) => {
+    const newItems = cartItems.map((item) =>
+      item.id === id
+        ? { ...item, quantity: Math.max(1, item.quantity + change) }
+        : item
     );
+    setCartItems(newItems);
+
+    // Sync to database
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (user) {
+      const item = newItems.find(i => i.id === id);
+      if (item) {
+        await supabase
+          .from('cart_items')
+          .update({ quantity: item.quantity })
+          .eq('user_id', user.id)
+          .eq('product_id', id);
+      }
+    } else {
+      localStorage.setItem('cart', JSON.stringify(newItems));
+    }
   };
 
   const removeItem = (id: string) => {

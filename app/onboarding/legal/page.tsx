@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { CheckCircle, FileText, Shield, AlertCircle } from 'lucide-react';
+import { Circle, FileText, Shield, AlertCircle } from 'lucide-react';
+import { SignatureInput } from '@/components/onboarding/SignatureInput';
 
 interface Agreement {
   type: string;
@@ -226,7 +227,7 @@ export default function LegalOnboardingPage() {
                     agreement.signed ? 'bg-green-100' : 'bg-slate-100'
                   }`}>
                     {agreement.signed ? (
-                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <Circle className="w-5 h-5 text-green-600" />
                     ) : (
                       <FileText className="w-5 h-5 text-slate-400" />
                     )}
@@ -263,6 +264,20 @@ export default function LegalOnboardingPage() {
             </div>
           ))}
         </div>
+
+        {/* Signature Section */}
+        {allSigned && user && (
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 mb-6">
+            <h3 className="font-semibold text-slate-900 mb-4">Digital Signature</h3>
+            <SignatureInput
+              userName={user.user_metadata?.full_name || user.email?.split('@')[0] || 'Student'}
+              documentType="onboarding_agreements"
+              onSignatureChange={(sig, type) => console.log('Signature:', type)}
+              onSignatureSaved={(id) => console.log('Saved:', id)}
+              autoSave={false}
+            />
+          </div>
+        )}
 
         {/* Complete Button */}
         {allSigned && (

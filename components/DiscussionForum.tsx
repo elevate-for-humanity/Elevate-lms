@@ -3,10 +3,11 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { MessageSquare, ThumbsUp, Reply } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface ForumPost {
   id: string;
@@ -29,22 +30,71 @@ export function DiscussionForum({
 }: DiscussionForumProps) {
   const [newPost, setNewPost] = useState('');
   const [forumPosts, setForumPosts] = useState<ForumPost[]>(posts);
+  const [loading, setLoading] = useState(true);
 
-  const handleSubmit = () => {
+  const fetchPosts = useCallback(async () => {
+    const supabase = createClient();
+    
+    try {
+      const { data } = await supabase
+        .from('forum_posts')
+        .select('*, profiles(full_name, avatar_url)')
+        .eq('course_id', courseId)
+        .order('created_at', { ascending: false });
+
+      if (data) {
+        const formatted: ForumPost[] = data.map(p => ({
+          id: p.id,
+          author: p.profiles?.full_name || 'Anonymous',
+          avatar: p.profiles?.avatar_url || '/images/default-avatar.png',
+          content: p.content,
+          timestamp: new Date(p.created_at).toLocaleString(),
+          likes: p.likes_count || 0,
+          replies: p.replies_count || 0,
+        }));
+        setForumPosts(formatted);
+      }
+    } catch (err) {
+      console.error('Error fetching posts:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [courseId]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  const handleSubmit = async () => {
     if (!newPost.trim()) return;
 
-    const post: ForumPost = {
-      id: Date.now().toString(),
-      author: 'Current User',
-      avatar: '/images/split/piece-15.webp',
-      content: newPost,
-      timestamp: 'Just now',
-      likes: 0,
-      replies: 0,
-    };
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    setForumPosts([post, ...forumPosts]);
-    setNewPost('');
+    const { data, error } = await supabase
+      .from('forum_posts')
+      .insert({
+        course_id: courseId,
+        user_id: user?.id,
+        content: newPost,
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      const post: ForumPost = {
+        id: data.id,
+        author: user?.email?.split('@')[0] || 'Current User',
+        avatar: '/images/split/piece-15.webp',
+        content: newPost,
+        timestamp: 'Just now',
+        likes: 0,
+        replies: 0,
+      };
+
+      setForumPosts([post, ...forumPosts]);
+      setNewPost('');
+    }
   };
 
   return (

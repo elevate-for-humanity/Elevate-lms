@@ -4,6 +4,21 @@
 import { sanitizeHtml } from '@/lib/sanitize';
 import { getTenantFromHost } from "@/lib/multiTenant/tenantFromHost";
 import { headers } from "next/headers";
+import { createClient } from '@/lib/supabase/server';
+
+interface TenantStyles {
+  primary_color?: string;
+  secondary_color?: string;
+  accent_color?: string;
+  background_color?: string;
+  text_color?: string;
+  custom_css?: string;
+  custom_favicon_url?: string;
+  custom_font_url?: string;
+  font_family?: string;
+  border_radius?: string;
+  logo_url?: string;
+}
 
 interface TenantStyles {
   primary_color?: string;
@@ -25,7 +40,11 @@ export async function TenantCustomStyles() {
   
   let styles: TenantStyles | null = null;
 
+<<<<<<< HEAD
   // Get tenant from host - no DB call to avoid edge runtime issues
+=======
+  // Try to get tenant from host
+>>>>>>> d5f142eac (Add database integration to all components with createClient)
   const tenant = await getTenantFromHost(host);
   
   if (tenant) {
@@ -35,6 +54,25 @@ export async function TenantCustomStyles() {
       custom_css: tenant.custom_css,
       custom_favicon_url: tenant.custom_favicon_url,
     };
+<<<<<<< HEAD
+=======
+  } else {
+    // Fallback: try to get styles from site_settings
+    try {
+      const supabase = await createClient();
+      const { data: siteStyles } = await supabase
+        .from('site_settings')
+        .select('value')
+        .eq('key', 'custom_styles')
+        .single();
+
+      if (siteStyles?.value) {
+        styles = JSON.parse(siteStyles.value);
+      }
+    } catch (err) {
+      // No custom styles configured
+    }
+>>>>>>> d5f142eac (Add database integration to all components with createClient)
   }
 
   if (!styles) return null;

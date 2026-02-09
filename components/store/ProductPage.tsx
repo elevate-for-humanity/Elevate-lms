@@ -1,8 +1,32 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
+
+// Hook to track product page views
+function useProductPageAnalytics(productId: string) {
+  const supabase = createClient();
+  const hasLogged = useRef(false);
+
+  useEffect(() => {
+    if (hasLogged.current) return;
+    hasLogged.current = true;
+
+    async function logPageView() {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase
+        .from('product_page_views')
+        .insert({
+          product_id: productId,
+          user_id: user?.id,
+          viewed_at: new Date().toISOString()
+        });
+    }
+    logPageView();
+  }, [productId, supabase]);
+}
 import {
   Star,
   Play,

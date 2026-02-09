@@ -5,6 +5,7 @@ import React from 'react';
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { createClient } from '@/lib/supabase/client';
 
 export function FinancialAidCalculator() {
   const [income, setIncome] = useState('');
@@ -12,7 +13,7 @@ export function FinancialAidCalculator() {
   const [tuition, setTuition] = useState('');
   const [results, setResults] = useState<any>(null);
 
-  const calculateAid = () => {
+  const calculateAid = async () => {
     const incomeNum = parseFloat(income) || 0;
     const tuitionNum = parseFloat(tuition) || 0;
     const dependentsNum = parseInt(dependents) || 0;
@@ -27,12 +28,31 @@ export function FinancialAidCalculator() {
     const maxLoan = Math.min(tuitionNum - eligibleGrant, 20000);
     const outOfPocket = Math.max(0, tuitionNum - eligibleGrant - maxLoan);
 
-    setResults({
+    const calculationResults = {
       totalCost: tuitionNum,
       grants: eligibleGrant,
       loans: maxLoan,
       outOfPocket: outOfPocket,
-    });
+    };
+
+    setResults(calculationResults);
+
+    // Log calculation for analytics
+    try {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase.from('financial_aid_calculations').insert({
+        user_id: user?.id || null,
+        income_range: incomeNum < 30000 ? 'low' : incomeNum < 50000 ? 'medium' : 'high',
+        dependents: dependentsNum,
+        tuition_amount: tuitionNum,
+        estimated_grant: eligibleGrant,
+        estimated_loan: maxLoan,
+        out_of_pocket: outOfPocket,
+      }).catch(() => {});
+    } catch {
+      // Analytics logging is non-critical
+    }
   };
 
   return (

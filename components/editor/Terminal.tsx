@@ -4,12 +4,14 @@
 import React from 'react';
 
 import { useState, useRef, useEffect } from 'react';
+import { createClient } from '@/lib/supabase/client';
 
 interface TerminalProps {
   onCommand?: (command: string) => Promise<string>;
+  sessionId?: string;
 }
 
-export default function Terminal({ onCommand }: TerminalProps) {
+export default function Terminal({ onCommand, sessionId }: TerminalProps) {
   const [history, setHistory] = useState<
     Array<{ type: 'input' | 'output'; text: string }>
   >([
@@ -21,6 +23,21 @@ export default function Terminal({ onCommand }: TerminalProps) {
   const [input, setInput] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
   const terminalRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
+
+  // Log terminal command to DB
+  const logCommand = async (command: string, output: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('terminal_command_log')
+      .insert({
+        user_id: user?.id,
+        session_id: sessionId,
+        command,
+        output: output.substring(0, 1000), // Truncate long outputs
+        executed_at: new Date().toISOString()
+      });
+  };
 
   useEffect(() => {
     if (terminalRef.current) {

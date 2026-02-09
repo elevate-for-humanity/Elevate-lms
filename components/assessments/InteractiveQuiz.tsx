@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from "react";
 import { CheckCircle, XCircle, AlertCircle, ArrowRight } from "lucide-react";
@@ -35,6 +37,42 @@ export function InteractiveQuiz({
   const [showFeedback, setShowFeedback] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
   const [score, setScore] = useState(0);
+  const [attemptId, setAttemptId] = useState<string | null>(null);
+  const supabase = createClient();
+
+  // Log quiz start and create attempt record
+  useEffect(() => {
+    async function startQuizAttempt() {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      const { data: attempt } = await supabase
+        .from('quiz_attempts')
+        .insert({
+          quiz_id: quizId,
+          user_id: user?.id,
+          started_at: new Date().toISOString(),
+          status: 'in_progress'
+        })
+        .select('id')
+        .single();
+      
+      if (attempt) setAttemptId(attempt.id);
+    }
+    startQuizAttempt();
+  }, [quizId, supabase]);
+
+  // Save answer to DB when user answers
+  const saveAnswerToDB = async (questionId: string, answer: any) => {
+    if (!attemptId) return;
+    await supabase
+      .from('quiz_answers')
+      .upsert({
+        attempt_id: attemptId,
+        question_id: questionId,
+        answer,
+        answered_at: new Date().toISOString()
+      }, { onConflict: 'attempt_id,question_id' });
+  };
 
   const question = questions[currentQuestion];
   const isLastQuestion = currentQuestion === questions.length - 1;

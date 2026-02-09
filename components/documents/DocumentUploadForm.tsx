@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Upload, CheckCircle, AlertCircle } from 'lucide-react';
 
@@ -19,11 +21,30 @@ interface Props {
 
 export function DocumentUploadForm({ requirements }: Props) {
   const router = useRouter();
+  const supabase = createClient();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
   const [documentType, setDocumentType] = useState('');
   const [file, setFile] = useState<File | null>(null);
+  const [uploadedDocs, setUploadedDocs] = useState<any[]>([]);
+
+  // Load previously uploaded documents from DB
+  useEffect(() => {
+    async function loadUploadedDocs() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('user_documents')
+        .select('id, document_type, file_name, status, uploaded_at')
+        .eq('user_id', user.id)
+        .order('uploaded_at', { ascending: false });
+
+      if (data) setUploadedDocs(data);
+    }
+    loadUploadedDocs();
+  }, [supabase]);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Building2, MapPin, Phone, User, Award, Globe, AlertTriangle, Info } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 export interface ShopFormData {
   trainingRegion: string;
@@ -21,6 +22,35 @@ interface ApprenticeshipShopFieldsProps {
   formData: ShopFormData;
   onChange: (data: Partial<ShopFormData>) => void;
   errors?: Record<string, string>;
+  applicationId?: string;
+}
+
+// Hook to load existing shop data and save drafts
+function useShopFormDB(applicationId?: string) {
+  const supabase = createClient();
+
+  const loadExistingShop = async (shopName: string) => {
+    const { data } = await supabase
+      .from('apprenticeship_shops')
+      .select('*')
+      .ilike('shop_name', shopName)
+      .single();
+    return data;
+  };
+
+  const saveDraft = async (formData: ShopFormData) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('apprenticeship_shop_drafts')
+      .upsert({
+        user_id: user?.id,
+        application_id: applicationId,
+        form_data: formData,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id,application_id' });
+  };
+
+  return { loadExistingShop, saveDraft };
 }
 
 const TRAINING_REGIONS = [

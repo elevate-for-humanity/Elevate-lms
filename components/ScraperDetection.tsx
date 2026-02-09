@@ -1,7 +1,10 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 import { useEffect, useRef } from 'react';
+
 /**
  * Scraper Detection Component
  * Detects suspicious behavior that indicates automated scraping
@@ -12,6 +15,22 @@ export function ScraperDetection() {
   const clickEvents = useRef(0);
   const startTime = useRef(Date.now());
   const alerted = useRef(false);
+  const supabase = createClient();
+
+  // Log scraper detection event to DB
+  const logScraperEvent = async (eventData: any) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('scraper_detection_events')
+      .insert({
+        user_id: user?.id,
+        event_type: eventData.type,
+        url: eventData.url,
+        details: eventData,
+        user_agent: navigator.userAgent,
+        detected_at: new Date().toISOString()
+      });
+  };
   useEffect(() => {
     // Track mouse movements
     const handleMouseMove = () => {

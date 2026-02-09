@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from 'react';
 import { Play, CheckCircle, X } from 'lucide-react';
@@ -10,6 +12,7 @@ interface ProgramOrientationVideoProps {
   videoUrl?: string;
   title?: string;
   description?: string;
+  programId?: string;
 }
 
 export default function ProgramOrientationVideo({
@@ -17,13 +20,58 @@ export default function ProgramOrientationVideo({
   videoUrl = '/videos/programs-overview-video-with-narration.mp4',
   title = 'Program Orientation',
   description = 'Watch this orientation video to learn about our programs, what to expect, and how to succeed.',
+  programId,
 }: ProgramOrientationVideoProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [hasWatched, setHasWatched] = useState(false);
   const [showModal, setShowModal] = useState(false);
+  const supabase = createClient();
 
-  const handleVideoEnd = () => {
+  // Check if user has already watched this orientation
+  useEffect(() => {
+    async function checkWatchStatus() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('orientation_completions')
+        .select('completed_at')
+        .eq('user_id', user.id)
+        .eq('video_url', videoUrl)
+        .single();
+
+      if (data) setHasWatched(true);
+    }
+    checkWatchStatus();
+  }, [videoUrl, supabase]);
+
+  const handleVideoEnd = async () => {
     setHasWatched(true);
+    
+    // Log completion to DB
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      await supabase
+        .from('orientation_completions')
+        .upsert({
+          user_id: user.id,
+          program_id: programId,
+          video_url: videoUrl,
+          completed_at: new Date().toISOString()
+        }, { onConflict: 'user_id,video_url' });
+
+      // Also log to video_views for analytics
+      await supabase
+        .from('video_views')
+        .insert({
+          user_id: user.id,
+          video_url: videoUrl,
+          video_type: 'orientation',
+          completed: true,
+          viewed_at: new Date().toISOString()
+        });
+    }
+
     if (onComplete) {
       onComplete();
     }

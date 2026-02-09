@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from 'react';
 import Image from 'next/image';
@@ -21,7 +23,43 @@ interface ProductReviewsProps {
   productId: string;
 }
 
-// Mock reviews - in production, fetch from database
+// Hook to load reviews from DB
+function useProductReviews(productId: string) {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function loadReviews() {
+      const { data } = await supabase
+        .from('product_reviews')
+        .select(`
+          id, rating, title, content, verified_purchase, helpful_count, created_at,
+          profiles:user_id (full_name, avatar_url)
+        `)
+        .eq('product_id', productId)
+        .order('created_at', { ascending: false });
+
+      if (data && data.length > 0) {
+        setReviews(data.map((r: any) => ({
+          id: r.id,
+          author: r.profiles?.full_name || 'Anonymous',
+          avatar: r.profiles?.avatar_url,
+          rating: r.rating,
+          date: r.created_at?.split('T')[0],
+          title: r.title,
+          content: r.content,
+          verified: r.verified_purchase,
+          helpful: r.helpful_count || 0
+        })));
+      }
+    }
+    loadReviews();
+  }, [productId, supabase]);
+
+  return reviews;
+}
+
+// Mock reviews - fallback
 const mockReviews: Review[] = [
   {
     id: '1',

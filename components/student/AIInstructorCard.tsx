@@ -1,8 +1,9 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
 
-import { useState } from "react";
+import React, { useEffect, useState } from 'react';
+
 import Image from "next/image";
 
 export function AIInstructorCard(props: {
@@ -11,6 +12,39 @@ export function AIInstructorCard(props: {
   programName: string;
   onOpenChat: () => void;
 }) {
+  const [instructorData, setInstructorData] = useState<any>(null);
+  const supabase = createClient();
+
+  // Load instructor data from DB
+  useEffect(() => {
+    async function loadInstructor() {
+      const { data } = await supabase
+        .from('ai_instructors')
+        .select('name, role_title, avatar_url, bio, availability_status')
+        .eq('program_name', props.programName)
+        .single();
+      
+      if (data) setInstructorData(data);
+    }
+    loadInstructor();
+  }, [props.programName, supabase]);
+
+  // Log card view for analytics
+  useEffect(() => {
+    async function logView() {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase
+        .from('ai_instructor_interactions')
+        .insert({
+          user_id: user?.id,
+          instructor_name: props.instructorName,
+          interaction_type: 'card_view',
+          timestamp: new Date().toISOString()
+        });
+    }
+    logView();
+  }, [props.instructorName, supabase]);
+
   return (
     <div className="rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
       <div className="flex items-start gap-4">

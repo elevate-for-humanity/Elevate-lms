@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -13,6 +15,14 @@ interface Requirement {
   required: boolean;
 }
 
+interface UploadedDocument {
+  id: string;
+  document_type: string;
+  file_name: string;
+  status: string;
+  uploaded_at: string;
+}
+
 export function ShopDocumentUpload({
   shopId,
   requirements,
@@ -21,13 +31,29 @@ export function ShopDocumentUpload({
   requirements: Requirement[];
 }) {
   const router = useRouter();
+  const supabase = createClient();
   const [selectedType, setSelectedType] = useState(requirements[0]?.document_type || '');
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [uploadedDocs, setUploadedDocs] = useState<UploadedDocument[]>([]);
   const [message, setMessage] = useState<{
     type: 'success' | 'error';
     text: string;
   } | null>(null);
+
+  // Load previously uploaded documents from DB
+  useEffect(() => {
+    async function loadUploadedDocs() {
+      const { data } = await supabase
+        .from('shop_documents')
+        .select('id, document_type, file_name, status, uploaded_at')
+        .eq('shop_id', shopId)
+        .order('uploaded_at', { ascending: false });
+      
+      if (data) setUploadedDocs(data);
+    }
+    if (shopId) loadUploadedDocs();
+  }, [shopId, supabase]);
 
   async function handleUpload(e: React.FormEvent) {
     e.preventDefault();

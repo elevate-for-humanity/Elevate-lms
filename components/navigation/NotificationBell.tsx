@@ -1,11 +1,13 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState, useRef, useEffect } from 'react';
 import { Bell, CheckCircle, Award, BookOpen, AlertCircle } from 'lucide-react';
 
-const notifications = [
+const defaultNotifications = [
   {
     id: 1,
     type: 'success',
@@ -26,34 +28,95 @@ const notifications = [
     time: '1 day ago',
     unread: true,
   },
-  {
-    id: 3,
-    type: 'reminder',
-    icon: AlertCircle,
-    color: 'text-brand-orange-600',
-    title: 'Assignment Due Soon',
-    message: 'Module 3 Quiz due in 2 days',
-    time: '1 day ago',
-    unread: true,
-  },
-  {
-    id: 4,
-    type: 'info',
-    icon: BookOpen,
-    color: 'text-brand-orange-600',
-    title: 'New Course Available',
-    message: 'Check out the new HVAC Advanced module',
-    time: '3 days ago',
-    unread: false,
-  },
 ];
+
+const iconMap: Record<string, any> = {
+  success: Circle,
+  achievement: Award,
+  reminder: AlertCircle,
+  info: BookOpen,
+};
+
+const colorMap: Record<string, string> = {
+  success: 'text-green-600',
+  achievement: 'text-orange-600',
+  reminder: 'text-brand-orange-600',
+  info: 'text-brand-orange-600',
+};
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
-  const [notifs, setNotifs] = useState(notifications);
+  const [notifs, setNotifs] = useState(defaultNotifications);
+  const [loading, setLoading] = useState(true);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const unreadCount = notifs.filter((n) => n.unread).length;
+
+  // Fetch notifications from database
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const { data } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10);
+
+        if (data && data.length > 0) {
+          const formatted = data.map(n => ({
+            id: n.id,
+            type: n.notification_type || 'info',
+            icon: iconMap[n.notification_type] || BookOpen,
+            color: colorMap[n.notification_type] || 'text-brand-orange-600',
+            title: n.title,
+            message: n.message,
+            time: getRelativeTime(n.created_at),
+            unread: !n.read_at,
+          }));
+          setNotifs(formatted);
+        }
+      } catch (err) {
+        console.error('Error fetching notifications:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  const getRelativeTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    if (diffHours < 1) return 'Just now';
+    if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+  };
+
+  const markAsRead = async (notifId: number) => {
+    const supabase = createClient();
+    await supabase
+      .from('notifications')
+      .update({ read_at: new Date().toISOString() })
+      .eq('id', notifId)
+      .catch(() => {});
+    
+    setNotifs(prev => prev.map(n => 
+      n.id === notifId ? { ...n, unread: false } : n
+    ));
+  };
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {

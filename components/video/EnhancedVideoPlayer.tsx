@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useEffect, useRef, useState } from "react";
@@ -31,6 +33,19 @@ export function EnhancedVideoPlayer(props: EnhancedVideoPlayerProps) {
       learnerId: props.learnerId,
       title: props.title,
     });
+
+    // Log video view to database
+    const logVideoView = async () => {
+      const supabase = createClient();
+      await supabase.from('video_views').insert({
+        video_id: props.videoId,
+        user_id: props.learnerId,
+        course_id: props.courseId,
+        lesson_id: props.lessonId,
+        started_at: new Date().toISOString(),
+      }).catch(() => {});
+    };
+    logVideoView();
 
     setIsLoading(false);
   }, [props.videoId, props.courseId, props.lessonId, props.learnerId, props.title]);

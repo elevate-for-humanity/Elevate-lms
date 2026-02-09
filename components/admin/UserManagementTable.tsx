@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -19,12 +21,40 @@ interface Props {
   users: User[];
 }
 
-export default function UserManagementTable({ users }: Props) {
+export default function UserManagementTable({ users: initialUsers }: Props) {
+  const [users, setUsers] = useState<User[]>(initialUsers);
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
+  const supabase = createClient();
+
+  // Load fresh user data from DB
+  useEffect(() => {
+    async function loadUsers() {
+      const { data } = await supabase
+        .from('profiles')
+        .select('id, email, full_name, role, status, created_at, last_sign_in_at')
+        .order('created_at', { ascending: false });
+      
+      if (data && data.length > 0) setUsers(data);
+    }
+    loadUsers();
+  }, [supabase]);
+
+  // Log admin user management actions
+  const logAdminAction = async (action: string, targetUserId: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('admin_audit_log')
+      .insert({
+        admin_id: user?.id,
+        action,
+        target_user_id: targetUserId,
+        timestamp: new Date().toISOString()
+      });
+  };
 
   // Filter users
   const filteredUsers = users.filter(user => {

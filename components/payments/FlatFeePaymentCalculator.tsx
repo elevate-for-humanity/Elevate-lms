@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React, { useState, useMemo } from 'react';
 import { CreditCard, Calendar, CheckCircle, AlertTriangle } from 'lucide-react';
 
@@ -74,24 +76,47 @@ export function FlatFeePaymentCalculator({
     setSelectedPlan(months);
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
+    let planData: any = null;
+    
     if (balance <= 0) {
-      onSelectPlan({
+      planData = {
         downPayment: downPaymentNum,
         planMonths: 0,
         monthlyAmount: 0,
         totalPrice: programFee,
-      });
+      };
     } else if (selectedPlan) {
       const plan = paymentPlans.find(p => p.months === selectedPlan);
       if (plan) {
-        onSelectPlan({
+        planData = {
           downPayment: downPaymentNum,
           planMonths: plan.months,
           monthlyAmount: plan.monthlyAmount,
           totalPrice: programFee,
-        });
+        };
       }
+    }
+
+    if (planData) {
+      // Log payment plan selection for analytics
+      try {
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        await supabase.from('payment_plan_selections').insert({
+          user_id: user?.id || null,
+          program_name: programName,
+          program_fee: programFee,
+          down_payment: planData.downPayment,
+          plan_months: planData.planMonths,
+          monthly_amount: planData.monthlyAmount,
+          selected_at: new Date().toISOString(),
+        }).catch(() => {});
+      } catch {
+        // Analytics logging is non-critical
+      }
+
+      onSelectPlan(planData);
     }
   };
 

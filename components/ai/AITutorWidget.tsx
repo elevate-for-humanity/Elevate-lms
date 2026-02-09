@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MessageCircle, X, Send } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -18,6 +19,49 @@ export function AITutorWidget({ courseId, courseName }: { courseId: string; cour
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const supabase = createClient();
+  const sessionId = useRef(crypto.randomUUID());
+
+  // Log AI tutor interaction to DB
+  const logTutorInteraction = async (userMessage: string, assistantResponse: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('ai_tutor_interactions')
+      .insert({
+        user_id: user?.id,
+        session_id: sessionId.current,
+        course_id: courseId,
+        user_message: userMessage,
+        assistant_response: assistantResponse.substring(0, 2000),
+        timestamp: new Date().toISOString()
+      });
+  };
+
+  // Load previous chat history from DB
+  useEffect(() => {
+    async function loadHistory() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('ai_tutor_interactions')
+        .select('user_message, assistant_response')
+        .eq('user_id', user.id)
+        .eq('course_id', courseId)
+        .order('timestamp', { ascending: true })
+        .limit(10);
+
+      if (data && data.length > 0) {
+        const history: Message[] = [];
+        data.forEach(d => {
+          history.push({ role: 'user', content: d.user_message });
+          history.push({ role: 'assistant', content: d.assistant_response });
+        });
+        setMessages(prev => [...prev, ...history]);
+      }
+    }
+    if (isOpen) loadHistory();
+  }, [isOpen, courseId, supabase]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;

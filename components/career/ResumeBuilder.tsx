@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState } from "react";
@@ -56,6 +58,41 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
   });
 
   const [isSaving, setIsSaving] = useState(false);
+
+  // Load existing resume from database
+  React.useEffect(() => {
+    const loadResume = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data } = await supabase
+        .from('resumes')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (data?.resume_data) {
+        setResumeData(data.resume_data);
+      }
+    };
+    if (!initialData) {
+      loadResume();
+    }
+  }, [initialData]);
+
+  // Save resume to database
+  const saveToDatabase = async (data: ResumeData) => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    await supabase.from('resumes').upsert({
+      user_id: user.id,
+      resume_data: data,
+      updated_at: new Date().toISOString(),
+    }).catch(() => {});
+  };
 
   const handleSave = async () => {
     setIsSaving(true);

@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import EnrollmentManagementClient from './EnrollmentManagementClient';
+import AutomatedEnrollmentWorkflow from '@/components/AutomatedEnrollmentWorkflow';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -57,6 +58,11 @@ export default async function AdminEnrollmentsPage() {
       <div className="bg-slate-50 border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Admin', href: '/admin' }, { label: 'Enrollments' }]} />
+        </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="mb-8">
+          <AutomatedEnrollmentWorkflow showStats={true} />
         </div>
       </div>
       <EnrollmentManagementClient 

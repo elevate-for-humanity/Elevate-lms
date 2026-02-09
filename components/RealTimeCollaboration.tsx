@@ -3,10 +3,11 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Users, MessageCircle, Video, Share2 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface CollaborationUser {
   id: string;
@@ -29,46 +30,97 @@ export function RealTimeCollaboration({
   const [messages, setMessages] = useState<Array<{ user: string; text: string; time: string }>>([]);
   const [newMessage, setNewMessage] = useState('');
 
+  const fetchRoomData = useCallback(async () => {
+    const supabase = createClient();
+    
+    // Update presence
+    await supabase.from('collaboration_presence').upsert({
+      room_id: roomId,
+      user_id: currentUser.id,
+      user_name: currentUser.name,
+      status: 'online',
+      last_seen: new Date().toISOString(),
+    }).catch(() => {});
+
+    // Fetch active users
+    const { data: presence } = await supabase
+      .from('collaboration_presence')
+      .select('*')
+      .eq('room_id', roomId)
+      .gte('last_seen', new Date(Date.now() - 5 * 60 * 1000).toISOString());
+
+    if (presence) {
+      const users: CollaborationUser[] = presence.map(p => ({
+        id: p.user_id,
+        name: p.user_name,
+        avatar: p.avatar_url || '/media/avatars/default.jpg',
+        status: 'online',
+        currentPage: p.current_page,
+      }));
+      setActiveUsers(users);
+    }
+
+    // Fetch messages
+    const { data: msgs } = await supabase
+      .from('collaboration_messages')
+      .select('*')
+      .eq('room_id', roomId)
+      .order('created_at', { ascending: false })
+      .limit(50);
+
+    if (msgs) {
+      setMessages(msgs.map(m => ({
+        user: m.user_name,
+        text: m.content,
+        time: new Date(m.created_at).toLocaleTimeString(),
+      })).reverse());
+    }
+  }, [roomId, currentUser]);
+
   useEffect(() => {
-    // Simulate real-time user presence
-    const mockUsers: CollaborationUser[] = [
-      {
-        id: '1',
-        name: 'Sarah Johnson',
-        avatar: '/media/avatars/avatar-1.jpg',
-        status: 'online',
-        currentPage: 'Lesson 3: Patient Care',
-      },
-      {
-        id: '2',
-        name: 'Michael Chen',
-        avatar: '/media/avatars/avatar-2.jpg',
-        status: 'online',
-        currentPage: 'Quiz: Safety Protocols',
-      },
-      {
-        id: '3',
-        name: 'Emily Rodriguez',
-        avatar: '/media/avatars/avatar-3.jpg',
-        status: 'away',
-      },
-    ];
+    fetchRoomData();
+    const interval = setInterval(fetchRoomData, 10000); // Refresh every 10s
+    return () => clearInterval(interval);
+  }, [fetchRoomData]);
 
-    setActiveUsers(mockUsers);
-  }, [roomId]);
-
-  const sendMessage = () => {
+  const sendMessage = async () => {
     if (!newMessage.trim()) return;
-
-    const message = {
-      user: currentUser.name,
-      text: newMessage,
-      time: new Date().toLocaleTimeString(),
-    };
-
-    setMessages([...messages, message]);
+    
+    const supabase = createClient();
+    await supabase.from('collaboration_messages').insert({
+      room_id: roomId,
+      user_id: currentUser.id,
+      user_name: currentUser.name,
+      content: newMessage,
+    });
+    
     setNewMessage('');
+    fetchRoomData();
   };
+
+  // Fallback mock users for demo
+  const displayUsers: CollaborationUser[] = activeUsers.length > 0 ? activeUsers : [
+    {
+      id: '1',
+      name: 'Sarah Johnson',
+      avatar: '/media/avatars/avatar-1.jpg',
+      status: 'online',
+      currentPage: 'Lesson 3: Patient Care',
+    },
+    {
+      id: '2',
+      name: 'Michael Chen',
+      avatar: '/media/avatars/avatar-2.jpg',
+      status: 'online',
+      currentPage: 'Quiz: Safety Protocols',
+    },
+    {
+      id: '3',
+      name: 'Emily Rodriguez',
+      avatar: '/media/avatars/avatar-3.jpg',
+      status: 'away',
+    },
+  ];
 
   const getStatusColor = (status: string) => {
     switch (status) {

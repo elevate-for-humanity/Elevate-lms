@@ -1,6 +1,8 @@
 
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState, useRef, useEffect } from 'react';
@@ -75,6 +77,80 @@ export default function InteractiveVideoPlayer({
   >('transcript');
   const [showCaptions, setShowCaptions] = useState(false);
   const [currentCaption, setCurrentCaption] = useState('');
+  const [lessonId, setLessonId] = useState<string | null>(null);
+
+  // Load saved notes from database
+  useEffect(() => {
+    const loadNotes = async () => {
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Extract lesson ID from video URL or use title
+      const id = videoUrl.split('/').pop()?.split('.')[0] || title;
+      setLessonId(id);
+
+      const { data } = await supabase
+        .from('video_notes')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('video_id', id)
+        .order('timestamp', { ascending: true });
+
+      if (data) {
+        setNotes(data.map(n => ({
+          id: n.id,
+          timestamp: n.timestamp,
+          content: n.content,
+          createdAt: new Date(n.created_at),
+        })));
+      }
+    };
+    loadNotes();
+  }, [videoUrl, title]);
+
+  // Save note to database
+  const saveNote = async () => {
+    if (!newNote.trim()) return;
+
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const note: VideoNote = {
+      id: Date.now().toString(),
+      timestamp: currentTime,
+      content: newNote,
+      createdAt: new Date(),
+    };
+
+    setNotes([...notes, note]);
+    setNewNote('');
+
+    if (user && lessonId) {
+      await supabase.from('video_notes').insert({
+        user_id: user.id,
+        video_id: lessonId,
+        timestamp: currentTime,
+        content: newNote,
+      }).catch(() => {});
+    }
+  };
+
+  // Save progress to database
+  const saveProgress = async (progress: number) => {
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (user && lessonId) {
+      await supabase.from('video_progress').upsert({
+        user_id: user.id,
+        video_id: lessonId,
+        progress_percent: progress,
+        last_position: currentTime,
+        updated_at: new Date().toISOString(),
+      }).catch(() => {});
+    }
+  };
 
   // Check for quizzes at current timestamp
   useEffect(() => {
@@ -104,9 +180,17 @@ export default function InteractiveVideoPlayer({
 
   // Report progress
   useEffect(() => {
-    if (duration > 0 && onProgress) {
+    if (duration > 0) {
       const progress = (currentTime / duration) * 100;
-      onProgress(progress);
+      
+      if (onProgress) {
+        onProgress(progress);
+      }
+
+      // Save progress every 10%
+      if (Math.floor(progress) % 10 === 0) {
+        saveProgress(progress);
+      }
 
       // Check if video is complete (watched 95%)
       if (progress >= 95 && onComplete) {

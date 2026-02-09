@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState } from "react";
@@ -29,6 +31,7 @@ export function CourseReviewsPanel({
   const [body, setBody] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const supabase = createClient();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +40,31 @@ export function CourseReviewsPanel({
     setSubmitting(true);
     setError(null);
     try {
+      // Direct DB insert for review
+      const { data: { user } } = await supabase.auth.getUser();
+      const { data: newReview, error: dbError } = await supabase
+        .from('course_reviews')
+        .insert({
+          course_id: courseId,
+          user_id: user?.id,
+          rating,
+          title,
+          body,
+          created_at: new Date().toISOString()
+        })
+        .select('id, rating, title, body, created_at')
+        .single();
+
+      if (newReview && !dbError) {
+        setLocalReviews(prev => [newReview, ...prev]);
+        setTitle("");
+        setBody("");
+        setRating(5);
+        setSubmitting(false);
+        return;
+      }
+
+      // Fallback to API
       const res = await fetch(`/api/courses/${courseId}/reviews`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },

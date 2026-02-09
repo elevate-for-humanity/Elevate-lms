@@ -2,8 +2,9 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Megaphone, Pin, Mail, Bell, Eye, Calendar } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface Announcement {
   id: string;
@@ -28,11 +29,12 @@ interface AnnouncementsSystemProps {
 
 export function AnnouncementsSystem({
   courseId,
-  announcements = [],
+  announcements: initialAnnouncements = [],
   canCreate = false,
   onCreateAnnouncement
 }: AnnouncementsSystemProps) {
   const [isCreating, setIsCreating] = useState(false);
+  const [announcements, setAnnouncements] = useState<Announcement[]>(initialAnnouncements);
   const [newAnnouncement, setNewAnnouncement] = useState({
     title: '',
     content: '',
@@ -42,17 +44,67 @@ export function AnnouncementsSystem({
     sendSMS: false
   });
 
+  // Fetch announcements from database
+  const fetchAnnouncements = useCallback(async () => {
+    const supabase = createClient();
+    const { data } = await supabase
+      .from('announcements')
+      .select('*, profiles(full_name, avatar_url)')
+      .eq('course_id', courseId)
+      .order('is_pinned', { ascending: false })
+      .order('created_at', { ascending: false });
+
+    if (data) {
+      const formatted: Announcement[] = data.map(a => ({
+        id: a.id,
+        title: a.title,
+        content: a.content,
+        authorName: (a.profiles as any)?.full_name || 'Admin',
+        authorAvatar: (a.profiles as any)?.avatar_url,
+        publishedAt: new Date(a.created_at),
+        isPinned: a.is_pinned || false,
+        isRead: false,
+        viewCount: a.view_count || 0,
+        sendEmail: a.send_email || false,
+        sendPush: a.send_push || false,
+      }));
+      setAnnouncements(formatted);
+    }
+  }, [courseId]);
+
+  useEffect(() => {
+    if (initialAnnouncements.length === 0) {
+      fetchAnnouncements();
+    }
+  }, [fetchAnnouncements, initialAnnouncements.length]);
+
   const handleCreate = async () => {
-    await onCreateAnnouncement?.(newAnnouncement);
-    setNewAnnouncement({
-      title: '',
-      content: '',
-      isPinned: false,
-      sendEmail: true,
-      sendPush: true,
-      sendSMS: false
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const { error } = await supabase.from('announcements').insert({
+      course_id: courseId,
+      author_id: user?.id,
+      title: newAnnouncement.title,
+      content: newAnnouncement.content,
+      is_pinned: newAnnouncement.isPinned,
+      send_email: newAnnouncement.sendEmail,
+      send_push: newAnnouncement.sendPush,
     });
-    setIsCreating(false);
+
+    if (!error) {
+      await onCreateAnnouncement?.(newAnnouncement);
+      setNewAnnouncement({
+        title: '',
+        content: '',
+        isPinned: false,
+        sendEmail: true,
+        sendPush: true,
+        sendSMS: false
+      });
+      setIsCreating(false);
+      fetchAnnouncements();
+    }
   };
 
   const pinnedAnnouncements = announcements.filter(a => a.isPinned);

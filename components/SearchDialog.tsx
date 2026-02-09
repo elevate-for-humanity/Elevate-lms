@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { usePathname } from 'next/navigation';
-import { Search } from 'lucide-react';
+import { Search, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 import {
   Dialog,
@@ -13,25 +13,10 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/Input';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
-const searchableContent = [
-  {
-    title: 'Barber Apprenticeship',
-    href: '/programs/barber',
-    category: 'Program',
-  },
-  {
-    title: 'Building Services Technician',
-    href: '/programs/building-tech',
-    category: 'Program',
-  },
-  { title: 'CNA Training', href: '/programs/cna', category: 'Program' },
-  { title: 'HVAC & Welding', href: '/programs/hvac', category: 'Program' },
-  {
-    title: 'Digital Skills Training',
-    href: '/programs/digital-skills',
-    category: 'Program',
-  },
+// Static pages always available
+const staticPages = [
   { title: 'About Us', href: '/about', category: 'Page' },
   { title: 'Contact', href: '/contact', category: 'Page' },
   { title: 'Apply Now', href: '/apply', category: 'Page' },
@@ -42,14 +27,59 @@ const searchableContent = [
 export function SearchDialog() {
   const [open, setOpen] = React.useState(false);
   const [query, setQuery] = React.useState('');
+  const [searchResults, setSearchResults] = React.useState<Array<{title: string; href: string; category: string}>>([]);
+  const [loading, setLoading] = React.useState(false);
   const pathname = usePathname();
 
-  const filteredResults = React.useMemo(() => {
-    if (!query) return [];
-    return searchableContent.filter((item) =>
-      item.title.toLowerCase().includes(query.toLowerCase())
-    );
-  }, [query]);
+  // Search programs from database
+  const searchPrograms = React.useCallback(async (searchQuery: string) => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const supabase = createClient();
+      const { data: programs } = await supabase
+        .from('training_programs')
+        .select('name, slug')
+        .eq('is_active', true)
+        .ilike('name', `%${searchQuery}%`)
+        .limit(10);
+
+      const programResults = (programs || []).map(p => ({
+        title: p.name,
+        href: `/programs/${p.slug}`,
+        category: 'Program',
+      }));
+
+      // Combine with static pages that match
+      const pageResults = staticPages.filter(p => 
+        p.title.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+
+      setSearchResults([...programResults, ...pageResults]);
+    } catch (err) {
+      console.error('Search error:', err);
+      // Fallback to static search
+      setSearchResults(staticPages.filter(p => 
+        p.title.toLowerCase().includes(searchQuery.toLowerCase())
+      ));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // Debounced search
+  React.useEffect(() => {
+    const timer = setTimeout(() => {
+      searchPrograms(query);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query, searchPrograms]);
+
+  const filteredResults = searchResults;
 
   // Close dialog on route change
   React.useEffect(() => {

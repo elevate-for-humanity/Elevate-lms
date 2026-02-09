@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState, useEffect } from 'react';
@@ -103,16 +105,60 @@ const testimonials: Testimonial[] = [
 export default function SocialProof() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+  const [dbTestimonials, setDbTestimonials] = useState<Testimonial[]>([]);
+  const [stats, setStats] = useState({ successStories: 500, avgRating: 4.9, jobPlacement: 87, completionRate: 95 });
+  const supabase = createClient();
+
+  // Load testimonials and stats from DB
+  useEffect(() => {
+    async function loadSocialProofData() {
+      // Load testimonials from DB
+      const { data: testimonialData } = await supabase
+        .from('testimonials')
+        .select('id, name, role, program, image_url, quote, rating, outcome, salary')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false })
+        .limit(10);
+      
+      if (testimonialData && testimonialData.length > 0) {
+        setDbTestimonials(testimonialData.map((t: any) => ({
+          ...t,
+          image: t.image_url
+        })));
+      }
+
+      // Load real stats from DB
+      const { data: statsData } = await supabase
+        .from('platform_stats')
+        .select('stat_name, stat_value')
+        .in('stat_name', ['success_stories', 'avg_rating', 'job_placement_rate', 'completion_rate']);
+      
+      if (statsData) {
+        const statsMap: any = {};
+        statsData.forEach((s: any) => { statsMap[s.stat_name] = s.stat_value; });
+        setStats({
+          successStories: statsMap.success_stories || 500,
+          avgRating: statsMap.avg_rating || 4.9,
+          jobPlacement: statsMap.job_placement_rate || 87,
+          completionRate: statsMap.completion_rate || 95
+        });
+      }
+    }
+    loadSocialProofData();
+  }, [supabase]);
+
+  // Use DB testimonials if available, otherwise fallback to static
+  const displayTestimonials = dbTestimonials.length > 0 ? dbTestimonials : testimonials;
 
   useEffect(() => {
     if (!isAutoPlaying) return;
 
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % testimonials.length);
+      setCurrentIndex((prev) => (prev + 1) % displayTestimonials.length);
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAutoPlaying]);
+  }, [isAutoPlaying, displayTestimonials.length]);
 
   const currentTestimonial = testimonials[currentIndex];
 

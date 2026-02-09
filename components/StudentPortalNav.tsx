@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -55,6 +57,36 @@ export default function StudentPortalNav() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreMenuOpen, setMoreMenuOpen] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const supabase = createClient();
+
+  // Load user profile and notification count from DB
+  useEffect(() => {
+    async function loadNavData() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Load user profile
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url, role')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile) setUserProfile(profile);
+
+      // Load unread notification count
+      const { count } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('read', false);
+      
+      setUnreadCount(count || 0);
+    }
+    loadNavData();
+  }, [supabase]);
 
   return (
     <nav role="navigation" aria-label="Main navigation" className="bg-white border-b border-gray-200 sticky top-0 z-50">

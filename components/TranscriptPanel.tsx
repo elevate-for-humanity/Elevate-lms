@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState, useRef, useEffect } from 'react';
@@ -15,19 +17,36 @@ interface TranscriptPanelProps {
   currentTime?: number;
   onSeek?: (time: number) => void;
   className?: string;
+  videoId?: string;
 }
 
 export function TranscriptPanel({
   segments,
   currentTime = 0,
   onSeek,
-  className = ''
+  className = '',
+  videoId
 }: TranscriptPanelProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isExpanded, setIsExpanded] = useState(true);
   const activeSegmentRef = useRef<HTMLDivElement>(null);
+  const supabase = createClient();
 
-  // Au to active segment
+  // Log transcript search for analytics
+  const logTranscriptSearch = async (query: string) => {
+    if (!query.trim()) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('transcript_search_log')
+      .insert({
+        user_id: user?.id,
+        video_id: videoId,
+        query: query.trim(),
+        searched_at: new Date().toISOString()
+      });
+  };
+
+  // Auto scroll to active segment
   useEffect(() => {
     if (activeSegmentRef.current) {
       activeSegmentRef.current.scrollIntoView({

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect } from 'react';
 import { 
   Building2, 
   DollarSign, 
@@ -20,6 +21,7 @@ import {
   Folder,
   Globe
 } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface AppScreenshotProps {
   app: 'sam-gov' | 'grants' | 'website-builder';
@@ -27,6 +29,24 @@ interface AppScreenshotProps {
 }
 
 export function AppScreenshot({ app, variant = 'dashboard' }: AppScreenshotProps) {
+  const supabase = createClient();
+
+  // Log screenshot view for analytics
+  useEffect(() => {
+    async function logView() {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase
+        .from('app_screenshot_views')
+        .insert({
+          user_id: user?.id,
+          app_type: app,
+          variant,
+          viewed_at: new Date().toISOString()
+        });
+    }
+    logView();
+  }, [app, variant, supabase]);
+
   if (app === 'sam-gov') {
     return <SamGovScreenshot variant={variant} />;
   }

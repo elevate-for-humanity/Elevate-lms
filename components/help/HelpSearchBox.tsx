@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 // components/help/HelpSearchBox.tsx
 
@@ -19,6 +21,20 @@ export function HelpSearchBox() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);
+  const supabase = createClient();
+
+  // Log help search to DB
+  const logHelpSearch = async (searchQuery: string, resultCount: number) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('help_search_log')
+      .insert({
+        user_id: user?.id,
+        query: searchQuery,
+        result_count: resultCount,
+        searched_at: new Date().toISOString()
+      });
+  };
 
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -28,6 +44,7 @@ export function HelpSearchBox() {
       const res = await fetch(`/api/help/search?q=${encodeURIComponent(query)}`);
       const data = await res.json();
       setResults(data.results || []);
+      await logHelpSearch(query.trim(), data.results?.length || 0);
     } finally {
       setLoading(false);
     }

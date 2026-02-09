@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
@@ -19,8 +21,7 @@ interface StudyGroup {
   avatar: string;
 }
 
-export function StudyGroups() {
-  const [groups, setGroups] = useState<StudyGroup[]>([
+const MOCK_GROUPS: StudyGroup[] = [
     {
       id: '1',
       name: 'CNA Study Squad',
@@ -53,9 +54,43 @@ export function StudyGroups() {
       privacy: 'private',
       avatar: '/media/groups/group-3.jpg',
     },
-  ]);
+  ];
 
+export function StudyGroups() {
+  const [groups, setGroups] = useState<StudyGroup[]>(MOCK_GROUPS);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const supabase = createClient();
+
+  // Load study groups from DB
+  useEffect(() => {
+    async function loadStudyGroups() {
+      const { data: { user } } = await supabase.auth.getUser();
+
+      // Load all public groups and user's private groups
+      const { data } = await supabase
+        .from('study_groups')
+        .select(`
+          id, name, description, course, max_members, privacy, next_meeting, avatar_url,
+          study_group_members (count)
+        `)
+        .or(`privacy.eq.public,created_by.eq.${user?.id}`);
+
+      if (data && data.length > 0) {
+        setGroups(data.map((g: any) => ({
+          id: g.id,
+          name: g.name,
+          description: g.description,
+          course: g.course,
+          members: g.study_group_members?.[0]?.count || 0,
+          maxMembers: g.max_members,
+          privacy: g.privacy,
+          nextMeeting: g.next_meeting,
+          avatar: g.avatar_url || '/media/groups/default.jpg'
+        })));
+      }
+    }
+    loadStudyGroups();
+  }, [supabase]);
 
   return (
     <div className="space-y-6">

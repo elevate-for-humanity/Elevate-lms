@@ -1,6 +1,8 @@
 
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState } from 'react';
@@ -30,20 +32,61 @@ export function DiscussionForum({
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
   const [replyText, setReplyText] = useState('');
 
-  const addComment = () => {
+  // Fetch comments from database
+  React.useEffect(() => {
+    const fetchComments = async () => {
+      const supabase = createClient();
+      const { data } = await supabase
+        .from('lesson_comments')
+        .select('*, profiles(full_name, avatar_url)')
+        .eq('lesson_id', lessonId)
+        .is('parent_id', null)
+        .order('created_at', { ascending: false });
+
+      if (data) {
+        const formatted: Comment[] = data.map(c => ({
+          id: c.id,
+          author: (c.profiles as any)?.full_name || 'Anonymous',
+          avatar: (c.profiles as any)?.avatar_url || 'AU',
+          content: c.content,
+          timestamp: new Date(c.created_at).toLocaleDateString(),
+          likes: c.likes_count || 0,
+          replies: [],
+        }));
+        setComments(formatted);
+      }
+    };
+    fetchComments();
+  }, [lessonId]);
+
+  const addComment = async () => {
     if (!newComment.trim()) return;
 
-    const comment: Comment = {
-      id: Date.now().toString(),
-      author: 'Current User',
-      avatar: 'CU',
-      content: newComment,
-      timestamp: 'Just now',
-      likes: 0,
-      replies: [],
-    };
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    setComments([comment, ...comments]);
+    const { data, error } = await supabase
+      .from('lesson_comments')
+      .insert({
+        lesson_id: lessonId,
+        user_id: user?.id,
+        content: newComment,
+      })
+      .select()
+      .single();
+
+    if (!error && data) {
+      const comment: Comment = {
+        id: data.id,
+        author: user?.email?.split('@')[0] || 'Current User',
+        avatar: 'CU',
+        content: newComment,
+        timestamp: 'Just now',
+        likes: 0,
+        replies: [],
+      };
+      setComments([comment, ...comments]);
+    }
     setNewComment('');
   };
 

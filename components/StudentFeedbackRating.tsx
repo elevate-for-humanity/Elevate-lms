@@ -1,6 +1,8 @@
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
@@ -15,11 +17,7 @@ interface Review {
   helpful: number;
 }
 
-export function StudentFeedbackRating() {
-  const [rating, setRating] = useState(0);
-  const [comment, setComment] = useState('');
-
-  const reviews: Review[] = [
+const MOCK_REVIEWS: Review[] = [
     {
       id: '1',
       studentName: 'Alex Chen',
@@ -46,7 +44,76 @@ export function StudentFeedbackRating() {
     },
   ];
 
-  const avgRating = reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
+export function StudentFeedbackRating({ courseId }: { courseId?: string }) {
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [reviews, setReviews] = useState<Review[]>(MOCK_REVIEWS);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const supabase = createClient();
+
+  // Load reviews from DB
+  useEffect(() => {
+    async function loadReviews() {
+      const { data } = await supabase
+        .from('course_reviews')
+        .select(`
+          id, rating, comment, created_at, helpful_count,
+          profiles:user_id (full_name)
+        `)
+        .eq('course_id', courseId || 'default')
+        .order('created_at', { ascending: false });
+
+      if (data && data.length > 0) {
+        setReviews(data.map((r: any) => ({
+          id: r.id,
+          studentName: r.profiles?.full_name || 'Anonymous',
+          rating: r.rating,
+          comment: r.comment,
+          date: r.created_at?.split('T')[0],
+          helpful: r.helpful_count || 0
+        })));
+      }
+    }
+    loadReviews();
+  }, [courseId, supabase]);
+
+  // Submit review to DB
+  const handleSubmitReview = async () => {
+    if (!rating || !comment.trim()) return;
+    setIsSubmitting(true);
+
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    const { data: newReview } = await supabase
+      .from('course_reviews')
+      .insert({
+        course_id: courseId || 'default',
+        user_id: user?.id,
+        rating,
+        comment: comment.trim(),
+        created_at: new Date().toISOString()
+      })
+      .select('id')
+      .single();
+
+    if (newReview) {
+      setReviews(prev => [{
+        id: newReview.id,
+        studentName: 'You',
+        rating,
+        comment: comment.trim(),
+        date: new Date().toISOString().split('T')[0],
+        helpful: 0
+      }, ...prev]);
+      setRating(0);
+      setComment('');
+    }
+    setIsSubmitting(false);
+  };
+
+  const avgRating = reviews.length > 0 
+    ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length 
+    : 0;
 
   return (
     <div className="min-h-screen bg-gray-50">

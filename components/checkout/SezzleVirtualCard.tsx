@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Copy, Check, CreditCard, Eye, EyeOff, Shield } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
 
 interface VirtualCardData {
   firstName: string;
@@ -17,6 +18,7 @@ interface SezzleVirtualCardProps {
   cardData: VirtualCardData;
   amount: number;
   onUseCard?: () => void;
+  orderId?: string;
 }
 
 /**
@@ -35,8 +37,41 @@ export default function SezzleVirtualCard({
   cardData,
   amount,
   onUseCard,
+  orderId,
 }: SezzleVirtualCardProps) {
   const [showCvv, setShowCvv] = useState(false);
+  const supabase = createClient();
+
+  // Log virtual card display for audit
+  useEffect(() => {
+    async function logCardDisplay() {
+      const { data: { user } } = await supabase.auth.getUser();
+      await supabase
+        .from('sezzle_card_events')
+        .insert({
+          user_id: user?.id,
+          order_id: orderId,
+          event_type: 'card_displayed',
+          amount,
+          card_last_four: cardData.pan.slice(-4),
+          timestamp: new Date().toISOString()
+        });
+    }
+    logCardDisplay();
+  }, [orderId, amount, cardData.pan, supabase]);
+
+  // Log card copy events
+  const logCopyEvent = async (field: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('sezzle_card_events')
+      .insert({
+        user_id: user?.id,
+        order_id: orderId,
+        event_type: `copied_${field}`,
+        timestamp: new Date().toISOString()
+      });
+  };
   const [showPan, setShowPan] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
 

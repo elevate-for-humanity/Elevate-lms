@@ -3,7 +3,12 @@
 import React from 'react';
 
 import { useState } from 'react';
+<<<<<<< HEAD
 import { Mail, CheckCircle, AlertCircle } from 'lucide-react';
+=======
+import { Mail, Circle, AlertCircle } from 'lucide-react';
+import { createClient } from '@/lib/supabase/client';
+>>>>>>> d5f142eac (Add database integration to all components with createClient)
 
 export default function NewsletterSignup() {
   const [email, setEmail] = useState('');
@@ -17,8 +22,23 @@ export default function NewsletterSignup() {
     setStatus('loading');
 
     try {
-      // Simulate success for now
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const supabase = createClient();
+      
+      // Save to newsletter_subscribers table
+      const { error } = await supabase
+        .from('newsletter_subscribers')
+        .upsert({
+          email: email.toLowerCase().trim(),
+          subscribed_at: new Date().toISOString(),
+          status: 'pending_confirmation',
+          source: 'website_signup',
+        }, {
+          onConflict: 'email',
+        });
+
+      if (error && error.code !== '23505') { // Ignore duplicate key errors
+        throw error;
+      }
 
       setStatus('success');
       setMessage('Thanks for subscribing! Check your email to confirm.');
@@ -29,7 +49,8 @@ export default function NewsletterSignup() {
         setStatus('idle');
         setMessage('');
       }, 5000);
-    } catch (error) { /* Error handled silently */ 
+    } catch (error) {
+      console.error('Newsletter signup error:', error);
       setStatus('error');
       setMessage('Something went wrong. Please try again.');
 

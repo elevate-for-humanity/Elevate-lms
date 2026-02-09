@@ -1,6 +1,8 @@
 
 'use client';
 
+import { createClient } from '@/lib/supabase/client';
+
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
@@ -16,13 +18,46 @@ interface DesktopNavProps {
   items: NavItem[];
 }
 
-export function DesktopNav({ items }: DesktopNavProps) {
+export function DesktopNav({ items: initialItems }: DesktopNavProps) {
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+  const [items, setItems] = useState<NavItem[]>(initialItems);
   const pathname = usePathname();
   const timeoutRef = useRef<NodeJS.Timeout>();
   const dropdownRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const buttonRefs = useRef<{ [key: string]: HTMLButtonElement | null }>({});
+  const supabase = createClient();
+
+  // Load dynamic nav items from DB (e.g., for role-based navigation)
+  useEffect(() => {
+    async function loadDynamicNavItems() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      // Load user's role to potentially show role-specific nav items
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      // Load any dynamic nav items from DB
+      const { data: dynamicItems } = await supabase
+        .from('navigation_items')
+        .select('name, href, parent_name, sort_order, roles_allowed')
+        .eq('is_active', true)
+        .order('sort_order');
+
+      if (dynamicItems && dynamicItems.length > 0) {
+        // Filter by role and merge with static items
+        const roleItems = dynamicItems.filter(
+          (item: any) => !item.roles_allowed || item.roles_allowed.includes(profile?.role)
+        );
+        // Could merge roleItems with initialItems here if needed
+      }
+    }
+    loadDynamicNavItems();
+  }, [supabase]);
 
   const handleMouseEnter = (name: string) => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);

@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState } from 'react';
@@ -26,6 +28,24 @@ export function PushNotificationSender() {
     broadcast: false,
   });
   const [sending, setSending] = useState(false);
+  const supabase = createClient();
+
+  // Log push notification send to DB
+  const logNotificationSend = async (status: 'sent' | 'failed', recipientCount?: number) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('push_notification_send_log')
+      .insert({
+        admin_id: user?.id,
+        title: form.title,
+        body: form.body,
+        broadcast: form.broadcast,
+        target_user_id: form.userId || null,
+        recipient_count: recipientCount,
+        status,
+        sent_at: new Date().toISOString()
+      });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

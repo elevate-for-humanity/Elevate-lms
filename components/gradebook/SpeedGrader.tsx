@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useState } from 'react';
@@ -52,6 +54,23 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
     setSaving(true);
     try {
       const percentage = (points / assignment.points) * 100;
+
+      // Save to database directly
+      const supabase = createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+
+      await supabase.from('grades').upsert({
+        submission_id: currentSubmission.id,
+        assignment_id: assignment.id,
+        student_id: currentSubmission.studentId,
+        grader_id: user?.id,
+        points,
+        max_points: assignment.points,
+        percentage,
+        feedback,
+        rubric_scores: rubricScores,
+        graded_at: new Date().toISOString(),
+      }).catch(() => {});
 
       await onGrade(currentSubmission.id, {
         points,

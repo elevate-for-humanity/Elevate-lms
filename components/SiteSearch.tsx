@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Search,
   X,
@@ -11,8 +11,10 @@ import {
   Calendar,
   Briefcase,
   GraduationCap,
+  Loader2,
 } from 'lucide-react';
 import Link from 'next/link';
+import { createClient } from '@/lib/supabase/client';
 
 interface SearchResult {
   title: string;
@@ -161,7 +163,66 @@ export default function SiteSearch() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [loading, setLoading] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+
+  const searchDatabase = useCallback(async (searchQuery: string) => {
+    if (!searchQuery.trim()) {
+      setResults([]);
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const supabase = createClient();
+      
+      // Search programs
+      const { data: programs } = await supabase
+        .from('training_programs')
+        .select('name, slug, description, category')
+        .eq('is_active', true)
+        .or(`name.ilike.%${searchQuery}%,description.ilike.%${searchQuery}%`)
+        .limit(5);
+
+      const programResults: SearchResult[] = (programs || []).map(p => ({
+        title: p.name,
+        url: `/programs/${p.slug}`,
+        description: p.description?.substring(0, 100) || p.category || '',
+        category: 'program',
+      }));
+
+      // Search events
+      const { data: events } = await supabase
+        .from('events')
+        .select('title, slug, description')
+        .gte('event_date', new Date().toISOString())
+        .ilike('title', `%${searchQuery}%`)
+        .limit(3);
+
+      const eventResults: SearchResult[] = (events || []).map(e => ({
+        title: e.title,
+        url: `/events/${e.slug}`,
+        description: e.description?.substring(0, 100) || '',
+        category: 'event',
+      }));
+
+      // Combine with static pages
+      const staticResults = searchableContent.filter(item =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 5);
+
+      setResults([...programResults, ...eventResults, ...staticResults].slice(0, 10));
+    } catch (err) {
+      console.error('Search error:', err);
+      // Fallback to static search
+      setResults(searchableContent.filter(item =>
+        item.title.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 10));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -197,14 +258,11 @@ export default function SiteSearch() {
       return;
     }
 
-    const searchQuery = query.toLowerCase();
-    const filtered = searchableContent.filter(
-      (item) =>
-        item.title.toLowerCase().includes(searchQuery) ||
-        item.description.toLowerCase().includes(searchQuery)
-    );
-    setResults(filtered.slice(0, 8));
-  }, [query]);
+    const timer = setTimeout(() => {
+      searchDatabase(query);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [query, searchDatabase]);
 
   const getCategoryIcon = (category: string) => {
     switch (category) {

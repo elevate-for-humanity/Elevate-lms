@@ -1,5 +1,7 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/client';
+
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
 import Link from 'next/link';
@@ -20,6 +22,7 @@ interface VideoHeroBannerProps {
   autoPlay?: boolean;
   loop?: boolean;
   showControls?: boolean;
+  bannerId?: string;
 }
 
 export default function VideoHeroBanner({
@@ -38,11 +41,45 @@ export default function VideoHeroBanner({
   autoPlay = true,
   loop = true,
   showControls = true,
+  bannerId,
 }: VideoHeroBannerProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(autoPlay);
   const [isMuted, setIsMuted] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
+  const supabase = createClient();
+
+  // Log banner view and track engagement
+  useEffect(() => {
+    async function logBannerView() {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      // Log banner impression
+      await supabase
+        .from('banner_analytics')
+        .insert({
+          banner_id: bannerId || 'video_hero',
+          user_id: user?.id || null,
+          event_type: 'impression',
+          video_src: videoSrc,
+          viewed_at: new Date().toISOString()
+        });
+    }
+    logBannerView();
+  }, [bannerId, videoSrc, supabase]);
+
+  // Log video play/pause events
+  const logVideoEvent = async (eventType: 'play' | 'pause' | 'complete') => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('video_engagement')
+      .insert({
+        video_src: videoSrc,
+        user_id: user?.id || null,
+        event_type: eventType,
+        timestamp: new Date().toISOString()
+      });
+  };
 
   useEffect(() => {
     const video = videoRef.current;

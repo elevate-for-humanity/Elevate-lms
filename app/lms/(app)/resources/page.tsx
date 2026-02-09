@@ -21,6 +21,7 @@ import {
   Users,
   HelpCircle,
 } from 'lucide-react';
+import ContentLibrary from '@/components/ContentLibrary';
 
 export const metadata: Metadata = {
   alternates: {

@@ -1,7 +1,9 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/client';
+
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { X } from 'lucide-react';
 import { useFocusTrap } from '@/hooks/useFocusTrap';
@@ -23,6 +25,33 @@ interface MobileMenuProps {
 export function MobileMenu({ isOpen, onClose, items, user }: MobileMenuProps) {
   const pathname = usePathname();
   const menuRef = useFocusTrap(isOpen);
+  const supabase = createClient();
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
+
+  // Load user profile and notification count from DB
+  useEffect(() => {
+    async function loadUserData() {
+      if (!user?.id) return;
+      
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('full_name, avatar_url, role')
+        .eq('id', user.id)
+        .single();
+      
+      if (profile) setUserProfile(profile);
+
+      const { count } = await supabase
+        .from('notifications')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+        .eq('read', false);
+      
+      setUnreadNotifications(count || 0);
+    }
+    if (isOpen && user) loadUserData();
+  }, [isOpen, user, supabase]);
 
   useEffect(() => {
     if (isOpen) {

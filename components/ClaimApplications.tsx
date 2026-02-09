@@ -23,6 +23,41 @@ export function ClaimApplications() {
 
     const claimApplications = async () => {
       try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user?.email) return;
+
+        // First, check for unclaimed applications matching user's email
+        const { data: unclaimedApps } = await supabase
+          .from('applications')
+          .select('id, email, program_id, status')
+          .eq('email', user.email)
+          .is('user_id', null);
+
+        if (unclaimedApps && unclaimedApps.length > 0) {
+          // Claim applications by updating user_id
+          const { error: updateError } = await supabase
+            .from('applications')
+            .update({ 
+              user_id: user.id,
+              claimed_at: new Date().toISOString()
+            })
+            .eq('email', user.email)
+            .is('user_id', null);
+
+          if (!updateError) {
+            // Log the claim event
+            await supabase
+              .from('application_claim_log')
+              .insert({
+                user_id: user.id,
+                email: user.email,
+                applications_claimed: unclaimedApps.length,
+                claimed_at: new Date().toISOString()
+              });
+          }
+        }
+
+        // Also try the RPC function as fallback
         const { data, error } = await supabase.rpc(
           'claim_applications_for_current_user'
         );

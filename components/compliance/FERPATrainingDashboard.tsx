@@ -1,7 +1,9 @@
 
 "use client";
 
-import React from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import React, { useEffect } from 'react';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -45,12 +47,44 @@ interface FERPATrainingDashboardProps {
 }
 
 export default function FERPATrainingDashboard({
-  trainingRecords,
-  pendingUsers,
+  trainingRecords: initialRecords,
+  pendingUsers: initialPending,
   currentUser
 }: FERPATrainingDashboardProps) {
   const [filter, setFilter] = useState<'all' | 'completed' | 'expired' | 'pending'>('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [trainingRecords, setTrainingRecords] = useState<TrainingRecord[]>(initialRecords);
+  const [pendingUsers, setPendingUsers] = useState<PendingUser[]>(initialPending);
+  const supabase = createClient();
+
+  // Load fresh training data from DB
+  useEffect(() => {
+    async function loadTrainingData() {
+      // Fetch completed training records
+      const { data: records } = await supabase
+        .from('ferpa_training')
+        .select(`
+          id, user_id, quiz_score, completed_at, expires_at, status,
+          profiles:user_id (full_name, email, role)
+        `)
+        .order('completed_at', { ascending: false });
+      
+      if (records) setTrainingRecords(records as any);
+
+      // Fetch users without training
+      const { data: allUsers } = await supabase
+        .from('profiles')
+        .select('id, full_name, email, role, created_at')
+        .in('role', ['admin', 'instructor', 'staff']);
+      
+      if (allUsers && records) {
+        const trainedUserIds = records.map((r: any) => r.user_id);
+        const pending = allUsers.filter(u => !trainedUserIds.includes(u.id));
+        setPendingUsers(pending);
+      }
+    }
+    loadTrainingData();
+  }, [supabase]);
 
   // Calculate statistics
   const totalStaff = trainingRecords.length + pendingUsers.length;

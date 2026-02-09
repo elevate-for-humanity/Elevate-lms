@@ -1,6 +1,8 @@
 
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useRouter, useSearchParams } from "next/navigation";
@@ -12,6 +14,46 @@ function GlobalSearchContent() {
   const searchParams = useSearchParams();
   const initial = searchParams?.get("q") ?? "";
   const [query, setQuery] = useState(initial);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+  const supabase = createClient();
+
+  // Log search and get suggestions
+  async function logSearch(searchQuery: string) {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    // Log search to history
+    await supabase
+      .from('search_history')
+      .insert({
+        user_id: user?.id,
+        query: searchQuery,
+        search_type: 'global',
+        searched_at: new Date().toISOString()
+      });
+
+    // Update search analytics
+    await supabase.rpc('increment_search_count', { search_query: searchQuery });
+  }
+
+  // Load search suggestions from DB
+  useEffect(() => {
+    async function loadSuggestions() {
+      if (query.length < 2) {
+        setSuggestions([]);
+        return;
+      }
+
+      const { data } = await supabase
+        .from('search_suggestions')
+        .select('suggestion')
+        .ilike('suggestion', `%${query}%`)
+        .limit(5);
+
+      if (data) setSuggestions(data.map(s => s.suggestion));
+    }
+    const debounce = setTimeout(loadSuggestions, 300);
+    return () => clearTimeout(debounce);
+  }, [query, supabase]);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,6 +62,7 @@ function GlobalSearchContent() {
       router.push("/courses");
       return;
     }
+    logSearch(q);
     router.push(`/courses?q=${encodeURIComponent(q)}`);
   }
 

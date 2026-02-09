@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -50,10 +52,44 @@ export function SCORMPlayer({
     'cmi.core.total_time': '00:00:00',
     'cmi.suspend_data': '',
   });
-  // Load existing enrollment data
+  const supabase = createClient();
+
+  // Load existing enrollment data from DB
   useEffect(() => {
+    async function loadFromDB() {
+      // Direct DB query for enrollment data
+      const { data: enrollment } = await supabase
+        .from('scorm_enrollments')
+        .select('status, progress_percentage, score, attempts, time_spent_seconds, cmi_data')
+        .eq('scorm_package_id', scormPackageId)
+        .eq('user_id', userId)
+        .single();
+
+      if (enrollment) {
+        setStatus(enrollment.status || 'not_attempted');
+        setProgress(enrollment.progress_percentage || 0);
+        setScore(enrollment.score);
+        setAttempts(enrollment.attempts || 0);
+        setTimeSpent(enrollment.time_spent_seconds || 0);
+        if (enrollment.cmi_data) {
+          setScormData(prev => ({ ...prev, ...enrollment.cmi_data }));
+        }
+      }
+      
+      // Log SCORM session start
+      await supabase
+        .from('scorm_session_log')
+        .insert({
+          scorm_package_id: scormPackageId,
+          enrollment_id: enrollmentId,
+          user_id: userId,
+          event_type: 'session_start',
+          timestamp: new Date().toISOString()
+        });
+    }
+    loadFromDB();
     loadEnrollmentData();
-  }, [scormPackageId, userId]);
+  }, [scormPackageId, userId, supabase, enrollmentId]);
   // SCORM API Implementation
   useEffect(() => {
     // Create SCORM API for the iframe

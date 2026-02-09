@@ -1,5 +1,7 @@
 'use client';
 
+import { createClient } from '@/lib/supabase/client';
+
 import { useEffect, useState, useRef, useCallback } from 'react';
 
 interface AmbientMusicProps {
@@ -11,6 +13,7 @@ interface AmbientMusicProps {
   fadeInDuration?: number;
   // Delay before starting
   delay?: number;
+  pageId?: string;
 }
 
 /**
@@ -26,13 +29,45 @@ export default function AmbientMusic({
   src = '/audio/ambient-soft.mp3',
   volume = 0.18,
   fadeInDuration = 2000,
-  delay = 1000
+  delay = 1000,
+  pageId
 }: AmbientMusicProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [showControl, setShowControl] = useState(false);
   const [hasInteracted, setHasInteracted] = useState(false);
+  const [userPrefs, setUserPrefs] = useState<any>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const fadeInterval = useRef<NodeJS.Timeout | null>(null);
+  const supabase = createClient();
+
+  // Load user audio preferences from DB
+  useEffect(() => {
+    async function loadPreferences() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data } = await supabase
+          .from('audio_preferences')
+          .select('ambient_enabled, ambient_volume')
+          .eq('user_id', user.id)
+          .single();
+        if (data) setUserPrefs(data);
+      }
+    }
+    loadPreferences();
+  }, [supabase]);
+
+  // Log ambient music play for analytics
+  const logAmbientPlay = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('ambient_music_log')
+      .insert({
+        user_id: user?.id,
+        page_id: pageId,
+        audio_src: src,
+        played_at: new Date().toISOString()
+      });
+  };
 
   const fadeIn = useCallback((audio: HTMLAudioElement, targetVolume: number, duration: number) => {
     audio.volume = 0;

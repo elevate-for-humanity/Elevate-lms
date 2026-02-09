@@ -1,5 +1,7 @@
 "use client";
 
+import { createClient } from '@/lib/supabase/client';
+
 import React from 'react';
 
 import { useEffect, useState } from "react";
@@ -20,11 +22,32 @@ export function CourseReviewsSection({ courseId }: { courseId: string }) {
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const supabase = createClient();
 
   useEffect(() => {
     async function load() {
       setLoading(true);
       try {
+        // Direct DB query for reviews
+        const { data } = await supabase
+          .from('course_reviews')
+          .select(`
+            id, rating, title, body, created_at,
+            profiles:user_id (full_name)
+          `)
+          .eq('course_id', courseId)
+          .order('created_at', { ascending: false });
+
+        if (data && data.length > 0) {
+          setReviews(data.map((r: any) => ({
+            ...r,
+            user_name: r.profiles?.full_name || 'Anonymous'
+          })));
+          setLoading(false);
+          return;
+        }
+
+        // Fallback to API
         const res = await fetch(`/api/courses/${courseId}/reviews`);
         const json = await res.json();
         setReviews(json.reviews || []);
@@ -35,7 +58,7 @@ export function CourseReviewsSection({ courseId }: { courseId: string }) {
       }
     }
     load();
-  }, [courseId]);
+  }, [courseId, supabase]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

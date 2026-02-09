@@ -1,6 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { createClient } from '@/lib/supabase/client';
+
+import { useState, useEffect } from 'react';
 import { Search, X } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -8,11 +10,56 @@ import { motion, AnimatePresence } from 'framer-motion';
 export function SearchButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
+  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [suggestions, setSuggestions] = useState<any[]>([]);
   const router = useRouter();
+  const supabase = createClient();
 
-  const handleSearch = (e: React.FormEvent) => {
+  // Load recent searches and popular searches from DB
+  useEffect(() => {
+    async function loadSearchData() {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user) {
+        // Load user's recent searches
+        const { data: recent } = await supabase
+          .from('search_history')
+          .select('query, searched_at')
+          .eq('user_id', user.id)
+          .order('searched_at', { ascending: false })
+          .limit(5);
+        
+        if (recent) setRecentSearches(recent.map(r => r.query));
+      }
+
+      // Load popular/suggested searches
+      const { data: popular } = await supabase
+        .from('search_analytics')
+        .select('query, search_count')
+        .order('search_count', { ascending: false })
+        .limit(5);
+      
+      if (popular) setSuggestions(popular);
+    }
+    if (isOpen) loadSearchData();
+  }, [isOpen, supabase]);
+
+  // Log search to DB
+  const logSearch = async (searchQuery: string) => {
+    const { data: { user } } = await supabase.auth.getUser();
+    await supabase
+      .from('search_history')
+      .insert({
+        user_id: user?.id || null,
+        query: searchQuery,
+        searched_at: new Date().toISOString()
+      });
+  };
+
+  const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (query.trim()) {
+      await logSearch(query.trim());
       router.push(`/search?q=${encodeURIComponent(query.trim())}`);
       setIsOpen(false);
       setQuery('');

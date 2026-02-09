@@ -2,6 +2,39 @@ import { withSentryConfig } from '@sentry/nextjs';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Server external packages - exclude heavy dependencies from the server bundle
+  // These are loaded at runtime instead of being bundled, reducing Lambda size
+  serverExternalPackages: [
+    'tesseract.js',
+    'tesseract.js-core',
+    'sharp',
+    'pdf-parse',
+    'pdfkit',
+    'pdf-lib',
+    'jspdf',
+    '@react-pdf/renderer',
+    '@aws-sdk/client-s3',
+    '@aws-sdk/s3-request-presigner',
+    'pg',
+    'openai',
+    'stripe',
+    'ioredis',
+    'redis',
+    'socket.io',
+    'socket.io-client',
+    '@sendgrid/mail',
+    'nodemailer',
+    '@sentry/nextjs',
+    '@sentry/node',
+    '@sentry/core',
+    '@opentelemetry/api',
+    '@opentelemetry/sdk-node',
+    'puppeteer',
+    'puppeteer-core',
+    'playwright',
+    'chromium-bidi',
+  ],
+
   // Disable dev indicators (static route indicator, build indicator)
   devIndicators: {
     appIsrStatus: false,

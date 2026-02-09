@@ -47,6 +47,36 @@
 
 [functions]
   node_bundler = "esbuild"
+  external_node_modules = [
+    "sharp",
+    "tesseract.js",
+    "tesseract.js-core",
+    "@aws-sdk/client-s3",
+    "@aws-sdk/s3-request-presigner",
+    "pg",
+    "openai",
+    "stripe",
+    "ioredis",
+    "redis",
+    "socket.io",
+    "socket.io-client",
+    "@sendgrid/mail",
+    "nodemailer",
+    "puppeteer",
+    "puppeteer-core",
+    "playwright",
+    "chromium-bidi",
+    "@sentry/nextjs",
+    "@sentry/node",
+    "@sentry/core",
+    "@opentelemetry/api",
+    "@opentelemetry/sdk-node",
+    "pdf-parse",
+    "pdfkit",
+    "pdf-lib",
+    "jspdf",
+    "@react-pdf/renderer"
+  ]
 
 # Social Media Scheduler - DISABLED due to AWS Lambda 4KB env var limit
 # TODO: Re-enable with reduced env vars or use background functions

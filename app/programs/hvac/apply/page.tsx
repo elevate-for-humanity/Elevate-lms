@@ -78,7 +78,7 @@ export default function ApplyPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/apply?program=hvac"
+              href="/inquiry?program=hvac"
               className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
             >
               Start Application

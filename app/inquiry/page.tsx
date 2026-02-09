@@ -19,10 +19,19 @@ function InquiryForm() {
     if (programParam) {
       const programMap: Record<string, string> = {
         'barber-apprenticeship': 'Barber Apprenticeship',
+        'barber': 'Barber Apprenticeship',
         'hvac-technician': 'HVAC Technician',
+        'hvac': 'HVAC Technician',
         'cna-certification': 'CNA (Certified Nursing Assistant)',
+        'cna': 'CNA (Certified Nursing Assistant)',
+        'medical-assistant': 'Medical Assistant',
+        'cdl': 'CDL (Commercial Driver License)',
+        'electrical': 'Electrical',
+        'plumbing': 'Plumbing',
+        'it-support': 'IT Support',
+        'cybersecurity': 'Cybersecurity',
       };
-      setSelectedProgram(programMap[programParam] || '');
+      setSelectedProgram(programMap[programParam.toLowerCase()] || '');
     }
   }, [searchParams]);
 

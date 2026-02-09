@@ -191,18 +191,17 @@ export default function HVACProgramPage() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/wioa-eligibility"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-blue-500/30"
+                  href="/inquiry?program=hvac"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-green-500 hover:bg-green-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-green-500/30"
                 >
-                  Check Your Eligibility
+                  Apply Now
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
                 <Link
-                  href="#curriculum"
+                  href="/wioa-eligibility"
                   className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-semibold rounded-full transition-all"
                 >
-                  <Play className="w-5 h-5 mr-2" />
-                  View Curriculum
+                  Check Eligibility First
                 </Link>
               </div>
             </motion.div>
@@ -508,18 +507,18 @@ export default function HVACProgramPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/wioa-eligibility"
+              href="/inquiry?program=hvac"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-full hover:bg-blue-50 transition-all transform hover:scale-105 shadow-lg"
             >
-              Check Eligibility Now
+              Apply Now
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
-              href="/contact"
+              href="tel:317-314-3757"
               className="inline-flex items-center justify-center px-8 py-4 bg-blue-700 hover:bg-blue-600 text-white font-semibold rounded-full transition-all"
             >
               <Phone className="w-5 h-5 mr-2" />
-              Talk to an Advisor
+              Call (317) 314-3757
             </Link>
           </div>
           <p className="mt-8 text-blue-200 text-sm">

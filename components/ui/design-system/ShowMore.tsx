@@ -72,6 +72,7 @@ export function ShowMore({
       {shouldShowButton && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
+          aria-expanded={isExpanded}
           className={cn(
             'mt-4 inline-flex items-center gap-2',
             'text-blue-600 hover:text-blue-700 font-semibold',
@@ -81,9 +82,9 @@ export function ShowMore({
         >
           <span>{isExpanded ? 'Show Less' : 'Show More'}</span>
           {isExpanded ? (
-            <ChevronUp className="h-4 w-4" />
+            <ChevronUp className="h-4 w-4" aria-hidden="true" />
           ) : (
-            <ChevronDown className="h-4 w-4" />
+            <ChevronDown className="h-4 w-4" aria-hidden="true" />
           )}
         </button>
       )}

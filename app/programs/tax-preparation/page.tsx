@@ -102,7 +102,7 @@ export default async function Page() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/tax-guide.mp4" title="Tax Preparation Program Guide" />
+      <PageAvatar videoSrc="/videos/avatars/financial-guide.mp4" title="Tax Preparation Program Guide" />
 
       {/* Pathway Disclosure */}
       <PathwayDisclosure programName="Tax Preparation" programSlug="tax-preparation" />

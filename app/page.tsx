@@ -71,8 +71,8 @@ export default function HomePage() {
             <p className="text-lg text-gray-700">Watch our guide explain how free career training works</p>
           </div>
           <PageAvatar 
-            videoSrc="/videos/avatars-heygen/avatar-1.mp4"
-            title="Programs & Funding Guide"
+            videoSrc="/videos/avatars/home-welcome.mp4"
+            title="Welcome to Elevate for Humanity"
           />
         </div>
       </section>

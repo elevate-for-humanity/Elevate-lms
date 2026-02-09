@@ -97,12 +97,11 @@ export default async function BarberApprenticeshipPage() {
           <div className="rounded-2xl overflow-hidden shadow-xl">
             <video
               autoPlay
-              loop
               controls
               playsInline
               className="w-full"
             >
-              <source src="/videos/avatars-heygen/avatar-5.mp4" type="video/mp4" />
+              <source src="/videos/avatars/barber-guide.mp4" type="video/mp4" />
             </video>
           </div>
         </div>

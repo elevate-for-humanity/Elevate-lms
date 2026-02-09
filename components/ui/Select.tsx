@@ -99,11 +99,14 @@ export const SelectTrigger = React.forwardRef<
       ref={triggerRef}
       type="button"
       onClick={() => setOpen(!open)}
+      aria-haspopup="listbox"
+      aria-expanded={open}
       className={`flex items-center justify-between w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
     >
       {children}
       <ChevronDown
         className={`h-4 w-4 transition-transform ${open ? 'rotate-180' : ''}`}
+        aria-hidden="true"
       />
     </button>
   );
@@ -136,6 +139,7 @@ export const SelectContent: React.FC<SelectContentProps> = ({
 
   return (
     <div
+      role="listbox"
       className={`absolute z-50 w-full mt-1 bg-white border border-slate-200 rounded-md shadow-lg max-h-60 overflow-auto ${className}`}
     >
       <div className="py-1">{children}</div>
@@ -160,6 +164,8 @@ export const SelectItem: React.FC<SelectItemProps> = ({
   return (
     <button
       type="button"
+      role="option"
+      aria-selected={isSelected}
       onClick={() => !disabled && onValueChange(value)}
       disabled={disabled}
       className={`w-full px-3 py-2 text-left text-sm transition-colors ${

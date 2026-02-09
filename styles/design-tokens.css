@@ -15,9 +15,63 @@
 
   /* Semantic colors */
   --color-success: #22c55e;
+  --color-success-dark: #16a34a;
+  --color-success-light: #86efac;
   --color-warning: #f59e0b;
+  --color-warning-dark: #d97706;
+  --color-warning-light: #fde68a;
   --color-error: #ef4444;
+  --color-error-dark: #dc2626;
+  --color-error-light: #fecaca;
   --color-info: #2563eb;
+  --color-info-dark: #1d4ed8;
+  --color-info-light: #93c5fd;
+
+  /* Code editor / dark theme colors (GitHub-inspired) */
+  --code-bg: #0d1117;
+  --code-bg-secondary: #161b22;
+  --code-bg-tertiary: #21262d;
+  --code-border: #30363d;
+  --code-text: #e6edf3;
+  --code-text-muted: #8b949e;
+  --code-text-subtle: #6e7681;
+  --code-link: #58a6ff;
+  --code-success: #3fb950;
+  --code-success-emphasis: #238636;
+  --code-danger: #f85149;
+  --code-danger-emphasis: #da3633;
+  --code-warning: #d29922;
+  --code-warning-emphasis: #e3b341;
+  --code-accent: #a074c4;
+
+  /* VS Code-inspired editor colors */
+  --editor-bg: #1e1e1e;
+  --editor-sidebar: #252526;
+  --editor-active: #3c3c3c;
+  --editor-border: #2d2d2d;
+  --editor-text: #d4d4d4;
+  --editor-text-muted: #8b8b8b;
+  --editor-accent: #0e639c;
+
+  /* Language-specific syntax colors */
+  --syntax-keyword: #569cd6;
+  --syntax-string: #ce9178;
+  --syntax-number: #b5cea8;
+  --syntax-function: #dcdcaa;
+  --syntax-variable: #9cdcfe;
+  --syntax-comment: #6a9955;
+  --syntax-type: #4ec9b0;
+  --syntax-operator: #d4d4d4;
+
+  /* Tech brand colors (for badges/icons) */
+  --tech-javascript: #f7df1e;
+  --tech-typescript: #3178c6;
+  --tech-react: #61dafb;
+  --tech-node: #339933;
+  --tech-python: #3776ab;
+  --tech-go: #00add8;
+  --tech-rust: #dea584;
+  --tech-ruby: #cc342d;
 
   /* Spacing scale */
   --space-xs: 0.25rem;

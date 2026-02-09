@@ -32,10 +32,14 @@ export function Accordion({
 }: AccordionProps) {
   const [isOpen, setIsOpen] = useState(defaultOpen);
 
+  const accordionId = `accordion-${title.toLowerCase().replace(/\s+/g, '-')}`;
+
   return (
     <div className={cn('border-b border-slate-200', className)}>
       <button
         onClick={() => setIsOpen(!isOpen)}
+        aria-expanded={isOpen}
+        aria-controls={accordionId}
         className={cn(
           'w-full flex items-center justify-between py-4 text-left',
           'hover:text-blue-600 transition-colors',
@@ -50,10 +54,14 @@ export function Accordion({
             isOpen && 'rotate-180',
             alwaysOpenOnDesktop && 'md:hidden'
           )}
+          aria-hidden="true"
         />
       </button>
 
       <div
+        id={accordionId}
+        role="region"
+        aria-labelledby={`${accordionId}-trigger`}
         className={cn(
           'overflow-hidden transition-all duration-200',
           isOpen || (alwaysOpenOnDesktop && 'md:block')
@@ -91,31 +99,40 @@ export function AccordionGroup({
 
   return (
     <div className={cn('divide-y divide-slate-200', className)}>
-      {items.map((item, index) => (
+      {items.map((item, index) => {
+        const itemId = `accordion-group-${index}`;
+        const isOpen = openIndex === index;
+        return (
         <div key={index}>
           <button
-            onClick={() => setOpenIndex(openIndex === index ? -1 : index)}
+            onClick={() => setOpenIndex(isOpen ? -1 : index)}
+            aria-expanded={isOpen}
+            aria-controls={itemId}
             className="w-full flex items-center justify-between py-4 text-left hover:text-blue-600 transition-colors"
           >
             <span className="font-semibold text-lg">{item.title}</span>
             <ChevronDown
               className={cn(
                 'h-5 w-5 transition-transform duration-200',
-                openIndex === index && 'rotate-180'
+                isOpen && 'rotate-180'
               )}
+              aria-hidden="true"
             />
           </button>
 
           <div
+            id={itemId}
+            role="region"
             className={cn(
               'overflow-hidden transition-all duration-200',
-              openIndex === index ? 'max-h-[2000px] pb-4' : 'max-h-0'
+              isOpen ? 'max-h-[2000px] pb-4' : 'max-h-0'
             )}
           >
             {item.content}
           </div>
         </div>
-      ))}
+        );
+      })}
     </div>
   );
 }

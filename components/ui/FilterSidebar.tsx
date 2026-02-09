@@ -102,6 +102,7 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                 onClick={() => toggleGroup(group.id)}
                 className="w-full flex items-center justify-between p-4 hover:bg-slate-50 transition-colors"
                 aria-expanded={isExpanded}
+                aria-controls={`filter-group-${group.id}`}
               >
                 <span className="font-medium text-black">
                   {group.label}
@@ -112,14 +113,19 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                   )}
                 </span>
                 {isExpanded ? (
-                  <ChevronUp className="h-5 w-5 text-slate-400" />
+                  <ChevronUp className="h-5 w-5 text-slate-400" aria-hidden="true" />
                 ) : (
-                  <ChevronDown className="h-5 w-5 text-slate-400" />
+                  <ChevronDown className="h-5 w-5 text-slate-400" aria-hidden="true" />
                 )}
               </button>
 
               {isExpanded && (
-                <div className="px-4 pb-4 space-y-2">
+                <div 
+                  id={`filter-group-${group.id}`}
+                  role="group"
+                  aria-label={`${group.label} filters`}
+                  className="px-4 pb-4 space-y-2"
+                >
                   {group.options.map((option) => {
                     const isChecked = groupSelections.includes(option.id);
                     const inputType = group.type || 'checkbox';
@@ -137,12 +143,13 @@ export const FilterSidebar: React.FC<FilterSidebarProps> = ({
                             onFilterChange(group.id, option.id, e.target.checked)
                           }
                           className="h-4 w-4 text-brand-orange-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                          aria-describedby={option.count !== undefined ? `${option.id}-count` : undefined}
                         />
                         <span className="flex-1 text-sm text-black group-hover:text-black">
                           {option.label}
                         </span>
                         {option.count !== undefined && (
-                          <span className="text-sm text-slate-500">
+                          <span id={`${option.id}-count`} className="text-sm text-slate-500">
                             {option.count}
                           </span>
                         )}

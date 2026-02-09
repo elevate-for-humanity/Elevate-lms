@@ -94,8 +94,8 @@ export default function TechnologyProgramsPage() {
 
       {/* Avatar Guide */}
       <PageAvatar 
-        videoSrc="/videos/avatars/healthcare-guide.mp4" 
-        title="Tech Guide" 
+        videoSrc="/videos/avatars/ai-tutor.mp4" 
+        title="Technology Programs Guide" 
       />
 
       {/* Breadcrumbs */}

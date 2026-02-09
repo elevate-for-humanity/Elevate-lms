@@ -94,7 +94,7 @@ export default async function EstheticianApprenticeshipPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/esthetician-guide.mp4" title="Esthetician Apprenticeship Guide" />
+      <PageAvatar videoSrc="/videos/avatars/barber-guide.mp4" title="Esthetician Apprenticeship Guide" />
 
       {/* Pathway Disclosure */}
       <PathwayDisclosure programName="Esthetician Apprenticeship" programSlug="esthetician-apprenticeship" />

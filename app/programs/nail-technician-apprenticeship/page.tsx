@@ -94,7 +94,7 @@ export default async function NailTechnicianApprenticeshipPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/nail-tech-guide.mp4" title="Nail Technician Apprenticeship Guide" />
+      <PageAvatar videoSrc="/videos/avatars/barber-guide.mp4" title="Nail Technician Apprenticeship Guide" />
 
       {/* Pathway Disclosure */}
       <PathwayDisclosure programName="Nail Technician Apprenticeship" programSlug="nail-technician-apprenticeship" />

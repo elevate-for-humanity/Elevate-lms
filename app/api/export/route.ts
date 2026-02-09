@@ -12,7 +12,6 @@ import {
   exportGrades,
   exportAnalytics,
   convertToCSV,
-  exportToPDF,
   EXPORT_TEMPLATES,
   type ExportOptions,
 } from '@/lib/dataExport';
@@ -130,18 +129,30 @@ export async function GET(request: NextRequest) {
         },
       });
     } else if (format === 'pdf') {
+      // Redirect to Netlify function for PDF generation
+      // This keeps heavy PDF libraries out of the main Next.js server handler
       const template = EXPORT_TEMPLATES[type as keyof typeof EXPORT_TEMPLATES];
-      const doc = await exportToPDF(data, {
-        title: `${type.charAt(0).toUpperCase() + type.slice(1)} Export`,
-        subtitle: `Generated on ${new Date().toLocaleDateString()}`,
-        columns: template?.columns,
-        orientation:
-          data.length > 0 && Object.keys(data[0]).length > 6
-            ? 'landscape'
-            : 'portrait',
+      const pdfResponse = await fetch(`${process.env.URL || ''}/.netlify/functions/export-pdf`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data,
+          options: {
+            title: `${type.charAt(0).toUpperCase() + type.slice(1)} Export`,
+            subtitle: `Generated on ${new Date().toLocaleDateString()}`,
+            columns: template?.columns,
+            orientation: data.length > 0 && Object.keys(data[0]).length > 6 ? 'landscape' : 'portrait',
+          },
+          filename: `${filename}.pdf`,
+        }),
       });
 
-      const pdfBuffer = doc.output('arraybuffer');
+      if (!pdfResponse.ok) {
+        const error = await pdfResponse.text();
+        return NextResponse.json({ error: 'PDF generation failed', details: error }, { status: 500 });
+      }
+
+      const pdfBuffer = await pdfResponse.arrayBuffer();
 
       return new NextResponse(pdfBuffer, {
         headers: {

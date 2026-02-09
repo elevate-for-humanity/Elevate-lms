@@ -60,40 +60,42 @@ export async function GET(request: Request) {
       });
     }
 
-    // PDF Export
+    // PDF Export - redirect to Netlify function
     if (format === 'pdf') {
-      const PDFDocument = (await import('pdfkit')).default;
-      const doc = new PDFDocument({ margin: 50 });
-      const chunks: Buffer[] = [];
-      
-      doc.on('data', (chunk: Buffer) => chunks.push(chunk));
-      
-      // Title
-      doc.fontSize(20).text('Program Catalog', { align: 'center' });
-      doc.moveDown();
-      doc.fontSize(10).text(`Generated: ${new Date().toLocaleDateString()}`, { align: 'center' });
-      doc.moveDown(2);
+      // Transform data for PDF export
+      const pdfData = programList.map(p => ({
+        title: p.title || 'Untitled',
+        category: p.category || 'N/A',
+        duration: `${p.duration_weeks || 'N/A'} weeks`,
+        hours: `${p.total_hours || 'N/A'} hours`,
+        tuition: `$${p.tuition?.toLocaleString() || 'N/A'}`,
+      }));
 
-      // Programs
-      for (const program of programList) {
-        doc.fontSize(14).text(program.title || 'Untitled', { underline: true });
-        doc.fontSize(10);
-        doc.text(`Category: ${program.category || 'N/A'}`);
-        doc.text(`Duration: ${program.duration_weeks || 'N/A'} weeks | ${program.total_hours || 'N/A'} hours`);
-        doc.text(`Tuition: $${program.tuition?.toLocaleString() || 'N/A'}`);
-        if (program.description) {
-          doc.moveDown(0.5);
-          doc.text(program.description.substring(0, 200) + (program.description.length > 200 ? '...' : ''));
-        }
-        doc.moveDown();
+      const pdfResponse = await fetch(`${process.env.URL || ''}/.netlify/functions/export-pdf`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: pdfData,
+          options: {
+            title: 'Program Catalog',
+            subtitle: `Generated: ${new Date().toLocaleDateString()}`,
+            columns: [
+              { key: 'title', label: 'Program' },
+              { key: 'category', label: 'Category' },
+              { key: 'duration', label: 'Duration' },
+              { key: 'hours', label: 'Hours' },
+              { key: 'tuition', label: 'Tuition' },
+            ],
+          },
+          filename: 'catalog-export.pdf',
+        }),
+      });
+
+      if (!pdfResponse.ok) {
+        return NextResponse.json({ error: 'PDF generation failed' }, { status: 500 });
       }
 
-      doc.end();
-
-      // Wait for PDF to be generated
-      const pdfBuffer = await new Promise<Buffer>((resolve) => {
-        doc.on('end', () => resolve(Buffer.concat(chunks)));
-      });
+      const pdfBuffer = await pdfResponse.arrayBuffer();
 
       return new NextResponse(pdfBuffer, {
         headers: {

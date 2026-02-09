@@ -183,131 +183,19 @@ export async function sendInvoice(invoiceId: string): Promise<void> {
 
   if (!profile) throw new Error('User not found');
 
-  // Generate PDF
-  const pdfBuffer = await generateInvoicePDF(invoice, profile);
-
-  // Send email (implement email service)
-  // await sendEmail({
-  //   to: profile.email,
-  //   subject: `Invoice ${invoice.invoice_number}`,
-  //   body: `Dear ${profile.first_name}, please find your invoice attached.`,
-  //   attachments: [{ filename: `invoice-${invoice.invoice_number}.pdf`, content: pdfBuffer }]
-  // });
+  // TODO: PDF generation moved to Netlify functions
+  // For now, just update status
+  // In production, call /.netlify/functions/invoice-pdf to generate PDF
 
   // Update status
   await updateInvoiceStatus(invoiceId, 'sent');
 }
 
 // =====================================================
-// PDF GENERATION
+// PDF GENERATION - Moved to Netlify functions
 // =====================================================
-
-/**
- * Generate invoice PDF
- */
-export async function generateInvoicePDF(
-  invoice: Invoice,
-  userProfile: any
-): Promise<Buffer> {
-  // Dynamic import to reduce bundle size
-  const jsPDF = (await import('jspdf')).default;
-  const autoTable = (await import('jspdf-autotable')).default;
-  
-  const doc = new jsPDF();
-
-  // Company header
-  doc.setFontSize(24);
-  doc.setFont('helvetica', 'bold');
-  doc.text('INVOICE', 20, 20);
-
-  // Company info
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Elevate for Humanity', 20, 30);
-  doc.text('8888 Keystone Crossing Suite 1300', 20, 35);
-  doc.text('Indianapolis, IN 46240', 20, 40);
-  doc.text('elevate4humanityedu@gmail.com', 20, 45);
-  doc.text('(317) 314-3757', 20, 50);
-
-  // Invoice details
-  doc.setFont('helvetica', 'bold');
-  doc.text('Invoice Number:', 140, 30);
-  doc.text('Invoice Date:', 140, 35);
-  doc.text('Due Date:', 140, 40);
-  doc.text('Status:', 140, 45);
-
-  doc.setFont('helvetica', 'normal');
-  doc.text(invoice.invoice_number, 175, 30);
-  doc.text(new Date(invoice.created_at).toLocaleDateString(), 175, 35);
-  doc.text(new Date(invoice.due_date).toLocaleDateString(), 175, 40);
-  doc.text(invoice.status.toUpperCase(), 175, 45);
-
-  // Bill to
-  doc.setFont('helvetica', 'bold');
-  doc.text('BILL TO:', 20, 60);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${userProfile.first_name} ${userProfile.last_name}`, 20, 65);
-  doc.text(userProfile.email, 20, 70);
-
-  // Items table
-  const tableData = invoice.items.map((item) => [
-    item.description,
-    item.quantity.toString(),
-    `$${item.unit_price.toFixed(2)}`,
-    `$${item.total.toFixed(2)}`,
-  ]);
-
-  autoTable(doc, {
-    startY: 85,
-    head: [['Description', 'Quantity', 'Unit Price', 'Total']],
-    body: tableData,
-    theme: 'striped',
-    headStyles: {
-      fillColor: [41, 128, 185],
-      textColor: 255,
-      fontStyle: 'bold',
-    },
-    styles: {
-      fontSize: 10,
-    },
-  });
-
-  // Totals
-  const finalY = (doc as string).lastAutoTable.finalY + 10;
-
-  doc.setFont('helvetica', 'bold');
-  doc.text('Subtotal:', 140, finalY);
-  doc.text('Tax:', 140, finalY + 7);
-  doc.text('TOTAL:', 140, finalY + 14);
-
-  doc.setFont('helvetica', 'normal');
-  doc.text(`$${invoice.amount.toFixed(2)}`, 175, finalY);
-  doc.text(`$${invoice.tax.toFixed(2)}`, 175, finalY + 7);
-  doc.setFont('helvetica', 'bold');
-  doc.text(`$${invoice.total.toFixed(2)}`, 175, finalY + 14);
-
-  // Notes
-  if (invoice.notes) {
-    doc.setFont('helvetica', 'normal');
-    doc.setFontSize(9);
-    doc.text('Notes:', 20, finalY + 30);
-    doc.text(invoice.notes, 20, finalY + 35, { maxWidth: 170 });
-  }
-
-  // Footer
-  doc.setFontSize(8);
-  doc.setTextColor(128);
-  doc.text('Thank you for your business!', 105, 280, { align: 'center' });
-
-  return Buffer.from(doc.output('arraybuffer'));
-}
-
-/**
- * Download invoice PDF
- */
-export function downloadInvoicePDF(doc: jsPDF, invoiceNumber: string): void {
-  doc.save(`invoice-${invoiceNumber}.pdf`);
-}
+// PDF generation has been moved to /.netlify/functions/invoice-pdf
+// to reduce the main server bundle size
 
 // =====================================================
 // BILLING CYCLES
@@ -362,95 +250,9 @@ export async function processDueInvoices(): Promise<void> {
 }
 
 // =====================================================
-// PAYMENT RECEIPTS
+// PAYMENT RECEIPTS - Moved to Netlify functions
 // =====================================================
-
-/**
- * Generate payment receipt
- */
-export async function generateReceipt(paymentId: string): Promise<Buffer> {
-  const supabase = await createClient();
-
-  const { data: payment } = await supabase
-    .from('payments')
-    .select('*, user:profiles!user_id(*)')
-    .eq('id', paymentId)
-    .single();
-
-  if (!payment) throw new Error('Payment not found');
-
-  // Dynamic import to reduce bundle size
-  const jsPDF = (await import('jspdf')).default;
-  const autoTable = (await import('jspdf-autotable')).default;
-  
-  const doc = new jsPDF();
-
-  // Header
-  doc.setFontSize(24);
-  doc.setFont('helvetica', 'bold');
-  doc.text('RECEIPT', 20, 20);
-
-  // Company info
-  doc.setFontSize(10);
-  doc.setFont('helvetica', 'normal');
-  doc.text('Elevate for Humanity', 20, 30);
-  doc.text('Thank you for your payment!', 20, 35);
-
-  // Receipt details
-  doc.setFont('helvetica', 'bold');
-  doc.text('Receipt Number:', 20, 50);
-  doc.text('Date:', 20, 57);
-  doc.text('Payment Method:', 20, 64);
-  doc.text('Status:', 20, 71);
-
-  doc.setFont('helvetica', 'normal');
-  doc.text(payment.id.substring(0, 8).toUpperCase(), 60, 50);
-  doc.text(new Date(payment.created_at).toLocaleDateString(), 60, 57);
-  doc.text(payment.payment_method.toUpperCase(), 60, 64);
-  doc.text(payment.status.toUpperCase(), 60, 71);
-
-  // Customer info
-  doc.setFont('helvetica', 'bold');
-  doc.text('CUSTOMER:', 20, 90);
-  doc.setFont('helvetica', 'normal');
-  doc.text(`${payment.user.first_name} ${payment.user.last_name}`, 20, 97);
-  doc.text(payment.user.email, 20, 104);
-
-  // Payment details
-  doc.setFont('helvetica', 'bold');
-  doc.text('PAYMENT DETAILS:', 20, 120);
-
-  autoTable(doc, {
-    startY: 125,
-    head: [['Description', 'Amount']],
-    body: [
-      [
-        payment.description || 'Course Purchase',
-        `$${payment.amount.toFixed(2)}`,
-      ],
-    ],
-    theme: 'plain',
-    styles: {
-      fontSize: 10,
-    },
-  });
-
-  const finalY = (doc as string).lastAutoTable.finalY + 10;
-
-  doc.setFont('helvetica', 'bold');
-  doc.setFontSize(14);
-  doc.text('TOTAL PAID:', 20, finalY);
-  doc.text(`$${payment.amount.toFixed(2)}`, 60, finalY);
-
-  // Footer
-  doc.setFontSize(8);
-  doc.setTextColor(128);
-  doc.text('This is an official receipt for your records.', 105, 280, {
-    align: 'center',
-  });
-
-  return Buffer.from(doc.output('arraybuffer'));
-}
+// Receipt generation has been moved to /.netlify/functions/receipt-pdf
 
 // =====================================================
 // REPORTING

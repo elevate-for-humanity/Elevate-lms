@@ -50,11 +50,17 @@
 
 [functions]
   node_bundler = "esbuild"
-  # Only list packages that MUST remain external (native bindings, etc.)
-  # PDF libraries removed - now dynamically imported to reduce bundle size
+  # Minimal externals for the main Next.js handler - keep it small!
   external_node_modules = [
     "sharp",
     "pg"
+  ]
+
+# PDF export function - isolated bundle with PDF libraries
+[functions."export-pdf"]
+  external_node_modules = [
+    "pdf-lib",
+    "@pdf-lib/fontkit"
   ]
 
 # Social Media Scheduler - DISABLED due to AWS Lambda 4KB env var limit
@@ -95,6 +101,17 @@
   from = "http://www.elevateforhumanity.org/*"
   to = "https://www.elevateforhumanity.org/:splat"
   status = 301
+  force = true
+
+# ============================================
+# API REDIRECTS TO NETLIFY FUNCTIONS
+# ============================================
+
+# PDF export - routed to dedicated Netlify function to reduce main handler size
+[[redirects]]
+  from = "/api/pdf/export"
+  to = "/.netlify/functions/export-pdf"
+  status = 200
   force = true
 
 # ============================================

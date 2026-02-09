@@ -1,21 +1,10 @@
 import { createClient } from '@/lib/supabase/server';
 
-// PDF types - jsPDF is dynamically imported to reduce bundle size
-type jsPDFInstance = {
-  setFontSize: (size: number) => void;
-  setFont: (font: string, style: string) => void;
-  text: (text: string, x: number, y: number) => void;
-  setTextColor: (color: number) => void;
-  getNumberOfPages: () => number;
-  setPage: (page: number) => void;
-  internal: { pageSize: { width: number; height: number } };
-  output: (type: string) => ArrayBuffer;
-  save: (filename: string) => void;
-};
-
 // =====================================================
 // CSV EXPORT
 // =====================================================
+// Note: PDF export has been moved to netlify/functions/export-pdf.ts
+// to keep heavy PDF libraries out of the main Next.js server handler
 
 export interface ExportColumn {
   key: string;
@@ -98,143 +87,6 @@ export function downloadCSV(
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
-}
-
-// =====================================================
-// PDF EXPORT
-// =====================================================
-
-export interface PDFExportOptions {
-  title?: string;
-  subtitle?: string;
-  orientation?: 'portrait' | 'landscape';
-  pageSize?: 'a4' | 'letter' | 'legal';
-  columns?: ExportColumn[];
-  includeHeader?: boolean;
-  includeFooter?: boolean;
-  headerText?: string;
-  footerText?: string;
-}
-
-/**
- * Export data to PDF
- */
-export async function exportToPDF(
-  data: any[],
-  options: PDFExportOptions = {}
-): Promise<jsPDFInstance> {
-  const {
-    title = 'Data Export',
-    subtitle,
-    orientation = 'portrait',
-    pageSize = 'a4',
-    columns,
-    includeHeader = true,
-    includeFooter = true,
-    headerText,
-    footerText,
-  } = options;
-
-  // Dynamic import to reduce bundle size
-  const { jsPDF } = await import('jspdf');
-  const autoTable = (await import('jspdf-autotable')).default;
-
-  // Create PDF document
-  const doc = new jsPDF({
-    orientation,
-    unit: 'mm',
-    format: pageSize,
-  });
-
-  let yPosition = 20;
-
-  // Add title
-  if (title) {
-    doc.setFontSize(18);
-    doc.setFont('helvetica', 'bold');
-    doc.text(title, 14, yPosition);
-    yPosition += 10;
-  }
-
-  // Add subtitle
-  if (subtitle) {
-    doc.setFontSize(12);
-    doc.setFont('helvetica', 'normal');
-    doc.text(subtitle, 14, yPosition);
-    yPosition += 8;
-  }
-
-  // Add export date
-  doc.setFontSize(10);
-  doc.setTextColor(100);
-  doc.text(`Generated: ${new Date().toLocaleString()}`, 14, yPosition);
-  yPosition += 10;
-
-  // Determine columns
-  const cols =
-    columns || Object.keys(data[0] || {}).map((key: any) => ({ key, label: key }));
-
-  // Prepare table data
-  const headers = cols.map((col) => col.label);
-  const rows = data.map((row) =>
-    cols.map((col) => {
-      const value = row[col.key];
-      return col.format
-        ? col.format(value)
-        : String(value || '');
-    })
-  );
-
-  // Add table
-  autoTable(doc, {
-    head: [headers],
-    body: rows,
-    startY: yPosition,
-    theme: 'striped',
-    headStyles: {
-      fillColor: [41, 128, 185],
-      textColor: 255,
-      fontStyle: 'bold',
-    },
-    styles: {
-      fontSize: 9,
-      cellPadding: 3,
-    },
-    alternateRowStyles: {
-      fillColor: [245, 245, 245],
-    },
-  });
-
-  // Add footer
-  if (includeFooter) {
-    const pageCount = doc.getNumberOfPages();
-    for (let i = 1; i <= pageCount; i++) {
-      doc.setPage(i);
-      doc.setFontSize(8);
-      doc.setTextColor(100);
-
-      const footerY = doc.internal.pageSize.height - 10;
-
-      if (footerText) {
-        doc.text(footerText, 14, footerY);
-      }
-
-      doc.text(
-        `Page ${i} of ${pageCount}`,
-        doc.internal.pageSize.width - 30,
-        footerY
-      );
-    }
-  }
-
-  return doc;
-}
-
-/**
- * Download PDF file
- */
-export function downloadPDF(doc: jsPDFInstance, filename: string = 'export.pdf'): void {
-  doc.save(filename);
 }
 
 // =====================================================

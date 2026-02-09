@@ -37,16 +37,15 @@ export default function HVACProgramPage() {
           muted
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
-          poster="/images/hvac/hvac-hero.jpg"
         >
-          <source src="/videos/hvac-training.mp4" type="video/mp4" />
+          <source src="/videos/hvac-hero-final.mp4" type="video/mp4" />
         </video>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
       </section>
 
       {/* Avatar Section */}
       <PageAvatar 
-        videoSrc="/videos/avatars/hvac-guide.mp4" 
+        videoSrc="/videos/hero-hvac-avatar.mp4" 
         title="Learn About HVAC Training"
       />
 

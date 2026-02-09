@@ -147,15 +147,29 @@ export default async function EnrollSuccessPage() {
           </div>
         </div>
 
-        {/* Primary Action - Start Learning */}
+        {/* Primary Action - Start Onboarding */}
         <div className="mb-6">
           <Link
-            href="/lms"
+            href="/student-portal/onboarding"
             className="block w-full bg-green-600 text-white px-6 py-4 rounded-lg font-bold text-center text-lg hover:bg-green-700 transition"
           >
             <ArrowRight className="w-5 h-5 inline-block mr-2" />
-            Start Learning Now
+            Start Onboarding Now
           </Link>
+        </div>
+
+        {/* Email Confirmation Notice */}
+        <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
+          <div className="flex items-start gap-3">
+            <Mail className="w-5 h-5 text-green-600 mt-0.5" />
+            <div>
+              <p className="font-medium text-green-900">Check Your Email</p>
+              <p className="text-sm text-green-700">
+                We&apos;ve sent a welcome letter to your email with important information about your program, 
+                next steps, and how to get started.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Secondary Actions */}
@@ -167,10 +181,10 @@ export default async function EnrollSuccessPage() {
             Student Dashboard
           </Link>
           <Link
-            href="/student/progress"
+            href="/student/billing"
             className="flex-1 border border-blue-600 text-blue-600 px-6 py-3 rounded-lg font-semibold text-center hover:bg-blue-50 transition"
           >
-            View My Progress
+            View Payment Plan
           </Link>
         </div>
 

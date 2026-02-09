@@ -166,13 +166,14 @@ async function createBnplCheckout(
 
 /**
  * INSTALLMENT PLAN - Step 1: Deposit checkout
- * After deposit is paid, subscription is created via webhook
+ * After deposit is paid, weekly subscription is created via webhook
  */
 async function createInstallmentDepositCheckout(
   config: typeof import('./tuition-config').TUITION_PRODUCTS[0],
   params: CheckoutParams
 ): Promise<CheckoutResult> {
   const { installmentPlan } = config;
+  const remainingBalance = config.totalTuition - installmentPlan.depositAmount;
   
   const session = await stripe.checkout.sessions.create({
     mode: 'payment',
@@ -188,7 +189,7 @@ async function createInstallmentDepositCheckout(
           currency: 'usd',
           product_data: {
             name: `${config.programName} - Enrollment Deposit`,
-            description: `Non-refundable deposit. Includes $${config.registrationFee} registration fee. Remaining balance: $${config.totalTuition - installmentPlan.depositAmount} over ${installmentPlan.numberOfMonths} monthly payments of $${installmentPlan.monthlyAmount}.`,
+            description: `Non-refundable deposit. Includes $${config.registrationFee} registration fee. Remaining balance: $${remainingBalance} over ${installmentPlan.numberOfWeeks} weekly payments of $${installmentPlan.weeklyAmount}.`,
             metadata: {
               program_id: params.programId,
               payment_type: 'tuition_deposit',
@@ -204,11 +205,12 @@ async function createInstallmentDepositCheckout(
       program_id: params.programId,
       payment_option: 'installment_plan',
       deposit_amount: installmentPlan.depositAmount.toString(),
-      monthly_amount: installmentPlan.monthlyAmount.toString(),
-      number_of_months: installmentPlan.numberOfMonths.toString(),
+      weekly_amount: installmentPlan.weeklyAmount.toString(),
+      number_of_weeks: installmentPlan.numberOfWeeks.toString(),
       tuition_amount: config.totalTuition.toString(),
       // Flag to create subscription after deposit
       create_subscription: 'true',
+      payment_interval: 'week',
     },
     success_url: params.successUrl,
     cancel_url: params.cancelUrl,
@@ -226,7 +228,7 @@ async function createInstallmentDepositCheckout(
 }
 
 /**
- * Create subscription after deposit is paid (called from webhook)
+ * Create weekly subscription after deposit is paid (called from webhook)
  */
 export async function createInstallmentSubscription(
   customerId: string,
@@ -234,32 +236,47 @@ export async function createInstallmentSubscription(
   metadata: {
     student_id: string;
     program_id: string;
-    monthly_amount: string;
-    number_of_months: string;
+    weekly_amount?: string;
+    number_of_weeks?: string;
+    // Legacy support for monthly
+    monthly_amount?: string;
+    number_of_months?: string;
+    payment_interval?: string;
   }
 ): Promise<{ success: boolean; subscriptionId?: string; error?: string }> {
   try {
-    const monthlyAmount = parseInt(metadata.monthly_amount);
-    const numberOfMonths = parseInt(metadata.number_of_months);
+    // Determine if weekly or monthly (default to weekly for new subscriptions)
+    const isWeekly = metadata.payment_interval === 'week' || metadata.weekly_amount;
+    
+    const amount = isWeekly 
+      ? parseInt(metadata.weekly_amount || '0')
+      : parseInt(metadata.monthly_amount || '0');
+    
+    const numberOfPayments = isWeekly
+      ? parseInt(metadata.number_of_weeks || '0')
+      : parseInt(metadata.number_of_months || '0');
+    
+    const interval = isWeekly ? 'week' : 'month';
     
     // Create a price for the subscription
     const price = await stripe.prices.create({
       currency: 'usd',
-      unit_amount: monthlyAmount * 100,
+      unit_amount: amount * 100,
       recurring: {
-        interval: 'month',
+        interval: interval,
         interval_count: 1,
       },
       product_data: {
-        name: 'Tuition Installment Payment',
+        name: `Tuition ${isWeekly ? 'Weekly' : 'Monthly'} Payment`,
         metadata: {
           program_id: metadata.program_id,
           payment_type: 'tuition_installment',
+          payment_interval: interval,
         },
       },
     });
     
-    // Create subscription with fixed number of billing cycles
+    // Create subscription with automatic weekly/monthly billing
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       default_payment_method: paymentMethodId,
@@ -268,10 +285,12 @@ export async function createInstallmentSubscription(
         student_id: metadata.student_id,
         program_id: metadata.program_id,
         payment_type: 'tuition_installment',
-        total_installments: numberOfMonths.toString(),
+        payment_interval: interval,
+        total_installments: numberOfPayments.toString(),
         installments_paid: '0',
+        amount_per_payment: amount.toString(),
       },
-      // Cancel after X successful payments
+      // Automatic billing
       cancel_at_period_end: false,
       collection_method: 'charge_automatically',
       payment_settings: {
@@ -279,6 +298,8 @@ export async function createInstallmentSubscription(
         save_default_payment_method: 'on_subscription',
       },
     });
+    
+    console.log(`Created ${interval}ly subscription ${subscription.id} for student ${metadata.student_id}: $${amount}/${interval} x ${numberOfPayments}`);
     
     return {
       success: true,

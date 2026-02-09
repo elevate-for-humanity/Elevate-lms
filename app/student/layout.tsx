@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { BookOpen, Award, Trophy, Shield, Home, Settings } from 'lucide-react';
+import StudentNav from './StudentNav';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,13 +11,6 @@ export const metadata: Metadata = {
   title: 'Student Portal | Elevate for Humanity',
   description: 'Access your courses, track progress, and earn achievements.',
 };
-
-const navItems = [
-  { href: '/student/dashboard', icon: Home, label: 'Dashboard' },
-  { href: '/student/badges', icon: Award, label: 'Badges' },
-  { href: '/student/leaderboard', icon: Trophy, label: 'Leaderboard' },
-  { href: '/student/privacy', icon: Shield, label: 'Privacy' },
-];
 
 export default async function StudentLayout({
   children,
@@ -42,18 +35,7 @@ export default async function StudentLayout({
               <Link href="/student/dashboard" className="font-bold text-blue-600">
                 Student Portal
               </Link>
-              <div className="hidden md:flex items-center gap-1">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.href}
-                    href={item.href}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
-                  >
-                    <item.icon className="w-4 h-4" />
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
+              <StudentNav />
             </div>
             <Link
               href="/dashboard"

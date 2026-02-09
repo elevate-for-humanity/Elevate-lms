@@ -182,6 +182,17 @@ const nextConfig = {
   // See: https://nextjs.org/docs/app/api-reference/file-conventions/route-segment-config
   outputFileTracingExcludes: {
     '/api/accreditation/report': ['**/*'],
+    // Exclude heavy test/browser packages from ALL routes to reduce Lambda size
+    '*': [
+      '**/node_modules/playwright/**',
+      '**/node_modules/puppeteer/**',
+      '**/node_modules/@playwright/**',
+      '**/node_modules/playwright-core/**',
+      '**/node_modules/puppeteer-core/**',
+      '**/node_modules/**/chromium/**',
+      '**/node_modules/@sparticuz/**',
+      '**/node_modules/chrome-aws-lambda/**',
+    ],
   },
 
   // Redirects for consolidated routes

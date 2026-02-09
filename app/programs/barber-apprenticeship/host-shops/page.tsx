@@ -61,38 +61,120 @@ export default function HostShopsPage() {
         </div>
       </section>
 
-      {/* Why Partner */}
-      <section className="py-16 px-6">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">Why Partner With Us?</h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <BenefitCard
-              icon={<Users className="w-8 h-8" />}
-              title="Trained Talent Pipeline"
-              description="Access motivated apprentices ready to learn and contribute to your shop."
-            />
-            <BenefitCard
-              icon={<Shield className="w-8 h-8" />}
-              title="Program Support"
-              description="We handle documentation, tracking, and compliance. You focus on training."
-            />
-            <BenefitCard
-              icon={<Award className="w-8 h-8" />}
-              title="Build Your Legacy"
-              description="Shape the next generation of barbers and strengthen the profession."
-            />
+      {/* Why Partner - Visual Benefits */}
+      <section className="py-20 px-6">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-center mb-4 text-black">Why Partner With Us?</h2>
+          <p className="text-xl text-black text-center mb-16 max-w-3xl mx-auto">
+            Host shops gain trained talent, zero paperwork burden, and the satisfaction of building the next generation.
+          </p>
+          
+          {/* Benefit 1 - Image Left */}
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+            <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl">
+              <Image
+                src="/images/barber/training.jpg"
+                alt="Barber training apprentice"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mb-6">
+                <Users className="w-8 h-8 text-green-700" />
+              </div>
+              <h3 className="text-2xl font-bold text-black mb-4">Get Trained, Motivated Help</h3>
+              <p className="text-lg text-black mb-4">
+                Apprentices come to you ready to learn. They handle shampoos, sweeping, prep work, and basic services under your supervision - freeing you to focus on paying clients.
+              </p>
+              <ul className="space-y-2 text-black">
+                <li className="flex items-center gap-2">
+                  <span className="text-green-600 font-bold">✓</span> Extra hands during busy hours
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-600 font-bold">✓</span> Pre-screened, committed learners
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-green-600 font-bold">✓</span> Potential future employees
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Benefit 2 - Image Right */}
+          <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
+            <div className="order-2 md:order-1">
+              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
+                <Shield className="w-8 h-8 text-blue-700" />
+              </div>
+              <h3 className="text-2xl font-bold text-black mb-4">Zero Paperwork for You</h3>
+              <p className="text-lg text-black mb-4">
+                We handle all the administrative burden. Hour tracking, state compliance, curriculum delivery, and completion documentation - that's our job, not yours.
+              </p>
+              <ul className="space-y-2 text-black">
+                <li className="flex items-center gap-2">
+                  <span className="text-blue-600 font-bold">✓</span> Digital hour tracking system
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-blue-600 font-bold">✓</span> State board compliance handled
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-blue-600 font-bold">✓</span> Simple attendance verification
+                </li>
+              </ul>
+            </div>
+            <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl order-1 md:order-2">
+              <Image
+                src="/images/barber/gallery-2.jpg"
+                alt="Professional barbershop"
+                fill
+                className="object-cover"
+              />
+            </div>
+          </div>
+
+          {/* Benefit 3 - Image Left */}
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="relative h-80 rounded-2xl overflow-hidden shadow-xl">
+              <Image
+                src="/images/barber/gallery-3.jpg"
+                alt="Barber with client"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div>
+              <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center mb-6">
+                <Award className="w-8 h-8 text-amber-700" />
+              </div>
+              <h3 className="text-2xl font-bold text-black mb-4">Build Your Legacy</h3>
+              <p className="text-lg text-black mb-4">
+                Every master barber learned from someone. By hosting apprentices, you pass on your skills and strengthen the profession. Many host shops hire their best apprentices after completion.
+              </p>
+              <ul className="space-y-2 text-black">
+                <li className="flex items-center gap-2">
+                  <span className="text-amber-600 font-bold">✓</span> Train barbers your way
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-amber-600 font-bold">✓</span> First pick of new talent
+                </li>
+                <li className="flex items-center gap-2">
+                  <span className="text-amber-600 font-bold">✓</span> Recognition as a training shop
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
       </section>
 
       {/* Qualifications */}
-      <section className="py-16 px-6 bg-gray-50">
+      <section className="py-16 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-4 text-blue-900">Host Shop Qualifications</h2>
-          <p className="text-gray-600 text-center mb-12">
+          <h2 className="text-3xl font-bold text-center mb-4 text-black">Host Shop Qualifications</h2>
+          <p className="text-black text-center mb-12">
             To participate as a host barbershop, your shop must meet these requirements:
           </p>
-          <div className="bg-white rounded-2xl p-8 shadow-sm">
+          <div className="bg-white rounded-2xl p-8 shadow-lg border-2 border-black">
             <ul className="space-y-4">
               {[
                 'Hold an active Indiana barbershop license in good standing',
@@ -103,8 +185,8 @@ export default function HostShopsPage() {
                 'Carry appropriate business insurance',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="text-blue-800 font-bold">•</span>
-                  <span className="text-gray-700">{item}</span>
+                  <span className="text-green-600 font-bold text-xl">✓</span>
+                  <span className="text-black text-lg">{item}</span>
                 </li>
               ))}
             </ul>
@@ -113,49 +195,49 @@ export default function HostShopsPage() {
       </section>
 
       {/* Responsibilities */}
-      <section className="py-16 px-6">
+      <section className="py-16 px-6 bg-slate-50">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">Host Shop Responsibilities</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-black">Host Shop Responsibilities</h2>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
-              <h3 className="font-bold text-lg mb-4 text-gray-900">What You Provide</h3>
-              <ul className="space-y-3 text-gray-700">
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-800 font-bold">•</span>
-                  Supervised on-the-job training
+            <div className="bg-white rounded-xl p-8 border-2 border-black shadow-lg">
+              <h3 className="font-bold text-xl mb-6 text-black">What You Provide</h3>
+              <ul className="space-y-4 text-black">
+                <li className="flex items-start gap-3">
+                  <span className="text-brand-orange-600 font-bold text-xl">→</span>
+                  <span className="text-lg">Supervised on-the-job training</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-800 font-bold">•</span>
-                  Workspace and tools access
+                <li className="flex items-start gap-3">
+                  <span className="text-brand-orange-600 font-bold text-xl">→</span>
+                  <span className="text-lg">Workspace and tools access</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-800 font-bold">•</span>
-                  Attendance verification
+                <li className="flex items-start gap-3">
+                  <span className="text-brand-orange-600 font-bold text-xl">→</span>
+                  <span className="text-lg">Attendance verification</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="text-blue-800 font-bold">•</span>
-                  Professional mentorship
+                <li className="flex items-start gap-3">
+                  <span className="text-brand-orange-600 font-bold text-xl">→</span>
+                  <span className="text-lg">Professional mentorship</span>
                 </li>
               </ul>
             </div>
-            <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
-              <h3 className="font-bold text-lg mb-4 text-blue-900">What We Handle</h3>
-              <ul className="space-y-3 text-blue-800">
-                <li className="flex items-start gap-2">
-                  <span className="font-bold">•</span>
-                  Apprenticeship structure & framework
+            <div className="bg-brand-orange-600 rounded-xl p-8 shadow-lg">
+              <h3 className="font-bold text-xl mb-6 text-white">What We Handle</h3>
+              <ul className="space-y-4 text-white">
+                <li className="flex items-start gap-3">
+                  <span className="font-bold text-xl">✓</span>
+                  <span className="text-lg">Apprenticeship structure & framework</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold">•</span>
-                  Related instruction (Milady curriculum)
+                <li className="flex items-start gap-3">
+                  <span className="font-bold text-xl">✓</span>
+                  <span className="text-lg">Related instruction (Milady curriculum)</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold">•</span>
-                  Documentation & compliance
+                <li className="flex items-start gap-3">
+                  <span className="font-bold text-xl">✓</span>
+                  <span className="text-lg">Documentation & compliance</span>
                 </li>
-                <li className="flex items-start gap-2">
-                  <span className="font-bold">•</span>
-                  Completion verification
+                <li className="flex items-start gap-3">
+                  <span className="font-bold text-xl">✓</span>
+                  <span className="text-lg">Completion verification</span>
                 </li>
               </ul>
             </div>
@@ -164,9 +246,9 @@ export default function HostShopsPage() {
       </section>
 
       {/* Approval Process */}
-      <section className="py-16 px-6 bg-gray-50">
+      <section className="py-16 px-6 bg-white">
         <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-bold text-center mb-12 text-blue-900">Approval Process</h2>
+          <h2 className="text-3xl font-bold text-center mb-12 text-black">Approval Process</h2>
           <div className="space-y-6">
             {[
               { step: 1, title: 'Submit Application', description: 'Complete the host shop enrollment form with your shop details and license information.' },
@@ -175,18 +257,18 @@ export default function HostShopsPage() {
               { step: 4, title: 'Approval & Placement', description: 'Once approved, you can begin hosting apprentices based on availability.' },
             ].map((item) => (
               <div key={item.step} className="flex gap-4 items-start">
-                <div className="w-12 h-12 bg-blue-800 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-14 h-14 bg-black text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
                   {item.step}
                 </div>
-                <div className="flex-1 bg-white rounded-xl p-5 shadow-sm">
-                  <h3 className="font-bold text-gray-900 mb-1">{item.title}</h3>
-                  <p className="text-gray-600">{item.description}</p>
+                <div className="flex-1 bg-white rounded-xl p-6 shadow-lg border border-black">
+                  <h3 className="font-bold text-black text-lg mb-2">{item.title}</h3>
+                  <p className="text-black">{item.description}</p>
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
-            <p className="text-blue-900 font-medium">
+          <div className="mt-8 bg-green-50 border-2 border-green-600 rounded-xl p-6 text-center">
+            <p className="text-black font-medium text-lg">
               Host shops must be approved before they can host apprentices. Enrollment includes intake and Host Shop Agreement acceptance.
             </p>
           </div>
@@ -227,8 +309,8 @@ function BenefitCard({ icon, title, description }: { icon: React.ReactNode; titl
       <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-800">
         {icon}
       </div>
-      <h3 className="font-bold text-lg mb-2">{title}</h3>
-      <p className="text-gray-600">{description}</p>
+      <h3 className="font-bold text-lg mb-2 text-black">{title}</h3>
+      <p className="text-black">{description}</p>
     </div>
   );
 }

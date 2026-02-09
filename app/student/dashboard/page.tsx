@@ -25,6 +25,7 @@ import {
   Calendar,
   Award,
   Users,
+  DollarSign,
 } from 'lucide-react';
 import { Leaderboard } from '@/components/Leaderboard';
 import { Gamification } from '@/components/Gamification';
@@ -430,11 +431,11 @@ export default async function StudentDashboardPage() {
                   <Award className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
                   <span className="font-medium text-slate-900 text-xs sm:text-base">Certifications</span>
                 </Link>
-                <Link href="/programs" className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 text-left hover:bg-slate-50 rounded-lg transition">
-                  <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
-                  <span className="font-medium text-slate-900 text-xs sm:text-base">Programs</span>
+                <Link href="/student/billing" className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 text-left hover:bg-slate-50 rounded-lg transition">
+                  <DollarSign className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
+                  <span className="font-medium text-slate-900 text-xs sm:text-base">Billing</span>
                 </Link>
-                <Link href="/support" className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 text-left hover:bg-slate-50 rounded-lg transition">
+                <Link href="/student/support" className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 text-left hover:bg-slate-50 rounded-lg transition">
                   <HelpCircle className="w-4 h-4 sm:w-5 sm:h-5 text-orange-600 flex-shrink-0" />
                   <span className="font-medium text-slate-900 text-xs sm:text-base">Get Help</span>
                 </Link>

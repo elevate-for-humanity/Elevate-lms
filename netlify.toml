@@ -15,6 +15,9 @@
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXTAUTH_URL"
   # Admin dev tools - enabled for all builds, production guards handle access
   ENABLE_ADMIN_DEVTOOLS = "true"
+  # Skip browser binary downloads - reduces bundle size significantly
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1"
+  PUPPETEER_SKIP_DOWNLOAD = "1"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"

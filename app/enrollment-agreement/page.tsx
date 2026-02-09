@@ -98,42 +98,124 @@ export default function EnrollmentAgreementPage() {
             <li>Notify the School promptly of any changes to contact information</li>
             <li>Comply with all School policies and procedures</li>
           </ul>
+
+          {/* Clock In/Out and Hours Requirements */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6">
+            <h3 className="font-bold text-gray-900 mb-4">Attendance & Time Tracking Requirements</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">Clock In/Out Requirement</h4>
+                <p className="text-gray-700">
+                  Students are <strong>required to clock in and clock out</strong> for all training sessions 
+                  using the Student Portal. Failure to clock in/out will result in unrecorded hours and 
+                  may affect your program completion status.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">Weekly Hour Requirements</h4>
+                <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  <li><strong>Related Technical Instruction (RTI):</strong> Minimum 8-10 hours per week of online coursework and classroom instruction</li>
+                  <li><strong>On-the-Job Training (OJT):</strong> Minimum 20-32 hours per week at approved training site (program dependent)</li>
+                  <li><strong>Total Weekly Commitment:</strong> 28-40 hours per week depending on program</li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">Hour Logging</h4>
+                <p className="text-gray-700">
+                  All hours must be logged accurately in the Student Portal within 24 hours of completion. 
+                  Hours must be verified by your supervisor or instructor. Falsifying time records is 
+                  grounds for immediate termination.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="font-semibold text-gray-900 mb-2">Attendance Standards</h4>
+                <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  <li>Minimum 90% attendance required for program completion</li>
+                  <li>Absences must be reported before the scheduled start time</li>
+                  <li>Three (3) unexcused absences may result in termination</li>
+                  <li>Tardiness of more than 15 minutes counts as an absence</li>
+                </ul>
+              </div>
+
+              <div className="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mt-4">
+                <h4 className="font-semibold text-gray-900 mb-2">Clock Out Rules</h4>
+                <ul className="list-disc list-inside text-gray-700 space-y-1">
+                  <li><strong>Leaving the shop/training site for more than 15 minutes:</strong> You MUST clock out. Failure to clock out when leaving will result in automatic time adjustment and may be considered time falsification.</li>
+                  <li><strong>Lunch breaks:</strong> You MUST clock out for lunch. Lunch breaks are unpaid time and must not be included in training hours.</li>
+                  <li><strong>Personal errands or appointments:</strong> Clock out before leaving and clock back in upon return.</li>
+                  <li><strong>Smoke breaks:</strong> Breaks longer than 15 minutes require clocking out.</li>
+                  <li><strong>End of day:</strong> Always clock out before leaving for the day. Forgetting to clock out will result in your hours being adjusted to the last verified activity.</li>
+                </ul>
+                <p className="text-gray-700 mt-3 font-medium">
+                  Repeated failure to follow clock in/out procedures will result in disciplinary action up to and including termination from the program.
+                </p>
+              </div>
+            </div>
+          </div>
         </section>
 
-        {/* Section 5: Cancellation and Refund */}
+        {/* Section 5: All Sales Final */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">5. Cancellation and Refund Policy</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">5. All Sales Final - No Refunds</h2>
           
-          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-4">
-            <h3 className="font-bold text-gray-900 mb-2">Three-Day Cancellation Right</h3>
-            <p className="text-gray-700">
-              You have the right to cancel this agreement within <strong>three (3) business days</strong> of 
-              signing and receive a full refund of all money paid, with no penalty or obligation.
+          <div className="bg-red-50 border border-red-200 rounded-lg p-6">
+            <p className="text-gray-700 mb-4">
+              <strong>ALL SALES ARE FINAL. NO REFUNDS WILL BE ISSUED.</strong>
+            </p>
+            <p className="text-gray-700 mb-4">
+              By enrolling in a program, you acknowledge and agree that all tuition payments, fees, 
+              and deposits are non-refundable. This includes but is not limited to:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <li>Registration fees</li>
+              <li>Tuition payments (full or partial)</li>
+              <li>Deposit payments</li>
+              <li>Material fees</li>
+              <li>Any other fees associated with enrollment</li>
+            </ul>
+            <p className="text-gray-700 mt-4">
+              This policy applies regardless of whether you complete the program, withdraw voluntarily, 
+              or are terminated for any reason.
             </p>
           </div>
+        </section>
 
-          <div className="space-y-4">
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-bold text-gray-900 mb-2">Before Program Start</h4>
-              <p className="text-gray-700">
-                If you cancel before the program start date (after the 3-day period), you will receive 
-                a refund of all tuition paid minus a registration fee of $100.
-              </p>
-            </div>
-            
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h4 className="font-bold text-gray-900 mb-2">After Program Start</h4>
-              <p className="text-gray-700">
-                Refunds after the program start date are calculated on a pro-rata basis according to 
-                the percentage of the program completed. See the complete <Link href="/refund-policy" className="text-orange-600 hover:underline">Refund Policy</Link> for details.
-              </p>
-            </div>
+        {/* Section 6: Termination Rights */}
+        <section className="mb-10">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">6. Termination of Enrollment</h2>
+          
+          <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+            <p className="text-gray-700 mb-4">
+              <strong>Elevate for Humanity reserves the right to terminate a student&apos;s enrollment 
+              at any time</strong> if the student fails to comply with school policies, rules, or 
+              the terms of this agreement. Grounds for termination include, but are not limited to:
+            </p>
+            <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <li>Failure to maintain satisfactory academic progress</li>
+              <li>Excessive absences or tardiness</li>
+              <li>Failure to make required tuition payments</li>
+              <li>Violation of the Code of Conduct or Participation Agreement</li>
+              <li>Disruptive, disrespectful, or unprofessional behavior</li>
+              <li>Harassment or discrimination of any kind</li>
+              <li>Cheating, plagiarism, or academic dishonesty</li>
+              <li>Violation of safety rules or protocols</li>
+              <li>Misrepresentation of information on enrollment documents</li>
+              <li>Any conduct that reflects negatively on the School</li>
+            </ul>
+            <p className="text-gray-700 mt-4 font-semibold">
+              In the event of termination, no refund of tuition or fees will be provided. 
+              All sales are final.
+            </p>
           </div>
         </section>
 
-        {/* Section 6: No Guarantees */}
+        {/* Section 7: No Guarantees */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">6. No Guarantees</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">7. No Guarantees</h2>
           
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <p className="text-gray-700 mb-4">
@@ -154,9 +236,9 @@ export default function EnrollmentAgreementPage() {
           </div>
         </section>
 
-        {/* Section 7: Credential Awarded */}
+        {/* Section 8: Credential Awarded */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">7. Credential Awarded</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Credential Awarded</h2>
           <p className="text-gray-700 mb-4">
             Upon successful completion of all program requirements, students will receive a 
             <strong> Certificate of Completion</strong> from Elevate for Humanity.
@@ -168,9 +250,9 @@ export default function EnrollmentAgreementPage() {
           </p>
         </section>
 
-        {/* Section 8: Dispute Resolution */}
+        {/* Section 9: Dispute Resolution */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Dispute Resolution</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Dispute Resolution</h2>
           <p className="text-gray-700 mb-4">
             Any disputes arising from this agreement shall first be addressed through the 
             School's internal <Link href="/grievance" className="text-orange-600 hover:underline">Grievance Process</Link>.
@@ -182,9 +264,9 @@ export default function EnrollmentAgreementPage() {
           </p>
         </section>
 
-        {/* Section 9: Electronic Agreement */}
+        {/* Section 10: Electronic Agreement */}
         <section className="mb-10">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">9. Electronic Agreement</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">10. Electronic Agreement</h2>
           <div className="bg-gray-50 rounded-lg p-6">
             <p className="text-gray-700 mb-4">
               By completing the online enrollment process and clicking "I Agree" or similar 
@@ -193,7 +275,8 @@ export default function EnrollmentAgreementPage() {
             <ul className="list-disc list-inside text-gray-700 space-y-2">
               <li>You have read and understand this Enrollment Agreement</li>
               <li>You have reviewed the <Link href="/tuition-fees" className="text-orange-600 hover:underline">Tuition & Fees Schedule</Link></li>
-              <li>You have reviewed the <Link href="/refund-policy" className="text-orange-600 hover:underline">Refund Policy</Link></li>
+              <li>You understand that <strong>all sales are final and no refunds will be issued</strong></li>
+              <li>You understand that the School may terminate your enrollment for rule violations</li>
               <li>You have reviewed the <Link href="/disclosures" className="text-orange-600 hover:underline">Student Consumer Information</Link></li>
               <li>You agree to be bound by the terms of this agreement</li>
               <li>Your electronic signature has the same legal effect as a handwritten signature</li>

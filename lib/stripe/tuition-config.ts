@@ -395,3 +395,164 @@ export function calculateRefund(
   const refundableAmount = amountPaid - REFUND_POLICY.registrationFee;
   return Math.max(0, Math.round(refundableAmount * (1 - completionPercent / 100)));
 }
+
+// =============================================================================
+// PAYMENT METHODS CONFIGURATION
+// =============================================================================
+
+export const PAYMENT_METHODS = {
+  card: true,
+  us_bank_account: true,
+  klarna: true,
+  afterpay_clearpay: true,
+  zip: true,
+};
+
+// =============================================================================
+// INSTALLMENT RULES - WEEKLY PAYMENTS
+// =============================================================================
+
+export const INSTALLMENT_RULES = {
+  // Payment frequency
+  interval: 'week' as const, // 'week' or 'month'
+  
+  // Enforcement
+  suspendOnFailure: true,
+  gracePeriodDays: 3,
+  maxFailedPayments: 2,
+  
+  // Late fees
+  lateFee: 25,
+  applyLateFeeAfterDays: 7,
+};
+
+// =============================================================================
+// TUITION PRODUCTS - Used by checkout
+// =============================================================================
+
+export interface TuitionProduct {
+  programId: string;
+  programName: string;
+  totalTuition: number;
+  registrationFee: number;
+  
+  // Pay in full option
+  payInFull: {
+    amount: number;
+    discount: number;
+  };
+  
+  // Installment plan (weekly payments after deposit)
+  installmentPlan: {
+    depositAmount: number;
+    weeklyAmount: number;
+    numberOfWeeks: number;
+    totalPayments: number;
+  };
+}
+
+export const TUITION_PRODUCTS: TuitionProduct[] = [
+  {
+    programId: 'prog-barber',
+    programName: 'Barber Apprenticeship',
+    totalTuition: 4980,
+    registrationFee: 150,
+    payInFull: {
+      amount: 4980,
+      discount: 0,
+    },
+    installmentPlan: {
+      depositAmount: 1000,
+      weeklyAmount: 166, // ($4980 - $1000) / 24 weeks
+      numberOfWeeks: 24,
+      totalPayments: 24,
+    },
+  },
+  {
+    programId: 'prog-cna',
+    programName: 'CNA Training Program',
+    totalTuition: 2200,
+    registrationFee: 150,
+    payInFull: {
+      amount: 2200,
+      discount: 0,
+    },
+    installmentPlan: {
+      depositAmount: 500,
+      weeklyAmount: 106, // ($2200 - $500) / 16 weeks
+      numberOfWeeks: 16,
+      totalPayments: 16,
+    },
+  },
+  {
+    programId: 'prog-hvac',
+    programName: 'HVAC Technician Program',
+    totalTuition: 4800,
+    registrationFee: 150,
+    payInFull: {
+      amount: 4800,
+      discount: 0,
+    },
+    installmentPlan: {
+      depositAmount: 1000,
+      weeklyAmount: 158, // ($4800 - $1000) / 24 weeks
+      numberOfWeeks: 24,
+      totalPayments: 24,
+    },
+  },
+  {
+    programId: 'prog-cdl',
+    programName: 'CDL Training Program',
+    totalTuition: 5200,
+    registrationFee: 150,
+    payInFull: {
+      amount: 5200,
+      discount: 0,
+    },
+    installmentPlan: {
+      depositAmount: 1000,
+      weeklyAmount: 175, // ($5200 - $1000) / 24 weeks
+      numberOfWeeks: 24,
+      totalPayments: 24,
+    },
+  },
+  {
+    programId: 'prog-business-apprentice',
+    programName: 'Business Support Apprenticeship',
+    totalTuition: 3500,
+    registrationFee: 150,
+    payInFull: {
+      amount: 3500,
+      discount: 0,
+    },
+    installmentPlan: {
+      depositAmount: 700,
+      weeklyAmount: 117, // ($3500 - $700) / 24 weeks
+      numberOfWeeks: 24,
+      totalPayments: 24,
+    },
+  },
+  {
+    programId: 'prog-esthetics-apprentice',
+    programName: 'Esthetics Apprenticeship',
+    totalTuition: 4200,
+    registrationFee: 150,
+    payInFull: {
+      amount: 4200,
+      discount: 0,
+    },
+    installmentPlan: {
+      depositAmount: 850,
+      weeklyAmount: 140, // ($4200 - $850) / 24 weeks
+      numberOfWeeks: 24,
+      totalPayments: 24,
+    },
+  },
+];
+
+/**
+ * Get tuition config for a program
+ */
+export function getTuitionConfig(programId: string): TuitionProduct | undefined {
+  return TUITION_PRODUCTS.find(p => p.programId === programId);
+}

@@ -121,9 +121,9 @@ export default async function StudentPortalGradesPage() {
             <p className="text-3xl font-bold text-green-600">{gradesList.length}</p>
           </div>
           <div className="bg-white rounded-xl border p-6 text-center">
-            <Award className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+            <Award className="w-8 h-8 text-purple-600 mx-auto mb-2" />
             <p className="text-sm text-gray-600 mb-1">Average Score</p>
-            <p className="text-3xl font-bold text-blue-600">
+            <p className="text-3xl font-bold text-purple-600">
               {averageScore !== null ? `${averageScore}%` : '--'}
             </p>
           </div>

@@ -100,8 +100,8 @@ export async function POST(req: NextRequest) {
         programSlug: programId === 'prog-barber' ? 'barber-apprenticeship' : programId,
         ...metadata,
       },
-      // Enable buy now pay later options
-      payment_method_types: ['card', 'affirm', 'klarna', 'afterpay_clearpay'],
+      // Let Stripe dynamically show eligible payment methods based on customer location and cart
+      automatic_payment_methods: { enabled: true },
     };
 
     // Add customer email if provided

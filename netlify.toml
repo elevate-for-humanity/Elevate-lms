@@ -51,8 +51,8 @@
 [functions]
   node_bundler = "esbuild"
   # Minimal externals for the main Next.js handler - keep it small!
+  # Heavy libs (sharp, tesseract, pdf) are in dedicated Netlify functions
   external_node_modules = [
-    "sharp",
     "pg"
   ]
 
@@ -61,6 +61,19 @@
   external_node_modules = [
     "pdf-lib",
     "@pdf-lib/fontkit"
+  ]
+
+# OCR function - isolated bundle with Tesseract and Sharp
+[functions."ocr-extract"]
+  external_node_modules = [
+    "tesseract.js",
+    "sharp"
+  ]
+
+# Image optimization function - isolated bundle with Sharp
+[functions."image-optimize"]
+  external_node_modules = [
+    "sharp"
   ]
 
 # Social Media Scheduler - DISABLED due to AWS Lambda 4KB env var limit
@@ -111,6 +124,20 @@
 [[redirects]]
   from = "/api/pdf/export"
   to = "/.netlify/functions/export-pdf"
+  status = 200
+  force = true
+
+# OCR extraction - routed to dedicated Netlify function
+[[redirects]]
+  from = "/api/ocr/extract"
+  to = "/.netlify/functions/ocr-extract"
+  status = 200
+  force = true
+
+# Image optimization - routed to dedicated Netlify function
+[[redirects]]
+  from = "/api/image/optimize"
+  to = "/.netlify/functions/image-optimize"
   status = 200
   force = true
 

@@ -1,8 +1,12 @@
-import sharp from 'sharp';
-import { createClient } from '@/lib/supabase/server';
+/**
+ * Media Optimization Utilities
+ * 
+ * Image optimization has been moved to Netlify function: /.netlify/functions/image-optimize
+ * This file provides URL helpers and client-side utilities that don't require Sharp.
+ */
 
 // =====================================================
-// IMAGE OPTIMIZATION
+// IMAGE URL UTILITIES
 // =====================================================
 
 export interface ImageOptimizationOptions {
@@ -11,64 +15,6 @@ export interface ImageOptimizationOptions {
   quality?: number;
   format?: 'webp' | 'jpeg' | 'png' | 'avif';
   fit?: 'cover' | 'contain' | 'fill' | 'inside' | 'outside';
-}
-
-/**
- * Optimize image using Sharp
- */
-export async function optimizeImage(
-  buffer: Buffer,
-  options: ImageOptimizationOptions = {}
-): Promise<Buffer> {
-  const {
-    width,
-    height,
-    quality = 80,
-    format = 'webp',
-    fit = 'cover',
-  } = options;
-
-  let pipeline = sharp(buffer);
-
-  // Resize if dimensions provided
-  if (width || height) {
-    pipeline = pipeline.resize(width, height, { fit });
-  }
-
-  // Convert format and compress
-  switch (format) {
-    case 'webp':
-      pipeline = pipeline.webp({ quality });
-      break;
-    case 'jpeg':
-      pipeline = pipeline.jpeg({ quality, progressive: true });
-      break;
-    case 'png':
-      pipeline = pipeline.png({ quality, compressionLevel: 9 });
-      break;
-    case 'avif':
-      pipeline = pipeline.avif({ quality });
-      break;
-  }
-
-  return pipeline.toBuffer();
-}
-
-/**
- * Generate responsive image sizes
- */
-export async function generateResponsiveImages(
-  buffer: Buffer,
-  sizes: number[] = [320, 640, 768, 1024, 1280, 1920]
-): Promise<Array<{ width: number; buffer: Buffer }>> {
-  const results = await Promise.all(
-    sizes.map(async (width) => ({
-      width,
-      buffer: await optimizeImage(buffer, { width, format: 'webp' }),
-    }))
-  );
-
-  return results;
 }
 
 /**
@@ -109,7 +55,7 @@ export function generateSrcSet(
 }
 
 // =====================================================
-// VIDEO OPTIMIZATION
+// VIDEO UTILITIES
 // =====================================================
 
 export interface VideoOptimizationOptions {
@@ -140,18 +86,6 @@ export function getVideoOptimizationSettings(
 }
 
 /**
- * Generate video thumbnail
- */
-export async function generateVideoThumbnail(
-  videoPath: string,
-  timestamp: number = 0
-): Promise<Buffer> {
-  // This would use FFmpeg in production
-  // For now, return a Content
-  throw new Error('Video thumbnail generation requires FFmpeg');
-}
-
-/**
  * Get adaptive streaming manifest URL
  */
 export function getAdaptiveStreamingUrl(videoId: string): {
@@ -167,35 +101,6 @@ export function getAdaptiveStreamingUrl(videoId: string): {
 }
 
 // =====================================================
-// LAZY LOADING UTILITIES
-// =====================================================
-
-/**
- * Generate blur Content for image
- */
-export async function generateBlurContent(buffer: Buffer): Promise<string> {
-  const Content = await sharp(buffer)
-    .resize(20, 20, { fit: 'inside' })
-    .blur(10)
-    .webp({ quality: 20 })
-    .toBuffer();
-
-  return `data:image/webp;base64,${Content.toString('base64')}`;
-}
-
-/**
- * Get low quality image Content (LQIP)
- */
-export async function generateLQIP(buffer: Buffer): Promise<string> {
-  const lqip = await sharp(buffer)
-    .resize(40, 40, { fit: 'inside' })
-    .webp({ quality: 30 })
-    .toBuffer();
-
-  return `data:image/webp;base64,${lqip.toString('base64')}`;
-}
-
-// =====================================================
 // CDN INTEGRATION
 // =====================================================
 
@@ -206,104 +111,12 @@ export function getCDNUrl(path: string, type: 'image' | 'video' = 'image'): stri
   const cdnDomain = process.env.NEXT_PUBLIC_CDN_DOMAIN;
 
   if (!cdnDomain) {
-    // Fallback to Supabase storage
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const bucket = type === 'image' ? 'images' : 'videos';
     return `${supabaseUrl}/storage/v1/object/public/${bucket}/${path}`;
   }
 
   return `${cdnDomain}/${type}s/${path}`;
-}
-
-// =====================================================
-// BATCH OPTIMIZATION
-// =====================================================
-
-/**
- * Batch optimize images in a directory
- */
-export async function batchOptimizeImages(
-  paths: string[],
-  options: ImageOptimizationOptions = {}
-): Promise<Array<{ path: string; success: boolean; error?: string }>> {
-  const results = await Promise.allSettled(
-    paths.map(async (path) => {
-      try {
-        const supabase = await createClient();
-
-        // Download original
-        const { data, error }: any = await supabase.storage
-          .from('images')
-          .download(path);
-
-        if (error) throw error;
-
-        // Convert to buffer and optimize
-        const buffer = Buffer.from(await data.arrayBuffer());
-        const optimized = await optimizeImage(buffer, options);
-
-        // Upload optimized version
-        const optimizedPath = path.replace(/\.[^.]+$/, '.webp');
-        await supabase.storage
-          .from('images')
-          .upload(optimizedPath, optimized, {
-            contentType: 'image/webp',
-            upsert: true,
-          });
-
-        return { path, success: true };
-      } catch (error) { /* Error handled silently */ 
-        return {
-          path,
-          success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
-        };
-      }
-    })
-  );
-
-  return results.map((result, index) => {
-    if (result.status === 'fulfilled') {
-      return result.value;
-    } else {
-      return {
-        path: paths[index],
-        success: false,
-        error: result.reason?.message || 'Unknown error',
-      };
-    }
-  });
-}
-
-// =====================================================
-// PERFORMANCE MONITORING
-// =====================================================
-
-export interface MediaMetrics {
-  originalSize: number;
-  optimizedSize: number;
-  compressionRatio: number;
-  format: string;
-  dimensions: { width: number; height: number };
-}
-
-/**
- * Get image metrics
- */
-export async function getImageMetrics(buffer: Buffer): Promise<MediaMetrics> {
-  const metadata = await sharp(buffer).metadata();
-  const optimized = await optimizeImage(buffer);
-
-  return {
-    originalSize: buffer.length,
-    optimizedSize: optimized.length,
-    compressionRatio: ((buffer.length - optimized.length) / buffer.length) * 100,
-    format: metadata.format || 'unknown',
-    dimensions: {
-      width: metadata.width || 0,
-      height: metadata.height || 0,
-    },
-  };
 }
 
 // =====================================================
@@ -322,7 +135,6 @@ export function imageLoader({
   width: number;
   quality?: number;
 }): string {
-  // If it's already a full URL, return as is
   if (src.startsWith('http')) {
     return src;
   }
@@ -355,4 +167,34 @@ export function generatePrefetchLinks(images: string[]): string {
   return images
     .map((src) => `<link rel="prefetch" as="image" href="${src}">`)
     .join('\n');
+}
+
+// =====================================================
+// SERVER-SIDE IMAGE OPTIMIZATION
+// =====================================================
+// These functions require Sharp and have been moved to Netlify function.
+// Call /.netlify/functions/image-optimize instead.
+
+/**
+ * Optimize image using Netlify function
+ * @deprecated Use fetch('/.netlify/functions/image-optimize') directly
+ */
+export async function optimizeImage(
+  buffer: Buffer,
+  options: ImageOptimizationOptions = {}
+): Promise<Buffer> {
+  const base64 = buffer.toString('base64');
+  
+  const response = await fetch(`${process.env.URL || ''}/.netlify/functions/image-optimize`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image: base64, options }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Image optimization failed');
+  }
+
+  const optimizedBase64 = await response.text();
+  return Buffer.from(optimizedBase64, 'base64');
 }

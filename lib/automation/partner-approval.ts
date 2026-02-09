@@ -4,7 +4,7 @@
  */
 
 import { createClient } from '@supabase/supabase-js';
-import { processDocument } from './evidence-processor';
+// Document processing moved to Netlify function
 import {
   REQUIRED_DOCUMENTS,
   areAllDocumentsAccepted,
@@ -256,7 +256,19 @@ export async function processPartnerDocument(
   programId: string = 'barber_apprenticeship',
   state: string = 'IN'
 ): Promise<PartnerApprovalResult> {
-  // 1. Process the document through evidence processor
+  // Document processing moved to Netlify function
+  // For now, skip automatic processing and require manual review
+  return {
+    success: true,
+    approved: false,
+    status: 'submitted',
+    missing_documents: [],
+    pending_documents: [documentId],
+    failed_documents: [],
+    review_queue_id: undefined,
+  };
+  
+  /* Original code - requires evidence-processor which uses Tesseract
   const docResult = await processDocument(documentId);
   
   if (!docResult.success) {
@@ -270,6 +282,7 @@ export async function processPartnerDocument(
       error: docResult.error,
     };
   }
+  */
   
   // 2. If document passed, update partner_documents status
   const supabase = getSupabaseAdmin();

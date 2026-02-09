@@ -1,54 +1,13 @@
 /**
  * Universal OCR Extraction API
- * 
- * Used across the entire website for document reading:
- * - WIOA eligibility verification (pay stubs, ID, proof of residence)
- * - JRI applications (court documents, ID)
- * - Program enrollment (transcripts, certificates)
- * - Financial aid (tax returns, bank statements)
- * - Workforce board (employment verification)
- * - Apprenticeship (work logs, certifications)
- * - Healthcare programs (TB tests, immunization records)
- * - CDL training (driver's license, medical cards)
- * - Barber/Cosmetology (state licenses)
+ * Redirects to Netlify function to keep heavy dependencies out of main handler
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
-export const maxDuration = 120; // OCR can take time
-
-// Dynamic import to avoid bundling tesseract.js into the main handler
-async function getOCRFunctions() {
-  const ocr = await import('@/lib/ocr/tesseract-ocr');
-  return {
-    extractTextFromImage: ocr.extractTextFromImage,
-    autoExtract: ocr.autoExtract,
-    extractW2Data: ocr.extractW2Data,
-    extract1099Data: ocr.extract1099Data,
-    extractIDData: ocr.extractIDData,
-  };
-}
-
-// Document types supported
-type DocumentType = 
-  | 'id' 
-  | 'drivers_license'
-  | 'pay_stub' 
-  | 'w2' 
-  | '1099' 
-  | 'tax_return'
-  | 'bank_statement'
-  | 'court_document'
-  | 'transcript'
-  | 'certificate'
-  | 'immunization_record'
-  | 'tb_test'
-  | 'medical_card'
-  | 'work_log'
-  | 'proof_of_residence'
-  | 'auto';
+export const maxDuration = 120;
 
 export async function POST(req: NextRequest) {
   try {
@@ -62,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     const formData = await req.formData();
     const file = formData.get('file') as File;
-    const documentType = (formData.get('documentType') as DocumentType) || 'auto';
+    const documentType = formData.get('documentType') as string || 'auto';
     const programContext = formData.get('programContext') as string || 'general';
 
     if (!file) {
@@ -70,53 +29,34 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf'];
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json({ 
-        error: 'Invalid file type. Supported: JPEG, PNG, WebP, GIF, PDF' 
+        error: 'Invalid file type. Supported: JPEG, PNG, WebP' 
       }, { status: 400 });
     }
 
-    // Convert file to buffer
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
+    // Convert file to base64
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const base64 = buffer.toString('base64');
+    const dataUrl = `data:${file.type};base64,${base64}`;
 
-    // Get OCR functions (dynamic import)
-    const { extractTextFromImage, autoExtract, extractW2Data, extract1099Data, extractIDData } = await getOCRFunctions();
+    // Call Netlify function
+    const response = await fetch(`${process.env.URL || ''}/.netlify/functions/ocr-extract`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        image: dataUrl,
+        options: { language: 'eng', preprocess: true },
+      }),
+    });
 
-    let result: any;
-    let rawText = '';
-
-    // Handle based on document type
-    if (file.type === 'application/pdf') {
-      // For PDFs, use pdf-parse
-      const pdfParse = (await import('pdf-parse')).default;
-      const pdfData = await pdfParse(buffer);
-      rawText = pdfData.text;
-      result = { text: rawText, type: 'pdf', pages: pdfData.numpages };
-    } else {
-      // For images, use OCR
-      rawText = await extractTextFromImage(buffer);
-      
-      // Extract structured data based on document type
-      switch (documentType) {
-        case 'w2':
-          result = await extractW2Data(buffer);
-          break;
-        case '1099':
-          result = await extract1099Data(buffer);
-          break;
-        case 'id':
-        case 'drivers_license':
-          result = await extractIDData(buffer);
-          break;
-        case 'auto':
-          result = await autoExtract(buffer);
-          break;
-        default:
-          result = { text: rawText, type: documentType };
-      }
+    if (!response.ok) {
+      const error = await response.text();
+      return NextResponse.json({ error: 'OCR extraction failed', details: error }, { status: 500 });
     }
+
+    const result = await response.json();
 
     // Log extraction for audit
     await supabase.from('ocr_extractions').insert({
@@ -127,12 +67,12 @@ export async function POST(req: NextRequest) {
       file_type: file.type,
       success: true,
       extracted_at: new Date().toISOString(),
-    }).catch(() => {}); // Don't fail if logging fails
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,
       data: result,
-      rawText: rawText.substring(0, 500), // First 500 chars for preview
+      rawText: result.text?.substring(0, 500),
       documentType,
       programContext,
     });
@@ -150,15 +90,9 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   return NextResponse.json({
     name: 'Universal OCR API',
-    version: '1.0.0',
-    description: 'Extract text and data from documents across all programs',
-    supportedTypes: [
-      'id', 'drivers_license', 'pay_stub', 'w2', '1099', 'tax_return',
-      'bank_statement', 'court_document', 'transcript', 'certificate',
-      'immunization_record', 'tb_test', 'medical_card', 'work_log',
-      'proof_of_residence', 'auto'
-    ],
-    supportedFormats: ['JPEG', 'PNG', 'WebP', 'GIF', 'PDF'],
+    version: '2.0.0',
+    description: 'Extract text from documents (powered by Netlify function)',
+    supportedFormats: ['JPEG', 'PNG', 'WebP'],
     usage: 'POST with multipart/form-data: file, documentType, programContext',
   });
 }

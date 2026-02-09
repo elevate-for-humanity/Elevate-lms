@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import PageAvatar from '@/components/PageAvatar';
-import { CheckCircle, DollarSign, Award, ArrowRight } from 'lucide-react';
+import { DollarSign, Award, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'HVAC Technician Training | Free Through WRG | Elevate for Humanity',
@@ -90,11 +90,11 @@ export default function HVACProgramPage() {
               <p className="text-slate-200 mb-6">
                 This is not a loan. You don't pay it back. It's a grant funded by the state of Indiana to help Hoosiers get into good-paying careers. We are an approved WRG training provider, and we help you apply for the funding as part of our enrollment process.
               </p>
-              <ul className="space-y-3">
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" /><span>100% tuition covered - you pay $0</span></li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" /><span>Books and training materials included</span></li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" /><span>Certification exam fees paid</span></li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" /><span>Not a loan - no repayment required</span></li>
+              <ul className="space-y-2 text-white">
+                <li>• 100% tuition covered - you pay $0</li>
+                <li>• Books and training materials included</li>
+                <li>• Certification exam fees paid</li>
+                <li>• Not a loan - no repayment required</li>
               </ul>
             </div>
           </div>
@@ -114,11 +114,11 @@ export default function HVACProgramPage() {
               <p className="text-slate-800 mb-6">
                 This means you're not just learning generic HVAC skills - you're learning exactly what Central Indiana employers are looking for. When you graduate, you have employers ready to hire you because they helped design your training.
               </p>
-              <ul className="space-y-3">
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" /><span className="text-slate-700">Curriculum designed by local employers</span></li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" /><span className="text-slate-700">Employers committed to hiring graduates</span></li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" /><span className="text-slate-700">Training matches real job requirements</span></li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" /><span className="text-slate-700">Direct pathway from training to employment</span></li>
+              <ul className="space-y-2 text-slate-800">
+                <li>• Curriculum designed by local employers</li>
+                <li>• Employers committed to hiring graduates</li>
+                <li>• Training matches real job requirements</li>
+                <li>• Direct pathway from training to employment</li>
               </ul>
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden">
@@ -207,10 +207,10 @@ export default function HVACProgramPage() {
               <div className="bg-green-50 border border-green-200 rounded-xl p-6">
                 <h4 className="font-bold text-green-800 mb-2">OJT Benefits</h4>
                 <ul className="space-y-2 text-green-700">
-                  <li className="flex gap-2"><CheckCircle className="w-5 h-5 flex-shrink-0" />Paid wages from day one</li>
-                  <li className="flex gap-2"><CheckCircle className="w-5 h-5 flex-shrink-0" />Real-world job experience</li>
-                  <li className="flex gap-2"><CheckCircle className="w-5 h-5 flex-shrink-0" />Professional references</li>
-                  <li className="flex gap-2"><CheckCircle className="w-5 h-5 flex-shrink-0" />Path to full-time employment</li>
+                  <li>• Paid wages from day one</li>
+                  <li>• Real-world job experience</li>
+                  <li>• Professional references</li>
+                  <li>• Path to full-time employment</li>
                 </ul>
               </div>
             </div>
@@ -263,12 +263,12 @@ export default function HVACProgramPage() {
               </div>
               <div className="p-8">
               <h3 className="text-xl font-bold text-slate-900 mb-4">What to Bring to Your Appointment</h3>
-              <ul className="space-y-3 text-slate-800">
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /><span>Government-issued photo ID</span></li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /><span>Social Security card or number</span></li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /><span>Proof of Indiana residency (utility bill, lease, etc.)</span></li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /><span>High school diploma or GED</span></li>
-                <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /><span>Proof of income (if applicable for WRG eligibility)</span></li>
+              <ul className="space-y-2 text-slate-800">
+                <li>• Government-issued photo ID</li>
+                <li>• Social Security card or number</li>
+                <li>• Proof of Indiana residency (utility bill, lease, etc.)</li>
+                <li>• High school diploma or GED</li>
+                <li>• Proof of income (if applicable for WRG eligibility)</li>
               </ul>
               <div className="mt-6 pt-6 border-t border-slate-200">
                 <p className="text-sm text-slate-700 mb-3">Find your local WorkOne office:</p>
@@ -332,20 +332,20 @@ export default function HVACProgramPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <h3 className="font-bold text-slate-900 mb-4">Basic Requirements</h3>
-                <ul className="space-y-3">
-                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /><span>Indiana resident</span></li>
-                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /><span>18 years or older</span></li>
-                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /><span>High school diploma or GED</span></li>
-                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /><span>Meet income guidelines OR receive assistance</span></li>
+                <ul className="space-y-2 text-slate-800">
+                  <li>• Indiana resident</li>
+                  <li>• 18 years or older</li>
+                  <li>• High school diploma or GED</li>
+                  <li>• Meet income guidelines OR receive assistance</li>
                 </ul>
               </div>
               <div>
                 <h3 className="font-bold text-slate-900 mb-4">Also May Qualify</h3>
-                <ul className="space-y-3">
-                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" /><span>Veterans and military spouses</span></li>
-                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" /><span>Single parents</span></li>
-                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" /><span>Individuals with disabilities</span></li>
-                  <li className="flex gap-3"><CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" /><span>Unemployed or underemployed</span></li>
+                <ul className="space-y-2 text-slate-800">
+                  <li>• Veterans and military spouses</li>
+                  <li>• Single parents</li>
+                  <li>• Individuals with disabilities</li>
+                  <li>• Unemployed or underemployed</li>
                 </ul>
               </div>
             </div>

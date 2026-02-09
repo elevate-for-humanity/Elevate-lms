@@ -1,35 +1,11 @@
-
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { getUserById } from '@/lib/supabase-admin';
 import QRCode from 'qrcode';
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  Image,
-  StyleSheet,
-  pdf,
-} from '@react-pdf/renderer';
 
 // Use Node.js runtime for PDF generation
 export const runtime = 'nodejs';
-
-const styles = StyleSheet.create({
-  page: { padding: 60, fontFamily: 'Helvetica' },
-  h1: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 10,
-  },
-  h2: { fontSize: 16, textAlign: 'center', marginBottom: 30, color: '#666' },
-  row: { fontSize: 14, marginBottom: 8 },
-  qrRow: { marginTop: 30, flexDirection: 'row', alignItems: 'center', gap: 15 },
-  qrText: { fontSize: 10, color: '#666' },
-});
 
 export async function GET(req: NextRequest) {
   const supabase = await createRouteHandlerClient({ cookies });
@@ -65,6 +41,23 @@ export async function GET(req: NextRequest) {
   const origin = req.headers.get('origin') || 'https://efh-lms.com';
   const verifyUrl = `${origin}/cert/verify/${cert.verification_code || cert.serial}`;
   const qrDataUrl = await QRCode.toDataURL(verifyUrl, { margin: 0 });
+
+  // Dynamic import to reduce bundle size
+  const { Document, Page, Text, View, Image, StyleSheet, pdf } = await import('@react-pdf/renderer');
+  
+  const styles = StyleSheet.create({
+    page: { padding: 60, fontFamily: 'Helvetica' },
+    h1: {
+      fontSize: 28,
+      fontWeight: 'bold',
+      textAlign: 'center',
+      marginBottom: 10,
+    },
+    h2: { fontSize: 16, textAlign: 'center', marginBottom: 30, color: '#666' },
+    row: { fontSize: 14, marginBottom: 8 },
+    qrRow: { marginTop: 30, flexDirection: 'row', alignItems: 'center', gap: 15 },
+    qrText: { fontSize: 10, color: '#666' },
+  });
 
   // Create PDF document
   const doc = (

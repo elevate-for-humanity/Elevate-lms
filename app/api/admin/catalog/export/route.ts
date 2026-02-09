@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import PDFDocument from 'pdfkit';
 
 export const dynamic = 'force-dynamic';
 
@@ -63,6 +62,7 @@ export async function GET(request: Request) {
 
     // PDF Export
     if (format === 'pdf') {
+      const PDFDocument = (await import('pdfkit')).default;
       const doc = new PDFDocument({ margin: 50 });
       const chunks: Buffer[] = [];
       

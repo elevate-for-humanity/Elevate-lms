@@ -3,22 +3,17 @@
  * Uses jsPDF for lightweight PDF generation compatible with Vercel
  */
 
-import { jsPDF } from 'jspdf';
-import 'jspdf-autotable';
-
-declare module 'jspdf' {
-  interface jsPDF {
-    autoTable: (options: any) => jsPDF;
-  }
-}
-
-export function generateCertificatePDF(data: {
+export async function generateCertificatePDF(data: {
   studentName: string;
   courseName: string;
   completionDate: string;
   certificateNumber: string;
   instructorName?: string;
 }) {
+  // Dynamic import to reduce bundle size
+  const { jsPDF } = await import('jspdf');
+  await import('jspdf-autotable');
+  
   const doc = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',

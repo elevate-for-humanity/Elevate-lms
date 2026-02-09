@@ -1,5 +1,4 @@
 import { createClient } from '@supabase/supabase-js';
-import { jsPDF } from 'jspdf';
 
 function getSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -22,6 +21,9 @@ interface CertificateData {
 }
 
 export async function generateCertificatePDF(data: CertificateData): Promise<Buffer> {
+  // Dynamic import to reduce bundle size
+  const { jsPDF } = await import('jspdf');
+  
   const doc = new jsPDF({
     orientation: 'landscape',
     unit: 'mm',

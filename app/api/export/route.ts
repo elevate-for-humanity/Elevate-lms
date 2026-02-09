@@ -1,5 +1,4 @@
-
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -132,7 +131,7 @@ export async function GET(request: NextRequest) {
       });
     } else if (format === 'pdf') {
       const template = EXPORT_TEMPLATES[type as keyof typeof EXPORT_TEMPLATES];
-      const doc = exportToPDF(data, {
+      const doc = await exportToPDF(data, {
         title: `${type.charAt(0).toUpperCase() + type.slice(1)} Export`,
         subtitle: `Generated on ${new Date().toLocaleDateString()}`,
         columns: template?.columns,

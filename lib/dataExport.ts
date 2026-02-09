@@ -1,7 +1,17 @@
-
 import { createClient } from '@/lib/supabase/server';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
+
+// PDF types - jsPDF is dynamically imported to reduce bundle size
+type jsPDFInstance = {
+  setFontSize: (size: number) => void;
+  setFont: (font: string, style: string) => void;
+  text: (text: string, x: number, y: number) => void;
+  setTextColor: (color: number) => void;
+  getNumberOfPages: () => number;
+  setPage: (page: number) => void;
+  internal: { pageSize: { width: number; height: number } };
+  output: (type: string) => ArrayBuffer;
+  save: (filename: string) => void;
+};
 
 // =====================================================
 // CSV EXPORT
@@ -109,10 +119,10 @@ export interface PDFExportOptions {
 /**
  * Export data to PDF
  */
-export function exportToPDF(
+export async function exportToPDF(
   data: any[],
   options: PDFExportOptions = {}
-): jsPDF {
+): Promise<jsPDFInstance> {
   const {
     title = 'Data Export',
     subtitle,
@@ -124,6 +134,10 @@ export function exportToPDF(
     headerText,
     footerText,
   } = options;
+
+  // Dynamic import to reduce bundle size
+  const { jsPDF } = await import('jspdf');
+  const autoTable = (await import('jspdf-autotable')).default;
 
   // Create PDF document
   const doc = new jsPDF({
@@ -219,7 +233,7 @@ export function exportToPDF(
 /**
  * Download PDF file
  */
-export function downloadPDF(doc: jsPDF, filename: string = 'export.pdf'): void {
+export function downloadPDF(doc: jsPDFInstance, filename: string = 'export.pdf'): void {
   doc.save(filename);
 }
 

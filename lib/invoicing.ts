@@ -1,7 +1,4 @@
-
 import { createClient } from '@/lib/supabase/server';
-import jsPDF from 'jspdf';
-import autoTable from 'jspdf-autotable';
 
 // =====================================================
 // INVOICE TYPES
@@ -212,6 +209,10 @@ export async function generateInvoicePDF(
   invoice: Invoice,
   userProfile: any
 ): Promise<Buffer> {
+  // Dynamic import to reduce bundle size
+  const jsPDF = (await import('jspdf')).default;
+  const autoTable = (await import('jspdf-autotable')).default;
+  
   const doc = new jsPDF();
 
   // Company header
@@ -378,6 +379,10 @@ export async function generateReceipt(paymentId: string): Promise<Buffer> {
 
   if (!payment) throw new Error('Payment not found');
 
+  // Dynamic import to reduce bundle size
+  const jsPDF = (await import('jspdf')).default;
+  const autoTable = (await import('jspdf-autotable')).default;
+  
   const doc = new jsPDF();
 
   // Header

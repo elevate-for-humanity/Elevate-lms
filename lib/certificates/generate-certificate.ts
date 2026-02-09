@@ -1,4 +1,3 @@
-import { jsPDF } from 'jspdf';
 import QRCode from 'qrcode';
 
 interface CertificateData {
@@ -12,6 +11,9 @@ interface CertificateData {
 }
 
 export async function generateCertificate(data: CertificateData): Promise<Buffer> {
+  // Dynamic import to reduce bundle size
+  const { jsPDF } = await import('jspdf');
+  
   // Create PDF in landscape mode
   const doc = new jsPDF({
     orientation: 'landscape',

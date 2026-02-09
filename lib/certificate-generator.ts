@@ -3,8 +3,6 @@
  * Generates completion certificates for programs and courses
  */
 
-import { jsPDF } from 'jspdf';
-
 export interface CertificateData {
   recipientName: string;
   programName: string;
@@ -16,22 +14,34 @@ export interface CertificateData {
   credentialType?: string;
 }
 
-export class CertificateGenerator {
-  private doc: jsPDF;
+// Type for jsPDF instance
+type jsPDFInstance = any;
 
-  constructor() {
-    // Letter size: 8.5" x 11" = 216mm x 279mm
-    this.doc = new jsPDF({
+export class CertificateGenerator {
+  private doc: jsPDFInstance;
+
+  private constructor(doc: jsPDFInstance) {
+    this.doc = doc;
+  }
+
+  /**
+   * Create a new CertificateGenerator instance
+   * Uses dynamic import to reduce bundle size
+   */
+  static async create(): Promise<CertificateGenerator> {
+    const { jsPDF } = await import('jspdf');
+    const doc = new jsPDF({
       orientation: 'landscape',
       unit: 'mm',
       format: 'letter'
     });
+    return new CertificateGenerator(doc);
   }
 
   /**
    * Generate a professional certificate
    */
-  generateCertificate(data: CertificateData): jsPDF {
+  generateCertificate(data: CertificateData): jsPDFInstance {
     const pageWidth = this.doc.internal.pageSize.getWidth();
     const pageHeight = this.doc.internal.pageSize.getHeight();
     const centerX = pageWidth / 2;

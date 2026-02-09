@@ -1,5 +1,3 @@
-import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
-
 export interface MOUPDFData {
   programHolderName: string;
   payoutShare: number;
@@ -11,6 +9,9 @@ export interface MOUPDFData {
 }
 
 export async function generateMOUPDF(data: MOUPDFData): Promise<Uint8Array> {
+  // Dynamic import to reduce bundle size
+  const { PDFDocument, rgb, StandardFonts } = await import('pdf-lib');
+  
   const pdfDoc = await PDFDocument.create();
   const timesRomanFont = await pdfDoc.embedFont(StandardFonts.TimesRoman);
   const timesRomanBold = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);

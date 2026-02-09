@@ -141,7 +141,7 @@ export default async function BeautyProgramsPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <Award className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+              <Award className="w-12 h-12 text-blue-600 mx-auto mb-4" />
               <h3 className="text-lg font-bold text-black mb-2">State Licensure</h3>
               <p className="text-gray-600 text-sm">
                 Programs meet state requirements for professional licensure

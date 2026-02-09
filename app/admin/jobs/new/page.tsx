@@ -16,14 +16,14 @@ export default function AdminNewJobPage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "New" }]} />
       </div>
 <div className="max-w-3xl mx-auto">
-        <Link href="/admin/jobs" className="flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-6">
+        <Link href="/admin/jobs" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to Jobs
         </Link>
 
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-            <Briefcase className="w-6 h-6 text-purple-600" />
+          <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+            <Briefcase className="w-6 h-6 text-blue-600" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Post New Job</h1>
@@ -41,7 +41,7 @@ export default function AdminNewJobPage() {
                 <input
                   type="text"
                   placeholder="e.g., Barber Apprentice"
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -52,7 +52,7 @@ export default function AdminNewJobPage() {
                   <input
                     type="text"
                     placeholder="Search employers..."
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -60,7 +60,7 @@ export default function AdminNewJobPage() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Healthcare</option>
                     <option>Barbering & Cosmetology</option>
                     <option>IT & Technology</option>
@@ -71,7 +71,7 @@ export default function AdminNewJobPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Employment Type</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Full-time</option>
                     <option>Part-time</option>
                     <option>Apprenticeship</option>
@@ -87,7 +87,7 @@ export default function AdminNewJobPage() {
                   <input
                     type="text"
                     placeholder="City, State"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -95,7 +95,7 @@ export default function AdminNewJobPage() {
               <div className="grid md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Pay Type</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Hourly</option>
                     <option>Salary</option>
                   </select>
@@ -107,7 +107,7 @@ export default function AdminNewJobPage() {
                     <input
                       type="number"
                       placeholder="15.00"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -118,7 +118,7 @@ export default function AdminNewJobPage() {
                     <input
                       type="number"
                       placeholder="25.00"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -129,7 +129,7 @@ export default function AdminNewJobPage() {
                 <textarea
                   rows={6}
                   placeholder="Describe the role, responsibilities, and requirements..."
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -142,7 +142,7 @@ export default function AdminNewJobPage() {
             <div className="grid md:grid-cols-2 gap-3">
               {['Veterans', 'SNAP Recipients', 'Long-term Unemployed', 'Ex-Felons', 'TANF Recipients', 'SSI Recipients', 'Vocational Rehabilitation', 'Summer Youth'].map((group) => (
                 <label key={group} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
-                  <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600 rounded" />
+                  <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600 rounded" />
                   <span className="text-sm text-gray-700">{group}</span>
                 </label>
               ))}
@@ -154,14 +154,14 @@ export default function AdminNewJobPage() {
             
             <div className="space-y-4">
               <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
-                <input type="radio" name="status" defaultChecked className="w-4 h-4 text-purple-600" />
+                <input type="radio" name="status" defaultChecked className="w-4 h-4 text-blue-600" />
                 <div>
                   <p className="font-medium text-gray-900">Publish Immediately</p>
                   <p className="text-sm text-gray-500">Job will be visible to candidates right away</p>
                 </div>
               </label>
               <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
-                <input type="radio" name="status" className="w-4 h-4 text-purple-600" />
+                <input type="radio" name="status" className="w-4 h-4 text-blue-600" />
                 <div>
                   <p className="font-medium text-gray-900">Save as Draft</p>
                   <p className="text-sm text-gray-500">Review and publish later</p>
@@ -179,7 +179,7 @@ export default function AdminNewJobPage() {
             </Link>
             <button
               type="submit"
-              className="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold flex items-center gap-2"
+              className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
               Post Job

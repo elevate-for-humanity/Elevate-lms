@@ -12,7 +12,7 @@ export default function ProLicenseTrialPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <span className="inline-block bg-purple-100 text-purple-700 px-4 py-1 rounded-full text-sm font-medium mb-4">
+          <span className="inline-block bg-blue-100 text-blue-700 px-4 py-1 rounded-full text-sm font-medium mb-4">
             14-Day Free Trial
           </span>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
@@ -55,7 +55,7 @@ export default function ProLicenseTrialPage() {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Your organization"
                   />
                 </div>
@@ -65,7 +65,7 @@ export default function ProLicenseTrialPage() {
                   </label>
                   <input
                     type="email"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="you@company.com"
                   />
                 </div>
@@ -75,13 +75,13 @@ export default function ProLicenseTrialPage() {
                   </label>
                   <input
                     type="text"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     placeholder="Your name"
                   />
                 </div>
                 <button
                   type="submit"
-                  className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition"
+                  className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
                 >
                   Start Free Trial
                 </button>
@@ -95,24 +95,24 @@ export default function ProLicenseTrialPage() {
 
         <div className="grid md:grid-cols-3 gap-6">
           <div className="bg-white rounded-xl p-6 text-center">
-            <Clock className="w-10 h-10 text-purple-600 mx-auto mb-3" />
+            <Clock className="w-10 h-10 text-blue-600 mx-auto mb-3" />
             <h3 className="font-semibold text-gray-900 mb-2">14 Days Free</h3>
             <p className="text-sm text-gray-600">Full access to all features</p>
           </div>
           <div className="bg-white rounded-xl p-6 text-center">
-            <Shield className="w-10 h-10 text-purple-600 mx-auto mb-3" />
+            <Shield className="w-10 h-10 text-blue-600 mx-auto mb-3" />
             <h3 className="font-semibold text-gray-900 mb-2">No Risk</h3>
             <p className="text-sm text-gray-600">Cancel anytime, no questions</p>
           </div>
           <div className="bg-white rounded-xl p-6 text-center">
-            <Zap className="w-10 h-10 text-purple-600 mx-auto mb-3" />
+            <Zap className="w-10 h-10 text-blue-600 mx-auto mb-3" />
             <h3 className="font-semibold text-gray-900 mb-2">Instant Access</h3>
             <p className="text-sm text-gray-600">Start using immediately</p>
           </div>
         </div>
 
         <div className="text-center mt-8">
-          <Link href="/store/licenses" className="text-purple-600 hover:text-purple-700 font-medium">
+          <Link href="/store/licenses" className="text-blue-600 hover:text-blue-700 font-medium">
             ← Back to Licenses
           </Link>
         </div>

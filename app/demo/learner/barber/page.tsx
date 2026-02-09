@@ -9,7 +9,7 @@ import {
   Award,
   Calendar,
   ArrowRight,
-  CheckCircle,
+  Circle,
   Info,
   Users,
   DollarSign,
@@ -205,8 +205,8 @@ export default function BarberApprenticeshipDemoPage() {
             </div>
             <div className="bg-white rounded-xl p-4 border border-slate-200">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <CheckCircle className="w-5 h-5 text-purple-600" />
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Circle className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
                   <p className="text-2xl font-bold text-slate-900">{student.attendance}%</p>
@@ -260,7 +260,7 @@ export default function BarberApprenticeshipDemoPage() {
                       <div key={module.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                         <div className="flex items-center gap-3">
                           {module.status === 'completed' ? (
-                            <CheckCircle className="w-5 h-5 text-green-500" />
+                            <Circle className="w-5 h-5 text-green-500" />
                           ) : module.status === 'in-progress' ? (
                             <div className="w-5 h-5 border-2 border-orange-500 rounded-full flex items-center justify-center">
                               <div className="w-2 h-2 bg-orange-500 rounded-full"></div>
@@ -485,35 +485,35 @@ export default function BarberApprenticeshipDemoPage() {
               <h2 className="text-2xl font-bold mb-4">Full LMS Feature Set Included</h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4 mb-6">
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <Circle className="w-5 h-5 text-green-400" />
                   <span className="text-sm">Video Lessons</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <Circle className="w-5 h-5 text-green-400" />
                   <span className="text-sm">Progress Tracking</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <Circle className="w-5 h-5 text-green-400" />
                   <span className="text-sm">Certificates</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <Circle className="w-5 h-5 text-green-400" />
                   <span className="text-sm">Funding Integration</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <Circle className="w-5 h-5 text-green-400" />
                   <span className="text-sm">Shop Placements</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <Circle className="w-5 h-5 text-green-400" />
                   <span className="text-sm">Career Services</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <Circle className="w-5 h-5 text-green-400" />
                   <span className="text-sm">Messaging</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <Circle className="w-5 h-5 text-green-400" />
                   <span className="text-sm">Mobile Ready</span>
                 </div>
               </div>

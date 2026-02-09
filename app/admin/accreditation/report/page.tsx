@@ -33,7 +33,7 @@ export default function AccreditationReportPage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Report" }]} />
       </div>
 <div className="max-w-6xl mx-auto">
-        <Link href="/admin/accreditation" className="flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-6">
+        <Link href="/admin/accreditation" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to Accreditation
         </Link>
@@ -43,7 +43,7 @@ export default function AccreditationReportPage() {
             <h1 className="text-2xl font-bold text-gray-900">Accreditation Compliance Report</h1>
             <p className="text-gray-600">Generated: {new Date().toLocaleDateString()}</p>
           </div>
-          <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2">
+          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
             <Download className="w-4 h-4" />
             Export PDF
           </button>

@@ -80,7 +80,7 @@ const services = [
 
 const colorClasses: Record<string, { bg: string; text: string; border: string; light: string }> = {
   green: { bg: 'bg-green-600', text: 'text-green-600', border: 'border-green-200', light: 'bg-green-50' },
-  purple: { bg: 'bg-purple-600', text: 'text-purple-600', border: 'border-purple-200', light: 'bg-purple-50' },
+  purple: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
   blue: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
   amber: { bg: 'bg-amber-600', text: 'text-amber-600', border: 'border-amber-200', light: 'bg-amber-50' },
 };
@@ -122,7 +122,7 @@ export default function CommunityServicesPage() {
             </Link>
             <Link
               href="/nonprofit"
-              className="px-8 py-4 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition"
+              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
             >
               Mental Wellness
             </Link>
@@ -141,7 +141,7 @@ export default function CommunityServicesPage() {
               <p className="text-gray-600 text-sm">Start at our VITA site for free tax preparation</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div>
+              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">2</div>
               <h3 className="font-bold mb-2">Access Wellness Support</h3>
               <p className="text-gray-600 text-sm">Connect with Selfish Inc. for mental health services</p>
             </div>

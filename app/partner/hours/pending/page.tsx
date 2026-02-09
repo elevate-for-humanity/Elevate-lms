@@ -290,7 +290,7 @@ export default function PartnerHoursPendingPage() {
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           hour.hour_type === 'ojt' 
                             ? 'bg-blue-100 text-blue-700' 
-                            : 'bg-purple-100 text-purple-700'
+                            : 'bg-blue-100 text-blue-700'
                         }`}>
                           {hour.hour_type === 'ojt' ? 'OJT' : 'RTI'}
                         </span>

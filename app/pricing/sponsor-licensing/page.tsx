@@ -251,8 +251,8 @@ export default async function SponsorLicensingPage() {
             {/* Enterprise */}
             <div className="bg-white rounded-3xl shadow-lg border-2 border-slate-200 p-8 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <Image src="/images/icons/trending-up.png" alt="Enterprise" width={24} height={24} className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Image src="/images/icons/trending-up.png" alt="Enterprise" width={24} height={24} className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black">
@@ -283,44 +283,44 @@ export default async function SponsorLicensingPage() {
 
               <div className="space-y-3 mb-8">
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Everything in Professional
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Multi-state rules engine
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Tenant licensing enforcement
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     SOC-style audit controls
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Monitoring response bundles
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Dedicated onboarding + training
                   </span>
                 </div>
               </div>
 
-              <div className="bg-purple-50 rounded-xl p-4 mb-6">
+              <div className="bg-blue-50 rounded-xl p-4 mb-6">
                 <p className="text-sm font-bold text-black mb-2">
                   Includes:
                 </p>
@@ -332,7 +332,7 @@ export default async function SponsorLicensingPage() {
 
               <Link
                 href="/contact?topic=licensing-enterprise"
-                className="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center px-6 py-4 rounded-xl font-bold transition"
+                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-4 rounded-xl font-bold transition"
               >
                 Contact Sales
               </Link>

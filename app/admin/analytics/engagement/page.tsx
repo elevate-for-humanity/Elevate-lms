@@ -114,7 +114,7 @@ export default async function EngagementPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-500">Engagement Rate</h3>
-              <span className="text-purple-600 bg-purple-100 p-2 rounded-lg">
+              <span className="text-blue-600 bg-blue-100 p-2 rounded-lg">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                 </svg>

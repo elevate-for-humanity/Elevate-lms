@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Plug, CheckCircle, Code, Zap, Database, Mail, CreditCard, Users } from 'lucide-react';
+import { Plug, Circle, Code, Zap, Database, Mail, CreditCard, Users } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -71,23 +71,23 @@ export default async function IntegrationsPage() {
               </p>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <span>Real-time student enrollment sync</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <span>Automatic lead creation from applications</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <span>Course completion tracking</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <span>Custom field mapping</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <span>Webhook triggers for workflows</span>
                 </li>
               </ul>
@@ -99,12 +99,12 @@ export default async function IntegrationsPage() {
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-purple-600" />
+                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Zap className="w-8 h-8 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">Zapier</h3>
-                  <span className="px-3 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-bold">
+                  <span className="px-3 py-2 bg-blue-100 text-purple-800 rounded-full text-sm font-bold">
                     1000+ Apps
                   </span>
                 </div>
@@ -114,27 +114,27 @@ export default async function IntegrationsPage() {
               </p>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Google Sheets for reporting</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Slack notifications</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Mailchimp email campaigns</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>HubSpot CRM sync</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>QuickBooks accounting</span>
                 </li>
               </ul>
-              <div className="bg-purple-50 rounded-lg p-4">
+              <div className="bg-blue-50 rounded-lg p-4">
                 <div className="font-bold mb-2">Setup Time</div>
                 <div className="text-gray-700">5-10 minutes per integration</div>
               </div>
@@ -180,23 +180,23 @@ export default async function IntegrationsPage() {
                   <h4 className="font-bold mb-3">Available Endpoints</h4>
                   <ul className="space-y-2 text-sm text-gray-700">
                     <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <Circle className="w-4 h-4 text-green-600" />
                       <code className="bg-gray-100 px-2 py-2 rounded">POST /api/students</code>
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <Circle className="w-4 h-4 text-green-600" />
                       <code className="bg-gray-100 px-2 py-2 rounded">GET /api/courses</code>
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <Circle className="w-4 h-4 text-green-600" />
                       <code className="bg-gray-100 px-2 py-2 rounded">POST /api/enrollments</code>
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <Circle className="w-4 h-4 text-green-600" />
                       <code className="bg-gray-100 px-2 py-2 rounded">GET /api/progress</code>
                     </li>
                     <li className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <Circle className="w-4 h-4 text-green-600" />
                       <code className="bg-gray-100 px-2 py-2 rounded">POST /api/certificates</code>
                     </li>
                   </ul>
@@ -205,23 +205,23 @@ export default async function IntegrationsPage() {
                   <h4 className="font-bold mb-3">Features</h4>
                   <ul className="space-y-2 text-sm text-gray-700">
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span>OAuth 2.0 authentication</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span>Rate limiting (1000 req/hour)</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span>Webhook subscriptions</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span>JSON responses</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                      <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                       <span>OpenAPI 3.0 spec</span>
                     </li>
                   </ul>

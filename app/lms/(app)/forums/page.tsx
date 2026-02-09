@@ -165,12 +165,12 @@ export default async function ForumsPage() {
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
                       category.color === 'blue' ? 'bg-blue-100' :
                       category.color === 'green' ? 'bg-green-100' :
-                      category.color === 'purple' ? 'bg-purple-100' : 'bg-orange-100'
+                      category.color === 'purple' ? 'bg-blue-100' : 'bg-orange-100'
                     }`}>
                       <category.icon className={`w-6 h-6 ${
                         category.color === 'blue' ? 'text-blue-600' :
                         category.color === 'green' ? 'text-green-600' :
-                        category.color === 'purple' ? 'text-purple-600' : 'text-orange-600'
+                        category.color === 'purple' ? 'text-blue-600' : 'text-orange-600'
                       }`} />
                     </div>
                     <div className="flex-1">

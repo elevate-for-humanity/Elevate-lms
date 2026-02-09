@@ -389,7 +389,7 @@ function CheckoutButton({ cartTotal, itemCount }: { cartTotal: number; itemCount
     <button
       onClick={handleCheckout}
       disabled={loading || itemCount === 0}
-      className="w-full bg-purple-600 text-white py-2 rounded-lg font-medium hover:bg-purple-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      className="w-full bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
     >
       {loading ? (
         <>
@@ -527,7 +527,7 @@ export default function CurvatureShopPage() {
                   <div className="border-t border-gray-200 pt-2 mb-3">
                     <div className="flex justify-between font-bold">
                       <span>Total</span>
-                      <span className="text-purple-600">${cartTotal.toFixed(2)}</span>
+                      <span className="text-blue-600">${cartTotal.toFixed(2)}</span>
                     </div>
                   </div>
                   <CheckoutButton cartTotal={cartTotal} itemCount={cart.length} />
@@ -550,7 +550,7 @@ export default function CurvatureShopPage() {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
             {/* Categories */}
@@ -561,7 +561,7 @@ export default function CurvatureShopPage() {
                   onClick={() => setSelectedCategory(category)}
                   className={`px-4 py-2 rounded-full text-sm font-medium transition ${
                     selectedCategory === category
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -578,7 +578,7 @@ export default function CurvatureShopPage() {
         <div className="max-w-6xl mx-auto px-4">
           {loading ? (
             <div className="flex items-center justify-center py-20">
-              <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
+              <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
               <span className="ml-3 text-gray-600">Loading products...</span>
             </div>
           ) : (
@@ -603,19 +603,19 @@ export default function CurvatureShopPage() {
                         <Sparkles className="w-16 h-16 text-purple-300 group-hover:scale-110 transition" />
                       )}
                       {product.badge && (
-                        <span className="absolute top-3 left-3 px-2 py-1 bg-purple-600 text-white text-xs font-bold rounded-full z-10">
+                        <span className="absolute top-3 left-3 px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded-full z-10">
                           {product.badge}
                         </span>
                       )}
                     </div>
                     {/* Product Info */}
                     <div className="p-4">
-                      <p className="text-xs text-purple-600 font-medium mb-1 capitalize">{product.category}</p>
+                      <p className="text-xs text-blue-600 font-medium mb-1 capitalize">{product.category}</p>
                       <h3 className="font-bold text-gray-900 mb-2">{product.name}</h3>
                       <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
                       {product.ingredients && (
                         <details className="mb-3">
-                          <summary className="text-xs text-purple-600 cursor-pointer hover:text-purple-800 font-medium">
+                          <summary className="text-xs text-blue-600 cursor-pointer hover:text-purple-800 font-medium">
                             View Ingredients
                           </summary>
                           <p className="text-xs text-gray-500 mt-2 leading-relaxed">
@@ -631,7 +631,7 @@ export default function CurvatureShopPage() {
                           className={`flex items-center gap-1 px-4 py-2 rounded-lg font-medium transition ${
                             isInCart(product.id)
                               ? 'bg-green-100 text-green-700'
-                              : 'bg-purple-600 text-white hover:bg-purple-700'
+                              : 'bg-blue-600 text-white hover:bg-blue-700'
                           }`}
                         >
                           {addingToCart === product.id ? (
@@ -663,14 +663,14 @@ export default function CurvatureShopPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Heart className="w-12 h-12 text-pink-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-4">Supporting Mental Wellness</h2>
-          <p className="text-purple-200 mb-6">
+          <p className="text-blue-200 mb-6">
             A portion of every purchase supports Selfish Inc. 501(c)(3) mental wellness programs 
             and free community services through VITA.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/nonprofit/mental-wellness"
-              className="px-6 py-3 bg-white text-purple-900 font-medium rounded-lg hover:bg-purple-50 transition"
+              className="px-6 py-3 bg-white text-purple-900 font-medium rounded-lg hover:bg-blue-50 transition"
             >
               Learn About Selfish Inc.
             </Link>
@@ -689,7 +689,7 @@ export default function CurvatureShopPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Questions?</h2>
           <p className="text-gray-600 mb-6">
-            Contact us at <a href="mailto:curvaturebodysculpting@gmail.com" className="text-purple-600 hover:underline">curvaturebodysculpting@gmail.com</a>
+            Contact us at <a href="mailto:curvaturebodysculpting@gmail.com" className="text-blue-600 hover:underline">curvaturebodysculpting@gmail.com</a>
           </p>
         </div>
       </section>

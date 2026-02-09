@@ -71,7 +71,7 @@ export default async function ApplicationsPage() {
   const statusColors: Record<string, string> = {
     'New': 'bg-blue-100 text-blue-700',
     'Reviewed': 'bg-yellow-100 text-yellow-700',
-    'Interview': 'bg-purple-100 text-purple-700',
+    'Interview': 'bg-blue-100 text-blue-700',
     'Offered': 'bg-green-100 text-green-700',
     'Rejected': 'bg-red-100 text-red-700',
   };
@@ -85,7 +85,7 @@ export default async function ApplicationsPage() {
     { label: 'Total', count: applications.length, color: 'text-gray-900' },
     { label: 'New', count: newCount, color: 'text-blue-600' },
     { label: 'In Review', count: reviewCount, color: 'text-yellow-600' },
-    { label: 'Interview', count: interviewCount, color: 'text-purple-600' },
+    { label: 'Interview', count: interviewCount, color: 'text-blue-600' },
     { label: 'Offered', count: offeredCount, color: 'text-green-600' },
   ];
 

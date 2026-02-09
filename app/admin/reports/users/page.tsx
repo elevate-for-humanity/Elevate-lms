@@ -40,7 +40,7 @@ export default async function UsersReportPage() {
 
   const roleColors: Record<string, { bg: string; text: string; icon: typeof Users }> = {
     super_admin: { bg: 'bg-red-100', text: 'text-red-700', icon: Shield },
-    admin: { bg: 'bg-purple-100', text: 'text-purple-700', icon: Shield },
+    admin: { bg: 'bg-blue-100', text: 'text-blue-700', icon: Shield },
     instructor: { bg: 'bg-blue-100', text: 'text-blue-700', icon: GraduationCap },
     student: { bg: 'bg-green-100', text: 'text-green-700', icon: Users },
     user: { bg: 'bg-gray-100', text: 'text-gray-700', icon: Users },
@@ -92,8 +92,8 @@ export default async function UsersReportPage() {
           
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Shield className="w-5 h-5 text-purple-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Shield className="w-5 h-5 text-blue-600" />
               </div>
               <span className="text-sm text-gray-600">Admins</span>
             </div>
@@ -117,7 +117,7 @@ export default async function UsersReportPage() {
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Recent Users</h2>
-              <Link href="/admin/users" className="text-sm text-purple-600 hover:text-purple-700">
+              <Link href="/admin/users" className="text-sm text-blue-600 hover:text-blue-700">
                 View All
               </Link>
             </div>

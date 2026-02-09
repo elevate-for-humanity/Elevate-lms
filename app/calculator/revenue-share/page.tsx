@@ -273,7 +273,7 @@ export default function RevenueShareCalculator() {
                   <div className="text-xs text-black">Avg per Return</div>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-purple-600">
+                  <div className="text-2xl font-bold text-blue-600">
                     {((subofficeShare / clientPayment) * 100).toFixed(0)}%
                   </div>
                   <div className="text-xs text-black">Your Margin</div>

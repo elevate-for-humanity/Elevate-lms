@@ -35,12 +35,12 @@ export default function StorePaymentsPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 mb-8 flex items-center justify-between">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 flex items-center justify-between">
           <div>
             <p className="font-medium text-purple-900">Official Store Operations Document</p>
-            <p className="text-sm text-purple-700">Authoritative reference for e-commerce, payments, and licensing.</p>
+            <p className="text-sm text-blue-700">Authoritative reference for e-commerce, payments, and licensing.</p>
           </div>
-          <a href="/docs/Store_Payments_Licensing_Framework.pdf" download className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+          <a href="/docs/Store_Payments_Licensing_Framework.pdf" download className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
             <Download className="w-4 h-4" /> PDF
           </a>
         </div>
@@ -48,21 +48,21 @@ export default function StorePaymentsPage() {
         <nav className="bg-gray-50 rounded-lg p-6 mb-10">
           <h2 className="font-semibold mb-4">Contents</h2>
           <ol className="space-y-2 text-sm">
-            <li><a href="#purpose" className="text-purple-600 hover:underline">1. Purpose & Scope</a></li>
-            <li><a href="#products" className="text-purple-600 hover:underline">2. Product Types & Catalog</a></li>
-            <li><a href="#payments" className="text-purple-600 hover:underline">3. Payment Processing</a></li>
-            <li><a href="#licensing" className="text-purple-600 hover:underline">4. Digital Licensing</a></li>
-            <li><a href="#pricing" className="text-purple-600 hover:underline">5. Pricing & Promotions</a></li>
-            <li><a href="#refunds" className="text-purple-600 hover:underline">6. Refunds & Disputes</a></li>
-            <li><a href="#seller" className="text-purple-600 hover:underline">7. Seller/Creator Policies</a></li>
-            <li><a href="#responsibilities" className="text-purple-600 hover:underline">8. Roles & Responsibilities</a></li>
-            <li><a href="#versioning" className="text-purple-600 hover:underline">9. Versioning & Review</a></li>
+            <li><a href="#purpose" className="text-blue-600 hover:underline">1. Purpose & Scope</a></li>
+            <li><a href="#products" className="text-blue-600 hover:underline">2. Product Types & Catalog</a></li>
+            <li><a href="#payments" className="text-blue-600 hover:underline">3. Payment Processing</a></li>
+            <li><a href="#licensing" className="text-blue-600 hover:underline">4. Digital Licensing</a></li>
+            <li><a href="#pricing" className="text-blue-600 hover:underline">5. Pricing & Promotions</a></li>
+            <li><a href="#refunds" className="text-blue-600 hover:underline">6. Refunds & Disputes</a></li>
+            <li><a href="#seller" className="text-blue-600 hover:underline">7. Seller/Creator Policies</a></li>
+            <li><a href="#responsibilities" className="text-blue-600 hover:underline">8. Roles & Responsibilities</a></li>
+            <li><a href="#versioning" className="text-blue-600 hover:underline">9. Versioning & Review</a></li>
           </ol>
         </nav>
 
         <section id="purpose" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <ShoppingCart className="w-6 h-6 text-purple-600" />
+            <ShoppingCart className="w-6 h-6 text-blue-600" />
             1. Purpose & Scope
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">1.1 Purpose</h3>
@@ -80,7 +80,7 @@ export default function StorePaymentsPage() {
 
         <section id="products" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <FileCheck className="w-6 h-6 text-purple-600" />
+            <FileCheck className="w-6 h-6 text-blue-600" />
             2. Product Types & Catalog
           </h2>
           
@@ -116,7 +116,7 @@ export default function StorePaymentsPage() {
 
         <section id="payments" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <CreditCard className="w-6 h-6 text-purple-600" />
+            <CreditCard className="w-6 h-6 text-blue-600" />
             3. Payment Processing
           </h2>
           
@@ -150,7 +150,7 @@ export default function StorePaymentsPage() {
 
         <section id="licensing" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Shield className="w-6 h-6 text-purple-600" />
+            <Shield className="w-6 h-6 text-blue-600" />
             4. Digital Licensing
           </h2>
           
@@ -184,7 +184,7 @@ export default function StorePaymentsPage() {
 
         <section id="pricing" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <FileText className="w-6 h-6 text-purple-600" />
+            <FileText className="w-6 h-6 text-blue-600" />
             5. Pricing & Promotions
           </h2>
           
@@ -215,7 +215,7 @@ export default function StorePaymentsPage() {
 
         <section id="refunds" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <RefreshCw className="w-6 h-6 text-purple-600" />
+            <RefreshCw className="w-6 h-6 text-blue-600" />
             6. Refunds & Disputes
           </h2>
           
@@ -252,7 +252,7 @@ export default function StorePaymentsPage() {
 
         <section id="seller" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Users className="w-6 h-6 text-purple-600" />
+            <Users className="w-6 h-6 text-blue-600" />
             7. Seller/Creator Policies
           </h2>
           

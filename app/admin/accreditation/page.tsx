@@ -309,7 +309,7 @@ export default async function AccreditationPage() {
 
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-4">
-              <Award className="w-8 h-8 text-purple-600" />
+              <Award className="w-8 h-8 text-blue-600" />
               <span className="text-2xl font-bold text-black">
                 {completionRate}%
               </span>
@@ -441,7 +441,7 @@ export default async function AccreditationPage() {
             href="/student-handbook"
             className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
           >
-            <FileText className="w-8 h-8 text-purple-600 mb-3" />
+            <FileText className="w-8 h-8 text-blue-600 mb-3" />
             <h3 className="text-lg font-semibold text-black mb-2">
               Student Handbook
             </h3>

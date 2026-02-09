@@ -39,7 +39,7 @@ export default function ProgramHolderStudentsPage() {
             <button className="flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
               <Filter className="w-5 h-5" /> Filter
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700">
+            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
               <Download className="w-5 h-5" /> Export
             </button>
           </div>
@@ -85,7 +85,7 @@ export default function ProgramHolderStudentsPage() {
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-center gap-2">
                         <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded"><Eye className="w-4 h-4" /></button>
-                        <button className="p-2 text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded"><Mail className="w-4 h-4" /></button>
+                        <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded"><Mail className="w-4 h-4" /></button>
                       </div>
                     </td>
                   </tr>

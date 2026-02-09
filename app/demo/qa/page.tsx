@@ -40,10 +40,10 @@ export default function DemoQAPage() {
                 </Link>
                 <Link
                   href="/demo/tour/partner_employer?step=1"
-                  className="block p-4 bg-purple-50 border border-purple-200 rounded-xl hover:bg-purple-100 transition"
+                  className="block p-4 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition"
                 >
                   <div className="font-semibold text-purple-900">Partner Employer Tour</div>
-                  <div className="text-sm text-purple-700">6 steps • Employer portal flow</div>
+                  <div className="text-sm text-blue-700">6 steps • Employer portal flow</div>
                 </Link>
                 <Link
                   href="/demo/tour/workforce_program?step=1"

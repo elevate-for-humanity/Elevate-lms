@@ -196,12 +196,12 @@ export default async function AtRiskStudentsPage() {
 
           <div className="bg-white rounded-lg shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <TrendingDown className="w-8 h-8 text-purple-600" />
+              <TrendingDown className="w-8 h-8 text-blue-600" />
               <div>
                 <div className="text-sm text-black">
                   Low Completion Programs
                 </div>
-                <div className="text-3xl font-bold text-purple-600">
+                <div className="text-3xl font-bold text-blue-600">
                   {lowCompletionPrograms?.length || 0}
                 </div>
               </div>
@@ -362,7 +362,7 @@ export default async function AtRiskStudentsPage() {
         {lowCompletionPrograms && lowCompletionPrograms.length > 0 && (
           <div className="bg-white rounded-lg shadow-sm p-6">
             <h2 className="text-xl font-bold text-black mb-4 flex items-center gap-2">
-              <TrendingDown className="w-6 h-6 text-purple-600" />
+              <TrendingDown className="w-6 h-6 text-blue-600" />
               Programs Needing Attention
             </h2>
             <div className="overflow-x-auto">

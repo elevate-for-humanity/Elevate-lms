@@ -110,7 +110,7 @@ export default function RefundTrackerPage() {
       case 'approved':
         return <CheckCircle className="w-12 h-12 text-green-600" />;
       case 'sent':
-        return <TrendingUp className="w-12 h-12 text-purple-600" />;
+        return <TrendingUp className="w-12 h-12 text-blue-600" />;
       default:
         return <AlertCircle className="w-12 h-12 text-black" />;
     }
@@ -123,7 +123,7 @@ export default function RefundTrackerPage() {
       case 'approved':
         return 'bg-green-600';
       case 'sent':
-        return 'bg-purple-600';
+        return 'bg-blue-600';
       default:
         return 'bg-gray-600';
     }

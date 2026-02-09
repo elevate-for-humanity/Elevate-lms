@@ -66,7 +66,7 @@ const SUPPORT_CATEGORIES = [
     title: 'Account & Billing',
     description: 'Account settings, enrollment, or payment questions',
     icon: FileText,
-    color: 'bg-purple-100 text-purple-600',
+    color: 'bg-blue-100 text-blue-600',
   },
   {
     title: 'Career Services',
@@ -239,14 +239,14 @@ export default async function SupportPage() {
             </div>
 
             {/* AI Tutor */}
-            <div className="bg-purple-50 rounded-2xl border border-purple-200 p-6">
+            <div className="bg-blue-50 rounded-2xl border border-blue-200 p-6">
               <h3 className="font-bold text-purple-900 mb-2">Need Course Help?</h3>
               <p className="text-sm text-purple-800 mb-4">
                 Our AI Tutor can help with course questions 24/7.
               </p>
               <Link
                 href="/lms/ai-tutor"
-                className="block w-full text-center bg-purple-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-purple-700 transition"
+                className="block w-full text-center bg-blue-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
               >
                 Ask AI Tutor
               </Link>

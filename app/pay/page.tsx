@@ -69,10 +69,10 @@ export default function PayPage() {
           </div>
 
           {/* Buy Now Pay Later */}
-          <div className="bg-white rounded-xl p-6 border-2 border-purple-200">
+          <div className="bg-white rounded-xl p-6 border-2 border-blue-200">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <CreditCard className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <CreditCard className="w-6 h-6 text-blue-600" />
               </div>
               <div className="flex-1">
                 <h3 className="text-xl font-bold text-black mb-2">Pay in 4</h3>
@@ -83,7 +83,7 @@ export default function PayPage() {
                 <div className="flex flex-wrap gap-2">
                   <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-sm font-medium">Klarna</span>
                   <span className="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-sm font-medium">Afterpay</span>
-                  <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-sm font-medium">Zip</span>
+                  <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">Zip</span>
                 </div>
               </div>
             </div>

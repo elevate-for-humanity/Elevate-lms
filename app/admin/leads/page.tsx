@@ -14,7 +14,7 @@ const statusColors: Record<string, string> = {
   new: 'bg-blue-100 text-blue-800',
   contacted: 'bg-yellow-100 text-yellow-800',
   qualified: 'bg-green-100 text-green-800',
-  appointment_set: 'bg-purple-100 text-purple-800',
+  appointment_set: 'bg-blue-100 text-purple-800',
   application_started: 'bg-indigo-100 text-indigo-800',
   enrolled: 'bg-emerald-100 text-emerald-800',
   not_interested: 'bg-gray-100 text-gray-800',
@@ -147,8 +147,8 @@ export default async function AdminLeadsPage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Users className="w-6 h-6 text-purple-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Users className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{qualifiedLeads || 0}</p>

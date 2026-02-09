@@ -53,7 +53,7 @@ export default function GrantApplicationPage() {
                 </ul>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
                 <h3 className="text-xl font-bold text-black mb-3">Private Foundations</h3>
                 <ul className="list-disc pl-6 text-black space-y-1">
                   <li>National foundations</li>
@@ -105,7 +105,7 @@ export default function GrantApplicationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>

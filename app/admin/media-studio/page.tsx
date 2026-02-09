@@ -273,7 +273,7 @@ export default function MediaStudioPage() {
               <button
                 onClick={optimizeImages}
                 disabled={selectedFiles.size === 0}
-                className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
               >
                 <Sparkles className="w-4 h-4" />
                 Optimize

@@ -133,12 +133,12 @@ export default function DemoHubPage() {
                   cta: 'text-green-600',
                 },
                 purple: {
-                  bg: 'bg-purple-100',
-                  bgHover: 'group-hover:bg-purple-500',
-                  text: 'text-purple-600',
+                  bg: 'bg-blue-100',
+                  bgHover: 'group-hover:bg-blue-500',
+                  text: 'text-blue-600',
                   textHover: 'group-hover:text-white',
-                  border: 'hover:border-purple-500',
-                  cta: 'text-purple-600',
+                  border: 'hover:border-blue-500',
+                  cta: 'text-blue-600',
                 },
                 blue: {
                   bg: 'bg-blue-100',
@@ -212,9 +212,9 @@ export default function DemoHubPage() {
               </Link>
               <Link
                 href="/demo/employer"
-                className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-purple-300 hover:bg-purple-50 transition"
+                className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-purple-300 hover:bg-blue-50 transition"
               >
-                <Building2 className="w-6 h-6 text-purple-600" />
+                <Building2 className="w-6 h-6 text-blue-600" />
                 <div>
                   <div className="font-semibold text-slate-900">Employer Portal</div>
                   <div className="text-sm text-slate-500">Hiring & apprentices</div>

@@ -51,7 +51,7 @@ const documents = [
     description: 'E-commerce operations, payment processing, digital licensing, and refund policies.',
     href: '/legal/governance/store-payments',
     icon: ShoppingCart,
-    color: 'bg-purple-100 text-purple-700',
+    color: 'bg-blue-100 text-blue-700',
     owner: 'Director of Operations',
   },
   {

@@ -110,7 +110,7 @@ export default async function CampaignsPage() {
               <span className="text-sm font-semibold text-black">
                 Click Rate
               </span>
-              <TrendingUp className="w-5 h-5 text-purple-600" />
+              <TrendingUp className="w-5 h-5 text-blue-600" />
             </div>
             <p className="text-3xl font-bold text-black">{clickRate}%</p>
             <p className="text-sm text-black mt-1">

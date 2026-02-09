@@ -323,17 +323,17 @@ export default async function AdminDashboardOrchestrated() {
         {/* Partner & Hybrid Enrollments */}
         <div className="mb-6 sm:mb-8">
           <h3 className="text-base sm:text-lg font-bold text-black mb-3 sm:mb-4 flex items-center gap-2">
-            <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+            <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
             Partner & Hybrid Enrollments
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-purple-50 rounded-lg shadow-sm border border-purple-200 p-4 sm:p-6">
+            <div className="bg-blue-50 rounded-lg shadow-sm border border-blue-200 p-4 sm:p-6">
               <div className="text-2xl sm:text-3xl font-bold text-purple-900 mb-1 sm:mb-2">
                 {partnerEnrollmentsTotal || 0}
               </div>
               <div className="text-xs sm:text-sm text-purple-900">Partner Total</div>
             </div>
-            <div className="bg-purple-50 rounded-lg shadow-sm border border-purple-600 p-4 sm:p-6">
+            <div className="bg-blue-50 rounded-lg shadow-sm border border-blue-600 p-4 sm:p-6">
               <div className="text-2xl sm:text-3xl font-bold text-purple-900 mb-1 sm:mb-2">
                 {partnerEnrollmentsActive || 0}
               </div>
@@ -357,7 +357,7 @@ export default async function AdminDashboardOrchestrated() {
         {/* Program Holders */}
         <div className="mb-6 sm:mb-8">
           <h3 className="text-base sm:text-lg font-bold text-black mb-3 sm:mb-4 flex items-center gap-2">
-            <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-purple-600" />
+            <Building2 className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
             Program Holders
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
@@ -533,7 +533,7 @@ export default async function AdminDashboardOrchestrated() {
             </div>
             <div className="p-3">
               <p className="text-slate-600 text-sm">Monitor compliance</p>
-              <span className="inline-flex items-center gap-1 text-purple-600 font-medium text-sm mt-1 group-hover:gap-2 transition-all">
+              <span className="inline-flex items-center gap-1 text-blue-600 font-medium text-sm mt-1 group-hover:gap-2 transition-all">
                 Open <ArrowRight className="w-4 h-4" />
               </span>
             </div>
@@ -898,14 +898,14 @@ export default async function AdminDashboardOrchestrated() {
             <Link
               href="/admin/promo-codes"
               aria-label="Promo Codes"
-              className="p-3 bg-purple-50 border border-purple-200 rounded-lg hover:border-purple-500 hover:shadow text-sm font-medium text-purple-900"
+              className="p-3 bg-blue-50 border border-blue-200 rounded-lg hover:border-blue-500 hover:shadow text-sm font-medium text-purple-900"
             >
               Promo Codes
             </Link>
             <Link
               href="/admin/career-courses/create"
               aria-label="Course Creator"
-              className="p-3 bg-purple-50 border border-purple-200 rounded-lg hover:border-purple-500 hover:shadow text-sm font-medium text-purple-900"
+              className="p-3 bg-blue-50 border border-blue-200 rounded-lg hover:border-blue-500 hover:shadow text-sm font-medium text-purple-900"
             >
               Course Creator (AI)
             </Link>

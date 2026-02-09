@@ -143,7 +143,7 @@ export default async function StaffTrainingPage() {
 
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-2">
-              <Clock className="h-11 w-11 text-purple-600" />
+              <Clock className="h-11 w-11 text-blue-600" />
               <span className="text-3xl font-bold text-black">
                 {completionPercentage}%
               </span>

@@ -80,7 +80,7 @@ export default function ProgressPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-purple-500 mx-auto mb-4 animate-spin" />
+          <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-white">Loading progress...</p>
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function ProgressPage() {
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/barber/progress"
-            className="inline-block px-6 py-3 bg-purple-600 text-white rounded-xl font-medium"
+            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
           >
             Sign In
           </Link>
@@ -137,7 +137,7 @@ export default function ProgressPage() {
   return (
     <div className="min-h-screen bg-slate-900 pb-20">
       {/* Header */}
-      <header className="bg-purple-600 px-4 pt-12 pb-6 safe-area-inset-top">
+      <header className="bg-blue-600 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4 mb-6">
           <Link href="/pwa/barber" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -149,7 +149,7 @@ export default function ProgressPage() {
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-5">
           <div className="text-center mb-4">
             <p className="text-6xl font-black text-white">{formatHours(totalHours)}</p>
-            <p className="text-purple-200">of {formatHours(targetHours)} hours</p>
+            <p className="text-blue-200">of {formatHours(targetHours)} hours</p>
           </div>
           
           <div className="h-4 bg-white/20 rounded-full overflow-hidden mb-4">
@@ -162,15 +162,15 @@ export default function ProgressPage() {
           <div className="grid grid-cols-3 gap-4 text-center">
             <div>
               <p className="text-2xl font-bold text-white">{progressPercent.toFixed(0)}%</p>
-              <p className="text-purple-200 text-xs">Complete</p>
+              <p className="text-blue-200 text-xs">Complete</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-white">{formatHours(Math.max(0, targetHours - totalHours))}</p>
-              <p className="text-purple-200 text-xs">Remaining</p>
+              <p className="text-blue-200 text-xs">Remaining</p>
             </div>
             <div>
               <p className="text-2xl font-bold text-white">{weeksRemaining > 0 ? `~${weeksRemaining}` : '-'}</p>
-              <p className="text-purple-200 text-xs">Weeks Left</p>
+              <p className="text-blue-200 text-xs">Weeks Left</p>
             </div>
           </div>
         </div>
@@ -251,7 +251,7 @@ export default function ProgressPage() {
               <p className="text-slate-400">No hours logged yet</p>
               <Link 
                 href="/pwa/barber/log-hours"
-                className="inline-block mt-4 px-4 py-2 bg-purple-600 text-white rounded-lg text-sm"
+                className="inline-block mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg text-sm"
               >
                 Log Your First Hours
               </Link>

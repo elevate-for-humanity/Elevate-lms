@@ -66,7 +66,7 @@ export default async function StudentCertificationsPage() {
                 <BookOpen className="w-4 h-4" />
                 My Courses
               </Link>
-              <Link href="/student/certifications" className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-purple-50 text-purple-600">
+              <Link href="/student/certifications" className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-blue-50 text-blue-600">
                 <Award className="w-4 h-4" />
                 Certifications
               </Link>

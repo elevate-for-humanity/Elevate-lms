@@ -38,7 +38,7 @@ export default async function WIOADocumentsPage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Documents" }]} />
       </div>
 <div className="max-w-7xl mx-auto">
-        <Link href="/admin/wioa" className="flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-6">
+        <Link href="/admin/wioa" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to WIOA Management
         </Link>
@@ -48,7 +48,7 @@ export default async function WIOADocumentsPage() {
             <h1 className="text-2xl font-bold text-gray-900">WIOA Documents</h1>
             <p className="text-gray-600">Manage participant documentation and compliance files</p>
           </div>
-          <button className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2">
+          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
             <Upload className="w-4 h-4" />
             Upload Document
           </button>
@@ -80,7 +80,7 @@ export default async function WIOADocumentsPage() {
                   <input
                     type="text"
                     placeholder="Search documents..."
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <button className="px-4 py-2 border rounded-lg hover:bg-gray-50 transition flex items-center gap-2">
@@ -94,7 +94,7 @@ export default async function WIOADocumentsPage() {
                   <File className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">No Documents</h3>
                   <p className="text-gray-600 mb-6">Upload WIOA participant documents to get started.</p>
-                  <button className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition">
+                  <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
                     <Plus className="w-4 h-4" />
                     Upload Document
                   </button>

@@ -82,13 +82,13 @@ export default function WebDevelopmentPage() {
           <div className="mt-10 flex flex-wrap gap-4">
             <Link
               href="/apply?program=web-development"
-              className="inline-flex items-center justify-center bg-purple-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-purple-700 transition-colors text-lg"
+              className="inline-flex items-center justify-center bg-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-blue-700 transition-colors text-lg"
             >
               Apply Now
             </Link>
             <Link
               href="/wioa-eligibility"
-              className="inline-flex items-center justify-center border-2 border-purple-600 text-purple-600 px-8 py-4 rounded-full font-semibold hover:bg-purple-50 transition-colors text-lg"
+              className="inline-flex items-center justify-center border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-full font-semibold hover:bg-blue-50 transition-colors text-lg"
             >
               Check Eligibility
             </Link>

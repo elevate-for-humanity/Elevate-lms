@@ -86,7 +86,7 @@ export default async function GroupsPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
               <h1 className="text-3xl md:text-4xl font-bold mb-2">Community Groups</h1>
-              <p className="text-purple-100">Find your tribe and grow together</p>
+              <p className="text-blue-100">Find your tribe and grow together</p>
             </div>
             {user && (
               <Link
@@ -109,7 +109,7 @@ export default async function GroupsPage() {
             <input
               type="text"
               placeholder="Search groups..."
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>
@@ -168,7 +168,7 @@ export default async function GroupsPage() {
                 {user && (
                   <Link
                     href="/community/groups/create"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
                   >
                     <Plus className="w-5 h-5" />
                     Create the First Group
@@ -276,7 +276,7 @@ export default async function GroupsPage() {
                   <p className="text-gray-600 mb-3">Sign in to join groups</p>
                   <Link
                     href="/login?redirect=/community/groups"
-                    className="text-purple-600 font-medium hover:text-purple-700"
+                    className="text-blue-600 font-medium hover:text-blue-700"
                   >
                     Sign In
                   </Link>
@@ -285,9 +285,9 @@ export default async function GroupsPage() {
             </div>
 
             {/* Events CTA */}
-            <div className="bg-purple-50 rounded-lg p-6 border border-purple-200">
+            <div className="bg-blue-50 rounded-lg p-6 border border-blue-200">
               <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center">
-                <Calendar className="w-5 h-5 mr-2 text-purple-600" />
+                <Calendar className="w-5 h-5 mr-2 text-blue-600" />
                 Community Events
               </h2>
               <p className="text-gray-600 text-sm mb-4">
@@ -295,7 +295,7 @@ export default async function GroupsPage() {
               </p>
               <Link
                 href="/community/events"
-                className="block text-center text-purple-600 font-medium hover:text-purple-700"
+                className="block text-center text-blue-600 font-medium hover:text-blue-700"
               >
                 View all events →
               </Link>

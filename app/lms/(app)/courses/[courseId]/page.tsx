@@ -337,8 +337,8 @@ export default async function CoursePage({ params }: { params: Params }) {
                       href={`/lms/quizzes/${quiz.id}`}
                       className="flex items-center gap-4 p-4 hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0"
                     >
-                      <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-purple-600" />
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-blue-600" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-medium text-slate-900">{quiz.title}</h3>

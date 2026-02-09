@@ -179,7 +179,7 @@ export default function SocialMediaPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-2">
-              <Clock className="w-8 h-8 text-purple-600" />
+              <Clock className="w-8 h-8 text-blue-600" />
             </div>
             <div className="text-2xl font-bold text-black">3x Daily</div>
             <div className="text-sm text-black">Post Frequency</div>

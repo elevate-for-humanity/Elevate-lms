@@ -149,10 +149,10 @@ export default function IncentivesPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Users className="w-6 h-6 text-purple-600" />
+              <Users className="w-6 h-6 text-blue-600" />
               <h3 className="text-sm font-medium text-black">Paid Out</h3>
             </div>
-            <p className="text-3xl font-bold text-purple-600">{stats.paid}</p>
+            <p className="text-3xl font-bold text-blue-600">{stats.paid}</p>
             <p className="text-xs text-black mt-1">Completed programs</p>
           </div>
         </div>
@@ -256,7 +256,7 @@ export default function IncentivesPage() {
                         className={`px-2 py-2 text-xs rounded ${
                           incentive.program_type === 'WEX'
                             ? 'bg-blue-100 text-blue-800'
-                            : 'bg-purple-100 text-purple-800'
+                            : 'bg-blue-100 text-purple-800'
                         }`}
                       >
                         {incentive.program_type}

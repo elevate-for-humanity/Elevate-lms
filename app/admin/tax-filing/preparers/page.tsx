@@ -76,7 +76,7 @@ export default async function TaxPreparersPage() {
             <div className="text-black text-sm">Active</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-purple-600">VITA</div>
+            <div className="text-3xl font-bold text-blue-600">VITA</div>
             <div className="text-black text-sm">Certified</div>
           </div>
         </div>

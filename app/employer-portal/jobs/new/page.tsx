@@ -15,13 +15,13 @@ export default function NewJobPage() {
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Jobs" }]} />
 <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <Link href="/employer-portal/jobs" className="flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-4">
+          <Link href="/employer-portal/jobs" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to Jobs
           </Link>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-purple-600" />
+            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+              <Briefcase className="w-6 h-6 text-blue-600" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Post a New Job</h1>
@@ -43,14 +43,14 @@ export default function NewJobPage() {
                 <input
                   type="text"
                   placeholder="e.g., Barber Apprentice, Medical Assistant"
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Department</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Select department</option>
                     <option>Operations</option>
                     <option>Healthcare</option>
@@ -60,7 +60,7 @@ export default function NewJobPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Employment Type *</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Full-time</option>
                     <option>Part-time</option>
                     <option>Contract</option>
@@ -74,7 +74,7 @@ export default function NewJobPage() {
                 <textarea
                   rows={6}
                   placeholder="Describe the role, responsibilities, and what makes this opportunity unique..."
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -93,13 +93,13 @@ export default function NewJobPage() {
                     <input
                       type="text"
                       placeholder="City, State"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Remote Options</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>On-site only</option>
                     <option>Hybrid</option>
                     <option>Fully remote</option>
@@ -115,7 +115,7 @@ export default function NewJobPage() {
                     <input
                       type="text"
                       placeholder="e.g., Mon-Fri 9am-5pm"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -124,7 +124,7 @@ export default function NewJobPage() {
                   <input
                     type="number"
                     placeholder="40"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -139,7 +139,7 @@ export default function NewJobPage() {
               <div className="grid md:grid-cols-3 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Pay Type</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Hourly</option>
                     <option>Salary</option>
                   </select>
@@ -151,7 +151,7 @@ export default function NewJobPage() {
                     <input
                       type="number"
                       placeholder="15.00"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -162,7 +162,7 @@ export default function NewJobPage() {
                     <input
                       type="number"
                       placeholder="25.00"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -173,7 +173,7 @@ export default function NewJobPage() {
                 <div className="grid md:grid-cols-3 gap-3">
                   {['Health Insurance', 'Dental Insurance', 'Vision Insurance', '401(k)', 'Paid Time Off', 'Training Provided', 'Tuition Assistance', 'Flexible Schedule', 'Career Growth'].map((benefit) => (
                     <label key={benefit} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
-                      <input type="checkbox" className="w-4 h-4 text-purple-600 rounded" />
+                      <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
                       <span className="text-sm text-gray-700">{benefit}</span>
                     </label>
                   ))}
@@ -192,7 +192,7 @@ export default function NewJobPage() {
                 <textarea
                   rows={4}
                   placeholder="List the must-have qualifications..."
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -201,14 +201,14 @@ export default function NewJobPage() {
                 <textarea
                   rows={4}
                   placeholder="List nice-to-have qualifications..."
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Experience Level</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Entry Level (No experience required)</option>
                     <option>1-2 years</option>
                     <option>3-5 years</option>
@@ -217,7 +217,7 @@ export default function NewJobPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Education</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>No requirement</option>
                     <option>High School / GED</option>
                     <option>Some College</option>
@@ -230,9 +230,9 @@ export default function NewJobPage() {
           </div>
 
           {/* WOTC Preferences */}
-          <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
+          <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
             <div className="flex items-center gap-3 mb-4">
-              <Users className="w-6 h-6 text-purple-600" />
+              <Users className="w-6 h-6 text-blue-600" />
               <h2 className="text-lg font-bold text-gray-900">WOTC Candidate Preferences</h2>
             </div>
             <p className="text-gray-600 mb-4">Select which WOTC-eligible groups you are open to hiring from:</p>
@@ -249,7 +249,7 @@ export default function NewJobPage() {
                 'SSI Recipients',
               ].map((group) => (
                 <label key={group} className="flex items-center gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:border-purple-300">
-                  <input type="checkbox" defaultChecked className="w-4 h-4 text-purple-600 rounded" />
+                  <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600 rounded" />
                   <span className="text-sm text-gray-700">{group}</span>
                 </label>
               ))}
@@ -263,11 +263,11 @@ export default function NewJobPage() {
               Save as Draft
             </button>
             <div className="flex gap-4">
-              <button type="button" className="px-6 py-3 border border-purple-600 text-purple-600 rounded-lg hover:bg-purple-50 transition flex items-center gap-2">
+              <button type="button" className="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition flex items-center gap-2">
                 <Eye className="w-4 h-4" />
                 Preview
               </button>
-              <button type="submit" className="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold">
+              <button type="submit" className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold">
                 Post Job
               </button>
             </div>

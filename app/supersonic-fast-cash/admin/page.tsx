@@ -116,7 +116,7 @@ export default function SupersonicAdminDashboard() {
             <div className="text-sm text-gray-600">Total Refunds</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
-            <Calendar className="w-8 h-8 text-purple-600 mb-2" />
+            <Calendar className="w-8 h-8 text-blue-600 mb-2" />
             <div className="text-2xl font-bold text-gray-900">{stats.todayAppointments}</div>
             <div className="text-sm text-gray-600">Today's Appts</div>
           </div>
@@ -144,10 +144,10 @@ export default function SupersonicAdminDashboard() {
               </Link>
               <Link
                 href="/supersonic-fast-cash/book-appointment"
-                className="flex items-center justify-between p-4 bg-purple-50 rounded-lg hover:bg-purple-100 transition"
+                className="flex items-center justify-between p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition"
               >
                 <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-purple-600" />
+                  <Calendar className="w-5 h-5 text-blue-600" />
                   <span className="font-medium text-gray-900">Book Appointment</span>
                 </div>
                 <ArrowRight className="w-4 h-4 text-gray-400" />
@@ -274,7 +274,7 @@ export default function SupersonicAdminDashboard() {
               href="/supersonic-fast-cash/sub-office-agreement"
               className="bg-white rounded-xl p-6 shadow-sm border hover:border-orange-300 transition"
             >
-              <Users className="w-8 h-8 text-purple-600 mb-3" />
+              <Users className="w-8 h-8 text-blue-600 mb-3" />
               <h3 className="font-bold text-gray-900">Sub-Office</h3>
               <p className="text-sm text-gray-600">Partner with us</p>
             </Link>

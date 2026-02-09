@@ -100,7 +100,7 @@ export default async function EventsPage() {
   const getEventTypeColor = (type: string) => {
     const colors: Record<string, string> = {
       'info_session': 'bg-blue-100 text-blue-700',
-      'workshop': 'bg-purple-100 text-purple-700',
+      'workshop': 'bg-blue-100 text-blue-700',
       'career_fair': 'bg-green-100 text-green-700',
       'graduation': 'bg-yellow-100 text-yellow-700',
       'networking': 'bg-orange-100 text-orange-700',

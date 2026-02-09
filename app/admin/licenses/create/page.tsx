@@ -16,14 +16,14 @@ export default function CreateLicensePage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Create" }]} />
       </div>
 <div className="max-w-3xl mx-auto">
-        <Link href="/admin/licenses" className="flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-6">
+        <Link href="/admin/licenses" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to Licenses
         </Link>
 
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-            <Award className="w-6 h-6 text-purple-600" />
+          <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+            <Award className="w-6 h-6 text-blue-600" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Issue New License</h1>
@@ -38,7 +38,7 @@ export default function CreateLicensePage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">License Type *</label>
-                <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                   <option>Select license type</option>
                   <option>Barber License</option>
                   <option>Cosmetology License</option>
@@ -55,12 +55,12 @@ export default function CreateLicensePage() {
                   <input
                     type="text"
                     placeholder="e.g., BL-2025-001234"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Issuing Authority *</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Indiana State Board</option>
                     <option>National Certification Board</option>
                     <option>OSHA</option>
@@ -76,7 +76,7 @@ export default function CreateLicensePage() {
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="date"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -86,7 +86,7 @@ export default function CreateLicensePage() {
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="date"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -105,7 +105,7 @@ export default function CreateLicensePage() {
                   <input
                     type="text"
                     placeholder="Search by name or email..."
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -113,7 +113,7 @@ export default function CreateLicensePage() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Program Completed</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Barber Apprenticeship Program</option>
                     <option>Medical Assistant Training</option>
                     <option>IT Support Certification</option>
@@ -125,7 +125,7 @@ export default function CreateLicensePage() {
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="date"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -142,12 +142,12 @@ export default function CreateLicensePage() {
                 <textarea
                   rows={3}
                   placeholder="Any additional notes about this license..."
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div className="flex items-center gap-3">
-                <input type="checkbox" id="notify" className="w-4 h-4 text-purple-600 rounded" defaultChecked />
+                <input type="checkbox" id="notify" className="w-4 h-4 text-blue-600 rounded" defaultChecked />
                 <label htmlFor="notify" className="text-sm text-gray-700">
                   Send notification email to recipient
                 </label>
@@ -164,7 +164,7 @@ export default function CreateLicensePage() {
             </Link>
             <button
               type="submit"
-              className="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold flex items-center gap-2"
+              className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
               Issue License

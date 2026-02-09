@@ -180,7 +180,7 @@ export default async function AdminCoursesPage() {
               <h3 className="text-sm font-medium text-black mb-2">
                 Total Enrollments
               </h3>
-              <p className="text-3xl font-bold text-purple-600">
+              <p className="text-3xl font-bold text-blue-600">
                 {enrollmentCounts?.length || 0}
               </p>
             </div>
@@ -250,7 +250,7 @@ export default async function AdminCoursesPage() {
                             ) : (
                               <div className="w-12 h-12 rounded bg-blue-100 flex items-center justify-center">
                                 <svg
-                                  className="w-6 h-6 text-purple-600"
+                                  className="w-6 h-6 text-blue-600"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"

@@ -17,7 +17,7 @@ export default function EnterpriseCapitalReadinessPage() {
               <ArrowLeft className="w-4 h-4" />
               Back to Capital Readiness Guide
             </Link>
-            <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm font-medium border border-purple-500/30">
+            <span className="px-3 py-1 bg-blue-500/20 text-purple-300 rounded-full text-sm font-medium border border-blue-500/30">
               Level 4: Enterprise
             </span>
           </div>
@@ -27,7 +27,7 @@ export default function EnterpriseCapitalReadinessPage() {
       {/* Hero Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-500/20 rounded-full text-purple-300 text-sm font-medium mb-6 border border-purple-500/30">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 rounded-full text-purple-300 text-sm font-medium mb-6 border border-blue-500/30">
             <Building2 className="w-4 h-4" />
             Enterprise & Government Deployment
           </div>
@@ -270,11 +270,11 @@ export default function EnterpriseCapitalReadinessPage() {
                 }
               ].map((phase, i) => (
                 <div key={i} className="relative pl-20">
-                  <div className="absolute left-6 w-4 h-4 rounded-full bg-purple-500 border-4 border-slate-900"></div>
+                  <div className="absolute left-6 w-4 h-4 rounded-full bg-blue-500 border-4 border-slate-900"></div>
                   <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
                     <div className="flex flex-wrap items-center gap-4 mb-4">
                       <h3 className="text-lg font-semibold text-white">{phase.phase}</h3>
-                      <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-sm">
+                      <span className="px-3 py-1 bg-blue-500/20 text-purple-300 rounded-full text-sm">
                         {phase.duration}
                       </span>
                     </div>
@@ -475,7 +475,7 @@ export default function EnterpriseCapitalReadinessPage() {
 
         {/* CTA */}
         <section className="text-center">
-          <div className="bg-purple-500/20 rounded-2xl border border-purple-500/30 p-12">
+          <div className="bg-blue-500/20 rounded-2xl border border-blue-500/30 p-12">
             <h2 className="text-3xl font-bold text-white mb-4">
               Ready for Enterprise Deployment?
             </h2>
@@ -486,7 +486,7 @@ export default function EnterpriseCapitalReadinessPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact?type=enterprise"
-                className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg transition-colors"
+                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
               >
                 Schedule Enterprise Consultation
               </Link>

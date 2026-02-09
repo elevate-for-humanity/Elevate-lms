@@ -100,7 +100,7 @@ export default async function TaxFilingApplicationsPage() {
               aria-label="Link"
               className="block"
             >
-              <div className="text-lg font-bold text-purple-600">+ New</div>
+              <div className="text-lg font-bold text-blue-600">+ New</div>
               <div className="text-black text-sm">Add Application</div>
             </Link>
           </div>

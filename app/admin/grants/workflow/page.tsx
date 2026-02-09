@@ -139,7 +139,7 @@ export default async function GrantWorkflowPage() {
               </div>
               <div className="flex-shrink-0 w-16 h-1 bg-slate-200" />
               <div className="flex-1 text-center">
-                <div className="w-12 h-12 bg-purple-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 font-bold">
+                <div className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 font-bold">
                   {statusCounts.ready}
                 </div>
                 <p className="text-sm font-medium text-black">🟣 Ready</p>

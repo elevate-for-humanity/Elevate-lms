@@ -115,7 +115,7 @@ export default async function AlumniPage() {
           <div className="text-gray-600 text-sm">Companies</div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border p-5 text-center">
-          <MapPin className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+          <MapPin className="w-8 h-8 text-blue-600 mx-auto mb-2" />
           <div className="text-2xl font-bold">20+</div>
           <div className="text-gray-600 text-sm">Cities</div>
         </div>

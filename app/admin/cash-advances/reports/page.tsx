@@ -100,7 +100,7 @@ export default async function CashAdvanceReportsPage() {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-purple-600">
+            <div className="text-3xl font-bold text-blue-600">
               ${totalAmount.toFixed(2)}
             </div>
             <div className="text-black text-sm">Total Amount</div>
@@ -153,7 +153,7 @@ export default async function CashAdvanceReportsPage() {
             <button className="px-4 py-2 bg-brand-green-600 text-white rounded hover:bg-green-700" aria-label="Action button">
               Export to PDF
             </button>
-            <button className="px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700" aria-label="Action button">
+            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" aria-label="Action button">
               Export to Excel
             </button>
           </div>

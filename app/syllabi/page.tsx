@@ -575,7 +575,7 @@ export default function SyllabiPage() {
                     {/* Assessments */}
                     <div className="mb-6">
                       <div className="flex items-center gap-2 mb-3">
-                        <Award className="w-5 h-5 text-purple-600" />
+                        <Award className="w-5 h-5 text-blue-600" />
                         <h4 className="font-bold text-black">
                           Assessments & Grading
                         </h4>
@@ -586,7 +586,7 @@ export default function SyllabiPage() {
                             key={idx}
                             className="flex items-start gap-3 text-black"
                           >
-                            <span className="text-purple-600 font-bold">•</span>
+                            <span className="text-blue-600 font-bold">•</span>
                             <span>{assessment}</span>
                           </li>
                         ))}

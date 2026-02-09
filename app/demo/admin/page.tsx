@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Info, Menu, X, Home, Users, GraduationCap, FileText, Building2, Search, Plus, ChevronRight, Bell, Download, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Info, Menu, X, Home, Users, GraduationCap, FileText, Building2, Search, Plus, ChevronRight, Bell, Download, AlertCircle, Circle, Clock } from 'lucide-react';
 
 interface Program {
   name: string;
@@ -113,7 +113,7 @@ export default function AdminDemo() {
               {[
                 { label: 'Students', value: 312, icon: Users, color: 'text-blue-600' },
                 { label: 'Programs', value: 12, icon: GraduationCap, color: 'text-green-600' },
-                { label: 'Completion', value: '78%', icon: CheckCircle, color: 'text-purple-600' },
+                { label: 'Completion', value: '78%', icon: Circle, color: 'text-blue-600' },
                 { label: 'Partners', value: 24, icon: Building2, color: 'text-orange-600' },
               ].map((s, i) => (
                 <div key={i} className="bg-white rounded-xl p-3 border">
@@ -131,7 +131,7 @@ export default function AdminDemo() {
                   { stage: 'Review', count: 32, color: 'bg-yellow-500' },
                   { stage: 'Enrolled', count: 28, color: 'bg-blue-500' },
                   { stage: 'Active', count: 312, color: 'bg-green-500' },
-                  { stage: 'Done', count: 214, color: 'bg-purple-500' },
+                  { stage: 'Done', count: 214, color: 'bg-blue-500' },
                 ].map((p, i) => (
                   <div key={i} className={`${p.color} text-white px-3 py-2 rounded-lg text-center min-w-[60px]`}>
                     <div className="font-bold">{p.count}</div>
@@ -208,7 +208,7 @@ export default function AdminDemo() {
             <div className="grid sm:grid-cols-2 gap-3">
               {programs.map((p, i) => (
                 <div key={i} className="bg-white rounded-xl p-4 border hover:shadow-md transition">
-                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${p.cat === 'Healthcare' ? 'bg-blue-100 text-blue-700' : p.cat === 'Trades' ? 'bg-orange-100 text-orange-700' : 'bg-purple-100 text-purple-700'}`}>{p.cat}</span>
+                  <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${p.cat === 'Healthcare' ? 'bg-blue-100 text-blue-700' : p.cat === 'Trades' ? 'bg-orange-100 text-orange-700' : 'bg-blue-100 text-blue-700'}`}>{p.cat}</span>
                   <h3 className="font-bold text-gray-900 mt-2 mb-3">{p.name}</h3>
                   <div className="flex justify-between">
                     <div><div className="text-xl font-bold text-gray-900">{p.enrolled}</div><div className="text-xs text-gray-500">Enrolled</div></div>

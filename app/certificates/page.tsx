@@ -260,7 +260,7 @@ export default function CertificatesPage() {
             </div>
 
             <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
-              <GraduationCap className="h-12 w-12 text-purple-600 mb-4" />
+              <GraduationCap className="h-12 w-12 text-blue-600 mb-4" />
               <h3 className="text-lg font-bold text-black mb-2">DOL</h3>
               <p className="text-sm text-black mb-3">
                 Department of Labor - Apprenticeship Programs
@@ -396,8 +396,8 @@ export default function CertificatesPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="h-11 w-11 text-purple-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award className="h-11 w-11 text-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
                 Career Advancement

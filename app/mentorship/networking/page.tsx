@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Users, CheckCircle, ArrowRight, Briefcase, MessageSquare, Globe } from 'lucide-react';
+import { Users, Circle, ArrowRight, Briefcase, MessageSquare, Globe } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Networking Mentorship | Elevate for Humanity',
@@ -34,7 +34,7 @@ export default function NetworkingPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <Users className="w-16 h-16 mx-auto mb-4 text-white/80" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Professional Networking</h1>
-          <p className="text-xl text-purple-100">Build connections that advance your career</p>
+          <p className="text-xl text-blue-100">Build connections that advance your career</p>
         </div>
       </section>
 
@@ -42,18 +42,18 @@ export default function NetworkingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-12 text-center">Networking Support</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-purple-50 rounded-xl p-6 text-center">
-              <Briefcase className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+            <div className="bg-blue-50 rounded-xl p-6 text-center">
+              <Briefcase className="w-12 h-12 text-blue-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">Industry Introductions</h3>
               <p className="text-gray-600">Get introduced to professionals in your target industry</p>
             </div>
-            <div className="bg-purple-50 rounded-xl p-6 text-center">
-              <MessageSquare className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+            <div className="bg-blue-50 rounded-xl p-6 text-center">
+              <MessageSquare className="w-12 h-12 text-blue-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">Networking Coaching</h3>
               <p className="text-gray-600">Learn effective networking strategies and techniques</p>
             </div>
-            <div className="bg-purple-50 rounded-xl p-6 text-center">
-              <Globe className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+            <div className="bg-blue-50 rounded-xl p-6 text-center">
+              <Globe className="w-12 h-12 text-blue-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">Event Access</h3>
               <p className="text-gray-600">Attend exclusive networking events and meetups</p>
             </div>
@@ -74,7 +74,7 @@ export default function NetworkingPage() {
               'Building your personal brand',
             ].map((item, i) => (
               <div key={i} className="bg-white rounded-lg p-4 flex items-center shadow-sm">
-                <CheckCircle className="w-5 h-5 text-purple-600 mr-3 flex-shrink-0" />
+                <Circle className="w-5 h-5 text-blue-600 mr-3 flex-shrink-0" />
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}
@@ -82,11 +82,11 @@ export default function NetworkingPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-purple-700 text-white">
+      <section className="py-16 bg-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Expand Your Network</h2>
-          <p className="text-xl text-purple-100 mb-8">Get guidance on building meaningful professional connections.</p>
-          <Link href="/apply" className="bg-white hover:bg-gray-100 text-purple-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <p className="text-xl text-blue-100 mb-8">Get guidance on building meaningful professional connections.</p>
+          <Link href="/apply" className="bg-white hover:bg-gray-100 text-blue-700 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Apply for Mentorship <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

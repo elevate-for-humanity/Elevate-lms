@@ -104,7 +104,7 @@ export default async function AnalyticsPage() {
     const colors: Record<string, string> = {
       blue: 'bg-blue-100 text-blue-600',
       green: 'bg-green-100 text-green-600',
-      purple: 'bg-purple-100 text-purple-600',
+      purple: 'bg-blue-100 text-blue-600',
     };
     return colors[color] || colors.blue;
   };

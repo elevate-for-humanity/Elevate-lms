@@ -63,8 +63,8 @@ export default async function CompanyProfilePage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-sm p-8 text-center">
-          <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Building className="w-8 h-8 text-purple-600" />
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Building className="w-8 h-8 text-blue-600" />
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Set Up Your Company Profile</h1>
           <p className="text-gray-600 mb-8">
@@ -72,7 +72,7 @@ export default async function CompanyProfilePage() {
           </p>
           <Link
             href="/employer-portal/company/setup"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
           >
             <Edit className="w-4 h-4" />
             Create Profile
@@ -108,7 +108,7 @@ export default async function CompanyProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Cover Image */}
-      <div className="relative h-64 bg-purple-600">
+      <div className="relative h-64 bg-blue-600">
         {companyData.cover && companyData.cover !== '/images/defaults/company-cover.jpg' && (
           <Image
             src={companyData.cover}
@@ -138,7 +138,7 @@ export default async function CompanyProfilePage() {
                 </div>
                 <Link 
                   href="/employer-portal/company/setup"
-                  className="absolute bottom-0 right-0 p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 transition"
+                  className="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
                 >
                   <Camera className="w-4 h-4" />
                 </Link>
@@ -180,7 +180,7 @@ export default async function CompanyProfilePage() {
               </div>
               <Link
                 href="/employer-portal/company/setup"
-                className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2"
+                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
               >
                 <Edit className="w-4 h-4" />
                 Edit Profile
@@ -201,7 +201,7 @@ export default async function CompanyProfilePage() {
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-                <Briefcase className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+                <Briefcase className="w-8 h-8 text-blue-600 mx-auto mb-2" />
                 <p className="text-2xl font-bold text-gray-900">{stats.activeJobs}</p>
                 <p className="text-sm text-gray-600">Active Jobs</p>
               </div>
@@ -247,7 +247,7 @@ export default async function CompanyProfilePage() {
                 {companyData.website && (
                   <div className="flex items-center gap-3">
                     <Globe className="w-5 h-5 text-gray-400" />
-                    <a href={`https://${companyData.website}`} target="_blank" rel="noopener noreferrer" className="text-purple-600 hover:underline">
+                    <a href={`https://${companyData.website}`} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
                       {companyData.website}
                     </a>
                   </div>
@@ -255,7 +255,7 @@ export default async function CompanyProfilePage() {
                 {companyData.phone && (
                   <div className="flex items-center gap-3">
                     <Phone className="w-5 h-5 text-gray-400" />
-                    <a href={`tel:${companyData.phone}`} className="text-gray-700 hover:text-purple-600">
+                    <a href={`tel:${companyData.phone}`} className="text-gray-700 hover:text-blue-600">
                       {companyData.phone}
                     </a>
                   </div>
@@ -263,7 +263,7 @@ export default async function CompanyProfilePage() {
                 {companyData.email && (
                   <div className="flex items-center gap-3">
                     <Mail className="w-5 h-5 text-gray-400" />
-                    <a href={`mailto:${companyData.email}`} className="text-gray-700 hover:text-purple-600">
+                    <a href={`mailto:${companyData.email}`} className="text-gray-700 hover:text-blue-600">
                       {companyData.email}
                     </a>
                   </div>
@@ -283,13 +283,13 @@ export default async function CompanyProfilePage() {
               <div className="space-y-3">
                 <Link
                   href="/employer-portal/jobs/new"
-                  className="block w-full px-4 py-3 bg-purple-600 text-white text-center rounded-lg hover:bg-purple-700 transition"
+                  className="block w-full px-4 py-3 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700 transition"
                 >
                   Post New Job
                 </Link>
                 <Link
                   href="/employer-portal/candidates"
-                  className="block w-full px-4 py-3 border border-purple-600 text-purple-600 text-center rounded-lg hover:bg-purple-50 transition"
+                  className="block w-full px-4 py-3 border border-blue-600 text-blue-600 text-center rounded-lg hover:bg-blue-50 transition"
                 >
                   Browse Candidates
                 </Link>

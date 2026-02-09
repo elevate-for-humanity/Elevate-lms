@@ -402,7 +402,7 @@ export default function FranchiseAdminDashboard() {
                       <div className={`p-2 rounded-full ${
                         activity.type === 'return' ? 'bg-blue-100 text-blue-600' :
                         activity.type === 'office' ? 'bg-green-100 text-green-600' :
-                        'bg-purple-100 text-purple-600'
+                        'bg-blue-100 text-blue-600'
                       }`}>
                         {activity.type === 'return' ? <FileText className="h-4 w-4" /> :
                          activity.type === 'office' ? <Building2 className="h-4 w-4" /> :

@@ -152,7 +152,7 @@ export default async function StaffReportsPage() {
             <p className="text-gray-600 text-sm">Completed This Month</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <Clock className="w-8 h-8 text-purple-500 mb-2" />
+            <Clock className="w-8 h-8 text-blue-500 mb-2" />
             <p className="text-2xl font-bold">{attendanceToday || 0}</p>
             <p className="text-gray-600 text-sm">Attendance Today</p>
           </div>

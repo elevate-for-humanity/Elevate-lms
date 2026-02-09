@@ -47,7 +47,7 @@ export default function EstheticianOrientationPage() {
         <div className="space-y-4">
           <p>The {config.programTitle} requires <strong>{config.hoursLabel}</strong> of combined training:</p>
           <div className="grid gap-4 mt-4">
-            <div className="bg-purple-50 p-4 rounded-lg">
+            <div className="bg-blue-50 p-4 rounded-lg">
               <h4 className="font-bold text-purple-900">On-the-Job Training (OJT)</h4>
               <p className="text-purple-800 text-sm">{config.ojtDescription}</p>
             </div>
@@ -192,7 +192,7 @@ export default function EstheticianOrientationPage() {
             <span className="text-sm font-bold text-slate-900">{currentSection + 1} of {sections.length}</span>
           </div>
           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
-            <div className="h-full bg-purple-600 transition-all duration-300" style={{ width: `${progress}%` }} />
+            <div className="h-full bg-blue-600 transition-all duration-300" style={{ width: `${progress}%` }} />
           </div>
         </div>
       </div>
@@ -201,7 +201,7 @@ export default function EstheticianOrientationPage() {
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="bg-slate-900 px-6 py-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
                 <CurrentIcon className="w-5 h-5 text-white" />
               </div>
               <h2 className="text-xl font-bold text-white">{sections[currentSection].title}</h2>
@@ -217,7 +217,7 @@ export default function EstheticianOrientationPage() {
                   type="checkbox"
                   checked={acknowledged}
                   onChange={(e) => setAcknowledged(e.target.checked)}
-                  className="w-5 h-5 mt-0.5 rounded border-slate-300 text-purple-600 focus:ring-purple-500"
+                  className="w-5 h-5 mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-slate-700">
                   <strong>I understand my responsibilities and agree to proceed.</strong>
@@ -240,12 +240,12 @@ export default function EstheticianOrientationPage() {
               <button
                 onClick={handleComplete}
                 disabled={!acknowledged || submitting}
-                className="px-8 py-3 bg-purple-600 text-white font-bold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-700 transition"
+                className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition"
               >
                 {submitting ? 'Processing...' : 'Continue to Program'}
               </button>
             ) : (
-              <button onClick={handleNext} className="px-8 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition">
+              <button onClick={handleNext} className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition">
                 Next
               </button>
             )}

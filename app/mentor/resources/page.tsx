@@ -36,8 +36,8 @@ export default function MentorResourcesPage() {
           {resources.map((resource) => (
             <div key={resource.id} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
               <div className="flex items-start gap-4">
-                <div className={`p-3 rounded-lg ${resource.type === 'video' ? 'bg-purple-100' : 'bg-blue-100'}`}>
-                  {resource.type === 'video' ? <Video className="w-6 h-6 text-purple-600" /> : <FileText className="w-6 h-6 text-blue-600" />}
+                <div className={`p-3 rounded-lg ${resource.type === 'video' ? 'bg-blue-100' : 'bg-blue-100'}`}>
+                  {resource.type === 'video' ? <Video className="w-6 h-6 text-blue-600" /> : <FileText className="w-6 h-6 text-blue-600" />}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 mb-1">{resource.title}</h3>

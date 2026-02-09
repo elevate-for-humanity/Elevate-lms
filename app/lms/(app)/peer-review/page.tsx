@@ -97,8 +97,8 @@ export default async function PeerReviewPage() {
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                <Star className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <Star className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">--</div>

@@ -32,7 +32,7 @@ interface CalendarEvent {
 
 const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
   training: { label: 'Training', color: 'bg-blue-100 text-blue-700' },
-  audit: { label: 'Audit', color: 'bg-purple-100 text-purple-700' },
+  audit: { label: 'Audit', color: 'bg-blue-100 text-blue-700' },
   deadline: { label: 'Deadline', color: 'bg-red-100 text-red-700' },
   review: { label: 'Review', color: 'bg-orange-100 text-orange-700' },
   notification: { label: 'Notification', color: 'bg-green-100 text-green-700' },

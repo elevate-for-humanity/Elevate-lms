@@ -126,7 +126,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
                   <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">Veteran</span>
                 )}
                 {caseFile.profile.demographics?.justiceInvolved && (
-                  <span className="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-xs">Justice-Involved</span>
+                  <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">Justice-Involved</span>
                 )}
                 {caseFile.profile.demographics?.disability && (
                   <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs">Disability</span>

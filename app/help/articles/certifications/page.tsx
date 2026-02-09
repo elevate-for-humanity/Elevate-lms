@@ -64,8 +64,8 @@ export default function CertificationsHelpPage() {
               <h3 className="font-semibold mb-2">Access Anytime</h3>
               <p className="text-sm text-gray-600">View and download your certificates from your dashboard 24/7.</p>
             </div>
-            <div className="bg-purple-50 rounded-lg p-6">
-              <Download className="w-8 h-8 text-purple-600 mb-3" />
+            <div className="bg-blue-50 rounded-lg p-6">
+              <Download className="w-8 h-8 text-blue-600 mb-3" />
               <h3 className="font-semibold mb-2">Share & Verify</h3>
               <p className="text-sm text-gray-600">Share certificates with employers who can verify them online.</p>
             </div>

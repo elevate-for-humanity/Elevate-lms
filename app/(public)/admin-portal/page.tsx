@@ -51,7 +51,7 @@ export default function AdminPortalPublicPage() {
               <p className="text-slate-600">Track enrollments, completions, placements, and program performance.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
-              <Settings className="w-10 h-10 text-purple-600 mb-4" />
+              <Settings className="w-10 h-10 text-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">System Configuration</h3>
               <p className="text-slate-600">Configure programs, courses, certifications, and platform settings.</p>
             </div>

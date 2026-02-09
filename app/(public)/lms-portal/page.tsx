@@ -67,7 +67,7 @@ export default function LMSPortalPublicPage() {
               <p className="text-slate-600">Earn industry-recognized certificates upon completing your training programs.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
-              <Users className="w-10 h-10 text-purple-600 mb-4" />
+              <Users className="w-10 h-10 text-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Community</h3>
               <p className="text-slate-600">Connect with fellow students, join study groups, and participate in forums.</p>
             </div>

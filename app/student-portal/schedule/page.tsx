@@ -60,7 +60,7 @@ export default function StudentPortalSchedulePage() {
                         </div>
                       )}
                       {day === 'Tuesday' && time === '10:00 AM' && (
-                        <div className="bg-purple-100 border-l-4 border-purple-500 p-2 rounded text-sm">
+                        <div className="bg-blue-100 border-l-4 border-blue-500 p-2 rounded text-sm">
                           <div className="font-medium">CHEM 201</div>
                           <div className="text-gray-600">Lab 302</div>
                         </div>
@@ -78,7 +78,7 @@ export default function StudentPortalSchedulePage() {
                         </div>
                       )}
                       {day === 'Thursday' && time === '10:00 AM' && (
-                        <div className="bg-purple-100 border-l-4 border-purple-500 p-2 rounded text-sm">
+                        <div className="bg-blue-100 border-l-4 border-blue-500 p-2 rounded text-sm">
                           <div className="font-medium">CHEM 201</div>
                           <div className="text-gray-600">Lab 302</div>
                         </div>
@@ -132,7 +132,7 @@ export default function StudentPortalSchedulePage() {
           </div>
           <div className="border rounded-lg p-4">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-4 h-4 bg-purple-500 rounded"></div>
+              <div className="w-4 h-4 bg-blue-500 rounded"></div>
               <h3 className="font-medium">Chemistry 201</h3>
             </div>
             <p className="text-sm text-gray-600">TTh 10:00 AM - 11:30 AM | Lab 302</p>

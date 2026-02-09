@@ -32,7 +32,7 @@ export default function CRMAppointmentsPage() {
           </div>
           <Link
             href="/admin/crm/appointments/new"
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             New Appointment
@@ -48,7 +48,7 @@ export default function CRMAppointmentsPage() {
                   <button className="p-2 hover:bg-gray-100 rounded-lg">
                     <ChevronLeft className="w-5 h-5" />
                   </button>
-                  <button className="px-4 py-2 bg-purple-100 text-purple-700 rounded-lg font-medium">
+                  <button className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium">
                     Today
                   </button>
                   <button className="p-2 hover:bg-gray-100 rounded-lg">
@@ -76,13 +76,13 @@ export default function CRMAppointmentsPage() {
                     <div
                       key={i}
                       className={`aspect-square p-2 rounded-lg ${
-                        isToday ? 'bg-purple-600 text-white' :
+                        isToday ? 'bg-blue-600 text-white' :
                         isCurrentMonth ? 'hover:bg-gray-100 cursor-pointer' : 'text-gray-300'
                       }`}
                     >
                       <span className="text-sm">{isCurrentMonth ? day : ''}</span>
                       {hasAppointment && isCurrentMonth && !isToday && (
-                        <div className="w-1.5 h-1.5 bg-purple-600 rounded-full mx-auto mt-1" />
+                        <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mx-auto mt-1" />
                       )}
                     </div>
                   );
@@ -120,7 +120,7 @@ export default function CRMAppointmentsPage() {
                       </div>
                     </div>
                     <div className="mt-3 flex gap-2">
-                      <button className="flex-1 px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition">
+                      <button className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
                         {apt.type === 'video' ? 'Join Call' : 'View Details'}
                       </button>
                       <button className="px-3 py-2 border rounded-lg hover:bg-gray-50 transition text-sm">

@@ -198,12 +198,12 @@ function SuccessContent() {
             href="/store/guides/licensing"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
           >
-            <BookOpen className="w-10 h-10 text-purple-600 mb-4" />
+            <BookOpen className="w-10 h-10 text-blue-600 mb-4" />
             <h3 className="text-xl font-bold mb-2">Licensing Guide</h3>
             <p className="text-slate-600 mb-4">
               Step-by-step walkthrough of setup, billing, and platform management.
             </p>
-            <span className="inline-flex items-center gap-2 text-purple-600 font-semibold">
+            <span className="inline-flex items-center gap-2 text-blue-600 font-semibold">
               Read Guide <ArrowRight className="w-4 h-4" />
             </span>
           </Link>

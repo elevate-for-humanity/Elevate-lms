@@ -236,7 +236,7 @@ export default function MonitoringDashboard() {
             {/* Stripe */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <Server className="h-11 w-11 text-purple-600" />
+                <Server className="h-11 w-11 text-blue-600" />
                 <span className={`px-3 py-2 rounded-full text-sm font-medium ${getStatusColor(status.checks.stripe.status)}`}>
                   {status.checks.stripe.status}
                 </span>
@@ -317,7 +317,7 @@ export default function MonitoringDashboard() {
             {/* Memory Usage */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center gap-3 mb-4">
-                <Server className="h-10 w-10 text-purple-600" />
+                <Server className="h-10 w-10 text-blue-600" />
                 <h3 className="text-lg font-bold text-black">Memory</h3>
               </div>
               <div className="space-y-3">
@@ -331,7 +331,7 @@ export default function MonitoringDashboard() {
                 </div>
                 <div>
                   <div className="text-sm text-black">Usage</div>
-                  <div className="text-2xl font-bold text-purple-600">
+                  <div className="text-2xl font-bold text-blue-600">
                     {((status.metrics.memory.used / status.metrics.memory.total) * 100).toFixed(1)}%
                   </div>
                 </div>

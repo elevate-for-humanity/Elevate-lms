@@ -130,7 +130,7 @@ export default async function NonprofitPage() {
           <div className="mb-12">
             <Link
               href="/nonprofit/donations"
-              className="inline-block bg-purple-600 text-white px-10 py-4 rounded-lg text-lg font-bold hover:bg-purple-700 transition-colors shadow-lg"
+              className="inline-block bg-blue-600 text-white px-10 py-4 rounded-lg text-lg font-bold hover:bg-blue-700 transition-colors shadow-lg"
             >
               Donate
             </Link>
@@ -179,7 +179,7 @@ export default async function NonprofitPage() {
                   href={service.href || '#'}
                   className="bg-gray-50 rounded-xl p-8 hover:shadow-lg transition group"
                 >
-                  <IconComponent className="w-12 h-12 text-purple-600 mb-4 group-hover:scale-110 transition" />
+                  <IconComponent className="w-12 h-12 text-blue-600 mb-4 group-hover:scale-110 transition" />
                   <h3 className="text-xl font-bold mb-3">{service.title}</h3>
                   <p className="text-gray-600">{service.description}</p>
                 </Link>
@@ -191,13 +191,13 @@ export default async function NonprofitPage() {
 
       {/* Upcoming Workshops */}
       {workshops && workshops.length > 0 && (
-        <section className="py-16 px-4 bg-purple-50">
+        <section className="py-16 px-4 bg-blue-50">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-center mb-12">Upcoming Workshops</h2>
             <div className="grid md:grid-cols-3 gap-8">
               {workshops.map((workshop: any) => (
                 <div key={workshop.id} className="bg-white rounded-xl p-6 shadow-sm">
-                  <div className="flex items-center gap-2 text-purple-600 mb-3">
+                  <div className="flex items-center gap-2 text-blue-600 mb-3">
                     <Calendar className="w-5 h-5" />
                     <span className="text-sm font-medium">
                       {new Date(workshop.date).toLocaleDateString()}
@@ -207,7 +207,7 @@ export default async function NonprofitPage() {
                   <p className="text-gray-600 text-sm mb-4">{workshop.description}</p>
                   <Link
                     href={`/nonprofit/workshops/${workshop.id}`}
-                    className="text-purple-600 font-medium hover:underline"
+                    className="text-blue-600 font-medium hover:underline"
                   >
                     Learn More →
                   </Link>
@@ -217,7 +217,7 @@ export default async function NonprofitPage() {
             <div className="text-center mt-8">
               <Link
                 href="/nonprofit/workshops"
-                className="inline-block bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition"
+                className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
               >
                 View All Workshops
               </Link>
@@ -253,7 +253,7 @@ export default async function NonprofitPage() {
           </p>
           <Link
             href="/nonprofit/meet-the-founder"
-            className="inline-block bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition"
+            className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
           >
             Meet Our Founder
           </Link>
@@ -261,23 +261,23 @@ export default async function NonprofitPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 px-4 bg-purple-600 text-white">
+      <section className="py-16 px-4 bg-blue-600 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Support Our Mission</h2>
-          <p className="text-purple-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
             Your donation helps us provide mental wellness services and holistic healing 
             programs to those in need.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/nonprofit/donations"
-              className="bg-white text-purple-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Donate Now
             </Link>
             <Link
               href="/nonprofit/sign-up"
-              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-purple-700 transition"
+              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition"
             >
               Sign Up for Updates
             </Link>

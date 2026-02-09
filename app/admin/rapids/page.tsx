@@ -2,7 +2,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { RAPIDS_CONFIG } from '@/lib/compliance/rapids-config';
-import { CheckCircle, XCircle, Copy, Shield, FileText, Users, Download, ExternalLink } from 'lucide-react';
+import { Circle, XCircle, Copy, Shield, FileText, Users, Download, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
 
 export default function RapidsAdminPage() {
@@ -62,16 +62,6 @@ export default function RapidsAdminPage() {
               href="/admin/rapids/apprentices"
               className="flex items-center gap-3 bg-white/10 rounded-lg p-4 hover:bg-white/20 transition-colors"
             >
-              <Download className="w-6 h-6" />
-              <div>
-                <p className="font-medium">Export for RAPIDS</p>
-                <p className="text-sm text-blue-100">Download CSV for portal upload</p>
-              </div>
-            </Link>
-            <Link
-              href="/admin/rapids/apprentices"
-              className="flex items-center gap-3 bg-white/10 rounded-lg p-4 hover:bg-white/20 transition-colors"
-            >
               <Users className="w-6 h-6" />
               <div>
                 <p className="font-medium">View Apprentices</p>
@@ -88,6 +78,56 @@ export default function RapidsAdminPage() {
               <div>
                 <p className="font-medium">Open RAPIDS Portal</p>
                 <p className="text-sm text-blue-100">Submit data to DOL</p>
+              </div>
+            </a>
+          </div>
+        </div>
+
+        {/* CSV Export Section */}
+        <div className="bg-white border border-gray-200 rounded-xl p-6 mb-6 shadow-sm">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">Export for RAPIDS Bulk Upload</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Download CSV files formatted for RAPIDS portal bulk upload. After downloading, upload to the RAPIDS portal.
+          </p>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <a
+              href="/api/admin/rapids/export?type=registrations&format=csv"
+              className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Download className="w-5 h-5 text-green-600" />
+              <div>
+                <p className="font-medium text-gray-900">New Registrations</p>
+                <p className="text-xs text-gray-500">Pending apprentice registrations</p>
+              </div>
+            </a>
+            <a
+              href="/api/admin/rapids/export?type=progress&format=csv"
+              className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Download className="w-5 h-5 text-blue-600" />
+              <div>
+                <p className="font-medium text-gray-900">Progress Updates</p>
+                <p className="text-xs text-gray-500">OJT & RTI hours report</p>
+              </div>
+            </a>
+            <a
+              href="/api/admin/rapids/export?type=completions&format=csv"
+              className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Download className="w-5 h-5 text-blue-600" />
+              <div>
+                <p className="font-medium text-gray-900">Completions</p>
+                <p className="text-xs text-gray-500">Program completions</p>
+              </div>
+            </a>
+            <a
+              href="/api/admin/rapids/export?type=cancellations&format=csv"
+              className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Download className="w-5 h-5 text-red-600" />
+              <div>
+                <p className="font-medium text-gray-900">Cancellations</p>
+                <p className="text-xs text-gray-500">Withdrawals & terminations</p>
               </div>
             </a>
           </div>
@@ -173,7 +213,7 @@ export default function RapidsAdminPage() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        <CheckCircle className="w-3 h-3" />
+                        <Circle className="w-3 h-3" />
                         Yes
                       </span>
                     </td>
@@ -184,7 +224,7 @@ export default function RapidsAdminPage() {
                       {program.totalHours.toLocaleString()} hrs
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-purple-800">
                         {program.fundingType === 'self_pay' ? 'Self-Pay' : program.fundingType}
                       </span>
                     </td>

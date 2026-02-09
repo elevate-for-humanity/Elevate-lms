@@ -35,7 +35,7 @@ export default async function TenantsPage() {
             {tenants && tenants.length > 0 ? tenants.map((tenant: any) => (
               <div key={tenant.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center"><span className="text-purple-600 font-bold">{(tenant.name || 'T')[0]}</span></div>
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center"><span className="text-blue-600 font-bold">{(tenant.name || 'T')[0]}</span></div>
                   <div><p className="font-medium">{tenant.name}</p><p className="text-sm text-gray-500">{tenant.domain || 'No domain'}</p></div>
                 </div>
                 <span className={`px-2 py-1 rounded-full text-xs ${tenant.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>{tenant.status || 'active'}</span>

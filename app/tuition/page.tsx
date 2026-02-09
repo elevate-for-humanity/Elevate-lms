@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
-  Building2, Calendar, CheckCircle, 
+  Building2, Calendar, Circle, 
   ArrowRight, Users, Briefcase, CreditCard, Phone
 } from 'lucide-react';
 
@@ -98,23 +98,23 @@ export default async function TuitionPage() {
                 <p className="font-medium text-slate-900 mb-2">This may include:</p>
                 <ul className="space-y-1 text-sm text-slate-600">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-green-600 flex-shrink-0" />
                     Workforce Innovation and Opportunity Act (WIOA) funding
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-green-600 flex-shrink-0" />
                     State and local workforce grants
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-green-600 flex-shrink-0" />
                     Vocational Rehabilitation (VR)
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-green-600 flex-shrink-0" />
                     Justice-involved and re-entry programs
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-green-600 flex-shrink-0" />
                     Other approved workforce agencies
                   </li>
                 </ul>
@@ -126,13 +126,13 @@ export default async function TuitionPage() {
             </div>
 
             {/* Pathway 2: Employer-Sponsored */}
-            <div className="bg-purple-50 border border-purple-200 rounded-xl p-6 sm:p-8">
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 sm:p-8">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-purple-600">Funding Pathway 2</p>
+                  <p className="text-xs sm:text-sm font-medium text-blue-600">Funding Pathway 2</p>
                   <h2 className="text-lg sm:text-xl font-bold text-slate-900">Employer-Sponsored Training</h2>
                 </div>
               </div>
@@ -145,15 +145,15 @@ export default async function TuitionPage() {
                 <p className="font-medium text-slate-900 mb-2">This may include:</p>
                 <ul className="space-y-1 text-sm text-slate-600">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-blue-600 flex-shrink-0" />
                     Employer-paid cohort training
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-blue-600 flex-shrink-0" />
                     Tuition reimbursement after hire
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-blue-600 flex-shrink-0" />
                     Payroll-based reimbursement agreements
                   </li>
                 </ul>
@@ -225,19 +225,19 @@ export default async function TuitionPage() {
           <div className="bg-white rounded-xl border border-slate-200 p-6 sm:p-8">
             <ul className="space-y-3 text-slate-700">
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
                 <span>Funding pathways are determined prior to enrollment</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
                 <span>Payment terms are standardized and non-negotiable</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
                 <span>Enrollment and completion credentials require active good-standing status</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
                 <span>Our team will guide you through eligibility screening and documentation</span>
               </li>
             </ul>

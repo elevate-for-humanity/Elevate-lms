@@ -112,7 +112,7 @@ export default async function HealingProductsPage() {
       </section>
 
       <div className="max-w-6xl mx-auto px-4 py-12">
-        <Link href="/nonprofit" className="text-purple-600 hover:text-purple-700 mb-8 inline-block">
+        <Link href="/nonprofit" className="text-blue-600 hover:text-blue-700 mb-8 inline-block">
           ← Back to Selfish Inc.
         </Link>
 

@@ -229,13 +229,13 @@ export default async function LMSPage() {
                     </Link>
                   ))}
                   {typedStudentEnrollments.map((enrollment: any) => (
-                    <Link key={enrollment.id} href="/apprentice" className="flex items-center gap-4 p-4 bg-purple-50 rounded-2xl hover:bg-purple-100 transition">
-                      <div className="w-12 h-12 bg-purple-200 rounded-xl flex items-center justify-center"><Award className="w-6 h-6 text-purple-700" /></div>
+                    <Link key={enrollment.id} href="/apprentice" className="flex items-center gap-4 p-4 bg-blue-50 rounded-2xl hover:bg-blue-100 transition">
+                      <div className="w-12 h-12 bg-blue-200 rounded-xl flex items-center justify-center"><Award className="w-6 h-6 text-blue-700" /></div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-slate-900 truncate">{enrollment.program_slug || 'Apprenticeship'}</h3>
                         <p className="text-sm text-slate-500">Active Apprenticeship</p>
                       </div>
-                      <span className="px-3 py-1 bg-purple-200 text-purple-800 text-xs font-semibold rounded-full">Apprentice</span>
+                      <span className="px-3 py-1 bg-blue-200 text-purple-800 text-xs font-semibold rounded-full">Apprentice</span>
                     </Link>
                   ))}
                 </div>

@@ -142,8 +142,8 @@ export default async function AdminPerformanceDashboardPage() {
                 <p className="text-3xl font-bold text-gray-900 mt-1">{employerContacts || 0}</p>
                 <p className="text-sm text-gray-500 mt-1">of {totalContacts || 0} contacts</p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Award className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Award className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </div>
@@ -306,7 +306,7 @@ export default async function AdminPerformanceDashboardPage() {
               href="/admin/course-builder"
               className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
             >
-              <BookOpen className="w-5 h-5 text-purple-600" />
+              <BookOpen className="w-5 h-5 text-blue-600" />
               <span className="font-medium text-gray-900">Courses</span>
             </Link>
             <Link 

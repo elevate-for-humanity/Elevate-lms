@@ -158,7 +158,7 @@ export default function EmployerDemoPage() {
                 <div className="text-gray-600">Total Applicants</div>
               </div>
               <div className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="text-3xl font-bold text-purple-600">5</div>
+                <div className="text-3xl font-bold text-blue-600">5</div>
                 <div className="text-gray-600">Interviews Scheduled</div>
               </div>
               <div className="bg-white rounded-xl p-6 shadow-sm">

@@ -119,7 +119,7 @@ export default function CreatorDashboardPage() {
                     <div className="flex items-center justify-center gap-2">
                       <button className="p-2 text-gray-600 hover:text-blue-600"><Eye className="w-4 h-4" /></button>
                       <button className="p-2 text-gray-600 hover:text-orange-600"><Edit className="w-4 h-4" /></button>
-                      <button className="p-2 text-gray-600 hover:text-purple-600"><BarChart3 className="w-4 h-4" /></button>
+                      <button className="p-2 text-gray-600 hover:text-blue-600"><BarChart3 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>

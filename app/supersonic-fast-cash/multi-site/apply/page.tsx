@@ -95,7 +95,7 @@ export default function MultiSiteApplyPage() {
             <div className="space-y-4">
               <Link
                 href="/supersonic-fast-cash"
-                className="block w-full bg-purple-600 text-white py-4 rounded-xl font-bold hover:bg-purple-700 transition-colors"
+                className="block w-full bg-blue-600 text-white py-4 rounded-xl font-bold hover:bg-blue-700 transition-colors"
               >
                 Return to Homepage
               </Link>
@@ -121,7 +121,7 @@ export default function MultiSiteApplyPage() {
         {/* Back Link */}
         <Link
           href="/supersonic-fast-cash/multi-site"
-          className="inline-flex items-center gap-2 text-purple-600 hover:text-purple-700 mb-8"
+          className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-8"
         >
           <ArrowLeft className="w-4 h-4" />
           Back to Partnership Info
@@ -129,7 +129,7 @@ export default function MultiSiteApplyPage() {
 
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-purple-100 text-purple-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
+          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-4">
             <Building2 className="w-4 h-4" />
             Partnership Application
           </div>
@@ -146,7 +146,7 @@ export default function MultiSiteApplyPage() {
           {/* Personal Information */}
           <div className="mb-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <User className="w-5 h-5 text-purple-600" />
+              <User className="w-5 h-5 text-blue-600" />
               Personal Information
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
@@ -160,7 +160,7 @@ export default function MultiSiteApplyPage() {
                   value={formData.firstName}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div>
@@ -173,7 +173,7 @@ export default function MultiSiteApplyPage() {
                   value={formData.lastName}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div>
@@ -186,7 +186,7 @@ export default function MultiSiteApplyPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div>
@@ -199,7 +199,7 @@ export default function MultiSiteApplyPage() {
                   value={formData.phone}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -208,7 +208,7 @@ export default function MultiSiteApplyPage() {
           {/* Location */}
           <div className="mb-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-purple-600" />
+              <MapPin className="w-5 h-5 text-blue-600" />
               Location
             </h2>
             <div className="grid md:grid-cols-3 gap-4">
@@ -222,7 +222,7 @@ export default function MultiSiteApplyPage() {
                   value={formData.city}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div>
@@ -235,7 +235,7 @@ export default function MultiSiteApplyPage() {
                   value={formData.state}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div>
@@ -248,7 +248,7 @@ export default function MultiSiteApplyPage() {
                   value={formData.zipCode}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -262,7 +262,7 @@ export default function MultiSiteApplyPage() {
                 value={formData.preferredLocation}
                 onChange={handleChange}
                 placeholder="City, State or specific area"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -270,7 +270,7 @@ export default function MultiSiteApplyPage() {
           {/* Business Information */}
           <div className="mb-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-purple-600" />
+              <Briefcase className="w-5 h-5 text-blue-600" />
               Business Information
             </h2>
             <div className="grid md:grid-cols-2 gap-4">
@@ -284,7 +284,7 @@ export default function MultiSiteApplyPage() {
                   value={formData.currentOccupation}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div>
@@ -296,7 +296,7 @@ export default function MultiSiteApplyPage() {
                   value={formData.experience}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                 >
                   <option value="">Select experience level</option>
                   {experienceLevels.map((level) => (
@@ -312,7 +312,7 @@ export default function MultiSiteApplyPage() {
           {/* Investment */}
           <div className="mb-8">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <DollarSign className="w-5 h-5 text-purple-600" />
+              <DollarSign className="w-5 h-5 text-blue-600" />
               Investment
             </h2>
             <div>
@@ -324,7 +324,7 @@ export default function MultiSiteApplyPage() {
                 value={formData.investmentRange}
                 onChange={handleChange}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
               >
                 <option value="">Select investment range</option>
                 {investmentRanges.map((range) => (
@@ -352,7 +352,7 @@ export default function MultiSiteApplyPage() {
                   onChange={handleChange}
                   required
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   placeholder="Tell us about your goals and why you want to partner with Supersonic Fast Cash..."
                 />
               </div>
@@ -364,7 +364,7 @@ export default function MultiSiteApplyPage() {
                   name="hearAboutUs"
                   value={formData.hearAboutUs}
                   onChange={handleChange}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent bg-white"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
                 >
                   <option value="">Select an option</option>
                   {hearAboutUs.map((option) => (
@@ -383,7 +383,7 @@ export default function MultiSiteApplyPage() {
                   value={formData.additionalInfo}
                   onChange={handleChange}
                   rows={3}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -393,7 +393,7 @@ export default function MultiSiteApplyPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="w-full bg-purple-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-purple-700 transition-colors disabled:bg-purple-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition-colors disabled:bg-purple-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {submitting ? (
               <>

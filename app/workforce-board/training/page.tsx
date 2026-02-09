@@ -33,7 +33,7 @@ export default async function TrainingPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Programs</h3><p className="text-3xl font-bold text-gray-900 mt-2">{count || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active</h3><p className="text-3xl font-bold text-green-600 mt-2">{activeCount || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Participants</h3><p className="text-3xl font-bold text-blue-600 mt-2">847</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Completion Rate</h3><p className="text-3xl font-bold text-purple-600 mt-2">76%</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Completion Rate</h3><p className="text-3xl font-bold text-blue-600 mt-2">76%</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-4 border-b"><h2 className="font-semibold">Training Programs</h2></div>

@@ -52,7 +52,7 @@ export default async function LeadsReportPage() {
   const statusColors: Record<string, string> = {
     new: 'bg-blue-100 text-blue-700',
     contacted: 'bg-yellow-100 text-yellow-700',
-    qualified: 'bg-purple-100 text-purple-700',
+    qualified: 'bg-blue-100 text-blue-700',
     appointment_set: 'bg-indigo-100 text-indigo-700',
     application_started: 'bg-orange-100 text-orange-700',
     enrolled: 'bg-green-100 text-green-700',
@@ -108,8 +108,8 @@ export default async function LeadsReportPage() {
           
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Target className="w-5 h-5 text-purple-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Target className="w-5 h-5 text-blue-600" />
               </div>
               <span className="text-sm text-gray-600">Conversion Rate</span>
             </div>

@@ -194,15 +194,15 @@ export default async function AcademicIntegrityPage() {
             </div>
 
             {/* Falsification */}
-            <div className="border-l-4 border-purple-500 pl-6">
+            <div className="border-l-4 border-blue-500 pl-6">
               <h3 className="text-base sm:text-lg font-bold text-black mb-3 flex items-center gap-2">
-                <FileText className="w-6 h-6 text-purple-600" />
+                <FileText className="w-6 h-6 text-blue-600" />
                 Falsification of Records
               </h3>
               <p className="text-black mb-3">
                 Altering or fabricating academic records or documentation.
               </p>
-              <div className="bg-purple-50 rounded-lg p-4">
+              <div className="bg-blue-50 rounded-lg p-4">
                 <p className="font-semibold text-purple-900 mb-2">Examples:</p>
                 <ul className="space-y-2 text-purple-800 text-sm">
                   <li>• Forging signatures on documents</li>

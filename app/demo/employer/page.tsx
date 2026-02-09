@@ -30,7 +30,7 @@ export default function EmployerDemo() {
     { id: 3, name: 'Robert Wilson', role: 'CNA', hours: 1203, level: 'Advanced', wage: '$18.00', avatar: '/images/testimonials/student-marcus.jpg' },
   ];
 
-  const statusColor = (s: string) => s === 'Interview' ? 'bg-green-100 text-green-700' : s === 'Offer' ? 'bg-purple-100 text-purple-700' : s === 'Review' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700';
+  const statusColor = (s: string) => s === 'Interview' ? 'bg-green-100 text-green-700' : s === 'Offer' ? 'bg-blue-100 text-blue-700' : s === 'Review' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700';
 
   const updateStatus = (id: number, newStatus: string) => {
     setCandidates(candidates.map(c => c.id === id ? { ...c, status: newStatus } : c));
@@ -65,7 +65,7 @@ export default function EmployerDemo() {
             { id: 'apprentice', icon: Award, label: 'Apprentice' },
             { id: 'incentives', icon: DollarSign, label: 'Incentives' },
           ].map(t => (
-            <button key={t.id} onClick={() => setTab(t.id)} className={`flex flex-col items-center px-4 py-3 ${tab === t.id ? 'text-purple-600' : 'text-gray-500'}`}>
+            <button key={t.id} onClick={() => setTab(t.id)} className={`flex flex-col items-center px-4 py-3 ${tab === t.id ? 'text-blue-600' : 'text-gray-500'}`}>
               <t.icon className="w-5 h-5" />
               <span className="text-[10px] mt-0.5">{t.label}</span>
             </button>
@@ -80,7 +80,7 @@ export default function EmployerDemo() {
           { id: 'apprentice', icon: Award, label: 'Apprenticeship' },
           { id: 'incentives', icon: DollarSign, label: 'Incentives' },
         ].map(t => (
-          <button key={t.id} onClick={() => setTab(t.id)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${tab === t.id ? 'bg-purple-100 text-purple-700' : 'text-gray-600 hover:bg-gray-100'}`}>
+          <button key={t.id} onClick={() => setTab(t.id)} className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium ${tab === t.id ? 'bg-blue-100 text-blue-700' : 'text-gray-600 hover:bg-gray-100'}`}>
             <t.icon className="w-4 h-4" />{t.label}
           </button>
         ))}
@@ -92,7 +92,7 @@ export default function EmployerDemo() {
           {[
             { label: 'Open Roles', value: 5 },
             { label: 'Hired YTD', value: 8, color: 'text-green-600' },
-            { label: 'Apprentices', value: 3, color: 'text-purple-600' },
+            { label: 'Apprentices', value: 3, color: 'text-blue-600' },
           ].map((s, i) => (
             <div key={i} className="bg-white rounded-xl p-3 border text-center">
               <div className={`text-xl font-bold ${s.color || 'text-gray-900'}`}>{s.value}</div>
@@ -122,7 +122,7 @@ export default function EmployerDemo() {
         {tab === 'roles' && (
           <div className="space-y-3">
             <div className="flex justify-end">
-              <button className="bg-purple-600 text-white px-3 py-3 rounded-lg text-sm font-medium flex items-center gap-1"><Plus className="w-4 h-4" />Post Role</button>
+              <button className="bg-blue-600 text-white px-3 py-3 rounded-lg text-sm font-medium flex items-center gap-1"><Plus className="w-4 h-4" />Post Role</button>
             </div>
             {roles.map(r => (
               <div key={r.id} className="bg-white rounded-xl p-4 border">
@@ -146,12 +146,12 @@ export default function EmployerDemo() {
 
         {tab === 'apprentice' && (
           <div className="space-y-4">
-            <div className="bg-purple-50 rounded-xl p-4 border border-purple-200">
+            <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
               <div className="flex items-center gap-2 mb-2">
-                <Award className="w-5 h-5 text-purple-600" />
+                <Award className="w-5 h-5 text-blue-600" />
                 <span className="font-bold text-purple-900">Registered Apprenticeship</span>
               </div>
-              <p className="text-sm text-purple-700">Indiana Dept of Labor • Healthcare Program</p>
+              <p className="text-sm text-blue-700">Indiana Dept of Labor • Healthcare Program</p>
             </div>
 
             <div className="bg-white rounded-xl border overflow-hidden">
@@ -165,7 +165,7 @@ export default function EmployerDemo() {
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-bold text-gray-900">{a.hours}h</div>
-                    <div className="text-xs text-purple-600">{a.level}</div>
+                    <div className="text-xs text-blue-600">{a.level}</div>
                   </div>
                   <div className="text-right">
                     <div className="text-sm font-bold text-green-600">{a.wage}</div>
@@ -269,11 +269,11 @@ export default function EmployerDemo() {
                     <label className="text-sm font-medium text-gray-700 mb-2 block">Update Status</label>
                     <div className="grid grid-cols-2 gap-2">
                       {['Screen', 'Review', 'Interview', 'Offer'].map(s => (
-                        <button key={s} onClick={() => updateStatus(c.id, s)} className={`py-2 rounded-lg text-sm font-medium ${c.status === s ? 'bg-purple-600 text-white' : 'bg-gray-100 text-gray-700'}`}>{s}</button>
+                        <button key={s} onClick={() => updateStatus(c.id, s)} className={`py-2 rounded-lg text-sm font-medium ${c.status === s ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-700'}`}>{s}</button>
                       ))}
                     </div>
                   </div>
-                  <button onClick={() => setModal(null)} className="w-full bg-purple-600 text-white py-3 rounded-lg font-medium">Schedule Interview</button>
+                  <button onClick={() => setModal(null)} className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium">Schedule Interview</button>
                 </>
               );
             })()}

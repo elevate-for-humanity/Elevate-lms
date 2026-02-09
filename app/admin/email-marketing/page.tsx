@@ -116,7 +116,7 @@ export default function EmailMarketingPage() {
 
           <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200">
             <div className="flex items-center justify-between mb-2">
-              <Users className="h-11 w-11 text-purple-600" />
+              <Users className="h-11 w-11 text-blue-600" />
               <span className="text-xs font-semibold text-slate-500">
                 CONTACTS
               </span>

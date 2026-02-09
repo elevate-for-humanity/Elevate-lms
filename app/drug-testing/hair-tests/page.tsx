@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, CheckCircle, ArrowLeft, Clock, Calendar, Shield } from 'lucide-react';
+import { Phone, Circle, ArrowLeft, Clock, Calendar, Shield } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Hair Follicle Drug Tests | Drug Testing Services',
@@ -70,12 +70,12 @@ export default function HairTestsPage() {
 {/* Hero */}
       <section className="relative py-20 bg-purple-900 text-white">
         <div className="max-w-6xl mx-auto px-6">
-          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-purple-200 hover:text-white mb-6 transition">
+          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-blue-200 hover:text-white mb-6 transition">
             <ArrowLeft className="w-4 h-4" />
             Back to Drug Testing
           </Link>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Hair Follicle Tests</h1>
-          <p className="text-xl text-purple-100 max-w-2xl">
+          <p className="text-xl text-blue-100 max-w-2xl">
             The gold standard for pre-employment screening. Hair testing provides a 90-day detection window 
             and is extremely difficult to cheat.
           </p>
@@ -83,27 +83,27 @@ export default function HairTestsPage() {
       </section>
 
       {/* Why Hair Testing */}
-      <section className="py-12 bg-purple-50">
+      <section className="py-12 bg-blue-50">
         <div className="max-w-6xl mx-auto px-6">
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">Why Choose Hair Testing?</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">90-Day Window</h3>
               <p className="text-gray-600 text-sm">Detects drug use from the past 3 months, not just recent use</p>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Hard to Cheat</h3>
               <p className="text-gray-600 text-sm">Cannot be beaten by abstaining for a few days or using detox products</p>
             </div>
             <div className="bg-white p-6 rounded-xl shadow-sm text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Circle className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Pattern Detection</h3>
               <p className="text-gray-600 text-sm">Shows history of use, not just a single point in time</p>
@@ -128,7 +128,7 @@ export default function HairTestsPage() {
             {hairTests.map((test) => (
               <div
                 key={test.name}
-                className={`bg-white rounded-2xl overflow-hidden shadow-lg border-2 ${test.popular ? 'border-purple-500' : 'border-gray-200'}`}
+                className={`bg-white rounded-2xl overflow-hidden shadow-lg border-2 ${test.popular ? 'border-blue-500' : 'border-gray-200'}`}
               >
                 <div className="grid lg:grid-cols-3">
                   <div className="relative h-64 lg:h-auto">
@@ -139,7 +139,7 @@ export default function HairTestsPage() {
                       className="object-cover"
                     />
                     {test.popular && (
-                      <div className="absolute top-4 left-4 bg-purple-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                      <div className="absolute top-4 left-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                         RECOMMENDED
                       </div>
                     )}
@@ -152,13 +152,13 @@ export default function HairTestsPage() {
                         <p className="text-gray-600 mt-1">{test.description}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-3xl font-bold text-purple-600">${test.price}</div>
+                        <div className="text-3xl font-bold text-blue-600">${test.price}</div>
                         <div className="text-sm text-gray-500">per person</div>
                       </div>
                     </div>
                     
                     <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mb-6">
-                      <span className="flex items-center gap-1 bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
+                      <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full">
                         <Calendar className="w-4 h-4" />
                         {test.detection} detection
                       </span>
@@ -173,7 +173,7 @@ export default function HairTestsPage() {
                       <ul className="grid md:grid-cols-2 gap-2">
                         {test.includes.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2 text-gray-700">
-                            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                            <Circle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
                             <span className="text-sm">{item}</span>
                           </li>
                         ))}
@@ -183,7 +183,7 @@ export default function HairTestsPage() {
                     <div className="mt-6">
                       <a
                         href="tel:+13173143757"
-                        className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-purple-700 transition"
+                        className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
                       >
                         <Phone className="w-4 h-4" />
                         Order Now
@@ -213,12 +213,12 @@ export default function HairTestsPage() {
               <tbody className="divide-y divide-gray-100">
                 <tr>
                   <td className="px-6 py-4 text-gray-700">Detection Window</td>
-                  <td className="px-6 py-4 text-center font-bold text-purple-600">90 days</td>
+                  <td className="px-6 py-4 text-center font-bold text-blue-600">90 days</td>
                   <td className="px-6 py-4 text-center text-gray-600">1-7 days</td>
                 </tr>
                 <tr>
                   <td className="px-6 py-4 text-gray-700">Cheat Resistant</td>
-                  <td className="px-6 py-4 text-center font-bold text-purple-600">Very High</td>
+                  <td className="px-6 py-4 text-center font-bold text-blue-600">Very High</td>
                   <td className="px-6 py-4 text-center text-gray-600">Moderate</td>
                 </tr>
                 <tr>
@@ -233,7 +233,7 @@ export default function HairTestsPage() {
                 </tr>
                 <tr>
                   <td className="px-6 py-4 text-gray-700">Best For</td>
-                  <td className="px-6 py-4 text-center text-purple-600">Pre-employment</td>
+                  <td className="px-6 py-4 text-center text-blue-600">Pre-employment</td>
                   <td className="px-6 py-4 text-center text-blue-600">Random/Post-accident</td>
                 </tr>
               </tbody>
@@ -243,15 +243,15 @@ export default function HairTestsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-purple-600 text-white">
+      <section className="py-16 bg-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready for Thorough Screening?</h2>
-          <p className="text-xl text-purple-100 mb-8">
+          <p className="text-xl text-blue-100 mb-8">
             Hair testing gives you the most complete picture of a candidate's drug use history.
           </p>
           <a
             href="tel:+13173143757"
-            className="inline-flex items-center gap-2 bg-white text-purple-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
+            className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
           >
             <Phone className="w-5 h-5" />
             (317) 314-3757

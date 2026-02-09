@@ -68,7 +68,7 @@ export default async function EstheticianApprenticeshipPage() {
             <span className="px-3 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
               DOL Registered
             </span>
-            <span className="px-3 py-2 bg-purple-600 text-white text-sm font-bold rounded-full shadow-lg">
+            <span className="px-3 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
               Apprenticeship Sponsorship
             </span>
           </div>

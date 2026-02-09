@@ -175,8 +175,8 @@ export default async function DrugTestingTrainingPage() {
               <p className="text-sm text-gray-600">Download your certificate immediately upon completion</p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Clock className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Clock className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="font-semibold mb-2">Self-Paced</h3>
               <p className="text-sm text-gray-600">Complete training on your schedule, 24/7 access</p>

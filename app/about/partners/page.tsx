@@ -129,7 +129,7 @@ export default async function PartnersPage() {
         <section className="py-16">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center gap-3 mb-8">
-              <GraduationCap className="w-8 h-8 text-purple-600" />
+              <GraduationCap className="w-8 h-8 text-blue-600" />
               <h2 className="text-3xl font-bold text-slate-900">Training Partners</h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -61,7 +61,7 @@ export default function CredentialsPage() {
                 </ul>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
                 <h3 className="text-xl font-bold text-black mb-3">Digital Badges</h3>
                 <p className="text-black mb-3">
                   Micro-credentials for specific skills:
@@ -135,7 +135,7 @@ export default function CredentialsPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>

@@ -56,11 +56,11 @@ export default function ProgramHolderDashboardPage() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <LayoutDashboard className="w-8 h-8 text-purple-600" />
+              <LayoutDashboard className="w-8 h-8 text-blue-600" />
               <h1 className="text-2xl font-bold text-gray-900">Program Holder Portal</h1>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/program-holder/settings" className="p-2 text-gray-600 hover:text-purple-600">
+              <Link href="/program-holder/settings" className="p-2 text-gray-600 hover:text-blue-600">
                 <Settings className="w-6 h-6" />
               </Link>
             </div>
@@ -72,7 +72,7 @@ export default function ProgramHolderDashboardPage() {
           {stats.map((stat, index) => (
             <div key={index} className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
-                <stat.icon className="w-8 h-8 text-purple-600" />
+                <stat.icon className="w-8 h-8 text-blue-600" />
                 <span className="text-sm text-green-600 font-medium">{stat.change}</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
@@ -85,7 +85,7 @@ export default function ProgramHolderDashboardPage() {
             <div className="bg-white rounded-xl shadow-sm p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-gray-900">Program Performance</h2>
-                <Link href="/program-holder/analytics" className="text-purple-600 hover:underline text-sm">View All</Link>
+                <Link href="/program-holder/analytics" className="text-blue-600 hover:underline text-sm">View All</Link>
               </div>
               <table className="w-full">
                 <thead>
@@ -115,7 +115,7 @@ export default function ProgramHolderDashboardPage() {
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="font-bold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
-                <Link href="/program-holder/programs/new" className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg text-purple-700 hover:bg-purple-100">
+                <Link href="/program-holder/programs/new" className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg text-blue-700 hover:bg-blue-100">
                   <BookOpen className="w-5 h-5" /> Add New Program
                 </Link>
                 <Link href="/program-holder/students" className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg text-gray-700 hover:bg-gray-100">

@@ -220,7 +220,7 @@ export default function WorkbooksPage() {
               href="/resources"
               className="block p-6 bg-white rounded-lg hover:shadow-md transition"
             >
-              <Download className="w-8 h-8 text-purple-600 mb-3" />
+              <Download className="w-8 h-8 text-blue-600 mb-3" />
               <h3 className="font-bold text-black mb-2">Download Center</h3>
               <p className="text-sm text-black">
                 Forms, guides, and documents

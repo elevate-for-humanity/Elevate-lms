@@ -359,12 +359,12 @@ export default async function SystemStatusPage() {
 
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Lock className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Lock className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Env Configured</p>
-                <p className="font-bold text-purple-600">{envConfigured} / {envTotal}</p>
+                <p className="font-bold text-blue-600">{envConfigured} / {envTotal}</p>
               </div>
             </div>
           </div>
@@ -500,7 +500,7 @@ export default async function SystemStatusPage() {
                 <span className="text-sm text-gray-600">Community Threads</span>
               </div>
               <div className="flex items-center gap-2 justify-center">
-                <Upload className="w-4 h-4 text-purple-600" />
+                <Upload className="w-4 h-4 text-blue-600" />
                 <span className="text-sm text-gray-600">Media Uploads</span>
               </div>
               <div className="flex items-center gap-2 justify-center">
@@ -599,7 +599,7 @@ export default async function SystemStatusPage() {
                         route.category === 'Public' ? 'bg-gray-100 text-gray-700' :
                         route.category === 'Admin' ? 'bg-red-100 text-red-700' :
                         route.category === 'Student' ? 'bg-blue-100 text-blue-700' :
-                        route.category === 'Partner' ? 'bg-purple-100 text-purple-700' :
+                        route.category === 'Partner' ? 'bg-blue-100 text-blue-700' :
                         'bg-green-100 text-green-700'
                       }`}>{route.category}</span>
                     </td>

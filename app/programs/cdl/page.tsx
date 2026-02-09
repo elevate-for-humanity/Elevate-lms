@@ -388,7 +388,7 @@ export default function CDLProgramPage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-4xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-16">
-            <span className="inline-block bg-purple-100 text-purple-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+            <span className="inline-block bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Common Questions
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">

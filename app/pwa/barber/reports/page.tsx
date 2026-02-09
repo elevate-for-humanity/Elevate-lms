@@ -46,7 +46,7 @@ export default function BarberReportsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-purple-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
       </div>
     );
   }
@@ -85,7 +85,7 @@ export default function BarberReportsPage() {
         </div>
 
         {/* Progress to Goal */}
-        <div className="bg-purple-500/20 border border-purple-500/30 rounded-xl p-4">
+        <div className="bg-blue-500/20 border border-blue-500/30 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <Award className="w-5 h-5 text-purple-400" />
@@ -95,11 +95,11 @@ export default function BarberReportsPage() {
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-purple-500 rounded-full"
+              className="h-full bg-blue-500 rounded-full"
               style={{ width: `${summary.milestoneProgress}%` }}
             />
           </div>
-          <p className="text-purple-200 text-sm mt-2">
+          <p className="text-blue-200 text-sm mt-2">
             {2000 - summary.totalHours} hours remaining
           </p>
         </div>

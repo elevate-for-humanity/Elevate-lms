@@ -107,7 +107,7 @@ export default async function CreatorAnalyticsPage() {
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="text-sm text-black mb-2">Active Students</div>
-              <div className="text-3xl font-bold text-purple-600">{activeEnrollments}</div>
+              <div className="text-3xl font-bold text-blue-600">{activeEnrollments}</div>
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="text-sm text-black mb-2">Completion Rate</div>

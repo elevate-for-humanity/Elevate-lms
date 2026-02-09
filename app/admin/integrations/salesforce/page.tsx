@@ -88,7 +88,7 @@ export default function SalesforceIntegrationPage() {
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3 mb-2">
-              <Building2 className="w-5 h-5 text-purple-600" />
+              <Building2 className="w-5 h-5 text-blue-600" />
               <span className="font-medium text-gray-900">Accounts</span>
             </div>
             <p className="text-3xl font-bold text-gray-900">{isConfigured ? '—' : '0'}</p>
@@ -262,8 +262,8 @@ export default function SalesforceIntegrationPage() {
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Users className="w-5 h-5 text-purple-600" />
+                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900">Custom Field Mapping</h3>

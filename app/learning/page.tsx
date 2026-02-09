@@ -80,7 +80,7 @@ export default async function LearningHubPage() {
               count="100+ courses"
             />
             <ResourceCard
-              icon={<NotebookPen className="w-12 h-12 text-purple-600" />}
+              icon={<NotebookPen className="w-12 h-12 text-blue-600" />}
               title="Workbooks"
               description="Interactive digital workbooks"
               href="/workbooks"

@@ -46,7 +46,7 @@ export default async function DonatePage() {
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Heart className="h-16 w-16 mx-auto mb-4" />
           <h1 className="text-4xl font-bold mb-4">Make a Difference Today</h1>
-          <p className="text-xl text-purple-100 max-w-2xl mx-auto">
+          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
             Your donation helps us provide education, workforce development, and
             support services to those who need it most.
           </p>
@@ -56,19 +56,19 @@ export default async function DonatePage() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 text-center">
-            <Users className="h-12 w-12 text-purple-600 mx-auto mb-3" />
+            <Users className="h-12 w-12 text-blue-600 mx-auto mb-3" />
             <p className="text-3xl font-bold text-black mb-1">Community</p>
             <p className="text-black">Impact</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 text-center">
-            <Target className="h-12 w-12 text-purple-600 mx-auto mb-3" />
+            <Target className="h-12 w-12 text-blue-600 mx-auto mb-3" />
             <p className="text-3xl font-bold text-black mb-1">20+</p>
             <p className="text-black">Programs Offered</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 text-center">
-            <TrendingUp className="h-12 w-12 text-purple-600 mx-auto mb-3" />
+            <TrendingUp className="h-12 w-12 text-blue-600 mx-auto mb-3" />
             <p className="text-3xl font-bold text-black mb-1">Growing</p>
             <p className="text-black">Network</p>
           </div>
@@ -89,7 +89,7 @@ export default async function DonatePage() {
                 <p className="text-black mb-6">
                   Support our mission with a general donation
                 </p>
-                <button className="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium" aria-label="Action button">
+                <button className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium" aria-label="Action button">
                   Donate Now
                 </button>
               </div>
@@ -126,13 +126,13 @@ export default async function DonatePage() {
                         </div>
                         <div className="w-full bg-slate-200 rounded-full h-3">
                           <div
-                            className="bg-purple-600 h-3 rounded-full transition-all duration-500"
+                            className="bg-blue-600 h-3 rounded-full transition-all duration-500"
                             style={{ width: `${Math.min(progress, 100)}%` }}
                           />
                         </div>
                       </div>
 
-                      <button className="w-full px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium" aria-label="Action button">
+                      <button className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium" aria-label="Action button">
                         Donate to This Campaign
                       </button>
                     </div>
@@ -151,7 +151,7 @@ export default async function DonatePage() {
                 {[25, 50, 100, 250].map((amount) => (
                   <button
                     key={amount}
-                    className="px-4 py-3 border-2 border-slate-300 rounded-lg hover:border-purple-600 hover:bg-purple-50 transition-colors font-medium"
+                    className="px-4 py-3 border-2 border-slate-300 rounded-lg hover:border-blue-600 hover:bg-blue-50 transition-colors font-medium"
                   >
                     ${amount}
                   </button>
@@ -162,12 +162,12 @@ export default async function DonatePage() {
                 placeholder="Custom amount"
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg mb-4"
               />
-              <button className="w-full px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium" aria-label="Action button">
+              <button className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium" aria-label="Action button">
                 Continue to Payment
               </button>
             </div>
 
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
               <h3 className="font-bold text-purple-900 mb-2">Tax Deductible</h3>
               <p className="text-purple-800 text-sm">
                 Rise Foundation is a 501(c)(3) nonprofit organization. Your

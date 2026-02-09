@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 import Link from 'next/link';
-import { BookOpen, CheckCircle, ArrowRight, FileText, Users, DollarSign, Clock, Award, Download } from 'lucide-react';
+import { BookOpen, Circle, ArrowRight, FileText, Users, DollarSign, Clock, Award, Download } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Hiring Guide | Employer Portal',
@@ -77,12 +77,12 @@ export default function HiringGuidePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div className="flex items-center gap-3 mb-4">
               <BookOpen className="w-10 h-10 text-purple-300" />
-              <span className="px-3 py-1 bg-purple-500/30 text-purple-200 rounded-full text-sm">
+              <span className="px-3 py-1 bg-blue-500/30 text-blue-200 rounded-full text-sm">
                 Employer Resource
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Hiring Guide</h1>
-            <p className="text-xl text-purple-200 max-w-2xl">
+            <p className="text-xl text-blue-200 max-w-2xl">
               Your complete guide to hiring WOTC-eligible candidates and maximizing tax credits
             </p>
           </div>
@@ -118,7 +118,7 @@ export default function HiringGuidePage() {
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute top-4 left-4 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
+                  <div className="absolute top-4 left-4 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold">
                     {step.number}
                   </div>
                 </div>
@@ -126,12 +126,12 @@ export default function HiringGuidePage() {
               <div className="md:w-1/2">
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">{step.title}</h3>
                 <p className="text-gray-600 mb-6">{step.description}</p>
-                <div className="bg-purple-50 rounded-xl p-4">
+                <div className="bg-blue-50 rounded-xl p-4">
                   <p className="font-semibold text-purple-900 mb-3">Pro Tips:</p>
                   <ul className="space-y-2">
                     {step.tips.map((tip, i) => (
                       <li key={i} className="flex items-center gap-2 text-gray-700">
-                        <CheckCircle className="w-4 h-4 text-purple-600 flex-shrink-0" />
+                        <Circle className="w-4 h-4 text-blue-600 flex-shrink-0" />
                         {tip}
                       </li>
                     ))}
@@ -148,8 +148,8 @@ export default function HiringGuidePage() {
             {resources.map((resource, index) => (
               <div key={index} className="flex items-center justify-between p-4 border rounded-xl hover:border-purple-300 transition">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-purple-600" />
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-blue-600" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">{resource.title}</p>
@@ -164,15 +164,15 @@ export default function HiringGuidePage() {
           </div>
         </div>
 
-        <div className="bg-purple-600 rounded-2xl p-8 text-white text-center">
+        <div className="bg-blue-600 rounded-2xl p-8 text-white text-center">
           <h3 className="text-2xl font-bold mb-4">Ready to Start Hiring?</h3>
-          <p className="text-purple-200 mb-6 max-w-2xl mx-auto">
+          <p className="text-blue-200 mb-6 max-w-2xl mx-auto">
             Post your first job and connect with pre-screened, WOTC-eligible candidates today.
           </p>
           <div className="flex justify-center gap-4">
             <Link
               href="/employer-portal/jobs/new"
-              className="px-6 py-3 bg-white text-purple-600 rounded-lg hover:bg-gray-100 transition font-semibold flex items-center gap-2"
+              className="px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-gray-100 transition font-semibold flex items-center gap-2"
             >
               Post a Job <ArrowRight className="w-4 h-4" />
             </Link>

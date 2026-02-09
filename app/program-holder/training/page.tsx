@@ -153,8 +153,8 @@ export default async function TrainingPage() {
 
             {/* Module 3 */}
             <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-purple-700">3</span>
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <span className="text-2xl font-bold text-blue-700">3</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Compliance & Reporting</h3>
               <p className="text-black mb-4">

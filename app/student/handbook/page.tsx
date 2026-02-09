@@ -224,7 +224,7 @@ export default async function StudentHandbookPage() {
             <p className="text-sm text-gray-500">Honor code policies</p>
           </Link>
           <Link href="/support" className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-            <ExternalLink className="w-6 h-6 text-purple-600 mb-2" />
+            <ExternalLink className="w-6 h-6 text-blue-600 mb-2" />
             <h3 className="font-medium text-gray-900">Get Support</h3>
             <p className="text-sm text-gray-500">Contact student services</p>
           </Link>

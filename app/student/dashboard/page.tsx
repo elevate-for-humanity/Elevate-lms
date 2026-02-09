@@ -320,8 +320,8 @@ export default async function StudentDashboardPage() {
 
               <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-5">
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-2 sm:gap-3">
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Video className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600" />
+                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Video className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600" />
                   </div>
                   <div className="text-center sm:text-left">
                     <p className="text-[10px] sm:text-sm text-slate-500">RTI</p>
@@ -344,7 +344,7 @@ export default async function StudentDashboardPage() {
                   {hours.slice(0, 5).map((entry: any) => (
                     <div key={entry.id} className="flex items-center justify-between p-3 sm:p-4 gap-2">
                       <div className="flex items-center gap-2 sm:gap-4 min-w-0 flex-1">
-                        <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${entry.hour_type === 'OJT' ? 'bg-green-500' : 'bg-purple-500'}`} />
+                        <div className={`w-2.5 h-2.5 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${entry.hour_type === 'OJT' ? 'bg-green-500' : 'bg-blue-500'}`} />
                         <div className="min-w-0">
                           <p className="font-medium text-slate-900 text-xs sm:text-base truncate">{entry.description || entry.hour_type}</p>
                           <p className="text-[10px] sm:text-sm text-slate-500">{entry.logged_date}</p>
@@ -427,7 +427,7 @@ export default async function StudentDashboardPage() {
                   <span className="font-medium text-slate-900 text-xs sm:text-base">Log Hours</span>
                 </Link>
                 <Link href="/student/certifications" className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 text-left hover:bg-slate-50 rounded-lg transition">
-                  <Award className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 flex-shrink-0" />
+                  <Award className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 flex-shrink-0" />
                   <span className="font-medium text-slate-900 text-xs sm:text-base">Certifications</span>
                 </Link>
                 <Link href="/programs" className="flex items-center gap-2 sm:gap-3 p-2.5 sm:p-3 text-left hover:bg-slate-50 rounded-lg transition">

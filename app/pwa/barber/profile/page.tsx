@@ -60,7 +60,7 @@ export default function BarberProfilePage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-purple-500 mx-auto mb-4 animate-spin" />
+          <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-white">Loading profile...</p>
         </div>
       </div>
@@ -76,7 +76,7 @@ export default function BarberProfilePage() {
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/barber/profile"
-            className="inline-block px-6 py-3 bg-purple-600 text-white rounded-xl font-medium"
+            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
           >
             Sign In
           </Link>
@@ -92,7 +92,7 @@ export default function BarberProfilePage() {
   return (
     <div className="min-h-screen bg-slate-900 pb-20">
       {/* Header */}
-      <header className="bg-purple-600 px-4 pt-12 pb-8 safe-area-inset-top">
+      <header className="bg-blue-600 px-4 pt-12 pb-8 safe-area-inset-top">
         <div className="flex items-center justify-between mb-6">
           <Link href="/pwa/barber" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
@@ -109,7 +109,7 @@ export default function BarberProfilePage() {
             </span>
           </div>
           <h1 className="text-2xl font-bold text-white mb-1">{profile.name}</h1>
-          <p className="text-purple-200">Barber Apprentice</p>
+          <p className="text-blue-200">Barber Apprentice</p>
         </div>
       </header>
 
@@ -122,7 +122,7 @@ export default function BarberProfilePage() {
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden mb-3">
             <div 
-              className="h-full bg-purple-500 rounded-full"
+              className="h-full bg-blue-500 rounded-full"
               style={{ width: `${Math.min(progressPercent, 100)}%` }}
             />
           </div>

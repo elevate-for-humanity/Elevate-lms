@@ -50,7 +50,7 @@ const portals = [
     description: 'Track referrals and partnership metrics',
     href: '/partner', 
     icon: Briefcase, 
-    color: 'bg-purple-500',
+    color: 'bg-blue-500',
     public: true
   },
   { 

@@ -69,7 +69,7 @@ export default function TransparencyPage() {
             {outcomes.map((outcome) => (
               <div key={outcome.label} className="bg-white rounded-xl shadow-sm border overflow-hidden">
                 <div className="relative h-20">
-                  <Image src={outcome.image} alt={outcome.label} fill className="object-cover" />
+                  <Image src={outcome.image} alt={outcome.label} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-4 text-center">
                   <div className="text-2xl font-bold">

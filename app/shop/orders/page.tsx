@@ -5,7 +5,7 @@ import { Metadata } from 'next';
 import {
   ChevronRight,
   Package,
-  CheckCircle,
+  Circle,
   Clock,
   Truck,
   Download,
@@ -97,11 +97,11 @@ export default async function OrderHistoryPage() {
   }));
 
   const getStatusConfig = (status: string) => {
-    const configs: Record<string, { label: string; color: string; icon: typeof CheckCircle }> = {
+    const configs: Record<string, { label: string; color: string; icon: typeof Circle }> = {
       pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-700', icon: Clock },
       processing: { label: 'Processing', color: 'bg-blue-100 text-blue-700', icon: Package },
-      shipped: { label: 'Shipped', color: 'bg-purple-100 text-purple-700', icon: Truck },
-      delivered: { label: 'Delivered', color: 'bg-green-100 text-green-700', icon: CheckCircle },
+      shipped: { label: 'Shipped', color: 'bg-blue-100 text-blue-700', icon: Truck },
+      delivered: { label: 'Delivered', color: 'bg-green-100 text-green-700', icon: Circle },
       cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-700', icon: Clock },
     };
     return configs[status] || configs.pending;

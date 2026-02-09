@@ -145,7 +145,7 @@ export default async function DocumentationPage() {
                     <BookOpen className="h-11 w-11 text-brand-green-600" />
                   )}
                   {category.category === 'Policies' && (
-                    <FileCheck className="h-11 w-11 text-purple-600" />
+                    <FileCheck className="h-11 w-11 text-blue-600" />
                   )}
                   <h2 className="text-2xl font-bold text-black">
                     {category.category}

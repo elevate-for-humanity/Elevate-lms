@@ -67,7 +67,7 @@ export default async function TaxFilingReportsPage() {
             <div className="text-black text-sm">Total Refunds</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-purple-600">0</div>
+            <div className="text-3xl font-bold text-blue-600">0</div>
             <div className="text-black text-sm">Clients Served</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
@@ -120,7 +120,7 @@ export default async function TaxFilingReportsPage() {
               <button className="w-full px-4 py-2 bg-brand-green-600 text-white rounded-md hover:bg-green-700" aria-label="Action button">
                 Export to PDF
               </button>
-              <button className="w-full px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700" aria-label="Action button">
+              <button className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700" aria-label="Action button">
                 Export to Excel
               </button>
             </div>

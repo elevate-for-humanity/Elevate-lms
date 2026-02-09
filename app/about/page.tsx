@@ -159,7 +159,7 @@ export default function AboutPage() {
               </div>
               <div>
                 <div className="font-bold text-slate-900">WorkOne</div>
-                <div className="text-purple-600 text-sm">Workforce Partner</div>
+                <div className="text-blue-600 text-sm">Workforce Partner</div>
               </div>
             </div>
 
@@ -214,12 +214,12 @@ export default function AboutPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="relative w-20 h-20 flex-shrink-0 bg-purple-100 rounded-lg flex items-center justify-center">
-                <span className="text-purple-600 font-bold text-sm">ISBCE</span>
+              <div className="relative w-20 h-20 flex-shrink-0 bg-blue-100 rounded-lg flex items-center justify-center">
+                <span className="text-blue-600 font-bold text-sm">ISBCE</span>
               </div>
               <div>
                 <div className="font-bold text-slate-900">Indiana State Board</div>
-                <div className="text-purple-600 text-sm">Cosmetology & Barber Examiners</div>
+                <div className="text-blue-600 text-sm">Cosmetology & Barber Examiners</div>
               </div>
             </div>
           </div>

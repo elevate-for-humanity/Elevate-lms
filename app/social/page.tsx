@@ -75,7 +75,7 @@ const socialPlatforms = [
   {
     name: 'Instagram',
     icon: Instagram,
-    color: 'bg-slate-700 hover:from-purple-700 hover:via-pink-700 hover:to-orange-600',
+    color: 'bg-slate-700 hover:from-blue-700 hover:via-pink-700 hover:to-orange-600',
     href: 'https://www.instagram.com/elevateforhumanity',
     followers: '3.4K',
     description: 'Behind-the-scenes content, student spotlights, and daily inspiration',

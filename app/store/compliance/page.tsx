@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Shield, CheckCircle, FileText, Lock, Download, ExternalLink } from 'lucide-react';
+import { Shield, Circle, FileText, Lock, Download, ExternalLink } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -56,7 +56,7 @@ export default async function CompliancePage() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-xl p-8 shadow-lg">
               <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-                <CheckCircle className="w-8 h-8 text-green-600" />
+                <Circle className="w-8 h-8 text-green-600" />
               </div>
               <h3 className="text-2xl font-bold mb-4">WIOA Compliance</h3>
               <p className="text-gray-700 mb-4">
@@ -64,19 +64,19 @@ export default async function CompliancePage() {
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <span>Participant intake and eligibility tracking</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <span>Performance metrics (employment, wages, credentials)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <span>Quarterly and annual reporting</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                   <span>PIRL (Participant Individual Record Layout) export</span>
                 </li>
               </ul>
@@ -99,19 +99,19 @@ export default async function CompliancePage() {
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Encrypted data storage (AES-256)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Role-based access control (RBAC)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Audit logging and access tracking</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Student consent management</span>
                 </li>
               </ul>
@@ -125,8 +125,8 @@ export default async function CompliancePage() {
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mb-4">
-                <FileText className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                <FileText className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-2xl font-bold mb-4">WCAG AA Accessibility</h3>
               <p className="text-gray-700 mb-4">
@@ -134,25 +134,25 @@ export default async function CompliancePage() {
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Screen reader compatible</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Keyboard navigation support</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Color contrast compliance</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Closed captions and transcripts</span>
                 </li>
               </ul>
               <Link
                 href="/store/compliance/wcag"
-                className="inline-flex items-center gap-2 text-purple-600 font-semibold hover:text-purple-700"
+                className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700"
               >
                 View WCAG Documentation
                 <ExternalLink className="w-4 h-4" />
@@ -169,19 +169,19 @@ export default async function CompliancePage() {
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
                   <span>Automated data collection</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
                   <span>Custom report templates</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
                   <span>Outcome tracking and metrics</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-orange-600 flex-shrink-0 mt-0.5" />
                   <span>Export to Excel, PDF, CSV</span>
                 </li>
               </ul>

@@ -229,7 +229,7 @@ export default function SupersonicFastCashPage() {
                 <Image src="/images/heroes/employer-partner-3.jpg" alt="DIY Tax Filing" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
                   DIY Tax Filing
                 </h3>
                 <p className="text-gray-600 text-sm">
@@ -375,7 +375,7 @@ export default function SupersonicFastCashPage() {
               href="/supersonic-fast-cash/upload-documents"
               className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <Upload className="w-8 h-8 text-purple-600" />
+              <Upload className="w-8 h-8 text-blue-600" />
               <span className="font-semibold text-gray-900">Upload Documents</span>
             </Link>
             <Link

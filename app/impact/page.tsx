@@ -78,7 +78,7 @@ export default async function ImpactPage() {
             </div>
 
             <div className="bg-gray-50 rounded-2xl p-8">
-              <div className="w-16 h-16 bg-brand-purple-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6">
                 <TrendingUp className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">

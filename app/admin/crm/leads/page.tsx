@@ -56,7 +56,7 @@ export default async function LeadsPage() {
       case 'Initial Contact': return 'bg-gray-100 text-gray-700';
       case 'Discovery': return 'bg-blue-100 text-blue-700';
       case 'Qualified': return 'bg-yellow-100 text-yellow-700';
-      case 'Proposal': return 'bg-purple-100 text-purple-700';
+      case 'Proposal': return 'bg-blue-100 text-blue-700';
       case 'Negotiation': return 'bg-orange-100 text-orange-700';
       case 'Closed Won': return 'bg-green-100 text-green-700';
       default: return 'bg-gray-100 text-gray-700';

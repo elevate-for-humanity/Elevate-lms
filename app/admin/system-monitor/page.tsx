@@ -75,7 +75,7 @@ export default function SystemMonitorPage() {
 
           {/* System */}
           <div className="bg-white rounded-xl border p-6">
-            <Server className="h-11 w-11 text-purple-600 mb-4" />
+            <Server className="h-11 w-11 text-blue-600 mb-4" />
             <h3 className="font-bold mb-2">System</h3>
             <div className="text-sm">
               <div>Status: {status?.checks?.system?.status || 'unknown'}</div>

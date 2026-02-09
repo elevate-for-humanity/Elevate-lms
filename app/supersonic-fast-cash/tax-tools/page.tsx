@@ -127,16 +127,16 @@ export default async function TaxToolsPage() {
               href="https://www.irs.gov/forms-pubs/about-form-1099-misc"
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-purple-50 rounded-2xl p-6 border-2 border-purple-200 hover:border-purple-500 transition-all transform hover:scale-105"
+              className="group bg-blue-50 rounded-2xl p-6 border-2 border-blue-200 hover:border-blue-500 transition-all transform hover:scale-105"
             >
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-2xl font-black text-purple-600">
+                <h3 className="text-2xl font-black text-blue-600">
                   Form 1099
                 </h3>
-                <ExternalLink className="w-6 h-6 text-purple-600 group-hover:translate-x-1 transition-transform" />
+                <ExternalLink className="w-6 h-6 text-blue-600 group-hover:translate-x-1 transition-transform" />
               </div>
               <p className="text-black mb-4">Miscellaneous Income</p>
-              <div className="flex items-center gap-2 text-purple-600 font-bold">
+              <div className="flex items-center gap-2 text-blue-600 font-bold">
                 <Download className="w-5 h-5" />
                 <span>Download PDF</span>
               </div>
@@ -248,12 +248,12 @@ export default async function TaxToolsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-purple-50 rounded-xl">
+                <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-xl">
                   <div className="flex-shrink-0 w-20 text-center">
-                    <div className="text-3xl font-black text-purple-600">
+                    <div className="text-3xl font-black text-blue-600">
                       APR
                     </div>
-                    <div className="text-2xl font-black text-purple-600">
+                    <div className="text-2xl font-black text-blue-600">
                       15
                     </div>
                   </div>

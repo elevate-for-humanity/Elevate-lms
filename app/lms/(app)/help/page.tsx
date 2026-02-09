@@ -165,8 +165,8 @@ export default async function HelpPage() {
               </div>
             </a>
             <Link href="/lms/messages/new" className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                <MessageCircle className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <div className="font-semibold text-gray-900">Send Message</div>

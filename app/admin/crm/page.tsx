@@ -165,8 +165,8 @@ export default async function CRMHubPage() {
             className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-blue-600" />
               </div>
               <span className="text-2xl font-bold text-black">
                 {scheduledMeetings || 0}
@@ -206,7 +206,7 @@ export default async function CRMHubPage() {
           >
             <Calendar className="w-8 h-8 mb-4" />
             <h3 className="text-xl font-bold mb-2">Schedule Meeting</h3>
-            <p className="text-purple-100 text-sm">
+            <p className="text-blue-100 text-sm">
               Book appointment with Zoom
             </p>
           </Link>

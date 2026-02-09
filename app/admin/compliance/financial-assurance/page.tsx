@@ -201,8 +201,8 @@ export default async function FinancialAssurancePage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Next Renewal</p>

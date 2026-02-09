@@ -98,7 +98,7 @@ export default async function EnrollmentSuccessPage() {
 
         <Link
           href="/programs/esthetician-apprenticeship/orientation"
-          className="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center py-5 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] shadow-lg"
+          className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-5 rounded-xl font-bold text-lg transition-all hover:scale-[1.02] shadow-lg"
         >
           Start Orientation
         </Link>

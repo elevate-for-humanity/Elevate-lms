@@ -156,7 +156,7 @@ export default function PromoCodesAdminPage() {
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Promo Codes" }]} />
         </div>
-        <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -185,7 +185,7 @@ export default function PromoCodesAdminPage() {
                 setEditingCode(null);
                 setShowForm(true);
               }}
-              className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700"
+              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
             >
               <Plus className="w-5 h-5" />
               Create Code
@@ -329,7 +329,7 @@ export default function PromoCodesAdminPage() {
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700"
+                    className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                   >
                     {editingCode ? 'Update' : 'Create'}
                   </button>
@@ -390,7 +390,7 @@ export default function PromoCodesAdminPage() {
                         <span className="flex items-center gap-1">
                           {promo.discount_type === 'percentage' ? (
                             <>
-                              <Percent className="w-4 h-4 text-purple-600" />
+                              <Percent className="w-4 h-4 text-blue-600" />
                               {promo.discount_value}% off
                             </>
                           ) : (

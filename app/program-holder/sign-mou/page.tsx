@@ -84,7 +84,7 @@ export default async function SignMOUPage() {
             </p>
           </div>
           <div className="bg-white rounded-lg p-4 border border-slate-200">
-            <FileText className="text-purple-600 mb-2" size={24} />
+            <FileText className="text-blue-600 mb-2" size={24} />
             <h3 className="font-semibold text-black text-sm">
               Instant Processing
             </h3>

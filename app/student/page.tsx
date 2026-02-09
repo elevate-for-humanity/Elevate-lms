@@ -67,7 +67,7 @@ export default async function StudentPortalPage() {
   const quickLinks = [
     { href: '/student/courses', icon: BookOpen, label: 'My Courses', color: 'bg-blue-100 text-blue-600' },
     { href: '/student/progress', icon: TrendingUp, label: 'Progress', color: 'bg-green-100 text-green-600' },
-    { href: '/student/hours/history', icon: Clock, label: 'Hours Log', color: 'bg-purple-100 text-purple-600' },
+    { href: '/student/hours/history', icon: Clock, label: 'Hours Log', color: 'bg-blue-100 text-blue-600' },
     { href: '/student/chat', icon: MessageCircle, label: 'Messages', color: 'bg-orange-100 text-orange-600' },
     { href: '/student/handbook', icon: FileText, label: 'Handbook', color: 'bg-pink-100 text-pink-600' },
     { href: '/lms/schedule', icon: Calendar, label: 'Schedule', color: 'bg-indigo-100 text-indigo-600' },
@@ -129,8 +129,8 @@ export default async function StudentPortalPage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">24</p>

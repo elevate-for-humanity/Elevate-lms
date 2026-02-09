@@ -123,41 +123,41 @@ export default async function ArchitecturePage() {
             </ul>
           </div>
 
-          <div className="bg-purple-50 border border-purple-200 rounded-xl p-8">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-8">
             <h2 className="text-2xl font-bold mb-4 text-black">
               Mobile & AI
             </h2>
             <ul className="space-y-3 text-black">
               <li className="flex items-start gap-3">
-                <span className="text-purple-600 font-bold">•</span>
+                <span className="text-blue-600 font-bold">•</span>
                 <span>
                   <strong>Native mobile app</strong> - iOS and Android (React
                   Native + Expo)
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-purple-600 font-bold">•</span>
+                <span className="text-blue-600 font-bold">•</span>
                 <span>
                   <strong>Push notifications</strong> - Expo push notification
                   service
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-purple-600 font-bold">•</span>
+                <span className="text-blue-600 font-bold">•</span>
                 <span>
                   <strong>Offline mode</strong> - Download courses, sync when
                   online
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-purple-600 font-bold">•</span>
+                <span className="text-blue-600 font-bold">•</span>
                 <span>
                   <strong>AI tutoring</strong> - 5 AI systems for learner
                   support
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-purple-600 font-bold">•</span>
+                <span className="text-blue-600 font-bold">•</span>
                 <span>
                   <strong>Biometric auth</strong> - Face ID, Touch ID,
                   Fingerprint

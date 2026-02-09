@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { ArrowLeft, GraduationCap, TrendingUp, CheckCircle, Clock } from 'lucide-react';
+import { ArrowLeft, GraduationCap, TrendingUp, Circle, Clock } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -90,8 +90,8 @@ export default async function EnrollmentReportPage() {
           
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-purple-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Circle className="w-5 h-5 text-blue-600" />
               </div>
               <span className="text-sm text-gray-600">Completion Rate</span>
             </div>
@@ -171,7 +171,7 @@ export default async function EnrollmentReportPage() {
                       </div>
                       <div className="w-full bg-gray-100 rounded-full h-2">
                         <div 
-                          className="bg-purple-600 h-2 rounded-full" 
+                          className="bg-blue-600 h-2 rounded-full" 
                           style={{ width: `${(count / (totalEnrollments || 1)) * 100}%` }}
                         />
                       </div>

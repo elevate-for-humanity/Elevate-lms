@@ -126,8 +126,8 @@ export default async function AdminMarketingPage() {
                 <p className="text-3xl font-bold text-gray-900 mt-1">{newLeadsThisMonth || 0}</p>
                 <p className="text-sm text-gray-500 mt-1">leads</p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Target className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Target className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </div>
@@ -222,8 +222,8 @@ export default async function AdminMarketingPage() {
                   href="/admin/analytics"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <BarChart3 className="w-5 h-5 text-purple-600" />
+                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 text-blue-600" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Analytics</p>

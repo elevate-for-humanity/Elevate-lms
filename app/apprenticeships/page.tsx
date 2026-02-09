@@ -121,7 +121,7 @@ export default function ApprenticeshipsPage() {
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                   b.color === 'green' ? 'bg-green-500' : 
                   b.color === 'blue' ? 'bg-blue-500' : 
-                  b.color === 'purple' ? 'bg-purple-500' : 'bg-orange-500'
+                  b.color === 'purple' ? 'bg-blue-500' : 'bg-orange-500'
                 }`}>
                   <b.icon className="w-6 h-6 text-white" />
                 </div>

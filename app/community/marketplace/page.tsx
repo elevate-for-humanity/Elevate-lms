@@ -75,7 +75,7 @@ const FEATURED_CATEGORIES = [
     name: 'Technology & IT',
     description: 'CompTIA study guides, lab equipment, practice exams, software tools',
     icon: Monitor,
-    color: 'bg-purple-100 text-purple-600',
+    color: 'bg-blue-100 text-blue-600',
   },
 ];
 
@@ -506,8 +506,8 @@ export default async function CommunityMarketplacePage() {
                 <p className="text-sm text-slate-600 mt-1">Competitive pricing from the community</p>
               </div>
               <div>
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Star className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Star className="w-6 h-6 text-blue-600" />
                 </div>
                 <h3 className="font-bold text-slate-900">Quality Guaranteed</h3>
                 <p className="text-sm text-slate-600 mt-1">Ratings and reviews from real buyers</p>

@@ -166,7 +166,7 @@ export default function AuditLogsPage() {
             <h3 className="text-sm font-medium text-black mb-2">
               Unique Users
             </h3>
-            <p className="text-3xl font-bold text-purple-600">
+            <p className="text-3xl font-bold text-blue-600">
               {new Set(logs.map((l) => l.user_id)).size}
             </p>
           </div>

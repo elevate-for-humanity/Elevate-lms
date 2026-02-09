@@ -19,7 +19,7 @@ const getFileIcon = (type: string) => {
   if (type?.includes('pdf')) return 'text-red-500';
   if (type?.includes('doc')) return 'text-blue-500';
   if (type?.includes('sheet') || type?.includes('excel')) return 'text-green-500';
-  if (type?.includes('image')) return 'text-purple-500';
+  if (type?.includes('image')) return 'text-blue-500';
   return 'text-gray-500';
 };
 

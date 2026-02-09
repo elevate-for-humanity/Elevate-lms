@@ -104,8 +104,8 @@ export default function CourseEnrollPage({
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                  <Award className="h-10 w-10 text-purple-600" />
+                <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <Award className="h-10 w-10 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-bold text-black mb-1">

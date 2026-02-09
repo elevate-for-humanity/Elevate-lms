@@ -257,13 +257,13 @@ export default async function ResourcesPage() {
             {resourceCategories.map((category) => {
               const colorClasses: Record<string, string> = {
                 blue: 'bg-blue-50 border-blue-200',
-                purple: 'bg-purple-50 border-purple-200',
+                purple: 'bg-blue-50 border-blue-200',
                 green: 'bg-green-50 border-green-200',
                 red: 'bg-red-50 border-red-200',
               };
               const iconColors: Record<string, string> = {
                 blue: 'text-blue-600',
-                purple: 'text-purple-600',
+                purple: 'text-blue-600',
                 green: 'text-green-600',
                 red: 'text-red-600',
               };

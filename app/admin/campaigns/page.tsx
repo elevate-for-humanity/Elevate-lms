@@ -132,8 +132,8 @@ export default async function AdminCampaignsPage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <Eye className="w-6 h-6 text-purple-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Eye className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{openRate}%</p>

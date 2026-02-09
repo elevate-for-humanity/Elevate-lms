@@ -142,7 +142,7 @@ export default function PlatformOverviewPage() {
 
             <div className="border rounded-lg p-6">
               <div className="flex items-center gap-3 mb-3">
-                <FileText className="w-6 h-6 text-purple-600" />
+                <FileText className="w-6 h-6 text-blue-600" />
                 <h3 className="text-lg font-semibold">2.4 Supersonic Fast Cash (Tax Services)</h3>
               </div>
               <p className="text-gray-700 mb-3"><strong>Function:</strong> Tax preparation services and optional refund advance products.</p>

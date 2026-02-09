@@ -31,7 +31,7 @@ export default async function PlacementsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Hires</h3><p className="text-3xl font-bold text-green-600 mt-2">{count || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">This Month</h3><p className="text-3xl font-bold text-blue-600 mt-2">5</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Retention Rate</h3><p className="text-3xl font-bold text-purple-600 mt-2">92%</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Retention Rate</h3><p className="text-3xl font-bold text-blue-600 mt-2">92%</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-4 border-b"><h2 className="font-semibold">Recent Placements</h2></div>

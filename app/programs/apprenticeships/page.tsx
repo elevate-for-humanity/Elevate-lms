@@ -151,7 +151,7 @@ export default async function ApprenticeshipProgramsPage() {
             </div>
 
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-purple-100 text-purple-600 mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-100 text-blue-600 mb-4">
                 <Award className="w-8 h-8" />
               </div>
               <h3 className="font-bold text-black mb-2">Certifications</h3>

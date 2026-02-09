@@ -315,7 +315,7 @@ function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
   const colorClasses = {
     blue: 'text-brand-blue-600',
     green: 'text-brand-green-600',
-    purple: 'text-purple-600',
+    purple: 'text-blue-600',
     orange: 'text-brand-orange-600',
   };
 

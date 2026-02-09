@@ -69,7 +69,7 @@ export default function RevocationPage() {
               </ul>
             </div>
 
-            <div className="bg-purple-50 border-l-4 border-purple-400 p-6 mb-6">
+            <div className="bg-blue-50 border-l-4 border-purple-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Serious Misconduct</h3>
               <p className="text-black mb-2">Discovered after graduation:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -112,7 +112,7 @@ export default function RevocationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>

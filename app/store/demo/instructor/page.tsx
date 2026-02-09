@@ -22,18 +22,18 @@ export default function InstructorDemoPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Instructor" }]} />
       </div>
-<section className="bg-purple-600 text-white py-12">
+<section className="bg-blue-600 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
-          <Link href="/store/demo" className="inline-flex items-center gap-2 text-purple-200 hover:text-white mb-4">
+          <Link href="/store/demo" className="inline-flex items-center gap-2 text-blue-200 hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4" /> Back to Demo Center
           </Link>
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-purple-500 rounded-xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center">
               <GraduationCap className="w-8 h-8" />
             </div>
             <div>
               <h1 className="text-3xl font-black">Instructor Demo</h1>
-              <p className="text-purple-200">Explore the instructor experience</p>
+              <p className="text-blue-200">Explore the instructor experience</p>
             </div>
           </div>
         </div>
@@ -46,7 +46,7 @@ export default function InstructorDemoPage() {
                 <h2 className="text-xl font-bold text-slate-900 mb-2">{section.title}</h2>
                 <p className="text-slate-600">{section.description}</p>
               </div>
-              <Link href={section.demoUrl} target="_blank" className="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-purple-700">
+              <Link href={section.demoUrl} target="_blank" className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700">
                 Open <ExternalLink className="w-4 h-4" />
               </Link>
             </div>
@@ -58,7 +58,7 @@ export default function InstructorDemoPage() {
       </section>
       <section className="py-12 px-4 bg-white border-t text-center">
         <h2 className="text-2xl font-bold text-slate-900 mb-4">Ready to set up your platform?</h2>
-        <Link href="/store/licenses/managed" className="inline-flex items-center gap-2 bg-purple-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-purple-700">
+        <Link href="/store/licenses/managed" className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700">
           Start License Setup <ArrowRight className="w-5 h-5" />
         </Link>
       </section>

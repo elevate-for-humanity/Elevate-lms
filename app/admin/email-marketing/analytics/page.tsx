@@ -335,7 +335,7 @@ export default function AnalyticsPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-black">Total Clicks</h3>
-              <MousePointerClick className="w-5 h-5 text-purple-600" />
+              <MousePointerClick className="w-5 h-5 text-blue-600" />
             </div>
             <div className="text-3xl font-bold text-black mb-2">
               {data.overview.totalClicks.toLocaleString()}
@@ -403,7 +403,7 @@ export default function AnalyticsPage() {
                   <div className="flex items-center space-x-2">
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-purple-600 h-2 rounded-full"
+                        className="bg-blue-600 h-2 rounded-full"
                         style={{
                           width: `${(day.clicks / Math.max(...data.timeline.map((d) => d.clicks))) * 100}%`,
                         }}
@@ -522,7 +522,7 @@ function StatCard({ title, value, icon: Icon, color, trend }: StatCardProps) {
   const colorClasses = {
     blue: 'text-brand-blue-600 bg-blue-50',
     green: 'text-brand-green-600 bg-green-50',
-    purple: 'text-purple-600 bg-purple-50',
+    purple: 'text-blue-600 bg-blue-50',
     red: 'text-brand-orange-600 bg-red-50',
   };
 

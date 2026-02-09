@@ -37,18 +37,18 @@ export default function StaffPortalLanding() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-purple-900/60" />
+        <div className="absolute inset-0 bg-blue-900/70" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
-          <span className="text-purple-200 font-medium">Staff Portal</span>
+          <span className="text-blue-200 font-medium">Staff Portal</span>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Staff Management Portal</h1>
-          <p className="text-xl text-purple-100 max-w-2xl mb-8">
+          <p className="text-xl text-blue-100 max-w-2xl mb-8">
             Manage students, track enrollments, monitor progress, and access administrative tools.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/login?redirect=/staff-portal/dashboard" className="px-8 py-4 bg-white text-purple-600 font-bold rounded-lg hover:bg-purple-50">
+            <Link href="/login?redirect=/staff-portal/dashboard" className="px-8 py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50">
               Sign In
             </Link>
-            <Link href="/onboarding/staff" className="px-8 py-4 bg-purple-500 text-white font-bold rounded-lg hover:bg-purple-400">
+            <Link href="/onboarding/staff" className="px-8 py-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-purple-400">
               Staff Onboarding
             </Link>
           </div>
@@ -68,7 +68,7 @@ export default function StaffPortalLanding() {
             {features.map((feature, idx) => (
               <div key={idx} className="bg-white rounded-xl overflow-hidden shadow-sm border">
                 <div className="relative h-32">
-                  <Image src={feature.image} alt={feature.title} fill className="object-cover" />
+                  <Image src={feature.image} alt={feature.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-lg font-bold text-slate-900 mb-2">{feature.title}</h3>
@@ -85,7 +85,7 @@ export default function StaffPortalLanding() {
           <h2 className="text-3xl font-bold text-slate-900 mb-4">Access Your Portal</h2>
           <p className="text-lg text-slate-600 mb-8">Sign in to access staff tools or complete onboarding if you are new.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/login?redirect=/staff-portal/dashboard" className="px-8 py-4 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700">Sign In</Link>
+            <Link href="/login?redirect=/staff-portal/dashboard" className="px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">Sign In</Link>
             <Link href="/onboarding/staff" className="px-8 py-4 bg-slate-100 text-slate-900 font-bold rounded-lg hover:bg-slate-200">Staff Onboarding</Link>
           </div>
         </div>

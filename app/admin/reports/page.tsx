@@ -41,7 +41,7 @@ export default async function ReportsPage() {
   const stats = [
     { label: 'Total Users', value: totalUsers || 0, icon: Users, color: 'text-blue-600', bgColor: 'bg-blue-100' },
     { label: 'Active Courses', value: totalCourses || 0, icon: GraduationCap, color: 'text-green-600', bgColor: 'bg-green-100' },
-    { label: 'Total Leads', value: totalLeads || 0, icon: TrendingUp, color: 'text-purple-600', bgColor: 'bg-purple-100' },
+    { label: 'Total Leads', value: totalLeads || 0, icon: TrendingUp, color: 'text-blue-600', bgColor: 'bg-blue-100' },
     { label: 'Enrollments', value: totalEnrollments || 0, icon: FileText, color: 'text-orange-600', bgColor: 'bg-orange-100' },
   ];
 
@@ -66,7 +66,7 @@ export default async function ReportsPage() {
       title: 'Financial Report',
       description: 'WOTC credits, grants awarded, and funding overview',
       icon: DollarSign,
-      color: 'bg-purple-500',
+      color: 'bg-blue-500',
       href: '/admin/reports/financial',
       metrics: ['WOTC tracking', 'Grant utilization'],
     },
@@ -123,7 +123,7 @@ export default async function ReportsPage() {
                   </div>
                   <Link
                     href={report.href}
-                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-purple-600 text-white rounded hover:bg-purple-700 transition"
+                    className="inline-flex items-center gap-1 px-3 py-1.5 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition"
                   >
                     <Eye className="w-3 h-3" />
                     View Report
@@ -160,7 +160,7 @@ export default async function ReportsPage() {
             
             <div className="p-4 bg-gray-50 rounded-lg">
               <div className="flex items-center gap-2 mb-2">
-                <GraduationCap className="w-5 h-5 text-purple-600" />
+                <GraduationCap className="w-5 h-5 text-blue-600" />
                 <span className="font-medium text-gray-900">Active Programs</span>
               </div>
               <p className="text-2xl font-bold text-gray-900">{totalCourses || 0}</p>

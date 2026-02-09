@@ -203,8 +203,8 @@ export default function SubofficeOnboardingPage() {
 
             {/* Step 3 */}
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3 text-center">
                 Step 3: Staff & Payroll

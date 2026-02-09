@@ -194,8 +194,8 @@ export default function SchedulePage() {
                 <p className="text-sm text-slate-600">Manage programs, enrollments, and reporting</p>
               </div>
               <div className="text-center">
-                <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-purple-600 font-bold">3</span>
+                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-blue-600 font-bold">3</span>
                 </div>
                 <h4 className="font-medium text-slate-900 mb-1">Employer Portal</h4>
                 <p className="text-sm text-slate-600">Connect with candidates and manage hiring pipelines</p>

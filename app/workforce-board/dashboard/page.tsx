@@ -159,7 +159,7 @@ export default async function WorkforceBoardDashboard() {
             <p className="text-sm text-gray-600">Completions</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-2"><Target className="w-8 h-8 text-purple-600" /></div>
+            <div className="flex items-center justify-between mb-2"><Target className="w-8 h-8 text-blue-600" /></div>
             <p className="text-2xl md:text-3xl font-bold text-gray-900">{completionRate}%</p>
             <p className="text-sm text-gray-600">Completion Rate</p>
           </div>
@@ -292,8 +292,8 @@ export default async function WorkforceBoardDashboard() {
               <p className="text-2xl font-bold text-green-600">{trainingProviders}</p>
               <p className="text-sm text-gray-600">Training Providers</p>
             </div>
-            <div className="text-center p-4 bg-purple-50 rounded-lg">
-              <p className="text-2xl font-bold text-purple-600">{activeEnrollments}</p>
+            <div className="text-center p-4 bg-blue-50 rounded-lg">
+              <p className="text-2xl font-bold text-blue-600">{activeEnrollments}</p>
               <p className="text-sm text-gray-600">Active Participants</p>
             </div>
             <div className="text-center p-4 bg-orange-50 rounded-lg">
@@ -315,7 +315,7 @@ export default async function WorkforceBoardDashboard() {
             <span className="text-sm text-gray-500">Verify participants</span>
           </Link>
           <Link href="/workforce-board/employment" className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
-            <Briefcase className="w-8 h-8 text-purple-600 mb-2" />
+            <Briefcase className="w-8 h-8 text-blue-600 mb-2" />
             <span className="font-medium text-gray-900">Employment Outcomes</span>
             <span className="text-sm text-gray-500">Track placements</span>
           </Link>

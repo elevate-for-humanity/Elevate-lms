@@ -285,15 +285,15 @@ export default function BarbershopPartnerPage() {
               <span className="text-xs text-blue-700 font-medium">For advanced apprentices</span>
             </div>
 
-            <div className="bg-gray-50 p-6 rounded-xl border-2 border-purple-300 bg-purple-50">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <Award className="w-5 h-5 text-purple-600" />
+            <div className="bg-gray-50 p-6 rounded-xl border-2 border-purple-300 bg-blue-50">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Award className="w-5 h-5 text-blue-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Hybrid</h3>
               <p className="text-sm text-gray-600 mb-3">
                 Base hourly rate plus commission on services. Balances stability with incentive.
               </p>
-              <span className="text-xs text-purple-700 font-medium">Most flexible option</span>
+              <span className="text-xs text-blue-700 font-medium">Most flexible option</span>
             </div>
 
             <div className="bg-gray-50 p-6 rounded-xl border-2 border-gray-200">

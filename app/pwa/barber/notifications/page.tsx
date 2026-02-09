@@ -34,7 +34,7 @@ const NOTIFICATION_COLORS: Record<NotificationType, string> = {
   hours_rejected: 'bg-red-500/20',
   milestone: 'bg-amber-500/20',
   reminder: 'bg-blue-500/20',
-  training: 'bg-purple-500/20',
+  training: 'bg-blue-500/20',
   system: 'bg-slate-700',
 };
 
@@ -139,7 +139,7 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-purple-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
       </div>
     );
   }
@@ -186,7 +186,7 @@ export default function NotificationsPage() {
               <div
                 key={notification.id}
                 className={`relative bg-slate-800 rounded-xl overflow-hidden ${
-                  !notification.read ? 'border-l-4 border-purple-500' : ''
+                  !notification.read ? 'border-l-4 border-blue-500' : ''
                 }`}
               >
                 {notification.actionUrl ? (

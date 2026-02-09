@@ -206,8 +206,8 @@ export default async function ProgressPage() {
           
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Target className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.completedLessons}</div>

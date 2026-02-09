@@ -6,7 +6,7 @@ import { useState } from 'react';
 import {
   Download,
   FileText,
-  CheckCircle,
+  Circle,
   AlertCircle,
   ExternalLink,
   Key,
@@ -135,15 +135,15 @@ export default function DrakeDownloadPage() {
 
             <div className="space-y-3 text-sm">
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-300" />
+                <Circle className="w-4 h-4 text-green-300" />
                 <span>Account credentials managed by IT department</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-300" />
+                <Circle className="w-4 h-4 text-green-300" />
                 <span>Secure access for certified tax preparers</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-300" />
+                <Circle className="w-4 h-4 text-green-300" />
                 <span>Training required before software access</span>
               </div>
             </div>
@@ -194,7 +194,7 @@ export default function DrakeDownloadPage() {
                   <ul className="space-y-2">
                     {product.features.map((feature, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm">
-                        <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                        <Circle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -320,12 +320,12 @@ export default function DrakeDownloadPage() {
             href="/supersonic-fast-cash/training"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition"
           >
-            <CheckCircle className="w-10 h-10 text-purple-600 mb-4" />
+            <Circle className="w-10 h-10 text-blue-600 mb-4" />
             <h3 className="font-bold text-lg mb-2">Our Training</h3>
             <p className="text-sm text-black mb-4">
               SupersonicFastCash tax preparation courses
             </p>
-            <span className="text-purple-600 font-semibold flex items-center gap-1">
+            <span className="text-blue-600 font-semibold flex items-center gap-1">
               Start Learning →
             </span>
           </Link>

@@ -4,7 +4,7 @@ import Image from 'next/image';
 import {
   Compass,
   Users,
-  CheckCircle,
+  Circle,
   Target,
   ArrowRight,
   Calendar,
@@ -118,8 +118,8 @@ export default function CareerCounselingPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {counselingAreas.map((area, index) => (
-              <div key={index} className="bg-purple-50 rounded-xl p-6 text-center hover:shadow-lg transition">
-                <area.icon className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+              <div key={index} className="bg-blue-50 rounded-xl p-6 text-center hover:shadow-lg transition">
+                <area.icon className="w-12 h-12 text-blue-600 mx-auto mb-4" />
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{area.title}</h3>
                 <p className="text-gray-600 text-sm">{area.description}</p>
               </div>
@@ -137,7 +137,7 @@ export default function CareerCounselingPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 1
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Initial Consultation</h3>
@@ -145,7 +145,7 @@ export default function CareerCounselingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Assessment</h3>
@@ -153,7 +153,7 @@ export default function CareerCounselingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 3
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Exploration</h3>
@@ -161,7 +161,7 @@ export default function CareerCounselingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 4
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Action Plan</h3>
@@ -184,7 +184,7 @@ export default function CareerCounselingPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {assessments.map((assessment, index) => (
               <div key={index} className="bg-gray-50 rounded-xl p-6 flex items-start">
-                <CheckCircle className="w-6 h-6 text-purple-600 mr-4 flex-shrink-0 mt-1" />
+                <Circle className="w-6 h-6 text-blue-600 mr-4 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="font-bold text-gray-900 mb-1">{assessment.name}</h3>
                   <p className="text-gray-600 text-sm">{assessment.description}</p>
@@ -196,7 +196,7 @@ export default function CareerCounselingPage() {
       </section>
 
       {/* Who Benefits */}
-      <section className="py-16 bg-purple-50">
+      <section className="py-16 bg-blue-50">
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
             Who Benefits from Career Counseling?
@@ -210,15 +210,15 @@ export default function CareerCounselingPage() {
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Identify transferable skills
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Explore new industries
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Plan your transition
                 </li>
               </ul>
@@ -231,15 +231,15 @@ export default function CareerCounselingPage() {
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Explore career options
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Build your professional brand
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Navigate the job market
                 </li>
               </ul>
@@ -252,15 +252,15 @@ export default function CareerCounselingPage() {
               </p>
               <ul className="space-y-2">
                 <li className="flex items-center text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Address employment gaps
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Update your skills
                 </li>
                 <li className="flex items-center text-sm text-gray-600">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Rebuild confidence
                 </li>
               </ul>
@@ -279,7 +279,7 @@ export default function CareerCounselingPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-gray-50 rounded-xl p-6 border-2 border-gray-200">
               <div className="flex items-center mb-4">
-                <Users className="w-8 h-8 text-purple-600 mr-3" />
+                <Users className="w-8 h-8 text-blue-600 mr-3" />
                 <h3 className="text-xl font-bold text-gray-900">In-Person Sessions</h3>
               </div>
               <p className="text-gray-600 mb-4">
@@ -287,15 +287,15 @@ export default function CareerCounselingPage() {
               </p>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   60-minute sessions
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Hands-on activities
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Access to resource library
                 </li>
               </ul>
@@ -303,7 +303,7 @@ export default function CareerCounselingPage() {
 
             <div className="bg-gray-50 rounded-xl p-6 border-2 border-gray-200">
               <div className="flex items-center mb-4">
-                <MessageSquare className="w-8 h-8 text-purple-600 mr-3" />
+                <MessageSquare className="w-8 h-8 text-blue-600 mr-3" />
                 <h3 className="text-xl font-bold text-gray-900">Virtual Sessions</h3>
               </div>
               <p className="text-gray-600 mb-4">
@@ -311,15 +311,15 @@ export default function CareerCounselingPage() {
               </p>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Flexible scheduling
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   No travel required
                 </li>
                 <li className="flex items-center">
-                  <CheckCircle className="w-4 h-4 text-green-600 mr-2" />
+                  <Circle className="w-4 h-4 text-green-600 mr-2" />
                   Screen sharing for resources
                 </li>
               </ul>
@@ -334,7 +334,7 @@ export default function CareerCounselingPage() {
           <p className="text-2xl italic mb-6">
             &quot;Career counseling helped me realize I had more options than I thought. My counselor helped me see how my skills could transfer to a completely new field. Now I am in a career I love.&quot;
           </p>
-          <p className="text-purple-200">— Maria S., Program Graduate</p>
+          <p className="text-blue-200">— Maria S., Program Graduate</p>
         </div>
       </section>
 
@@ -350,7 +350,7 @@ export default function CareerCounselingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               <Calendar className="mr-2 w-5 h-5" />
               Schedule Consultation

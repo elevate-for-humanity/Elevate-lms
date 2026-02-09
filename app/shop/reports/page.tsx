@@ -137,10 +137,10 @@ export default function ShopReportsPage() {
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Clock className="w-6 h-6 text-purple-600" />
+              <Clock className="w-6 h-6 text-blue-600" />
               <h3 className="text-sm font-medium text-black">Total Hours</h3>
             </div>
-            <p className="text-3xl font-bold text-purple-600">
+            <p className="text-3xl font-bold text-blue-600">
               {reports.reduce((sum, r) => sum + r.hours, 0)}
             </p>
           </div>

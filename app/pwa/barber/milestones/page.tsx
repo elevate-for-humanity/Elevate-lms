@@ -70,7 +70,7 @@ export default function MilestonesPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-purple-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
       </div>
     );
   }
@@ -135,13 +135,13 @@ export default function MilestonesPage() {
           <>
             {/* Next Milestone */}
             {nextMilestone && (
-              <div className="bg-purple-500/20 border border-purple-500/30 rounded-xl p-4">
+              <div className="bg-blue-500/20 border border-blue-500/30 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <Sparkles className="w-5 h-5 text-purple-400" />
                   <span className="text-purple-300 text-sm font-medium">Next Milestone</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-14 h-14 bg-purple-500/30 rounded-xl flex items-center justify-center">
+                  <div className="w-14 h-14 bg-blue-500/30 rounded-xl flex items-center justify-center">
                     {(() => {
                       const Icon = ICON_MAP[nextMilestone.icon];
                       return <Icon className="w-7 h-7 text-purple-400" />;
@@ -149,7 +149,7 @@ export default function MilestonesPage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="text-white font-bold">{nextMilestone.title}</h3>
-                    <p className="text-purple-200 text-sm">{nextMilestone.description}</p>
+                    <p className="text-blue-200 text-sm">{nextMilestone.description}</p>
                     <div className="mt-2">
                       <div className="flex justify-between text-xs mb-1">
                         <span className="text-purple-300">{totalHours} / {nextMilestone.hoursRequired} hours</span>
@@ -157,7 +157,7 @@ export default function MilestonesPage() {
                       </div>
                       <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-purple-500 rounded-full"
+                          className="h-full bg-blue-500 rounded-full"
                           style={{ width: `${Math.min((totalHours / nextMilestone.hoursRequired) * 100, 100)}%` }}
                         />
                       </div>

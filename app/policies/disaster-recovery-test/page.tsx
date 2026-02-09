@@ -93,12 +93,12 @@ export default function DisasterRecoveryTestPage() {
 
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Observed Recovery Metrics</h2>
         <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+          <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-5 h-5 text-purple-600" />
+              <Clock className="w-5 h-5 text-blue-600" />
               <h3 className="text-lg font-bold text-black m-0">Recovery Time Objective (RTO)</h3>
             </div>
-            <p className="text-3xl font-black text-purple-600 mb-1">18 minutes</p>
+            <p className="text-3xl font-black text-blue-600 mb-1">18 minutes</p>
             <p className="text-sm text-gray-600 m-0">Target: &lt; 4 hours</p>
           </div>
 

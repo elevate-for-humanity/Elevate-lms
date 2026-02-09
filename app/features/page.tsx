@@ -130,8 +130,8 @@ export default async function FeaturesPage() {
 
             {/* Feature 3 */}
             <div className="bg-gray-50 rounded-lg p-6 hover:shadow-lg transition-shadow">
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-purple-100 rounded-lg mb-4">
-                <Award className="w-6 h-6 text-purple-600" />
+              <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4">
+                <Award className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
                 Industry Certifications

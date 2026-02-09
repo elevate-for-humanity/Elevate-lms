@@ -127,7 +127,7 @@ export default function AIStudioPage() {
                 </span>
               </h1>
 
-              <p className="text-xl text-purple-100 mb-8">
+              <p className="text-xl text-blue-100 mb-8">
                 Generate videos, voiceovers, images, and AI instructors for your courses. 
                 No video editing skills required.
               </p>
@@ -135,7 +135,7 @@ export default function AIStudioPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="#pricing"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-purple-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-purple-50 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-purple-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg"
                 >
                   View Plans
                   <ArrowRight className="w-5 h-5" />
@@ -189,8 +189,8 @@ export default function AIStudioPage() {
               const Icon = cap.icon;
               return (
                 <div key={cap.title} className="bg-white rounded-xl p-8 shadow-sm hover:shadow-lg transition-all text-center">
-                  <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Icon className="w-8 h-8 text-purple-600" />
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Icon className="w-8 h-8 text-blue-600" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{cap.title}</h3>
                   <p className="text-gray-600">{cap.description}</p>
@@ -219,12 +219,12 @@ export default function AIStudioPage() {
                 key={plan.name}
                 className={`relative bg-white rounded-2xl p-8 ${
                   plan.popular
-                    ? 'border-2 border-purple-600 shadow-2xl scale-105 z-10'
+                    ? 'border-2 border-blue-600 shadow-2xl scale-105 z-10'
                     : 'border border-gray-200 hover:shadow-lg'
                 } transition-all`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-purple-600 text-white text-sm font-bold rounded-full">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-600 text-white text-sm font-bold rounded-full">
                     Most Popular
                   </div>
                 )}
@@ -246,7 +246,7 @@ export default function AIStudioPage() {
                   href={`/store/ai-studio/checkout?plan=${plan.name.toLowerCase().replace(' ', '-')}`}
                   className={`block w-full text-center py-3 rounded-lg font-bold transition-colors mb-6 ${
                     plan.popular
-                      ? 'bg-purple-600 text-white hover:bg-purple-700'
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                   }`}
                 >
@@ -274,12 +274,12 @@ export default function AIStudioPage() {
           <h2 className="text-4xl font-black text-white mb-6">
             Ready to Create with AI?
           </h2>
-          <p className="text-xl text-purple-200 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-blue-200 mb-10 max-w-2xl mx-auto">
             Start your free trial today. No credit card required.
           </p>
           <Link
             href="/store/ai-studio/checkout?plan=professional"
-            className="inline-flex items-center gap-2 bg-white text-purple-900 px-10 py-5 rounded-lg font-bold text-lg hover:bg-purple-50 transition-colors shadow-lg"
+            className="inline-flex items-center gap-2 bg-white text-purple-900 px-10 py-5 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg"
           >
             Start Free Trial
             <ArrowRight className="w-5 h-5" />

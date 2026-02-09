@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { DollarSign, Clock, CheckCircle, FileText, Plus, Calendar, ExternalLink } from 'lucide-react';
+import { DollarSign, Clock, Circle, FileText, Plus, Calendar, ExternalLink } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,7 +44,7 @@ export default async function GrantsPage() {
     { label: 'Open Opportunities', value: openGrants.toString(), icon: FileText, color: 'text-blue-600', bgColor: 'bg-blue-100' },
     { label: 'Available Funding', value: `$${(totalFunding / 1000).toFixed(0)}K`, icon: DollarSign, color: 'text-green-600', bgColor: 'bg-green-100' },
     { label: 'Pending Applications', value: pendingApps.toString(), icon: Clock, color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
-    { label: 'Awarded This Year', value: `$${approvedAmount.toLocaleString()}`, icon: CheckCircle, color: 'text-purple-600', bgColor: 'bg-purple-100' },
+    { label: 'Awarded This Year', value: `$${approvedAmount.toLocaleString()}`, icon: Circle, color: 'text-blue-600', bgColor: 'bg-blue-100' },
   ];
 
   const statusColors: Record<string, string> = {
@@ -63,7 +63,7 @@ export default async function GrantsPage() {
           </div>
           <Link
             href="/admin/grants/new"
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition flex items-center gap-2"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Add Opportunity
@@ -99,7 +99,7 @@ export default async function GrantsPage() {
                 <p className="text-gray-600 mb-6">Add grant opportunities to track funding sources.</p>
                 <Link
                   href="/admin/grants/new"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                 >
                   <Plus className="w-4 h-4" />
                   Add Opportunity

@@ -105,7 +105,7 @@ export default async function InstructorTrainingPage() {
               <p className="text-gray-600">Total Content</p>
             </div>
             <div>
-              <BookOpen className="w-8 h-8 text-purple-600 mx-auto mb-2" />
+              <BookOpen className="w-8 h-8 text-blue-600 mx-auto mb-2" />
               <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
               <p className="text-gray-600">Categories</p>
             </div>
@@ -190,7 +190,7 @@ export default async function InstructorTrainingPage() {
               </div>
             </div>
             <div className="flex items-start">
-              <Video className="w-6 h-6 text-purple-600 mr-3 flex-shrink-0" />
+              <Video className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0" />
               <div>
                 <h3 className="font-semibold text-gray-900">Office Hours</h3>
                 <p className="text-sm text-gray-600">Join weekly Q&A sessions</p>

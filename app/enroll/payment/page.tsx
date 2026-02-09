@@ -248,7 +248,7 @@ function EnrollPaymentContent() {
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-gray-600" />
                     <span className="font-semibold text-gray-900">{PRICING.installment.label}</span>
-                    <span className="text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
                       {PRICING.installment.savings}
                     </span>
                   </div>

@@ -151,7 +151,7 @@ export default function BarberPartnerPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -174,7 +174,7 @@ export default function BarberPartnerPage() {
             <div className="space-y-4">
               <Link
                 href="/partner/onboarding"
-                className="inline-flex items-center justify-center gap-2 w-full px-6 py-4 bg-purple-600 text-white font-semibold rounded-xl hover:bg-purple-700 transition-colors"
+                className="inline-flex items-center justify-center gap-2 w-full px-6 py-4 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors"
               >
                 <ClipboardList className="w-5 h-5" />
                 Start Onboarding
@@ -220,7 +220,7 @@ export default function BarberPartnerPage() {
           </Link>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-purple-600 rounded-xl flex items-center justify-center">
+              <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center">
                 <Scissors className="w-7 h-7 text-white" />
               </div>
               <div>
@@ -230,7 +230,7 @@ export default function BarberPartnerPage() {
             </div>
             <button
               onClick={() => setShowEntryForm(true)}
-              className="flex items-center gap-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="w-5 h-5" />
               Enter Weekly Progress
@@ -268,11 +268,11 @@ export default function BarberPartnerPage() {
               {apprentices.map((apprentice) => (
                 <div key={apprentice.id} className="bg-white rounded-xl p-6 border border-slate-200">
                   <div className="flex items-center gap-4 mb-4">
-                    <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                       {apprentice.avatar_url ? (
                         <img src={apprentice.avatar_url} alt="" className="w-12 h-12 rounded-full object-cover" />
                       ) : (
-                        <span className="text-lg font-bold text-purple-600">
+                        <span className="text-lg font-bold text-blue-600">
                           {apprentice.full_name.charAt(0)}
                         </span>
                       )}
@@ -287,7 +287,7 @@ export default function BarberPartnerPage() {
                       <Calendar className="w-4 h-4" />
                       Started {new Date(apprentice.start_date).toLocaleDateString()}
                     </div>
-                    <div className="flex items-center gap-2 text-purple-600 font-medium">
+                    <div className="flex items-center gap-2 text-blue-600 font-medium">
                       <Clock className="w-4 h-4" />
                       {apprentice.total_hours} hrs
                     </div>
@@ -302,7 +302,7 @@ export default function BarberPartnerPage() {
         <section>
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-bold text-slate-900">Progress History</h2>
-            <button className="flex items-center gap-2 text-sm text-purple-600 hover:text-purple-700">
+            <button className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700">
               <Download className="w-4 h-4" />
               Export
             </button>
@@ -362,7 +362,7 @@ export default function BarberPartnerPage() {
                 <select
                   value={entryForm.apprenticeId}
                   onChange={(e) => setEntryForm({ ...entryForm, apprenticeId: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   required
                 >
                   <option value="">Select apprentice...</option>
@@ -378,7 +378,7 @@ export default function BarberPartnerPage() {
                   type="date"
                   value={entryForm.weekEnding}
                   onChange={(e) => setEntryForm({ ...entryForm, weekEnding: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   required
                 />
               </div>
@@ -392,7 +392,7 @@ export default function BarberPartnerPage() {
                   max="80"
                   value={entryForm.hoursWorked}
                   onChange={(e) => setEntryForm({ ...entryForm, hoursWorked: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   placeholder="e.g., 40"
                   required
                 />
@@ -403,7 +403,7 @@ export default function BarberPartnerPage() {
                 <textarea
                   value={entryForm.notes}
                   onChange={(e) => setEntryForm({ ...entryForm, notes: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500"
                   rows={3}
                   placeholder="Any notes about this week..."
                 />
@@ -420,7 +420,7 @@ export default function BarberPartnerPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
                 >
                   {submitting ? 'Submitting...' : 'Submit Progress'}
                 </button>

@@ -98,7 +98,7 @@ export default function LicensingPartnershipsPage() {
         <Breadcrumbs items={[{ label: "Licensing Partnerships" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative bg-purple-600 text-white py-20 overflow-hidden">
+      <section className="relative bg-blue-600 text-white py-20 overflow-hidden">
         <div className="absolute inset-0 bg-grid-white/10" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -136,7 +136,7 @@ export default function LicensingPartnershipsPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center gap-2 bg-white text-purple-600 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold text-lg transition shadow-2xl hover:scale-105"
+                className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 rounded-xl font-bold text-lg transition shadow-2xl hover:scale-105"
               >
                 Become a Partner
                 <ArrowRight className="w-5 h-5" />
@@ -172,10 +172,10 @@ export default function LicensingPartnershipsPage() {
               return (
                 <div
                   key={idx}
-                  className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-purple-600 hover:shadow-xl transition-all"
+                  className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-blue-600 hover:shadow-xl transition-all"
                 >
-                  <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mb-6">
-                    <Icon className="w-8 h-8 text-purple-600" />
+                  <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
+                    <Icon className="w-8 h-8 text-blue-600" />
                   </div>
                   <h3 className="text-2xl font-bold text-black mb-4">
                     {type.title}
@@ -191,7 +191,7 @@ export default function LicensingPartnershipsPage() {
                   </ul>
                   <Link
                     href={type.href}
-                    className="block text-center bg-purple-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-purple-700 transition-colors"
+                    className="block text-center bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition-colors"
                   >
                     Learn More →
                   </Link>
@@ -216,7 +216,7 @@ export default function LicensingPartnershipsPage() {
               const Icon = benefit.icon;
               return (
                 <div key={idx} className="text-center">
-                  <div className="w-20 h-20 bg-purple-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <div className="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-6">
                     <Icon className="w-10 h-10 text-white" />
                   </div>
                   <h3 className="text-xl font-bold text-black mb-3">
@@ -239,7 +239,7 @@ export default function LicensingPartnershipsPage() {
 
           <div className="max-w-4xl mx-auto space-y-8">
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+              <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                 1
               </div>
               <div>
@@ -254,7 +254,7 @@ export default function LicensingPartnershipsPage() {
             </div>
 
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+              <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                 2
               </div>
               <div>
@@ -269,7 +269,7 @@ export default function LicensingPartnershipsPage() {
             </div>
 
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+              <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                 3
               </div>
               <div>
@@ -284,7 +284,7 @@ export default function LicensingPartnershipsPage() {
             </div>
 
             <div className="flex gap-6">
-              <div className="flex-shrink-0 w-12 h-12 bg-purple-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+              <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                 4
               </div>
               <div>
@@ -302,7 +302,7 @@ export default function LicensingPartnershipsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-purple-600 text-white">
+      <section className="py-20 bg-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl md:text-4xl lg:text-5xl font-black mb-6">
             Ready to Partner With Us?
@@ -314,7 +314,7 @@ export default function LicensingPartnershipsPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 bg-white text-purple-600 hover:bg-gray-100 px-10 py-5 rounded-xl text-lg font-black shadow-2xl hover:scale-105 transition-all"
+              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 hover:bg-gray-100 px-10 py-5 rounded-xl text-lg font-black shadow-2xl hover:scale-105 transition-all"
             >
               Apply to Partner
               <ArrowRight className="w-6 h-6" />

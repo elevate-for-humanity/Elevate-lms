@@ -421,8 +421,8 @@ export default async function PlatformLicensingPage() {
             {/* License Type 3: Apprenticeship Only */}
             <div className="bg-white rounded-2xl shadow-lg border-2 border-slate-200 p-8 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-purple-600" />
+                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Shield className="w-8 h-8 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black">
@@ -441,7 +441,7 @@ export default async function PlatformLicensingPage() {
                 </div>
               </div>
 
-              <div className="bg-purple-50 rounded-xl p-4 mb-6">
+              <div className="bg-blue-50 rounded-xl p-4 mb-6">
                 <div className="font-bold text-purple-900 mb-2">Includes:</div>
                 <div className="space-y-1 text-sm text-purple-800">
                   <div>• RAPIDS lifecycle tracking</div>
@@ -481,7 +481,7 @@ export default async function PlatformLicensingPage() {
 
               <Link
                 href="/pricing/sponsor-licensing"
-                className="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center px-6 py-4 rounded-lg font-bold transition text-lg"
+                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-4 rounded-lg font-bold transition text-lg"
               >
                 View Details →
               </Link>
@@ -695,8 +695,8 @@ export default async function PlatformLicensingPage() {
             {/* Tier 3: Federal Contractor */}
             <div className="bg-white rounded-2xl shadow-lg border-2 border-slate-200 p-6 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
+                  <Users className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-black">
@@ -734,7 +734,7 @@ export default async function PlatformLicensingPage() {
                 </div>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-3 mb-4 text-xs">
+              <div className="bg-blue-50 rounded-lg p-3 mb-4 text-xs">
                 <div className="font-semibold mb-1">$285K-$575K Value</div>
                 <div className="text-black">
                   All Gov + DOL + Multi-State
@@ -743,7 +743,7 @@ export default async function PlatformLicensingPage() {
 
               <Link
                 href="/contact?tier=federal"
-                className="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center px-4 py-3 rounded-lg font-bold transition"
+                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-3 rounded-lg font-bold transition"
               >
                 Get Started
               </Link>

@@ -106,7 +106,7 @@ export default function EstheticianDocumentsPage() {
                 <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                   <FileText className="w-5 h-5 text-slate-400" />
                   <span className="flex-1 text-sm text-slate-700 truncate">{governmentId.name}</span>
-                  {governmentId.status === 'uploading' && <span className="text-sm text-purple-600">Uploading...</span>}
+                  {governmentId.status === 'uploading' && <span className="text-sm text-blue-600">Uploading...</span>}
                   {governmentId.status === 'complete' && (
                     <button onClick={() => setGovernmentId(null)} className="text-slate-400 hover:text-red-500">
                       <X className="w-4 h-4" />
@@ -114,7 +114,7 @@ export default function EstheticianDocumentsPage() {
                   )}
                 </div>
               ) : (
-                <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-purple-500 hover:bg-purple-50 transition">
+                <label className="flex items-center justify-center gap-2 p-4 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition">
                   <Upload className="w-5 h-5 text-slate-400" />
                   <span className="text-slate-600">Click to upload</span>
                   <input type="file" accept="image/*,.pdf" onChange={handleFileUpload} className="hidden" />
@@ -127,7 +127,7 @@ export default function EstheticianDocumentsPage() {
         <button
           onClick={handleSubmit}
           disabled={!canSubmit || submitting}
-          className="w-full py-4 bg-purple-600 text-white font-bold text-lg rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-purple-700 transition"
+          className="w-full py-4 bg-blue-600 text-white font-bold text-lg rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition"
         >
           {submitting ? 'Submitting...' : 'Submit Documents'}
         </button>

@@ -142,7 +142,7 @@ export default function DemosPage() {
             <Link href="/videos" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
               Training Videos
             </Link>
-            <Link href="/webinars" className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors">
+            <Link href="/webinars" className="px-4 py-2 bg-blue-100 text-purple-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
               Webinars
             </Link>
             <Link href="/success-stories" className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
@@ -290,8 +290,8 @@ export default function DemosPage() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <ArrowRight className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <ArrowRight className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Integration Options</h3>
               <p className="text-gray-600 text-sm">

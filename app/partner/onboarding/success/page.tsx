@@ -45,8 +45,8 @@ export default function PartnerOnboardingSuccessPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Clock className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Clock className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <p className="font-medium text-slate-900">Review Process</p>
@@ -72,7 +72,7 @@ export default function PartnerOnboardingSuccessPage() {
           <div className="space-y-3">
             <Link
               href="/programs/barber-apprenticeship"
-              className="block w-full py-3 px-6 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+              className="block w-full py-3 px-6 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
             >
               Back to Barber Program
             </Link>
@@ -86,7 +86,7 @@ export default function PartnerOnboardingSuccessPage() {
 
           <p className="mt-8 text-sm text-slate-500">
             Questions? Call us at{' '}
-            <a href="tel:3173143757" className="text-purple-600 hover:underline">
+            <a href="tel:3173143757" className="text-blue-600 hover:underline">
               (317) 314-3757
             </a>
           </p>

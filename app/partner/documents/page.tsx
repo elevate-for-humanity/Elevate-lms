@@ -117,7 +117,7 @@ export default function PartnerDocumentsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-100 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
       </div>
     );
   }
@@ -139,8 +139,8 @@ export default function PartnerDocumentsPage() {
       <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <FileText className="w-8 h-8 text-purple-600" />
+          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FileText className="w-8 h-8 text-blue-600" />
           </div>
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Required Documents</h1>
           <p className="text-slate-600">
@@ -152,11 +152,11 @@ export default function PartnerDocumentsPage() {
         <div className="bg-white rounded-xl p-6 mb-6 border border-slate-200">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm font-medium text-slate-700">Document Completion</span>
-            <span className="text-sm font-bold text-purple-600">{progress}%</span>
+            <span className="text-sm font-bold text-blue-600">{progress}%</span>
           </div>
           <div className="w-full bg-slate-200 rounded-full h-3">
             <div 
-              className={`h-3 rounded-full transition-all ${allComplete ? 'bg-green-500' : 'bg-purple-600'}`}
+              className={`h-3 rounded-full transition-all ${allComplete ? 'bg-green-500' : 'bg-blue-600'}`}
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -229,9 +229,9 @@ export default function PartnerDocumentsPage() {
               {(doc.status === 'missing' || doc.status === 'rejected' || doc.status === 'expired') && (
                 <div className="mt-4">
                   <label className="block">
-                    <div className="flex items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-purple-50 transition-colors">
+                    <div className="flex items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-blue-50 transition-colors">
                       {uploading === doc.document_type ? (
-                        <div className="flex items-center gap-2 text-purple-600">
+                        <div className="flex items-center gap-2 text-blue-600">
                           <Loader2 className="w-5 h-5 animate-spin" />
                           Uploading...
                         </div>

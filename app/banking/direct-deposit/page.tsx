@@ -252,7 +252,7 @@ export default function DirectDepositPage() {
                 <p className="text-sm text-gray-600">Savings Account</p>
               </div>
               <div className="bg-white rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-purple-600">20%</p>
+                <p className="text-2xl font-bold text-blue-600">20%</p>
                 <p className="text-sm text-gray-600">IRA or Investment</p>
               </div>
             </div>

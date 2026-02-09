@@ -16,7 +16,7 @@ export default function PWAIndexPage() {
     <div className="min-h-screen bg-slate-900 flex flex-col">
       {/* Header */}
       <header className="bg-slate-800 px-6 pt-16 pb-8 text-center">
-        <div className="w-20 h-20 bg-purple-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+        <div className="w-20 h-20 bg-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
           <span className="text-3xl font-black text-white">E</span>
         </div>
         <h1 className="text-3xl font-bold text-white mb-2">Elevate Apps</h1>
@@ -28,10 +28,10 @@ export default function PWAIndexPage() {
         {/* Barber Apprentice App */}
         <Link 
           href="/pwa/barber"
-          className="block bg-purple-600/20 border border-purple-500/30 rounded-2xl p-6 hover:border-purple-500/50 transition-colors"
+          className="block bg-blue-600/20 border border-blue-500/30 rounded-2xl p-6 hover:border-blue-500/50 transition-colors"
         >
           <div className="flex items-center gap-5">
-            <div className="w-16 h-16 bg-purple-500 rounded-xl flex items-center justify-center shadow-lg">
+            <div className="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center shadow-lg">
               <Scissors className="w-8 h-8 text-white" />
             </div>
             <div className="flex-1">
@@ -41,11 +41,11 @@ export default function PWAIndexPage() {
             <ChevronRight className="w-6 h-6 text-purple-400" />
           </div>
           
-          <div className="mt-4 pt-4 border-t border-purple-500/20">
+          <div className="mt-4 pt-4 border-t border-blue-500/20">
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs">Log Hours</span>
-              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs">Training Materials</span>
-              <span className="px-3 py-1 bg-purple-500/20 text-purple-300 rounded-full text-xs">Progress Tracking</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-purple-300 rounded-full text-xs">Log Hours</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-purple-300 rounded-full text-xs">Training Materials</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-purple-300 rounded-full text-xs">Progress Tracking</span>
             </div>
           </div>
         </Link>

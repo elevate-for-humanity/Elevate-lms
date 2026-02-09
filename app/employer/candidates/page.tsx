@@ -112,7 +112,7 @@ export default async function CandidatesPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center gap-3">
-              <GraduationCap className="w-8 h-8 text-purple-600" />
+              <GraduationCap className="w-8 h-8 text-blue-600" />
               <div>
                 <div className="text-2xl font-bold">0</div>
                 <div className="text-sm text-gray-600">Program Graduates</div>

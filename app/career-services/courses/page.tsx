@@ -111,8 +111,8 @@ export default async function CareerCoursesPage() {
               <p className="text-sm text-gray-600">Templates, worksheets, and checklists</p>
             </div>
             <div className="text-center">
-              <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Award className="w-7 h-7 text-purple-600" />
+              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Award className="w-7 h-7 text-blue-600" />
               </div>
               <h3 className="font-semibold mb-2">Certificate</h3>
               <p className="text-sm text-gray-600">Earn a certificate upon completion</p>

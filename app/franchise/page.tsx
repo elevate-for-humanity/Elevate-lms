@@ -6,7 +6,7 @@ import {
   TrendingUp,
   Users,
   Award,
-  CheckCircle,
+  Circle,
   Home,
   Briefcase,
 } from 'lucide-react';
@@ -109,8 +109,8 @@ export default function FranchisePage() {
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mb-4">
-                <TrendingUp className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
+                <TrendingUp className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">High Profit Margins</h3>
               <p className="text-black">
@@ -181,31 +181,31 @@ export default function FranchisePage() {
                 <p className="font-bold mb-3">What's Included:</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">
                       3 training programs of your choice
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">
                       Complete curriculum & materials
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Use of DOL/DWD approvals</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Basic website template</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">2-week training</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Email support</span>
                   </li>
                 </ul>
@@ -244,45 +244,45 @@ export default function FranchisePage() {
                 <p className="font-bold mb-3">What's Included:</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">8 training programs</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">
                       Complete curriculum & materials
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Use of DOL/DWD approvals</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Custom branded website</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">LMS platform access</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">
                       Marketing materials & templates
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">
                       4-week training + certification
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Phone & email support</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-yellow-400 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Quarterly business reviews</span>
                   </li>
                 </ul>
@@ -309,7 +309,7 @@ export default function FranchisePage() {
             <div className="bg-white border-2 border-gray-300 rounded-xl p-8">
               <h3 className="text-2xl font-bold mb-4">Enterprise Package</h3>
               <div className="mb-6">
-                <div className="text-4xl font-bold text-purple-600 mb-2">
+                <div className="text-4xl font-bold text-blue-600 mb-2">
                   $75,000
                 </div>
                 <p className="text-sm text-black">One-time franchise fee</p>
@@ -320,47 +320,47 @@ export default function FranchisePage() {
                 <p className="font-bold mb-3">What's Included:</p>
                 <ul className="space-y-2">
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">ALL 15+ training programs</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">
                       Complete curriculum & materials
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Use of DOL/DWD approvals</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">
                       Fully custom website & branding
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Full LMS platform</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Complete marketing system</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">6-week intensive training</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Dedicated account manager</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">On-site launch support</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-sm">Protected territory</span>
                   </li>
                 </ul>
@@ -368,13 +368,13 @@ export default function FranchisePage() {
 
               <Link
                 href="/franchise/apply?package=enterprise"
-                className="block w-full text-center px-6 py-3 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition"
+                className="block w-full text-center px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
               >
                 Get Started
               </Link>
 
               <div className="mt-4 text-center">
-                <p className="text-sm font-bold text-purple-600">
+                <p className="text-sm font-bold text-blue-600">
                   Payment Plans Available
                 </p>
                 <p className="text-xs text-black">

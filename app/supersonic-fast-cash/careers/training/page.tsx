@@ -780,7 +780,7 @@ export default function TrainingPage() {
                     <div className="text-sm text-black">Content</div>
                   </div>
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <Award className="w-8 h-8 mx-auto mb-2 text-purple-600" />
+                    <Award className="w-8 h-8 mx-auto mb-2 text-blue-600" />
                     <div className="font-bold">Certificate</div>
                     <div className="text-sm text-black">Upon Completion</div>
                   </div>

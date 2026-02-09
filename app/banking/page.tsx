@@ -183,9 +183,9 @@ export default async function BankingPage() {
             </div>
 
             {/* Prepaid Card */}
-            <div className="bg-white border-2 border-purple-200 rounded-lg p-8 hover:shadow-xl transition-all">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CreditCard className="w-8 h-8 text-purple-600" />
+            <div className="bg-white border-2 border-blue-200 rounded-lg p-8 hover:shadow-xl transition-all">
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CreditCard className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4 text-center">
                 Prepaid Card
@@ -214,7 +214,7 @@ export default async function BankingPage() {
               </ul>
               <Link
                 href="/banking/prepaid-card"
-                className="block w-full bg-purple-600 hover:bg-purple-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-all"
+                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-all"
               >
                 Learn More
               </Link>

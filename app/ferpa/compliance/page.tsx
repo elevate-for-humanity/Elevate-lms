@@ -145,8 +145,8 @@ export default async function FerpaCompliancePage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">45</p>
@@ -204,7 +204,7 @@ export default async function FerpaCompliancePage() {
             <p className="text-sm text-gray-500">Access compliance documents</p>
           </Link>
           <Link href="/ferpa/reports" className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow">
-            <TrendingUp className="w-6 h-6 text-purple-600 mb-2" />
+            <TrendingUp className="w-6 h-6 text-blue-600 mb-2" />
             <h3 className="font-semibold text-gray-900">Generate Reports</h3>
             <p className="text-sm text-gray-500">Compliance reporting</p>
           </Link>

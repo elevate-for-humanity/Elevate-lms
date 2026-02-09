@@ -94,7 +94,7 @@ export default async function EventsPage() {
       case 'workshop': return 'bg-blue-500';
       case 'networking': return 'bg-green-500';
       case 'qa': return 'bg-orange-500';
-      case 'webinar': return 'bg-purple-500';
+      case 'webinar': return 'bg-blue-500';
       case 'panel': return 'bg-pink-500';
       case 'meetup': return 'bg-teal-500';
       default: return 'bg-gray-500';
@@ -130,23 +130,23 @@ export default async function EventsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-purple-700 text-white py-16">
+      <section className="relative bg-blue-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="flex items-center gap-2 mb-4">
-              <Calendar className="w-6 h-6 text-purple-200" />
-              <span className="text-purple-200 font-medium">Community Events</span>
+              <Calendar className="w-6 h-6 text-blue-200" />
+              <span className="text-blue-200 font-medium">Community Events</span>
             </div>
             <h1 className="text-4xl font-bold mb-4">
               Learn, Connect, and Grow Together
             </h1>
-            <p className="text-xl text-purple-100 mb-6">
+            <p className="text-xl text-blue-100 mb-6">
               Join live workshops, webinars, networking events, and Q&A sessions with industry experts and fellow community members.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
                 href="#upcoming"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-700 font-semibold rounded-lg hover:bg-purple-50 transition"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-700 font-semibold rounded-lg hover:bg-blue-50 transition"
               >
                 View Upcoming Events
                 <ArrowRight className="w-5 h-5" />
@@ -154,7 +154,7 @@ export default async function EventsPage() {
               {user && (
                 <Link
                   href="/community/events/create"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-500 transition border border-purple-400"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition border border-purple-400"
                 >
                   <Plus className="w-5 h-5" />
                   Create Event
@@ -181,7 +181,7 @@ export default async function EventsPage() {
               {user && (
                 <Link
                   href="/community/events/create"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
                 >
                   <Plus className="w-5 h-5" />
                   Create the First Event
@@ -264,15 +264,15 @@ export default async function EventsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-12 bg-purple-600">
+      <section className="py-12 bg-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-white mb-4">Want to Host an Event?</h2>
-          <p className="text-purple-100 mb-6">
+          <p className="text-blue-100 mb-6">
             Share your expertise with the community by hosting a workshop, webinar, or Q&A session.
           </p>
           <Link
             href={user ? "/community/events/create" : "/login?redirect=/community/events/create"}
-            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-purple-600 font-semibold rounded-lg hover:bg-purple-50 transition"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition"
           >
             {user ? 'Create Event' : 'Sign In to Create Event'}
             <ArrowRight className="w-5 h-5" />

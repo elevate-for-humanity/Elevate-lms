@@ -249,7 +249,7 @@ export default function SampleReportsPage() {
 
         {/* Sample Certificate */}
         <section className="bg-white rounded-xl border shadow-sm overflow-hidden">
-          <div className="bg-purple-600 text-white px-6 py-4 flex items-center justify-between">
+          <div className="bg-blue-600 text-white px-6 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Award className="w-6 h-6" />
               <h2 className="text-xl font-bold">Sample Certificate Record</h2>
@@ -262,12 +262,12 @@ export default function SampleReportsPage() {
           
           <div className="p-6">
             {/* Certificate Preview */}
-            <div className="border-2 border-purple-200 rounded-xl p-8 bg-purple-50 mb-6">
+            <div className="border-2 border-blue-200 rounded-xl p-8 bg-blue-50 mb-6">
               <div className="text-center">
-                <div className="text-purple-600 font-bold text-sm tracking-widest mb-2">CERTIFICATE OF COMPLETION</div>
+                <div className="text-blue-600 font-bold text-sm tracking-widest mb-2">CERTIFICATE OF COMPLETION</div>
                 <h3 className="text-3xl font-bold text-gray-900 mb-1">{SAMPLE_CERTIFICATE.student.name}</h3>
                 <p className="text-gray-600 mb-6">has successfully completed the</p>
-                <h4 className="text-2xl font-bold text-purple-700 mb-2">{SAMPLE_CERTIFICATE.program.name}</h4>
+                <h4 className="text-2xl font-bold text-blue-700 mb-2">{SAMPLE_CERTIFICATE.program.name}</h4>
                 <p className="text-gray-600 mb-6">
                   completing {SAMPLE_CERTIFICATE.program.hours_completed} hours of instruction and training
                 </p>
@@ -339,9 +339,9 @@ export default function SampleReportsPage() {
                 <div className="text-3xl font-bold text-green-600">${(SAMPLE_FUNDING_REPORT.summary.total_funding / 1000).toFixed(0)}K</div>
                 <div className="text-sm text-green-700">Total Funding</div>
               </div>
-              <div className="bg-purple-50 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-purple-600">{SAMPLE_FUNDING_REPORT.summary.completions}</div>
-                <div className="text-sm text-purple-700">Completions</div>
+              <div className="bg-blue-50 rounded-lg p-4 text-center">
+                <div className="text-3xl font-bold text-blue-600">{SAMPLE_FUNDING_REPORT.summary.completions}</div>
+                <div className="text-sm text-blue-700">Completions</div>
               </div>
               <div className="bg-orange-50 rounded-lg p-4 text-center">
                 <div className="text-3xl font-bold text-orange-600">{SAMPLE_FUNDING_REPORT.summary.placements}</div>

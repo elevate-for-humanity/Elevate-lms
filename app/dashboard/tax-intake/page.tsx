@@ -116,7 +116,7 @@ export default async function TaxIntakePage() {
             <p className="text-gray-600 text-sm">Completed</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <Users className="w-8 h-8 text-purple-500 mb-2" />
+            <Users className="w-8 h-8 text-blue-500 mb-2" />
             <p className="text-2xl font-bold">{totalCount || 0}</p>
             <p className="text-gray-600 text-sm">Total Clients</p>
           </div>

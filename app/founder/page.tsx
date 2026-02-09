@@ -218,8 +218,8 @@ export default function FounderPage() {
               </p>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
-                <Award className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Excellence & Accountability</h3>
               <p className="text-slate-600 text-sm">

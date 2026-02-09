@@ -193,10 +193,10 @@ export default function ContractsPage() {
             </div>
 
             {/* Data Sharing & Confidentiality */}
-            <div className="bg-white rounded-3xl shadow-lg border-2 border-purple-200 p-8">
+            <div className="bg-white rounded-3xl shadow-lg border-2 border-blue-200 p-8">
               <div className="flex items-start gap-4 mb-6">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Shield className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Shield className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black mb-2">
@@ -209,7 +209,7 @@ export default function ContractsPage() {
               </div>
 
               <div className="space-y-4 mb-6">
-                <div className="bg-purple-50 rounded-xl p-4">
+                <div className="bg-blue-50 rounded-xl p-4">
                   <h4 className="font-bold text-black mb-2">Covers:</h4>
                   <ul className="text-sm text-black space-y-1">
                     <li>• Confidential information definition</li>
@@ -221,7 +221,7 @@ export default function ContractsPage() {
                   </ul>
                 </div>
 
-                <div className="bg-purple-50 border border-purple-200 rounded-xl p-4">
+                <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                   <p className="text-xs text-black">
                     <strong className="text-black">Secure:</strong> Data may
                     be used solely for program administration, compliance,
@@ -232,7 +232,7 @@ export default function ContractsPage() {
 
               <Link
                 href="/contracts/data-sharing"
-                className="inline-flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-xl font-bold transition w-full justify-center"
+                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-bold transition w-full justify-center"
               >
                 <Download className="w-5 h-5" />
                 View Template

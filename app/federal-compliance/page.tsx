@@ -95,8 +95,8 @@ export default function FederalCompliancePage() {
           {/* FERPA Compliance */}
           <div className="mb-16">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <FileText className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <FileText className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold text-black mb-2">

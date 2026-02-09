@@ -46,7 +46,7 @@ const apps = [
 const colorClasses = {
   blue: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' },
   green: { bg: 'bg-green-100', text: 'text-green-600', border: 'border-green-200' },
-  purple: { bg: 'bg-purple-100', text: 'text-purple-600', border: 'border-purple-200' },
+  purple: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' },
 };
 
 export default function AppsPage() {

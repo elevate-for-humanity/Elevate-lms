@@ -100,10 +100,10 @@ export default function FederalCompliancePage() {
         </section>
 
         {/* Title IX Section */}
-        <section className="mb-12 bg-purple-50 rounded-2xl p-8 border-2 border-purple-200">
+        <section className="mb-12 bg-blue-50 rounded-2xl p-8 border-2 border-blue-200">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center">
-              <Scale className="w-7 h-7 text-purple-600" />
+            <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
+              <Scale className="w-7 h-7 text-blue-600" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Title IX Compliance</h2>

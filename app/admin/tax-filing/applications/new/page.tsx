@@ -16,7 +16,7 @@ export default function NewTaxFilingApplicationPage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "New" }]} />
       </div>
 <div className="max-w-3xl mx-auto">
-        <Link href="/admin/tax-filing" className="flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-6">
+        <Link href="/admin/tax-filing" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to Tax Filing
         </Link>
@@ -43,7 +43,7 @@ export default function NewTaxFilingApplicationPage() {
                   <input
                     type="text"
                     placeholder="Search by name or email..."
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -51,7 +51,7 @@ export default function NewTaxFilingApplicationPage() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Tax Year *</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>2024</option>
                     <option>2023</option>
                     <option>2022</option>
@@ -59,7 +59,7 @@ export default function NewTaxFilingApplicationPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Filing Status *</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Single</option>
                     <option>Married Filing Jointly</option>
                     <option>Married Filing Separately</option>
@@ -77,7 +77,7 @@ export default function NewTaxFilingApplicationPage() {
                     <input
                       type="number"
                       placeholder="0.00"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -86,7 +86,7 @@ export default function NewTaxFilingApplicationPage() {
                   <input
                     type="number"
                     placeholder="0"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -99,7 +99,7 @@ export default function NewTaxFilingApplicationPage() {
             <div className="space-y-4">
               {['W-2 Employment', '1099 Self-Employment', 'Unemployment Benefits', 'Social Security', 'Other Income'].map((source) => (
                 <label key={source} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
-                  <input type="checkbox" className="w-4 h-4 text-purple-600 rounded" />
+                  <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
                   <span className="text-gray-700">{source}</span>
                 </label>
               ))}
@@ -136,13 +136,13 @@ export default function NewTaxFilingApplicationPage() {
                   <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="date"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Preferred Time</label>
-                <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                   <option>Morning (9am - 12pm)</option>
                   <option>Afternoon (12pm - 5pm)</option>
                   <option>Evening (5pm - 8pm)</option>
@@ -160,7 +160,7 @@ export default function NewTaxFilingApplicationPage() {
             </Link>
             <button
               type="submit"
-              className="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold flex items-center gap-2"
+              className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
               Create Application

@@ -142,12 +142,12 @@ export default async function VideosPage() {
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <Eye className="h-11 w-11 text-purple-600" />
+                  <Eye className="h-11 w-11 text-blue-600" />
                   <h3 className="text-sm font-medium text-black">
                     Total Views
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-purple-600">
+                <p className="text-3xl font-bold text-blue-600">
                   {videos?.reduce((acc, v) => acc + (v.view_count || 0), 0) ||
                     0}
                 </p>

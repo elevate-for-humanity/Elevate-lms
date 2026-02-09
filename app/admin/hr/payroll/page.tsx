@@ -31,7 +31,7 @@ export default async function PayrollPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">This Period</h3><p className="text-3xl font-bold text-green-600 mt-2">$45,230</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">YTD Total</h3><p className="text-3xl font-bold text-blue-600 mt-2">$542K</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Employees</h3><p className="text-3xl font-bold text-purple-600 mt-2">24</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Employees</h3><p className="text-3xl font-bold text-blue-600 mt-2">24</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Next Run</h3><p className="text-xl font-bold text-gray-900 mt-2">Jan 31</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Payroll History</h2><p className="text-gray-500 text-center py-4">Payroll records will appear here</p></div>

@@ -7,7 +7,7 @@ import {
   Upload, 
   Users, 
   Clock, 
-  CheckCircle, 
+  Circle, 
   AlertCircle,
   FileSpreadsheet,
   RefreshCw,
@@ -37,7 +37,7 @@ const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
   registered: 'bg-blue-100 text-blue-800',
   active: 'bg-green-100 text-green-800',
-  completed: 'bg-purple-100 text-purple-800',
+  completed: 'bg-blue-100 text-purple-800',
   cancelled: 'bg-red-100 text-red-800',
   exited: 'bg-gray-100 text-gray-800',
 };
@@ -197,8 +197,8 @@ export default function RAPIDSApprenticesPage() {
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-purple-600" />
+              <div className="p-2 bg-blue-100 rounded-lg">
+                <Circle className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.completed}</p>
@@ -276,7 +276,7 @@ export default function RAPIDSApprenticesPage() {
                 <button
                   onClick={() => handleExport('completion', 'csv')}
                   disabled={exporting}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 disabled:opacity-50"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50"
                 >
                   <Download className="w-4 h-4" />
                   CSV

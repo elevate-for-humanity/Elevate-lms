@@ -16,7 +16,7 @@ export default function NewDealPage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "New" }]} />
       </div>
 <div className="max-w-2xl mx-auto">
-        <Link href="/admin/crm/deals" className="flex items-center gap-2 text-gray-600 hover:text-purple-600 mb-6">
+        <Link href="/admin/crm/deals" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to Deals
         </Link>
@@ -41,7 +41,7 @@ export default function NewDealPage() {
                 <input
                   type="text"
                   placeholder="e.g., ABC Corp - Apprenticeship Program"
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -52,7 +52,7 @@ export default function NewDealPage() {
                   <input
                     type="text"
                     placeholder="Search companies..."
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -64,7 +64,7 @@ export default function NewDealPage() {
                   <input
                     type="text"
                     placeholder="Search contacts..."
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -77,7 +77,7 @@ export default function NewDealPage() {
                     <input
                       type="number"
                       placeholder="0.00"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -87,7 +87,7 @@ export default function NewDealPage() {
                     <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="date"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -96,7 +96,7 @@ export default function NewDealPage() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Stage</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                     <option>Lead</option>
                     <option>Qualified</option>
                     <option>Proposal</option>
@@ -112,14 +112,14 @@ export default function NewDealPage() {
                     placeholder="50"
                     min="0"
                     max="100"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Deal Type</label>
-                <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent">
+                <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
                   <option>Apprenticeship Program</option>
                   <option>WOTC Services</option>
                   <option>Training Partnership</option>
@@ -133,7 +133,7 @@ export default function NewDealPage() {
                 <textarea
                   rows={3}
                   placeholder="Add any relevant notes about this deal..."
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -148,7 +148,7 @@ export default function NewDealPage() {
             </Link>
             <button
               type="submit"
-              className="px-8 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition font-semibold flex items-center gap-2"
+              className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
               Create Deal

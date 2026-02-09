@@ -109,7 +109,7 @@ export default function CurvatureBodySculptingPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/curvature-body-sculpting/book-appointment"
-              className="px-8 py-4 bg-white text-purple-700 font-bold rounded-lg hover:bg-pink-50 transition"
+              className="px-8 py-4 bg-white text-blue-700 font-bold rounded-lg hover:bg-pink-50 transition"
             >
               Book Appointment
             </Link>
@@ -164,7 +164,7 @@ export default function CurvatureBodySculptingPage() {
           <div className="text-center mt-8">
             <Link
               href="/curvature-body-sculpting/services"
-              className="inline-flex items-center gap-2 text-purple-600 font-semibold hover:text-purple-700"
+              className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700"
             >
               View All Services <ArrowRight className="w-4 h-4" />
             </Link>
@@ -176,7 +176,7 @@ export default function CurvatureBodySculptingPage() {
       <section className="py-20 bg-pink-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 rounded-full text-purple-700 text-sm font-medium mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full text-blue-700 text-sm font-medium mb-4">
               <Heart className="w-4 h-4" />
               Meri-Go-Round Products
             </div>
@@ -198,8 +198,8 @@ export default function CurvatureBodySculptingPage() {
                 <h3 className="text-xl font-bold mb-2">{product.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{product.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-purple-600 font-bold">{product.price}</span>
-                  <button className="px-4 py-2 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition">
+                  <span className="text-blue-600 font-bold">{product.price}</span>
+                  <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition">
                     Add to Cart
                   </button>
                 </div>
@@ -209,7 +209,7 @@ export default function CurvatureBodySculptingPage() {
           <div className="text-center mt-8">
             <Link
               href="/curvature-body-sculpting/shop"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-purple-600 text-white font-bold rounded-lg hover:bg-purple-700 transition"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
             >
               Shop All Products <ArrowRight className="w-5 h-5" />
             </Link>
@@ -232,8 +232,8 @@ export default function CurvatureBodySculptingPage() {
               <p className="text-gray-600 text-sm">Trained and certified professionals</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-purple-600" />
+              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-blue-600" />
               </div>
               <h3 className="font-bold mb-2">Safe & Non-Invasive</h3>
               <p className="text-gray-600 text-sm">FDA-cleared treatments</p>
@@ -328,7 +328,7 @@ export default function CurvatureBodySculptingPage() {
       </section>
 
       {/* Community Partnership */}
-      <section className="py-16 bg-purple-50">
+      <section className="py-16 bg-blue-50">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Community Partnership</h2>
           <p className="text-gray-600 mb-8">
@@ -344,7 +344,7 @@ export default function CurvatureBodySculptingPage() {
             </Link>
             <Link
               href="/nonprofit"
-              className="px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition"
+              className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
             >
               Selfish Inc. Mental Wellness
             </Link>
@@ -368,7 +368,7 @@ export default function CurvatureBodySculptingPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/curvature-body-sculpting/book-appointment"
-              className="px-8 py-4 bg-white text-purple-700 font-bold rounded-lg hover:bg-pink-50 transition flex items-center gap-2"
+              className="px-8 py-4 bg-white text-blue-700 font-bold rounded-lg hover:bg-pink-50 transition flex items-center gap-2"
             >
               <Calendar className="w-5 h-5" />
               Book Free Consultation

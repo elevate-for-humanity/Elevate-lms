@@ -221,7 +221,7 @@ export default async function AutomationLogPage() {
         {/* Cron Job Status */}
         <div className="mt-8 bg-white rounded-xl shadow-sm p-6">
           <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <RefreshCw className="w-5 h-5 text-purple-500" />
+            <RefreshCw className="w-5 h-5 text-blue-500" />
             Scheduled Jobs
           </h2>
           <div className="grid md:grid-cols-3 gap-4">

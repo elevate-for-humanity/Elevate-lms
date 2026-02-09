@@ -573,7 +573,7 @@ export default function BarberApprenticeshipApplyPage() {
                     onClick={() => setPaymentOption('custom')}
                     className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
                       paymentOption === 'custom' 
-                        ? 'border-purple-600 bg-purple-50' 
+                        ? 'border-blue-600 bg-blue-50' 
                         : 'border-gray-300 bg-white hover:border-gray-400'
                     }`}
                   >
@@ -583,14 +583,14 @@ export default function BarberApprenticeshipApplyPage() {
                         <p className="text-black text-sm">Pay what you can today (min ${Math.round(PRICING.fullPrice * 0.35).toLocaleString()})</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-purple-600 text-lg">You Choose</p>
+                        <p className="font-bold text-blue-600 text-lg">You Choose</p>
                       </div>
                     </div>
                   </button>
 
                   {/* Custom Amount Input */}
                   {paymentOption === 'custom' && (
-                    <div className="bg-purple-50 rounded-xl p-4 mb-3 border-2 border-purple-200">
+                    <div className="bg-blue-50 rounded-xl p-4 mb-3 border-2 border-blue-200">
                       <label className="block text-sm font-medium text-black mb-2">
                         Enter your payment amount (min ${Math.round(PRICING.fullPrice * 0.35).toLocaleString()})
                       </label>
@@ -610,7 +610,7 @@ export default function BarberApprenticeshipApplyPage() {
                             if (customAmount < min) setCustomAmount(min);
                             if (customAmount > PRICING.fullPrice) setCustomAmount(PRICING.fullPrice);
                           }}
-                          className="w-full px-4 py-3 text-2xl font-bold border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+                          className="w-full px-4 py-3 text-2xl font-bold border-2 border-purple-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                         />
                       </div>
                       <p className="text-sm text-black mt-2">
@@ -736,7 +736,7 @@ export default function BarberApprenticeshipApplyPage() {
                     <div className="flex flex-wrap gap-2 justify-center mb-2">
                       <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-bold">Klarna</span>
                       <span className="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-bold">Afterpay</span>
-                      <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-bold">Zip</span>
+                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">Zip</span>
                     </div>
                     <div className="flex flex-wrap gap-2 justify-center">
                       <span className="px-3 py-1 bg-green-500 text-white rounded-full text-xs font-bold">Cash App</span>

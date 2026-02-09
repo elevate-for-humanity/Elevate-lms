@@ -101,7 +101,7 @@ export default async function QAChecklistPage() {
             <p className="text-black text-sm">Completed Today</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <User className="h-11 w-11 text-purple-600 mb-2" />
+            <User className="h-11 w-11 text-blue-600 mb-2" />
             <p className="text-3xl font-bold text-black">{profile.role}</p>
             <p className="text-black text-sm">Your Role</p>
           </div>

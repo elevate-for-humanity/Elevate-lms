@@ -184,7 +184,7 @@ export default function JRIPage() {
                   Financial Literacy
                 </h3>
 
-                <div className="bg-purple-100 text-purple-700 px-3 py-2 rounded-full text-sm font-semibold">
+                <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
                   Bonus
                 </div>
               </div>
@@ -196,7 +196,7 @@ export default function JRIPage() {
                   Digital Literacy
                 </h3>
 
-                <div className="bg-purple-100 text-purple-700 px-3 py-2 rounded-full text-sm font-semibold">
+                <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
                   Bonus
                 </div>
               </div>

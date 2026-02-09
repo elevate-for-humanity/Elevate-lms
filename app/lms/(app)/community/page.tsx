@@ -103,9 +103,9 @@ export default async function CommunityPage() {
               href="/lms/leaderboard"
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
             >
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <svg
-                  className="w-6 h-6 text-purple-600"
+                  className="w-6 h-6 text-blue-600"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"

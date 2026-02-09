@@ -225,8 +225,8 @@ export default async function GovernmentPage() {
                 />
               </div>
               <div className="p-8">
-                <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-white">
-                  <Shield className="w-7 h-7 text-purple-600" />
+                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-white">
+                  <Shield className="w-7 h-7 text-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Federal Programs</h3>
                 <p className="text-gray-600 mb-4">
@@ -386,10 +386,10 @@ export default async function GovernmentPage() {
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="font-medium text-gray-700">Employment Rate (Q2)</span>
-                      <span className="font-bold text-purple-600">78%</span>
+                      <span className="font-bold text-blue-600">78%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-purple-600 h-3 rounded-full" style={{ width: '78%' }} />
+                      <div className="bg-blue-600 h-3 rounded-full" style={{ width: '78%' }} />
                     </div>
                   </div>
                   <div>
@@ -478,8 +478,8 @@ export default async function GovernmentPage() {
                 />
               </div>
               <div className="p-6 text-center">
-                <div className="w-14 h-14 bg-purple-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
-                  <Handshake className="w-7 h-7 text-purple-600" />
+                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
+                  <Handshake className="w-7 h-7 text-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Employer Network</h3>
                 <p className="text-sm text-gray-600">

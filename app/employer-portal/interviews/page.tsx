@@ -88,12 +88,12 @@ export default async function InterviewsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Calendar className="w-8 h-8 text-purple-600" />
+                <Calendar className="w-8 h-8 text-blue-600" />
                 <h1 className="text-3xl font-bold text-gray-900">Interviews</h1>
               </div>
               <p className="text-gray-600">Schedule and manage candidate interviews</p>
             </div>
-            <button className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white font-semibold rounded-lg hover:bg-purple-700 transition-colors">
+            <button className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors">
               <Plus className="w-5 h-5" />
               Schedule Interview
             </button>
@@ -115,7 +115,7 @@ export default async function InterviewsPage() {
               </button>
             </div>
             <div className="flex gap-2">
-              <button className="px-4 py-2 bg-purple-100 text-purple-700 font-medium rounded-lg">Day</button>
+              <button className="px-4 py-2 bg-blue-100 text-blue-700 font-medium rounded-lg">Day</button>
               <button className="px-4 py-2 hover:bg-gray-100 rounded-lg">Week</button>
               <button className="px-4 py-2 hover:bg-gray-100 rounded-lg">Month</button>
             </div>
@@ -173,7 +173,7 @@ export default async function InterviewsPage() {
                   </div>
                   <div className="flex gap-3 mt-4">
                     {interview.type === 'Video Call' && (
-                      <button className="px-4 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2">
+                      <button className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2">
                         <Video className="w-4 h-4" />
                         Join Call
                       </button>

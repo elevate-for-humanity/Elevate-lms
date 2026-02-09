@@ -134,7 +134,7 @@ export default async function ModulesPage() {
               <h3 className="text-sm font-medium text-black mb-1">
                 Assessments
               </h3>
-              <p className="text-base md:text-lg font-bold text-purple-600">
+              <p className="text-base md:text-lg font-bold text-blue-600">
                 {assessmentModules || 0}
               </p>
             </div>

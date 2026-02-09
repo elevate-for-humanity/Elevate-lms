@@ -203,7 +203,7 @@ export default async function BookingPage() {
                 <div key={member.id} className="bg-white rounded-xl shadow-sm border p-6 text-center">
                   <div className="w-20 h-20 rounded-full bg-slate-200 mx-auto mb-4 overflow-hidden relative">
                     {member.avatar_url ? (
-                      <Image src={member.avatar_url} alt={member.name} fill className="object-cover" sizes="80px" />
+                      <Image src={member.avatar_url} alt={member.name} fill sizes="100vw" className="object-cover" sizes="80px" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
                         <User className="w-10 h-10 text-slate-400" />

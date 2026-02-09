@@ -217,7 +217,7 @@ export default async function EmployerSettingsPage() {
         {/* Verification Status */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <Shield className="w-6 h-6 text-purple-600" />
+            <Shield className="w-6 h-6 text-blue-600" />
             <h2 className="text-lg font-semibold">Verification Status</h2>
           </div>
           

@@ -68,7 +68,7 @@ export default async function ContactsPage() {
     switch (type) {
       case 'Lead': return 'bg-blue-100 text-blue-700';
       case 'Customer': return 'bg-green-100 text-green-700';
-      case 'Partner': return 'bg-purple-100 text-purple-700';
+      case 'Partner': return 'bg-blue-100 text-blue-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };

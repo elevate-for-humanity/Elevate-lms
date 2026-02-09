@@ -104,7 +104,7 @@ export default function AITutorPage() {
         <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Ai Tutor" }]} />
       </div>
       {/* Header */}
-      <div className="bg-purple-600 text-white py-6">
+      <div className="bg-blue-600 text-white py-6">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
@@ -112,7 +112,7 @@ export default function AITutorPage() {
             </div>
             <div>
               <h1 className="text-2xl font-bold">AI Tutor</h1>
-              <p className="text-purple-100 text-sm">Your 24/7 learning assistant</p>
+              <p className="text-blue-100 text-sm">Your 24/7 learning assistant</p>
             </div>
           </div>
         </div>
@@ -131,7 +131,7 @@ export default function AITutorPage() {
               onClick={() => setMode(m.id as typeof mode)}
               className={`flex-1 p-3 rounded-xl border-2 transition ${
                 mode === m.id
-                  ? 'border-purple-600 bg-purple-50 text-purple-700'
+                  ? 'border-blue-600 bg-blue-50 text-blue-700'
                   : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
               }`}
             >
@@ -156,7 +156,7 @@ export default function AITutorPage() {
                   className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                     message.role === 'user'
                       ? 'bg-blue-600 text-white'
-                      : 'bg-purple-100 text-purple-600'
+                      : 'bg-blue-100 text-blue-600'
                   }`}
                 >
                   {message.role === 'user' ? (
@@ -178,11 +178,11 @@ export default function AITutorPage() {
             ))}
             {isLoading && (
               <div className="flex gap-3">
-                <div className="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center">
                   <Bot className="w-4 h-4" />
                 </div>
                 <div className="bg-slate-100 rounded-2xl px-4 py-3">
-                  <Loader2 className="w-5 h-5 animate-spin text-purple-600" />
+                  <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
                 </div>
               </div>
             )}
@@ -197,7 +197,7 @@ export default function AITutorPage() {
                   key={index}
                   onClick={() => sendMessage(prompt.prompt)}
                   disabled={isLoading}
-                  className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 hover:border-purple-300 hover:text-purple-600 transition whitespace-nowrap disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 hover:border-purple-300 hover:text-blue-600 transition whitespace-nowrap disabled:opacity-50"
                 >
                   <prompt.icon className="w-4 h-4" />
                   {prompt.text}
@@ -214,14 +214,14 @@ export default function AITutorPage() {
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={handleKeyPress}
                 placeholder="Ask me anything about your coursework..."
-                className="flex-1 resize-none border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="flex-1 resize-none border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 rows={2}
                 disabled={isLoading}
               />
               <button
                 onClick={() => sendMessage()}
                 disabled={!input.trim() || isLoading}
-                className="px-6 bg-purple-600 text-white rounded-xl font-semibold hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="w-5 h-5" />
               </button>
@@ -230,7 +230,7 @@ export default function AITutorPage() {
         </div>
 
         {/* Tips */}
-        <div className="mt-6 bg-purple-50 rounded-xl p-4 border border-purple-100">
+        <div className="mt-6 bg-blue-50 rounded-xl p-4 border border-blue-100">
           <h3 className="font-semibold text-purple-900 mb-2">Tips for better results:</h3>
           <ul className="text-sm text-purple-800 space-y-1">
             <li>• Be specific about what you want to learn</li>

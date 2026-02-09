@@ -116,12 +116,12 @@ export default function DemoCenterPage() {
               const Icon = demo.icon;
               const colorClasses = {
                 blue: 'bg-blue-100 text-blue-600 border-blue-200',
-                purple: 'bg-purple-100 text-purple-600 border-purple-200',
+                purple: 'bg-blue-100 text-blue-600 border-blue-200',
                 green: 'bg-green-100 text-green-600 border-green-200',
               };
               const btnClasses = {
                 blue: 'bg-blue-600 hover:bg-blue-700',
-                purple: 'bg-purple-600 hover:bg-purple-700',
+                purple: 'bg-blue-600 hover:bg-blue-700',
                 green: 'bg-green-600 hover:bg-green-700',
               };
               

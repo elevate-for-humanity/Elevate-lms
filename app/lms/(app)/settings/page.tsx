@@ -59,7 +59,7 @@ const SETTINGS_SECTIONS = [
     description: 'Set your preferred language and timezone',
     icon: Globe,
     href: '/lms/settings/language',
-    color: 'bg-purple-100 text-purple-600',
+    color: 'bg-blue-100 text-blue-600',
   },
   {
     title: 'Appearance',

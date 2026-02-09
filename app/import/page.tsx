@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import Link from 'next/link';
 import { 
-  Globe, ArrowRight, Loader2, CheckCircle, 
+  Globe, ArrowRight, Loader2, Circle, 
   Palette, FileText, Image, Navigation, Sparkles,
   AlertCircle, ExternalLink
 } from 'lucide-react';
@@ -199,8 +199,8 @@ export default function ImportSitePage() {
                 <p className="text-slate-400 text-sm">We extract your content, colors & style</p>
               </div>
               <div className="text-center">
-                <div className="w-12 h-12 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <CheckCircle className="w-6 h-6 text-purple-400" />
+                <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <Circle className="w-6 h-6 text-purple-400" />
                 </div>
                 <h3 className="text-white font-bold mb-1">3. Launch</h3>
                 <p className="text-slate-400 text-sm">Your site recreated on Elevate LMS</p>
@@ -247,7 +247,7 @@ export default function ImportSitePage() {
           <div className="space-y-8">
             <div className="text-center">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-500/20 text-green-400 rounded-full text-sm font-medium mb-4">
-                <CheckCircle className="w-4 h-4" />
+                <Circle className="w-4 h-4" />
                 Import Successful!
               </div>
               <h1 className="text-4xl font-black text-white mb-4">
@@ -397,7 +397,7 @@ export default function ImportSitePage() {
                 <div className="space-y-2">
                   {config.programs.map((program, idx) => (
                     <div key={idx} className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
-                      <CheckCircle className="w-5 h-5 text-green-400" />
+                      <Circle className="w-5 h-5 text-green-400" />
                       <div>
                         <p className="text-white font-medium">{program.name}</p>
                         <p className="text-slate-400 text-sm">{program.description.slice(0, 80)}...</p>

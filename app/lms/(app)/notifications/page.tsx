@@ -82,7 +82,7 @@ export default async function NotificationsPage() {
       case 'course': return 'bg-blue-100 text-blue-600';
       case 'assignment': return 'bg-orange-100 text-orange-600';
       case 'grade': return 'bg-green-100 text-green-600';
-      case 'message': return 'bg-purple-100 text-purple-600';
+      case 'message': return 'bg-blue-100 text-blue-600';
       case 'alert': return 'bg-red-100 text-red-600';
       case 'success': return 'bg-green-100 text-green-600';
       default: return 'bg-slate-100 text-slate-600';

@@ -56,8 +56,8 @@ export default async function StudyGroupsPage() {
       <div className="max-w-4xl mx-auto px-4">
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-            <Users className="w-6 h-6 text-purple-600" />
+          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+            <Users className="w-6 h-6 text-blue-600" />
           </div>
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-900">Study Groups</h1>

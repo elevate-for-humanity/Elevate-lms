@@ -10,7 +10,7 @@ import {
   TrendingUp,
   Award,
   FileText,
-  CheckCircle,
+  Circle,
   Clock,
   ChevronRight,
   BarChart3,
@@ -284,8 +284,8 @@ export default async function GradesPage() {
 
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-purple-600" />
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Circle className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">
@@ -391,7 +391,7 @@ export default async function GradesPage() {
                             className="flex items-center justify-between p-3 bg-slate-50 rounded-lg"
                           >
                             <div className="flex items-center gap-3">
-                              <CheckCircle className="w-5 h-5 text-slate-400" />
+                              <Circle className="w-5 h-5 text-slate-400" />
                               <div>
                                 <p className="font-medium text-slate-900">{quiz.title}</p>
                                 <p className="text-sm text-slate-500">{formatDate(quiz.date)}</p>
@@ -427,15 +427,15 @@ export default async function GradesPage() {
                     Based on {stats.totalAssignments} graded assignments
                   </p>
                 </div>
-                <div className="p-4 bg-purple-50 rounded-xl">
+                <div className="p-4 bg-blue-50 rounded-xl">
                   <div className="flex items-center gap-3 mb-2">
-                    <CheckCircle className="w-5 h-5 text-purple-600" />
+                    <Circle className="w-5 h-5 text-blue-600" />
                     <span className="font-semibold text-purple-900">Quiz Average</span>
                   </div>
-                  <div className="text-3xl font-bold text-purple-600">
+                  <div className="text-3xl font-bold text-blue-600">
                     {stats.avgQuizScore}%
                   </div>
-                  <p className="text-sm text-purple-700 mt-1">
+                  <p className="text-sm text-blue-700 mt-1">
                     Based on {stats.totalQuizzes} completed quizzes
                   </p>
                 </div>
@@ -461,7 +461,7 @@ export default async function GradesPage() {
                 href="/lms/quizzes"
                 className="inline-flex items-center gap-2 border border-slate-200 text-slate-700 px-6 py-3 rounded-xl font-bold hover:bg-slate-50 transition"
               >
-                <CheckCircle className="w-5 h-5" />
+                <Circle className="w-5 h-5" />
                 Take Quizzes
               </Link>
             </div>

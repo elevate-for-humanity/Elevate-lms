@@ -125,7 +125,7 @@ export default async function PartnerReportsPage() {
             <p className="text-gray-600 text-sm">This Quarter</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <Calendar className="w-8 h-8 text-purple-500 mb-2" />
+            <Calendar className="w-8 h-8 text-blue-500 mb-2" />
             <p className="text-2xl font-bold">{completedEnrollments || 0}</p>
             <p className="text-gray-600 text-sm">Completions</p>
           </div>

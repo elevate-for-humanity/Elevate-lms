@@ -45,9 +45,9 @@ export default function ResponseSLAPage() {
                 <p className="text-black">During business hours (8 AM - 6 PM EST)</p>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
                 <h3 className="text-xl font-bold text-black mb-3">Applications</h3>
-                <p className="text-3xl font-black text-purple-600 mb-2">2-3 Days</p>
+                <p className="text-3xl font-black text-blue-600 mb-2">2-3 Days</p>
                 <p className="text-black">Initial review and response</p>
               </div>
 

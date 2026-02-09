@@ -194,8 +194,8 @@ export default async function AnalyticsDashboardPage() {
           <MetricCard
             title="Completion Rate"
             value={`${completionRate}%`}
-            icon={<GraduationCap className="w-6 h-6 text-purple-600" />}
-            color="bg-purple-100"
+            icon={<GraduationCap className="w-6 h-6 text-blue-600" />}
+            color="bg-blue-100"
           />
           <MetricCard
             title="Active Programs"
@@ -297,7 +297,7 @@ export default async function AnalyticsDashboardPage() {
               <span className="font-medium">View Enrollments</span>
             </Link>
             <Link href="/admin/programs" className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition">
-              <Award className="w-5 h-5 text-purple-600" />
+              <Award className="w-5 h-5 text-blue-600" />
               <span className="font-medium">Manage Programs</span>
             </Link>
             <Link href="/admin/reports" className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition">

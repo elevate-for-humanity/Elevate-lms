@@ -158,14 +158,14 @@ export default async function EmployerDashboardOrchestrated() {
             <div
               className={`rounded-lg shadow-sm border p-6 ${
                 apprenticeshipProgram
-                  ? 'bg-purple-50 border-purple-600'
+                  ? 'bg-blue-50 border-blue-600'
                   : 'bg-white border-slate-200'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
                 <TrendingUp
                   className={`h-11 w-11 ${
-                    apprenticeshipProgram ? 'text-purple-600' : 'text-slate-400'
+                    apprenticeshipProgram ? 'text-blue-600' : 'text-slate-400'
                   }`}
                 />
                 <span
@@ -347,7 +347,7 @@ export default async function EmployerDashboardOrchestrated() {
 
           {/* Apprenticeship CTA */}
           {!apprenticeshipProgram && profile.verified && (
-            <div className="bg-purple-50 rounded-lg border-2 border-purple-600 p-6">
+            <div className="bg-blue-50 rounded-lg border-2 border-blue-600 p-6">
               <h3 className="text-lg font-bold text-purple-900 mb-3">
                 Build Your Talent Pipeline
               </h3>
@@ -357,7 +357,7 @@ export default async function EmployerDashboardOrchestrated() {
               </p>
               <a
                 href="/employer/apprenticeship/new"
-                className="block w-full text-center px-4 py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition"
+                className="block w-full text-center px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
               >
                 Learn More
               </a>

@@ -89,7 +89,7 @@ export default async function OnboardingPage() {
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
               <div className="relative h-40">
-                <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Student" fill className="object-cover" />
+                <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Student" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">
               <h3 className="text-lg md:text-lg font-bold text-black mb-3 text-center">
@@ -134,7 +134,7 @@ export default async function OnboardingPage() {
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
               <div className="relative h-40">
-                <Image src="/images/business/program-tax-preparation.jpg" alt="Program Holder" fill className="object-cover" />
+                <Image src="/images/business/program-tax-preparation.jpg" alt="Program Holder" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">
               <h3 className="text-lg md:text-lg font-bold text-black mb-3 text-center">
@@ -167,7 +167,7 @@ export default async function OnboardingPage() {
                 </li>
               </ul>
               <div className="text-center">
-                <span className="inline-flex items-center text-purple-700 font-semibold">
+                <span className="inline-flex items-center text-blue-700 font-semibold">
                   Learn More <ArrowRight className="ml-2" size={20} />
                 </span>
               </div>
@@ -178,7 +178,7 @@ export default async function OnboardingPage() {
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
               <div className="relative h-40">
-                <Image src="/images/healthcare/phlebotomy.jpg" alt="Partner/Employer" fill className="object-cover" />
+                <Image src="/images/healthcare/phlebotomy.jpg" alt="Partner/Employer" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">
               <h3 className="text-lg md:text-lg font-bold text-black mb-3 text-center">

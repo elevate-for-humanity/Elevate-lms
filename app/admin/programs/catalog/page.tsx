@@ -108,8 +108,8 @@ export default async function ProgramCatalogPage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <Building2 className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Categories</p>
@@ -262,7 +262,7 @@ export default async function ProgramCatalogPage() {
             {/* Business */}
             <div className="p-6">
               <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-3 h-3 bg-purple-500 rounded-full"></span>
+                <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
                 Business & Finance ({categories.business.length} programs)
               </h3>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">

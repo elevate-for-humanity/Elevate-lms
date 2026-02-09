@@ -130,8 +130,8 @@ export default async function ProgramHolderDashboard() {
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
-                <Award className="text-purple-600" size={24} />
+              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+                <Award className="text-blue-600" size={24} />
               </div>
               <div>
                 <p className="text-base md:text-lg font-bold text-black">
@@ -280,10 +280,10 @@ export default async function ProgramHolderDashboard() {
                 <div className="space-y-2">
                   <Link 
                     href="/community" 
-                    className="block w-full text-left px-4 py-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition border border-purple-200"
+                    className="block w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition border border-blue-200"
                   >
                     <p className="font-medium text-purple-900">Community Hub</p>
-                    <p className="text-xs text-purple-700">Connect with students and instructors</p>
+                    <p className="text-xs text-blue-700">Connect with students and instructors</p>
                   </Link>
                   <Link 
                     href="/lms/forums" 

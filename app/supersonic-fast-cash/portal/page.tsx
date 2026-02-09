@@ -100,8 +100,8 @@ export default async function ClientPortalPage() {
 
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-purple-600" />
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-blue-600" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-black">$0</div>

@@ -181,8 +181,8 @@ export default function GrantsPage() {
             {/* JRI */}
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-start gap-6">
-                <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <GraduationCap className="w-8 h-8 text-purple-600" />
+                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <GraduationCap className="w-8 h-8 text-blue-600" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">JRI (Justice Reinvestment Initiative)</h3>

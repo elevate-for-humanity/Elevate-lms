@@ -32,7 +32,7 @@ const NOTIFICATION_COLORS: Record<NotificationType, string> = {
   hours_submitted: 'bg-amber-500/20',
   apprentice_joined: 'bg-green-500/20',
   report_ready: 'bg-blue-500/20',
-  reminder: 'bg-purple-500/20',
+  reminder: 'bg-blue-500/20',
   system: 'bg-slate-700',
 };
 

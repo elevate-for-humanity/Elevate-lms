@@ -91,7 +91,7 @@ export default async function PartnerLearningPage({ params }: Props) {
           
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-purple-600 text-sm font-medium mb-2">
+              <div className="flex items-center gap-2 text-blue-600 text-sm font-medium mb-2">
                 <Building2 className="w-4 h-4" />
                 Partner Course
               </div>
@@ -145,7 +145,7 @@ export default async function PartnerLearningPage({ params }: Props) {
               href={provider.portal_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
             >
               Open Partner Portal
               <ExternalLink className="w-4 h-4" />

@@ -55,7 +55,7 @@ export default function StoreCoursesPage() {
               <span className="block text-purple-300">With Exam Vouchers</span>
             </h1>
 
-            <p className="text-xl text-purple-100 mb-8">
+            <p className="text-xl text-blue-100 mb-8">
               Get certified in Microsoft Office, Adobe Creative Suite, OSHA Safety, and more. 
               Each course includes the certification exam voucher.
             </p>
@@ -94,13 +94,13 @@ export default function StoreCoursesPage() {
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <div className="absolute top-4 left-4 px-3 py-1 bg-purple-600 text-white text-xs font-bold rounded-full">
+                  <div className="absolute top-4 left-4 px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
                     {course.provider}
                   </div>
                 </div>
 
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
                     {course.name}
                   </h3>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-2">
@@ -126,7 +126,7 @@ export default function StoreCoursesPage() {
                     </div>
                     <Link
                       href={`/courses/${course.slug}`}
-                      className="inline-flex items-center gap-1 text-purple-600 font-semibold hover:text-purple-700"
+                      className="inline-flex items-center gap-1 text-blue-600 font-semibold hover:text-blue-700"
                     >
                       View Details
                       <ArrowRight className="w-4 h-4" />
@@ -144,21 +144,21 @@ export default function StoreCoursesPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
-              <Shield className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+              <Shield className="w-12 h-12 text-blue-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">Accredited Providers</h3>
               <p className="text-gray-600">
                 All certifications from recognized providers like Certiport, HSI, and CareerSafe.
               </p>
             </div>
             <div>
-              <Award className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+              <Award className="w-12 h-12 text-blue-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">Exam Voucher Included</h3>
               <p className="text-gray-600">
                 Every course includes the certification exam voucher - no hidden costs.
               </p>
             </div>
             <div>
-              <BookOpen className="w-12 h-12 text-purple-600 mx-auto mb-4" />
+              <BookOpen className="w-12 h-12 text-blue-600 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-gray-900 mb-2">Self-Paced Learning</h3>
               <p className="text-gray-600">
                 Learn at your own pace with lifetime access to course materials.
@@ -169,17 +169,17 @@ export default function StoreCoursesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-purple-600">
+      <section className="py-16 bg-blue-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-black text-white mb-4">
             Need Multiple Certifications?
           </h2>
-          <p className="text-xl text-purple-100 mb-8">
+          <p className="text-xl text-blue-100 mb-8">
             Contact us for volume pricing on team certifications.
           </p>
           <Link
             href="/contact?topic=bulk-courses"
-            className="inline-flex items-center gap-2 bg-white text-purple-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-purple-50 transition-colors"
+            className="inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors"
           >
             Get Volume Pricing
             <ArrowRight className="w-5 h-5" />

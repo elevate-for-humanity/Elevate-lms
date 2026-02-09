@@ -224,10 +224,8 @@ export async function POST(request: NextRequest) {
     // Add payment method configuration if available
     if (paymentMethodConfig) {
       sessionConfig.payment_method_configuration = paymentMethodConfig;
-    } else {
-      // Fall back to automatic payment methods in test mode without PMC
-      sessionConfig.automatic_payment_methods = { enabled: true };
     }
+    // If no PMC (test mode without config), Stripe uses Dashboard default settings
 
     const session = await stripe.checkout.sessions.create(sessionConfig);
 

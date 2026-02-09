@@ -9,13 +9,20 @@
  * - Cancellations
  */
 
-import { createClient } from '@supabase/supabase-js';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { RAPIDS_CONFIG } from './rapids-config';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Lazy initialization to avoid build-time errors
+function getSupabaseAdmin(): SupabaseClient {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  
+  if (!url || !key) {
+    throw new Error('Missing Supabase configuration for RAPIDS export');
+  }
+  
+  return createClient(url, key);
+}
 
 /**
  * RAPIDS CSV Column Headers for New Registrations
@@ -123,6 +130,7 @@ export async function exportNewRegistrations(
   const errors: string[] = [];
   
   // Query enrollments that need RAPIDS registration
+  const supabase = getSupabaseAdmin();
   let query = supabase
     .from('enrollments')
     .select(`
@@ -246,6 +254,7 @@ export async function exportProgressUpdates(
   const errors: string[] = [];
 
   // Query active apprentices with hours logged
+  const supabase = getSupabaseAdmin();
   const { data: enrollments, error } = await supabase
     .from('enrollments')
     .select(`
@@ -328,6 +337,7 @@ export async function exportCompletions(
   endDate?: string
 ): Promise<{ csv: string; count: number; errors: string[] }> {
   const errors: string[] = [];
+  const supabase = getSupabaseAdmin();
 
   let query = supabase
     .from('enrollments')
@@ -402,6 +412,7 @@ export async function exportCancellations(
   endDate?: string
 ): Promise<{ csv: string; count: number; errors: string[] }> {
   const errors: string[] = [];
+  const supabase = getSupabaseAdmin();
 
   let query = supabase
     .from('enrollments')
@@ -505,6 +516,7 @@ export async function markAsSubmitted(
   enrollmentIds: string[],
   type: 'registration' | 'completion' | 'cancellation'
 ): Promise<{ success: boolean; error?: string }> {
+  const supabase = getSupabaseAdmin();
   const updateField = {
     registration: 'rapids_submitted',
     completion: 'rapids_completion_submitted',

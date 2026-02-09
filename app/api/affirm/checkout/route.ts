@@ -13,6 +13,8 @@
  * 6. Capture route loads metadata from DB by order_id
  */
 
+export const runtime = 'nodejs';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { getAffirmCheckoutConfig, affirm } from '@/lib/affirm/client';
 import { createAdminClient } from '@/lib/supabase/admin';

@@ -8,6 +8,8 @@
  * URL params (except checkout_token and order_id) are ignored to prevent tampering.
  */
 
+export const runtime = 'nodejs';
+
 import { NextRequest, NextResponse } from 'next/server';
 import { affirm } from '@/lib/affirm/client';
 import { createAdminClient } from '@/lib/supabase/admin';

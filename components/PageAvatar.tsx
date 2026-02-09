@@ -99,7 +99,6 @@ export default function PageAvatar({ videoSrc, voiceoverSrc, title, position = '
           src={videoSrc}
           autoPlay
           muted
-          loop
           playsInline
           preload="metadata"
         />
@@ -129,7 +128,6 @@ export default function PageAvatar({ videoSrc, voiceoverSrc, title, position = '
               className="absolute inset-0 w-full h-[110%] object-cover object-top"
               src={videoSrc}
               playsInline
-              loop
               muted
               autoPlay
               preload="metadata"

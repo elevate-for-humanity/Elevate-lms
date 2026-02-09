@@ -39,7 +39,7 @@ export default function BarberShopPartnerPage() {
       if (!res.ok) throw new Error('Failed to submit');
       setSuccess(true);
     } catch (err) {
-      setError('Something went wrong. Please call us at (317) 314-3757.');
+      setError('Something went wrong. Please contact us at (317) 314-3757.');
     } finally {
       setLoading(false);
     }
@@ -57,7 +57,7 @@ export default function BarberShopPartnerPage() {
             We received your partnership inquiry. Our team will contact you within 1-2 business days to discuss next steps.
           </p>
           <p className="text-gray-700 mb-8">
-            Questions? Call us at{' '}
+            Questions? Contact us at{' '}
             <a href="tel:+13173143757" className="text-brand-orange-600 font-semibold">(317) 314-3757</a>
           </p>
           <Link

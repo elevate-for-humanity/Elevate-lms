@@ -234,11 +234,11 @@ Include Assignments: ${formData.includeAssignments}
         )}
 
         <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="font-semibold text-purple-900 mb-2 flex items-center gap-2">
+          <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
             <GraduationCap className="w-5 h-5" />
             What Gets Generated
           </h3>
-          <ul className="text-purple-800 space-y-1 text-sm">
+          <ul className="text-blue-800 space-y-1 text-sm">
             <li>• Complete course structure with modules and lessons</li>
             <li>• Detailed lesson content in markdown format</li>
             <li>• Learning objectives for each module</li>

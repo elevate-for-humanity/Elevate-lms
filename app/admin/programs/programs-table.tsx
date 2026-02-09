@@ -128,7 +128,7 @@ export function ProgramsTable({ programs }: { programs: Program[] }) {
                         </span>
                       )}
                       {program.featured && (
-                        <span className="px-2 py-2 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                        <span className="px-2 py-2 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
                           Featured
                         </span>
                       )}

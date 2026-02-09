@@ -51,7 +51,7 @@ export default function CompanySetupPage() {
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Company Logo</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-400 transition cursor-pointer">
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition cursor-pointer">
                   <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                   <p className="text-sm text-gray-600 mb-1">Click to upload or drag and drop</p>
                   <p className="text-xs text-gray-500">PNG, JPG up to 5MB (400x400 recommended)</p>
@@ -59,7 +59,7 @@ export default function CompanySetupPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Cover Image</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-400 transition cursor-pointer">
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition cursor-pointer">
                   <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                   <p className="text-sm text-gray-600 mb-1">Click to upload or drag and drop</p>
                   <p className="text-xs text-gray-500">PNG, JPG up to 10MB (1920x400 recommended)</p>
@@ -207,7 +207,7 @@ export default function CompanySetupPage() {
                 'Employee Discounts',
                 'Wellness Programs',
               ].map((benefit) => (
-                <label key={benefit} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
+                <label key={benefit} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-blue-300">
                   <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
                   <span className="text-sm text-gray-700">{benefit}</span>
                 </label>

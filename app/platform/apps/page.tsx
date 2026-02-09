@@ -175,7 +175,7 @@ export default async function PlatformAppsPage() {
             {premiumApps.map((app) => (
               <div
                 key={app.id}
-                className="bg-white rounded-lg shadow-sm p-6 hover:shadow-lg transition-shadow border-2 border-purple-200"
+                className="bg-white rounded-lg shadow-sm p-6 hover:shadow-lg transition-shadow border-2 border-blue-200"
               >
                 <div className="flex items-start mb-4">
                   <span className="text-4xl mr-4">{app.icon}</span>
@@ -183,7 +183,7 @@ export default async function PlatformAppsPage() {
                     <h3 className="text-lg font-semibold text-black mb-2">
                       {app.name}
                     </h3>
-                    <div className="inline-flex items-center px-2 py-2 bg-purple-100 text-purple-800 text-xs font-semibold rounded">
+                    <div className="inline-flex items-center px-2 py-2 bg-blue-100 text-blue-800 text-xs font-semibold rounded">
                       Premium
                     </div>
                   </div>

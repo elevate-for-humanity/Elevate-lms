@@ -159,7 +159,7 @@ export default async function TuitionPage() {
                 </ul>
               </div>
               
-              <p className="text-sm text-purple-800 font-medium">
+              <p className="text-sm text-blue-800 font-medium">
                 Employer sponsorship is coordinated directly with admissions and hiring partners.
               </p>
             </div>

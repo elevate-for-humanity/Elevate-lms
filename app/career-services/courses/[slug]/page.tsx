@@ -102,15 +102,15 @@ export default async function CourseDetailPage({
 
               <div className="flex flex-wrap gap-6 mb-8 text-sm">
                 <div className="flex items-center gap-2">
-                  <Play className="w-5 h-5 text-purple-400" />
+                  <Play className="w-5 h-5 text-blue-400" />
                   <span>{course.lesson_count} video lessons</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-purple-400" />
+                  <Clock className="w-5 h-5 text-blue-400" />
                   <span>{course.duration_hours} hours of content</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Award className="w-5 h-5 text-purple-400" />
+                  <Award className="w-5 h-5 text-blue-400" />
                   <span>Certificate included</span>
                 </div>
                 <div className="flex items-center gap-2">

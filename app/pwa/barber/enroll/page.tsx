@@ -100,12 +100,12 @@ export default function BarberEnrollPage() {
         </header>
 
         <main className="px-4 py-6 space-y-6">
-          <div className="bg-purple-600/20 border border-purple-500/30 rounded-xl p-6">
-            <div className="w-16 h-16 bg-purple-500 rounded-xl flex items-center justify-center mb-4">
+          <div className="bg-blue-600/20 border border-blue-500/30 rounded-xl p-6">
+            <div className="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center mb-4">
               <Scissors className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-xl font-bold text-white mb-2">Barber Apprenticeship</h2>
-            <p className="text-purple-200 mb-4">
+            <p className="text-blue-200 mb-4">
               Train at a licensed barbershop while earning hours toward your state license.
             </p>
             <ul className="space-y-2 text-sm text-slate-300">
@@ -140,7 +140,7 @@ export default function BarberEnrollPage() {
 
           <button
             onClick={() => setStep('shop')}
-            className="w-full bg-purple-600 text-white font-bold py-4 rounded-xl hover:bg-purple-700 flex items-center justify-center gap-2"
+            className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2"
           >
             Continue
             <ChevronRight className="w-5 h-5" />
@@ -175,14 +175,14 @@ export default function BarberEnrollPage() {
             placeholder="Search by name or city..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-purple-500"
+            className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
 
         <main className="px-4 pb-6 space-y-3">
           {loadingPartners ? (
             <div className="text-center py-12">
-              <Loader2 className="w-8 h-8 text-purple-500 mx-auto mb-3 animate-spin" />
+              <Loader2 className="w-8 h-8 text-blue-500 mx-auto mb-3 animate-spin" />
               <p className="text-slate-400">Loading partner shops...</p>
             </div>
           ) : filteredPartners.length === 0 ? (
@@ -201,13 +201,13 @@ export default function BarberEnrollPage() {
                 }}
                 className={`w-full text-left bg-slate-800 rounded-xl p-4 border-2 transition-colors ${
                   selectedPartner?.id === partner.id 
-                    ? 'border-purple-500' 
+                    ? 'border-blue-500' 
                     : 'border-transparent hover:border-slate-700'
                 }`}
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                    <Scissors className="w-6 h-6 text-purple-400" />
+                  <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                    <Scissors className="w-6 h-6 text-blue-400" />
                   </div>
                   <div className="flex-1">
                     <p className="text-white font-medium">{partner.name}</p>
@@ -253,8 +253,8 @@ export default function BarberEnrollPage() {
           <div className="bg-slate-800 rounded-xl p-4">
             <h3 className="text-slate-400 text-sm mb-3">Training Location</h3>
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-purple-500/20 rounded-xl flex items-center justify-center">
-                <Scissors className="w-6 h-6 text-purple-400" />
+              <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
+                <Scissors className="w-6 h-6 text-blue-400" />
               </div>
               <div>
                 <p className="text-white font-medium">{selectedPartner?.name}</p>
@@ -288,7 +288,7 @@ export default function BarberEnrollPage() {
               type="checkbox"
               checked={agreedToTerms}
               onChange={(e) => setAgreedToTerms(e.target.checked)}
-              className="w-5 h-5 mt-0.5 rounded border-slate-600 bg-slate-700 text-purple-600 focus:ring-purple-500"
+              className="w-5 h-5 mt-0.5 rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
             />
             <span className="text-slate-300 text-sm">
               I agree to the apprenticeship terms and conditions, and understand that I must complete 2,000 hours of training to be eligible for state licensure.
@@ -298,7 +298,7 @@ export default function BarberEnrollPage() {
           <button
             onClick={handleEnroll}
             disabled={loading || !agreedToTerms}
-            className="w-full bg-purple-600 text-white font-bold py-4 rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
@@ -330,7 +330,7 @@ export default function BarberEnrollPage() {
         </p>
         <Link
           href="/pwa/barber"
-          className="inline-block w-full bg-purple-600 text-white font-bold py-4 rounded-xl hover:bg-purple-700"
+          className="inline-block w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700"
         >
           Go to Dashboard
         </Link>

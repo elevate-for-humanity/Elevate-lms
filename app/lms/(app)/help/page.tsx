@@ -151,7 +151,7 @@ export default async function HelpPage() {
                 <Phone className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <div className="font-semibold text-gray-900">Call Us</div>
+                <div className="font-semibold text-gray-900">Contact Us</div>
                 <div className="text-gray-600">(317) 314-3757</div>
               </div>
             </a>

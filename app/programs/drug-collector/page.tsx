@@ -104,7 +104,7 @@ export default async function Page() {
               <Image
                 src="/images/healthcare/healthcare-professional-portrait-1.jpg"
                 alt="Healthcare professional"
-                fill
+                fill sizes="100vw"
                 className="object-cover"
               />
             </div>

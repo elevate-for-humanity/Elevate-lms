@@ -63,8 +63,8 @@ export default function WorkOnePartnerPacketPage() {
                 <div className="px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full">
                   <span className="text-sm font-bold text-blue-300">ETPL Approved</span>
                 </div>
-                <div className="px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-purple-400/30 rounded-full">
-                  <span className="text-sm font-bold text-purple-300">WIOA | WRG Eligible</span>
+                <div className="px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full">
+                  <span className="text-sm font-bold text-blue-300">WIOA | WRG Eligible</span>
                 </div>
               </div>
 

@@ -86,7 +86,7 @@ Already have a shop in mind? They can apply to become a partner training site.`,
 
 Payment is collected after your enrollment is approved.
 
-Questions? Call us: (317) 314-3757`,
+Questions? Contact us: (317) 314-3757`,
 
   'schedule|hours per week|part time|full time': `You choose your schedule with your host shop:
 
@@ -167,7 +167,7 @@ export default function BarberChatAssistant() {
       if (data.error) {
         setMessages(prev => [...prev, {
           role: 'assistant',
-          content: "I'm not sure about that. For specific questions, please call us at (317) 314-3757 or email elevate4humanityedu@gmail.com.",
+          content: "I'm not sure about that. For specific questions, please contact us at (317) 314-3757 or email elevate4humanityedu@gmail.com.",
         }]);
       } else {
         setMessages(prev => [...prev, {
@@ -178,7 +178,7 @@ export default function BarberChatAssistant() {
     } catch {
       setMessages(prev => [...prev, {
         role: 'assistant',
-        content: "I'm having trouble connecting. Please try again or call us at (317) 314-3757.",
+        content: "I'm having trouble connecting. Please try again or contact us at (317) 314-3757.",
       }]);
     } finally {
       setIsLoading(false);
@@ -197,7 +197,7 @@ export default function BarberChatAssistant() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-purple-600 hover:bg-purple-700 text-white px-5 py-3 rounded-full shadow-lg transition-all hover:scale-105"
+        className="fixed bottom-6 right-6 z-50 flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-full shadow-lg transition-all hover:scale-105"
       >
         <div className="relative">
           <Scissors className="w-6 h-6" />
@@ -215,26 +215,26 @@ export default function BarberChatAssistant() {
       }`}
     >
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-3 flex items-center justify-between">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center">
+          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
             <Scissors className="w-4 h-4" />
           </div>
           <div>
             <div className="font-semibold text-sm">Barber Program Assistant</div>
-            <div className="text-xs text-purple-200">Ask me anything</div>
+            <div className="text-xs text-blue-200">Ask me anything</div>
           </div>
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={() => setIsMinimized(!isMinimized)}
-            className="p-1.5 hover:bg-purple-500 rounded-full transition-colors"
+            className="p-1.5 hover:bg-blue-500 rounded-full transition-colors"
           >
             {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
           </button>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-1.5 hover:bg-purple-500 rounded-full transition-colors"
+            className="p-1.5 hover:bg-blue-500 rounded-full transition-colors"
           >
             <X className="w-4 h-4" />
           </button>
@@ -253,7 +253,7 @@ export default function BarberChatAssistant() {
                 <div
                   className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm whitespace-pre-wrap ${
                     msg.role === 'user'
-                      ? 'bg-purple-600 text-white rounded-br-md'
+                      ? 'bg-blue-600 text-white rounded-br-md'
                       : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md shadow-sm'
                   }`}
                 >
@@ -286,7 +286,7 @@ export default function BarberChatAssistant() {
                       setInput(action.query);
                       setTimeout(() => handleSend(), 100);
                     }}
-                    className="text-xs px-3 py-1.5 bg-purple-50 text-purple-700 rounded-full hover:bg-purple-100 transition"
+                    className="text-xs px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full hover:bg-blue-100 transition"
                   >
                     {action.label}
                   </button>
@@ -309,13 +309,13 @@ export default function BarberChatAssistant() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask about the program..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className="p-2 bg-purple-600 text-white rounded-full hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <Send className="w-4 h-4" />
               </button>

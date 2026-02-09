@@ -69,7 +69,7 @@ export default async function LiveQaPage() {
         <Image
           src="/images/platform/student-portal-mock.jpg"
           alt="Live Qa"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority

@@ -173,7 +173,7 @@ export default function ScholarshipsPage() {
               <div className="text-slate-400 text-sm">Students Funded</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-purple-400">10+</div>
+              <div className="text-3xl font-bold text-blue-400">10+</div>
               <div className="text-slate-400 text-sm">Funding Sources</div>
             </div>
           </div>

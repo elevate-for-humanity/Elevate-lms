@@ -72,7 +72,7 @@ function ModuleCard({ module, onSelect, apprenticeHours }: {
           ) : progress === 100 ? (
             <CheckCircle className="w-6 h-6 text-green-400" />
           ) : (
-            <BookOpen className="w-6 h-6 text-purple-400" />
+            <BookOpen className="w-6 h-6 text-blue-400" />
           )}
         </div>
         <div className="flex-1 min-w-0">
@@ -120,7 +120,7 @@ function ChapterItem({ chapter, onComplete }: {
     
   const typeColor = chapter.type === 'video' ? 'text-blue-400' 
     : chapter.type === 'quiz' ? 'text-amber-400' 
-    : chapter.type === 'lab' ? 'text-purple-400'
+    : chapter.type === 'lab' ? 'text-blue-400'
     : 'text-green-400';
     
   const typeBg = chapter.type === 'video' ? 'bg-blue-500/20' 
@@ -161,7 +161,7 @@ function ChapterItem({ chapter, onComplete }: {
       </div>
       {chapter.type === 'video' && !chapter.completed && chapter.contentUrl && (
         <a href={chapter.contentUrl} target="_blank" rel="noopener noreferrer">
-          <Play className="w-5 h-5 text-purple-400" />
+          <Play className="w-5 h-5 text-blue-400" />
         </a>
       )}
     </div>
@@ -270,7 +270,7 @@ export default function BarberTrainingPage() {
         <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
           <button 
             onClick={() => setSelectedModule(null)}
-            className="flex items-center gap-2 text-purple-400 mb-4"
+            className="flex items-center gap-2 text-blue-400 mb-4"
           >
             <ChevronLeft className="w-5 h-5" />
             Back to Modules
@@ -313,7 +313,7 @@ export default function BarberTrainingPage() {
               <Clock className="w-6 h-6" />
               <span className="text-xs">Log</span>
             </Link>
-            <Link href="/pwa/barber/training" className="flex flex-col items-center gap-1 text-purple-400">
+            <Link href="/pwa/barber/training" className="flex flex-col items-center gap-1 text-blue-400">
               <BookOpen className="w-6 h-6" />
               <span className="text-xs">Learn</span>
             </Link>
@@ -332,7 +332,7 @@ export default function BarberTrainingPage() {
       <header className="bg-slate-700 px-4 pt-12 pb-6 safe-area-inset-top">
         <h1 className="text-2xl font-bold text-white mb-1">{data.course.title}</h1>
         <p className="text-blue-200 text-sm mb-1">{data.course.subtitle}</p>
-        <p className="text-purple-300 text-xs">Powered by {data.course.partner}</p>
+        <p className="text-blue-300 text-xs">Powered by {data.course.partner}</p>
         
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mt-4">
           <div className="flex items-center justify-between mb-2">
@@ -390,7 +390,7 @@ export default function BarberTrainingPage() {
             <Clock className="w-6 h-6" />
             <span className="text-xs">Log</span>
           </Link>
-          <Link href="/pwa/barber/training" className="flex flex-col items-center gap-1 text-purple-400">
+          <Link href="/pwa/barber/training" className="flex flex-col items-center gap-1 text-blue-400">
             <BookOpen className="w-6 h-6" />
             <span className="text-xs">Learn</span>
           </Link>

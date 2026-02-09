@@ -282,7 +282,7 @@ export default async function ProgramHolderDashboard() {
                     href="/community" 
                     className="block w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition border border-blue-200"
                   >
-                    <p className="font-medium text-purple-900">Community Hub</p>
+                    <p className="font-medium text-blue-900">Community Hub</p>
                     <p className="text-xs text-blue-700">Connect with students and instructors</p>
                   </Link>
                   <Link 

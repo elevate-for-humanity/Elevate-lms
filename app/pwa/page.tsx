@@ -36,16 +36,16 @@ export default function PWAIndexPage() {
             </div>
             <div className="flex-1">
               <h2 className="text-xl font-bold text-white mb-1">Barber Apprentice</h2>
-              <p className="text-purple-300 text-sm">Track hours, access training, monitor progress</p>
+              <p className="text-blue-300 text-sm">Track hours, access training, monitor progress</p>
             </div>
-            <ChevronRight className="w-6 h-6 text-purple-400" />
+            <ChevronRight className="w-6 h-6 text-blue-400" />
           </div>
           
           <div className="mt-4 pt-4 border-t border-blue-500/20">
             <div className="flex flex-wrap gap-2">
-              <span className="px-3 py-1 bg-blue-500/20 text-purple-300 rounded-full text-xs">Log Hours</span>
-              <span className="px-3 py-1 bg-blue-500/20 text-purple-300 rounded-full text-xs">Training Materials</span>
-              <span className="px-3 py-1 bg-blue-500/20 text-purple-300 rounded-full text-xs">Progress Tracking</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">Log Hours</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">Training Materials</span>
+              <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-xs">Progress Tracking</span>
             </div>
           </div>
         </Link>

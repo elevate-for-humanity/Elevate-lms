@@ -70,7 +70,7 @@ export default function BarberReportsPage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-slate-800 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-5 h-5 text-purple-400" />
+              <Clock className="w-5 h-5 text-blue-400" />
               <span className="text-slate-400 text-sm">Total Hours</span>
             </div>
             <p className="text-3xl font-bold text-white">{summary.totalHours}</p>
@@ -88,10 +88,10 @@ export default function BarberReportsPage() {
         <div className="bg-blue-500/20 border border-blue-500/30 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Award className="w-5 h-5 text-purple-400" />
+              <Award className="w-5 h-5 text-blue-400" />
               <span className="text-white font-medium">Progress to 2,000 Hours</span>
             </div>
-            <span className="text-purple-300 font-bold">{summary.milestoneProgress}%</span>
+            <span className="text-blue-300 font-bold">{summary.milestoneProgress}%</span>
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
             <div 

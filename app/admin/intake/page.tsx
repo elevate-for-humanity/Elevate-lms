@@ -144,7 +144,7 @@ export default function AdminIntakePage() {
                       </p>
                     </div>
                     <div className="bg-blue-50 p-4 rounded-lg">
-                      <p className="font-medium text-purple-800">2. Employer-Sponsored</p>
+                      <p className="font-medium text-blue-800">2. Employer-Sponsored</p>
                       <p className="text-sm text-blue-700 mt-1">
                         "Some students enroll through employer partnerships. Does your employer offer 
                         tuition reimbursement or training support?"
@@ -503,7 +503,7 @@ function IntakeDetailModal({
               className={`p-4 rounded-lg border-2 text-left transition ${
                 intake.funding_pathway === 'employer_sponsored'
                   ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-purple-300'
+                  : 'border-gray-200 hover:border-blue-300'
               }`}
             >
               <Building2 className="w-6 h-6 text-blue-600 mb-2" />

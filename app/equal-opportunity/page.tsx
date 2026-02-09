@@ -31,7 +31,7 @@ const policies = [
     href: '/policies/wioa',
     description: 'Workforce Innovation and Opportunity Act compliance and equal access requirements.',
     icon: Users,
-    color: 'purple',
+    color: 'blue',
   },
   {
     title: 'Grievance Procedure',
@@ -73,7 +73,7 @@ const policies = [
 const colorClasses: Record<string, { bg: string; border: string; icon: string }> = {
   blue: { bg: 'bg-blue-50', border: 'border-blue-200', icon: 'text-blue-600' },
   green: { bg: 'bg-green-50', border: 'border-green-200', icon: 'text-green-600' },
-  purple: { bg: 'bg-blue-50', border: 'border-blue-200', icon: 'text-blue-600' },
+  blue: { bg: 'bg-blue-50', border: 'border-blue-200', icon: 'text-blue-600' },
   orange: { bg: 'bg-orange-50', border: 'border-orange-200', icon: 'text-orange-600' },
   rose: { bg: 'bg-rose-50', border: 'border-rose-200', icon: 'text-rose-600' },
   teal: { bg: 'bg-teal-50', border: 'border-teal-200', icon: 'text-teal-600' },

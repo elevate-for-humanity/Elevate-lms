@@ -262,7 +262,7 @@ export default function ProgressPage() {
         {/* Shop Info */}
         <div className="bg-slate-800 rounded-xl p-4">
           <div className="flex items-center gap-3 mb-2">
-            <Scissors className="w-5 h-5 text-purple-400" />
+            <Scissors className="w-5 h-5 text-blue-400" />
             <span className="text-slate-400 text-sm">Training Location</span>
           </div>
           <p className="text-white font-medium">{apprentice.shopName}</p>
@@ -289,7 +289,7 @@ export default function ProgressPage() {
             <BookOpen className="w-6 h-6" />
             <span className="text-xs">Learn</span>
           </Link>
-          <Link href="/pwa/barber/progress" className="flex flex-col items-center gap-1 text-purple-400">
+          <Link href="/pwa/barber/progress" className="flex flex-col items-center gap-1 text-blue-400">
             <TrendingUp className="w-6 h-6" />
             <span className="text-xs">Progress</span>
           </Link>

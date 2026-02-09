@@ -67,7 +67,7 @@ export default async function GradesPage() {
         <Image
           src="/images/platform/student-portal-mock.jpg"
           alt="Grades"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority

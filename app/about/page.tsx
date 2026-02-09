@@ -376,7 +376,7 @@ export default function AboutPage() {
       <section className="py-20 bg-blue-600">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-            Questions? Call Us
+            Questions? Contact Us
           </h2>
           <p className="text-blue-100 text-lg mb-8">
             Training may be free for eligible Indiana residents.

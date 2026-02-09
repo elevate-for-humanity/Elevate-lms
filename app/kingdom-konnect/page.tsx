@@ -52,11 +52,11 @@ export default function KingdomKonnectPage() {
           </div>
         </div>
       </section>
-      <section className="py-16 bg-purple-900 text-white">
+      <section className="py-16 bg-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Partner With Us</h2>
           <p className="text-xl text-blue-100 mb-8">Join our network of faith-based organizations making a difference.</p>
-          <Link href="/partners" className="bg-white hover:bg-gray-100 text-purple-900 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
+          <Link href="/partners" className="bg-white hover:bg-gray-100 text-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Learn More <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
         </div>

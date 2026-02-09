@@ -199,13 +199,13 @@ export default async function EnrollPage({ searchParams }: Props) {
                     key={course.id}
                     className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition"
                   >
-                    <div className="h-40 bg-purple-600 flex items-center justify-center">
+                    <div className="h-40 bg-blue-600 flex items-center justify-center">
                       <BookOpen className="w-12 h-12 text-white/50" />
                     </div>
 
                     <div className="p-5">
                       {provider && (
-                        <p className="text-xs text-purple-600 font-semibold mb-1">
+                        <p className="text-xs text-blue-600 font-semibold mb-1">
                           {provider.provider_name}
                         </p>
                       )}
@@ -246,7 +246,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                             href={course.enrollment_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
+                            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
                           >
                             Enroll
                             <ArrowRight className="w-4 h-4" />
@@ -254,7 +254,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                         ) : (
                           <Link
                             href={`/lms/courses/${course.id}/enroll`}
-                            className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-purple-700 transition"
+                            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
                           >
                             Enroll
                             <ArrowRight className="w-4 h-4" />

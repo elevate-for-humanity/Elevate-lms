@@ -89,7 +89,7 @@ export default function CNACertificationPage() {
         <Image 
           src="/images/healthcare/hero-programs-healthcare.jpg" 
           alt="CNA Training Program" 
-          fill 
+          fill sizes="100vw"
           className="object-cover" 
           priority 
         />
@@ -115,7 +115,7 @@ export default function CNACertificationPage() {
               <div className="text-slate-400 text-sm">Included</div>
             </div>
             <div>
-              <Users className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+              <Users className="w-8 h-8 text-blue-400 mx-auto mb-2" />
               <div className="text-2xl font-bold text-white">High</div>
               <div className="text-slate-400 text-sm">Job Demand</div>
             </div>
@@ -167,7 +167,7 @@ export default function CNACertificationPage() {
               <Image 
                 src="/images/healthcare/program-cna-overview.jpg" 
                 alt="CNA at work" 
-                fill 
+                fill sizes="100vw"
                 className="object-cover" 
               />
             </div>

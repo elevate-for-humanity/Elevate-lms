@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: 'Student Support | Elevate for Humani
 export default function StudentSupportPage() {
   const supportOptions = [
     { icon: MessageSquare, title: 'Live Chat', description: 'Chat with a support agent', action: 'Start Chat', href: '/support/chat' },
-    { icon: Phone, title: 'Phone Support', description: 'Call (317) 314-3757', action: 'Call Now', href: 'tel:317-314-3757' },
+    { icon: Phone, title: 'Phone Support', description: 'Call (317) 314-3757', action: 'Get Started', href: 'tel:317-314-3757' },
     { icon: Mail, title: 'Email Support', description: 'elevate4humanityedu@gmail.com', action: 'Send Email', href: 'mailto:elevate4humanityedu@gmail.com' },
     { icon: FileText, title: 'Help Articles', description: 'Browse our knowledge base', action: 'View Articles', href: '/help' },
   ];

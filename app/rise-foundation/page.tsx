@@ -271,7 +271,7 @@ export default async function RiseFoundationPage() {
             </Link>
             <a
               href="tel:+13173143757"
-              className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-purple-400 border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-400 border-2 border-white"
             >
               <Phone className="w-5 h-5" /> Get Help
             </a>

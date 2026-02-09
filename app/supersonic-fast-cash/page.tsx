@@ -102,7 +102,7 @@ export default function SupersonicFastCashPage() {
                 <div className="text-gray-300 text-sm">Fast Approval</div>
               </div>
               <div className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-                <Shield className="w-12 h-12 mx-auto mb-3 text-purple-400" />
+                <Shield className="w-12 h-12 mx-auto mb-3 text-blue-400" />
                 <div className="font-black text-xl text-white mb-1">0% Interest</div>
                 <div className="text-gray-300 text-sm">No Hidden Fees</div>
               </div>
@@ -309,7 +309,7 @@ export default function SupersonicFastCashPage() {
                 <div className="flex items-start gap-4">
                   <Phone className="w-8 h-8 text-red-400 flex-shrink-0" />
                   <div>
-                    <h3 className="font-bold text-lg">Call Us</h3>
+                    <h3 className="font-bold text-lg">Contact Us</h3>
                     <p className="text-blue-200">(317) 314-3757</p>
                   </div>
                 </div>
@@ -415,7 +415,7 @@ export default function SupersonicFastCashPage() {
             </Link>
           </div>
           <p className="mt-6 text-red-200 text-sm">
-            Or call us at <a href="tel:3173143757" className="underline font-bold text-white">(317) 314-3757</a>
+            Or contact us at <a href="tel:3173143757" className="underline font-bold text-white">(317) 314-3757</a>
           </p>
         </div>
       </section>

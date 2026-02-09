@@ -240,8 +240,8 @@ export default async function SupportPage() {
 
             {/* AI Tutor */}
             <div className="bg-blue-50 rounded-2xl border border-blue-200 p-6">
-              <h3 className="font-bold text-purple-900 mb-2">Need Course Help?</h3>
-              <p className="text-sm text-purple-800 mb-4">
+              <h3 className="font-bold text-blue-900 mb-2">Need Course Help?</h3>
+              <p className="text-sm text-blue-800 mb-4">
                 Our AI Tutor can help with course questions 24/7.
               </p>
               <Link

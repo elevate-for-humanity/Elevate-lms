@@ -183,7 +183,7 @@ export default function ApplicationStatusPage() {
 
       <div className="mt-6 text-center">
         <p className="text-gray-600">
-          Questions? Call us at{' '}
+          Questions? Contact us at{' '}
           <a href="tel:317-314-3757" className="text-emerald-600 font-medium">
             317-314-3757
           </a>

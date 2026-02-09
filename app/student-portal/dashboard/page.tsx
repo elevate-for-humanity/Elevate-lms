@@ -72,7 +72,7 @@ export default async function StudentPortalPage() {
   const quickLinks = [
     { icon: BookOpen, title: 'My Courses', href: '/student-portal/courses', color: 'blue' },
     { icon: Calendar, title: 'Schedule', href: '/student-portal/schedule', color: 'green' },
-    { icon: BarChart3, title: 'Grades', href: '/student-portal/grades', color: 'purple' },
+    { icon: BarChart3, title: 'Grades', href: '/student-portal/grades', color: 'blue' },
     { icon: Users, title: 'Instructors', href: '/student-portal/instructors', color: 'orange' },
     { icon: Briefcase, title: 'Career Services', href: '/career-services', color: 'teal' },
     { icon: FileText, title: 'Documents', href: '/student-portal/documents', color: 'indigo' },

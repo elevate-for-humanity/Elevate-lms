@@ -36,12 +36,12 @@ export default function AdvisingPage() {
         setIsSubmitted(true);
       } else {
         alert(
-          'There was an error submitting your request. Please call us at 317-314-3757.'
+          'There was an error submitting your request. Please contact us at 317-314-3757.'
         );
       }
     } catch (error) { /* Error handled silently */ 
       alert(
-        'There was an error submitting your request. Please call us at 317-314-3757.'
+        'There was an error submitting your request. Please contact us at 317-314-3757.'
       );
     } finally {
       setIsSubmitting(false);
@@ -106,7 +106,7 @@ export default function AdvisingPage() {
               1-2 business days.
             </p>
             <p className="text-sm text-black">
-              Need immediate assistance? Call us at{' '}
+              Need immediate assistance? Contact us at{' '}
               <a
                 href="tel:3173143757"
                 className="text-indigo-600 font-semibold hover:underline"

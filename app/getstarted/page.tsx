@@ -112,7 +112,7 @@ export default function Page() {
                 answer all your questions. No pressure, just guidance.
               </p>
               <p className="text-sm text-black">
-                Call us anytime:{' '}
+                Contact us anytime:{' '}
                 <a
                   href="tel:3173143757"
                   className="text-brand-blue-600 font-semibold"

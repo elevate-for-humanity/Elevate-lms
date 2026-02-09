@@ -67,7 +67,7 @@ export default async function SettingsPage() {
         <Image
           src="/images/homepage/student-portal-interface.png"
           alt="Settings"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority

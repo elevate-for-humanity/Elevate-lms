@@ -64,7 +64,7 @@ export default async function InstructorLayout({
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
-              <Link href="/instructor" className="font-bold text-purple-600">
+              <Link href="/instructor" className="font-bold text-blue-600">
                 Instructor Portal
               </Link>
               <div className="hidden md:flex items-center gap-1">
@@ -72,7 +72,7 @@ export default async function InstructorLayout({
                   <Link
                     key={item.href}
                     href={item.href}
-                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition"
+                    className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
                   >
                     <item.icon className="w-4 h-4" />
                     {item.label}

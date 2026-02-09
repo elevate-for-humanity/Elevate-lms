@@ -12,12 +12,12 @@ export default function EnterpriseCapitalReadinessPage() {
           <div className="flex items-center justify-between">
             <Link 
               href="/store/guides/capital-readiness"
-              className="flex items-center gap-2 text-purple-300 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-blue-300 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Capital Readiness Guide
             </Link>
-            <span className="px-3 py-1 bg-blue-500/20 text-purple-300 rounded-full text-sm font-medium border border-blue-500/30">
+            <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm font-medium border border-blue-500/30">
               Level 4: Enterprise
             </span>
           </div>
@@ -27,7 +27,7 @@ export default function EnterpriseCapitalReadinessPage() {
       {/* Hero Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 rounded-full text-purple-300 text-sm font-medium mb-6 border border-blue-500/30">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 rounded-full text-blue-300 text-sm font-medium mb-6 border border-blue-500/30">
             <Building2 className="w-4 h-4" />
             Enterprise & Government Deployment
           </div>
@@ -49,7 +49,7 @@ export default function EnterpriseCapitalReadinessPage() {
         <section className="mb-16">
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-              <Globe className="w-6 h-6 text-purple-400" />
+              <Globe className="w-6 h-6 text-blue-400" />
               Enterprise Deployment Overview
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
@@ -83,7 +83,7 @@ export default function EnterpriseCapitalReadinessPage() {
                     "Data residency compliance"
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3 text-gray-300">
-                      <Shield className="w-5 h-5 text-purple-400 flex-shrink-0 mt-0.5" />
+                      <Shield className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                       {item}
                     </li>
                   ))}
@@ -156,7 +156,7 @@ export default function EnterpriseCapitalReadinessPage() {
                 <ul className="space-y-2">
                   {pathway.steps.map((step, j) => (
                     <li key={j} className="text-sm text-gray-300 flex items-start gap-2">
-                      <span className="text-purple-400 font-medium">{j + 1}.</span>
+                      <span className="text-blue-400 font-medium">{j + 1}.</span>
                       {step}
                     </li>
                   ))}
@@ -274,7 +274,7 @@ export default function EnterpriseCapitalReadinessPage() {
                   <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
                     <div className="flex flex-wrap items-center gap-4 mb-4">
                       <h3 className="text-lg font-semibold text-white">{phase.phase}</h3>
-                      <span className="px-3 py-1 bg-blue-500/20 text-purple-300 rounded-full text-sm">
+                      <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm">
                         {phase.duration}
                       </span>
                     </div>

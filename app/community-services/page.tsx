@@ -41,7 +41,7 @@ const services = [
     title: 'Mental Wellness (Selfish Inc.)',
     description: 'Free counseling, stress management, and holistic healing support.',
     icon: Heart,
-    color: 'purple',
+    color: 'blue',
     href: '/nonprofit/mental-wellness',
     benefits: [
       'Individual counseling',
@@ -80,7 +80,7 @@ const services = [
 
 const colorClasses: Record<string, { bg: string; text: string; border: string; light: string }> = {
   green: { bg: 'bg-green-600', text: 'text-green-600', border: 'border-green-200', light: 'bg-green-50' },
-  purple: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
+  blue: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
   blue: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
   amber: { bg: 'bg-amber-600', text: 'text-amber-600', border: 'border-amber-200', light: 'bg-amber-50' },
 };
@@ -220,7 +220,7 @@ export default function CommunityServicesPage() {
               <p className="text-slate-300 text-sm">Low-income, unemployed, underemployed, or facing barriers</p>
             </div>
             <div className="bg-white/10 rounded-xl p-6">
-              <h3 className="font-bold text-purple-400 mb-2">Mental Wellness</h3>
+              <h3 className="font-bold text-blue-400 mb-2">Mental Wellness</h3>
               <p className="text-slate-300 text-sm">Open to all community members</p>
             </div>
           </div>
@@ -238,7 +238,7 @@ export default function CommunityServicesPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Apply Now</h2>
           <p className="text-gray-600 mb-8">
-            Not sure where to start? Call us and we'll help connect you with the right services.
+            Not sure where to start? Contact us and we'll help connect you with the right services.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <a

@@ -68,7 +68,7 @@ export default async function CosmetologyApprenticeshipPage() {
             <span className="px-3 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
               DOL Registered
             </span>
-            <span className="px-3 py-2 bg-purple-600 text-white text-sm font-bold rounded-full shadow-lg">
+            <span className="px-3 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
               Apprenticeship Sponsorship
             </span>
           </div>
@@ -118,7 +118,7 @@ export default async function CosmetologyApprenticeshipPage() {
               <Image
                 src="/images/pathways/beauty-hero.jpg"
                 alt="Cosmetology training"
-                fill
+                fill sizes="100vw"
                 className="object-cover"
               />
             </div>

@@ -69,7 +69,7 @@ export default async function StudentsPage() {
         <Image
           src="/images/success-new/success-4.jpg"
           alt="Students"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority

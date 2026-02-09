@@ -183,7 +183,7 @@ export default async function BeautyProgramsPage() {
                   <Image
                     src={program.image}
                     alt={program.title}
-                    fill
+                    fill sizes="100vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-2 rounded-full">

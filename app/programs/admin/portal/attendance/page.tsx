@@ -68,7 +68,7 @@ export default async function AttendancePage() {
         <Image
           src="/images/platform/student-portal-mock.jpg"
           alt="Attendance"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority

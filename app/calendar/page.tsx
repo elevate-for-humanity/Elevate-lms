@@ -88,7 +88,7 @@ export default async function CalendarPage() {
               <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Sign in" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-6 text-center">
-              <h2 className="text-lg font-semibold text-purple-900 mb-2">Sign in to see your schedule</h2>
+              <h2 className="text-lg font-semibold text-blue-900 mb-2">Sign in to see your schedule</h2>
               <p className="text-blue-700 mb-4">View your enrolled classes, assignments, and deadlines.</p>
               <Link href="/login?redirect=/calendar" className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700">
                 Sign In

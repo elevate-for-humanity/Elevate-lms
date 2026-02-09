@@ -64,7 +64,7 @@ export default function BarberSettingsPage() {
           <div className="bg-slate-800 rounded-xl p-4">
             <div className="flex items-center gap-4">
               <div className="w-14 h-14 bg-blue-500/20 rounded-full flex items-center justify-center">
-                <User className="w-7 h-7 text-purple-400" />
+                <User className="w-7 h-7 text-blue-400" />
               </div>
               <div>
                 <p className="text-white font-medium text-lg">{user.name}</p>
@@ -86,7 +86,7 @@ export default function BarberSettingsPage() {
               >
                 <div className="flex items-center gap-4">
                   {subscribed ? (
-                    <Bell className="w-5 h-5 text-purple-400" />
+                    <Bell className="w-5 h-5 text-blue-400" />
                   ) : (
                     <BellOff className="w-5 h-5 text-slate-400" />
                   )}
@@ -131,7 +131,7 @@ export default function BarberSettingsPage() {
             >
               <div className="flex items-center gap-4">
                 {darkMode ? (
-                  <Moon className="w-5 h-5 text-purple-400" />
+                  <Moon className="w-5 h-5 text-blue-400" />
                 ) : (
                   <Sun className="w-5 h-5 text-amber-400" />
                 )}

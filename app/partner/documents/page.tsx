@@ -229,7 +229,7 @@ export default function PartnerDocumentsPage() {
               {(doc.status === 'missing' || doc.status === 'rejected' || doc.status === 'expired') && (
                 <div className="mt-4">
                   <label className="block">
-                    <div className="flex items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-purple-400 hover:bg-blue-50 transition-colors">
+                    <div className="flex items-center justify-center w-full h-32 border-2 border-dashed border-slate-300 rounded-lg cursor-pointer hover:border-blue-400 hover:bg-blue-50 transition-colors">
                       {uploading === doc.document_type ? (
                         <div className="flex items-center gap-2 text-blue-600">
                           <Loader2 className="w-5 h-5 animate-spin" />

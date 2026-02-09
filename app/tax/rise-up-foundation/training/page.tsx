@@ -159,10 +159,10 @@ export default function TrainingPage() {
             </div>
           </div>
 
-          <div className="rounded-lg border-2 border-purple-200 p-6">
+          <div className="rounded-lg border-2 border-blue-200 p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-lg">Advanced Certification</h3>
-              <span className="px-3 py-2 rounded-full bg-purple-100 text-purple-800 text-xs font-semibold">
+              <span className="px-3 py-2 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold">
                 FOR EXPERIENCED VOLUNTEERS
               </span>
             </div>

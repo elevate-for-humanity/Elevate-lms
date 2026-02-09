@@ -23,7 +23,7 @@ export default function WebDevelopmentPage() {
         <Image
           src="/images/technology/hero-program-web-dev.jpg"
           alt="Web Development Training"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           priority
         />

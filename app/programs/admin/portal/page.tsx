@@ -67,7 +67,7 @@ export default async function PortalPage() {
         <Image
           src="/images/heroes/employer-partner-1.jpg"
           alt="Portal"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority

@@ -298,7 +298,7 @@ export default function PricingPage() {
             Questions About Pricing?
           </h2>
           <p className="text-gray-600 mb-8">
-            Call us for a custom quote based on your specific tax situation.
+            Contact us for a custom quote based on your specific tax situation.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

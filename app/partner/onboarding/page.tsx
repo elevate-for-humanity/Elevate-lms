@@ -176,7 +176,7 @@ export default function PartnerOnboardingPage() {
 
       <div className="max-w-3xl mx-auto py-12 px-4">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-blue-600/20 text-purple-300 px-4 py-2 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-blue-600/20 text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Building2 className="w-4 h-4" />
             Partner Shop Onboarding
           </div>
@@ -393,7 +393,7 @@ export default function PartnerOnboardingPage() {
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <p className="text-green-800 text-sm"><strong>No admin approval required.</strong> Your account will be activated automatically once documents are verified (typically within 24-48 hours).</p>
               </div>
-              <label className="flex items-start gap-3 p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-purple-300">
+              <label className="flex items-start gap-3 p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-blue-300">
                 <input type="checkbox" checked={formData.agreedToTerms} onChange={(e) => updateField('agreedToTerms', e.target.checked)}
                   className="mt-1 w-5 h-5 text-blue-600 rounded" />
                 <div className="text-sm text-slate-600">

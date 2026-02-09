@@ -23,7 +23,7 @@ export default function ITSupportPage() {
         <Image
           src="/images/technology/hero-program-it-support.jpg"
           alt="IT Support Training"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           priority
         />

@@ -246,7 +246,7 @@ export default function BookAppointmentPage() {
                         className={`p-4 rounded-xl border-2 text-left transition ${
                           selectedService === service.id
                             ? 'border-blue-600 bg-blue-50'
-                            : 'border-gray-200 hover:border-purple-300'
+                            : 'border-gray-200 hover:border-blue-300'
                         }`}
                       >
                         <div className="flex items-start justify-between">
@@ -291,7 +291,7 @@ export default function BookAppointmentPage() {
                       className={`p-3 rounded-lg border text-center transition ${
                         selectedDate === formatDate(date)
                           ? 'border-blue-600 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 hover:border-purple-300'
+                          : 'border-gray-200 hover:border-blue-300'
                       }`}
                     >
                       <div className="text-xs text-gray-500">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
@@ -318,7 +318,7 @@ export default function BookAppointmentPage() {
                             ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed line-through'
                             : selectedTime === time
                             ? 'border-blue-600 bg-blue-50 text-blue-700'
-                            : 'border-gray-200 hover:border-purple-300'
+                            : 'border-gray-200 hover:border-blue-300'
                         }`}
                       >
                         {time}

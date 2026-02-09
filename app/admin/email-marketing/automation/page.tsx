@@ -238,7 +238,7 @@ export default function AutomationPage() {
               title="Course Reminders"
               description="Send reminders before class starts"
               icon={Zap}
-              color="purple"
+              color="blue"
               onClick={() =>
                 router.push(
                   '/admin/email-marketing/automation/new?template=reminder'
@@ -490,7 +490,7 @@ interface WorkflowTemplateProps {
   title: string;
   description: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: 'blue' | 'orange' | 'purple';
+  color: 'blue' | 'orange' | 'blue';
   onClick: () => void;
 }
 
@@ -504,7 +504,7 @@ function WorkflowTemplate({
   const colorClasses = {
     blue: 'bg-blue-50 text-brand-blue-600 hover:bg-gray-100',
     orange: 'bg-orange-50 text-brand-orange-600 hover:bg-orange-100',
-    purple: 'bg-blue-50 text-blue-600 hover:bg-blue-100',
+    blue: 'bg-blue-50 text-blue-600 hover:bg-blue-100',
   };
 
   return (

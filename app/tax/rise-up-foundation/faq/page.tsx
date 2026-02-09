@@ -84,7 +84,7 @@ export default function FAQPage() {
     {
       question: "What if I'm missing a W-2 or 1099?",
       answer:
-        "Contact your employer or payer first. If you can't get it, the IRS can provide a wage and income transcript. Call us for guidance.",
+        "Contact your employer or payer first. If you can't get it, the IRS can provide a wage and income transcript. Contact us for guidance.",
     },
   ];
 

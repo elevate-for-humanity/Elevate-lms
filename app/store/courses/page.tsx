@@ -31,7 +31,7 @@ export default function StoreCoursesPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Courses" }]} />
       </div>
 {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden bg-purple-900">
+      <section className="relative min-h-[400px] flex items-center overflow-hidden bg-blue-900">
         <video
           autoPlay
           muted
@@ -52,7 +52,7 @@ export default function StoreCoursesPage() {
 
             <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight mb-6">
               Certification Courses
-              <span className="block text-purple-300">With Exam Vouchers</span>
+              <span className="block text-blue-300">With Exam Vouchers</span>
             </h1>
 
             <p className="text-xl text-blue-100 mb-8">

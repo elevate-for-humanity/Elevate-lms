@@ -22,7 +22,7 @@ export const dynamic = 'force-dynamic';
 
 const QUEUE_TYPE_CONFIG: Record<string, { label: string; icon: any; color: string }> = {
   document_review: { label: 'Document Review', icon: FileText, color: 'blue' },
-  transcript_review: { label: 'Transcript Review', icon: FileText, color: 'purple' },
+  transcript_review: { label: 'Transcript Review', icon: FileText, color: 'blue' },
   partner_docs_review: { label: 'Partner Documents', icon: Building2, color: 'green' },
   routing_review: { label: 'Shop Routing', icon: MapPin, color: 'orange' },
 };

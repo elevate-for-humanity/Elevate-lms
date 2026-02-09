@@ -113,7 +113,7 @@ export default async function DemoPage() {
             <div className="mt-8 bg-orange-50 rounded-xl p-6">
               <h3 className="font-semibold mb-2">Prefer to Talk?</h3>
               <p className="text-gray-600 mb-4">
-                Call us directly to discuss your needs.
+                Contact us directly to discuss your needs.
               </p>
               <a
                 href="tel:3173143757"

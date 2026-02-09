@@ -136,7 +136,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
                 <p className="text-sm text-gray-500 mt-1">Import from CSV or SAM.gov</p>
               </button>
               <button className="bg-white rounded-xl p-6 border hover:shadow-lg transition text-left">
-                <RefreshCw className="w-8 h-8 text-purple-600 mb-3" />
+                <RefreshCw className="w-8 h-8 text-blue-600 mb-3" />
                 <h3 className="font-bold">Sync SAM.gov</h3>
                 <p className="text-sm text-gray-500 mt-1">Update from SAM.gov API</p>
               </button>

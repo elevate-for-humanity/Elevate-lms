@@ -82,7 +82,7 @@ export default function TechnologyProgramsPage() {
                 </Link>
                 <Link 
                   href="/wioa-eligibility"
-                  className="inline-flex items-center text-white text-lg border-b-2 border-white pb-1 hover:border-purple-400 hover:text-purple-400 transition-all duration-300"
+                  className="inline-flex items-center text-white text-lg border-b-2 border-white pb-1 hover:border-blue-400 hover:text-blue-400 transition-all duration-300"
                 >
                   Check Eligibility
                 </Link>

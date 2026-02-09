@@ -382,7 +382,7 @@ export default function HealthcareFundamentalsCoursePage() {
             </Link>
           </div>
           <p className="text-white/80 mt-6">
-            Questions? Call us at (317) 314-3757
+            Questions? Contact us at (317) 314-3757
           </p>
         </div>
       </section>

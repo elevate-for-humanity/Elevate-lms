@@ -286,7 +286,7 @@ export default function GrantProgramsPage() {
               >
                 Contact us
               </Link>{' '}
-              or call us at (317) 314-3757
+              or contact us at (317) 314-3757
             </p>
           </div>
         </div>

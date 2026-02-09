@@ -168,8 +168,8 @@ export default async function DonatePage() {
             </div>
 
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="font-bold text-purple-900 mb-2">Tax Deductible</h3>
-              <p className="text-purple-800 text-sm">
+              <h3 className="font-bold text-blue-900 mb-2">Tax Deductible</h3>
+              <p className="text-blue-800 text-sm">
                 Rise Foundation is a 501(c)(3) nonprofit organization. Your
                 donation is tax-deductible to the extent allowed by law.
               </p>

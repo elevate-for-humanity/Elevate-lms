@@ -25,7 +25,7 @@ const stateButtonLabels: Record<string, string> = {
 };
 
 const stateButtonColors: Record<string, string> = {
-  in_review: 'bg-purple-600 hover:bg-purple-700 text-white',
+  in_review: 'bg-blue-600 hover:bg-blue-700 text-white',
   approved: 'bg-green-600 hover:bg-green-700 text-white',
   rejected: 'bg-red-600 hover:bg-red-700 text-white',
   submitted: 'bg-blue-600 hover:bg-blue-700 text-white',

@@ -96,7 +96,7 @@ export default function CRMAppointmentsPage() {
               <h3 className="font-bold text-gray-900 mb-4">Today - January 18</h3>
               <div className="space-y-4">
                 {appointments.map((apt) => (
-                  <div key={apt.id} className="p-4 border rounded-xl hover:border-purple-300 transition">
+                  <div key={apt.id} className="p-4 border rounded-xl hover:border-blue-300 transition">
                     <div className="flex items-start justify-between mb-2">
                       <h4 className="font-medium text-gray-900">{apt.title}</h4>
                       <span className={`px-2 py-0.5 rounded text-xs font-medium ${

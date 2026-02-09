@@ -24,7 +24,7 @@ const botResponses: Record<string, string> = {
   'how do i apply': 'To apply for a program, visit our Apply page at /apply. You will need to provide basic information, select your program of interest, and complete the eligibility screening. The process takes about 10-15 minutes.',
   'funding': 'We offer several funding options including WIOA (Workforce Innovation and Opportunity Act), WRG (Workforce Ready Grant), and JRI (Justice Reinvestment Initiative) funding. You can also choose self-pay options. Visit /funding to learn more about eligibility.',
   'application status': 'To check your application status, log into your Student Portal at /student-portal. Your dashboard will show your current application status, any required documents, and next steps.',
-  'account': 'For account issues, you can reset your password at /forgot-password, or contact our support team at elevate4humanityedu@gmail.com. You can also call us at (317) 314-3757 during business hours.',
+  'account': 'For account issues, you can reset your password at /forgot-password, or contact our support team at elevate4humanityedu@gmail.com. You can also contact us at (317) 314-3757 during business hours.',
   'contact': 'You can reach our support team by: Email: elevate4humanityedu@gmail.com, Phone: (317) 314-3757 (Mon-Fri 9am-5pm EST), or submit a support ticket at /support.',
   'default': 'Thank you for your message. For immediate assistance, please contact our support team at elevate4humanityedu@gmail.com or call (317) 314-3757 during business hours (Mon-Fri 9am-5pm EST). You can also submit a support ticket at /support for a response within 24 hours.',
 };

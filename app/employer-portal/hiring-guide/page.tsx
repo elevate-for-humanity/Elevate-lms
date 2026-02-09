@@ -66,7 +66,7 @@ export default function HiringGuidePage() {
   return (
     <div className="min-h-screen bg-gray-50">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Hiring Guide" }]} />
-<div className="relative h-80 bg-purple-800">
+<div className="relative h-80 bg-blue-800">
         <Image
           src="/images/heroes-hq/career-services-hero.jpg"
           alt="Hiring guide"
@@ -76,7 +76,7 @@ export default function HiringGuidePage() {
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
             <div className="flex items-center gap-3 mb-4">
-              <BookOpen className="w-10 h-10 text-purple-300" />
+              <BookOpen className="w-10 h-10 text-blue-300" />
               <span className="px-3 py-1 bg-blue-500/30 text-blue-200 rounded-full text-sm">
                 Employer Resource
               </span>
@@ -94,7 +94,7 @@ export default function HiringGuidePage() {
           {[
             { icon: DollarSign, label: 'Avg. Tax Credit', value: '$4,800', color: 'green' },
             { icon: Clock, label: 'Time to Hire', value: '2-3 weeks', color: 'blue' },
-            { icon: Users, label: 'Candidates Available', value: '2,500+', color: 'purple' },
+            { icon: Users, label: 'Candidates Available', value: '2,500+', color: 'blue' },
             { icon: Award, label: 'Success Rate', value: '94%', color: 'orange' },
           ].map((stat, index) => (
             <div key={index} className="bg-white rounded-xl p-6 shadow-sm text-center">
@@ -127,7 +127,7 @@ export default function HiringGuidePage() {
                 <h3 className="text-2xl font-bold text-gray-900 mb-4">{step.title}</h3>
                 <p className="text-gray-600 mb-6">{step.description}</p>
                 <div className="bg-blue-50 rounded-xl p-4">
-                  <p className="font-semibold text-purple-900 mb-3">Pro Tips:</p>
+                  <p className="font-semibold text-blue-900 mb-3">Pro Tips:</p>
                   <ul className="space-y-2">
                     {step.tips.map((tip, i) => (
                       <li key={i} className="flex items-center gap-2 text-gray-700">
@@ -146,7 +146,7 @@ export default function HiringGuidePage() {
           <h3 className="text-2xl font-bold text-gray-900 mb-6">Downloadable Resources</h3>
           <div className="grid md:grid-cols-2 gap-4">
             {resources.map((resource, index) => (
-              <div key={index} className="flex items-center justify-between p-4 border rounded-xl hover:border-purple-300 transition">
+              <div key={index} className="flex items-center justify-between p-4 border rounded-xl hover:border-blue-300 transition">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                     <FileText className="w-6 h-6 text-blue-600" />

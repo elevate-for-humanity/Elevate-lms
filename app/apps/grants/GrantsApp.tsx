@@ -115,7 +115,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
               </div>
               <div className="bg-white rounded-lg p-4 border">
                 <p className="text-gray-500 text-sm">Applications</p>
-                <p className="text-2xl font-bold text-purple-600">{applications.length}</p>
+                <p className="text-2xl font-bold text-blue-600">{applications.length}</p>
               </div>
               <div className="bg-white rounded-lg p-4 border">
                 <p className="text-gray-500 text-sm">Closing Soon</p>

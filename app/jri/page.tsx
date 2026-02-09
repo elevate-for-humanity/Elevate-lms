@@ -263,7 +263,7 @@ export default function JRIPage() {
                   href="tel:3173143757"
                   className="block w-full border-2 border-gray-300 text-gray-700 text-center px-6 py-4 rounded-lg font-semibold hover:bg-gray-50 transition"
                 >
-                  Call Us: (317) 314-3757
+                  Contact Us: (317) 314-3757
                 </a>
               </div>
             </div>

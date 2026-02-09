@@ -215,7 +215,7 @@ Preferred Contact: ${form.preferredContact}`,
               Want to Talk Sooner?
             </h3>
             <p className="text-black mb-4">
-              Schedule your advisor call now instead of waiting for us to reach
+              Schedule your advisor get started instead of waiting for us to reach
               out.
             </p>
             <a
@@ -225,7 +225,7 @@ Preferred Contact: ${form.preferredContact}`,
               className="inline-flex items-center gap-2 px-6 py-3 bg-brand-orange-600 text-white font-bold rounded-lg hover:bg-brand-orange-700 transition shadow-lg"
             >
               <Calendar className="w-5 h-5" />
-              Schedule Call Now
+              Schedule Get Started
             </a>
           </div>
 
@@ -252,7 +252,7 @@ Preferred Contact: ${form.preferredContact}`,
           {/* Contact Info */}
           <div className="mt-8 pt-6 border-t border-slate-200">
             <p className="text-sm text-black">
-              Questions? Call us at{' '}
+              Questions? Contact us at{' '}
               <a
                 href="tel:3173143757"
                 className="font-bold text-brand-orange-600 hover:text-brand-orange-700"

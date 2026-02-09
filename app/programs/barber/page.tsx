@@ -343,7 +343,7 @@ export default function BarberProgramPage() {
             </Link>
           </div>
           <p className="mt-8 text-gray-400">
-            Or call us: <a href="tel:+13173143757" className="text-orange-400 font-semibold">(317) 314-3757</a>
+            Or contact us: <a href="tel:+13173143757" className="text-orange-400 font-semibold">(317) 314-3757</a>
           </p>
         </div>
       </section>

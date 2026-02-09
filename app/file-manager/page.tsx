@@ -48,7 +48,7 @@ export default async function FileManagerPage() {
           {[
             { name: 'Documents', count: 12, icon: Folder, color: 'blue' },
             { name: 'Certificates', count: 3, icon: Folder, color: 'green' },
-            { name: 'Course Materials', count: 8, icon: Folder, color: 'purple' },
+            { name: 'Course Materials', count: 8, icon: Folder, color: 'blue' },
             { name: 'Submissions', count: 5, icon: Folder, color: 'orange' },
           ].map((folder, i) => (
             <div key={i} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md cursor-pointer">

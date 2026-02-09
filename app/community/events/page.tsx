@@ -154,7 +154,7 @@ export default async function EventsPage() {
               {user && (
                 <Link
                   href="/community/events/create"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition border border-purple-400"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-500 transition border border-blue-400"
                 >
                   <Plus className="w-5 h-5" />
                   Create Event

@@ -232,7 +232,7 @@ export default async function CareerServicesPage() {
       </section>
 
       {/* Self-Paced Courses CTA */}
-      <section className="py-16 bg-purple-600">
+      <section className="py-16 bg-blue-600">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="text-white">
@@ -242,7 +242,7 @@ export default async function CareerServicesPage() {
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
                 Career Success Video Courses
               </h2>
-              <p className="text-purple-100 text-lg mb-6">
+              <p className="text-blue-100 text-lg mb-6">
                 Learn resume writing, interview skills, and job search strategies at your own pace with our professional video courses.
               </p>
               <ul className="space-y-2 mb-8">
@@ -265,7 +265,7 @@ export default async function CareerServicesPage() {
               </ul>
               <Link
                 href="/career-services/courses"
-                className="inline-flex items-center bg-white text-purple-600 px-8 py-4 rounded-lg font-bold hover:bg-purple-50 transition"
+                className="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-blue-50 transition"
               >
                 Browse Courses
                 <ArrowRight className="w-5 h-5 ml-2" />

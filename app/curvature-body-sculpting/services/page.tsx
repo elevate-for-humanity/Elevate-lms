@@ -45,7 +45,7 @@ const services = [
     price: 'From $149/session',
     duration: '45 minutes',
     icon: Star,
-    color: 'purple',
+    color: 'blue',
     benefits: [
       'Stimulates collagen production',
       'Tightens loose skin',
@@ -134,7 +134,7 @@ const packages = [
 
 const colorClasses: Record<string, { bg: string; light: string; text: string }> = {
   pink: { bg: 'bg-pink-600', light: 'bg-pink-50', text: 'text-pink-600' },
-  purple: { bg: 'bg-blue-600', light: 'bg-blue-50', text: 'text-blue-600' },
+  blue: { bg: 'bg-blue-600', light: 'bg-blue-50', text: 'text-blue-600' },
   indigo: { bg: 'bg-indigo-600', light: 'bg-indigo-50', text: 'text-indigo-600' },
   green: { bg: 'bg-green-600', light: 'bg-green-50', text: 'text-green-600' },
   amber: { bg: 'bg-amber-600', light: 'bg-amber-50', text: 'text-amber-600' },

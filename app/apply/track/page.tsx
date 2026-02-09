@@ -335,7 +335,7 @@ export default function TrackApplicationPage() {
                 <div className="space-y-3 text-sm text-black">
                   <p>• Please respond to our advisor's message</p>
                   <p>• Check your email inbox and spam folder</p>
-                  <p>• Call us if you haven't heard from us: (317) 314-3757</p>
+                  <p>• Contact us if you haven't heard from us: (317) 314-3757</p>
                 </div>
               )}
 
@@ -351,7 +351,7 @@ export default function TrackApplicationPage() {
                 <div className="space-y-3 text-sm text-black">
                   <p>• Contact us to discuss alternative options</p>
                   <p>• We may have other programs that fit your needs</p>
-                  <p>• Call us at (317) 314-3757 for more information</p>
+                  <p>• Contact us at (317) 314-3757 for more information</p>
                 </div>
               )}
             </div>
@@ -364,7 +364,7 @@ export default function TrackApplicationPage() {
             <Phone className="w-8 h-8 text-brand-orange-600 mb-3" />
             <h3 className="font-bold text-black mb-2">Need Help?</h3>
             <p className="text-sm text-black mb-3">
-              Call us Monday-Friday, 9am-5pm
+              Contact us Monday-Friday, 9am-5pm
             </p>
             <a
               href="tel:3173143757"

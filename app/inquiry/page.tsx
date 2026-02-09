@@ -80,7 +80,7 @@ function InquiryForm() {
         imageSrc="/hero-images/apply-hero.jpg"
         imageAlt="Apply Now"
         primaryCTA={{ text: "Start Application", href: "#application" }}
-        secondaryCTA={{ text: "Questions? Call Us", href: "tel:317-314-3757" }}
+        secondaryCTA={{ text: "Questions? Contact Us", href: "tel:317-314-3757" }}
         features={[
           "10-minute application with 2-3 day response",
           "Funded training through WIOA and state grants",

@@ -193,7 +193,7 @@ export default function CurvatureBodySculptingPage() {
                 className="bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition"
               >
                 <div className="w-full h-40 bg-pink-100 rounded-xl mb-4 flex items-center justify-center">
-                  <Sparkles className="w-12 h-12 text-purple-400" />
+                  <Sparkles className="w-12 h-12 text-blue-400" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">{product.name}</h3>
                 <p className="text-gray-600 text-sm mb-4">{product.description}</p>

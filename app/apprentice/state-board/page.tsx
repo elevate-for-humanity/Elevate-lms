@@ -238,10 +238,10 @@ export default async function StateBoardExamPage() {
                   href={examInfo.examProviderUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block p-6 bg-blue-50 border-2 border-blue-200 rounded-xl hover:border-purple-400 transition-all group"
+                  className="block p-6 bg-blue-50 border-2 border-blue-200 rounded-xl hover:border-blue-400 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-bold text-purple-900">Schedule Exam</h4>
+                    <h4 className="font-bold text-blue-900">Schedule Exam</h4>
                     <ExternalLink className="w-5 h-5 text-blue-600 group-hover:translate-x-1 transition-transform" />
                   </div>
                   <p className="text-sm text-blue-700 mb-3">

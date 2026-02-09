@@ -105,9 +105,9 @@ export default async function ProductDetailPage({ params }: Props) {
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
                     <div className="w-24 h-24 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <ShoppingCart className="w-12 h-12 text-purple-400" />
+                      <ShoppingCart className="w-12 h-12 text-blue-400" />
                     </div>
-                    <p className="text-purple-400 font-medium">Meri-Go-Round</p>
+                    <p className="text-blue-400 font-medium">Meri-Go-Round</p>
                   </div>
                 </div>
               )}
@@ -185,7 +185,7 @@ export default async function ProductDetailPage({ params }: Props) {
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <ShoppingCart className="w-8 h-8 text-purple-300" />
+                        <ShoppingCart className="w-8 h-8 text-blue-300" />
                       </div>
                     )}
                   </div>

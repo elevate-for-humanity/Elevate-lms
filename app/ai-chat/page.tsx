@@ -201,7 +201,7 @@ export default function AIChatPage() {
               <Link
                 key={index}
                 href="/ai-tutor"
-                className="flex items-center gap-3 p-4 bg-white rounded-xl border hover:border-purple-300 hover:shadow-md transition-all"
+                className="flex items-center gap-3 p-4 bg-white rounded-xl border hover:border-blue-300 hover:shadow-md transition-all"
               >
                 <MessageSquare className="w-5 h-5 text-blue-600 flex-shrink-0" />
                 <span className="text-gray-700">{question}</span>

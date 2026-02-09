@@ -43,7 +43,7 @@ export default function ForumsPage() {
     'General Discussion': { bg: 'bg-blue-50', border: 'border-blue-200', hover: 'hover:border-blue-400' },
     'Healthcare Programs': { bg: 'bg-green-50', border: 'border-green-200', hover: 'hover:border-green-400' },
     'Skilled Trades': { bg: 'bg-orange-50', border: 'border-orange-200', hover: 'hover:border-orange-400' },
-    'Technology': { bg: 'bg-purple-50', border: 'border-purple-200', hover: 'hover:border-purple-400' },
+    'Technology': { bg: 'bg-blue-50', border: 'border-blue-200', hover: 'hover:border-blue-400' },
     'Job Search & Career': { bg: 'bg-indigo-50', border: 'border-indigo-200', hover: 'hover:border-indigo-400' },
     'Student Support': { bg: 'bg-rose-50', border: 'border-rose-200', hover: 'hover:border-rose-400' },
   };

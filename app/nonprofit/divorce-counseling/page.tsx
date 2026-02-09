@@ -163,7 +163,7 @@ export default async function DivorceCounselingPage() {
               className="inline-flex items-center justify-center gap-2 border border-rose-600 text-rose-600 px-6 py-3 rounded-lg font-semibold hover:bg-rose-50 transition"
             >
               <Phone className="w-5 h-5" />
-              Call Us
+              Contact Us
             </a>
           </div>
         </section>

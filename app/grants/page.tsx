@@ -257,7 +257,7 @@ export default function GrantsPage() {
             We&apos;re here to help you figure out your funding options.
           </p>
           <p className="text-slate-700">
-            Call us at{' '}
+            Contact us at{' '}
             <a href="tel:+13173143757" className="font-semibold text-blue-600 hover:underline">
               (317) 314-3757
             </a>{' '}

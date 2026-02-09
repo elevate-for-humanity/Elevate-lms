@@ -765,7 +765,7 @@ export default async function TaxCareersPage() {
 
           <div className="mt-8 text-center">
             <p className="text-black">
-              Questions? Call us at{' '}
+              Questions? Contact us at{' '}
               <a
                 href="tel:3173143757"
                 className="text-green-600 font-bold underline"

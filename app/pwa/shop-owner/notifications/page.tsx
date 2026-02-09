@@ -24,7 +24,7 @@ const NOTIFICATION_ICONS: Record<NotificationType, React.ReactNode> = {
   hours_submitted: <Clock className="w-5 h-5 text-amber-400" />,
   apprentice_joined: <Users className="w-5 h-5 text-green-400" />,
   report_ready: <FileText className="w-5 h-5 text-blue-400" />,
-  reminder: <AlertCircle className="w-5 h-5 text-purple-400" />,
+  reminder: <AlertCircle className="w-5 h-5 text-blue-400" />,
   system: <Bell className="w-5 h-5 text-slate-400" />,
 };
 

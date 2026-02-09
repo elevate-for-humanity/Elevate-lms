@@ -99,7 +99,7 @@ export default function TaxServicesPage() {
             <Link href="/tax" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
               Locations
             </Link>
-            <Link href="/tax" className="px-4 py-2 bg-blue-100 text-purple-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+            <Link href="/tax" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
               What to Bring
             </Link>
             <Link href="/tax/volunteer" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
@@ -455,7 +455,7 @@ export default function TaxServicesPage() {
           </div>
           <p className="mt-8 text-blue-200">
             <Phone className="inline-block w-4 h-4 mr-2" />
-            Questions? Call us at (317) 314-3757
+            Questions? Contact us at (317) 314-3757
           </p>
         </div>
       </section>

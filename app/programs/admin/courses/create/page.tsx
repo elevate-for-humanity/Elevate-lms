@@ -61,7 +61,7 @@ export default async function CreatePage() {
         <Image
           src="/images/courses/home-health-aide-10002413-cover.jpg"
           alt="Create"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority

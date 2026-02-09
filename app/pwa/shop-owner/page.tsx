@@ -62,7 +62,7 @@ function LandingPage() {
 
         <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
           <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-            <FileText className="w-5 h-5 text-purple-400" />
+            <FileText className="w-5 h-5 text-blue-400" />
           </div>
           <div>
             <h3 className="text-white font-semibold">Compliance Reports</h3>
@@ -231,7 +231,7 @@ function Dashboard({
 
           <Link href="/pwa/shop-owner/reports" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
             <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <FileText className="w-6 h-6 text-purple-400" />
+              <FileText className="w-6 h-6 text-blue-400" />
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Reports</p>
@@ -268,7 +268,7 @@ function Dashboard({
                   className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700"
                 >
                   <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
-                    <span className="text-purple-400 font-bold text-lg">
+                    <span className="text-blue-400 font-bold text-lg">
                       {apprentice.name.charAt(0)}
                     </span>
                   </div>

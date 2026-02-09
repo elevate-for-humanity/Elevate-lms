@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { Phone, Clock, MessageSquare, Mail, MapPin, CheckCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Call Now | Elevate For Humanity',
+  title: 'Get Started | Elevate For Humanity',
   description: 'Contact us by phone for immediate assistance with enrollment, programs, and support.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/call-now',
@@ -16,14 +16,14 @@ export default function CallNowPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Call Now' }]} />
+          <Breadcrumbs items={[{ label: 'Get Started' }]} />
         </div>
       </div>
 
       <section className="bg-green-600 text-white py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Phone className="w-16 h-16 mx-auto mb-6" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Call Us Now</h1>
+          <h1 className="text-4xl md:text-5xl font-bold mb-6">Contact Us Now</h1>
           <p className="text-xl text-green-100 mb-8">Speak with a team member about enrollment, programs, or support</p>
           <a href="tel:+13173143757" className="inline-flex items-center gap-3 bg-white text-green-600 px-10 py-5 rounded-full font-bold text-2xl hover:bg-green-50 transition-colors">
             <Phone className="w-8 h-8" />

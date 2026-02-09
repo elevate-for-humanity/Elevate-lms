@@ -63,7 +63,7 @@ export default async function MicroProgramsPage() {
         ]}
       />
       {/* Hero */}
-      <section className="relative bg-purple-800 text-white px-6 sm:px-10 lg:px-12 py-20 lg:py-28">
+      <section className="relative bg-blue-800 text-white px-6 sm:px-10 lg:px-12 py-20 lg:py-28">
         <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
         <div className="mx-auto max-w-5xl text-center">
           <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full mb-6">

@@ -81,7 +81,7 @@ export default async function GroupsPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-purple-900 text-white py-12">
+      <div className="bg-blue-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between">
             <div>

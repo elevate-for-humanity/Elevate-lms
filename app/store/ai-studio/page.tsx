@@ -135,7 +135,7 @@ export default function AIStudioPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="#pricing"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-purple-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-blue-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg"
                 >
                   View Plans
                   <ArrowRight className="w-5 h-5" />
@@ -163,7 +163,7 @@ export default function AIStudioPage() {
                   <div className="w-10 h-10 bg-slate-700 rounded-full" />
                   <div>
                     <p className="text-white font-semibold">Instructor</p>
-                    <p className="text-purple-300 text-sm">AI Healthcare Instructor</p>
+                    <p className="text-blue-300 text-sm">AI Healthcare Instructor</p>
                   </div>
                 </div>
               </div>
@@ -279,7 +279,7 @@ export default function AIStudioPage() {
           </p>
           <Link
             href="/store/ai-studio/checkout?plan=professional"
-            className="inline-flex items-center gap-2 bg-white text-purple-900 px-10 py-5 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg"
+            className="inline-flex items-center gap-2 bg-white text-blue-900 px-10 py-5 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg"
           >
             Start Free Trial
             <ArrowRight className="w-5 h-5" />

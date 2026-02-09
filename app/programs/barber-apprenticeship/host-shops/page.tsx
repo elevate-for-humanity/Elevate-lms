@@ -27,7 +27,7 @@ export default function HostShopsPage() {
         <Image
           src="/images/barber/gallery-1.jpg"
           alt="Professional barbershop interior"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           priority
         />

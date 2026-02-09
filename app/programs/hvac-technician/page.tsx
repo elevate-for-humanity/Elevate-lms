@@ -109,7 +109,7 @@ export default function HVACTechnicianPage() {
         <Image 
           src="/images/trades/hero-program-hvac.jpg" 
           alt="HVAC Technician Training Program" 
-          fill 
+          fill sizes="100vw"
           className="object-cover" 
           priority 
         />
@@ -156,7 +156,7 @@ export default function HVACTechnicianPage() {
               <div className="text-slate-400 text-sm">Certification</div>
             </div>
             <div>
-              <Users className="w-8 h-8 text-purple-400 mx-auto mb-2" />
+              <Users className="w-8 h-8 text-blue-400 mx-auto mb-2" />
               <div className="text-2xl font-bold text-white">$45K+</div>
               <div className="text-slate-400 text-sm">Starting Salary</div>
             </div>
@@ -213,7 +213,7 @@ export default function HVACTechnicianPage() {
               <Image 
                 src="/images/trades/program-hvac-technician.jpg" 
                 alt="HVAC technician working on unit" 
-                fill 
+                fill sizes="100vw"
                 className="object-cover" 
               />
             </div>

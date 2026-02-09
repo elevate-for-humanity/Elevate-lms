@@ -16,7 +16,7 @@ const steps = [
   {
     step: 1,
     title: 'Apply',
-    description: 'Complete a simple online application or call us.',
+    description: 'Complete a simple online application or contact us.',
     image: '/images/success-new/success-1.jpg',
     href: '/apply',
   },

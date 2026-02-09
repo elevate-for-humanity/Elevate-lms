@@ -113,7 +113,7 @@ export default function StartPage() {
               Prefer to Talk?
             </h2>
             <p className="text-gray-600 mb-6">
-              Call us to discuss your tax situation or get help choosing the right option.
+              Contact us to discuss your tax situation or get help choosing the right option.
             </p>
             <a
               href="tel:3173143757"

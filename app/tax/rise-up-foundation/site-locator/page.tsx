@@ -196,7 +196,7 @@ export default function SiteLocatorPage() {
       <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-green-600 p-6">
         <h2 className="text-xl font-bold mb-3">Ready to Get Started?</h2>
         <p className="text-black mb-6">
-          Call us to schedule your appointment or use the IRS locator to find
+          Contact us to schedule your appointment or use the IRS locator to find
           other VITA sites in your area.
         </p>
         <div className="flex flex-wrap gap-4">

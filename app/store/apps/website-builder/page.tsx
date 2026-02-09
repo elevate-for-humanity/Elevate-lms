@@ -159,7 +159,7 @@ export default function WebsiteBuilderAppPage() {
           <p className="text-gray-600 text-center mb-12">Start free, upgrade as you grow</p>
           <div className="grid md:grid-cols-3 gap-8">
             {pricing.map((plan, i) => (
-              <div key={i} className={`rounded-2xl p-8 ${plan.popular ? 'bg-blue-600 text-white ring-4 ring-purple-300' : 'bg-white border border-gray-200'}`}>
+              <div key={i} className={`rounded-2xl p-8 ${plan.popular ? 'bg-blue-600 text-white ring-4 ring-blue-300' : 'bg-white border border-gray-200'}`}>
                 {plan.popular && <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">MOST POPULAR</span>}
                 <h3 className={`text-2xl font-bold mt-4 ${plan.popular ? 'text-white' : 'text-gray-900'}`}>{plan.name}</h3>
                 <div className="mt-4 mb-6">

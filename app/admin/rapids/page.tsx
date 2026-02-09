@@ -114,7 +114,7 @@ export default function RapidsAdminPage() {
               href="/api/admin/rapids/export?type=completions&format=csv"
               className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <Download className="w-5 h-5 text-purple-600" />
+              <Download className="w-5 h-5 text-blue-600" />
               <div>
                 <p className="font-medium text-gray-900">Completions</p>
                 <p className="text-xs text-gray-500">Program completions</p>
@@ -224,7 +224,7 @@ export default function RapidsAdminPage() {
                       {program.totalHours.toLocaleString()} hrs
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                         {program.fundingType === 'self_pay' ? 'Self-Pay' : program.fundingType}
                       </span>
                     </td>

@@ -329,7 +329,7 @@ export default function CareerCounselingPage() {
       </section>
 
       {/* Testimonial */}
-      <section className="py-16 bg-purple-900 text-white">
+      <section className="py-16 bg-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-2xl italic mb-6">
             &quot;Career counseling helped me realize I had more options than I thought. My counselor helped me see how my skills could transfer to a completely new field. Now I am in a career I love.&quot;

@@ -70,7 +70,7 @@ export default async function Page() {
         headline="Direct Support Professional: Make a difference in people's lives"
         description="Funded DSP training. Help individuals with disabilities live independently and participate fully in their communities. 4-6 weeks, job placement included."
         primaryCTA={{ text: 'Start Eligibility & Choose This Program', href: '/apply' }}
-        secondaryCTA={{ text: 'Questions? Call Us', href: 'tel:317-314-3757' }}
+        secondaryCTA={{ text: 'Questions? Contact Us', href: 'tel:317-314-3757' }}
       />
 
       {/* Funding Badge */}
@@ -104,7 +104,7 @@ export default async function Page() {
               <Image
                 src="/images/gallery/image1.jpg"
                 alt="DSP training session"
-                fill
+                fill sizes="100vw"
                 className="object-cover"
               />
             </div>
@@ -288,7 +288,7 @@ export default async function Page() {
               href="tel:317-314-3757"
               className="px-8 py-4 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg transition-all text-center border-2 border-white"
             >
-              Questions? Call Us
+              Questions? Contact Us
             </Link>
           </div>
         </div>

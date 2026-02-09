@@ -120,17 +120,17 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
         {/* Bundle Offer */}
         {bundle && (
           <section className="mb-16">
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-2xl overflow-hidden shadow-xl">
+            <div className="bg-gradient-to-r from-blue-600 to-blue-600 rounded-2xl overflow-hidden shadow-xl">
               <div className="grid lg:grid-cols-2">
                 <div className="p-8 lg:p-12 text-white">
                   <span className="inline-block bg-yellow-400 text-yellow-900 text-xs font-bold px-3 py-1 rounded-full mb-4">
                     BEST VALUE - SAVE ${(Number(bundle.original_price) - Number(bundle.price)).toFixed(0)}
                   </span>
                   <h2 className="text-3xl font-bold mb-2">{bundle.title}</h2>
-                  <p className="text-purple-100 mb-6">{bundle.description}</p>
+                  <p className="text-blue-100 mb-6">{bundle.description}</p>
                   
                   <div className="mb-6">
-                    <p className="text-sm text-purple-200 mb-2">What&apos;s Included:</p>
+                    <p className="text-sm text-blue-200 mb-2">What&apos;s Included:</p>
                     <ul className="space-y-2">
                       {sortedFeatures(bundle.features || []).map((f, i) => (
                         <li key={i} className="flex items-center gap-2">
@@ -143,13 +143,13 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
 
                   <div className="flex items-center gap-4 mb-6">
                     <span className="text-4xl font-bold">${Number(bundle.price).toFixed(0)}</span>
-                    <span className="text-xl text-purple-300 line-through">${Number(bundle.original_price).toFixed(0)}</span>
+                    <span className="text-xl text-blue-300 line-through">${Number(bundle.original_price).toFixed(0)}</span>
                   </div>
 
                   <button
                     onClick={() => addToCart(bundle.id)}
                     disabled={cart.includes(bundle.id)}
-                    className="w-full sm:w-auto bg-white text-purple-600 px-8 py-4 rounded-lg font-bold hover:bg-purple-50 transition disabled:bg-green-100 disabled:text-green-600 flex items-center justify-center gap-2"
+                    className="w-full sm:w-auto bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-blue-50 transition disabled:bg-green-100 disabled:text-green-600 flex items-center justify-center gap-2"
                   >
                     {cart.includes(bundle.id) ? (
                       <>
@@ -209,7 +209,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
 
                   <div className="p-6 flex-1 flex flex-col">
                     <h3 className="text-xl font-bold text-gray-900 mb-1">{course.title}</h3>
-                    <p className="text-sm text-purple-600 font-medium mb-3">{course.subtitle}</p>
+                    <p className="text-sm text-blue-600 font-medium mb-3">{course.subtitle}</p>
                     <p className="text-gray-600 text-sm mb-4 flex-1">{course.description}</p>
 
                     <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">

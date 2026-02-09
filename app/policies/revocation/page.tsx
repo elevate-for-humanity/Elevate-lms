@@ -69,7 +69,7 @@ export default function RevocationPage() {
               </ul>
             </div>
 
-            <div className="bg-blue-50 border-l-4 border-purple-400 p-6 mb-6">
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Serious Misconduct</h3>
               <p className="text-black mb-2">Discovered after graduation:</p>
               <ul className="list-disc pl-6 text-black space-y-1">

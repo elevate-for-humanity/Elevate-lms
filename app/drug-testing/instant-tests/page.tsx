@@ -209,7 +209,7 @@ export default function InstantTestsPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need Fast Results?</h2>
           <p className="text-xl text-green-100 mb-8">
-            Call now to schedule instant testing at a location near you.
+            Schedule online to schedule instant testing at a location near you.
           </p>
           <a
             href="tel:+13173143757"

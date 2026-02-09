@@ -27,7 +27,7 @@ export const metadata: Metadata = {
 const credentials = [
   { icon: Shield, title: 'DOL Registered', desc: 'Apprenticeship Sponsor', color: 'blue' },
   { icon: CheckCircle, title: 'WIOA Approved', desc: 'Training Provider', color: 'green' },
-  { icon: Building, title: 'Indiana DWD', desc: 'INTraining Provider', color: 'purple' },
+  { icon: Building, title: 'Indiana DWD', desc: 'INTraining Provider', color: 'blue' },
   { icon: GraduationCap, title: 'Indiana DOE', desc: 'State Recognized', color: 'indigo' },
   { icon: Heart, title: 'JRI Approved', desc: 'Justice Programs', color: 'red' },
   { icon: Award, title: 'Certiport CATC', desc: 'Testing Center', color: 'orange' },

@@ -172,7 +172,7 @@ export default async function BarberApprenticeshipPage() {
               <Image
                 src={src}
                 alt={`Barber apprenticeship gallery ${idx + 1}`}
-                fill
+                fill sizes="100vw"
                 className="object-cover object-center"
               />
             </div>
@@ -377,7 +377,7 @@ export default async function BarberApprenticeshipPage() {
             </ul>
           </div>
           <div className="relative aspect-[4/3] max-w-md mx-auto rounded-2xl overflow-hidden shadow-lg">
-            <Image src={IMAGES.training} alt="Hands-on barber training" fill className="object-cover object-center" />
+            <Image src={IMAGES.training} alt="Hands-on barber training" fill sizes="100vw" className="object-cover object-center" />
           </div>
         </div>
       </section>

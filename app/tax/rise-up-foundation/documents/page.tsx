@@ -333,7 +333,7 @@ export default function DocumentsPage() {
       <section className="mt-8 rounded-2xl bg-green-50 border-l-4 border-brand-green-600 p-6">
         <h2 className="text-xl font-bold mb-3">Questions About Documents?</h2>
         <p className="text-black mb-6">
-          Not sure if you have everything? Call us and we'll help you prepare
+          Not sure if you have everything? Contact us and we'll help you prepare
           for your appointment.
         </p>
         <div className="flex flex-wrap gap-4">

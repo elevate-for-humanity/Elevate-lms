@@ -55,7 +55,7 @@ export default async function BusinessFinancialPage() {
           <Image
             src="/images/pathways/trades-hero.jpg"
             alt="Business & Financial Programs"
-            fill
+            fill sizes="100vw"
             priority
             sizes="100vw"
             className="object-cover"

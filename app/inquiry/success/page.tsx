@@ -42,7 +42,7 @@ export default function InquirySuccessPage() {
               className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
             >
               <Phone className="w-4 h-4" />
-              Call Us
+              Contact Us
             </a>
             <a
               href="mailto:elevate4humanityedu@gmail.com"

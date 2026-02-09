@@ -102,7 +102,7 @@ export function CourseDetailClient({ course }: { course: Course }) {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <Tag className="w-6 h-6 text-purple-600" />
+              <Tag className="w-6 h-6 text-blue-600" />
               <span className="font-medium text-gray-900">Have a promo code?</span>
               <div className="flex gap-2">
                 <input
@@ -127,7 +127,7 @@ export function CourseDetailClient({ course }: { course: Course }) {
                   <button
                     onClick={validatePromo}
                     disabled={validating || !promoCode.trim()}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-300"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300"
                   >
                     {validating ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Apply'}
                   </button>
@@ -148,7 +148,7 @@ export function CourseDetailClient({ course }: { course: Course }) {
               <button
                 onClick={handlePurchase}
                 disabled={purchasing}
-                className="flex items-center gap-2 bg-purple-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-purple-700 disabled:bg-gray-400"
+                className="flex items-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400"
               >
                 {purchasing ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -183,13 +183,13 @@ export function CourseDetailClient({ course }: { course: Course }) {
               <div className="flex items-center gap-2">
                 {promoApplied ? (
                   <>
-                    <span className="text-xl font-bold text-purple-600">${finalPrice.toFixed(0)}</span>
+                    <span className="text-xl font-bold text-blue-600">${finalPrice.toFixed(0)}</span>
                     <span className="text-gray-400 line-through">${Number(course.price).toFixed(0)}</span>
                     <span className="text-green-600 text-sm">({promoApplied.promo.code} applied)</span>
                   </>
                 ) : (
                   <>
-                    <span className="text-xl font-bold text-purple-600">${Number(course.price).toFixed(0)}</span>
+                    <span className="text-xl font-bold text-blue-600">${Number(course.price).toFixed(0)}</span>
                     {course.original_price && (
                       <span className="text-gray-400 line-through">${Number(course.original_price).toFixed(0)}</span>
                     )}
@@ -200,7 +200,7 @@ export function CourseDetailClient({ course }: { course: Course }) {
             <button
               onClick={handlePurchase}
               disabled={purchasing}
-              className="flex items-center gap-2 bg-purple-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-purple-700 disabled:bg-gray-400"
+              className="flex items-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 disabled:bg-gray-400"
             >
               {purchasing ? (
                 <Loader2 className="w-5 h-5 animate-spin" />

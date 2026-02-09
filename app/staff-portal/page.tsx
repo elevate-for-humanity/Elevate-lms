@@ -48,7 +48,7 @@ export default function StaffPortalLanding() {
             <Link href="/login?redirect=/staff-portal/dashboard" className="px-8 py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-blue-50">
               Sign In
             </Link>
-            <Link href="/onboarding/staff" className="px-8 py-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-purple-400">
+            <Link href="/onboarding/staff" className="px-8 py-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400">
               Staff Onboarding
             </Link>
           </div>

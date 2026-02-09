@@ -288,10 +288,10 @@ export default function ContactPage() {
         <div className="space-y-4">
           {[
             { q: 'What are your office hours?', a: 'Our team is available Monday-Friday, 9am-5pm EST. You can leave a message anytime and we\'ll respond within 1-2 business days.' },
-            { q: 'How quickly will I get a response?', a: 'We typically respond to inquiries within 1-2 business days. For urgent matters, please call us directly at (317) 314-3757.' },
-            { q: 'Can I visit your office in person?', a: 'Yes, but please schedule an appointment first. Training locations vary by program. Call us to arrange a visit.' },
-            { q: 'Who should I contact about enrollment?', a: 'For enrollment questions, select "Enrollment Questions" in the contact form or call us directly. Our enrollment team will assist you.' },
-            { q: 'How do I check my application status?', a: 'Log into your student dashboard to check status, or call us with your name and the program you applied for.' },
+            { q: 'How quickly will I get a response?', a: 'We typically respond to inquiries within 1-2 business days. For urgent matters, please contact us directly at (317) 314-3757.' },
+            { q: 'Can I visit your office in person?', a: 'Yes, but please schedule an appointment first. Training locations vary by program. Contact us to arrange a visit.' },
+            { q: 'Who should I contact about enrollment?', a: 'For enrollment questions, select "Enrollment Questions" in the contact form or contact us directly. Our enrollment team will assist you.' },
+            { q: 'How do I check my application status?', a: 'Log into your student dashboard to check status, or contact us with your name and the program you applied for.' },
             { q: 'I\'m an employer - who do I contact?', a: 'Select "Employer Partnership" in the contact form or email us directly. Our employer relations team will reach out to discuss partnership opportunities.' },
           ].map((faq, i) => (
             <details key={i} className="bg-slate-50 rounded-xl overflow-hidden group">

@@ -178,15 +178,15 @@ export default function WeeklySummaryPage() {
         {/* Cumulative Progress */}
         <div className="bg-blue-500/20 border border-blue-500/30 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="w-5 h-5 text-purple-400" />
-            <span className="text-purple-300 font-medium">Overall Progress</span>
+            <TrendingUp className="w-5 h-5 text-blue-400" />
+            <span className="text-blue-300 font-medium">Overall Progress</span>
           </div>
           <div className="flex items-end justify-between mb-3">
             <div>
               <p className="text-3xl font-bold text-white">{summary.cumulativeHours}</p>
               <p className="text-blue-200 text-sm">of 2,000 hours</p>
             </div>
-            <p className="text-2xl font-bold text-purple-300">{summary.progressPercent}%</p>
+            <p className="text-2xl font-bold text-blue-300">{summary.progressPercent}%</p>
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
             <div 

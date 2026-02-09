@@ -41,7 +41,7 @@ const DEMO_TOURS = [
     title: 'Partner / Employer License',
     description: 'Employer portal for hiring, apprenticeship management, and workforce pipeline access. Ideal for employers and industry partners.',
     icon: Building2,
-    color: 'purple',
+    color: 'blue',
     features: [
       'Candidate pipeline access',
       'Apprenticeship tracking',
@@ -132,7 +132,7 @@ export default function DemoHubPage() {
                   border: 'hover:border-green-500',
                   cta: 'text-green-600',
                 },
-                purple: {
+                blue: {
                   bg: 'bg-blue-100',
                   bgHover: 'group-hover:bg-blue-500',
                   text: 'text-blue-600',
@@ -212,7 +212,7 @@ export default function DemoHubPage() {
               </Link>
               <Link
                 href="/demo/employer"
-                className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-purple-300 hover:bg-blue-50 transition"
+                className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition"
               >
                 <Building2 className="w-6 h-6 text-blue-600" />
                 <div>

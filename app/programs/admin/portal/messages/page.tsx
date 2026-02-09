@@ -69,7 +69,7 @@ export default async function MessagesPage() {
         <Image
           src="/images/homepage/student-portal-interface.png"
           alt="Messages"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority

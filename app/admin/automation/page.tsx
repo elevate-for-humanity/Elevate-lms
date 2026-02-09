@@ -79,7 +79,7 @@ export default async function AutomationLogPage() {
     { label: 'Emails Sent', value: emailsSent, icon: Mail, color: 'green' },
     { label: 'Emails Failed', value: emailsFailed, icon: XCircle, color: 'red' },
     { label: 'SMS Sent', value: smsSent, icon: Bell, color: 'blue' },
-    { label: 'Notifications', value: notificationCount, icon: Bell, color: 'purple' },
+    { label: 'Notifications', value: notificationCount, icon: Bell, color: 'blue' },
   ];
 
   const formatTime = (dateStr: string) => {

@@ -202,7 +202,7 @@ export default function QuestionManagerClient({ quiz, initialQuestions, quizId, 
           <p className="text-sm text-gray-500">Passing Score</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4 text-center">
-          <p className="text-2xl font-bold text-purple-600">{quiz?.time_limit_minutes || 'No'}</p>
+          <p className="text-2xl font-bold text-blue-600">{quiz?.time_limit_minutes || 'No'}</p>
           <p className="text-sm text-gray-500">Time Limit (min)</p>
         </div>
       </div>

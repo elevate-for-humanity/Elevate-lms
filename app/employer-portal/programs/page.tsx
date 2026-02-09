@@ -53,7 +53,7 @@ export default function EmployerProgramsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Programs" }]} />
-<div className="relative h-64 bg-purple-800">
+<div className="relative h-64 bg-blue-800">
         <Image
           src="/images/community/community-hero.jpg"
           alt="Employer programs"
@@ -73,7 +73,7 @@ export default function EmployerProgramsPage() {
           {[
             { icon: DollarSign, label: 'Total Savings Available', value: '$50,000+', color: 'green' },
             { icon: Users, label: 'Eligible Candidates', value: '2,500+', color: 'blue' },
-            { icon: Award, label: 'Active Programs', value: '4', color: 'purple' },
+            { icon: Award, label: 'Active Programs', value: '4', color: 'blue' },
             { icon: Clock, label: 'Avg. Processing Time', value: '2-4 weeks', color: 'orange' },
           ].map((stat, index) => (
             <div key={index} className="bg-white rounded-xl p-6 shadow-sm">

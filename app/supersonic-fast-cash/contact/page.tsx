@@ -45,7 +45,7 @@ export default function ContactPage() {
 
       setSuccess(true);
     } catch (err) {
-      setError('Failed to send message. Please call us at (317) 314-3757.');
+      setError('Failed to send message. Please contact us at (317) 314-3757.');
     } finally {
       setLoading(false);
     }
@@ -77,7 +77,7 @@ export default function ContactPage() {
             <a href="tel:+13173143757" className="text-blue-600 hover:text-blue-800 font-semibold text-lg">
               (317) 314-3757
             </a>
-            <p className="text-gray-600 mt-2 text-sm">Call us for immediate assistance</p>
+            <p className="text-gray-600 mt-2 text-sm">Contact us for immediate assistance</p>
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center hover:border-blue-600 transition">

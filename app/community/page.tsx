@@ -359,7 +359,7 @@ export default async function CommunityPage() {
             </Link>
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-blue-700 text-white font-semibold rounded-lg hover:bg-purple-800 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-800 transition-colors"
             >
               Start Training
             </Link>

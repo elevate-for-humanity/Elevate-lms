@@ -169,7 +169,7 @@ export default function VolunteerPage() {
             <div>
               <h3 className="font-semibold text-lg">Express Interest</h3>
               <p className="text-black mt-1">
-                Call us at 317-314-3757 or email to express your interest in
+                Contact us at 317-314-3757 or email to express your interest in
                 volunteering.
               </p>
             </div>

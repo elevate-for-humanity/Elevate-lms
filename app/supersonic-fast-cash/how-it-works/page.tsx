@@ -258,7 +258,7 @@ export default function HowItWorksPage() {
             Ready to Get Started?
           </h2>
           <p className="text-gray-300 text-lg mb-8">
-            File online, visit a location, or call us. We're here to help you get your maximum refund.
+            File online, visit a location, or contact us. We're here to help you get your maximum refund.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link

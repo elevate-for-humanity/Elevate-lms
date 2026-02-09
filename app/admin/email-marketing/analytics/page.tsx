@@ -293,7 +293,7 @@ export default function AnalyticsPage() {
             title="Click Rate"
             value={`${data.overview.clickRate.toFixed(1)}%`}
             icon={MousePointerClick}
-            color="purple"
+            color="blue"
             trend={
               data.overview.clickRate > 8
                 ? 'up'
@@ -514,7 +514,7 @@ interface StatCardProps {
   title: string;
   value: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: 'blue' | 'green' | 'purple' | 'red';
+  color: 'blue' | 'green' | 'blue' | 'red';
   trend: 'up' | 'down' | null;
 }
 
@@ -522,7 +522,7 @@ function StatCard({ title, value, icon: Icon, color, trend }: StatCardProps) {
   const colorClasses = {
     blue: 'text-brand-blue-600 bg-blue-50',
     green: 'text-brand-green-600 bg-green-50',
-    purple: 'text-blue-600 bg-blue-50',
+    blue: 'text-blue-600 bg-blue-50',
     red: 'text-brand-orange-600 bg-red-50',
   };
 

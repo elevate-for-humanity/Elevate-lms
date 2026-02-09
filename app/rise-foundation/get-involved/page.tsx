@@ -51,7 +51,7 @@ export default async function GetInvolvedPage() {
       title: 'Donate',
       description: 'Your financial support enables us to provide free services to those in need.',
       href: '/donate',
-      color: 'purple',
+      color: 'blue',
       image: '/images/rise-foundation/donate.jpg',
     },
     {
@@ -189,7 +189,7 @@ export default async function GetInvolvedPage() {
             </a>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-purple-400 border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-400 border-2 border-white"
             >
               <Mail className="w-5 h-5" /> Email Us
             </Link>

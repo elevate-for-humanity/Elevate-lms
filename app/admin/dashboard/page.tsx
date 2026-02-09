@@ -328,16 +328,16 @@ export default async function AdminDashboardOrchestrated() {
           </h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
             <div className="bg-blue-50 rounded-lg shadow-sm border border-blue-200 p-4 sm:p-6">
-              <div className="text-2xl sm:text-3xl font-bold text-purple-900 mb-1 sm:mb-2">
+              <div className="text-2xl sm:text-3xl font-bold text-blue-900 mb-1 sm:mb-2">
                 {partnerEnrollmentsTotal || 0}
               </div>
-              <div className="text-xs sm:text-sm text-purple-900">Partner Total</div>
+              <div className="text-xs sm:text-sm text-blue-900">Partner Total</div>
             </div>
             <div className="bg-blue-50 rounded-lg shadow-sm border border-blue-600 p-4 sm:p-6">
-              <div className="text-2xl sm:text-3xl font-bold text-purple-900 mb-1 sm:mb-2">
+              <div className="text-2xl sm:text-3xl font-bold text-blue-900 mb-1 sm:mb-2">
                 {partnerEnrollmentsActive || 0}
               </div>
-              <div className="text-xs sm:text-sm text-purple-900">Partner Active</div>
+              <div className="text-xs sm:text-sm text-blue-900">Partner Active</div>
             </div>
             <div className="bg-orange-50 rounded-lg shadow-sm border border-orange-200 p-4 sm:p-6">
               <div className="text-2xl sm:text-3xl font-bold text-orange-900 mb-1 sm:mb-2">
@@ -898,14 +898,14 @@ export default async function AdminDashboardOrchestrated() {
             <Link
               href="/admin/promo-codes"
               aria-label="Promo Codes"
-              className="p-3 bg-blue-50 border border-blue-200 rounded-lg hover:border-blue-500 hover:shadow text-sm font-medium text-purple-900"
+              className="p-3 bg-blue-50 border border-blue-200 rounded-lg hover:border-blue-500 hover:shadow text-sm font-medium text-blue-900"
             >
               Promo Codes
             </Link>
             <Link
               href="/admin/career-courses/create"
               aria-label="Course Creator"
-              className="p-3 bg-blue-50 border border-blue-200 rounded-lg hover:border-blue-500 hover:shadow text-sm font-medium text-purple-900"
+              className="p-3 bg-blue-50 border border-blue-200 rounded-lg hover:border-blue-500 hover:shadow text-sm font-medium text-blue-900"
             >
               Course Creator (AI)
             </Link>

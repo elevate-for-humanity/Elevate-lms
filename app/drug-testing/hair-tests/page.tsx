@@ -68,7 +68,7 @@ export default function HairTestsPage() {
         <Breadcrumbs items={[{ label: "Drug Testing", href: "/drug-testing" }, { label: "Hair Tests" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 bg-purple-900 text-white">
+      <section className="relative py-20 bg-blue-900 text-white">
         <div className="max-w-6xl mx-auto px-6">
           <Link href="/drug-testing" className="inline-flex items-center gap-2 text-blue-200 hover:text-white mb-6 transition">
             <ArrowLeft className="w-4 h-4" />

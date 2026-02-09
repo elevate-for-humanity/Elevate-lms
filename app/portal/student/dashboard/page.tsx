@@ -96,7 +96,7 @@ export default async function StudentDashboardPage() {
             <p className="text-gray-600 text-sm">Hours Logged</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <Award className="w-8 h-8 text-purple-500 mb-2" />
+            <Award className="w-8 h-8 text-blue-500 mb-2" />
             <p className="text-2xl font-bold">{certificates?.length || 0}</p>
             <p className="text-gray-600 text-sm">Certificates Earned</p>
           </div>

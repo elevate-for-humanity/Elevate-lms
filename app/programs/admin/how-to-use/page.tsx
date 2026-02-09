@@ -67,7 +67,7 @@ export default async function HowToUsePage() {
         <Image
           src="/images/homepage/student-portal-interface.png"
           alt="How To Use"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority

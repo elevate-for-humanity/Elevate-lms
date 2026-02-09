@@ -47,7 +47,7 @@ export default function NotificationsClient({ userId, initialNotifications, unre
       case 'achievement':
         return <Award className="w-5 h-5 text-yellow-500" />;
       case 'event':
-        return <Calendar className="w-5 h-5 text-purple-500" />;
+        return <Calendar className="w-5 h-5 text-blue-500" />;
       case 'group':
         return <Users className="w-5 h-5 text-green-500" />;
       case 'course':

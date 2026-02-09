@@ -340,7 +340,7 @@ export default function DotTestingPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need DOT-Compliant Testing?</h2>
           <p className="text-xl text-orange-100 mb-8">
-            We ensure full compliance with all FMCSA regulations. Call now for same-day appointments.
+            We ensure full compliance with all FMCSA regulations. Schedule online for same-day appointments.
           </p>
           <a
             href="tel:+13173143757"

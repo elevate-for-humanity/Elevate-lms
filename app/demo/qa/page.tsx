@@ -42,7 +42,7 @@ export default function DemoQAPage() {
                   href="/demo/tour/partner_employer?step=1"
                   className="block p-4 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 transition"
                 >
-                  <div className="font-semibold text-purple-900">Partner Employer Tour</div>
+                  <div className="font-semibold text-blue-900">Partner Employer Tour</div>
                   <div className="text-sm text-blue-700">6 steps • Employer portal flow</div>
                 </Link>
                 <Link

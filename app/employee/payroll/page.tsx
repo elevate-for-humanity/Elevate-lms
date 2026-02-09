@@ -47,7 +47,7 @@ export default function PayrollPage() {
               <p className="text-sm text-gray-600 mb-1">Hours Worked</p>
               <p className="text-lg font-bold text-gray-900">72 hours</p>
             </div>
-            <div className="bg-purple-50 rounded-lg p-4">
+            <div className="bg-blue-50 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Estimated Gross</p>
               <p className="text-lg font-bold text-gray-900">$2,450.00</p>
             </div>

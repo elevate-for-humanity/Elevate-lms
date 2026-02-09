@@ -48,8 +48,8 @@ export default function EstheticianOrientationPage() {
           <p>The {config.programTitle} requires <strong>{config.hoursLabel}</strong> of combined training:</p>
           <div className="grid gap-4 mt-4">
             <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-bold text-purple-900">On-the-Job Training (OJT)</h4>
-              <p className="text-purple-800 text-sm">{config.ojtDescription}</p>
+              <h4 className="font-bold text-blue-900">On-the-Job Training (OJT)</h4>
+              <p className="text-blue-800 text-sm">{config.ojtDescription}</p>
             </div>
             <div className="bg-indigo-50 p-4 rounded-lg">
               <h4 className="font-bold text-indigo-900">Related Technical Instruction (RTI)</h4>

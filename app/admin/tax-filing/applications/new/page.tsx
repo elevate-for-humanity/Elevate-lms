@@ -98,7 +98,7 @@ export default function NewTaxFilingApplicationPage() {
             
             <div className="space-y-4">
               {['W-2 Employment', '1099 Self-Employment', 'Unemployment Benefits', 'Social Security', 'Other Income'].map((source) => (
-                <label key={source} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
+                <label key={source} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-blue-300">
                   <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
                   <span className="text-gray-700">{source}</span>
                 </label>
@@ -109,7 +109,7 @@ export default function NewTaxFilingApplicationPage() {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-6">Documents</h2>
             
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-purple-400 transition cursor-pointer">
+            <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition cursor-pointer">
               <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
               <p className="text-sm text-gray-600 mb-1">Click to upload or drag and drop</p>
               <p className="text-xs text-gray-500">W-2s, 1099s, ID, and other tax documents</p>

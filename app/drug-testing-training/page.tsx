@@ -492,7 +492,7 @@ export default async function DrugTestingTrainingPage() {
         <div className="mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Get Certified?</h2>
           <p className="text-xl text-blue-100 mb-8">
-            Call us to enroll in training or get answers to your questions.
+            Contact us to enroll in training or get answers to your questions.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

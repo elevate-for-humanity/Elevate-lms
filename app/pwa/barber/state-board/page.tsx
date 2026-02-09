@@ -45,7 +45,7 @@ const STUDY_TOPICS: StudyTopic[] = [
 
 const CATEGORY_COLORS = {
   theory: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  practical: { bg: 'bg-blue-500/20', text: 'text-purple-400' },
+  practical: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
   sanitation: { bg: 'bg-green-500/20', text: 'text-green-400' },
   laws: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
 };

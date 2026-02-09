@@ -600,7 +600,7 @@ export default function CurvatureShopPage() {
                           className="object-cover group-hover:scale-105 transition"
                         />
                       ) : (
-                        <Sparkles className="w-16 h-16 text-purple-300 group-hover:scale-110 transition" />
+                        <Sparkles className="w-16 h-16 text-blue-300 group-hover:scale-110 transition" />
                       )}
                       {product.badge && (
                         <span className="absolute top-3 left-3 px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded-full z-10">
@@ -615,7 +615,7 @@ export default function CurvatureShopPage() {
                       <p className="text-gray-600 text-sm mb-3 line-clamp-2">{product.description}</p>
                       {product.ingredients && (
                         <details className="mb-3">
-                          <summary className="text-xs text-blue-600 cursor-pointer hover:text-purple-800 font-medium">
+                          <summary className="text-xs text-blue-600 cursor-pointer hover:text-blue-800 font-medium">
                             View Ingredients
                           </summary>
                           <p className="text-xs text-gray-500 mt-2 leading-relaxed">
@@ -659,7 +659,7 @@ export default function CurvatureShopPage() {
       </section>
 
       {/* Partnership Banner */}
-      <section className="py-12 bg-purple-900 text-white">
+      <section className="py-12 bg-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Heart className="w-12 h-12 text-pink-400 mx-auto mb-4" />
           <h2 className="text-2xl font-bold mb-4">Supporting Mental Wellness</h2>
@@ -670,7 +670,7 @@ export default function CurvatureShopPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/nonprofit/mental-wellness"
-              className="px-6 py-3 bg-white text-purple-900 font-medium rounded-lg hover:bg-blue-50 transition"
+              className="px-6 py-3 bg-white text-blue-900 font-medium rounded-lg hover:bg-blue-50 transition"
             >
               Learn About Selfish Inc.
             </Link>

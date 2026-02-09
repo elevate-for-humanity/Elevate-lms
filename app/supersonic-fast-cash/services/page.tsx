@@ -270,7 +270,7 @@ export default async function ServicesPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Ready to Get Started?</h2>
           <p className="text-lg text-white mb-8">
-            Schedule your appointment today or call us for immediate assistance
+            Schedule your appointment today or contact us for immediate assistance
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

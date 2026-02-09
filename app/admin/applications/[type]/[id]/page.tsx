@@ -30,7 +30,7 @@ const stateColors: Record<string, string> = {
   submitted: 'bg-blue-100 text-blue-800 border-blue-300',
   approved: 'bg-green-100 text-green-800 border-green-300',
   rejected: 'bg-red-100 text-red-800 border-red-300',
-  in_review: 'bg-purple-100 text-purple-800 border-purple-300',
+  in_review: 'bg-blue-100 text-blue-800 border-blue-300',
   eligibility_complete: 'bg-blue-100 text-blue-800 border-blue-300',
   documents_complete: 'bg-indigo-100 text-indigo-800 border-indigo-300',
   review_ready: 'bg-yellow-100 text-yellow-800 border-yellow-300',

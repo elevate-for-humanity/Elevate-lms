@@ -54,7 +54,7 @@ export default async function AdminPage() {
         <Image
           src="/images/heroes/hero-employers.jpg"
           alt="Program Holder Admin Portal"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority
@@ -153,7 +153,7 @@ export default async function AdminPage() {
                 <Image
                   src="/images/technology/hero-programs-technology.jpg"
                   alt="Admin"
-                  fill
+                  fill sizes="100vw"
                   className="object-cover"
                   quality={100}
                   sizes="(max-width: 768px) 100vw, 50vw"

@@ -277,14 +277,14 @@ export default async function ShopOnboardingPage() {
         </div>
 
         {/* Sponsor of Record */}
-        <div className="bg-purple-50 border border-purple-200 rounded-xl p-6 mb-6">
-          <h3 className="text-lg font-bold text-purple-900 mb-3">
+        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
+          <h3 className="text-lg font-bold text-blue-900 mb-3">
             Sponsor of Record
           </h3>
-          <p className="text-sm text-purple-900 mb-2">
+          <p className="text-sm text-blue-900 mb-2">
             Elevate for Humanity is the program brand operated by 2Exclusive LLC, the USDOL Registered Apprenticeship Sponsor of Record.
           </p>
-          <p className="text-sm text-purple-800">
+          <p className="text-sm text-blue-800">
             Partner training sites provide supervised practical training and validate training hours. Partners do not set wages, provide payroll services, or guarantee employment.
           </p>
         </div>

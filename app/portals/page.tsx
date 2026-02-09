@@ -58,7 +58,7 @@ const portals = [
     description:
       'Collaborate on programs, access partnership resources, track referrals, and manage your organization\'s involvement with Elevate.',
     href: '/partner-portal',
-    color: 'purple',
+    color: 'blue',
     features: ['Program Collaboration', 'Referral Tracking', 'Resource Library', 'Impact Reports'],
   },
   {
@@ -93,7 +93,7 @@ const portals = [
 const colorClasses: Record<string, { bg: string; text: string; border: string; light: string }> = {
   blue: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
   green: { bg: 'bg-green-600', text: 'text-green-600', border: 'border-green-200', light: 'bg-green-50' },
-  purple: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
+  blue: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
   orange: { bg: 'bg-orange-600', text: 'text-orange-600', border: 'border-orange-200', light: 'bg-orange-50' },
   teal: { bg: 'bg-teal-600', text: 'text-teal-600', border: 'border-teal-200', light: 'bg-teal-50' },
   indigo: { bg: 'bg-indigo-600', text: 'text-indigo-600', border: 'border-indigo-200', light: 'bg-indigo-50' },
@@ -125,7 +125,7 @@ export default function PortalsPage() {
               <span>24/7 Availability</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-purple-400" />
+              <CheckCircle className="w-5 h-5 text-blue-400" />
               <span>Real-Time Updates</span>
             </div>
           </div>

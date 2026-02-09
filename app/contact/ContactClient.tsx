@@ -147,7 +147,7 @@ export default function ContactClient() {
 
         <div className="max-w-5xl mx-auto px-4 relative z-10">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            {/* Left: Call Now */}
+            {/* Left: Get Started */}
             <div className="bg-white rounded-3xl p-10 shadow-xl">
               <div className="w-20 h-20 bg-zinc-900   rounded-3xl flex items-center justify-center mb-6 transform hover:scale-110 transition-transform">
                 <span className="text-4xl">
@@ -155,7 +155,7 @@ export default function ContactClient() {
                 </span>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-black mb-4">
-                Prefer to call now?
+                Prefer to get started?
               </h2>
               <p className="text-black mb-6 leading-relaxed">
                 You can reach us Monday-Friday, 8am-5pm EST. Our advisors are

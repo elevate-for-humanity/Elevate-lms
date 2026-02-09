@@ -109,16 +109,16 @@ export default function ApprenticeEnrollmentPage() {
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
                     isActive
-                      ? 'bg-purple-600 text-white'
+                      ? 'bg-blue-600 text-white'
                       : 'bg-gray-200 text-gray-500'
-                  } ${isCurrent ? 'ring-4 ring-purple-200' : ''}`}
+                  } ${isCurrent ? 'ring-4 ring-blue-200' : ''}`}
                 >
                   {i + 1}
                 </div>
                 <span className={`ml-2 text-sm ${isActive ? 'text-gray-900' : 'text-gray-500'}`}>
                   {label}
                 </span>
-                {i < 3 && <div className={`w-8 h-0.5 mx-2 ${isActive ? 'bg-purple-600' : 'bg-gray-200'}`} />}
+                {i < 3 && <div className={`w-8 h-0.5 mx-2 ${isActive ? 'bg-blue-600' : 'bg-gray-200'}`} />}
               </div>
             );
           })}
@@ -138,7 +138,7 @@ export default function ApprenticeEnrollmentPage() {
                     required
                     value={intakeData.fullName}
                     onChange={(e) => setIntakeData({ ...intakeData, fullName: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -148,7 +148,7 @@ export default function ApprenticeEnrollmentPage() {
                     required
                     value={intakeData.email}
                     onChange={(e) => setIntakeData({ ...intakeData, email: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -158,7 +158,7 @@ export default function ApprenticeEnrollmentPage() {
                     required
                     value={intakeData.phone}
                     onChange={(e) => setIntakeData({ ...intakeData, phone: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -168,7 +168,7 @@ export default function ApprenticeEnrollmentPage() {
                     required
                     value={intakeData.dateOfBirth}
                     onChange={(e) => setIntakeData({ ...intakeData, dateOfBirth: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -180,7 +180,7 @@ export default function ApprenticeEnrollmentPage() {
                   required
                   value={intakeData.address}
                   onChange={(e) => setIntakeData({ ...intakeData, address: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -192,7 +192,7 @@ export default function ApprenticeEnrollmentPage() {
                     required
                     value={intakeData.city}
                     onChange={(e) => setIntakeData({ ...intakeData, city: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -201,7 +201,7 @@ export default function ApprenticeEnrollmentPage() {
                     required
                     value={intakeData.state}
                     onChange={(e) => setIntakeData({ ...intakeData, state: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   >
                     <option value="IN">Indiana</option>
                     <option value="IL">Illinois</option>
@@ -217,7 +217,7 @@ export default function ApprenticeEnrollmentPage() {
                     required
                     value={intakeData.zip}
                     onChange={(e) => setIntakeData({ ...intakeData, zip: e.target.value })}
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -228,7 +228,7 @@ export default function ApprenticeEnrollmentPage() {
                   id="diploma"
                   checked={intakeData.hasHighSchoolDiploma}
                   onChange={(e) => setIntakeData({ ...intakeData, hasHighSchoolDiploma: e.target.checked })}
-                  className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                  className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
                 />
                 <label htmlFor="diploma" className="text-sm text-gray-700">
                   I have a high school diploma or GED
@@ -242,7 +242,7 @@ export default function ApprenticeEnrollmentPage() {
                   onChange={(e) => setIntakeData({ ...intakeData, priorExperience: e.target.value })}
                   placeholder="Describe any prior experience (or write 'None')"
                   rows={3}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -251,7 +251,7 @@ export default function ApprenticeEnrollmentPage() {
                 <select
                   value={intakeData.preferredSchedule}
                   onChange={(e) => setIntakeData({ ...intakeData, preferredSchedule: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="">Select...</option>
                   <option value="full-time">Full-time (40 hrs/week)</option>
@@ -266,13 +266,13 @@ export default function ApprenticeEnrollmentPage() {
                   type="text"
                   value={intakeData.howDidYouHear}
                   onChange={(e) => setIntakeData({ ...intakeData, howDidYouHear: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition flex items-center justify-center gap-2"
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2"
               >
                 Continue to Review
                 <ArrowRight className="w-5 h-5" />
@@ -302,7 +302,7 @@ export default function ApprenticeEnrollmentPage() {
                 </button>
                 <button
                   onClick={() => setStep('agreement')}
-                  className="flex-1 bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition flex items-center justify-center gap-2"
+                  className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2"
                 >
                   Continue
                   <ArrowRight className="w-5 h-5" />
@@ -393,7 +393,7 @@ export default function ApprenticeEnrollmentPage() {
                     id="agreement"
                     checked={agreementAccepted}
                     onChange={(e) => setAgreementAccepted(e.target.checked)}
-                    className="w-5 h-5 text-purple-600 rounded focus:ring-purple-500 mt-0.5"
+                    className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 mt-0.5"
                     required
                   />
                   <label htmlFor="agreement" className="text-sm text-gray-700">
@@ -411,7 +411,7 @@ export default function ApprenticeEnrollmentPage() {
                     value={agreementName}
                     onChange={(e) => setAgreementName(e.target.value)}
                     placeholder="Full Legal Name"
-                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -431,7 +431,7 @@ export default function ApprenticeEnrollmentPage() {
                 <button
                   type="submit"
                   disabled={!agreementAccepted || !agreementName.trim() || isSubmitting}
-                  className="flex-1 bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? 'Submitting...' : 'Submit Application'}
                 </button>
@@ -455,7 +455,7 @@ export default function ApprenticeEnrollmentPage() {
               </div>
               <Link
                 href="/programs/barber-apprenticeship"
-                className="inline-block bg-purple-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-purple-700 transition"
+                className="inline-block bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
               >
                 Return to Program Page
               </Link>

@@ -430,7 +430,7 @@ export default async function GradesPage() {
                 <div className="p-4 bg-blue-50 rounded-xl">
                   <div className="flex items-center gap-3 mb-2">
                     <Circle className="w-5 h-5 text-blue-600" />
-                    <span className="font-semibold text-purple-900">Quiz Average</span>
+                    <span className="font-semibold text-blue-900">Quiz Average</span>
                   </div>
                   <div className="text-3xl font-bold text-blue-600">
                     {stats.avgQuizScore}%

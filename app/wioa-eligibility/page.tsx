@@ -146,7 +146,7 @@ export default async function WIOAEligibilityPage() {
             <Link href="/financial-aid" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
               Financial Aid
             </Link>
-            <Link href="/jri" className="px-4 py-2 bg-purple-100 text-purple-800 rounded-full text-sm font-medium hover:bg-purple-200 transition-colors">
+            <Link href="/jri" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
               JRI Programs
             </Link>
             <Link href="/how-it-works" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
@@ -246,7 +246,7 @@ export default async function WIOAEligibilityPage() {
             <div className="space-y-4">
               {(faqs && faqs.length > 0 ? faqs : [
                 { id: 1, question: 'What is WIOA?', answer: 'The Workforce Innovation and Opportunity Act (WIOA) is a federal program that provides funding for job training and employment services. It helps adults, dislocated workers, and youth access career training at no cost.' },
-                { id: 2, question: 'How do I know if I qualify?', answer: 'You likely qualify if you are unemployed, underemployed, receiving public assistance (SNAP, TANF, Medicaid), a veteran, or have household income below 200% of poverty level. Take our eligibility check or call us.' },
+                { id: 2, question: 'How do I know if I qualify?', answer: 'You likely qualify if you are unemployed, underemployed, receiving public assistance (SNAP, TANF, Medicaid), a veteran, or have household income below 200% of poverty level. Take our eligibility check or contact us.' },
                 { id: 3, question: 'What does WIOA cover?', answer: 'WIOA can cover tuition, books, supplies, certification exam fees, and even supportive services like transportation and childcare assistance for eligible participants.' },
                 { id: 4, question: 'How long does the application process take?', answer: 'The eligibility determination typically takes 1-2 weeks. You will work with a WorkOne case manager who will verify your eligibility and help you enroll in training.' },
                 { id: 5, question: 'Can I work while receiving WIOA training?', answer: 'Yes, you can work while in training. WIOA is designed to help you gain skills for better employment, whether you are currently employed or not.' },

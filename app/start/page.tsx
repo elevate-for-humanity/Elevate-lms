@@ -44,7 +44,7 @@ const DEFAULT_PATHWAYS = [
     description: 'Check if you qualify for WIOA, WRG, or other funding assistance.',
     icon: Briefcase,
     href: '/funding',
-    color: 'purple',
+    color: 'blue',
   },
   {
     title: 'I Have a Background (Second Chance)',
@@ -106,14 +106,14 @@ export default async function StartPage() {
   const colorClasses: Record<string, string> = {
     blue: 'bg-blue-50 border-blue-200 hover:border-blue-400',
     green: 'bg-green-50 border-green-200 hover:border-green-400',
-    purple: 'bg-blue-50 border-blue-200 hover:border-purple-400',
+    blue: 'bg-blue-50 border-blue-200 hover:border-blue-400',
     amber: 'bg-amber-50 border-amber-200 hover:border-amber-400',
   };
 
   const iconColorClasses: Record<string, string> = {
     blue: 'text-blue-600',
     green: 'text-green-600',
-    purple: 'text-blue-600',
+    blue: 'text-blue-600',
     amber: 'text-amber-600',
   };
 

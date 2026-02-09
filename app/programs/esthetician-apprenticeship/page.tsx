@@ -118,7 +118,7 @@ export default async function EstheticianApprenticeshipPage() {
               <Image
                 src="/images/programs/efh-esthetician-client-services-card.jpg"
                 alt="Esthetician training"
-                fill
+                fill sizes="100vw"
                 className="object-cover"
               />
             </div>

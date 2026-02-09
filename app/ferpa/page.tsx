@@ -245,7 +245,7 @@ export default async function FERPAPortal() {
             className="group"
             aria-label="FERPA Compliance and Standards"
           >
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-purple-300 transition">
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-blue-300 transition">
               <div className="flex items-center gap-4 mb-4">
                 <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition">
                   <Shield className="w-8 h-8 text-blue-600" />

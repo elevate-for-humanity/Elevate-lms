@@ -53,7 +53,7 @@ export default function StoreDigitalPage() {
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
                 Digital Resources
-                <span className="block text-purple-300">For Training Providers</span>
+                <span className="block text-blue-300">For Training Providers</span>
               </h1>
 
               <p className="text-xl text-indigo-100 mb-8 leading-relaxed">
@@ -102,7 +102,7 @@ export default function StoreDigitalPage() {
                   <p className="text-sm text-indigo-200">Federal registration made easy</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <Sparkles className="w-10 h-10 text-purple-400 mb-3" />
+                  <Sparkles className="w-10 h-10 text-blue-400 mb-3" />
                   <h3 className="font-bold text-white mb-1">AI Studio</h3>
                   <p className="text-sm text-indigo-200">Generate videos & content</p>
                 </div>

@@ -47,7 +47,7 @@ export default function VerificationPage() {
                 </p>
               </div>
 
-              <div className="bg-purple-50 rounded-lg p-6 border-2 border-purple-200">
+              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
                 <h3 className="text-xl font-bold text-black mb-3">Credential Verification</h3>
                 <p className="text-black">
                   Confirming authenticity of certificates and credentials for employers.

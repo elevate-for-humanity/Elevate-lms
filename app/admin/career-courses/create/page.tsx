@@ -205,7 +205,7 @@ export default function CreateCourseContentPage() {
                         }}
                         className={`w-full text-left p-3 rounded-lg transition ${
                           selectedCourse?.id === course.id
-                            ? 'bg-blue-100 border-purple-300 border'
+                            ? 'bg-blue-100 border-blue-300 border'
                             : 'bg-gray-50 hover:bg-gray-100'
                         }`}
                       >

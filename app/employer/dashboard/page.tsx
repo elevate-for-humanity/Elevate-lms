@@ -170,7 +170,7 @@ export default async function EmployerDashboardOrchestrated() {
                 />
                 <span
                   className={`text-3xl font-bold ${
-                    apprenticeshipProgram ? 'text-purple-900' : 'text-black'
+                    apprenticeshipProgram ? 'text-blue-900' : 'text-black'
                   }`}
                 >
                   {apprenticeshipProgram ? '1' : '0'}
@@ -178,7 +178,7 @@ export default async function EmployerDashboardOrchestrated() {
               </div>
               <div
                 className={`text-sm ${
-                  apprenticeshipProgram ? 'text-purple-900' : 'text-black'
+                  apprenticeshipProgram ? 'text-blue-900' : 'text-black'
                 }`}
               >
                 Apprenticeship Programs
@@ -348,10 +348,10 @@ export default async function EmployerDashboardOrchestrated() {
           {/* Apprenticeship CTA */}
           {!apprenticeshipProgram && profile.verified && (
             <div className="bg-blue-50 rounded-lg border-2 border-blue-600 p-6">
-              <h3 className="text-lg font-bold text-purple-900 mb-3">
+              <h3 className="text-lg font-bold text-blue-900 mb-3">
                 Build Your Talent Pipeline
               </h3>
-              <p className="text-purple-800 mb-4 text-sm">
+              <p className="text-blue-800 mb-4 text-sm">
                 Start an apprenticeship program and train workers specifically
                 for your needs.
               </p>

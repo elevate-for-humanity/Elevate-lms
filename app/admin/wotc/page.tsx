@@ -43,7 +43,7 @@ export default async function WOTCAdminPage() {
     { label: 'Total Credits', value: `$${totalCredits.toLocaleString()}`, icon: DollarSign, color: 'green' },
     { label: 'Active Applications', value: activeCount.toString(), icon: FileText, color: 'blue' },
     { label: 'Pending Review', value: pendingCount.toString(), icon: Clock, color: 'yellow' },
-    { label: 'Approved This Month', value: approvedThisMonth.toString(), icon: CheckCircle, color: 'purple' },
+    { label: 'Approved This Month', value: approvedThisMonth.toString(), icon: CheckCircle, color: 'blue' },
   ];
   return (
     <div className="min-h-screen bg-gray-50 p-8">

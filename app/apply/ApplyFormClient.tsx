@@ -213,7 +213,7 @@ export default function ApplyFormClient() {
             you.
           </p>
           <p className="text-lg text-black mb-6">
-            Call us at{' '}
+            Contact us at{' '}
             <a
               href="tel:3173143757"
               className="font-bold text-brand-orange-600 hover:text-brand-orange-700"
@@ -435,7 +435,7 @@ export default function ApplyFormClient() {
               {status === 'error' && (
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-red-800">
-                    Something went wrong. Please try again or call us at
+                    Something went wrong. Please try again or contact us at
                     317-314-3757.
                   </p>
                 </div>

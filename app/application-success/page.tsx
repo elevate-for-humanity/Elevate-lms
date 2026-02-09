@@ -95,7 +95,7 @@ export default async function ApplicationSuccessPage() {
                 4
               </span>
               <span>
-                Once scheduled, call us back so we can track your progress
+                Once scheduled, contact us back so we can track your progress
               </span>
             </li>
           </ol>

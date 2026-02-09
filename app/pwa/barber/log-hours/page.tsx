@@ -159,7 +159,7 @@ export default function LogHoursPage() {
             <Scissors className="w-6 h-6" />
             <span className="text-xs">Home</span>
           </Link>
-          <Link href="/pwa/barber/log-hours" className="flex flex-col items-center gap-1 text-purple-400">
+          <Link href="/pwa/barber/log-hours" className="flex flex-col items-center gap-1 text-blue-400">
             <Clock className="w-6 h-6" />
             <span className="text-xs">Log</span>
           </Link>

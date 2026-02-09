@@ -79,7 +79,7 @@ const tutorials = [
     duration: '6:45',
     category: 'getting-started',
     icon: GraduationCap,
-    color: 'purple',
+    color: 'blue',
     steps: [
       'What to bring on day one',
       'Meeting your instructors',
@@ -140,7 +140,7 @@ const tutorials = [
     duration: '5:00',
     category: 'courses',
     icon: CheckCircle,
-    color: 'purple',
+    color: 'blue',
     steps: [
       'Starting a quiz',
       'Navigating questions',
@@ -202,7 +202,7 @@ const tutorials = [
     duration: '2:45',
     category: 'support',
     icon: Users,
-    color: 'purple',
+    color: 'blue',
     steps: [
       'Using live chat',
       'Submitting a support ticket',
@@ -369,7 +369,7 @@ export default async function TutorialsPage() {
               const colorClasses: Record<string, string> = {
                 blue: 'bg-blue-100 text-blue-600',
                 green: 'bg-green-100 text-green-600',
-                purple: 'bg-blue-100 text-blue-600',
+                blue: 'bg-blue-100 text-blue-600',
                 orange: 'bg-orange-100 text-orange-600',
               };
 

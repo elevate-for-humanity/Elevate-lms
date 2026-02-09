@@ -256,7 +256,7 @@ export default function IncentivesPage() {
                         className={`px-2 py-2 text-xs rounded ${
                           incentive.program_type === 'WEX'
                             ? 'bg-blue-100 text-blue-800'
-                            : 'bg-blue-100 text-purple-800'
+                            : 'bg-blue-100 text-blue-800'
                         }`}
                       >
                         {incentive.program_type}

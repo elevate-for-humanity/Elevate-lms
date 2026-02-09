@@ -81,7 +81,7 @@ export default function BusinessPage() {
               <Image
                 src="/images/business-vibrant.jpg"
                 alt="Business training"
-                fill
+                fill sizes="100vw"
                 className="object-cover"
                 priority
               />

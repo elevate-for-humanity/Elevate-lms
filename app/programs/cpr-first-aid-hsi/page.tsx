@@ -113,7 +113,7 @@ export default function CPRFirstAidPage() {
         <Image 
           src="/images/healthcare/cpr-certification-group.jpg" 
           alt="CPR First Aid Training" 
-          fill 
+          fill sizes="100vw"
           className="object-cover" 
           priority 
         />
@@ -214,7 +214,7 @@ export default function CPRFirstAidPage() {
               <Image 
                 src="/images/healthcare/cpr-individual-practice.jpg" 
                 alt="CPR practice on mannequin" 
-                fill 
+                fill sizes="100vw"
                 className="object-cover" 
               />
             </div>
@@ -319,7 +319,7 @@ export default function CPRFirstAidPage() {
               <Image 
                 src="/images/healthcare/cpr-group-training-session.jpg" 
                 alt="Group CPR training session" 
-                fill 
+                fill sizes="100vw"
                 className="object-cover" 
               />
             </div>

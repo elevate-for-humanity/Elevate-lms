@@ -273,7 +273,7 @@ export default async function VerificationPage() {
                   className="inline-flex items-center text-blue-900 hover:text-blue-700 font-medium"
                 >
                   <Phone className="h-4 w-4 mr-2" />
-                  Call Us
+                  Contact Us
                 </a>
               </div>
             </div>

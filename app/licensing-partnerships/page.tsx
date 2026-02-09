@@ -124,7 +124,7 @@ export default function LicensingPartnershipsPage() {
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-black mb-6 leading-tight">
               Licensing & Partnerships
               <br />
-              <span className="text-purple-300">Grow Together</span>
+              <span className="text-blue-300">Grow Together</span>
             </h1>
 
             <p className="text-2xl md:text-3xl text-white/90 mb-8 leading-relaxed font-medium">

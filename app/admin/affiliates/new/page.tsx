@@ -135,7 +135,7 @@ export default function NewAffiliatePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-3">Programs to Promote</label>
                 <div className="space-y-2">
                   {['Barber Apprenticeship', 'Medical Assistant Training', 'IT Certifications', 'WOTC Services', 'All Programs'].map((program) => (
-                    <label key={program} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
+                    <label key={program} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-blue-300">
                       <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
                       <span className="text-sm text-gray-700">{program}</span>
                     </label>

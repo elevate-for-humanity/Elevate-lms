@@ -124,7 +124,7 @@ export default function WCAGCompliancePage() {
                 { icon: Monitor, label: 'High Contrast' },
               ].map((item) => (
                 <div key={item.label} className="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
-                  <item.icon className="w-8 h-8 mx-auto mb-2 text-purple-300" />
+                  <item.icon className="w-8 h-8 mx-auto mb-2 text-blue-300" />
                   <p className="text-sm font-medium">{item.label}</p>
                 </div>
               ))}

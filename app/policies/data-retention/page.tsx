@@ -121,7 +121,7 @@ export default function DataRetentionPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Employment and HR Records</h2>
             
-            <div className="bg-purple-50 rounded-xl p-6 border-2 border-purple-200 mb-6">
+            <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Employee Records</h3>
               <ul className="space-y-3 text-black">
                 <li><strong>Personnel Files:</strong> 7 years after employment ends</li>

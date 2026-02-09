@@ -61,7 +61,7 @@ export default async function PaymentCancelPage() {
               </li>
               <li>💳 Try a different payment method</li>
               <li>
-                <Phone className="w-5 h-5 inline-block" /> Call us to discuss
+                <Phone className="w-5 h-5 inline-block" /> Contact us to discuss
                 payment plans: 317-314-3757
               </li>
               <li>💬 Chat with our enrollment team</li>

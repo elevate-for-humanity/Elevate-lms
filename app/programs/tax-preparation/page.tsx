@@ -59,7 +59,7 @@ export default async function Page() {
           <Image
             src="/images/business/program-tax-preparation.jpg"
             alt="VITA Tax Preparation Training"
-            fill
+            fill sizes="100vw"
             className="object-cover"
             priority
           />

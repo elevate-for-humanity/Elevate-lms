@@ -13,7 +13,7 @@ export default function MarketplaceLanding() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-20">
+      <section className="bg-gradient-to-r from-blue-600 to-blue-600 text-white py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <ShoppingBag className="w-20 h-20 mx-auto mb-6" />
           <h1 className="text-5xl font-bold mb-6">Marketplace</h1>
@@ -24,14 +24,14 @@ export default function MarketplaceLanding() {
           <div className="flex gap-4 justify-center">
             <Link
               href="/marketplace/browse"
-              className="px-8 py-4 bg-white text-purple-600 rounded-lg font-bold hover:bg-gray-100 flex items-center gap-2"
+              className="px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-gray-100 flex items-center gap-2"
             >
               Browse Marketplace
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/marketplace/sell"
-              className="px-8 py-4 bg-purple-700 text-white rounded-lg font-bold hover:bg-purple-800 border-2 border-white"
+              className="px-8 py-4 bg-blue-700 text-white rounded-lg font-bold hover:bg-blue-800 border-2 border-white"
             >
               Start Selling
             </Link>
@@ -45,7 +45,7 @@ export default function MarketplaceLanding() {
           <h2 className="text-3xl font-bold text-center mb-12">Marketplace Features</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <FeatureCard
-              icon={<Store className="w-12 h-12 text-purple-600" />}
+              icon={<Store className="w-12 h-12 text-blue-600" />}
               title="Shop"
               description="Browse thousands of products and services from verified sellers"
               href="/shop"
@@ -117,7 +117,7 @@ export default function MarketplaceLanding() {
               description="Bank-level security for all payments and data"
             />
             <BenefitCard
-              icon={<Award className="w-8 h-8 text-purple-500" />}
+              icon={<Award className="w-8 h-8 text-blue-500" />}
               title="Quality Guaranteed"
               description="All sellers verified, all products reviewed"
             />
@@ -131,7 +131,7 @@ export default function MarketplaceLanding() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 bg-gradient-to-r from-purple-600 to-blue-600 text-white">
+      <section className="py-16 bg-gradient-to-r from-blue-600 to-blue-600 text-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <StatCard number="10,000+" label="Active Users" />
@@ -152,7 +152,7 @@ export default function MarketplaceLanding() {
           <div className="flex gap-4 justify-center">
             <Link
               href="/marketplace/browse"
-              className="px-8 py-4 bg-purple-600 text-white rounded-lg font-bold hover:bg-purple-700"
+              className="px-8 py-4 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700"
             >
               Start Shopping
             </Link>

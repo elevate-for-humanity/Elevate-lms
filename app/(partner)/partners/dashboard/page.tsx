@@ -9,7 +9,7 @@ export default function PartnerDashboardPage() {
   const stats = [
     { icon: Users, label: 'Active Students', value: '47', color: 'blue' },
     { icon: DollarSign, label: 'Revenue MTD', value: '$12,450', color: 'green' },
-    { icon: TrendingUp, label: 'Completion Rate', value: '89%', color: 'purple' },
+    { icon: TrendingUp, label: 'Completion Rate', value: '89%', color: 'blue' },
     { icon: Calendar, label: 'Sessions This Week', value: '12', color: 'orange' },
   ];
 

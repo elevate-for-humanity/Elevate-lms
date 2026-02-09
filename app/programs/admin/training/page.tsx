@@ -68,7 +68,7 @@ export default async function TrainingPage() {
         <Image
           src="/images/heroes/training-provider-3.jpg"
           alt="Training"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority

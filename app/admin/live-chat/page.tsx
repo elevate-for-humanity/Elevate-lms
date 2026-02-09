@@ -117,7 +117,7 @@ export default function LiveChatPage() {
             title="Satisfaction Rate"
             value="98%"
             icon={CheckCircle}
-            color="purple"
+            color="blue"
           />
           <StatCard
             title="Total Conversations"
@@ -308,14 +308,14 @@ interface StatCardProps {
   title: string;
   value: string;
   icon: React.ComponentType<{ className?: string }>;
-  color: 'blue' | 'green' | 'purple' | 'orange';
+  color: 'blue' | 'green' | 'blue' | 'orange';
 }
 
 function StatCard({ title, value, icon: Icon, color }: StatCardProps) {
   const colorClasses = {
     blue: 'text-brand-blue-600',
     green: 'text-brand-green-600',
-    purple: 'text-blue-600',
+    blue: 'text-blue-600',
     orange: 'text-brand-orange-600',
   };
 

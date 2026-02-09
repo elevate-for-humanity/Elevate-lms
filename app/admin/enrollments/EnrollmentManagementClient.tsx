@@ -260,7 +260,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">Completed</p>
-          <p className="text-2xl font-bold text-purple-600">{currentStats.completed}</p>
+          <p className="text-2xl font-bold text-blue-600">{currentStats.completed}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">At Risk</p>

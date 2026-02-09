@@ -70,7 +70,7 @@ export default function PayrollHistoryPage() {
               <p className="text-sm text-gray-600 mb-1">Net Pay</p>
               <p className="text-2xl font-bold text-gray-900">${ytdTotals.netPay.toLocaleString()}</p>
             </div>
-            <div className="bg-purple-50 rounded-lg p-4">
+            <div className="bg-blue-50 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Total Hours</p>
               <p className="text-2xl font-bold text-gray-900">{ytdTotals.hours}</p>
             </div>

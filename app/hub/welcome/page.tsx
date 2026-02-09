@@ -339,7 +339,7 @@ export default async function HubWelcomePage() {
         </div>
         
         <div className="relative max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Questions? Call Us</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Questions? Contact Us</h2>
           <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
             Join thousands of learners who are using the Hub to track their progress and achieve their career goals.
           </p>

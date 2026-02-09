@@ -331,19 +331,19 @@ function CheckInContent() {
               <h3 className="text-white font-medium mb-2">How to check in</h3>
               <ol className="text-slate-400 text-sm space-y-2">
                 <li className="flex gap-2">
-                  <span className="text-purple-400">1.</span>
+                  <span className="text-blue-400">1.</span>
                   Ask your supervisor to show the shop's QR code
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-purple-400">2.</span>
+                  <span className="text-blue-400">2.</span>
                   Scan the code or enter it manually
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-purple-400">3.</span>
+                  <span className="text-blue-400">3.</span>
                   Your training time starts automatically
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-purple-400">4.</span>
+                  <span className="text-blue-400">4.</span>
                   Check out when you leave to log your hours
                 </li>
               </ol>

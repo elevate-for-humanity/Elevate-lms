@@ -197,7 +197,7 @@ export default function AITutorPage() {
                   key={index}
                   onClick={() => sendMessage(prompt.prompt)}
                   disabled={isLoading}
-                  className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 hover:border-purple-300 hover:text-blue-600 transition whitespace-nowrap disabled:opacity-50"
+                  className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-600 hover:border-blue-300 hover:text-blue-600 transition whitespace-nowrap disabled:opacity-50"
                 >
                   <prompt.icon className="w-4 h-4" />
                   {prompt.text}
@@ -231,8 +231,8 @@ export default function AITutorPage() {
 
         {/* Tips */}
         <div className="mt-6 bg-blue-50 rounded-xl p-4 border border-blue-100">
-          <h3 className="font-semibold text-purple-900 mb-2">Tips for better results:</h3>
-          <ul className="text-sm text-purple-800 space-y-1">
+          <h3 className="font-semibold text-blue-900 mb-2">Tips for better results:</h3>
+          <ul className="text-sm text-blue-800 space-y-1">
             <li>• Be specific about what you want to learn</li>
             <li>• Ask follow-up questions for deeper understanding</li>
             <li>• Request examples or practice problems</li>

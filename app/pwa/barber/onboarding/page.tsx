@@ -161,8 +161,8 @@ export default function OnboardingPage() {
               return (
                 <div className="bg-blue-500/20 border border-blue-500/30 rounded-xl p-4">
                   <div className="flex items-center gap-2 mb-3">
-                    <Sparkles className="w-5 h-5 text-purple-400" />
-                    <span className="text-purple-300 text-sm font-medium">Next Step</span>
+                    <Sparkles className="w-5 h-5 text-blue-400" />
+                    <span className="text-blue-300 text-sm font-medium">Next Step</span>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
@@ -233,7 +233,7 @@ export default function OnboardingPage() {
           </p>
           <Link 
             href="/help"
-            className="text-purple-400 text-sm font-medium"
+            className="text-blue-400 text-sm font-medium"
           >
             Visit Help Center →
           </Link>

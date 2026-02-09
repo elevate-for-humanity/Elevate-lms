@@ -135,7 +135,7 @@ export default function BarberProfilePage() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-slate-800 rounded-xl p-4">
-            <Clock className="w-6 h-6 text-purple-400 mb-2" />
+            <Clock className="w-6 h-6 text-blue-400 mb-2" />
             <p className="text-2xl font-bold text-white">{profile.totalHours.toLocaleString()}</p>
             <p className="text-slate-400 text-sm">Total Hours</p>
           </div>
@@ -168,7 +168,7 @@ export default function BarberProfilePage() {
           <h2 className="text-white font-bold">Training Location</h2>
           
           <div className="flex items-center gap-3">
-            <Scissors className="w-5 h-5 text-purple-400" />
+            <Scissors className="w-5 h-5 text-blue-400" />
             <span className="text-white">{profile.shopName}</span>
           </div>
           

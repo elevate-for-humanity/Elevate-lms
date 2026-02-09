@@ -104,7 +104,7 @@ export default function AdminDemoClient({ stats, students, programs, activity }:
               {[
                 { label: 'Students', value: stats.students, icon: Users, color: 'text-blue-600' },
                 { label: 'Programs', value: stats.programs, icon: GraduationCap, color: 'text-green-600' },
-                { label: 'Active', value: stats.activeEnrollments, icon: CheckCircle, color: 'text-purple-600' },
+                { label: 'Active', value: stats.activeEnrollments, icon: CheckCircle, color: 'text-blue-600' },
                 { label: 'Partners', value: stats.partners, icon: Building2, color: 'text-orange-600' },
               ].map((s, i) => (
                 <div key={i} className="bg-white rounded-xl p-3 border">
@@ -125,7 +125,7 @@ export default function AdminDemoClient({ stats, students, programs, activity }:
                   { stage: 'Review', count: 32, color: 'bg-yellow-500' },
                   { stage: 'Enrolled', count: 28, color: 'bg-blue-500' },
                   { stage: 'Active', count: stats.activeEnrollments, color: 'bg-green-500' },
-                  { stage: 'Done', count: 214, color: 'bg-purple-500' },
+                  { stage: 'Done', count: 214, color: 'bg-blue-500' },
                 ].map((p, i) => (
                   <div key={i} className={`${p.color} text-white px-3 py-2 rounded-lg text-center min-w-[60px]`}>
                     <div className="font-bold">{p.count}</div>
@@ -241,7 +241,7 @@ export default function AdminDemoClient({ stats, students, programs, activity }:
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
                       p.category === 'Healthcare' ? 'bg-blue-100 text-blue-700' : 
                       p.category === 'Trades' ? 'bg-orange-100 text-orange-700' : 
-                      'bg-purple-100 text-purple-700'
+                      'bg-blue-100 text-blue-700'
                     }`}>{p.category}</span>
                     <h3 className="font-bold text-gray-900 mt-2 mb-3">{p.name}</h3>
                     <div className="flex justify-between">

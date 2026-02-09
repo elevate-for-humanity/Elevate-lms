@@ -144,7 +144,7 @@ export default function MultiSitePage() {
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
               Own Your Own
-              <span className="block text-purple-300">Tax Preparation Office</span>
+              <span className="block text-blue-300">Tax Preparation Office</span>
             </h1>
             <p className="text-xl text-blue-100 mb-8">
               Join the Supersonic Fast Cash network and build a profitable tax business with our proven systems, training, and support.
@@ -173,19 +173,19 @@ export default function MultiSitePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-black text-purple-400">15+</div>
+              <div className="text-4xl font-black text-blue-400">15+</div>
               <div className="text-gray-400">Active Locations</div>
             </div>
             <div>
-              <div className="text-4xl font-black text-purple-400">50K+</div>
+              <div className="text-4xl font-black text-blue-400">50K+</div>
               <div className="text-gray-400">Returns Filed</div>
             </div>
             <div>
-              <div className="text-4xl font-black text-purple-400">98%</div>
+              <div className="text-4xl font-black text-blue-400">98%</div>
               <div className="text-gray-400">Partner Retention</div>
             </div>
             <div>
-              <div className="text-4xl font-black text-purple-400">$75K+</div>
+              <div className="text-4xl font-black text-blue-400">$75K+</div>
               <div className="text-gray-400">Avg. Partner Revenue</div>
             </div>
           </div>

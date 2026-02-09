@@ -28,7 +28,7 @@ const getNotificationColor = (type: string) => {
   switch (type) {
     case 'success': return 'text-green-500 bg-green-100';
     case 'warning': return 'text-yellow-500 bg-yellow-100';
-    case 'achievement': return 'text-purple-500 bg-purple-100';
+    case 'achievement': return 'text-blue-500 bg-blue-100';
     case 'course': return 'text-blue-500 bg-blue-100';
     case 'event': return 'text-orange-500 bg-orange-100';
     default: return 'text-gray-500 bg-gray-100';

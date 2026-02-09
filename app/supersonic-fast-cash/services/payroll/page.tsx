@@ -635,7 +635,7 @@ export default async function PayrollPage() {
           <div className="grid md:grid-cols-3 gap-8 text-center">
             <div>
               <Phone className="w-8 h-8 text-orange-600 mx-auto mb-3" />
-              <h3 className="font-bold text-black mb-2">Call Us</h3>
+              <h3 className="font-bold text-black mb-2">Contact Us</h3>
               <p className="text-gray-600">(317) 653-5046</p>
             </div>
             <div>

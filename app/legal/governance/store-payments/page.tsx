@@ -37,7 +37,7 @@ export default function StorePaymentsPage() {
       <div className="max-w-4xl mx-auto px-6 py-12">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 flex items-center justify-between">
           <div>
-            <p className="font-medium text-purple-900">Official Store Operations Document</p>
+            <p className="font-medium text-blue-900">Official Store Operations Document</p>
             <p className="text-sm text-blue-700">Authoritative reference for e-commerce, payments, and licensing.</p>
           </div>
           <a href="/docs/Store_Payments_Licensing_Framework.pdf" download className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">

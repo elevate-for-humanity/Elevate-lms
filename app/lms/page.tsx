@@ -235,7 +235,7 @@ export default async function LMSPage() {
                         <h3 className="font-semibold text-slate-900 truncate">{enrollment.program_slug || 'Apprenticeship'}</h3>
                         <p className="text-sm text-slate-500">Active Apprenticeship</p>
                       </div>
-                      <span className="px-3 py-1 bg-blue-200 text-purple-800 text-xs font-semibold rounded-full">Apprentice</span>
+                      <span className="px-3 py-1 bg-blue-200 text-blue-800 text-xs font-semibold rounded-full">Apprentice</span>
                     </Link>
                   ))}
                 </div>

@@ -162,7 +162,7 @@ export default function DeployClient() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -185,8 +185,8 @@ export default function DeployClient() {
           <div key={option.id} className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </div>
@@ -245,7 +245,7 @@ export default function DeployClient() {
                     className={`px-4 py-2 rounded-lg font-medium ${
                       isDeploying
                         ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-purple-600 text-white hover:bg-purple-700'
+                        : 'bg-blue-600 text-white hover:bg-blue-700'
                     }`}
                   >
                     {isDeploying ? 'Deploying...' : 'Deploy'}

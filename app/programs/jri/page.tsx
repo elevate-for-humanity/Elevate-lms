@@ -42,7 +42,7 @@ export default function JRIProgramsPage() {
           <Image
             src="/images/heroes-hq/jri-hero.jpg"
             alt="JRI Programs"
-            fill
+            fill sizes="100vw"
             className="object-cover"
             priority
           />

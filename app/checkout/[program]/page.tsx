@@ -175,7 +175,7 @@ function CheckoutPageContent() {
               )}
               {program === 'barber-apprenticeship' && (
                 <>
-                  <div className="bg-purple-50 rounded-lg p-4 text-sm text-black mb-4">
+                  <div className="bg-blue-50 rounded-lg p-4 text-sm text-black mb-4">
                     <p className="font-bold mb-2">
                       <Lightbulb className="w-5 h-5 inline-block" /> Fee-Based Program
                     </p>

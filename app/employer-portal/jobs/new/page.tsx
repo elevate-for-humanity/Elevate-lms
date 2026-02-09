@@ -172,7 +172,7 @@ export default function NewJobPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-3">Benefits Offered</label>
                 <div className="grid md:grid-cols-3 gap-3">
                   {['Health Insurance', 'Dental Insurance', 'Vision Insurance', '401(k)', 'Paid Time Off', 'Training Provided', 'Tuition Assistance', 'Flexible Schedule', 'Career Growth'].map((benefit) => (
-                    <label key={benefit} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
+                    <label key={benefit} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-blue-300">
                       <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
                       <span className="text-sm text-gray-700">{benefit}</span>
                     </label>
@@ -248,7 +248,7 @@ export default function NewJobPage() {
                 'TANF Recipients',
                 'SSI Recipients',
               ].map((group) => (
-                <label key={group} className="flex items-center gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:border-purple-300">
+                <label key={group} className="flex items-center gap-2 p-3 bg-white border rounded-lg cursor-pointer hover:border-blue-300">
                   <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600 rounded" />
                   <span className="text-sm text-gray-700">{group}</span>
                 </label>

@@ -23,7 +23,7 @@ export default function CybersecurityPage() {
         <Image
           src="/images/technology/hero-program-cybersecurity.jpg"
           alt="Cybersecurity Training"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           priority
         />

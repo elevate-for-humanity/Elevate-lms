@@ -218,7 +218,7 @@ export default function UrineTestsPage() {
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need Help Choosing?</h2>
           <p className="text-xl text-blue-100 mb-8">
-            Call us and we'll recommend the right test for your situation.
+            Contact us and we'll recommend the right test for your situation.
           </p>
           <a
             href="tel:+13173143757"

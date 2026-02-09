@@ -98,7 +98,7 @@ export default function StudentProfileForm({ profile, student, stats }: Props) {
           <p className="text-sm text-gray-500">Completed</p>
         </div>
         <div className="bg-white rounded-xl p-4 border text-center">
-          <p className="text-2xl font-bold text-purple-600">{stats.certificates}</p>
+          <p className="text-2xl font-bold text-blue-600">{stats.certificates}</p>
           <p className="text-sm text-gray-500">Certificates</p>
         </div>
       </div>

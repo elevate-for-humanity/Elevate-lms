@@ -141,7 +141,7 @@ export default function AdminNewJobPage() {
             
             <div className="grid md:grid-cols-2 gap-3">
               {['Veterans', 'SNAP Recipients', 'Long-term Unemployed', 'Ex-Felons', 'TANF Recipients', 'SSI Recipients', 'Vocational Rehabilitation', 'Summer Youth'].map((group) => (
-                <label key={group} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
+                <label key={group} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-blue-300">
                   <input type="checkbox" defaultChecked className="w-4 h-4 text-blue-600 rounded" />
                   <span className="text-sm text-gray-700">{group}</span>
                 </label>
@@ -153,14 +153,14 @@ export default function AdminNewJobPage() {
             <h2 className="text-lg font-bold text-gray-900 mb-6">Publishing Options</h2>
             
             <div className="space-y-4">
-              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
+              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-blue-300">
                 <input type="radio" name="status" defaultChecked className="w-4 h-4 text-blue-600" />
                 <div>
                   <p className="font-medium text-gray-900">Publish Immediately</p>
                   <p className="text-sm text-gray-500">Job will be visible to candidates right away</p>
                 </div>
               </label>
-              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-purple-300">
+              <label className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:border-blue-300">
                 <input type="radio" name="status" className="w-4 h-4 text-blue-600" />
                 <div>
                   <p className="font-medium text-gray-900">Save as Draft</p>

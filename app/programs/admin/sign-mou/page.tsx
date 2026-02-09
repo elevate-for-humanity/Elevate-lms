@@ -67,7 +67,7 @@ export default async function SignMouPage() {
         <Image
           src="/images/heroes/employer-partner-2.jpg"
           alt="Sign Mou"
-          fill
+          fill sizes="100vw"
           className="object-cover"
           quality={100}
           priority

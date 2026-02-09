@@ -74,11 +74,11 @@ export default async function StartTrialPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-purple-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-blue-800 flex items-center justify-center p-4">
       <div className="max-w-lg w-full">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Layout className="w-10 h-10 text-purple-900" />
+            <Layout className="w-10 h-10 text-blue-900" />
           </div>
           <h1 className="text-3xl font-black text-white mb-2">Website Builder</h1>
           <p className="text-blue-200">Professional Websites in Minutes</p>
@@ -86,7 +86,7 @@ export default async function StartTrialPage() {
 
         <div className="bg-white rounded-2xl p-8 shadow-2xl">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-purple-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
               <Clock className="w-4 h-4" />
               14-Day Free Trial
             </div>

@@ -442,8 +442,8 @@ export default async function PlatformLicensingPage() {
               </div>
 
               <div className="bg-blue-50 rounded-xl p-4 mb-6">
-                <div className="font-bold text-purple-900 mb-2">Includes:</div>
-                <div className="space-y-1 text-sm text-purple-800">
+                <div className="font-bold text-blue-900 mb-2">Includes:</div>
+                <div className="space-y-1 text-sm text-blue-800">
                   <div>• RAPIDS lifecycle tracking</div>
                   <div>• Sponsor dashboard</div>
                   <div>• Employer onboarding</div>

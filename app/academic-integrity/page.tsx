@@ -203,8 +203,8 @@ export default async function AcademicIntegrityPage() {
                 Altering or fabricating academic records or documentation.
               </p>
               <div className="bg-blue-50 rounded-lg p-4">
-                <p className="font-semibold text-purple-900 mb-2">Examples:</p>
-                <ul className="space-y-2 text-purple-800 text-sm">
+                <p className="font-semibold text-blue-900 mb-2">Examples:</p>
+                <ul className="space-y-2 text-blue-800 text-sm">
                   <li>• Forging signatures on documents</li>
                   <li>• Altering grades or transcripts</li>
                   <li>• Fabricating data or research results</li>

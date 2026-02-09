@@ -356,7 +356,7 @@ export default function DrugTestingLandingPage() {
             Ready to Schedule a Drug Test?
           </h2>
           <p className="text-xl text-blue-100 mb-8">
-            Call now for same-day appointments at locations near you.
+            Schedule online for same-day appointments at locations near you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a

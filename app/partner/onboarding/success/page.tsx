@@ -85,7 +85,7 @@ export default function PartnerOnboardingSuccessPage() {
           </div>
 
           <p className="mt-8 text-sm text-slate-500">
-            Questions? Call us at{' '}
+            Questions? Contact us at{' '}
             <a href="tel:3173143757" className="text-blue-600 hover:underline">
               (317) 314-3757
             </a>

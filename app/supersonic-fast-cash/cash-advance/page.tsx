@@ -280,7 +280,7 @@ export default function CashAdvancePage() {
             Questions?
           </h2>
           <p className="text-gray-600 mb-8">
-            Call us to discuss your options and eligibility.
+            Contact us to discuss your options and eligibility.
           </p>
           <a
             href="tel:3173143757"

@@ -215,7 +215,7 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">Students</p>
-          <p className="text-2xl font-bold text-purple-600">{currentStats.students}</p>
+          <p className="text-2xl font-bold text-blue-600">{currentStats.students}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4">
           <p className="text-sm text-gray-500">Instructors</p>
@@ -288,7 +288,7 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
                   <td className="px-6 py-4">
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       user.role === 'admin' || user.role === 'super_admin' ? 'bg-red-100 text-red-700' :
-                      user.role === 'instructor' ? 'bg-purple-100 text-purple-700' :
+                      user.role === 'instructor' ? 'bg-blue-100 text-blue-700' :
                       user.role === 'employer' ? 'bg-orange-100 text-orange-700' :
                       'bg-green-100 text-green-700'
                     }`}>

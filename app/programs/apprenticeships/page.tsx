@@ -192,7 +192,7 @@ export default async function ApprenticeshipProgramsPage() {
                     priority
                     src={program.heroImage}
                     alt={program.heroImageAlt}
-                    fill
+                    fill sizes="100vw"
                     sizes="100vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                     loading="lazy"

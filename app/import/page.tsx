@@ -200,7 +200,7 @@ export default function ImportSitePage() {
               </div>
               <div className="text-center">
                 <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <Circle className="w-6 h-6 text-purple-400" />
+                  <Circle className="w-6 h-6 text-blue-400" />
                 </div>
                 <h3 className="text-white font-bold mb-1">3. Launch</h3>
                 <p className="text-slate-400 text-sm">Your site recreated on Elevate LMS</p>
@@ -275,7 +275,7 @@ export default function ImportSitePage() {
                   <p className="text-slate-400 text-sm">Pages</p>
                 </div>
                 <div className="bg-white/5 rounded-lg p-4 text-center">
-                  <Image className="w-6 h-6 text-purple-400 mx-auto mb-2" />
+                  <Image className="w-6 h-6 text-blue-400 mx-auto mb-2" />
                   <p className="text-2xl font-bold text-white">{extracted.imagesFound}</p>
                   <p className="text-slate-400 text-sm">Images</p>
                 </div>

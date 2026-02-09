@@ -25,7 +25,7 @@ const NOTIFICATION_ICONS: Record<NotificationType, React.ReactNode> = {
   hours_rejected: <AlertCircle className="w-5 h-5 text-red-400" />,
   milestone: <Award className="w-5 h-5 text-amber-400" />,
   reminder: <Clock className="w-5 h-5 text-blue-400" />,
-  training: <BookOpen className="w-5 h-5 text-purple-400" />,
+  training: <BookOpen className="w-5 h-5 text-blue-400" />,
   system: <Bell className="w-5 h-5 text-slate-400" />,
 };
 
@@ -155,7 +155,7 @@ export default function NotificationsPage() {
             <div>
               <h1 className="text-xl font-bold text-white">Notifications</h1>
               {unreadCount > 0 && (
-                <p className="text-purple-400 text-sm">{unreadCount} unread</p>
+                <p className="text-blue-400 text-sm">{unreadCount} unread</p>
               )}
             </div>
           </div>
@@ -163,7 +163,7 @@ export default function NotificationsPage() {
             <button
               onClick={markAllAsRead}
               disabled={markingRead === 'all'}
-              className="text-purple-400 text-sm font-medium hover:text-purple-300 disabled:opacity-50"
+              className="text-blue-400 text-sm font-medium hover:text-blue-300 disabled:opacity-50"
             >
               {markingRead === 'all' ? 'Marking...' : 'Mark all read'}
             </button>

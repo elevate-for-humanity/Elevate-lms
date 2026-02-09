@@ -348,7 +348,7 @@ export default async function WioaPage() {
           <div className="mt-8 bg-orange-50 rounded-lg p-6">
             <p className="text-orange-900 mb-4">
               <strong>Need help navigating the process?</strong> We work with
-              WorkOne centers every day. Call us at{' '}
+              WorkOne centers every day. Contact us at{' '}
               <a href="tel:3173143757" className="font-bold underline">
                 317-314-3757
               </a>{' '}

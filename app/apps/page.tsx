@@ -37,7 +37,7 @@ const apps = [
     name: 'Website Builder',
     description: 'Build professional training provider websites',
     icon: Layout,
-    color: 'purple',
+    color: 'blue',
     status: 'trial',
     href: '/apps/website-builder',
   },
@@ -46,7 +46,7 @@ const apps = [
 const colorClasses = {
   blue: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' },
   green: { bg: 'bg-green-100', text: 'text-green-600', border: 'border-green-200' },
-  purple: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' },
+  blue: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' },
 };
 
 export default function AppsPage() {

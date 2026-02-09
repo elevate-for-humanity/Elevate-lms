@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
 };
 
-const STRIPE_PAYMENT_LINK = 'https://buy.stripe.com/test_diesel_mechanic'; // Replace with actual Stripe link
+const APPLY_LINK = '/programs/diesel-mechanic/apply';
 
 export default function DieselMechanicPage() {
   return (
@@ -27,7 +27,7 @@ export default function DieselMechanicPage() {
           <Image
             src="/images/trades/hero-program-cdl.jpg"
             alt="Diesel Mechanic Training"
-            fill
+            fill sizes="100vw"
             className="object-cover"
             priority
           />
@@ -153,7 +153,7 @@ export default function DieselMechanicPage() {
                 </div>
 
                 <a
-                  href={STRIPE_PAYMENT_LINK}
+                  href={APPLY_LINK}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="block w-full bg-blue-600 text-white text-center py-4 rounded-full font-semibold hover:bg-blue-700 transition-colors mb-3"
@@ -183,7 +183,7 @@ export default function DieselMechanicPage() {
           <h2 className="text-2xl font-bold text-white mb-4">Ready to Start Your Diesel Mechanic Career?</h2>
           <p className="text-blue-100 mb-6">Enroll today and begin your journey to a rewarding career in diesel technology.</p>
           <a
-            href={STRIPE_PAYMENT_LINK}
+            href={APPLY_LINK}
             target="_blank"
             rel="noopener noreferrer"
             className="inline-block bg-white text-blue-600 px-8 py-3 font-semibold rounded-full hover:bg-blue-50 transition-colors"

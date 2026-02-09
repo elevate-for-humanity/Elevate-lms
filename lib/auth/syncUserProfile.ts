@@ -8,10 +8,14 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error('Supabase configuration missing');
+  }
+  return createClient(url, key);
+}
 
 type SyncUserInput = {
   email: string;
@@ -35,6 +39,8 @@ export async function syncUserProfile(input: SyncUserInput) {
   const { email, name, provider, providerAccountId, tenantId } = input;
 
   if (!email) return;
+
+  const supabase = getSupabaseAdmin();
 
   // Check if user exists
   const { data: existing } = await supabase

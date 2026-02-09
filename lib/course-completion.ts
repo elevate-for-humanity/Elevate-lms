@@ -1,13 +1,16 @@
-
 // lib/course-completion.ts
 // Course completion logic including external partner modules
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error('Supabase configuration missing');
+  }
+  return createClient(url, key);
+}
 
 export interface CourseCompletionStatus {
   isComplete: boolean;
@@ -74,6 +77,7 @@ async function checkInternalLessons(
   userId: string,
   courseId: string
 ): Promise<{ complete: boolean; total: number; completed: number }> {
+  const supabase = getSupabaseAdmin();
   // Count total lessons in course
   const { count: totalLessons } = await supabase
     .from('lessons')
@@ -107,6 +111,7 @@ async function checkExternalModules(
   completed: number;
   missingModules: any[];
 }> {
+  const supabase = getSupabaseAdmin();
   // Get all required external modules for this course
   const { data: requiredModules } = await supabase
     .from('external_partner_modules')
@@ -165,6 +170,7 @@ export async function completeCourse(
     };
   }
 
+  const supabase = getSupabaseAdmin();
   // Update enrollment status
   const { error } = await supabase
     .from('enrollments')
@@ -192,6 +198,7 @@ async function generateCourseCertificate(
   userId: string,
   courseId: string
 ): Promise<void> {
+  const supabase = getSupabaseAdmin();
   // Get course details
   const { data: course } = await supabase
     .from('courses')

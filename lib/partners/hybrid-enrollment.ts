@@ -1,14 +1,17 @@
-
 // lib/partners/hybrid-enrollment.ts
 // Unified enrollment handler that supports both API and link-based modes
 
 import { createClient } from '@supabase/supabase-js';
 import { getPartnerClient, PartnerType } from './index';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error('Supabase configuration missing');
+  }
+  return createClient(url, key);
+}
 
 export interface HybridEnrollmentRequest {
   userId: string;
@@ -32,6 +35,7 @@ export interface HybridEnrollmentResult {
 export async function enrollInExternalModule(
   request: HybridEnrollmentRequest
 ): Promise<HybridEnrollmentResult> {
+  const supabase = getSupabaseAdmin();
   try {
     // Fetch module details
     const { data: module, error: moduleError } = await supabase

@@ -1,10 +1,14 @@
 // lib/multiTenant/compliance.ts
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) {
+    throw new Error('Supabase configuration missing');
+  }
+  return createClient(url, key);
+}
 
 export type TenantCompliance = {
   wioa: boolean;
@@ -13,6 +17,7 @@ export type TenantCompliance = {
 };
 
 export async function getTenantCompliance(tenantId: string): Promise<TenantCompliance> {
+  const supabase = getSupabaseAdmin();
   const { data: tenant } = await supabase
     .from('tenants')
     .select('compliance_wioa, compliance_ferpa, compliance_hipaa')

@@ -1,0 +1,80 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
+
+function getSupabaseAdmin() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!url || !key) return null;
+  return createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+}
+
+/**
+ * POST /api/trial/begin-onboarding
+ *
+ * Called when a trial user clicks "Open Dashboard & Configure."
+ * Records onboarding initiation so we can distinguish between
+ * "trial created but never opened" and "trial created and user engaged."
+ *
+ * Body: { subdomain }
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const { subdomain } = await request.json();
+
+    if (!subdomain || typeof subdomain !== 'string') {
+      return NextResponse.json({ error: 'subdomain is required' }, { status: 400 });
+    }
+
+    const supabase = getSupabaseAdmin();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+    }
+
+    // Find the org by slug
+    const { data: org } = await supabase
+      .from('organizations')
+      .select('id, onboarding_started_at')
+      .eq('slug', subdomain)
+      .maybeSingle();
+
+    if (!org) {
+      return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+    }
+
+    // Only set onboarding_started_at once (idempotent)
+    if (!org.onboarding_started_at) {
+      await supabase
+        .from('organizations')
+        .update({ onboarding_started_at: new Date().toISOString() })
+        .eq('id', org.id);
+    }
+
+    // Log the event
+    const { data: license } = await supabase
+      .from('licenses')
+      .select('id')
+      .eq('organization_id', org.id)
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (license) {
+      await supabase.from('license_events').insert({
+        license_id: license.id,
+        organization_id: org.id,
+        event_type: 'trial_onboarding_started',
+        event_data: {
+          subdomain,
+          source: 'trial_success_page',
+        },
+      }).catch(() => {}); // Non-critical
+    }
+
+    return NextResponse.json({ ok: true });
+  } catch (error) {
+    console.error('[trial/begin-onboarding] Unexpected error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

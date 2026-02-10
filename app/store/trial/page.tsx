@@ -12,6 +12,7 @@ export default function TrialPage() {
   const [adminEmail, setAdminEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [correlationId, setCorrelationId] = useState<string | null>(null);
   const [result, setResult] = useState<{
     tenantUrl: string;
     subdomain: string;
@@ -38,14 +39,17 @@ export default function TrialPage() {
           ? `A trial already exists for this email. Your dashboard: ${data.tenantUrl}`
           : (data.error || 'Something went wrong. Please try again.');
         setError(errMsg);
+        setCorrelationId(data.correlationId || null);
         DemoTrialFunnelEvents.trialCreatedFailed(errMsg);
         return;
       }
 
       setResult(data);
+      setCorrelationId(null);
       DemoTrialFunnelEvents.trialCreatedSuccess(data.subdomain);
     } catch {
       setError('Network error. Please check your connection and try again.');
+      setCorrelationId(null);
     } finally {
       setLoading(false);
     }
@@ -105,7 +109,15 @@ export default function TrialPage() {
               </p>
               <a
                 href={result.tenantUrl}
-                onClick={() => DemoTrialFunnelEvents.trialSuccessOpenDashboard(result.subdomain)}
+                onClick={(e) => {
+                  DemoTrialFunnelEvents.trialSuccessOpenDashboard(result.subdomain);
+                  // Record onboarding initiation (fire-and-forget, don't block navigation)
+                  fetch('/api/trial/begin-onboarding', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ subdomain: result.subdomain }),
+                  }).catch(() => {});
+                }}
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors w-full sm:w-auto"
               >
                 Open Dashboard &amp; Configure <ArrowRight className="w-5 h-5" />
@@ -203,9 +215,30 @@ export default function TrialPage() {
             </div>
 
             {error && (
-              <div className="flex items-start gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800">
-                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <span>{error}</span>
+              <div className="p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-800 space-y-3">
+                <div className="flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                  <span>{error}</span>
+                </div>
+                <div className="flex flex-wrap items-center gap-3 pl-6">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="text-sm font-medium text-brand-red-600 hover:underline"
+                  >
+                    Try again
+                  </button>
+                  <span className="text-red-300">|</span>
+                  <Link
+                    href={`/contact?topic=support&reason=trial-create-failed${correlationId ? `&ref=${correlationId}` : ''}`}
+                    className="text-sm font-medium text-brand-red-600 hover:underline"
+                  >
+                    Contact support
+                  </Link>
+                </div>
+                {correlationId && (
+                  <p className="text-xs text-red-400 pl-6">Reference: {correlationId}</p>
+                )}
               </div>
             )}
 

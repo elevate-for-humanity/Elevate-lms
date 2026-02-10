@@ -88,9 +88,12 @@ async function sendTrialWelcomeEmail(
  * No auth required — rate-limited by email.
  *
  * Body: { orgName, adminName, adminEmail }
- * Returns: { ok, tenantUrl, subdomain, trialEndsAt }
+ * Returns: { ok, tenantUrl, subdomain, trialEndsAt, correlationId }
  */
 export async function POST(request: NextRequest) {
+  // Correlation ID for tracing failures across client ↔ server
+  const correlationId = `trial_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+
   try {
     const body = await request.json();
     const { orgName, adminName, adminEmail } = body;
@@ -98,35 +101,36 @@ export async function POST(request: NextRequest) {
     // Validate required fields
     if (!orgName || !adminName || !adminEmail) {
       return NextResponse.json(
-        { error: 'orgName, adminName, and adminEmail are required' },
+        { error: 'orgName, adminName, and adminEmail are required', correlationId },
         { status: 400 }
       );
     }
 
     if (typeof orgName !== 'string' || orgName.trim().length < 2 || orgName.trim().length > 100) {
-      return NextResponse.json({ error: 'orgName must be 2-100 characters' }, { status: 400 });
+      return NextResponse.json({ error: 'orgName must be 2-100 characters', correlationId }, { status: 400 });
     }
 
     if (typeof adminName !== 'string' || adminName.trim().length < 2) {
-      return NextResponse.json({ error: 'adminName must be at least 2 characters' }, { status: 400 });
+      return NextResponse.json({ error: 'adminName must be at least 2 characters', correlationId }, { status: 400 });
     }
 
     const email = adminEmail.trim().toLowerCase();
     if (!validateEmail(email)) {
-      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid email address', correlationId }, { status: 400 });
     }
 
     // Rate limit
     if (!checkRateLimit(email)) {
       return NextResponse.json(
-        { error: 'Too many trial requests. Please try again later.' },
+        { error: 'Too many trial requests. Please try again later.', correlationId },
         { status: 429 }
       );
     }
 
     const supabase = getSupabaseAdmin();
     if (!supabase) {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+      console.error(`[trial] ${correlationId} — Supabase not configured`);
+      return NextResponse.json({ error: 'Service unavailable', correlationId }, { status: 503 });
     }
 
     // Check if org with this email already exists
@@ -181,8 +185,8 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (orgError) {
-      console.error('[trial] Org creation error:', orgError);
-      return NextResponse.json({ error: 'Failed to create organization' }, { status: 500 });
+      console.error(`[trial] ${correlationId} — Org creation error:`, orgError);
+      return NextResponse.json({ error: 'Failed to create organization', correlationId }, { status: 500 });
     }
 
     // Create trial license
@@ -204,10 +208,10 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (licenseError) {
-      console.error('[trial] License creation error:', licenseError);
+      console.error(`[trial] ${correlationId} — License creation error:`, licenseError);
       // Rollback org
       await supabase.from('organizations').delete().eq('id', org.id);
-      return NextResponse.json({ error: 'Failed to create trial license' }, { status: 500 });
+      return NextResponse.json({ error: 'Failed to create trial license', correlationId }, { status: 500 });
     }
 
     // Log provisioning event
@@ -228,7 +232,7 @@ export async function POST(request: NextRequest) {
     try {
       await sendTrialWelcomeEmail(email, orgName.trim(), subdomain, dashboardUrl);
     } catch (emailError) {
-      console.error('[trial] Failed to send welcome email:', emailError);
+      console.error(`[trial] ${correlationId} — Failed to send welcome email:`, emailError);
       // Don't fail — trial is created
     }
 
@@ -237,10 +241,11 @@ export async function POST(request: NextRequest) {
       tenantUrl: dashboardUrl,
       subdomain,
       trialEndsAt: trialEndsAt.toISOString(),
+      correlationId,
       message: `Trial created. Check ${email} for login instructions.`,
     });
   } catch (error) {
-    console.error('[trial] Unexpected error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error(`[trial] ${correlationId} — Unexpected error:`, error);
+    return NextResponse.json({ error: 'Internal server error', correlationId }, { status: 500 });
   }
 }

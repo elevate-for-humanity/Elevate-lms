@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { TrackedTrialCta } from '@/components/store/TrackedTrialCta';
 
 export const metadata: Metadata = {
   title: 'Platform Demo | Elevate Workforce OS',
@@ -100,12 +101,7 @@ export default function StoreDemoPage() {
             This is a guided walkthrough. You won&apos;t create an account or enter any data here.
           </p>
           <div className="mt-8 flex flex-col items-center gap-3">
-            <Link
-              href="/store/trial"
-              className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors text-lg"
-            >
-              Start 14-Day Trial <ArrowRight className="w-5 h-5" />
-            </Link>
+            <TrackedTrialCta source="demo_hero" />
             <Link href="/store/licenses" className="text-sm text-white/60 hover:text-white/90 underline">
               View licensing options
             </Link>
@@ -183,12 +179,7 @@ export default function StoreDemoPage() {
             Most teams skip the demo and start directly in a trial. The demo is for evaluation only.
           </p>
           <div className="flex flex-col items-center gap-3">
-            <Link
-              href="/store/trial"
-              className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors text-lg"
-            >
-              Start 14-Day Trial <ArrowRight className="w-5 h-5" />
-            </Link>
+            <TrackedTrialCta source="demo_bottom" />
             <Link href="/store/licenses" className="text-sm text-slate-500 hover:underline">
               View licensing options
             </Link>

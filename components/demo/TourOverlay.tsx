@@ -22,6 +22,7 @@ import {
   type TourProgress 
 } from '@/lib/demo/progress';
 import { type DemoLicenseType, DEMO_USERS } from '@/lib/demo/context';
+import { DemoTrialFunnelEvents } from '@/lib/analytics/events';
 
 interface TourOverlayProps {
   tourId?: DemoLicenseType;
@@ -51,6 +52,11 @@ export function TourOverlay({ tourId: propTourId, stepNumber: propStepNumber }: 
     const p = initProgress(userId, tourId);
     setProgress(p);
     
+    // Track tour start on first step
+    if (stepParam === 1) {
+      DemoTrialFunnelEvents.demoTourStarted(tourId);
+    }
+    
     // Get current step
     const step = getTourStep(tourId, stepParam);
     setCurrentStep(step);
@@ -73,7 +79,7 @@ export function TourOverlay({ tourId: propTourId, stepNumber: propStepNumber }: 
     setProgress(newProgress);
     
     if (isLastStep) {
-      // Navigate to checkout
+      DemoTrialFunnelEvents.demoTourCompleted(tourId);
       router.push(currentStep.route);
     } else {
       // Navigate to next step's route with tour params

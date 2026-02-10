@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowRight, Clock, Shield, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { DemoTrialFunnelEvents } from '@/lib/analytics/events';
 
 export default function TrialPage() {
   const [orgName, setOrgName] = useState('');
@@ -33,15 +34,16 @@ export default function TrialPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (res.status === 409 && data.tenantUrl) {
-          setError(`A trial already exists for this email. Your dashboard: ${data.tenantUrl}`);
-        } else {
-          setError(data.error || 'Something went wrong. Please try again.');
-        }
+        const errMsg = res.status === 409 && data.tenantUrl
+          ? `A trial already exists for this email. Your dashboard: ${data.tenantUrl}`
+          : (data.error || 'Something went wrong. Please try again.');
+        setError(errMsg);
+        DemoTrialFunnelEvents.trialCreatedFailed(errMsg);
         return;
       }
 
       setResult(data);
+      DemoTrialFunnelEvents.trialCreatedSuccess(data.subdomain);
     } catch {
       setError('Network error. Please check your connection and try again.');
     } finally {
@@ -103,6 +105,7 @@ export default function TrialPage() {
               </p>
               <a
                 href={result.tenantUrl}
+                onClick={() => DemoTrialFunnelEvents.trialSuccessOpenDashboard(result.subdomain)}
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors w-full sm:w-auto"
               >
                 Open Dashboard &amp; Configure <ArrowRight className="w-5 h-5" />

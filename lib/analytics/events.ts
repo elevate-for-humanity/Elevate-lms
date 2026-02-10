@@ -461,3 +461,74 @@ export const ErrorEvents = {
     });
   },
 };
+
+// ============================================
+// DEMO + TRIAL FUNNEL
+// ============================================
+
+export const DemoTrialFunnelEvents = {
+  demoPrimaryCtaClicked: () => {
+    trackEvent({
+      action: 'demo_primary_cta_clicked',
+      category: 'demo_trial_funnel',
+      label: 'start_trial_from_demo',
+    });
+  },
+
+  demoTourStarted: (tourId: string) => {
+    trackEvent({
+      action: 'demo_tour_started',
+      category: 'demo_trial_funnel',
+      label: tourId,
+    });
+  },
+
+  demoTourCompleted: (tourId: string) => {
+    trackEvent({
+      action: 'demo_tour_completed',
+      category: 'demo_trial_funnel',
+      label: tourId,
+    });
+  },
+
+  trialCreatedSuccess: (subdomain: string) => {
+    trackEvent({
+      action: 'trial_created_success',
+      category: 'demo_trial_funnel',
+      label: subdomain,
+    });
+  },
+
+  trialCreatedFailed: (error: string) => {
+    trackEvent({
+      action: 'trial_created_failed',
+      category: 'demo_trial_funnel',
+      label: error,
+    });
+  },
+
+  trialSuccessOpenDashboard: (subdomain: string) => {
+    trackEvent({
+      action: 'trial_success_open_dashboard',
+      category: 'demo_trial_funnel',
+      label: subdomain,
+    });
+  },
+
+  redirectNoticeShown: (reason: string) => {
+    trackEvent({
+      action: 'redirect_notice_shown',
+      category: 'demo_trial_funnel',
+      label: reason,
+      nonInteraction: true,
+    });
+  },
+
+  redirectNoticeCtaClicked: (reason: string) => {
+    trackEvent({
+      action: 'redirect_notice_cta_clicked',
+      category: 'demo_trial_funnel',
+      label: reason,
+    });
+  },
+};

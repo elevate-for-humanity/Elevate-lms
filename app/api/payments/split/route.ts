@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 // Program-specific vendor costs
 const VENDOR_COSTS = {
@@ -21,6 +22,11 @@ const VENDOR_COSTS = {
 };
 
 export async function POST(request: NextRequest) {
+  const authResult = await apiAuthGuard({ requireAuth: true });
+  if (!authResult.authorized) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const supabase = await createClient();
 
   try {

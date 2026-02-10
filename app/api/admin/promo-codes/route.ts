@@ -1,11 +1,15 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export const dynamic = 'force-dynamic';
 
 // GET - Fetch all promo codes
 export async function GET() {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
+
     const supabase = createAdminClient();
 
     const { data: promoCodes, error } = await supabase
@@ -26,6 +30,9 @@ export async function GET() {
 // POST - Create new promo code
 export async function POST(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
+
     const body = await req.json();
     const supabase = createAdminClient();
 
@@ -61,6 +68,9 @@ export async function POST(req: Request) {
 // PUT - Update promo code
 export async function PUT(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
+
     const body = await req.json();
     const supabase = createAdminClient();
 
@@ -98,6 +108,9 @@ export async function PUT(req: Request) {
 // DELETE - Delete promo code
 export async function DELETE(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
+
     const { searchParams } = new URL(req.url);
     const id = searchParams.get('id');
 

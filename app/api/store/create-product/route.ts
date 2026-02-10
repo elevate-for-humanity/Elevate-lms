@@ -9,9 +9,13 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { requireActiveLicense, LicenseError, licenseErrorResponse } from '@/lib/license/requireActiveLicense';
 import { TenantContextError } from '@/lib/tenant';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function POST(req: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
+
     // STEP 5B: Require active license for paid features
     await requireActiveLicense();
     

@@ -5,9 +5,13 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function POST(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
+
     const body = await req.json();
     const { employer_id } = body;
 

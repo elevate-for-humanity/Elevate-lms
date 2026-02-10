@@ -7,6 +7,7 @@ import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { getProductBySlug } from '@/app/data/store-products';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 
 interface CustomerInfo {
@@ -23,6 +24,11 @@ interface RequestBody {
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const body = await parseBody<RequestBody>(request);
     const { productId, customerInfo } = body;
 

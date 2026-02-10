@@ -1,13 +1,26 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { Info } from 'lucide-react';
+import Link from 'next/link';
+import { Info, ArrowRight } from 'lucide-react';
 import { Suspense } from 'react';
 
-const notices: Record<string, string> = {
-  'invalid-product': 'That product was not found. Please choose a license below.',
-  'expired': 'Your license has expired. Renew or choose a new license below.',
-  'redirect': 'You were redirected here. Choose a license to get started.',
+const notices: Record<string, { message: string; cta?: string; href?: string }> = {
+  'invalid-product': {
+    message: 'That product was not found.',
+    cta: 'View available licenses',
+    href: '#licenses',
+  },
+  'expired': {
+    message: 'Your license has expired.',
+    cta: 'Renew license to restore access',
+    href: '/store/licenses/managed-platform',
+  },
+  'redirect': {
+    message: 'You were redirected here.',
+    cta: 'Choose a license to get started',
+    href: '#licenses',
+  },
 };
 
 function NoticeContent() {
@@ -16,11 +29,20 @@ function NoticeContent() {
 
   if (!reason || !notices[reason]) return null;
 
+  const { message, cta, href } = notices[reason];
+
   return (
     <div className="max-w-3xl mx-auto px-4 mt-4">
-      <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
-        <Info className="w-4 h-4 flex-shrink-0" />
-        <span>{notices[reason]}</span>
+      <div className="flex items-center justify-between gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+        <div className="flex items-center gap-2">
+          <Info className="w-4 h-4 flex-shrink-0" />
+          <span>{message}</span>
+        </div>
+        {cta && href && (
+          <Link href={href} className="flex items-center gap-1 font-semibold whitespace-nowrap hover:underline">
+            {cta} <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        )}
       </div>
     </div>
   );

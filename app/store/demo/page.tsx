@@ -99,15 +99,15 @@ export default function StoreDemoPage() {
             Walk through each role in the Workforce OS — admin, employer, and workforce program.
             This is a guided walkthrough. You won&apos;t create an account or enter any data here.
           </p>
-          <p className="mt-3 text-sm text-white/60">
-            When you&apos;re ready to work with real data, start a <Link href="/store/trial" className="underline hover:text-white/90">14-day trial</Link> or <Link href="/store/licenses" className="underline hover:text-white/90">choose a license</Link>.
-          </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col items-center gap-3">
             <Link
-              href="/store/licenses"
+              href="/store/trial"
               className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors text-lg"
             >
-              Get Started <ArrowRight className="w-5 h-5" />
+              Start 14-Day Trial <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link href="/store/licenses" className="text-sm text-white/60 hover:text-white/90 underline">
+              View licensing options
             </Link>
           </div>
         </div>
@@ -179,21 +179,24 @@ export default function StoreDemoPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-3">
             You&apos;ve seen how the Workforce OS works across all roles.
           </h2>
-          <p className="text-slate-800 mb-8">
-            Most organizations can get started immediately.
+          <p className="text-slate-800 mb-3">
+            Most teams skip the demo and start directly in a trial. The demo is for evaluation only.
           </p>
-          <div className="flex justify-center">
+          <div className="flex flex-col items-center gap-3">
             <Link
-              href="/store/licenses"
+              href="/store/trial"
               className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors text-lg"
             >
-              Get Started <ArrowRight className="w-5 h-5" />
+              Start 14-Day Trial <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link href="/store/licenses" className="text-sm text-slate-500 hover:underline">
+              View licensing options
             </Link>
           </div>
-          <p className="mt-6 text-sm text-slate-500">
-            <Link href="/contact?topic=enterprise-review" className="text-slate-600 hover:underline">Enterprise / Government review</Link>
+          <p className="mt-6 text-sm text-slate-400">
+            <Link href="/contact?topic=enterprise-review" className="hover:underline">Enterprise / Government review</Link>
             {' · '}
-            <Link href="/contact" className="text-slate-600 hover:underline">Compliance or procurement questions</Link>
+            <Link href="/contact" className="hover:underline">Compliance or procurement questions</Link>
           </p>
         </div>
       </section>

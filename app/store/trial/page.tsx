@@ -79,7 +79,7 @@ export default function TrialPage() {
               You&apos;re now in your live workspace (14-day trial). Nothing here is public until you launch.
             </p>
 
-            <div className="bg-slate-50 rounded-xl p-6 mb-8 text-left space-y-3">
+            <div className="bg-slate-50 rounded-xl p-6 mb-6 text-left space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-slate-600">Organization</span>
                 <span className="font-semibold text-slate-900">{orgName}</span>
@@ -94,14 +94,22 @@ export default function TrialPage() {
               </div>
             </div>
 
-            <a
-              href={result.tenantUrl}
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors text-lg"
-            >
-              Open Admin Dashboard <ArrowRight className="w-5 h-5" />
-            </a>
+            {/* First action — converts "trying" into "owning" */}
+            <div className="bg-white border border-slate-200 rounded-xl p-6 mb-8 text-left">
+              <h2 className="font-bold text-slate-900 mb-1">Your first step</h2>
+              <p className="text-sm text-slate-600 mb-4">
+                Open your dashboard and confirm your organization name and settings.
+                This takes 30 seconds and makes the workspace yours.
+              </p>
+              <a
+                href={result.tenantUrl}
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors w-full sm:w-auto"
+              >
+                Open Dashboard &amp; Configure <ArrowRight className="w-5 h-5" />
+              </a>
+            </div>
 
-            <p className="mt-6 text-sm text-slate-500">
+            <p className="text-sm text-slate-500">
               No credit card required. Full platform access for 14 days.
             </p>
           </div>

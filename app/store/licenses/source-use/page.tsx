@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { AlertTriangle, Check, X, FileCode, Building2, Shield, ArrowRight, Ban } from 'lucide-react';
+import { LicenseDemo } from '@/components/store/LicenseDemo';
 
 export const metadata: Metadata = {
   title: 'Restricted Source-Use License | Elevate for Humanity',
@@ -116,6 +117,21 @@ export default function SourceUseLicensePage() {
           </div>
         </div>
       </section>
+
+      {/* Interactive Demo */}
+      <LicenseDemo
+        tourId="workforce_program"
+        licenseName="Enterprise Source-Use License"
+        workflows={[
+          'Deploy the platform on your own infrastructure',
+          'Configure WIOA eligibility and funding rules',
+          'Set up outcome tracking and federal reporting',
+          'Integrate with existing workforce systems',
+          'Manage multi-location partner networks',
+        ]}
+        ctaHref="/contact?topic=enterprise-review"
+        ctaLabel="Request Enterprise Review"
+      />
 
       {/* Restrictions */}
       <section className="py-16 bg-slate-900/50">

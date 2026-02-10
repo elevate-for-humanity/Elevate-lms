@@ -95,8 +95,8 @@ export type DemoLicenseType = 'institution_admin' | 'partner_employer' | 'workfo
 export function getLicenseCheckoutUrl(licenseType: DemoLicenseType): string {
   const urls: Record<DemoLicenseType, string> = {
     institution_admin: '/store/licenses/managed-platform',
-    partner_employer: '/store/licenses/pro-license',
-    workforce_program: '/store/licenses/enterprise-license',
+    partner_employer: '/store/licenses/managed-platform',
+    workforce_program: '/store/licenses/source-use',
   };
   return urls[licenseType];
 }
@@ -106,9 +106,9 @@ export function getLicenseCheckoutUrl(licenseType: DemoLicenseType): string {
  */
 export function getLicenseDisplayName(licenseType: DemoLicenseType): string {
   const names: Record<DemoLicenseType, string> = {
-    institution_admin: 'Institution / Admin License',
-    partner_employer: 'Partner / Employer License',
-    workforce_program: 'Workforce / Program License',
+    institution_admin: 'Managed Platform',
+    partner_employer: 'Managed Platform (Employer)',
+    workforce_program: 'Enterprise Source-Use',
   };
   return names[licenseType];
 }

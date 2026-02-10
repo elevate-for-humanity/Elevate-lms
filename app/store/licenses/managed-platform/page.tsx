@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Check, Shield, Users, BarChart3, Lock, Headphones, ArrowRight, AlertTriangle } from 'lucide-react';
+import { LicenseDemo } from '@/components/store/LicenseDemo';
 
 export const metadata: Metadata = {
   title: 'Managed Enterprise LMS Platform | Elevate for Humanity',
@@ -144,6 +145,21 @@ export default function ManagedPlatformPage() {
           </div>
         </div>
       </section>
+
+      {/* Interactive Demo */}
+      <LicenseDemo
+        tourId="institution_admin"
+        licenseName="Managed Platform"
+        workflows={[
+          'Set up your organization profile and branding',
+          'Import or create your first training program',
+          'Enroll learners and assign courses',
+          'Run a WIOA compliance report',
+          'Invite employer partners to the portal',
+        ]}
+        ctaHref="/store/trial"
+        ctaLabel="Start 14-Day Trial"
+      />
 
       {/* License Terms - Clear */}
       <section className="py-12 bg-slate-800/30">

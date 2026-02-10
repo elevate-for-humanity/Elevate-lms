@@ -23,6 +23,8 @@ const tours = [
   {
     title: 'Admin Dashboard',
     icon: Shield,
+    tourId: 'institution_admin',
+    license: 'Managed Platform',
     description: 'Organization management, enrollment oversight, compliance reporting, and user administration.',
     highlights: [
       'Multi-program enrollment dashboard',
@@ -32,19 +34,10 @@ const tours = [
     ],
   },
   {
-    title: 'Learner Experience',
-    icon: GraduationCap,
-    description: 'Course delivery, progress tracking, credential issuance, and career services from the student perspective.',
-    highlights: [
-      'Course modules and assessments',
-      'Apprenticeship hour logging',
-      'Certificate and credential tracking',
-      'Job placement pipeline',
-    ],
-  },
-  {
     title: 'Employer Portal',
     icon: Briefcase,
+    tourId: 'partner_employer',
+    license: 'Managed Platform',
     description: 'Candidate pipelines, apprenticeship management, and workforce reporting for employer partners.',
     highlights: [
       'Candidate matching and pipelines',
@@ -54,14 +47,29 @@ const tours = [
     ],
   },
   {
-    title: 'Instructor Tools',
-    icon: Users,
-    description: 'Class management, attendance tracking, grading, and student communication tools.',
+    title: 'Workforce Program',
+    icon: BarChart3,
+    tourId: 'workforce_program',
+    license: 'Enterprise Source-Use',
+    description: 'WIOA eligibility, funding management, outcome tracking, and federal reporting for workforce boards.',
     highlights: [
-      'Class roster and attendance',
-      'Assignment and grade management',
-      'Student communication',
-      'Progress reports',
+      'WIOA eligibility determination',
+      'Grant funding management',
+      'Outcome and placement tracking',
+      'Federal compliance reporting',
+    ],
+  },
+  {
+    title: 'Learner Experience',
+    icon: GraduationCap,
+    tourId: null,
+    license: 'All licenses',
+    description: 'Course delivery, progress tracking, credential issuance, and career services from the student perspective.',
+    highlights: [
+      'Course modules and assessments',
+      'Apprenticeship hour logging',
+      'Certificate and credential tracking',
+      'Job placement pipeline',
     ],
   },
 ];
@@ -115,19 +123,31 @@ export default function StoreDemoPage() {
                 <div className="w-full md:w-1/2 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 aspect-video flex items-center justify-center">
                   <div className="text-center p-8">
                     <tour.icon className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                    <p className="text-slate-500 font-medium">{tour.title} Preview</p>
-                    <p className="text-slate-400 text-sm mt-1">Screenshots available during live demo</p>
+                    <p className="text-slate-500 font-medium">{tour.title}</p>
+                    {tour.tourId ? (
+                      <Link
+                        href={`/demo/tour/${tour.tourId}?step=1`}
+                        className="inline-flex items-center gap-2 mt-3 px-5 py-2 bg-brand-red-600 text-white text-sm font-bold rounded-lg hover:bg-brand-red-700 transition-colors"
+                      >
+                        <Play className="w-4 h-4" /> Start Tour
+                      </Link>
+                    ) : (
+                      <p className="text-slate-400 text-sm mt-2">Included in all licenses</p>
+                    )}
                   </div>
                 </div>
 
                 {/* Content */}
                 <div className="w-full md:w-1/2">
-                  <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center gap-3 mb-1">
                     <tour.icon className="w-6 h-6 text-brand-red-600" />
                     <h2 className="text-2xl font-bold text-slate-900">{tour.title}</h2>
                   </div>
+                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
+                    {tour.license}
+                  </p>
                   <p className="text-slate-800 mb-4">{tour.description}</p>
-                  <ul className="space-y-2">
+                  <ul className="space-y-2 mb-4">
                     {tour.highlights.map((h) => (
                       <li key={h} className="flex items-start gap-2 text-slate-800 text-sm">
                         <BarChart3 className="w-4 h-4 text-brand-red-600 flex-shrink-0 mt-0.5" />
@@ -135,6 +155,14 @@ export default function StoreDemoPage() {
                       </li>
                     ))}
                   </ul>
+                  {tour.tourId && (
+                    <Link
+                      href={`/demo/tour/${tour.tourId}?step=1`}
+                      className="inline-flex items-center gap-2 text-brand-red-600 font-semibold text-sm hover:underline"
+                    >
+                      Start {tour.title} Tour <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  )}
                 </div>
               </div>
             ))}

@@ -8,7 +8,6 @@ import {
   Download,
   BookOpen,
   MessageCircle,
-  Calendar,
   ArrowRight,
   Loader2,
 } from 'lucide-react';
@@ -24,9 +23,6 @@ function TrialSuccessContent() {
   const licenseSlug = searchParams.get('license') || 'starter-license';
   const license = LICENSES[licenseSlug] || LICENSES['starter-license'];
 
-  const trialEndDate = new Date();
-  trialEndDate.setDate(trialEndDate.getDate() + 14);
-
   return (
     <div className="min-h-screen bg-gray-50 py-16">
       <div className="max-w-2xl mx-auto px-4">
@@ -36,28 +32,23 @@ function TrialSuccessContent() {
             <CheckCircle className="w-12 h-12 text-green-600" />
           </div>
           <h1 className="text-3xl font-black text-gray-900 mb-3">
-            Your Trial Has Started!
+            Purchase Complete
           </h1>
           <p className="text-lg text-gray-600">
-            You now have full access to {license.name}
+            You now have access to {license.name}
           </p>
         </div>
 
-        {/* Trial Info Card */}
+        {/* License Info Card */}
         <div className="bg-white rounded-2xl p-8 shadow-sm mb-8">
-          <div className="flex items-center gap-4 p-4 bg-amber-50 rounded-xl mb-6">
-            <Calendar className="w-6 h-6 text-amber-600" />
+          <div className="flex items-center gap-4 p-4 bg-green-50 rounded-xl mb-6">
+            <CheckCircle className="w-6 h-6 text-green-600" />
             <div>
-              <p className="font-bold text-amber-900">
-                Trial ends {trialEndDate.toLocaleDateString('en-US', { 
-                  weekday: 'long',
-                  month: 'long', 
-                  day: 'numeric', 
-                  year: 'numeric' 
-                })}
+              <p className="font-bold text-green-900">
+                License activated
               </p>
-              <p className="text-sm text-amber-700">
-                You'll be charged ${license.price.toLocaleString()} after the trial unless you cancel.
+              <p className="text-sm text-green-700">
+                Your codebase license is ready. Download and deploy at any time.
               </p>
             </div>
           </div>
@@ -121,14 +112,13 @@ function TrialSuccessContent() {
           </div>
         </div>
 
-        {/* Cancel Info */}
+        {/* Account Info */}
         <div className="text-center text-sm text-gray-500">
           <p>
-            Need to cancel? Go to{' '}
+            Manage your licenses in{' '}
             <Link href="/account/billing" className="text-blue-600 hover:underline">
               Account → Billing
-            </Link>
-            {' '}anytime before your trial ends.
+            </Link>.
           </p>
         </div>
       </div>

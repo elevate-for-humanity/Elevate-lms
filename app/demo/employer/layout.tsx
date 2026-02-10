@@ -1,8 +1,9 @@
 import { Metadata } from 'next';
+import { DemoTourProvider } from '@/components/demo/DemoTourProvider';
 
 export const metadata: Metadata = {
   title: 'Demo | Employer | Elevate for Humanity',
-  description: 'Elevate for Humanity - Career training and workforce development programs.',
+  description: 'Public demo of the Elevate employer portal using sample data.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/demo/employer',
   },
@@ -12,6 +13,6 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return <>{children}</>;
+export default function DemoEmployerLayout({ children }: { children: React.ReactNode }) {
+  return <DemoTourProvider>{children}</DemoTourProvider>;
 }

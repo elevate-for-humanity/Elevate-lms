@@ -5,7 +5,9 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import { checkRateLimit, getIdentifier } from '@/lib/rate-limit';
-import { randomUUID } from 'crypto';
+import { createHash } from 'crypto';
+
+const IDEMPOTENCY_WINDOW_MS = 5 * 60 * 1000; // 5-minute window
 
 const MAX_DONATION_CENTS = 25_000_00; // $25,000
 const MIN_DONATION_CENTS = 1_00; // $1
@@ -53,7 +55,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const idempotencyKey = randomUUID();
+    // Stable idempotency key: same IP + amount + time window = same Stripe session.
+    // Prevents duplicate charges on client retries within the window.
+    const timeWindow = Math.floor(Date.now() / IDEMPOTENCY_WINDOW_MS);
+    const idempotencyKey = createHash('sha256')
+      .update(`donate:${ip}:${unitAmount}:${timeWindow}`)
+      .digest('hex');
 
     const session = await stripe.checkout.sessions.create(
       {

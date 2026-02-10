@@ -7,7 +7,8 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit, getIdentifier } from '@/lib/rate-limit';
 
 // Public endpoint — applicants check their own status.
-// Requires both email AND application ID to prevent enumeration.
+// Requires both application ID (UUID) AND email to prevent enumeration.
+// The confirmation email provides both values in the tracking link.
 export async function GET(request: NextRequest) {
   try {
     const ip = getIdentifier(request);
@@ -27,34 +28,29 @@ export async function GET(request: NextRequest) {
     const id = searchParams.get('id');
     const email = searchParams.get('email');
 
-    if (!email) {
+    // Require both ID and email — ID alone is guessable via UUID patterns,
+    // email alone enables enumeration. Together they form a two-factor lookup.
+    if (!id || !email) {
       return NextResponse.json(
-        { error: 'Email is required' },
+        { error: 'Application ID and email are both required' },
         { status: 400 }
       );
     }
 
     const supabase = createAdminClient();
 
-    // Always filter by email. If ID is also provided, require both to match.
-    let query = supabase
+    const { data, error } = await supabase
       .from('applications')
       .select(
         'id, first_name, last_name, email, phone, program_id, status, submitted_at'
       )
-      .eq('email', email.toLowerCase());
-
-    if (id) {
-      query = query.eq('id', id);
-    }
-
-    const { data, error } = await query
-      .order('submitted_at', { ascending: false })
+      .eq('id', id)
+      .eq('email', email.toLowerCase())
       .limit(1)
       .single();
 
     if (error || !data) {
-      // Uniform 404 whether email exists or not — prevents enumeration
+      // Uniform 404 regardless of which factor failed
       return NextResponse.json(
         { error: 'Application not found' },
         { status: 404 }

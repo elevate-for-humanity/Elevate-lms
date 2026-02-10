@@ -17,6 +17,7 @@ interface ApplicationStatus {
 
 export default function ApplicationStatusPage() {
   const [email, setEmail] = useState('');
+  const [applicationId, setApplicationId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [application, setApplication] = useState<ApplicationStatus | null>(null);
@@ -30,13 +31,17 @@ export default function ApplicationStatusPage() {
     setSearched(true);
 
     try {
-      const response = await fetch(`/api/applications/track?email=${encodeURIComponent(email)}`);
+      const params = new URLSearchParams();
+      params.append('email', email);
+      if (applicationId) params.append('id', applicationId);
+
+      const response = await fetch(`/api/applications/track?${params.toString()}`);
       const data = await response.json();
 
       if (response.ok && data.application) {
         setApplication(data.application);
       } else {
-        setError(data.error || 'No application found with this email address.');
+        setError(data.error || 'Application not found. Please check your Application ID and email.');
       }
     } catch (error) {
       setError('Failed to check status. Please try again or call 317-314-3757.');
@@ -93,27 +98,37 @@ export default function ApplicationStatusPage() {
       <div className="max-w-xl mx-auto px-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Check Application Status</h1>
-          <p className="text-gray-600">Enter your email to see your application status</p>
+          <p className="text-gray-600">Enter your Application ID and email from your confirmation to check status</p>
         </div>
 
         <form onSubmit={handleSearch} className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-          <div className="flex gap-3">
+          <div className="space-y-3">
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="Enter your email address"
+              type="text"
+              value={applicationId}
+              onChange={(e) => setApplicationId(e.target.value)}
+              placeholder="Application ID (from your confirmation email)"
               required
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             />
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-400 flex items-center gap-2"
-            >
-              <Search className="w-5 h-5" />
-              {loading ? 'Checking...' : 'Check'}
-            </button>
+            <div className="flex gap-3">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email address"
+                required
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:bg-gray-400 flex items-center gap-2"
+              >
+                <Search className="w-5 h-5" />
+                {loading ? 'Checking...' : 'Check'}
+              </button>
+            </div>
           </div>
         </form>
 

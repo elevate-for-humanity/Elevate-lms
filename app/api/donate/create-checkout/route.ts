@@ -4,14 +4,10 @@ export const runtime = 'edge';
 export const maxDuration = 60;
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { stripe } from '@/lib/stripe/client';
-import { apiAuthGuard } from '@/lib/authGuards';
 
+// Public endpoint — anonymous donations allowed
 export async function POST(request: NextRequest) {
   try {
-    const authResult = await apiAuthGuard({ requireAuth: true });
-    if (!authResult.authorized) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     if (!stripe) {
       return NextResponse.json(
         { error: 'Payment processing is not configured' },
@@ -58,7 +54,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (err: any) {
     return NextResponse.json(
-      { error: (err as Error).message || 'Failed to create checkout session' },
+      { error: 'Failed to create checkout session' },
       { status: 500 }
     );
   }

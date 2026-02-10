@@ -6,8 +6,8 @@ export const maxDuration = 60;
  * Record and track grant submissions
  */
 
-import {
-import { apiRequireAdmin } from '@/lib/authGuards'; NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
+import { apiRequireAdmin } from '@/lib/authGuards';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 import {

@@ -5,13 +5,10 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit } from '@/lib/rate-limit';
-import { apiRequireAdmin } from '@/lib/authGuards';
 
-
+// Public endpoint — WIOA application form submissions
 export async function POST(req: Request) {
   try {
-    const adminCheck = await apiRequireAdmin();
-    if (adminCheck instanceof NextResponse) return adminCheck;
     // Rate limiting
     const ip =
       req.headers.get('x-forwarded-for') ||

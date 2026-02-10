@@ -8,8 +8,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-import {
-import { apiRequireAdmin } from '@/lib/authGuards'; NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+import { apiRequireAdmin } from '@/lib/authGuards';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { logger } from '@/lib/logger';
 import {

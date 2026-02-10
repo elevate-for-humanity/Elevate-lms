@@ -4,14 +4,10 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
-import { apiAuthGuard } from '@/lib/authGuards';
 
+// Public endpoint — applicants check their own status by email/ID
 export async function GET(request: NextRequest) {
   try {
-    const authResult = await apiAuthGuard({ requireAuth: true });
-    if (!authResult.authorized) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
     const searchParams = request.nextUrl.searchParams;
     const id = searchParams.get('id');
     const email = searchParams.get('email');

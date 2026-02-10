@@ -3,6 +3,12 @@ import { SupabaseClient } from '@supabase/supabase-js';
 // In-memory cache: once an org is checked (whether reconciled or already set),
 // skip further Supabase queries for this server process. Keyed by org ID.
 // TTL prevents stale entries from accumulating across long-lived processes.
+//
+// Scope: per-process only. On serverless (Netlify Functions, Vercel), each cold
+// start gets a fresh cache. This is intentional — the cache avoids redundant
+// queries within a warm instance, not across all instances. The underlying
+// DB write is idempotent, so a cold-start re-check is harmless (one extra
+// SELECT, no duplicate writes). For a universal cache, move to Redis/Upstash.
 const reconcileCache = new Map<string, number>();
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
 

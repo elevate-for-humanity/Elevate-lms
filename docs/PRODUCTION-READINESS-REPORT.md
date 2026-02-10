@@ -177,4 +177,48 @@ The platform is production-ready with all core functionality operational. No har
 
 ---
 
-*Report generated: January 2025*
+## 10. Trial Funnel Verification Checklist
+
+Added February 2025. Required before trial funnel goes live.
+
+### External service verification
+
+Run one real trial creation in staging/prod and confirm each hop:
+
+| # | Hop | How to verify | Status |
+|---|-----|---------------|--------|
+| 1 | API returns `correlationId` | `curl -X POST /api/trial/start-managed` — check JSON response | |
+| 2 | Supabase: `license_events.event_data.correlation_id` populated | Query `license_events` where `event_type = 'trial_self_service_start'` | |
+| 3 | Resend: outbound email includes `X-Correlation-ID` header | Check Resend dashboard → Logs → email headers | |
+| 4 | GA4: `correlation_id` appears in DebugView | Open store/trial in Chrome with GA Debug extension | |
+| 5 | GA4: `correlation_id` queryable in reports | Verify custom dimension registered (see below) | |
+
+### GA4 custom dimension registration
+
+This cannot be done in code. Manual step in Google Analytics admin panel:
+
+1. Go to GA4 Admin → Custom definitions
+2. Click "Create custom dimension"
+3. Name: `Correlation ID`
+4. Scope: `Event`
+5. Event parameter: `correlation_id`
+6. Save
+
+Without this, `correlation_id` appears in DebugView but is not available in standard reports or explorations.
+
+### Environment variables required
+
+| Variable | Purpose | Required for |
+|----------|---------|-------------|
+| `NEXT_PUBLIC_SUPABASE_URL` | Database | Trial creation, event logging |
+| `SUPABASE_SERVICE_ROLE_KEY` | Admin DB access | Trial API, admin endpoints |
+| `RESEND_API_KEY` | Transactional email | Welcome email with correlation ID |
+| `NEXT_PUBLIC_GA_MEASUREMENT_ID` | Analytics | Client-side funnel tracking |
+
+### Operator review endpoint
+
+`GET /api/admin/trial-events?days=7` — returns trial funnel events with summary stats and `setup_warnings` for missing configuration. Requires admin auth.
+
+---
+
+*Report updated: February 2025*

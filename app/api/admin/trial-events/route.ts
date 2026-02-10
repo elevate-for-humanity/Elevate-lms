@@ -78,7 +78,20 @@ export const GET = withAuth(
         summary.by_type[event.event_type] = (summary.by_type[event.event_type] || 0) + 1;
       }
 
-      return NextResponse.json({ summary, events });
+      // Surface setup warnings so operators see what's missing
+      const setup_warnings: string[] = [];
+      if (!process.env.RESEND_API_KEY) {
+        setup_warnings.push('RESEND_API_KEY not configured — trial welcome emails are not being sent');
+      }
+      if (!process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID) {
+        setup_warnings.push('GA4 measurement ID not configured — client-side funnel analytics are not recording');
+      }
+      // GA4 custom dimension can't be verified programmatically — always remind
+      setup_warnings.push(
+        'Verify GA4 custom dimension: Admin → Custom definitions → Event-scoped → "correlation_id". Without this, correlation IDs appear in DebugView but not in reports.'
+      );
+
+      return NextResponse.json({ summary, setup_warnings, events });
     } catch (error) {
       console.error('[admin/trial-events] Unexpected error:', error);
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

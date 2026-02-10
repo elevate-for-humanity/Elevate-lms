@@ -61,6 +61,21 @@ export default function HVACProgramPage() {
         </div>
       </section>
 
+      {/* GALLERY STRIP */}
+      <section className="max-w-5xl mx-auto px-4 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
+            <Image src="/images/hvac-hero.jpg" alt="HVAC Training" fill className="object-cover" />
+          </div>
+          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
+            <Image src="/images/hvac-technician-success.jpg" alt="HVAC Technician Success" fill className="object-cover" />
+          </div>
+          <div className="relative aspect-[4/3] rounded-2xl overflow-hidden shadow-lg">
+            <Image src="/images/programs/hvac-hero.jpg" alt="HVAC Equipment" fill className="object-cover" />
+          </div>
+        </div>
+      </section>
+
       {/* CTA 1 */}
       <section className="bg-blue-600 py-10">
         <div className="max-w-4xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -282,40 +297,108 @@ export default function HVACProgramPage() {
         </div>
       </section>
 
-      {/* CERTIFICATIONS */}
+      {/* ETPL PROGRAM INFO */}
+      <section className="py-8 bg-blue-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-white rounded-xl p-6 border border-blue-200">
+            <div className="flex items-center gap-4 mb-4">
+              <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-bold">ETPL APPROVED</div>
+              <span className="text-slate-600 text-sm">Program Location ID: <strong>10004322</strong></span>
+            </div>
+            <p className="text-slate-700">
+              This program is listed on Indiana's <a href="https://www.in.gov/dwd/career-training/etpl/" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline font-semibold">Eligible Training Provider List (ETPL)</a> and approved for Workforce Ready Grant funding. 
+              <a href="https://www.nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline ml-1">Learn more at NextLevelJobs.org</a>
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* CERTIFICATIONS - ETPL CREDENTIALS */}
       <section className="py-16 bg-slate-900 text-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold">Certifications You'll Earn</h2>
-            <p className="text-slate-300 mt-2">Industry-recognized credentials included in your training</p>
+            <h2 className="text-3xl font-bold">Industry-Recognized Credentials</h2>
+            <p className="text-slate-300 mt-2">All certifications included in your training - required for employment in this field</p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="bg-slate-800 rounded-2xl overflow-hidden">
-              <div className="relative h-40">
-                <Image src="/images/certificates-hero.jpg" alt="EPA 608 Certification" fill className="object-cover" />
+          
+          {/* Main Certifications Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto mb-8">
+            {/* Residential HVAC Certification 1 */}
+            <div className="bg-slate-800 rounded-2xl p-6">
+              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-white" />
               </div>
-              <div className="p-6 text-center">
-                <h3 className="font-bold text-lg mb-2">EPA 608 Certification</h3>
-                <p className="text-slate-300 text-sm">Required by federal law to work with refrigerants. We cover the exam fee.</p>
-              </div>
+              <h3 className="font-bold text-lg mb-2">Residential HVAC Certification 1</h3>
+              <p className="text-slate-300 text-sm mb-3">Core residential heating and cooling systems installation and service.</p>
+              <ul className="text-xs text-slate-400 space-y-1">
+                <li>• Required for employment</li>
+                <li>• Test required</li>
+                <li>• Obtained in this program</li>
+              </ul>
             </div>
-            <div className="bg-slate-800 rounded-2xl overflow-hidden">
-              <div className="relative h-40">
-                <Image src="/images/homepage/emergency-health-safety-training.png" alt="OSHA 10 Safety" fill className="object-cover" />
+
+            {/* Residential HVAC Certification 2 */}
+            <div className="bg-slate-800 rounded-2xl p-6">
+              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-white" />
               </div>
-              <div className="p-6 text-center">
-                <h3 className="font-bold text-lg mb-2">OSHA 10 Safety</h3>
-                <p className="text-slate-300 text-sm">Industry-standard workplace safety certification recognized by all employers.</p>
-              </div>
+              <h3 className="font-bold text-lg mb-2">Residential HVAC Certification 2</h3>
+              <p className="text-slate-300 text-sm mb-3">Refrigeration diagnostics and advanced troubleshooting.</p>
+              <ul className="text-xs text-slate-400 space-y-1">
+                <li>• Required for employment</li>
+                <li>• Test required</li>
+                <li>• Obtained in this program</li>
+              </ul>
             </div>
-            <div className="bg-slate-800 rounded-2xl overflow-hidden">
-              <div className="relative h-40">
-                <Image src="/images/homepage/certificate-of-completion.png" alt="Program Certificate" fill className="object-cover" />
+
+            {/* OSHA 30 */}
+            <div className="bg-slate-800 rounded-2xl p-6">
+              <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-white" />
               </div>
-              <div className="p-6 text-center">
-                <h3 className="font-bold text-lg mb-2">Program Certificate</h3>
-                <p className="text-slate-300 text-sm">Completion certificate documenting your training hours and competencies.</p>
+              <h3 className="font-bold text-lg mb-2">OSHA 30 Safety</h3>
+              <p className="text-slate-300 text-sm mb-3">Comprehensive workplace safety certification for construction and general industry.</p>
+              <ul className="text-xs text-slate-400 space-y-1">
+                <li>• Required for employment</li>
+                <li>• Test required</li>
+                <li>• Obtained in this program</li>
+              </ul>
+            </div>
+
+            {/* CPR Certification */}
+            <div className="bg-slate-800 rounded-2xl p-6">
+              <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-white" />
               </div>
+              <h3 className="font-bold text-lg mb-2">CPR Certification</h3>
+              <p className="text-slate-300 text-sm mb-3">Emergency response and life-saving skills for workplace safety.</p>
+              <ul className="text-xs text-slate-400 space-y-1">
+                <li>• Required for employment</li>
+                <li>• Test required</li>
+                <li>• Obtained in this program</li>
+              </ul>
+            </div>
+
+            {/* Rise Up Certificate */}
+            <div className="bg-slate-800 rounded-2xl p-6">
+              <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mb-4">
+                <Award className="w-6 h-6 text-white" />
+              </div>
+              <h3 className="font-bold text-lg mb-2">Rise Up Certificate</h3>
+              <p className="text-slate-300 text-sm mb-3">Professional skills and workplace readiness certification.</p>
+              <ul className="text-xs text-slate-400 space-y-1">
+                <li>• Required for employment</li>
+                <li>• Test required</li>
+                <li>• Obtained in this program</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Program Accreditation Note */}
+          <div className="max-w-3xl mx-auto text-center">
+            <div className="bg-slate-800 rounded-xl p-6 border border-slate-700">
+              <p className="text-green-400 font-semibold mb-2">Program Accredited: Yes</p>
+              <p className="text-slate-400 text-sm">Curriculum includes specific learning objectives, learning checkpoints, and timeline/calendar.</p>
             </div>
           </div>
         </div>
@@ -363,6 +446,43 @@ export default function HVACProgramPage() {
             <div><div className="text-4xl font-bold text-green-600">90%</div><div className="text-slate-800">Job Placement Rate</div></div>
             <div><div className="text-4xl font-bold text-purple-600">15%</div><div className="text-slate-800">Industry Growth</div></div>
             <div><div className="text-4xl font-bold text-orange-600">500+</div><div className="text-slate-800">Local Job Openings</div></div>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ SECTION */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-slate-900 text-center mb-12">Frequently Asked Questions</h2>
+          <div className="space-y-6">
+            <div className="bg-slate-50 rounded-xl p-6">
+              <h3 className="font-bold text-slate-900 mb-2">Is this program really free?</h3>
+              <p className="text-slate-700">Yes, for eligible participants. The Workforce Ready Grant (WRG) covers 100% of tuition, books, certification exams, and training materials. You pay $0 out of pocket if you qualify.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-6">
+              <h3 className="font-bold text-slate-900 mb-2">What are the eligibility requirements?</h3>
+              <p className="text-slate-700">You must be an Indiana resident, 18 or older, with a high school diploma or GED. You must also meet income guidelines or receive public assistance. Veterans, single parents, and individuals with disabilities may also qualify.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-6">
+              <h3 className="font-bold text-slate-900 mb-2">How long is the program?</h3>
+              <p className="text-slate-700">The program takes 12-16 weeks to complete, including online coursework, hands-on lab training, and paid on-the-job training (OJT) with an employer partner.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-6">
+              <h3 className="font-bold text-slate-900 mb-2">What certifications will I earn?</h3>
+              <p className="text-slate-700">You will earn 5 industry-recognized credentials: Residential HVAC Certification 1, Residential HVAC Certification 2 (Refrigeration Diagnostics), OSHA 30 Safety, CPR Certification, and Rise Up Certificate.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-6">
+              <h3 className="font-bold text-slate-900 mb-2">What is Indiana Career Connect?</h3>
+              <p className="text-slate-700">Indiana Career Connect is the state's workforce system. You must register and complete an appointment with a career coach to access WRG funding. We help you through this process.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-6">
+              <h3 className="font-bold text-slate-900 mb-2">Will I get paid during training?</h3>
+              <p className="text-slate-700">Yes! During the OJT (On-the-Job Training) phase, you work with an employer partner and earn wages while completing your training hours.</p>
+            </div>
+            <div className="bg-slate-50 rounded-xl p-6">
+              <h3 className="font-bold text-slate-900 mb-2">What happens after I complete the program?</h3>
+              <p className="text-slate-700">Many OJT participants receive full-time job offers from their training employer. We also provide job placement assistance to help you find employment with our employer partners.</p>
+            </div>
           </div>
         </div>
       </section>

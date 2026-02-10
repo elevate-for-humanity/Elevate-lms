@@ -140,10 +140,14 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await parseBody<Record<string, any>>(request);
+    // Read the raw body once — the stream can only be consumed once.
+    // We need the raw text for webhook signature verification,
+    // and parsed JSON for all other actions.
+    const rawBody = await request.text();
+    const body: Record<string, any> = JSON.parse(rawBody);
     const { action } = body;
 
-    // Webhook handling (no auth required)
+    // Webhook handling (no auth required — verified by Stripe signature)
     if (action === 'webhook') {
       const signature = request.headers.get('stripe-signature');
       if (!signature) {
@@ -153,9 +157,8 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const payload = await request.text();
       const event = verifyWebhookSignature(
-        payload,
+        rawBody,
         signature,
         process.env.STRIPE_WEBHOOK_SECRET!
       );

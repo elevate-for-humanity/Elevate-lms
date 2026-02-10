@@ -9,6 +9,11 @@ import { toError, toErrorMessage } from '@/lib/safe';
 
 // TEST ONLY - Simulates webhook without Stripe payment
 export async function POST(req: Request) {
+  // Block in production — this endpoint is for development/testing only
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   try {
     const { studentId, programId } = await req.json();
 

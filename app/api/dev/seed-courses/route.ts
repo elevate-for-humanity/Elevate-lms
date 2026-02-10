@@ -11,6 +11,11 @@ import { logger } from '@/lib/logger';
 
 // WARNING: This is a dev/ops endpoint. In production, restrict or remove it.
 export async function POST() {
+  // Block in production — this endpoint is for development/testing only
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   const supabase = getSupabaseServerClient();
 
   const results: { programCode: string; programId?: string; error?: string }[] =

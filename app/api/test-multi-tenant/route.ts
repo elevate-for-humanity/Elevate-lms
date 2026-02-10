@@ -10,6 +10,11 @@ import { NextResponse } from 'next/server';
  * GET /api/test-multi-tenant
  */
 export async function GET() {
+  // Block in production — this endpoint is for development/testing only
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   try {
     if (
       !process.env.NEXT_PUBLIC_SUPABASE_URL ||

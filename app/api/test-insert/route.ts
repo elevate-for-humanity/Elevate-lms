@@ -7,6 +7,11 @@ import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function GET() {
+  // Block in production — this endpoint is for development/testing only
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   return NextResponse.json({
     message: 'Use POST to test insert',
     example: {
@@ -20,6 +25,11 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
+  // Block in production — this endpoint is for development/testing only
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   try {
     const body = await req.json();
     const supabase = createAdminClient();

@@ -10,6 +10,11 @@ export const maxDuration = 60;
  * Runs all test suites and provides complete production readiness report
  */
 export async function GET(request: Request) {
+  // Block in production — this endpoint is for development/testing only
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   try {
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 

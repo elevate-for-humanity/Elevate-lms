@@ -6,6 +6,11 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 
 export async function GET() {
+  // Block in production — this endpoint is for development/testing only
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   try {
     const supabase = await createClient();
 

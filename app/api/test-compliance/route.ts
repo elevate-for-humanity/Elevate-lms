@@ -14,6 +14,11 @@ import {
  * GET /api/test-compliance
  */
 export async function GET() {
+  // Block in production — this endpoint is for development/testing only
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  }
+
   try {
     const results: any = {
       timestamp: new Date().toISOString(),

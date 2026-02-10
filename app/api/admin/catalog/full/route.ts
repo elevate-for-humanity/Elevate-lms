@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { programs } from '@/app/data/programs';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function GET(request: NextRequest) {
+  const adminCheck = await apiRequireAdmin();
+  if (adminCheck instanceof NextResponse) return adminCheck;
+
   const { searchParams } = new URL(request.url);
   const format = searchParams.get('format') || 'html';
 

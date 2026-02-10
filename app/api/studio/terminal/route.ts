@@ -4,12 +4,17 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 const execAsync = promisify(exec);
 
 // Execute a command and return output
 export async function POST(req: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { command, cwd } = await req.json();
 
     if (!command) {

@@ -305,7 +305,7 @@ function DocumentStep({
           <div
             className="bg-slate-50 border border-slate-200 rounded-lg p-6 max-h-96 overflow-y-auto"
             dangerouslySetInnerHTML={{
-              __html: document.content.replace(/\n/g, '<br />'),
+              __html: sanitizeHtml(document.content.replace(/\n/g, '<br />')),
             }}
           />
         </div>

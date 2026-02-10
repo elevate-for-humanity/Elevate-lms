@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -8,6 +9,10 @@ export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const formData = await request.formData();
 
     const firstName = formData.get('firstName') as string;

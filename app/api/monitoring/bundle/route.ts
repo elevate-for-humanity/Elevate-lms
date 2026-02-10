@@ -52,9 +52,6 @@ export async function GET(req: Request) {
 
     return NextResponse.json(bundle);
   } catch (err: any) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : String(err) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

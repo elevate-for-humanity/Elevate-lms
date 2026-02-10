@@ -5,9 +5,12 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function GET() {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = await createClient();
 
     // Get recent enrollments

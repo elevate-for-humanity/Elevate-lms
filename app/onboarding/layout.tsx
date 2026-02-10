@@ -12,11 +12,9 @@ export default async function OnboardingLayout({
 }) {
   // Require authentication and enrollment for onboarding
   const supabase = await createServerSupabaseClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+  const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     redirect('/login?redirect=/onboarding');
   }
 
@@ -25,7 +23,7 @@ export default async function OnboardingLayout({
   const { data: profile } = await supabase
     .from('profiles')
     .select('role')
-    .eq('id', session.user.id)
+    .eq('id', user.id)
     .single();
 
   // All authenticated users can access onboarding

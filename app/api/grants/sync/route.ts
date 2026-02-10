@@ -8,7 +8,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-import { NextResponse } from 'next/server';
+import {
+import { apiRequireAdmin } from '@/lib/authGuards'; NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { logger } from '@/lib/logger';
 import {
@@ -25,6 +26,8 @@ import {
  */
 export async function POST() {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     // Ensure grant source exists
     const { data: source, error: sourceError } = await supabaseAdmin
       .from('grant_sources')
@@ -129,6 +132,8 @@ export async function POST() {
  */
 export async function GET() {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     // Get grant counts
     const { count: totalGrants } = await supabaseAdmin
       .from('grant_opportunities')

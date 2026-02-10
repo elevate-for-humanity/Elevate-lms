@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

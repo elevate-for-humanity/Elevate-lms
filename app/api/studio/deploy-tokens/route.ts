@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import crypto from 'crypto';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 // Simple encryption for tokens - in production use a proper KMS
 const ENCRYPTION_KEY = process.env.DEPLOY_TOKEN_KEY || 'default-key-change-in-production-32';
@@ -38,6 +39,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = supabaseServer();
     
     const { data, error } = await supabase
@@ -72,6 +75,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { provider, token, project_id } = await req.json();
 
     if (!provider || !token) {
@@ -125,6 +130,8 @@ export async function PUT(req: NextRequest) {
   }
 
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { provider } = await req.json();
 
     if (!provider) {
@@ -173,6 +180,8 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = supabaseServer();
 
     const { error } = await supabase

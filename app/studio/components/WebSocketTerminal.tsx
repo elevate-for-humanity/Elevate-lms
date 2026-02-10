@@ -130,8 +130,14 @@ export function WebSocketTerminal({ wsUrl = 'http://localhost:3001', cwd, onPort
 
   // Parse ANSI codes for display
   const parseAnsi = (text: string) => {
-    // Simple ANSI parser - convert to spans with colors
-    return text
+    // Escape HTML entities first to prevent XSS from terminal output
+    const escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+    // Then convert ANSI codes to styled spans
+    return escaped
       .replace(/\x1b\[32m/g, '<span style="color:#7ee787">')
       .replace(/\x1b\[33m/g, '<span style="color:#e2c08d">')
       .replace(/\x1b\[31m/g, '<span style="color:#f85149">')

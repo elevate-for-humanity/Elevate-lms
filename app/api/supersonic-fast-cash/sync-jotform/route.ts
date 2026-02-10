@@ -3,6 +3,7 @@ import { jotFormIntegration } from '@/lib/integrations/jotform';
 import { drakeIntegration } from '@/lib/integrations/drake-software';
 import { createClient } from '@supabase/supabase-js';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -20,6 +21,10 @@ interface SyncJotformBody {
  */
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body: SyncJotformBody = await request.json();
     const formId = body.formId || process.env.JOTFORM_FORM_ID;
 

@@ -3,7 +3,8 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 // app/api/applications/route.ts
-import { NextResponse } from 'next/server';
+import {
+import { apiAuthGuard } from '@/lib/authGuards'; NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   rateLimitNew as rateLimit,
@@ -13,9 +14,13 @@ import {
 
 export async function POST(req: Request) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     // Rate limiting: 3 requests per minute per IP
     const identifier = getClientIdentifier(req.headers);
-    const rateLimitResult = rateLimit(
+    const rateLimitResult = await rateLimit(
       `applications:${identifier}`,
       RATE_LIMITS.APPLICATION_FORM
     );

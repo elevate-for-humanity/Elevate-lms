@@ -7,9 +7,14 @@ import { generateId, generateShortId } from '@/lib/utils/id-generator';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(req: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { courseId, userId, enrollmentId, completionData } = await req.json();
 
     const supabase = await createClient();

@@ -65,17 +65,31 @@ export async function getSession() {
   }
   
   try {
+    // Use getUser() instead of getSession() — getUser() validates the JWT
+    // with the Supabase server, while getSession() only reads from cookies
+    // and can be spoofed.
     const {
-      data: { session },
+      data: { user },
       error,
-    } = await supabase.auth.getSession();
+    } = await supabase.auth.getUser();
 
-    if (error) {
-      logger.error('Error getting session', error as Error);
+    if (error || !user) {
+      if (error) logger.error('Error getting session', error as Error);
       return null;
     }
 
-    return session;
+    // Reconstruct a session-like object for backward compatibility
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) return session;
+
+    // If getUser succeeds but getSession doesn't, build a minimal session
+    return {
+      user,
+      access_token: '',
+      refresh_token: '',
+      expires_in: 0,
+      token_type: 'bearer' as const,
+    } as any;
   } catch (error) {
     logger.error('Exception getting session', error as Error);
     return null;
@@ -128,6 +142,8 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     if (!session?.user) return null;
 
     const supabase = await createServerSupabaseClient();
+    if (!supabase) return null;
+
     const { data: profile } = await supabase
       .from('profiles')
       .select('role, first_name, last_name')
@@ -159,6 +175,24 @@ export async function getAuthUser(): Promise<AuthUser | null> {
 function isDemoMode(): boolean {
   return false; // NEVER enable demo mode in production
 }
+
+// Placeholder session for dead demo-mode code paths.
+// isDemoMode() always returns false, so this is never used at runtime,
+// but it must exist to prevent a ReferenceError if the guard is ever toggled.
+const DEMO_SESSION = {
+  access_token: 'demo',
+  refresh_token: 'demo',
+  expires_in: 0,
+  token_type: 'bearer' as const,
+  user: {
+    id: 'demo-user',
+    email: 'demo@example.com',
+    app_metadata: {},
+    user_metadata: {},
+    aud: 'authenticated',
+    created_at: '',
+  },
+} as any;
 
 // =====================================================
 // ROLE CHECKING
@@ -282,6 +316,8 @@ export async function canAccessStudent(studentId: string): Promise<boolean> {
   // Delegates can access their assigned students
   if (role === 'delegate') {
     const supabase = await createServerSupabaseClient();
+    if (!supabase) return false;
+
     const { data }: any = await supabase
       .from('enrollments')
       .select('id')
@@ -295,6 +331,8 @@ export async function canAccessStudent(studentId: string): Promise<boolean> {
   // Program holders can access their enrolled students
   if (role === 'program_holder') {
     const supabase = await createServerSupabaseClient();
+    if (!supabase) return false;
+
     const { data }: any = await supabase
       .from('enrollments')
       .select('id')
@@ -315,6 +353,8 @@ export async function canAccessEnrollment(
   if (!user) return false;
 
   const supabase = await createServerSupabaseClient();
+  if (!supabase) return false;
+
   const { data: enrollment } = await supabase
     .from('enrollments')
     .select('student_id, delegate_id, program_holder_id')

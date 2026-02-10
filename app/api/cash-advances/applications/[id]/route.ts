@@ -7,12 +7,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { supabaseServer } from '@/lib/supabase-server';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const supabase = supabaseServer();
     const { id } = await params;
 
@@ -37,6 +42,10 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const supabase = supabaseServer();
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);

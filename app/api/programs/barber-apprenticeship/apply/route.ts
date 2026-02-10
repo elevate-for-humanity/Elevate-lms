@@ -116,9 +116,6 @@ export async function POST(req: Request) {
     });
   } catch (err: any) {
     console.error('Barber application error:', err);
-    return NextResponse.json(
-      { error: err.message || 'Application failed. Please try again.' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Application failed. Please try again.' }, { status: 500 });
   }
 }

@@ -6,9 +6,12 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function GET(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { searchParams } = new URL(req.url);
     const range = searchParams.get('range') || '30d';
 

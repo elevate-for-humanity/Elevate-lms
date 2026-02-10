@@ -5,9 +5,14 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { auditLog } from '@/lib/auditLog';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(req: Request) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await req.json();
     const {
       apprentice_id,
@@ -49,7 +54,7 @@ export async function POST(req: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Bad request' }, { status: 400 });
     }
 
     // Log the change
@@ -66,15 +71,16 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, funding: data });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function GET() {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const supabase = createAdminClient();
 
     const { data, error }: any = await supabase
@@ -83,14 +89,11 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Bad request' }, { status: 400 });
     }
 
     return NextResponse.json({ funding_cases: data });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

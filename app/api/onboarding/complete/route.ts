@@ -10,11 +10,9 @@ import { toError, toErrorMessage } from '@/lib/safe';
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -25,7 +23,7 @@ export async function POST(request: NextRequest) {
         onboarding_completed: true,
         onboarding_completed_at: new Date().toISOString(),
       })
-      .eq('id', session.user.id);
+      .eq('id', user.id);
 
     if (updateError) throw updateError;
 
@@ -33,7 +31,7 @@ export async function POST(request: NextRequest) {
     const { data: profile } = await supabase
       .from('profiles')
       .select('full_name, email')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single();
 
     // Send welcome email with LMS access info
@@ -43,9 +41,9 @@ export async function POST(request: NextRequest) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: profile?.email || session.user.email,
+          to: profile?.email || user.email,
           name: profile?.full_name || 'Student',
-          userId: session.user.id,
+          userId: user.id,
         }),
       }
     );

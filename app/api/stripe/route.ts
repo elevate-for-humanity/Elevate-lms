@@ -1,9 +1,15 @@
 import Stripe from 'stripe';
+import { NextResponse } from 'next/server';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   const stripe = new Stripe(
     process.env.STRIPE_SECRET_KEY || 'sk_test_Content',
     {

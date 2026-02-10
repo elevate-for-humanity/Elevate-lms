@@ -4,9 +4,12 @@ import { NextRequest, NextResponse } from 'next/server';
 export const maxDuration = 60;
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function POST(req: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body = await req.json();
     const { contactId, email, name, interest, subject, body: emailBody } = body;
 

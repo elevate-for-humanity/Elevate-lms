@@ -1,4 +1,9 @@
 /**
+ * @deprecated Use '@/lib/supabase/admin' or '@/lib/supabase/server' instead.
+ * This file is kept for backward compatibility.
+ */
+
+/**
  * Lazy-loading Supabase clients for build-time compatibility
  * Prevents "supabaseUrl is required" errors during Next.js build
  */

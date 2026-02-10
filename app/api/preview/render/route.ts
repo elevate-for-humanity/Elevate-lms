@@ -7,6 +7,7 @@ import { gh, parseRepo } from '@/lib/github';
 import { marked } from 'marked';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 // Simple HTML escape for security
 function escapeHtml(text: string): string {
@@ -69,6 +70,8 @@ export async function GET(req: NextRequest) {
   const { owner, name } = parseRepo(repo);
 
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     // Fetch file from GitHub
     const response = await client.repos.getContent({
       owner,

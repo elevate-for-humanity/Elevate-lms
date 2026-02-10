@@ -143,9 +143,6 @@ export async function POST(request: NextRequest) {
       message: 'Blog post generated successfully (saved as draft)',
     });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json(
-      { error: error.message || 'Failed to generate blog post' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to generate blog post' }, { status: 500 });
   }
 }

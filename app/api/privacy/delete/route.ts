@@ -7,9 +7,14 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 
 export async function POST(req: NextRequest) {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   const supabase = createSupabaseClient();
   const { email, reason } = await req.json();
 

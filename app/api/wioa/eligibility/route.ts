@@ -6,11 +6,14 @@ export const maxDuration = 60;
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 // GET /api/wioa/eligibility - Get eligibility records
 export async function GET(request: NextRequest) {
   const supabase = createSupabaseClient();
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
     const status = searchParams.get('status');
@@ -46,6 +49,8 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   const supabase = createSupabaseClient();
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body = await parseBody<Record<string, any>>(request);
     const {
       userId,

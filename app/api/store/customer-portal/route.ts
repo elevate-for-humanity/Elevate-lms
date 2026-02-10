@@ -8,6 +8,7 @@ import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 const stripeKey = process.env.STRIPE_SECRET_KEY;
 const stripe = stripeKey
@@ -30,6 +31,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const body = await parseBody<{ userId: string }>(request);
     const { userId } = body;
 

@@ -5,9 +5,14 @@ export const maxDuration = 60;
 import { gh, parseRepo } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function GET(req: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { searchParams } = new URL(req.url);
     const repo = searchParams.get('repo') || 'elevateforhumanity/fix2';
     const branch = searchParams.get('branch') || 'main';

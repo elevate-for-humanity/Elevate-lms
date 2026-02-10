@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     if (error instanceof APIAuthError) {
-      return NextResponse.json({ error: error.message }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     logger.error('Onboarding GET error:', error);
     return NextResponse.json(
@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
     }
   } catch (error) {
     if (error instanceof APIAuthError) {
-      return NextResponse.json({ error: error.message }, { status: 401 });
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     logger.error('Onboarding POST error:', error);
     return NextResponse.json(

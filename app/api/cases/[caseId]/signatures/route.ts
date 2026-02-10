@@ -73,7 +73,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ caseId:
     });
   } catch (err: any) {
     console.error('[POST /api/cases/[caseId]/signatures] Error:', err);
-    return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
 
@@ -95,7 +95,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
       .order('created_at', { ascending: true });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     const completeness = await checkSignatureCompleteness(caseId);
@@ -106,6 +106,6 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
     });
   } catch (err: any) {
     console.error('[GET /api/cases/[caseId]/signatures] Error:', err);
-    return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

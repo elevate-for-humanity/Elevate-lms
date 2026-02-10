@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
       .order('completed_count', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     if (format === 'csv') {
@@ -44,9 +44,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ data });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -7,6 +7,7 @@ import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import Stripe from 'stripe';
 import { logger } from '@/lib/logger';
 import { getRAPIDSMetadata, isRAPIDSProgram } from '@/lib/compliance/rapids-config';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 const stripeKey = process.env.STRIPE_SECRET_KEY || '';
 const stripe = stripeKey
@@ -33,6 +34,10 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const {
       programName,
       programSlug,

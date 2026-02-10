@@ -5,11 +5,16 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
 
     const {
@@ -148,6 +153,10 @@ export async function POST(request: NextRequest) {
 // GET endpoint to fetch appointments
 export async function GET(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     const email = searchParams.get('email');

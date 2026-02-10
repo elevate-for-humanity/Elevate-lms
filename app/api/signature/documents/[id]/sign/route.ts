@@ -5,11 +5,16 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   const { id } = await params;
   const supabase = await createClient();
   const { signerName, signerEmail, role } = await request.json();

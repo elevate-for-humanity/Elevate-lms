@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import fs from 'fs';
 import path from 'path';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,6 +95,8 @@ function seedContent() {
 // GET - Retrieve autopilot state
 export async function GET(request: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const state = loadState();
     return NextResponse.json(state);
   } catch (error) { /* Error handled silently */ 
@@ -107,6 +110,8 @@ export async function GET(request: NextRequest) {
 // POST - Add new task or update state
 export async function POST(request: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body = await parseBody<Record<string, any>>(request);
     const state = loadState();
 
@@ -157,6 +162,8 @@ export async function POST(request: NextRequest) {
 // DELETE - Remove task
 export async function DELETE(request: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { searchParams } = new URL(request.url);
     const taskId = searchParams.get('taskId');
 

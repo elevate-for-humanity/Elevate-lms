@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 /**
  * Direct Phone Integration API
@@ -22,6 +23,10 @@ import { logger } from '@/lib/logger';
 
 export async function POST(req: Request) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { action, phoneNumber, message, callerId } = await req.json();
 
     // Log the call request

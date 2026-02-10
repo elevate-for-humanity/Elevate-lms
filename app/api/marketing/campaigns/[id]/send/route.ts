@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { apiRequireAdmin } from '@/lib/authGuards';
 // import { resend } from '@/lib/resend'; // your Resend client - add later
 
 export async function POST(
@@ -13,6 +14,8 @@ export async function POST(
 ) {
   const { id } = await params;
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = await createClient();
 
     // 1) Load campaign

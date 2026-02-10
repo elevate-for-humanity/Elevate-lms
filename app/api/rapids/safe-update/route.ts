@@ -2,7 +2,8 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-import { NextResponse } from 'next/server';
+import {
+import { apiRequireAdmin } from '@/lib/authGuards'; NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import {
   normalizeRapidsStatus,
@@ -12,6 +13,8 @@ import {
 
 export async function POST(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body = await req.json();
     const { apprentice_id, status, rapids_id } = body;
 
@@ -74,14 +77,11 @@ export async function POST(req: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Bad request' }, { status: 400 });
     }
 
     return NextResponse.json({ success: true, rapids: data });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

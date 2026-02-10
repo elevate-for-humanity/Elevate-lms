@@ -3,9 +3,14 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(req: Request) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const body = await req.json();
     const { accountId } = body;
 
@@ -34,9 +39,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ url: link.url });
   } catch (err: any) {
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : String(err) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

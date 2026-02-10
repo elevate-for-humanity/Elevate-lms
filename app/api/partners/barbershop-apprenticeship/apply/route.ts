@@ -68,7 +68,7 @@ function hashIP(ip: string): string {
 export async function POST(req: Request) {
   try {
     const identifier = getClientIdentifier(req.headers);
-    const rateLimitResult = rateLimit(`barbershop-partner:${identifier}`, RATE_LIMITS.APPLICATION_FORM);
+    const rateLimitResult = await rateLimit(`barbershop-partner:${identifier}`, RATE_LIMITS.APPLICATION_FORM);
 
     if (!rateLimitResult.ok) {
       return NextResponse.json(

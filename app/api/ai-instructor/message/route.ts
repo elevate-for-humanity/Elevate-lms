@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({
@@ -36,6 +37,10 @@ export async function POST(req: NextRequest) {
   };
 
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { programId, lessonId, context = 'welcome' } = await req.json();
 
     // If no OpenAI configured, return helpful fallback

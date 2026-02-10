@@ -1,9 +1,11 @@
 /**
  * Rate Limiting Utility
  *
- * Prevents mass scraping and abuse by limiting requests per IP
- * Uses in-memory storage (upgrade to Redis for production)
+ * Delegates to the Redis-based rate limiter (lib/rate-limit.ts) when
+ * UPSTASH_REDIS_REST_URL is configured. Falls back to in-memory only
+ * when Redis is unavailable (development without Redis).
  */
+import { checkRateLimit as redisCheckRateLimit } from '@/lib/rate-limit';
 
 interface RateLimitStore {
   [key: string]: {
@@ -15,14 +17,16 @@ interface RateLimitStore {
 const store: RateLimitStore = {};
 
 // Clean up old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  Object.keys(store).forEach((key) => {
-    if (store[key].resetTime < now) {
-      delete store[key];
-    }
-  });
-}, 5 * 60 * 1000);
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    Object.keys(store).forEach((key) => {
+      if (store[key].resetTime < now) {
+        delete store[key];
+      }
+    });
+  }, 5 * 60 * 1000);
+}
 
 export interface RateLimitConfig {
   /**
@@ -136,13 +140,29 @@ export const RATE_LIMITS = {
 } as const;
 
 /**
- * Rate limit with new API interface (compatible with monitoring)
- * Converts windowMs to window for compatibility
+ * Rate limit with new API interface.
+ * Tries Redis first, falls back to in-memory.
  */
-export function rateLimitNew(
+export async function rateLimitNew(
   identifier: string,
   config: { limit: number; windowMs: number }
-): { ok: boolean; remaining: number; resetAt?: number } {
+): Promise<{ ok: boolean; remaining: number; resetAt?: number }> {
+  // Try Redis-based rate limiting first
+  try {
+    const windowSeconds = Math.ceil(config.windowMs / 1000);
+    const redisResult = await redisCheckRateLimit({
+      key: `ratelimit:${identifier}`,
+      limit: config.limit,
+      windowSeconds,
+    });
+    return {
+      ok: redisResult.ok,
+      remaining: redisResult.remaining,
+    };
+  } catch {
+    // Redis unavailable — fall back to in-memory
+  }
+
   const result = rateLimit(identifier, {
     limit: config.limit,
     window: config.windowMs,

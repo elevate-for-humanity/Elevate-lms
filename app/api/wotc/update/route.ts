@@ -5,9 +5,12 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function POST(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body = await req.json();
     const { employer_id, apprentice_id, hire_date, submitted, eligible } = body;
 
@@ -29,20 +32,19 @@ export async function POST(req: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Bad request' }, { status: 400 });
     }
 
     return NextResponse.json({ success: true, wotc: data });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function GET() {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = createAdminClient();
 
     const { data, error }: any = await supabase
@@ -51,7 +53,7 @@ export async function GET() {
       .order('hire_date', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Bad request' }, { status: 400 });
     }
 
     // Calculate urgency for each record
@@ -72,9 +74,6 @@ export async function GET() {
 
     return NextResponse.json({ wotc_tracking: enrichedData });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

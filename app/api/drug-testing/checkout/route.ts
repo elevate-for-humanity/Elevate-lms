@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 import Stripe from 'stripe';
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
@@ -19,6 +20,10 @@ const stripe = stripeSecretKey
 
 export async function POST(req: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     if (!stripe) {
       return NextResponse.json(
         { error: 'Stripe is not configured' },

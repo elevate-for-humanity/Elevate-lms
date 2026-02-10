@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
 const HEYGEN_API_URL = 'https://api.heygen.com/v2/video/generate';
@@ -17,6 +18,8 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body: VideoGenerateRequest = await request.json();
     const { title, script, avatarId = 'Angela-inblackskirt-20220820', voiceId, background } = body;
 

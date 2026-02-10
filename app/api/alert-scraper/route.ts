@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 /**
  * Scraper Alert Endpoint
@@ -16,6 +17,8 @@ import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body = await parseBody<Record<string, any>>(request);
     const { type, url, timestamp, ...additionalData } = body;
 

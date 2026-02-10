@@ -4,9 +4,12 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function POST(request: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const data = await parseBody<Record<string, any>>(request);
 
     // Log slow resource loading

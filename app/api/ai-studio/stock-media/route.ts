@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 /**
  * Stock Media Library API
@@ -15,6 +16,10 @@ import { logger } from '@/lib/logger';
 
 export async function GET(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const searchParams = request.nextUrl.searchParams;
     const query = searchParams.get('query') || 'business';
     const type = searchParams.get('type') || 'photos'; // photos, videos, music

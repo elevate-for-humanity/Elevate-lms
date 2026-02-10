@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 /**
  * Email Scheduler - Processes scheduled campaigns
@@ -14,6 +15,8 @@ import { toError, toErrorMessage } from '@/lib/safe';
  */
 export async function GET(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = await createClient();
 
     // Get scheduled campaigns that are due

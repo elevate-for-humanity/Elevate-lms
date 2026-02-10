@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -12,6 +13,10 @@ export const maxDuration = 60;
  * Will be removed in a future release.
  */
 export async function POST(request: NextRequest) {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   logger.warn('Deprecated checkout endpoint called', { 
     path: '/api/checkout/student',
     redirect: '/api/checkout/learner'

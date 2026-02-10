@@ -7,6 +7,7 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { logger } from '@/lib/logger';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 function computeMatchScore(
   entityNaics: string[],
@@ -49,6 +50,8 @@ function computeMatchScore(
 
 export async function POST() {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { data: entities, error: entitiesError } = await supabaseAdmin
       .from('entities')
       .select('*');

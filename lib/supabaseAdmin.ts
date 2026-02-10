@@ -1,3 +1,4 @@
+/** @deprecated Use '@/lib/supabase/admin' instead. */
 // lib/supabaseAdmin.ts
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 

@@ -6,7 +6,8 @@ export const maxDuration = 60;
  * Record and track grant submissions
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import {
+import { apiRequireAdmin } from '@/lib/authGuards'; NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 import {
@@ -19,6 +20,8 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body = await req.json();
     const { action, applicationId, submittedBy, method, details } = body;
 
@@ -101,6 +104,8 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { searchParams } = new URL(req.url);
     const applicationId = searchParams.get('applicationId');
 

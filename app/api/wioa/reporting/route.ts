@@ -5,11 +5,14 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 // GET /api/wioa/reporting - Generate WIOA reports
 export async function GET(request: NextRequest) {
   const supabase = createSupabaseClient();
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { searchParams } = new URL(request.url);
     const reportType = searchParams.get('type');
     const startDate = searchParams.get('startDate');

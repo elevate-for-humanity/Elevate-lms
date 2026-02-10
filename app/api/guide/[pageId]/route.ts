@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getPageGuide } from '@/lib/store/db';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function GET(
   request: NextRequest,
@@ -8,6 +9,10 @@ export async function GET(
   const { pageId } = await params;
 
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const guide = await getPageGuide(pageId);
     
     if (!guide) {

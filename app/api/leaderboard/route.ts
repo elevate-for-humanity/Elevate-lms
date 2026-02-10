@@ -57,10 +57,7 @@ export async function GET(request: Request) {
       .limit(100);
 
     if (error) {
-      return NextResponse.json(
-        { error: error instanceof Error ? error.message : String(error) },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     // Aggregate points by user

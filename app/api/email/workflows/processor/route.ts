@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -18,6 +19,8 @@ const resend = process.env.RESEND_API_KEY
  */
 export async function GET(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     if (!resend) {
       return NextResponse.json(
         { success: false, error: 'Email service not configured' },

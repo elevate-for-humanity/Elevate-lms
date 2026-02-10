@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { cloudflareStream } from '@/server/cloudflare-stream';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 /**
  * AI Video Generation API
@@ -18,6 +19,10 @@ import { cloudflareStream } from '@/server/cloudflare-stream';
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const {
       prompt,
       duration = 30,

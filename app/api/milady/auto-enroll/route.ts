@@ -8,9 +8,12 @@ import { NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createAccount, enrollInCourse } from '@/lib/partners/milady';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function POST(request: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { studentId, programId } = await request.json();
 
     const supabase = await createClient();

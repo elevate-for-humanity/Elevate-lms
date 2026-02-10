@@ -12,11 +12,16 @@ import { createZoomMeeting } from '@/lib/integrations/zoom';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 
 export async function POST(request: NextRequest) {
   const supabase = createSupabaseClient();
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { courseId, topic, startTime, durationMinutes, instructorZoomId, tenantId } = await request.json();
 
     if (!courseId || !topic || !startTime || !durationMinutes) {

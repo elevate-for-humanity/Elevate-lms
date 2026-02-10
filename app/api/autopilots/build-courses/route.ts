@@ -5,9 +5,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { gh, parseRepo } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function POST(req: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body = await req.json().catch(() => ({}));
     const { output, repo = 'elevateforhumanity/fix2', branch = 'main' } = body;
 

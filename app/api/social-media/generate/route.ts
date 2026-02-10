@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -30,6 +31,8 @@ const PROGRAM_INFO = {
 
 export async function POST(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     if (!openai) {
       return NextResponse.json(
         { success: false, error: 'AI service not configured' },

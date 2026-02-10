@@ -9,10 +9,13 @@ import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { sanitizeSearchInput } from '@/lib/utils';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 // GET /api/hr/employees - List all employees
 export async function GET(request: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = await createClient();
     const searchParams = request.nextUrl.searchParams;
 
@@ -79,6 +82,8 @@ export async function GET(request: NextRequest) {
 // POST /api/hr/employees - Create new employee
 export async function POST(request: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = await createClient();
     const body = await parseBody<Record<string, any>>(request);
 

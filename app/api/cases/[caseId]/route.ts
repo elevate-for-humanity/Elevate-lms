@@ -54,7 +54,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
     });
   } catch (err: any) {
     console.error('[GET /api/cases/[caseId]] Error:', err);
-    return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }
 
@@ -90,6 +90,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
     return NextResponse.json({ success: true });
   } catch (err: any) {
     console.error('[PATCH /api/cases/[caseId]] Error:', err);
-    return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

@@ -3,6 +3,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { sanitizeHtml } from '@/lib/sanitize';
 import {
   MessageCircle,
   CheckCircle,
@@ -379,14 +380,14 @@ Come back anytime if you need help!`,
                         color: message.type === 'user' ? 'white' : 'inherit',
                       }}
                       dangerouslySetInnerHTML={{
-                        __html: message.content
+                        __html: sanitizeHtml(message.content
                           .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                           .replace(/\n\n/g, '</p><p>')
                           .replace(/\n- /g, '</p><ul><li>')
                           .replace(/\n(\d+)\. /g, '</p><ol><li>')
                           .replace(/\n/g, '<br />')
                           .replace(/<\/li><br \/>/g, '</li><li>')
-                          .replace(/<li>([^<]+)$/gm, '<li>$1</li></ul>')
+                          .replace(/<li>([^<]+)$/gm, '<li>$1</li></ul>'))
                       }}
                     />
                     {message.options && message.options.length > 0 && (

@@ -1,10 +1,13 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = await createClient();
     
     // Get enrollment and completion data for the last 6 months

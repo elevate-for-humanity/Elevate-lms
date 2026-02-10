@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { getPartnerClient, PartnerType } from '@/lib/partners';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 function getSupabaseServerClient() {
   const cookieStore = cookies();

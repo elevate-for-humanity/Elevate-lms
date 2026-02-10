@@ -11,11 +11,12 @@ import {
 } from '@/lib/rateLimit';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(req: Request) {
   const supabase = createAdminClient();
   const identifier = getClientIdentifier(req.headers);
-  const rateLimitResult = rateLimit(identifier, {
+  const rateLimitResult = await rateLimit(identifier, {
     limit: 10,
     window: 60 * 60 * 1000,
   });
@@ -28,6 +29,10 @@ export async function POST(req: Request) {
   }
 
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { product_id, reporter_email, reason, details } = await req.json();
 
     if (!product_id || !reason) {

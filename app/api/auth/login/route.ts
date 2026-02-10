@@ -6,7 +6,7 @@ export async function POST(request: Request) {
   try {
     // Rate limit: 5 login attempts per minute per IP
     const identifier = getClientIdentifier(request.headers);
-    const rateLimitResult = rateLimit(identifier, RATE_LIMITS.AUTH);
+    const rateLimitResult = await rateLimit(identifier, RATE_LIMITS.AUTH);
     
     if (!rateLimitResult.ok) {
       return NextResponse.json(
@@ -32,10 +32,7 @@ export async function POST(request: Request) {
     });
 
     if (error) {
-      return NextResponse.json(
-        { error: error.message },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     return NextResponse.json({

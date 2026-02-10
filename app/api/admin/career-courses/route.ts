@@ -1,11 +1,14 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export const dynamic = 'force-dynamic';
 
 // GET - Fetch all career courses with modules
 export async function GET() {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = createAdminClient();
 
     const { data: courses, error } = await supabase
@@ -19,7 +22,7 @@ export async function GET() {
       .order('title');
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ courses });
@@ -31,6 +34,8 @@ export async function GET() {
 // POST - Create Stripe products for career courses
 export async function POST(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { action } = await req.json();
 
     if (action === 'sync-stripe') {
@@ -43,7 +48,7 @@ export async function POST(req: Request) {
         .is('stripe_product_id', null);
 
       if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
       }
 
       // Import Stripe

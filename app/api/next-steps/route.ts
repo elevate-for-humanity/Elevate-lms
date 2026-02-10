@@ -52,7 +52,7 @@ export async function GET() {
     .maybeSingle();
 
   if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
   // Create default row if missing (one-shot UX)
   if (!data) {
@@ -158,7 +158,7 @@ export async function PATCH(req: Request) {
     .single();
 
   if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
   // Send email notification to admin
   try {
@@ -212,7 +212,7 @@ export async function PATCH(req: Request) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        to: '3177607908@txt.att.net',
+        to: process.env.ADMIN_SMS_GATEWAY || '',
         subject: 'Checklist',
         html: `${userEmail}\n${data.program_code || 'General'}\n${progress.percent}% done`,
       }),

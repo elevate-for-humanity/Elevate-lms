@@ -2,9 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { calculateForm1040, getStandardDeduction } from '@/lib/tax-software/forms/form-1040';
 import { validateTaxReturn } from '@/lib/tax-software/validation/irs-rules';
 import { TaxReturn } from '@/lib/tax-software/types';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     
     // Build tax return from request

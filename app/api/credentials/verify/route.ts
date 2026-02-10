@@ -31,9 +31,7 @@ export async function POST(req: NextRequest) {
     const supabase = await createServerSupabaseClient();
 
     // Check if user is authenticated (partner)
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     // Lookup credential
     const { data: credential, error } = await supabase
@@ -94,7 +92,7 @@ export async function POST(req: NextRequest) {
     });
 
     // Determine response based on authentication
-    if (session && session.user.user_metadata?.role === 'partner') {
+    if (session && user.user_metadata?.role === 'partner') {
       // Full info for authenticated partners
       return NextResponse.json({
         valid: isValid,

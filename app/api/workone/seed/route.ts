@@ -78,7 +78,7 @@ export async function POST(req: Request) {
       .upsert(inserts, { onConflict: 'user_id,step_key' });
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });

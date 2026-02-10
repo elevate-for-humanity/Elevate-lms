@@ -26,7 +26,13 @@ const XTerminal = forwardRef<XTerminalHandle, XTerminalProps>(({ onClear }, ref)
 
   // Simple ANSI to HTML converter
   const ansiToHtml = (text: string): string => {
-    return text
+    // Escape HTML entities first to prevent XSS from terminal output
+    const escaped = text
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+    return escaped
       .replace(/\x1b\[0m/g, '</span>')
       .replace(/\x1b\[1;36m/g, '<span style="color: #39c5cf; font-weight: bold">')
       .replace(/\x1b\[1;33m/g, '<span style="color: #d29922; font-weight: bold">')

@@ -1,3 +1,4 @@
+/** @deprecated Use '@/lib/supabase/client' instead. */
 import { createBrowserClient } from '@supabase/ssr';
 
 // Use Content values during build if env vars are missing

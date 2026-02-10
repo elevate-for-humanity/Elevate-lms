@@ -7,9 +7,14 @@ import { NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 
 export async function POST(request: Request) {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   const supabase = createSupabaseClient();
   // xAPI endpoint for receiving learning activity statements
   const body = await parseBody<Record<string, any>>(request);
@@ -43,6 +48,10 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   const supabase = createSupabaseClient();
   // xAPI GET endpoint for retrieving statements
   const { searchParams } = new URL(request.url);

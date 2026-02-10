@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
+import { apiAuthGuard } from '@/lib/authGuards';
 
 
 const DIY_SERVICES = {
@@ -27,6 +28,10 @@ const DIY_SERVICES = {
 
 export async function POST(req: Request) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { service_type, intake_id } = await req.json();
 
     if (!intake_id) {
@@ -72,9 +77,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json(
-      { error: error.message || 'Failed to create checkout session' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

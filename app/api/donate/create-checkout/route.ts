@@ -4,9 +4,14 @@ export const runtime = 'edge';
 export const maxDuration = 60;
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { stripe } from '@/lib/stripe/client';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     if (!stripe) {
       return NextResponse.json(
         { error: 'Payment processing is not configured' },

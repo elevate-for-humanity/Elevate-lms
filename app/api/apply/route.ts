@@ -12,7 +12,7 @@ import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 import { getRoutingRecommendations } from '@/lib/automation/shop-routing';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
-const ADMIN_SMS = '3177607908@txt.att.net'; // AT&T email-to-SMS gateway
+const ADMIN_SMS = process.env.ADMIN_SMS_GATEWAY || '';
 
 export const POST = withRateLimit(
   async (req: Request) => {

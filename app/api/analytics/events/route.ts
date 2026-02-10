@@ -6,9 +6,12 @@ export const maxDuration = 60;
 // Track user activity events
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 
 export async function POST(req: NextRequest) {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
   const supabase = createSupabaseClient();
   const { tenantId, userId, eventType, payload, path } = await req.json();
 

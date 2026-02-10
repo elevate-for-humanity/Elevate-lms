@@ -29,6 +29,11 @@ const DEMO_ENROLLMENT_1_ID = '00000000-0000-0000-0000-000000000300';
 const DEMO_ENROLLMENT_2_ID = '00000000-0000-0000-0000-000000000301';
 
 export async function POST() {
+// Block in production — this endpoint is for development/testing only
+if (process.env.NODE_ENV === 'production') {
+  return NextResponse.json({ error: 'Not found' }, { status: 404 });
+}
+
   try {
     // Check if demo mode is enabled
     if (!isDemoEnabled()) {

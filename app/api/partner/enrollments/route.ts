@@ -6,9 +6,12 @@ export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
 import { toErrorMessage } from '@/lib/safe';
 import { getTenantContext, TenantContextError } from '@/lib/tenant';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function GET() {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     // STEP 4D: Get tenant context - enforces tenant isolation
     const tenantContext = await getTenantContext();
     const supabase = await createClient();
@@ -45,7 +48,7 @@ export async function GET() {
     return NextResponse.json({ enrollments });
   } catch (error) {
     if (error instanceof TenantContextError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
     }
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }

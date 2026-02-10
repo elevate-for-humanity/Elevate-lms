@@ -11,11 +11,9 @@ import { toError, toErrorMessage } from '@/lib/safe';
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createServerSupabaseClient();
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -25,7 +23,7 @@ export async function POST(request: NextRequest) {
     const { error: insertError } = await supabase
       .from('learner_onboarding')
       .insert({
-        user_id: session.user.id,
+        user_id: user.id,
         full_name: formData.full_name,
         phone: formData.phone,
         email: formData.email,
@@ -53,7 +51,7 @@ export async function POST(request: NextRequest) {
         onboarding_started: true,
         onboarding_started_at: new Date().toISOString(),
       })
-      .eq('id', session.user.id);
+      .eq('id', user.id);
 
     return NextResponse.json({
       success: true,

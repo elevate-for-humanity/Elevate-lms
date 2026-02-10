@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function PATCH(
   request: NextRequest,
@@ -14,6 +15,8 @@ export async function PATCH(
 ) {
   const { id } = await params;
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = await createClient();
     const body = await parseBody<Record<string, any>>(request);
 
@@ -71,6 +74,8 @@ export async function DELETE(
 ) {
   const { id } = await params;
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = await createClient();
     const { error } = await supabase.from('time_entries').delete().eq('id', id);
 

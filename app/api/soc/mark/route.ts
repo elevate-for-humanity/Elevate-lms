@@ -5,9 +5,12 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { auditLog } from '@/lib/auditLog';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function POST(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body = await req.json();
     const { control_id, evidence, implemented } = body;
 
@@ -31,7 +34,7 @@ export async function POST(req: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Bad request' }, { status: 400 });
     }
 
     // Log the control update
@@ -48,15 +51,14 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, data });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function GET() {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = createAdminClient();
 
     const { data, error }: any = await supabase
@@ -65,7 +67,7 @@ export async function GET() {
       .order('control_id');
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Bad request' }, { status: 400 });
     }
 
     const implemented = data?.filter((c) => c.implemented).length || 0;
@@ -80,9 +82,6 @@ export async function GET() {
       },
     });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

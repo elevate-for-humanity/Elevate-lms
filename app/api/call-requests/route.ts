@@ -5,9 +5,14 @@ export const maxDuration = 60;
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(req: Request) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { phoneNumber, name, requestedAt } = await req.json();
 
     if (!phoneNumber) {
@@ -51,6 +56,10 @@ export async function POST(req: Request) {
 // GET endpoint to fetch pending requests (for your team dashboard)
 export async function GET() {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const supabase = await createClient();
 
     const { data, error }: any = await supabase

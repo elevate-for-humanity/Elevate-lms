@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { logger } from '@/lib/logger';
 import OpenAI from 'openai';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
@@ -29,6 +30,8 @@ export async function POST(req: NextRequest) {
     );
   }
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body = await req.json();
     const { grantId, entityId } = body as { grantId: string; entityId: string };
 

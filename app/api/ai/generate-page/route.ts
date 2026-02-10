@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function GET(request: NextRequest) {
   const openaiKey = process.env.OPENAI_API_KEY;
@@ -21,6 +22,10 @@ export async function GET(request: NextRequest) {
   const description = request.nextUrl.searchParams.get('description') || '';
 
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const prompt = `Generate a React component for a ${pageType} page. ${description}
 
 Requirements:

@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 // POST /api/wioa/support-services/[id]/approve - Approve/deny support service
 export async function POST(
@@ -14,6 +15,8 @@ export async function POST(
 ) {
   const supabase = createSupabaseClient();
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
     const { approved, approvedAmount, approvedBy, notes, denialReason } = body;

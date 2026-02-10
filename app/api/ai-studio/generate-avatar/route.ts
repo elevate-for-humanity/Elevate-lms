@@ -10,6 +10,7 @@ import { writeFile, mkdir } from 'fs/promises';
 import path from 'path';
 import { exec } from 'child_process';
 import { promisify } from 'util';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,6 +30,10 @@ const execAsync = promisify(exec);
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const {
       prompt,
       duration = 30,

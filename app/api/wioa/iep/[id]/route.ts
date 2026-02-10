@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 // GET /api/wioa/iep/[id] - Get IEP by ID
 export async function GET(
@@ -14,6 +15,8 @@ export async function GET(
 ) {
   const supabase = createSupabaseClient();
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { id } = await params;
 
     const { data, error }: any = await supabase
@@ -43,6 +46,8 @@ export async function PUT(
 ) {
   const supabase = createSupabaseClient();
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
 
@@ -79,6 +84,8 @@ export async function POST(
 ) {
   const supabase = createSupabaseClient();
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
     const { approvedBy, approvalNotes } = body;

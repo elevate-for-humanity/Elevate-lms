@@ -76,10 +76,8 @@ export async function PATCH(
     const supabase = await createClient();
 
     // Check authentication
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -87,7 +85,7 @@ export async function PATCH(
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single();
 
     if (!profile || !['admin', 'instructor'].includes(profile.role)) {
@@ -132,10 +130,8 @@ export async function DELETE(
     const supabase = await createClient();
 
     // Check authentication
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    if (!session) {
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
@@ -143,7 +139,7 @@ export async function DELETE(
     const { data: profile } = await supabase
       .from('profiles')
       .select('role')
-      .eq('id', session.user.id)
+      .eq('id', user.id)
       .single();
 
     if (!profile || profile.role !== 'admin') {

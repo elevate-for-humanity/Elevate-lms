@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
   const payload = {
     now: new Date().toISOString(),
     platform: 'netlify',

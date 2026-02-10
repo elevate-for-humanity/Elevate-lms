@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 // Get PR tracking data for user
 export async function GET(req: NextRequest) {
@@ -14,6 +15,8 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = supabaseServer();
     
     let query = supabase
@@ -49,6 +52,8 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { repo_id, pr_number, is_watching, notes } = await req.json();
 
     if (!repo_id || !pr_number) {
@@ -100,6 +105,8 @@ export async function PUT(req: NextRequest) {
   }
 
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { id, is_watching, notes, last_viewed_at } = await req.json();
 
     if (!id) {
@@ -147,6 +154,8 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = supabaseServer();
 
     const { error } = await supabase

@@ -3,9 +3,14 @@ import { validateTaxReturn } from '@/lib/tax-software/validation/irs-rules';
 import { createMeFSubmission } from '@/lib/tax-software/mef/xml-generator';
 import { createTransmitter } from '@/lib/tax-software/mef/transmission';
 import { TaxReturn } from '@/lib/tax-software/types';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     
     // Build complete tax return

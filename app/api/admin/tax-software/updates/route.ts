@@ -4,6 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,8 @@ export const dynamic = 'force-dynamic';
  */
 export async function GET() {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { createMonitor } = await import('@/lib/tax-software/irs-monitor');
     const monitor = createMonitor();
     
@@ -44,6 +47,8 @@ export async function GET() {
  */
 export async function POST(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { createMonitor } = await import('@/lib/tax-software/irs-monitor');
     const body = await req.json();
     const { action, updateId, alertId, userId } = body;

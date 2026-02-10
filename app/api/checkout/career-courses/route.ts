@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export const dynamic = 'force-dynamic';
 
@@ -15,6 +16,10 @@ function getStripe() {
 
 export async function POST(req: Request) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { courseIds, email, successUrl, cancelUrl, promoCode } = await req.json();
 
     if (!courseIds || !Array.isArray(courseIds) || courseIds.length === 0) {
@@ -136,9 +141,6 @@ export async function POST(req: Request) {
     });
   } catch (error: any) {
     console.error('Checkout error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to create checkout session' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to create checkout session' }, { status: 500 });
   }
 }

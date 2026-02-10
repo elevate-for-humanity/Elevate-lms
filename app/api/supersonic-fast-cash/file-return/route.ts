@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { drakeIntegration } from '@/lib/integrations/drake-software';
 import { Resend } from 'resend';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -75,6 +76,10 @@ interface TaxReturnBody {
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const taxReturn: TaxReturnBody = await request.json();
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 

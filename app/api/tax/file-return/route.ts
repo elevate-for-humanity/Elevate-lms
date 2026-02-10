@@ -343,10 +343,7 @@ export async function POST(request: NextRequest) {
     
   } catch (error: any) {
     console.error('Tax filing error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to process tax return' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to process tax return' }, { status: 500 });
   }
 }
 

@@ -1,12 +1,18 @@
 import { gh, parseRepo } from "@/lib/github";
+import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(req: Request) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { sourceRepo, newRepoName } = await req.json();
 
     if (!sourceRepo || !newRepoName) {

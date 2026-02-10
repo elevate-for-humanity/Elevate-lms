@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY;
@@ -18,6 +19,10 @@ function getStripe() {
  */
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     const {
       transferred_hours = 0,

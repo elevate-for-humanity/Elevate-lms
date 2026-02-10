@@ -6,7 +6,8 @@ export const maxDuration = 60;
  * Generate submission-ready grant packages
  */
 
-import { NextRequest, NextResponse } from 'next/server';
+import {
+import { apiRequireAdmin } from '@/lib/authGuards'; NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 import {
@@ -19,6 +20,8 @@ import {
 
 export async function POST(req: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const body = await req.json();
     const { action, applicationId, entityId, format } = body;
 

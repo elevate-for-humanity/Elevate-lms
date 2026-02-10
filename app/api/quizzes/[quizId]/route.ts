@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { getSupabaseServerClient } from '@/lib/supabaseServer';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 // GET /api/quizzes/[quizId] - Load quiz with questions
 export async function GET(
@@ -13,6 +14,10 @@ export async function GET(
   { params }: { params: Promise<{ quizId: string }> }
 ) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const supabase = getSupabaseServerClient();
     const { quizId } = await params;
 
@@ -57,6 +62,10 @@ export async function POST(
   { params }: { params: Promise<{ quizId: string }> }
 ) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const supabase = getSupabaseServerClient();
     const { quizId } = await params;
     const body = await parseBody<Record<string, any>>(request);

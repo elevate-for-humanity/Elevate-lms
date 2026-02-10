@@ -7,10 +7,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 // GET /api/hr/performance-reviews?employee_id=
 export async function GET(request: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = await createClient();
     const params = request.nextUrl.searchParams;
     const employeeId = params.get('employee_id');
@@ -51,6 +54,8 @@ export async function GET(request: NextRequest) {
 // POST /api/hr/performance-reviews
 export async function POST(request: NextRequest) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const supabase = await createClient();
     const body = await parseBody<Record<string, any>>(request);
 

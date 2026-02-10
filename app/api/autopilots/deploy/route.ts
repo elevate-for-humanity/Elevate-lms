@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prepareDeploy } from '@/lib/autopilot/deploy-prep';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

@@ -3,8 +3,13 @@ import { NextResponse } from 'next/server';
 export const runtime = 'edge';
 export const maxDuration = 60;
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function GET() {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   return NextResponse.json({
     provider: 'Certiport',
     status: 'active',
@@ -20,6 +25,10 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   const body = await parseBody<Record<string, any>>(request);
 
   return NextResponse.json({

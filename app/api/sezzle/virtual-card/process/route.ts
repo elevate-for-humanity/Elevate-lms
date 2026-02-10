@@ -17,6 +17,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sezzle } from '@/lib/sezzle/client';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 interface VirtualCardProcessRequest {
   // Session info from Sezzle
@@ -61,6 +62,10 @@ interface VirtualCardProcessRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     // Check if Sezzle is configured
     if (!sezzle.isConfigured()) {
       return NextResponse.json(

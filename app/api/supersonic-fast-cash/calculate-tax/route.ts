@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export const runtime = 'edge';
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const taxReturn = await request.json();
 
     // Calculate total income

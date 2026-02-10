@@ -7,7 +7,7 @@ import { sendEmail } from '@/lib/email/resend';
 import { createClient } from '@/lib/supabase/server';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
-const ADMIN_SMS = '3177607908@txt.att.net';
+const ADMIN_SMS = process.env.ADMIN_SMS_GATEWAY || '';
 
 export async function POST(req: Request) {
   try {

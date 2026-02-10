@@ -1,12 +1,18 @@
 import { createClient } from '@/lib/supabase/server';
+import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   const path = new URL(req.url).searchParams.get('path');
 
   if (!path) {

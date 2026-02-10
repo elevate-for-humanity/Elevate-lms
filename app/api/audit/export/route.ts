@@ -5,9 +5,12 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { auditExport } from '@/lib/auditLog';
+import { apiRequireAdmin } from '@/lib/authGuards';
 
 export async function GET(req: Request) {
   try {
+    const adminCheck = await apiRequireAdmin();
+    if (adminCheck instanceof NextResponse) return adminCheck;
     const { searchParams } = new URL(req.url);
     const format = searchParams.get('format') || 'csv';
 
@@ -17,7 +20,7 @@ export async function GET(req: Request) {
     const { data, error }: any = await supabase.from('audit_snapshot').select('*');
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Bad request' }, { status: 400 });
     }
 
     if (!data || data.length === 0) {
@@ -56,9 +59,6 @@ export async function GET(req: Request) {
       },
     });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

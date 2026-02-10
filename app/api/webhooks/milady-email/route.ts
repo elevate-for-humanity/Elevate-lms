@@ -143,6 +143,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, forwarded: !!student });
   } catch (error: any) {
     console.error('[milady-email] Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

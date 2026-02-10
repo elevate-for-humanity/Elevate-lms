@@ -5,8 +5,13 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(request: Request) {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   const supabase = await createClient();
   const { type, apprenticeshipId, data } = await request.json();
 
@@ -84,6 +89,10 @@ export async function POST(request: Request) {
 
 // Cron endpoint to check for missed check-ins
 export async function GET(request: Request) {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
   const supabase = await createClient();
   const today = new Date().toISOString().split('T')[0];
   const currentHour = new Date().getHours();

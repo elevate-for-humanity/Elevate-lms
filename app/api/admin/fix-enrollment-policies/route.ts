@@ -57,10 +57,7 @@ export const POST = withAuth(
 
       if (error) {
         logger.error('Policy fix error:', error);
-        return NextResponse.json(
-          { error: error.message },
-          { status: 500 }
-        );
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
       }
 
       return NextResponse.json({
@@ -69,10 +66,7 @@ export const POST = withAuth(
       });
     } catch (err: any) {
       logger.error('Fix enrollment policies error:', err);
-      return NextResponse.json(
-        { error: err.message || 'Failed to fix policies' },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: 'Failed to fix policies' }, { status: 500 });
     }
   },
   { roles: ['admin', 'super_admin'] }

@@ -33,13 +33,13 @@ export async function GET() {
       .order('full_name', { ascending: true });
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ students: students || [] });
   } catch (error) {
     if (error instanceof TenantContextError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
     }
     return NextResponse.json(
       {

@@ -10,12 +10,13 @@ import {
   RateLimitPresets,
 } from '@/lib/rateLimit';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 
 export async function POST(req: Request) {
   // Rate limiting: 10 checkouts per minute per IP
   const identifier = getClientIdentifier(req.headers);
-  const rateLimitResult = rateLimit(identifier, RateLimitPresets.STRICT);
+  const rateLimitResult = await rateLimit(identifier, RateLimitPresets.STRICT);
 
   if (!rateLimitResult.success) {
     return NextResponse.json(
@@ -35,6 +36,10 @@ export async function POST(req: Request) {
   }
 
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { productId, creatorId, priceCents, productTitle } = await req.json();
 
     if (!productId || !creatorId || !priceCents) {

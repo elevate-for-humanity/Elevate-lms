@@ -19,9 +19,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAffirmCheckoutConfig, affirm } from '@/lib/affirm/client';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     // Check if Affirm is configured
     if (!affirm.isConfigured()) {
       return NextResponse.json(

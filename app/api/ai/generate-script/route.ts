@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -13,6 +14,10 @@ function getOpenAIClient() {
 export async function POST(req: Request) {
   const openai = getOpenAIClient();
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { courseTitle, moduleTitle, moduleDescription, duration } = await req.json();
 
     if (!moduleTitle) {
@@ -60,9 +65,6 @@ Write the complete script now:`;
     return NextResponse.json({ script });
   } catch (error: any) {
     console.error('Script generation error:', error);
-    return NextResponse.json(
-      { error: error.message || 'Failed to generate script' },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: 'Failed to generate script' }, { status: 500 });
   }
 }

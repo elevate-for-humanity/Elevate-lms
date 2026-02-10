@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import * as cheerio from 'cheerio';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
@@ -24,6 +25,10 @@ function getOpenAI() {
  */
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     const { url, includePages = ['/', '/about', '/programs', '/contact'] } = body;
 

@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { validateTaxReturn, validateSSN, validateEIN, validateRoutingNumber } from '@/lib/tax-software/validation/irs-rules';
 import { TaxReturn } from '@/lib/tax-software/types';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 export async function POST(request: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const body = await request.json();
     
     // If just validating a single field

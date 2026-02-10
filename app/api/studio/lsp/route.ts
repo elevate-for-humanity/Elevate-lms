@@ -2,6 +2,7 @@ export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { apiAuthGuard } from '@/lib/authGuards';
 
 const getOpenAI = () => new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -13,6 +14,10 @@ const getOpenAI = () => new OpenAI({
 
 export async function POST(req: NextRequest) {
   try {
+    const authResult = await apiAuthGuard({ requireAuth: true });
+    if (!authResult.authorized) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
     const { action, code, position, language, filename, symbol } = await req.json();
 
     switch (action) {

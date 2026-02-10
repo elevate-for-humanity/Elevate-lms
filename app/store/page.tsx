@@ -34,10 +34,11 @@ export default function StorePage() {
   return (
     <StoreClientWrapper>
       <div className="bg-white min-h-screen">
-        {/* Breadcrumbs */}
+        {/* Breadcrumbs + framing */}
         <div className="bg-slate-50 border-b">
           <div className="max-w-6xl mx-auto px-4 py-3">
             <Breadcrumbs items={[{ label: 'Store' }]} />
+            <p className="text-sm text-slate-600 mt-1">Licenses and resources for the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a></p>
           </div>
         </div>
 
@@ -211,11 +212,11 @@ export default function StorePage() {
                 Contact Us
               </Link>
               <Link 
-                href="/demo" 
+                href="/store/demo" 
                 className="inline-flex items-center justify-center gap-2 border-2 border-white px-8 py-4 rounded-lg font-bold hover:bg-white/10 transition"
               >
                 <Play className="w-5 h-5" />
-                Watch Demo
+                See Platform Tour
               </Link>
             </div>
           </div>

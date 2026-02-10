@@ -138,8 +138,8 @@ function SuccessContent() {
 
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
             <p className="text-blue-800 text-sm">
-              <strong>Provisioning in progress:</strong> Your platform will be fully ready within 24 hours. 
-              You'll receive an email with admin login credentials.
+              <strong>Provisioning in progress:</strong> Your platform is being set up automatically.
+              Admin login credentials will be sent to your email within minutes.
             </p>
           </div>
         </div>

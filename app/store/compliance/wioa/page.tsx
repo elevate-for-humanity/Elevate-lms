@@ -164,7 +164,7 @@ export default function WIOACompliancePage() {
                   View Pricing
                   <ArrowRight className="w-5 h-5" />
                 </Link>
-                <Link href="/demo" className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-500 transition border border-green-500">
+                <Link href="/store/demo" className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-500 transition border border-green-500">
                   Request Demo
                 </Link>
               </div>
@@ -339,7 +339,7 @@ export default function WIOACompliancePage() {
             Schedule a demo to see how our WIOA toolkit can streamline your compliance workflow.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/demo" className="inline-flex items-center justify-center gap-2 bg-white text-green-700 px-8 py-4 rounded-lg font-bold hover:bg-green-50 transition">
+            <Link href="/store/demo" className="inline-flex items-center justify-center gap-2 bg-white text-green-700 px-8 py-4 rounded-lg font-bold hover:bg-green-50 transition">
               Schedule Demo
             </Link>
             <Link href="/contact" className="inline-flex items-center justify-center gap-2 border-2 border-white px-8 py-4 rounded-lg font-bold hover:bg-white/10 transition">

@@ -1,199 +1,141 @@
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { 
-  Settings, 
-  GraduationCap, 
-  Users, 
-  ArrowRight, 
+import {
   Play,
-  Lock,
-  CheckCircle,
+  Shield,
+  GraduationCap,
+  Briefcase,
+  BarChart3,
+  Users,
+  ArrowRight,
 } from 'lucide-react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Demo Center | Elevate LMS Platform',
-  description: 'Explore the Elevate LMS platform through guided demos. See admin, instructor, and student experiences before you buy.',
+  title: 'Platform Demo | Elevate Workforce OS',
+  description: 'See the Elevate Workforce Operating System in action. Guided tours of the admin, learner, employer, and instructor experiences.',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/store/demo',
+  },
 };
 
-const DEMO_PATHS = [
+const tours = [
   {
-    id: 'admin',
-    title: 'Admin Demo',
-    icon: Settings,
-    color: 'blue',
-    description: 'See how administrators manage the platform, users, and reporting.',
-    canDo: [
-      'View organization dashboard',
-      'Browse user management interface',
-      'Explore reporting and analytics',
-      'See compliance tracking tools',
-      'Review enrollment workflows',
-      'Check system settings',
+    title: 'Admin Dashboard',
+    icon: Shield,
+    description: 'Organization management, enrollment oversight, compliance reporting, and user administration.',
+    highlights: [
+      'Multi-program enrollment dashboard',
+      'WIOA compliance reporting',
+      'Student progress tracking',
+      'Partner and employer management',
     ],
-    locked: [
-      'Create real users or data',
-      'Modify system configuration',
-      'Access production databases',
-      'Export real reports',
-    ],
-    href: '/store/demo/admin',
   },
   {
-    id: 'instructor',
-    title: 'Instructor Demo',
+    title: 'Learner Experience',
     icon: GraduationCap,
-    color: 'blue',
-    description: 'Experience the instructor view for course management and student tracking.',
-    canDo: [
-      'Browse course builder interface',
-      'View assessment creation tools',
-      'See gradebook and progress tracking',
-      'Explore certificate templates',
-      'Review student communication tools',
-      'Check attendance tracking',
+    description: 'Course delivery, progress tracking, credential issuance, and career services from the student perspective.',
+    highlights: [
+      'Course modules and assessments',
+      'Apprenticeship hour logging',
+      'Certificate and credential tracking',
+      'Job placement pipeline',
     ],
-    locked: [
-      'Create real courses',
-      'Grade actual students',
-      'Issue real certificates',
-      'Send live communications',
-    ],
-    href: '/store/demo/instructor',
   },
   {
-    id: 'student',
-    title: 'Student Demo',
+    title: 'Employer Portal',
+    icon: Briefcase,
+    description: 'Candidate pipelines, apprenticeship management, and workforce reporting for employer partners.',
+    highlights: [
+      'Candidate matching and pipelines',
+      'Apprenticeship progress monitoring',
+      'Hiring outcome tracking',
+      'Compliance documentation',
+    ],
+  },
+  {
+    title: 'Instructor Tools',
     icon: Users,
-    color: 'green',
-    description: 'Walk through the student experience from enrollment to certification.',
-    canDo: [
-      'View student dashboard',
-      'Browse course catalog',
-      'See lesson player interface',
-      'Explore progress tracking',
-      'View certificate display',
-      'Check mobile PWA experience',
+    description: 'Class management, attendance tracking, grading, and student communication tools.',
+    highlights: [
+      'Class roster and attendance',
+      'Assignment and grade management',
+      'Student communication',
+      'Progress reports',
     ],
-    locked: [
-      'Enroll in real courses',
-      'Submit actual assignments',
-      'Earn real credentials',
-      'Access paid content',
-    ],
-    href: '/store/demo/student',
   },
 ];
 
-export default function DemoCenterPage() {
+export default function StoreDemoPage() {
   return (
     <div className="min-h-screen bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Demo" }]} />
-      </div>
-{/* Hero */}
-      <section className="bg-slate-700 text-white py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-green-600 text-white rounded-full text-sm font-bold mb-6">
-            <Play className="w-4 h-4" />
-            Interactive Demos
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black mb-4">
-            Demo Center
-          </h1>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Explore the Elevate LMS platform from every perspective. 
-            See exactly what you're getting before you commit.
+      <div className="bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[{ label: 'Store', href: '/store' }, { label: 'Demo' }]} />
+          <p className="text-sm text-slate-600 mt-1">
+            Guided tours of the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>
           </p>
         </div>
-      </section>
+      </div>
 
-      {/* Demo Paths */}
-      <section className="py-16 px-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid md:grid-cols-3 gap-8">
-            {DEMO_PATHS.map((demo) => {
-              const Icon = demo.icon;
-              const colorClasses = {
-                blue: 'bg-blue-100 text-blue-600 border-blue-200',
-                blue: 'bg-blue-100 text-blue-600 border-blue-200',
-                green: 'bg-green-100 text-green-600 border-green-200',
-              };
-              const btnClasses = {
-                blue: 'bg-blue-600 hover:bg-blue-700',
-                blue: 'bg-blue-600 hover:bg-blue-700',
-                green: 'bg-green-600 hover:bg-green-700',
-              };
-              
-              return (
-                <div key={demo.id} className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
-                  <div className={`p-6 ${colorClasses[demo.color as keyof typeof colorClasses]} border-b`}>
-                    <div className="flex items-center gap-3 mb-3">
-                      <Icon className="w-8 h-8" />
-                      <h2 className="text-2xl font-bold text-slate-900">{demo.title}</h2>
-                    </div>
-                    <p className="text-slate-600">{demo.description}</p>
-                  </div>
-                  
-                  <div className="p-6">
-                    <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-600" />
-                      What You Can Do
-                    </h3>
-                    <ul className="space-y-2 mb-6">
-                      {demo.canDo.map((item, idx) => (
-                        <li key={idx} className="text-sm text-slate-600 flex items-start gap-2">
-                          <span className="text-green-500 mt-1">•</span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    <h3 className="font-bold text-slate-900 mb-3 flex items-center gap-2">
-                      <Lock className="w-5 h-5 text-slate-400" />
-                      Locked Until Onboarding
-                    </h3>
-                    <ul className="space-y-2 mb-6">
-                      {demo.locked.map((item, idx) => (
-                        <li key={idx} className="text-sm text-slate-400 flex items-start gap-2">
-                          <span className="mt-1">•</span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                    
-                    <Link
-                      href={demo.href}
-                      className={`block w-full text-center text-white py-3 rounded-lg font-bold ${btnClasses[demo.color as keyof typeof btnClasses]} transition-colors`}
-                    >
-                      Start {demo.title}
-                    </Link>
-                  </div>
-                </div>
-              );
-            })}
+      {/* Hero */}
+      <section className="py-14 sm:py-18 bg-slate-900 text-white">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <div className="inline-flex items-center gap-2 bg-brand-red-600/20 text-brand-red-400 px-4 py-2 rounded-full text-sm font-bold mb-6">
+            <Play className="w-4 h-4" /> Guided Platform Tour
+          </div>
+          <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
+            See the Platform in Action
+          </h1>
+          <p className="mt-6 text-lg text-white/90 max-w-2xl mx-auto">
+            Walk through each role in the Workforce OS — admin, learner, employer, and instructor.
+            These are guided tours showing real workflows, not a sandbox.
+          </p>
+          <div className="mt-8">
+            <Link
+              href="/store/licenses"
+              className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors text-lg"
+            >
+              Get Started <ArrowRight className="w-5 h-5" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-16 px-4 bg-slate-50">
-        <div className="max-w-4xl mx-auto">
-          <h2 className="text-3xl font-black text-slate-900 mb-8 text-center">
-            How Demos Work
-          </h2>
-          <div className="grid md:grid-cols-3 gap-6">
-            {[
-              { step: 1, title: 'Choose a Role', desc: 'Select admin, instructor, or student perspective.' },
-              { step: 2, title: 'Explore Features', desc: 'Click through real interfaces with sample data.' },
-              { step: 3, title: 'Decide & Buy', desc: 'When ready, start your managed platform setup.' },
-            ].map((item) => (
-              <div key={item.step} className="text-center">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl mx-auto mb-4">
-                  {item.step}
+      {/* Tour cards */}
+      <section className="py-16 sm:py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="space-y-12">
+            {tours.map((tour, i) => (
+              <div
+                key={tour.title}
+                className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} gap-8 items-center`}
+              >
+                {/* Screenshot placeholder */}
+                <div className="w-full md:w-1/2 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 aspect-video flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <tour.icon className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                    <p className="text-slate-500 font-medium">{tour.title} Preview</p>
+                    <p className="text-slate-400 text-sm mt-1">Screenshots available during live demo</p>
+                  </div>
                 </div>
-                <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-slate-600 text-sm">{item.desc}</p>
+
+                {/* Content */}
+                <div className="w-full md:w-1/2">
+                  <div className="flex items-center gap-3 mb-3">
+                    <tour.icon className="w-6 h-6 text-brand-red-600" />
+                    <h2 className="text-2xl font-bold text-slate-900">{tour.title}</h2>
+                  </div>
+                  <p className="text-slate-800 mb-4">{tour.description}</p>
+                  <ul className="space-y-2">
+                    {tour.highlights.map((h) => (
+                      <li key={h} className="flex items-start gap-2 text-slate-800 text-sm">
+                        <BarChart3 className="w-4 h-4 text-brand-red-600 flex-shrink-0 mt-0.5" />
+                        {h}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
             ))}
           </div>
@@ -201,27 +143,27 @@ export default function DemoCenterPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-blue-600 text-white">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-black mb-4">Ready to Get Started?</h2>
-          <p className="text-xl text-blue-100 mb-8">
-            After exploring the demos, set up your managed platform.
+      <section className="py-14 bg-slate-50 border-t border-slate-200">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-2xl font-bold text-slate-900 mb-3">
+            You&apos;ve seen how the Workforce OS works across all roles.
+          </h2>
+          <p className="text-slate-800 mb-8">
+            Most organizations can get started immediately.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex justify-center">
             <Link
-              href="/store/licenses/managed"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors"
+              href="/store/licenses"
+              className="inline-flex items-center justify-center gap-2 px-10 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors text-lg"
             >
-              Start License Setup
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/store/guides/licensing"
-              className="inline-flex items-center justify-center gap-2 bg-blue-800 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-900 transition-colors"
-            >
-              Read Licensing Guide
+              Get Started <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
+          <p className="mt-6 text-sm text-slate-500">
+            <Link href="/contact?topic=enterprise-review" className="text-slate-600 hover:underline">Enterprise / Government review</Link>
+            {' · '}
+            <Link href="/contact" className="text-slate-600 hover:underline">Compliance or procurement questions</Link>
+          </p>
         </div>
       </section>
     </div>

@@ -28,8 +28,8 @@ const plans = [
       'Analytics dashboard',
       'Email support',
     ],
-    cta: 'Request License',
-    href: '/contact?subject=Managed%20Platform%20-%20Growth',
+    cta: 'Start Growth Plan',
+    href: '/store/licenses/checkout/efh-core-platform',
     popular: false,
   },
   {
@@ -49,8 +49,8 @@ const plans = [
       'Priority support',
       'Dedicated onboarding',
     ],
-    cta: 'Request License',
-    href: '/contact?subject=Managed%20Platform%20-%20Professional',
+    cta: 'Start Professional Plan',
+    href: '/store/licenses/checkout/school-license',
     popular: true,
   },
   {
@@ -71,7 +71,7 @@ const plans = [
       'Credential add-ons available',
       'Multi-location support',
     ],
-    cta: 'Contact Sales',
+    cta: 'Talk to Licensing',
     href: '/contact?subject=Managed%20Platform%20-%20Enterprise',
     popular: false,
   },
@@ -110,13 +110,13 @@ export default function ManagedPlatformPage() {
                 href="#plans"
                 className="bg-orange-600 hover:bg-orange-700 text-white font-bold px-8 py-4 rounded-lg transition"
               >
-                View Plans
+                View Plans & Get Started
               </Link>
               <Link
-                href="/demo"
+                href="/store/demo"
                 className="bg-slate-800 hover:bg-slate-700 text-white font-bold px-8 py-4 rounded-lg transition"
               >
-                Request Demo
+                See Platform Tour
               </Link>
             </div>
           </div>
@@ -293,15 +293,18 @@ export default function ManagedPlatformPage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Launch Your Platform?</h2>
           <p className="text-slate-400 mb-8">
-            Contact us to discuss your requirements and get started.
+            Choose a plan above and start onboarding immediately.
           </p>
           <Link
-            href="/contact?subject=Managed%20Platform%20License"
+            href="#plans"
             className="inline-flex items-center gap-2 bg-orange-600 hover:bg-orange-700 text-white font-bold px-8 py-4 rounded-lg transition"
           >
-            Request License
+            Choose a Plan
             <ArrowRight className="w-5 h-5" />
           </Link>
+          <p className="mt-4 text-sm text-slate-500">
+            <Link href="/contact?topic=enterprise-review" className="text-slate-400 hover:text-white">Enterprise / Government review</Link>
+          </p>
         </div>
       </section>
 

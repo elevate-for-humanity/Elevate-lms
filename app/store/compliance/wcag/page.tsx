@@ -111,7 +111,7 @@ export default function WCAGCompliancePage() {
                   View Pricing
                   <ArrowRight className="w-5 h-5" />
                 </Link>
-                <Link href="/demo" className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-500 transition border border-blue-500">
+                <Link href="/store/demo" className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-500 transition border border-blue-500">
                   Request Demo
                 </Link>
               </div>
@@ -201,7 +201,7 @@ export default function WCAGCompliancePage() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Make Learning Accessible</h2>
           <p className="text-blue-100 mb-8">Schedule a demo to see our accessibility tools in action.</p>
-          <Link href="/demo" className="inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-blue-50 transition">
+          <Link href="/store/demo" className="inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-blue-50 transition">
             Schedule Demo
           </Link>
         </div>

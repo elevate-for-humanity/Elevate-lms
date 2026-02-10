@@ -108,7 +108,7 @@ export default function GrantReportingPage() {
                   View Pricing
                   <ArrowRight className="w-5 h-5" />
                 </Link>
-                <Link href="/demo" className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-400 transition border border-orange-400">
+                <Link href="/store/demo" className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-400 transition border border-orange-400">
                   Request Demo
                 </Link>
               </div>
@@ -222,7 +222,7 @@ export default function GrantReportingPage() {
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Simplify Grant Reporting</h2>
           <p className="text-orange-100 mb-8">Schedule a demo to see how we can save you hours on every report.</p>
-          <Link href="/demo" className="inline-flex items-center gap-2 bg-white text-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-orange-50 transition">
+          <Link href="/store/demo" className="inline-flex items-center gap-2 bg-white text-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-orange-50 transition">
             Schedule Demo
           </Link>
         </div>

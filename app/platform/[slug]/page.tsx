@@ -202,14 +202,13 @@ export default async function ProductDetailPage({ params }: Props) {
                 {product.requiresApproval ? (
                   <div>
                     <Link
-                      href="/contact"
+                      href="/contact?topic=enterprise-review"
                       className="block w-full text-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-4 rounded-lg font-semibold transition-colors mb-4"
                     >
-                      Request Access
+                      Request Enterprise Review
                     </Link>
                     <p className="text-sm text-black text-center">
-                      This license requires approval. We'll review your
-                      application and contact you within 1-2 business days.
+                      This license requires approval. Applications are reviewed within 1-2 business days.
                     </p>
                   </div>
                 ) : (

@@ -347,20 +347,20 @@ export default function SchoolLicensePage() {
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link 
-              href="/contact?subject=School%20License%20Demo"
+              href="/store/licenses/checkout/school-license"
               className="bg-white text-orange-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-50"
-            >
-              Schedule a Demo
-            </Link>
-            <Link 
-              href="/store/checkout?license=school"
-              className="bg-orange-700 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-800 border-2 border-orange-500"
             >
               Get Started — $15,000
             </Link>
+            <Link 
+              href="/store/demo"
+              className="bg-orange-700 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-800 border-2 border-orange-500"
+            >
+              See Platform Tour
+            </Link>
           </div>
           <p className="mt-8 text-orange-200">
-            Questions? Call (317) 314-3757
+            Questions? <Link href="/contact?topic=licensing" className="underline hover:text-white">Contact us</Link>
           </p>
         </div>
       </section>

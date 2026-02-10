@@ -7,12 +7,13 @@ import { createBrowserClient } from '@supabase/ssr';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Turnstile from '@/components/Turnstile';
+import { validateRedirect } from '@/lib/auth/validate-redirect';
 
 export const dynamic = 'force-dynamic';
 
 function SignupFormContent() {
   const searchParams = useSearchParams();
-  const next = searchParams.get('next') || '/lms/dashboard';
+  const next = validateRedirect(searchParams.get('next'), '/lms/dashboard');
   const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
@@ -74,10 +75,6 @@ function SignupFormContent() {
 
       // If email confirmation is disabled, redirect immediately
       if (data.session) {
-        // Check for next parameter in URL
-        const searchParams = new URLSearchParams(window.location.search);
-        const next = searchParams.get('next') || '/lms/dashboard';
-
         setTimeout(() => {
           router.push(next);
           router.refresh();

@@ -1,10 +1,27 @@
 "use client";
 
 import Script from 'next/script';
+import { useEffect } from 'react';
 
+/**
+ * Canonical GA4 loader. This is the ONLY component that should inject gtag.js.
+ * All other GA components in this repo are orphaned and should not be used.
+ *
+ * Measurement ID comes from NEXT_PUBLIC_GA_MEASUREMENT_ID env var.
+ * If missing, logs a warning to console (not silent) so operators notice.
+ */
 const GA_MEASUREMENT_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
 
 export function GoogleAnalytics() {
+  useEffect(() => {
+    if (!GA_MEASUREMENT_ID) {
+      console.warn(
+        '[analytics] NEXT_PUBLIC_GA_MEASUREMENT_ID is not set. GA4 is disabled. ' +
+        'Set this env var in Netlify or .env.local to enable analytics.'
+      );
+    }
+  }, []);
+
   if (!GA_MEASUREMENT_ID) {
     return null;
   }

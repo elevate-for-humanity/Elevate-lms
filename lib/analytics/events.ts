@@ -468,6 +468,15 @@ export const ErrorEvents = {
 // ============================================
 // DEMO + TRIAL FUNNEL
 // ============================================
+//
+// GA4 SETUP REQUIRED:
+// The `correlation_id` custom parameter is sent with trial events.
+// To make it queryable in GA4 reports (not just DebugView), register it:
+//   GA4 Admin → Custom definitions → Create custom dimension
+//     Name: Correlation ID
+//     Scope: Event
+//     Event parameter: correlation_id
+//
 
 export const DemoTrialFunnelEvents = {
   demoPrimaryCtaClicked: () => {

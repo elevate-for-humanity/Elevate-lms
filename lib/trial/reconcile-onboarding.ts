@@ -1,5 +1,11 @@
 import { SupabaseClient } from '@supabase/supabase-js';
 
+// In-memory cache: once an org is checked (whether reconciled or already set),
+// skip further Supabase queries for this server process. Keyed by org ID.
+// TTL prevents stale entries from accumulating across long-lived processes.
+const reconcileCache = new Map<string, number>();
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
 /**
  * Reconciles onboarding_started_at for trial organizations.
  *
@@ -8,12 +14,17 @@ import { SupabaseClient } from '@supabase/supabase-js';
  * page must have failed. Set it now so the behavioral signal is accurate.
  *
  * Runs server-side in the admin layout. Idempotent and non-blocking.
+ * Short-circuits via in-memory cache after first check per org.
  */
 export async function reconcileTrialOnboarding(
   supabase: SupabaseClient,
   organizationId: string
 ): Promise<void> {
   try {
+    // Short-circuit: already checked this org recently
+    const cached = reconcileCache.get(organizationId);
+    if (cached && Date.now() - cached < CACHE_TTL_MS) return;
+
     // Check if this org has a trial license
     const { data: license } = await supabase
       .from('licenses')
@@ -23,7 +34,10 @@ export async function reconcileTrialOnboarding(
       .limit(1)
       .maybeSingle();
 
-    if (!license) return; // Not a trial org, nothing to reconcile
+    if (!license) {
+      reconcileCache.set(organizationId, Date.now()); // Not a trial org — cache and skip
+      return;
+    }
 
     // Check if onboarding_started_at is already set
     const { data: org } = await supabase
@@ -32,7 +46,10 @@ export async function reconcileTrialOnboarding(
       .eq('id', organizationId)
       .single();
 
-    if (!org || org.onboarding_started_at) return; // Already set or org not found
+    if (!org || org.onboarding_started_at) {
+      reconcileCache.set(organizationId, Date.now()); // Already set — cache and skip
+      return;
+    }
 
     // User is in the admin dashboard but onboarding_started_at was never set.
     // The fire-and-forget call from trial success page must have failed.
@@ -51,6 +68,8 @@ export async function reconcileTrialOnboarding(
         reason: 'onboarding_started_at was null on first dashboard load',
       },
     }).catch(() => {}); // Non-critical
+
+    reconcileCache.set(organizationId, Date.now());
   } catch {
     // Reconciliation is best-effort — never block the admin layout
   }

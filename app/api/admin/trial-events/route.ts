@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { requireAdmin } from '@/lib/authGuards';
 import { withAuth } from '@/lib/with-auth';
 import { createClient } from '@supabase/supabase-js';
 
@@ -16,7 +15,8 @@ function getSupabaseAdmin() {
  * GET /api/admin/trial-events
  *
  * Admin-only endpoint for reviewing trial funnel events.
- * Returns recent license_events filtered to trial-related event types.
+ * Auth: withAuth verifies session cookie + role='admin' via Supabase.
+ * Non-admin authenticated users get 403. Unauthenticated users get 401.
  *
  * Query params:
  *   ?days=7        — lookback window (default 7, max 90)
@@ -26,8 +26,6 @@ function getSupabaseAdmin() {
 export const GET = withAuth(
   async (request: NextRequest) => {
     try {
-      await requireAdmin();
-
       const { searchParams } = new URL(request.url);
       const days = Math.min(parseInt(searchParams.get('days') || '7', 10) || 7, 90);
       const type = searchParams.get('type') || 'all';
@@ -85,5 +83,6 @@ export const GET = withAuth(
       console.error('[admin/trial-events] Unexpected error:', error);
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
-  }
+  },
+  { roles: ['admin'] }
 );

@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { Server, Code, ArrowRight, CheckCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { RedirectNotice } from '@/components/store/RedirectNotice';
 
 export const metadata: Metadata = {
   title: 'Licenses | Elevate Store',
@@ -64,10 +65,11 @@ export default function StoreLicensesPage() {
           ]} />
           <p className="text-sm text-slate-600 mt-1">
             Licensing for the <a href="/platform" className="text-brand-red-600 font-medium hover:underline">Elevate Workforce Operating System</a>.
-            {' '}<a href="/platform" className="hover:underline">Learn how the platform works →</a>
+            {' '}<a href="/platform/how-it-works" className="hover:underline">How it works →</a>
           </p>
         </div>
       </div>
+      <RedirectNotice />
 
       {/* Header */}
       <section className="py-14 sm:py-18 bg-white">
@@ -77,6 +79,10 @@ export default function StoreLicensesPage() {
           </h1>
           <p className="mt-4 text-lg text-slate-800 max-w-2xl mx-auto">
             Two ways to run the Workforce OS. Pick the model that fits your organization.
+          </p>
+          <p className="mt-3 text-sm text-slate-500 max-w-xl mx-auto">
+            If you&apos;ve completed the demo, this is the next step: choose how you want to run the platform.
+            Not sure yet? <Link href="/store/trial" className="text-brand-red-600 hover:underline">Start a free 14-day trial</Link> first.
           </p>
         </div>
       </section>

@@ -96,8 +96,11 @@ export default function StoreDemoPage() {
             See the Platform in Action
           </h1>
           <p className="mt-6 text-lg text-white/90 max-w-2xl mx-auto">
-            Walk through each role in the Workforce OS — admin, learner, employer, and instructor.
-            These are guided tours showing real workflows, not a sandbox.
+            Walk through each role in the Workforce OS — admin, employer, and workforce program.
+            This is a guided walkthrough. You won&apos;t create an account or enter any data here.
+          </p>
+          <p className="mt-3 text-sm text-white/60">
+            When you&apos;re ready to work with real data, start a <Link href="/store/trial" className="underline hover:text-white/90">14-day trial</Link> or <Link href="/store/licenses" className="underline hover:text-white/90">choose a license</Link>.
           </p>
           <div className="mt-8">
             <Link

@@ -72,8 +72,11 @@ export default function TrialPage() {
               <CheckCircle className="w-10 h-10 text-green-600" />
             </div>
             <h1 className="text-3xl font-black text-slate-900 mb-3">Your trial is live.</h1>
-            <p className="text-lg text-slate-800 mb-8">
+            <p className="text-lg text-slate-800 mb-2">
               Check <strong>{adminEmail}</strong> for login instructions.
+            </p>
+            <p className="text-sm text-slate-500 mb-8">
+              You&apos;re now in your live workspace (14-day trial). Nothing here is public until you launch.
             </p>
 
             <div className="bg-slate-50 rounded-xl p-6 mb-8 text-left space-y-3">
@@ -122,6 +125,10 @@ export default function TrialPage() {
             <h1 className="text-4xl font-black text-slate-900 mb-4">Start Your 14-Day Trial</h1>
             <p className="text-lg text-slate-800">
               Full platform access. No credit card. Your environment is provisioned instantly.
+            </p>
+            <p className="mt-2 text-sm text-slate-500">
+              This creates your real workspace with your own subdomain and admin dashboard.
+              The demo used sample data — this will be your live environment.
             </p>
           </div>
 

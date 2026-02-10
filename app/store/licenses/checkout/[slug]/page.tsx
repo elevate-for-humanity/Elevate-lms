@@ -131,7 +131,7 @@ export default function LicenseCheckoutPage() {
     const foundProduct = getProductBySlug(slug);
 
     if (!foundProduct) {
-      router.push('/store/licenses');
+      router.push('/store/licenses?reason=invalid-product');
       return;
     }
 

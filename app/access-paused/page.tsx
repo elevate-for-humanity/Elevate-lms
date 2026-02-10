@@ -32,28 +32,31 @@ export default function AccessPausedPage() {
           </h1>
 
           {/* Message */}
-          <p className="text-slate-600 mb-6">
-            Your organization's subscription needs attention. 
+          <p className="text-slate-600 mb-2">
+            Your organization&apos;s subscription needs attention.
             Please contact your administrator to restore access.
+          </p>
+          <p className="text-sm text-slate-500 mb-6">
+            You were redirected here because your organization&apos;s license has expired or is being renewed.
           </p>
 
           {/* Reassurance */}
           <div className="bg-slate-50 rounded-lg p-4 mb-6">
             <p className="text-sm text-slate-500">
-              Don't worry — your progress and data are safe. 
-              Once your administrator resolves the billing, you'll have full access again.
+              Your progress and data are safe.
+              Once your administrator resolves the billing, you&apos;ll have full access again.
             </p>
           </div>
 
           {/* Actions */}
           <div className="space-y-3">
-            <a
-              href="mailto:admin@example.com"
+            <Link
+              href="/contact?topic=support"
               className="w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
             >
               <Mail className="w-5 h-5" />
-              Contact Administrator
-            </a>
+              Contact Support
+            </Link>
             
             <Link
               href="/"

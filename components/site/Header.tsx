@@ -8,23 +8,23 @@ import HeaderDesktopNav from './HeaderDesktopNav';
 
 // Navigation structure
 export const NAV_ITEMS = [
-  { 
-    name: 'Platform', 
+  {
+    name: 'Platform',
     href: '/platform',
     subItems: [
-      { name: 'Platform Overview', href: '/platform' },
-      { name: 'Student Portal', href: '/platform/student-portal' },
-      { name: 'Partner Portal', href: '/platform/partner-portal' },
-      { name: 'Employer Portal', href: '/platform/employer-portal' },
+      { name: 'Overview', href: '/platform' },
+      { name: 'Partners', href: '/platform/partners' },
+      { name: 'Managed Platform', href: '/platform/managed' },
+      { name: 'Enterprise', href: '/platform/enterprise' },
       { name: 'Workforce Boards', href: '/platform/workforce-boards' },
-      { name: 'Compliance & Reporting', href: '/compliance' },
+      { name: 'Licensing', href: '/platform/licensing' },
+      { name: 'How It Works', href: '/platform/how-it-works' },
     ]
   },
   { 
     name: 'Programs', 
     href: '/programs',
     subItems: [
-      // WIOA Programs
       { name: '— WIOA Programs —', href: '/wioa-eligibility', isHeader: true },
       { name: 'CNA Training', href: '/programs/cna-certification' },
       { name: 'Medical Assistant', href: '/programs/medical-assistant' },
@@ -32,29 +32,21 @@ export const NAV_ITEMS = [
       { name: 'HVAC Technician', href: '/programs/hvac-technician' },
       { name: 'CDL Training', href: '/programs/cdl-training' },
       { name: 'IT Support', href: '/programs/it-support' },
-      // Apprenticeships
       { name: '— Apprenticeships —', href: '/apprenticeships', isHeader: true },
       { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
       { name: 'Cosmetology Apprenticeship', href: '/programs/cosmetology-apprenticeship' },
     ]
   },
   { 
-    name: 'Partners', 
-    href: '/partners',
+    name: 'About', 
+    href: '/about',
     subItems: [
-      { name: 'Become a Partner', href: '/partners' },
-      { name: 'Employer Partners', href: '/employers' },
-      { name: 'Training Providers', href: '/training-providers' },
-      { name: 'Partner Portal', href: '/partner-portal' },
+      { name: 'About Elevate', href: '/about' },
+      { name: 'Our Mission', href: '/mission' },
+      { name: 'How It Works', href: '/how-it-works' },
+      { name: 'Success Stories', href: '/success-stories' },
+      { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
     ]
-  },
-  { 
-    name: 'Managed Platform', 
-    href: '/managed',
-  },
-  { 
-    name: 'Enterprise', 
-    href: '/enterprise',
   },
   { 
     name: 'Support', 

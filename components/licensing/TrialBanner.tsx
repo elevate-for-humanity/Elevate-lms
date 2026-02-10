@@ -13,6 +13,7 @@ interface TrialBannerProps {
 }
 
 const TRIAL_STEPS = [
+  { id: 'oriented', label: 'You\'re in your live workspace', description: 'This is real — nothing is public until you launch' },
   { id: 'add_users', label: 'Add team members', description: 'Invite at least 1 admin and 1 user' },
   { id: 'create_program', label: 'Create a program', description: 'Set up your first training program' },
   { id: 'publish_course', label: 'Publish a course', description: 'Add content and publish' },

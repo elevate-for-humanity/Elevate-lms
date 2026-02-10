@@ -17,19 +17,27 @@ function getSupabaseAdmin() {
  * Records onboarding initiation so we can distinguish between
  * "trial created but never opened" and "trial created and user engaged."
  *
- * Body: { subdomain }
+ * Body: { subdomain, correlationId? }
+ * Also accepts x-correlation-id header.
  */
 export async function POST(request: NextRequest) {
+  const body = await request.json().catch(() => ({}));
+  const correlationId: string =
+    body.correlationId ||
+    request.headers.get('x-correlation-id') ||
+    `onboard_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
+
   try {
-    const { subdomain } = await request.json();
+    const { subdomain } = body;
 
     if (!subdomain || typeof subdomain !== 'string') {
-      return NextResponse.json({ error: 'subdomain is required' }, { status: 400 });
+      return NextResponse.json({ error: 'subdomain is required', correlationId }, { status: 400 });
     }
 
     const supabase = getSupabaseAdmin();
     if (!supabase) {
-      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+      console.error(`[trial/begin-onboarding] ${correlationId} — Supabase not configured`);
+      return NextResponse.json({ error: 'Service unavailable', correlationId }, { status: 503 });
     }
 
     // Find the org by slug
@@ -40,7 +48,7 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (!org) {
-      return NextResponse.json({ error: 'Organization not found' }, { status: 404 });
+      return NextResponse.json({ error: 'Organization not found', correlationId }, { status: 404 });
     }
 
     // Only set onboarding_started_at once (idempotent)
@@ -51,7 +59,7 @@ export async function POST(request: NextRequest) {
         .eq('id', org.id);
     }
 
-    // Log the event
+    // Log the event with correlation ID for end-to-end tracing
     const { data: license } = await supabase
       .from('licenses')
       .select('id')
@@ -66,15 +74,16 @@ export async function POST(request: NextRequest) {
         organization_id: org.id,
         event_type: 'trial_onboarding_started',
         event_data: {
+          correlation_id: correlationId,
           subdomain,
           source: 'trial_success_page',
         },
       }).catch(() => {}); // Non-critical
     }
 
-    return NextResponse.json({ ok: true });
+    return NextResponse.json({ ok: true, correlationId });
   } catch (error) {
-    console.error('[trial/begin-onboarding] Unexpected error:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    console.error(`[trial/begin-onboarding] ${correlationId} — Unexpected error:`, error);
+    return NextResponse.json({ error: 'Internal server error', correlationId }, { status: 500 });
   }
 }

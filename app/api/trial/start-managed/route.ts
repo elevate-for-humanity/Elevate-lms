@@ -49,11 +49,12 @@ async function sendTrialWelcomeEmail(
   email: string,
   orgName: string,
   subdomain: string,
-  dashboardUrl: string
+  dashboardUrl: string,
+  correlationId: string
 ) {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) {
-    console.warn('[trial] RESEND_API_KEY not configured, skipping welcome email');
+    console.warn(`[trial] ${correlationId} — RESEND_API_KEY not configured, skipping welcome email`);
     return;
   }
 
@@ -63,6 +64,7 @@ async function sendTrialWelcomeEmail(
     from: 'Elevate LMS <noreply@elevateforhumanity.org>',
     to: email,
     subject: `Your 14-day trial is ready — ${orgName}`,
+    headers: { 'X-Correlation-ID': correlationId },
     html: `
       <h1>Your trial is live.</h1>
       <p>Organization: <strong>${orgName}</strong></p>
@@ -220,6 +222,7 @@ export async function POST(request: NextRequest) {
       organization_id: org.id,
       event_type: 'trial_self_service_start',
       event_data: {
+        correlation_id: correlationId,
         plan_id: 'managed-trial',
         subdomain,
         admin_email: email,
@@ -230,7 +233,7 @@ export async function POST(request: NextRequest) {
     // Send welcome email
     const dashboardUrl = `https://${subdomain}.elevatelms.com/admin`;
     try {
-      await sendTrialWelcomeEmail(email, orgName.trim(), subdomain, dashboardUrl);
+      await sendTrialWelcomeEmail(email, orgName.trim(), subdomain, dashboardUrl, correlationId);
     } catch (emailError) {
       console.error(`[trial] ${correlationId} — Failed to send welcome email:`, emailError);
       // Don't fail — trial is created

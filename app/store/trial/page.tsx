@@ -17,6 +17,7 @@ export default function TrialPage() {
     tenantUrl: string;
     subdomain: string;
     trialEndsAt: string;
+    correlationId?: string;
     message: string;
   } | null>(null);
 
@@ -40,13 +41,13 @@ export default function TrialPage() {
           : (data.error || 'Something went wrong. Please try again.');
         setError(errMsg);
         setCorrelationId(data.correlationId || null);
-        DemoTrialFunnelEvents.trialCreatedFailed(errMsg);
+        DemoTrialFunnelEvents.trialCreatedFailed(errMsg, data.correlationId);
         return;
       }
 
       setResult(data);
       setCorrelationId(null);
-      DemoTrialFunnelEvents.trialCreatedSuccess(data.subdomain);
+      DemoTrialFunnelEvents.trialCreatedSuccess(data.subdomain, data.correlationId);
     } catch {
       setError('Network error. Please check your connection and try again.');
       setCorrelationId(null);
@@ -110,12 +111,18 @@ export default function TrialPage() {
               <a
                 href={result.tenantUrl}
                 onClick={(e) => {
-                  DemoTrialFunnelEvents.trialSuccessOpenDashboard(result.subdomain);
+                  DemoTrialFunnelEvents.trialSuccessOpenDashboard(result.subdomain, result.correlationId);
                   // Record onboarding initiation (fire-and-forget, don't block navigation)
                   fetch('/api/trial/begin-onboarding', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ subdomain: result.subdomain }),
+                    headers: {
+                      'Content-Type': 'application/json',
+                      ...(result.correlationId ? { 'x-correlation-id': result.correlationId } : {}),
+                    },
+                    body: JSON.stringify({
+                      subdomain: result.subdomain,
+                      correlationId: result.correlationId,
+                    }),
                   }).catch(() => {});
                 }}
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors w-full sm:w-auto"

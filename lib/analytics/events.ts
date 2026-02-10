@@ -48,6 +48,8 @@ interface TrackEventParams {
   value?: number;
   nonInteraction?: boolean;
   contentGroup?: ContentGroup;
+  /** Arbitrary key-value pairs forwarded to GA4 as custom parameters */
+  customParams?: Record<string, string | number | boolean>;
 }
 
 // Safe gtag wrapper
@@ -58,13 +60,14 @@ function safeGtag(command: string, ...args: any[]) {
 }
 
 // Track generic event
-export function trackEvent({ action, category, label, value, nonInteraction, contentGroup }: TrackEventParams) {
+export function trackEvent({ action, category, label, value, nonInteraction, contentGroup, customParams }: TrackEventParams) {
   safeGtag('event', action, {
     event_category: category,
     event_label: label,
     value: value,
     non_interaction: nonInteraction,
     content_group: contentGroup,
+    ...customParams,
   });
 }
 
@@ -491,27 +494,30 @@ export const DemoTrialFunnelEvents = {
     });
   },
 
-  trialCreatedSuccess: (subdomain: string) => {
+  trialCreatedSuccess: (subdomain: string, correlationId?: string) => {
     trackEvent({
       action: 'trial_created_success',
       category: 'demo_trial_funnel',
       label: subdomain,
+      customParams: correlationId ? { correlation_id: correlationId } : undefined,
     });
   },
 
-  trialCreatedFailed: (error: string) => {
+  trialCreatedFailed: (error: string, correlationId?: string) => {
     trackEvent({
       action: 'trial_created_failed',
       category: 'demo_trial_funnel',
       label: error,
+      customParams: correlationId ? { correlation_id: correlationId } : undefined,
     });
   },
 
-  trialSuccessOpenDashboard: (subdomain: string) => {
+  trialSuccessOpenDashboard: (subdomain: string, correlationId?: string) => {
     trackEvent({
       action: 'trial_success_open_dashboard',
       category: 'demo_trial_funnel',
       label: subdomain,
+      customParams: correlationId ? { correlation_id: correlationId } : undefined,
     });
   },
 

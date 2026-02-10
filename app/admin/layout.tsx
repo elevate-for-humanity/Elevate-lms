@@ -5,6 +5,7 @@ import { requireAdmin } from '@/lib/auth';
 import { createClient } from '@/lib/supabase/server';
 import { AdminLicenseWrapper } from '@/components/licensing/AdminLicenseWrapper';
 import { getLicenseAccessMode } from '@/lib/licensing/billing-authority';
+import { reconcileTrialOnboarding } from '@/lib/trial/reconcile-onboarding';
 import AdminHeader from '@/components/admin/AdminHeader';
 import { DemoTourProvider } from '@/components/demo/DemoTourProvider';
 
@@ -83,6 +84,14 @@ export default async function AdminLayout({
 
   // Get license context for banner
   const context = await getLicenseContext();
+
+  // Reconcile trial onboarding state if the fire-and-forget call missed
+  if (context?.tenantId) {
+    const supabase = await createClient();
+    if (supabase) {
+      reconcileTrialOnboarding(supabase, context.tenantId).catch(() => {});
+    }
+  }
 
   // Check if user should be blocked (non-admin with expired license)
   if (context?.license) {

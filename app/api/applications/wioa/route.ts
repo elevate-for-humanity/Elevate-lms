@@ -28,6 +28,23 @@ export async function POST(req: Request) {
     }
 
     const body = await req.json();
+
+    // Validate required fields
+    if (!body.firstName || !body.lastName || !body.email) {
+      return NextResponse.json(
+        { error: 'First name, last name, and email are required' },
+        { status: 400 }
+      );
+    }
+
+    // Basic email format check
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) {
+      return NextResponse.json(
+        { error: 'Invalid email address' },
+        { status: 400 }
+      );
+    }
+
     const supabase = createAdminClient();
 
     // Generate reference number
@@ -174,17 +191,14 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         ok: true,
-        id: data.id,
         referenceNumber: referenceNumber,
       },
       { status: 200 }
     );
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) {
     return NextResponse.json(
       {
-        error:
-          (error instanceof Error ? error.message : String(error)) ||
-          'Internal server err',
+        error: 'Failed to submit application. Please call 317-314-3757 for assistance.',
       },
       { status: 500 }
     );

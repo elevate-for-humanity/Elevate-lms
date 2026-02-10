@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Video, Calendar, Clock, Users, Play, Bell } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -32,11 +33,16 @@ export default function WebinarsPage() {
         </div>
       </div>
 
-      <section className="bg-slate-700 text-white py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <Video className="w-16 h-16 mx-auto mb-6" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Live Webinars</h1>
-          <p className="text-xl text-red-100 mb-8">Learn from experts and connect with the community</p>
+      <section className="relative min-h-[400px] flex items-center overflow-hidden">
+        <Image src="/hero-images/how-it-works-hero.jpg" alt="Webinars" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-slate-900/70" />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
+          <Video className="w-16 h-16 mx-auto mb-6 text-white/80" />
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Live Webinars</h1>
+          <p className="text-xl text-slate-200 mb-8">Learn from experts, ask questions, and connect with the community</p>
+          <Link href="/contact" className="px-8 py-4 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-100 transition">
+            Request a Topic
+          </Link>
         </div>
       </section>
 

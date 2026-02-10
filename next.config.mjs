@@ -198,6 +198,82 @@ const nextConfig = {
   // Redirects for consolidated routes
   async redirects() {
     return [
+      // ============================================
+      // APP ALIAS REDIRECTS (Rule B: auth/app path renames)
+      // Centralized here instead of scattered in-page redirect() calls.
+      // proxy.ts handles auth; these are pure path consolidation.
+      // ============================================
+
+      // Admin login lives at /admin-login (outside /admin layout auth gate)
+      // /admin/login redirects here to avoid the layout auth loop
+      { source: '/admin/login', destination: '/admin-login', permanent: true },
+      { source: '/admin/audits', destination: '/admin/compliance', permanent: true },
+      { source: '/admin/compliance-dashboard', destination: '/admin/compliance', permanent: true },
+      { source: '/admin/course-authoring', destination: '/admin/course-builder', permanent: true },
+      { source: '/admin/course-builder/new', destination: '/admin/course-builder', permanent: true },
+      { source: '/admin/course-studio', destination: '/admin/course-builder', permanent: true },
+      { source: '/admin/course-studio-ai', destination: '/admin/course-generator', permanent: true },
+      { source: '/admin/course-studio-simple', destination: '/admin/course-builder', permanent: true },
+      { source: '/admin/dashboard-enhanced', destination: '/admin/dashboard', permanent: true },
+      { source: '/admin/enrollment', destination: '/admin/enrollments', permanent: true },
+      { source: '/admin/lms-dashboard', destination: '/admin/dashboard', permanent: true },
+      { source: '/admin/marketplace', destination: '/admin/store', permanent: true },
+      { source: '/admin/master-dashboard', destination: '/admin/dashboard', permanent: true },
+      { source: '/admin/programs/catalog/preview', destination: '/admin/programs', permanent: true },
+
+      // Apprentice
+      { source: '/apprentice/dashboard', destination: '/apprentice', permanent: true },
+      { source: '/apprentice/progress', destination: '/apprentice/hours', permanent: true },
+
+      // Dashboard
+      { source: '/dashboard/sub-offices/new', destination: '/dashboard', permanent: true },
+
+      // Employer
+      { source: '/employer-portal/wotc', destination: '/employer-portal', permanent: true },
+      { source: '/employer/apprenticeship', destination: '/employer', permanent: true },
+      { source: '/employer/apprenticeship/new', destination: '/employer', permanent: true },
+      { source: '/employer/login', destination: '/login', permanent: true },
+      { source: '/employer/postings/new', destination: '/employer', permanent: true },
+      { source: '/employer/register', destination: '/apply/employer', permanent: true },
+
+      // LMS
+      { source: '/lms/catalog', destination: '/lms/courses', permanent: true },
+      { source: '/lms/messages/new', destination: '/lms', permanent: true },
+      { source: '/lms/messages/support/new', destination: '/lms', permanent: true },
+
+      // Mentor / Mentorship
+      { source: '/mentor', destination: '/mentor/dashboard', permanent: false },
+      { source: '/mentor/apply', destination: '/mentorship', permanent: true },
+      { source: '/mentorship/apply', destination: '/apply', permanent: true },
+      { source: '/mentorship/become-mentor', destination: '/contact', permanent: true },
+
+      // Partner (app-side)
+      { source: '/partner/refer', destination: '/partner-with-us', permanent: true },
+
+      // Portal — exact match before wildcard
+      { source: '/portal/staff/dashboard', destination: '/staff-portal/dashboard', permanent: true },
+
+      // Program holder
+      { source: '/program-holder/portal', destination: '/program-holder/dashboard', permanent: true },
+      { source: '/program-holder/portal/attendance', destination: '/program-holder/dashboard', permanent: true },
+      { source: '/program-holder/portal/live-qa', destination: '/program-holder/support', permanent: true },
+      { source: '/program-holder/portal/messages', destination: '/program-holder/support', permanent: true },
+      { source: '/program-holder/portal/reports', destination: '/program-holder/reports', permanent: true },
+      { source: '/program-holder/portal/students', destination: '/program-holder/students', permanent: true },
+      { source: '/program-holder/programs/new', destination: '/program-holder/programs', permanent: true },
+
+      // Staff
+      { source: '/staff-portal/processes', destination: '/staff-portal/qa-checklist', permanent: true },
+
+      // Student portal
+      { source: '/student-portal/messages', destination: '/student/chat', permanent: true },
+      { source: '/student-portal/profile', destination: '/student/profile', permanent: true },
+      { source: '/student-portal/settings', destination: '/lms/settings', permanent: true },
+
+      // ============================================
+      // LEGACY / FRAMEWORK REDIRECTS
+      // ============================================
+
       // Normalize "Institute" style routes into the infrastructure model
       { source: '/institute', destination: '/', permanent: true },
       { source: '/training-institute', destination: '/programs', permanent: true },
@@ -220,15 +296,12 @@ const nextConfig = {
         destination: '/sitemap.xml',
         permanent: true,
       },
-      // Redirect /home to homepage
-      {
-        source: '/home',
-        destination: '/',
-        permanent: true,
-      },
+      // /home → / handled by Netlify (public SEO route, Rule A)
       
       // Dashboard consolidation - canonical student entry is /student-portal
       { source: '/student', destination: '/student-portal', permanent: true },
+      // Exact match first: /portal → portal chooser. Wildcard below catches /portal/anything → /lms/anything.
+      { source: '/portal', destination: '/portals', permanent: true },
       { source: '/portal/:path*', destination: '/lms/:path*', permanent: true },
       { source: '/student/:path*', destination: '/lms/:path*', permanent: true },
       { source: '/students/:path*', destination: '/lms/:path*', permanent: true },
@@ -247,12 +320,10 @@ const nextConfig = {
       { source: '/program-finder/:path*', destination: '/programs/:path*', permanent: true },
       { source: '/compare-programs/:path*', destination: '/programs/:path*', permanent: true },
 
-      // Career consolidation
-      { source: '/career-center/:path*', destination: '/career-services/:path*', permanent: true },
+      // Career consolidation — /career-center handled by Netlify (Rule A)
       { source: '/career-fair/:path*', destination: '/career-services/:path*', permanent: true },
 
-      // Partner consolidation
-      { source: '/partner-with-us/:path*', destination: '/partners/:path*', permanent: true },
+      // Partner consolidation — /partner-with-us handled by Netlify (Rule A)
       { source: '/partner-application/:path*', destination: '/partners/:path*', permanent: true },
       { source: '/partner-courses/:path*', destination: '/partners/:path*', permanent: true },
       { source: '/partner-playbook/:path*', destination: '/partners/:path*', permanent: true },
@@ -272,35 +343,39 @@ const nextConfig = {
       // Misc redirects
       { source: '/for-students', destination: '/lms', permanent: true },
       { source: '/dashboards/:path*', destination: '/lms/:path*', permanent: true },
-      { source: '/portals/:path*', destination: '/lms/:path*', permanent: true },
+      // /portals base route has its own page — only redirect sub-paths
+      { source: '/portals/:slug/:path*', destination: '/lms/:slug/:path*', permanent: true },
+      { source: '/portals/:slug', destination: '/lms/:slug', permanent: true },
 
-      // Removed businesses
-      { source: '/serene-comfort-care/:path*', destination: '/programs', permanent: true },
-      { source: '/kingdom-konnect/:path*', destination: '/programs', permanent: true },
-      { source: '/urban-build-crew/:path*', destination: '/programs', permanent: true },
-      { source: '/selfish-inc/:path*', destination: '/rise-foundation/:path*', permanent: true },
+      // These brands have their own pages — only redirect sub-paths, not the root
+      // /serene-comfort-care/page.tsx exists and redirects to /partners itself
+      // /kingdom-konnect/page.tsx exists with full content
+      // /urban-build-crew/page.tsx exists with full content
+      // /selfish-inc/page.tsx exists with full content
 
       // Removed routes - financial-aid has its own page now
       { source: '/forums/:path*', destination: '/blog', permanent: true },
-      { source: '/alumni/:path*', destination: '/about', permanent: true },
+      // /alumni/page.tsx exists (182 lines) — do not redirect away from it
+      // { source: '/alumni/:path*', destination: '/about', permanent: true },
       { source: '/board/:path*', destination: '/admin/:path*', permanent: true },
       { source: '/receptionist/:path*', destination: '/staff-portal/:path*', permanent: true },
       { source: '/delegate/:path*', destination: '/admin/:path*', permanent: true },
       { source: '/study-groups/:path*', destination: '/lms', permanent: true },
       { source: '/forum/:path*', destination: '/blog', permanent: true },
-      // Volunteer page now has its own content
-      { source: '/news/:path*', destination: '/blog/:path*', permanent: true },
+      // /news/page.tsx exists (137 lines) — do not redirect away from it
+      // { source: '/news/:path*', destination: '/blog/:path*', permanent: true },
       
       // Old 404 URLs from Google - redirect to relevant pages
       { source: '/about/founder', destination: '/about/team', permanent: true },
       { source: '/etpl-programs', destination: '/pathways', permanent: true },
       { source: '/intake', destination: '/apply', permanent: true },
-      { source: '/scholarships', destination: '/funding', permanent: true },
+      // /scholarships → /funding handled by Netlify (public SEO route, Rule A)
       { source: '/health-services', destination: '/programs/healthcare', permanent: true },
       // Donate page has its own content now
       { source: '/resources/:path*', destination: '/blog', permanent: true },
       { source: '/career-uplift-services/:path*', destination: '/career-services', permanent: true },
-      { source: '/community', destination: '/blog', permanent: true },
+      // /community/page.tsx exists (371 lines) — do not redirect away from it
+      // { source: '/community', destination: '/blog', permanent: true },
       { source: '/video', destination: '/videos', permanent: true },
       
       // LMS redirects
@@ -311,18 +386,21 @@ const nextConfig = {
       { source: '/student-portal/courses', destination: '/student-portal', permanent: true },
       { source: '/student-portal/certificates', destination: '/student-portal', permanent: true },
       { source: '/student-portal/progress', destination: '/student-portal', permanent: true },
-      { source: '/student-portal/settings', destination: '/student-portal', permanent: true },
+      // /student-portal/settings → /lms/settings handled by middleware (Rule B)
       
       // Partner portal redirects
-      { source: '/partner/dashboard', destination: '/partner', permanent: true },
-      { source: '/partner/courses', destination: '/partner', permanent: true },
-      { source: '/partner/students', destination: '/partner', permanent: true },
+      // NOTE: /partner/dashboard is the canonical partner dashboard page.
+      // /partner/page.tsx redirects TO /partner/dashboard, so do NOT redirect /partner/dashboard back.
+      // Removed: { source: '/partner/dashboard', destination: '/partner', permanent: true },
+      // Removed: { source: '/partner/courses', destination: '/partner', permanent: true },
+      // Removed: { source: '/partner/students', destination: '/partner', permanent: true },
       
       // AI redirects
       { source: '/ai-instructor', destination: '/ai-tutor', permanent: true },
       
       // Marketing redirects
-      { source: '/success-stories', destination: '/testimonials', permanent: true },
+      // Removed: /success-stories has its own full page (179 lines) — do not redirect away from it
+      // { source: '/success-stories', destination: '/testimonials', permanent: true },
       { source: '/for-workforce-boards', destination: '/workforce-board', permanent: true },
       { source: '/get-started', destination: '/start', permanent: true },
       

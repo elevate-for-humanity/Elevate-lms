@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { validateRedirect } from '@/lib/auth/validate-redirect';
 
 function LoginForm() {
   const [email, setEmail] = useState('');
@@ -16,7 +17,8 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   // Support both 'next' and 'redirect' params for backward compatibility
-  const next = searchParams.get('next') || searchParams.get('redirect') || '';
+  const rawNext = searchParams.get('next') || searchParams.get('redirect') || '';
+  const next = validateRedirect(rawNext, '');
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -9,6 +9,7 @@
 
 [build.environment]
   NODE_VERSION = "20"
+  NODE_OPTIONS = "--max-old-space-size=8192"
   NETLIFY_USE_PNPM = "true"
   # Disable secret scanning - NEXT_PUBLIC_* vars are intentionally public
   SECRETS_SCAN_ENABLED = "false"
@@ -160,18 +161,11 @@
   status = 301
   force = true
 
+# Removed: /success-stories has its own full page — trailing slash only
 [[redirects]]
   from = "/success-stories/"
-  to = "/testimonials"
+  to = "/success-stories"
   status = 301
-  force = true
-
-# Consolidate /success-stories to /testimonials (single canonical)
-[[redirects]]
-  from = "/success-stories"
-  to = "/testimonials"
-  status = 301
-  force = true
 
 # Fix slow 307 redirect - handle at edge for instant response
 [[redirects]]
@@ -355,28 +349,17 @@
   status = 410
   force = true
 
-[[redirects]]
-  from = "/student/dashboard"
-  to = "/student-portal"
-  status = 308
-  force = true
-
-[[redirects]]
-  from = "/student/dashboard/*"
-  to = "/student-portal"
-  status = 308
-  force = true
-
-[[redirects]]
-  from = "/student"
-  to = "/student-portal"
-  status = 308
-  force = true
+# /student, /student/dashboard → /student-portal handled by next.config.mjs (auth/app route, Rule B)
 
 [[redirects]]
   from = "/partner-with-us"
-  to = "/partner"
-  status = 308
+  to = "/partners"
+  status = 301
+
+[[redirects]]
+  from = "/partner-with-us/*"
+  to = "/partners/:splat"
+  status = 301
   force = true
 
 [[redirects]]
@@ -393,6 +376,161 @@
 [[redirects]]
   from = "/home"
   to = "/"
+  status = 301
+
+# ============================================
+# PUBLIC ALIAS REDIRECTS (Rule A: public SEO → Netlify)
+# Migrated from in-page redirect() calls
+# ============================================
+
+[[redirects]]
+  from = "/community/about"
+  to = "/about"
+  status = 301
+
+[[redirects]]
+  from = "/community/events/create"
+  to = "/events"
+  status = 301
+
+[[redirects]]
+  from = "/community/forum"
+  to = "/forums"
+  status = 301
+
+[[redirects]]
+  from = "/donate/monthly"
+  to = "/donate"
+  status = 301
+
+[[redirects]]
+  from = "/help"
+  to = "/help/articles"
+  status = 301
+
+[[redirects]]
+  from = "/help/admin"
+  to = "/support"
+  status = 301
+
+[[redirects]]
+  from = "/help/articles/certificates"
+  to = "/faq"
+  status = 301
+
+[[redirects]]
+  from = "/help/articles/financial-aid"
+  to = "/faq"
+  status = 301
+
+[[redirects]]
+  from = "/help/articles/how-to-enroll"
+  to = "/faq"
+  status = 301
+
+[[redirects]]
+  from = "/help/articles/reset-password"
+  to = "/faq"
+  status = 301
+
+[[redirects]]
+  from = "/help/instructors"
+  to = "/support"
+  status = 301
+
+[[redirects]]
+  from = "/programs/admin/dashboard"
+  to = "/admin/dashboard"
+  status = 301
+
+[[redirects]]
+  from = "/programs/barber-apprenticeship/eligibility"
+  to = "/programs/barber-apprenticeship"
+  status = 301
+
+[[redirects]]
+  from = "/programs/barber-apprenticeship/inquiry"
+  to = "/inquiry?program=barber-apprenticeship"
+  status = 301
+
+[[redirects]]
+  from = "/store/add-ons/community-hub/checkout"
+  to = "/store"
+  status = 301
+
+[[redirects]]
+  from = "/store/ai-studio/checkout"
+  to = "/store"
+  status = 301
+
+[[redirects]]
+  from = "/store/ai-studio/demo"
+  to = "/store"
+  status = 301
+
+[[redirects]]
+  from = "/store/categories"
+  to = "/store"
+  status = 301
+
+[[redirects]]
+  from = "/store/demo/core"
+  to = "/demo/learner"
+  status = 301
+
+[[redirects]]
+  from = "/store/demo/enterprise"
+  to = "/demo/employer"
+  status = 301
+
+[[redirects]]
+  from = "/store/demo/institutional"
+  to = "/demo/admin"
+  status = 301
+
+[[redirects]]
+  from = "/store/deployment"
+  to = "/store/licenses"
+  status = 301
+
+[[redirects]]
+  from = "/store/digital/grant-guide"
+  to = "/store"
+  status = 301
+
+[[redirects]]
+  from = "/store/licenses/checkout/managed"
+  to = "/store/licenses"
+  status = 301
+
+[[redirects]]
+  from = "/store/licenses/pro-license"
+  to = "/store/licenses/source-use"
+  status = 301
+
+[[redirects]]
+  from = "/store/licenses/starter-license"
+  to = "/store/licenses/source-use"
+  status = 301
+
+[[redirects]]
+  from = "/store/orders"
+  to = "/store"
+  status = 301
+
+[[redirects]]
+  from = "/store/products"
+  to = "/store"
+  status = 301
+
+[[redirects]]
+  from = "/store/white-label"
+  to = "/store/licenses"
+  status = 301
+
+[[redirects]]
+  from = "/volunteer/apply"
+  to = "/volunteer"
   status = 301
 
 # ============================================

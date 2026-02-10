@@ -1,12 +1,13 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
+import { validateRedirect } from '@/lib/auth/validate-redirect';
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
   const error = requestUrl.searchParams.get('error');
   const errorDescription = requestUrl.searchParams.get('error_description');
-  const next = requestUrl.searchParams.get('next') || '/lms/dashboard';
+  const next = validateRedirect(requestUrl.searchParams.get('next'), '/lms/dashboard');
 
   // Handle OAuth errors from Supabase
   if (error) {

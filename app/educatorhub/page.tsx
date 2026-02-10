@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
+import Image from 'next/image';
 import { BookOpen, Users, Award, BarChart, FileText, Video, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -27,10 +28,12 @@ export default function EducatorHubPage() {
         </div>
       </div>
 
-      <section className="bg-teal-600 text-white py-20">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <BookOpen className="w-16 h-16 mx-auto mb-6" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Educator Hub</h1>
+      <section className="relative min-h-[400px] flex items-center overflow-hidden">
+        <Image src="/hero-images/how-it-works-hero.jpg" alt="Educator Hub" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-teal-900/70" />
+        <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
+          <BookOpen className="w-16 h-16 mx-auto mb-6 text-white/80" />
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Educator Hub</h1>
           <p className="text-xl text-teal-100 mb-8">Everything you need to create impactful learning experiences</p>
           <Link href="/instructor/dashboard" className="inline-flex items-center gap-2 bg-white text-teal-600 px-8 py-4 rounded-full font-bold hover:bg-teal-50">
             Go to Instructor Dashboard <ArrowRight className="w-5 h-5" />

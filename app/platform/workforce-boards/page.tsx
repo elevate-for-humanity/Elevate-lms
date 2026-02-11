@@ -43,6 +43,7 @@ export default function WorkforceBoardsPage() {
       <div className="bg-white border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Platform', href: '/platform' }, { label: 'Workforce Boards' }]} />
+          <p className="text-sm text-slate-600 font-medium mt-1">Part of the <a href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p>
         </div>
       </div>
 

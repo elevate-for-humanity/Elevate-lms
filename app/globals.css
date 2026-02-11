@@ -257,7 +257,7 @@ html, body {
   }
 
   p {
-    @apply text-sm md:text-base leading-relaxed text-slate-700;
+    @apply text-base md:text-lg leading-relaxed text-slate-900;
   }
 
   a {

@@ -20,6 +20,9 @@ export default function PlatformLicensingPage() {
           { label: 'Licensing' },
         ]}
       />
+      <div className="max-w-7xl mx-auto px-4 pb-2">
+        <p className="text-sm text-slate-600 font-medium">Part of the <a href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p>
+      </div>
       {/* Hero - Above the fold */}
       <section className="bg-slate-900 text-white py-24 lg:py-32">
         <div className="max-w-4xl mx-auto px-6 text-center">

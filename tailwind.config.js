@@ -29,35 +29,35 @@ export default {
 
       // Typography Scale (CANONICAL - DO NOT MODIFY)
       fontSize: {
-        // Readable system-wide scale
-        'xs': ['13px', { lineHeight: '1.5' }],
-        'sm': ['14px', { lineHeight: '1.5' }],
-        'base': ['16px', { lineHeight: '1.6' }],
-        'lg': ['18px', { lineHeight: '1.75' }],
-        'xl': ['20px', { lineHeight: '1.5' }],
-        '2xl': ['24px', { lineHeight: '1.4' }],
-        '3xl': ['30px', { lineHeight: '1.3' }],
-        '4xl': ['36px', { lineHeight: '1.2' }],
-        '5xl': ['48px', { lineHeight: '1.15' }],
+        // Readable system-wide scale — bumped for readability
+        'xs': ['14px', { lineHeight: '1.5' }],
+        'sm': ['15px', { lineHeight: '1.5' }],
+        'base': ['17px', { lineHeight: '1.6' }],
+        'lg': ['19px', { lineHeight: '1.75' }],
+        'xl': ['21px', { lineHeight: '1.5' }],
+        '2xl': ['26px', { lineHeight: '1.4' }],
+        '3xl': ['32px', { lineHeight: '1.3' }],
+        '4xl': ['38px', { lineHeight: '1.2' }],
+        '5xl': ['50px', { lineHeight: '1.15' }],
 
-        // Display (Hero headlines) - kept for compatibility
-        'display-lg': ['48px', { lineHeight: '1.15', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'display-md': ['36px', { lineHeight: '1.2', letterSpacing: '-0.02em', fontWeight: '700' }],
-        'display-sm': ['30px', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '700' }],
+        // Display (Hero headlines)
+        'display-lg': ['50px', { lineHeight: '1.15', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'display-md': ['38px', { lineHeight: '1.2', letterSpacing: '-0.02em', fontWeight: '700' }],
+        'display-sm': ['32px', { lineHeight: '1.3', letterSpacing: '-0.01em', fontWeight: '700' }],
 
-        // Headings - kept for compatibility
-        h1: ['32px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }],
-        h2: ['24px', { lineHeight: '1.4', fontWeight: '700' }],
-        h3: ['20px', { lineHeight: '1.4', fontWeight: '600' }],
-        h4: ['18px', { lineHeight: '1.4', fontWeight: '600' }],
+        // Headings
+        h1: ['34px', { lineHeight: '1.2', letterSpacing: '-0.01em', fontWeight: '700' }],
+        h2: ['26px', { lineHeight: '1.4', fontWeight: '700' }],
+        h3: ['21px', { lineHeight: '1.4', fontWeight: '600' }],
+        h4: ['19px', { lineHeight: '1.4', fontWeight: '600' }],
 
-        // Body - kept for compatibility
-        'body-lg': ['18px', { lineHeight: '1.75' }],
-        'body': ['16px', { lineHeight: '1.6' }],
-        'body-sm': ['14px', { lineHeight: '1.5' }],
+        // Body
+        'body-lg': ['19px', { lineHeight: '1.75' }],
+        'body': ['17px', { lineHeight: '1.6' }],
+        'body-sm': ['15px', { lineHeight: '1.5' }],
 
         // Meta/Small
-        'meta': ['13px', { lineHeight: '1.5', fontWeight: '500' }],
+        'meta': ['14px', { lineHeight: '1.5', fontWeight: '500' }],
       },
 
       // Spacing Scale (LOCKED)

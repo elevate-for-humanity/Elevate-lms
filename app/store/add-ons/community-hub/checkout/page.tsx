@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
-export default function CommunityHubCheckoutPage() {
-  redirect('/store');
+export default function CommunityHubCheckoutRedirect() {
+  redirect('/store/licenses');
 }

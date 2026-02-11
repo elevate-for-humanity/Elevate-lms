@@ -45,6 +45,7 @@ export default function PartnerPortalPage() {
           <Breadcrumbs items={[{ label: 'Platform', href: '/platform' }, { label: 'Partner Portal' }]} />
         </div>
       </div>
+      <div class="max-w-6xl mx-auto px-4 pb-2"><p class="text-sm text-slate-600 font-medium">Part of the <a href="/platform" class="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p></div>
 
       {/* Hero */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">

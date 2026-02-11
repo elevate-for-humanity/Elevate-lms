@@ -43,6 +43,9 @@ export default async function StudentPortalPage() {
           { label: 'Student Portal' },
         ]}
       />
+      <div className="max-w-6xl mx-auto px-4 pb-2">
+        <p className="text-sm text-slate-600 font-medium">Part of the <a href="/platform" className="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p>
+      </div>
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image

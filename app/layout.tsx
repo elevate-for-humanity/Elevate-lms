@@ -180,7 +180,7 @@ export default function RootLayout({
         <style dangerouslySetInnerHTML={{__html: `
           *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
           html{-webkit-text-size-adjust:100%;font-family:ui-sans-serif,system-ui,-apple-system,sans-serif;background:#fff}
-          body{margin:0;line-height:1.6;background:#fff;font-size:16px;min-height:100vh}
+          body{margin:0;line-height:1.6;background:#fff;font-size:17px;min-height:100vh}
           img{max-width:100%;height:auto;display:block}
           button,input,select,textarea{font-family:inherit;font-size:100%}
           .flex{display:flex}
@@ -212,7 +212,7 @@ export default function RootLayout({
       <body
         className={`${inter.className} min-h-dvh bg-white antialiased`}
         style={{
-          fontSize: '16px',
+          fontSize: '17px',
           backgroundColor: '#ffffff',
         }}
       >

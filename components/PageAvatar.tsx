@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from 'react';
 import Image from 'next/image';
-import { Play, Volume2, VolumeX } from 'lucide-react';
+import { Play, Volume2, VolumeX, VideoOff } from 'lucide-react';
 
 interface PageAvatarProps {
   videoSrc: string;
@@ -17,6 +17,8 @@ export default function PageAvatar({ videoSrc, voiceoverSrc, title, position = '
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(true);
   const [isMuted, setIsMuted] = useState(true);
+  const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const audioStartedRef = useRef(false);
   const unmuteAttemptedRef = useRef(false);
 
@@ -122,6 +124,13 @@ export default function PageAvatar({ videoSrc, voiceoverSrc, title, position = '
 
   // Inline position for centered avatar under hero
   if (position === 'inline') {
+    if (hasError) {
+      return (
+        <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-slate-800 relative flex items-center justify-center">
+          <VideoOff className="w-8 h-8 text-slate-400" />
+        </div>
+      );
+    }
     return (
       <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-white shadow-xl bg-black relative">
         <video
@@ -132,7 +141,9 @@ export default function PageAvatar({ videoSrc, voiceoverSrc, title, position = '
           muted={isMuted}
           loop={loop}
           playsInline
-          preload="metadata"
+          preload="auto"
+          onLoadedData={() => setIsLoaded(true)}
+          onError={() => setHasError(true)}
         />
         {voiceoverSrc && (
           <audio ref={audioRef} preload="auto">
@@ -149,10 +160,44 @@ export default function PageAvatar({ videoSrc, voiceoverSrc, title, position = '
     );
   }
 
+  // Error fallback
+  if (hasError) {
+    return (
+      <section className="w-full bg-slate-100 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="rounded-2xl overflow-hidden shadow-xl bg-gradient-to-br from-slate-800 to-slate-900 relative">
+            <div className="relative overflow-hidden flex flex-col items-center justify-center py-16 px-8 text-center">
+              <div className="w-20 h-20 rounded-full bg-slate-700 flex items-center justify-center mb-4">
+                <VideoOff className="w-10 h-10 text-slate-400" />
+              </div>
+              <h3 className="text-xl font-bold text-white mb-2">{title || 'Video Guide'}</h3>
+              <p className="text-slate-300 mb-4">Video is loading or unavailable. Please refresh the page to try again.</p>
+              <button
+                onClick={() => { setHasError(false); setIsLoaded(false); }}
+                className="px-6 py-3 bg-brand-red-600 text-white font-semibold rounded-lg hover:bg-brand-red-700 transition-colors"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="w-full bg-slate-100 py-8">
       <div className="max-w-4xl mx-auto px-4">
         <div className="rounded-2xl overflow-hidden shadow-xl bg-black relative">
+          {/* Loading state */}
+          {!isLoaded && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-slate-800 to-slate-900 z-10">
+              <div className="flex flex-col items-center gap-3">
+                <div className="w-10 h-10 border-4 border-slate-600 border-t-white rounded-full animate-spin" />
+                <span className="text-slate-300 text-sm">Loading video...</span>
+              </div>
+            </div>
+          )}
           {/* Cropped video container to hide bottom branding */}
           <div className="relative overflow-hidden" style={{ paddingBottom: '50%' }}>
             <video
@@ -163,8 +208,9 @@ export default function PageAvatar({ videoSrc, voiceoverSrc, title, position = '
               loop={loop}
               muted={isMuted}
               autoPlay
-              preload="metadata"
-              poster="/images/avatar-poster.jpg"
+              preload="auto"
+              onLoadedData={() => setIsLoaded(true)}
+              onError={() => setHasError(true)}
             />
             {voiceoverSrc && (
               <audio ref={audioRef} preload="auto">
@@ -189,7 +235,7 @@ export default function PageAvatar({ videoSrc, voiceoverSrc, title, position = '
           >
             {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
           </button>
-          {/* Logo overlay - covers bottom right corner where HeyGen logo appears */}
+          {/* Logo overlay */}
           <div className="absolute bottom-2 right-2 z-10 pointer-events-none">
             <div className="bg-black/80 rounded px-2 py-1 flex items-center gap-1">
               <Image 

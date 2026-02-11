@@ -29,16 +29,7 @@ export function clearUserContext() {
   }
 }
 
-export async function trackEvent(name: string, properties?: Record<string, any>) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('event', name, properties);
-  }
-}
-
-export async function trackPageView(url: string) {
-  if (typeof window !== 'undefined' && (window as any).gtag) {
-    (window as any).gtag('config', process.env.NEXT_PUBLIC_GA_ID, {
-      page_path: url,
-    });
-  }
-}
+// GA4 event tracking is handled exclusively by:
+//   - components/analytics/google-analytics.tsx (loader + config)
+//   - lib/analytics/events.ts (event firing via safeGtag)
+// Do not add gtag calls here. See docs/PRODUCTION-READINESS-REPORT.md §10.

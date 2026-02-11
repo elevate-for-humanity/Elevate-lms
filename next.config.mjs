@@ -426,8 +426,8 @@ const nextConfig = {
       { source: '/admin/autopilots', destination: '/admin/autopilot', permanent: true },
       { source: '/admin/analytics-dashboard', destination: '/admin/analytics', permanent: true },
       
-      // Hide metrics/outcomes until enrollment data exists
-      { source: '/outcomes/:path*', destination: '/programs', permanent: false },
+      // /outcomes/indiana is a public page — do not redirect it
+      // Other outcomes sub-routes redirect to programs until data exists
       { source: '/metrics', destination: '/programs', permanent: false },
     ];
   },

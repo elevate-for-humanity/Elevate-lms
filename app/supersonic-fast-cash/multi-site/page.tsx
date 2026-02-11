@@ -93,7 +93,7 @@ const requirements = [
 const testimonials = [
   {
     quote: "Opening my Supersonic Fast Cash office was the best business decision I've made. The support and training made it easy to get started.",
-    author: 'Marcus T.',
+    author: 'Graduate',
     location: 'Indianapolis, IN',
     year: '2023 Partner',
   },

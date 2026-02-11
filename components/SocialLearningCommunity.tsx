@@ -91,7 +91,7 @@ export function SocialLearningCommunity() {
     },
     {
       id: '2',
-      author: 'Marcus Johnson',
+      author: 'Graduate',
       avatar: '👨‍🎓',
       content: 'Looking for study partners for the upcoming Node.js certification exam. Planning to meet virtually every Tuesday evening.',
       timestamp: '5 hours ago',

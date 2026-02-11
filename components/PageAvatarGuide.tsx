@@ -80,9 +80,9 @@ export const AVATAR_CONFIGS: Record<string, {
     videoFile: '/videos/avatars/hvac-guide.mp4',
   },
   cdl: {
-    avatarName: 'Marcus',
+    avatarName: 'Guide',
     avatarRole: 'CDL Instructor',
-    welcomeMessage: "Hey! I'm Marcus. CDL training gets you on the road earning good money. Ready to become a truck driver?",
+    welcomeMessage: "Hey! I'm Guide. CDL training gets you on the road earning good money. Ready to become a truck driver?",
     context: 'trades',
     videoFile: '/videos/avatars/cdl-guide.mp4',
   },
@@ -259,9 +259,9 @@ export const AVATAR_CONFIGS: Record<string, {
     videoFile: '/videos/avatars/hvac-course.mp4',
   },
   courseCDL: {
-    avatarName: 'Marcus',
+    avatarName: 'Guide',
     avatarRole: 'CDL Instructor',
-    welcomeMessage: "Welcome to CDL Training! I'm Marcus. I'll help you get your Commercial Driver's License and start earning. Questions about the program?",
+    welcomeMessage: "Welcome to CDL Training! I'm Guide. I'll help you get your Commercial Driver's License and start earning. Questions about the program?",
     context: 'trades',
     videoFile: '/videos/avatars/cdl-course.mp4',
   },

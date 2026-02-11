@@ -42,7 +42,7 @@ export function VideoConferencingIntegration() {
     {
       id: '3',
       title: 'Career Counseling',
-      host: 'Marcus Johnson',
+      host: 'Graduate',
       date: '2024-01-28',
       time: '10:00 AM',
       duration: '30 minutes',

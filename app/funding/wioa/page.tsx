@@ -381,7 +381,7 @@ export default async function WioaPage() {
 
             <div className="bg-white rounded-lg p-6">
               <p className="text-lg text-black mb-4">
-                <strong>Marcus, 45 - HVAC Technician</strong>
+                <strong>Graduate, 45 - HVAC Technician</strong>
               </p>
               <p className="text-black">
                 "I got laid off after 15 years in manufacturing. I was 45 years

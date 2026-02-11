@@ -46,7 +46,7 @@ export function PeerTutoringMarketplace() {
     },
     {
       id: '3',
-      name: 'Marcus Johnson',
+      name: 'Graduate',
       avatar: '👨‍💻',
       subjects: ['Programming', 'Web Development'],
       rating: 5.0,

@@ -55,9 +55,9 @@ export function DocumentManagementSystem() {
       size: '856 KB',
       version: 'v1.0',
       lastModified: '2024-01-12',
-      author: 'Marcus Johnson',
+      author: 'Graduate',
       versions: [
-        { version: 'v1.0', date: '2024-01-12', author: 'Marcus Johnson' },
+        { version: 'v1.0', date: '2024-01-12', author: 'Graduate' },
       ],
     },
   ];

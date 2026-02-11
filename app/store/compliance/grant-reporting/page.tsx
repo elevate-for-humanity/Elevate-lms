@@ -64,8 +64,8 @@ export default function GrantReportingPage() {
       {/* Avatar Guide */}
       <AvatarGuide
         avatarImage="/images/team-hq/instructor-2.jpg"
-        avatarName="Marcus"
-        welcomeMessage="Hey! I'm Marcus. I used to spend 40 hours on quarterly reports. Now it takes 10 minutes. Let me show you how our grant reporting tools work."
+        avatarName="Guide"
+        welcomeMessage="Hey! I'm your guide. I used to spend 40 hours on quarterly reports. Now it takes 10 minutes. Let me show you how our grant reporting tools work."
         steps={guideSteps}
         autoStart={true}
       />

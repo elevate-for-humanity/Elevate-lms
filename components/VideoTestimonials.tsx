@@ -62,7 +62,7 @@ const testimonials: Testimonial[] = [
   },
   {
     id: '4',
-    name: 'Marcus Williams',
+    name: 'Graduate',
     program: 'CDL Training',
     beforeJob: 'Warehouse Worker',
     afterJob: 'Commercial Truck Driver at Schneider',

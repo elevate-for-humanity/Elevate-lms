@@ -40,7 +40,7 @@ export default function StudentChatPage() {
   const conversations: Conversation[] = [
     {
       id: '1',
-      name: 'Marcus Thompson',
+      name: 'Student',
       role: 'Instructor',
       lastMessage: 'Great work on your practical assignment!',
       timestamp: '10:30 AM',

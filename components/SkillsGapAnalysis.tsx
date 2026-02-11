@@ -93,7 +93,7 @@ export default function SkillsGapAnalysis() {
     },
     {
       id: '3',
-      name: 'Marcus Johnson',
+      name: 'Graduate',
       role: 'Junior Developer',
       skills: [
         { name: 'JavaScript', level: 60 },

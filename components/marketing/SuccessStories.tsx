@@ -2,7 +2,7 @@
 
 const stories = [
   {
-    name: "Marcus",
+    name: "Guide",
     role: "Barber Apprenticeship Graduate",
     quote:
       "From incarceration to owning my own chair. Elevate gave me structure, accountability, and a real pathway.",

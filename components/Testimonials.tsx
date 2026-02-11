@@ -14,7 +14,7 @@ const TESTIMONIALS: Testimonial[] = [
     avatar: '/people/sharon.jpg',
   },
   {
-    name: 'Marcus R.',
+    name: 'Graduate',
     role: 'Welding Apprentice',
     quote:
       "The lab time and OSHA-10 got me hired fast. I'm earning while I learn with a clear path to journeyman.",

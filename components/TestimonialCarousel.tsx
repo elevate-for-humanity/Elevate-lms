@@ -26,7 +26,7 @@ const testimonials: Testimonial[] = [
   {
     id: 2,
     quote: "The barber apprenticeship changed my life. I went from working retail to owning my own chair. The training was hands-on and the instructors were amazing.",
-    name: "Marcus Johnson",
+    name: "Graduate",
     title: "Barber Graduate, 2023",
     rating: 5,
     image: "/testimonials/marcus.jpg"

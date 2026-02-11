@@ -36,7 +36,7 @@ const MOCK_REVIEWS: Review[] = [
     },
     {
       id: '3',
-      studentName: 'Marcus Johnson',
+      studentName: 'Graduate',
       rating: 5,
       comment: 'Best programming course I\'ve taken. The pace is perfect and assignments are challenging.',
       date: '2024-01-13',

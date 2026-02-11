@@ -13,7 +13,7 @@ const leaderboardData = [
   },
   {
     rank: 2,
-    name: 'Marcus Johnson',
+    name: 'Graduate',
     points: 2640,
     courses: 2,
     avatar: 'MJ',

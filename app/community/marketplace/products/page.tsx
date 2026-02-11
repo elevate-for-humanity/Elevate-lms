@@ -25,7 +25,7 @@ export default function CommunityProductsPage() {
     {
       id: '1',
       title: 'HVAC Certification Study Flashcards',
-      creator: 'Marcus Johnson',
+      creator: 'Student',
       rating: 4.9,
       reviews: 87,
       downloads: 234,

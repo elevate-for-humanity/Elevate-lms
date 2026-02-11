@@ -48,7 +48,7 @@ export function ResourceLibrary() {
       type: 'article',
       description: 'Industry-standard practices for Node.js development',
       tags: ['Node.js', 'Backend', 'Best Practices'],
-      author: 'Marcus Johnson',
+      author: 'Graduate',
       date: '2024-01-12',
       downloads: 654,
     },

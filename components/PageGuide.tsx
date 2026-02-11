@@ -74,9 +74,9 @@ const PAGE_GUIDES: Record<string, {
     videoFile: '/videos/avatars/avatar-hvac.mp4',
   },
   cdl: {
-    avatarName: 'Marcus',
+    avatarName: 'Guide',
     avatarRole: 'CDL Instructor',
-    welcomeMessage: "Hey there! I'm Marcus. CDL training gets you behind the wheel of a commercial truck. Great pay, see the country, be your own boss. Interested?",
+    welcomeMessage: "Hey there! I'm Guide. CDL training gets you behind the wheel of a commercial truck. Great pay, see the country, be your own boss. Interested?",
     context: 'trades',
     videoFile: '/videos/avatars/avatar-cdl.mp4',
   },

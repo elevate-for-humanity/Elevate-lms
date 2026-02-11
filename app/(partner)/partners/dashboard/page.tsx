@@ -29,7 +29,7 @@ export default function PartnerDashboardPage() {
   ];
 
   const recentActivity = [
-    { action: 'New enrollment', detail: 'Marcus Johnson enrolled in HVAC Technician', time: '2 hours ago' },
+    { action: 'New enrollment', detail: 'New student enrolled in HVAC Technician', time: '2 hours ago' },
     { action: 'Hours verified', detail: '24 hours verified for Barber Apprenticeship cohort', time: '4 hours ago' },
     { action: 'Report generated', detail: 'Monthly outcomes report for January 2026', time: '1 day ago' },
     { action: 'Payment received', detail: '$3,200 funding disbursement processed', time: '2 days ago' },

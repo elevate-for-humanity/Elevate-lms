@@ -4,7 +4,7 @@ import { ArrowRight, TrendingUp } from 'lucide-react';
 
 const stories = [
   {
-    name: 'Marcus Thompson',
+    name: 'Graduate',
     program: 'Public Safety & Reentry Specialist',
     image: '/images/learners/reentry-coaching.jpg',
     beforeJob: 'Unemployed after incarceration',

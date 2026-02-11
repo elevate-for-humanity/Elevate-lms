@@ -186,7 +186,7 @@ export default async function AlumniPage() {
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="bg-gray-50 rounded-lg p-6">
                   <p className="text-gray-700 italic mb-4">&quot;The program changed my life. I went from unemployed to earning $55K in just 6 months.&quot;</p>
-                  <p className="font-semibold text-gray-900">Marcus J.</p>
+                  <p className="font-semibold text-gray-900">Graduate</p>
                   <p className="text-sm text-gray-500">HVAC Graduate, 2025</p>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-6">

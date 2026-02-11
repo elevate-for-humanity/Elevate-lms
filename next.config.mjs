@@ -320,6 +320,24 @@ const nextConfig = {
       { source: '/program-finder/:path*', destination: '/programs/:path*', permanent: true },
       { source: '/compare-programs/:path*', destination: '/programs/:path*', permanent: true },
 
+      // Program alias → canonical slug (one URL per program)
+      { source: '/programs/barber', destination: '/programs/barber-apprenticeship', permanent: true },
+      { source: '/programs/cna/:path*', destination: '/programs/cna-certification/:path*', permanent: true },
+      { source: '/programs/cna', destination: '/programs/cna-certification', permanent: true },
+      { source: '/programs/cdl/:path*', destination: '/programs/cdl-training/:path*', permanent: true },
+      { source: '/programs/cdl', destination: '/programs/cdl-training', permanent: true },
+      { source: '/programs/hvac/:path*', destination: '/programs/hvac-technician/:path*', permanent: true },
+      { source: '/programs/hvac', destination: '/programs/hvac-technician', permanent: true },
+      { source: '/programs/phlebotomy/:path*', destination: '/programs/phlebotomy-technician/:path*', permanent: true },
+      { source: '/programs/phlebotomy', destination: '/programs/phlebotomy-technician', permanent: true },
+      { source: '/programs/building-services-technician/:path*', destination: '/programs/building-maintenance-tech/:path*', permanent: true },
+      { source: '/programs/building-services-technician', destination: '/programs/building-maintenance-tech', permanent: true },
+      { source: '/programs/drug-collector', destination: '/programs/drug-alcohol-specimen-collector', permanent: true },
+      { source: '/programs/esthetician-apprenticeship/:path*', destination: '/programs/professional-esthetician/:path*', permanent: true },
+      { source: '/programs/esthetician-apprenticeship', destination: '/programs/professional-esthetician', permanent: true },
+      { source: '/programs/tax-preparation/:path*', destination: '/programs/tax-prep-financial-services/:path*', permanent: true },
+      { source: '/programs/tax-preparation', destination: '/programs/tax-prep-financial-services', permanent: true },
+
       // Career consolidation — /career-center handled by Netlify (Rule A)
       { source: '/career-fair/:path*', destination: '/career-services/:path*', permanent: true },
 

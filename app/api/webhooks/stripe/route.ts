@@ -186,7 +186,8 @@ export async function POST(request: NextRequest) {
             studentId, programId, programSlug, fundingSource, amountPaid
           });
 
-          // UPSERT student_enrollments - canonical enrollment record
+          // UPSERT student_enrollments - idempotent on (student_id, program_slug)
+          // Safe against Stripe retries and double-submissions
           const { data: enrollment, error: enrollError } = await supabase
             .from('student_enrollments')
             .upsert({
@@ -199,7 +200,7 @@ export async function POST(request: NextRequest) {
               amount_paid: amountPaid,
               started_at: new Date().toISOString(),
             }, {
-              onConflict: 'stripe_checkout_session_id',
+              onConflict: 'student_id,program_slug',
             })
             .select('id')
             .single();
@@ -915,9 +916,8 @@ export async function POST(request: NextRequest) {
               const barberFundingSource = session.metadata?.funding_source || 
                 ((session.amount_total || 0) > 0 ? 'self_pay' : 'unknown');
 
-              // Create student_enrollments record with transfer hours
-              // Uses stripe_checkout_session_id for canonical tracking
-              const { data: enrollment } = await supabase.from('student_enrollments').insert({
+              // Idempotent upsert on (student_id, program_slug)
+              const { data: enrollment } = await supabase.from('student_enrollments').upsert({
                 student_id: userId,
                 program_slug: 'barber-apprenticeship',
                 stripe_checkout_session_id: session.id,
@@ -928,6 +928,8 @@ export async function POST(request: NextRequest) {
                 transfer_hours: transferHours || 0,
                 has_host_shop: hasHostShop === 'yes',
                 host_shop_name: hostShopName || null,
+              }, {
+                onConflict: 'student_id,program_slug',
               }).select('id').single();
 
               // Create enrollment case (case spine) for workflow automation
@@ -1201,8 +1203,8 @@ export async function POST(request: NextRequest) {
         const legacyFundingSource = session.metadata?.funding_source || 
           ((session.amount_total || 0) > 0 ? 'self_pay' : 'unknown');
 
-        // Create new enrollment (legacy path)
-        await supabase.from('enrollments').insert({
+        // Idempotent upsert (legacy path) — safe against webhook retries
+        await supabase.from('enrollments').upsert({
           user_id: userId,
           course_id: courseId,
           status: 'active',
@@ -1215,6 +1217,8 @@ export async function POST(request: NextRequest) {
           funding_source: legacyFundingSource,
           partner_owed_cents: partnerOwedCents,
           your_revenue_cents: yourRevenueCents,
+        }, {
+          onConflict: 'stripe_checkout_session_id',
         });
 
         // Create partner payment record if applicable
@@ -1392,64 +1396,42 @@ export async function POST(request: NextRequest) {
 
         const programId = program?.id || enrollmentConfig.program_id;
 
-        // Check for existing enrollment (idempotency)
-        const { data: existingEnrollment } = await supabase
+        // UPSERT program_enrollments - idempotent on (student_id, program_slug)
+        // Handles Stripe retries, double-fires, and race conditions
+        const newStatus = enrollmentConfig.is_deposit ? 'DEPOSIT_PAID' : 'ACTIVE';
+        const newPaymentStatus = enrollmentConfig.is_deposit ? 'DEPOSIT_PAID' : 'PAID';
+
+        const { data: upsertedEnrollment, error: enrollError } = await supabase
           .from('program_enrollments')
-          .select('id, status')
-          .eq('student_id', studentId)
-          .eq('program_id', programId)
-          .maybeSingle();
+          .upsert({
+            student_id: studentId,
+            program_id: programId,
+            program_slug: enrollmentConfig.program_slug,
+            funding_source: enrollmentConfig.funding_source,
+            status: newStatus,
+            payment_status: newPaymentStatus,
+            enrollment_state: 'confirmed',
+            enrollment_confirmed_at: new Date().toISOString(),
+            next_required_action: 'ORIENTATION',
+            stripe_checkout_session_id: session.id,
+            stripe_payment_intent_id: session.payment_intent as string,
+            amount_paid_cents: session.amount_total || 0,
+            enrolled_at: new Date().toISOString(),
+          }, {
+            onConflict: 'student_id,program_slug',
+            ignoreDuplicates: false, // update on conflict
+          })
+          .select('id')
+          .single();
 
         let enrollmentResult: string;
 
-        if (existingEnrollment) {
-          // Update existing enrollment if not already active
-          if (existingEnrollment.status !== 'ACTIVE') {
-            await supabase
-              .from('program_enrollments')
-              .update({
-                status: enrollmentConfig.is_deposit ? 'DEPOSIT_PAID' : 'ACTIVE',
-                payment_status: enrollmentConfig.is_deposit ? 'DEPOSIT_PAID' : 'PAID',
-                enrollment_state: 'confirmed',
-                enrollment_confirmed_at: new Date().toISOString(),
-                next_required_action: 'ORIENTATION',
-                stripe_checkout_session_id: session.id,
-                stripe_payment_intent_id: session.payment_intent as string,
-                amount_paid_cents: session.amount_total || 0,
-                updated_at: new Date().toISOString(),
-              })
-              .eq('id', existingEnrollment.id);
-            enrollmentResult = `updated:${existingEnrollment.id}`;
-          } else {
-            enrollmentResult = `already_active:${existingEnrollment.id}`;
+        if (enrollError) {
+          console.error('[webhook] Failed to upsert enrollment:', enrollError);
+          break;
           }
         } else {
-          // Create new enrollment with confirmed state (payment complete)
-          const { data: newEnrollment, error: enrollError } = await supabase
-            .from('program_enrollments')
-            .insert({
-              student_id: studentId,
-              program_id: programId,
-              program_slug: enrollmentConfig.program_slug,
-              funding_source: enrollmentConfig.funding_source,
-              status: enrollmentConfig.is_deposit ? 'DEPOSIT_PAID' : 'ACTIVE',
-              payment_status: enrollmentConfig.is_deposit ? 'DEPOSIT_PAID' : 'PAID',
-              enrollment_state: 'confirmed',
-              enrollment_confirmed_at: new Date().toISOString(),
-              next_required_action: 'ORIENTATION',
-              stripe_checkout_session_id: session.id,
-              stripe_payment_intent_id: session.payment_intent as string,
-              amount_paid_cents: session.amount_total || 0,
-              enrolled_at: new Date().toISOString(),
-            })
-            .select('id')
-            .single();
-
-          if (enrollError) {
-            console.error('[webhook] Failed to create enrollment:', enrollError);
-            break;
-          }
-          enrollmentResult = `created:${newEnrollment?.id}`;
+          enrollmentResult = `upserted:${upsertedEnrollment?.id}`;
         }
 
         // Log the successful enrollment

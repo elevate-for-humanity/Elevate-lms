@@ -129,13 +129,17 @@ export async function POST(req: Request) {
       enrollmentId = existingEnrollment.id;
       logger.info('Enrollment already exists', { enrollmentId });
     } else {
+      // Idempotent upsert — safe against race conditions
       const { data: enrollment, error: enrollError } = await supabase
         .from('enrollments')
-        .insert({
+        .upsert({
           user_id: userId,
           program_id: program.id,
-          status: 'pending', // Changed from 'active' - requires approval
-          payment_status: 'waived', // Program is FREE
+          status: 'pending',
+          payment_status: 'waived',
+        }, {
+          onConflict: 'user_id,program_id',
+          ignoreDuplicates: false,
         })
         .select('id')
         .single();

@@ -284,7 +284,23 @@ export async function POST(req: Request) {
       }
 
       // STEP 2: Create/activate enrollment (AUTO-ENROLL)
-      // Idempotency: don't double-enroll if webhook retries
+      // Idempotent upsert — safe against Stripe retries and race conditions
+      const { data: upsertResult } = await supabaseClient
+        .from('enrollments')
+        .upsert({
+          student_id: studentId,
+          program_id: programId,
+          status: 'active',
+          payment_status: 'paid',
+          enrolled_at: new Date().toISOString(),
+        }, {
+          onConflict: 'student_id,program_id',
+          ignoreDuplicates: false,
+        })
+        .select('id')
+        .single();
+
+      // Check if this was a new enrollment or an update
       const { data: existing } = await supabaseClient
         .from('enrollments')
         .select('id, status')
@@ -292,27 +308,11 @@ export async function POST(req: Request) {
         .eq('program_id', programId)
         .maybeSingle();
 
-      let enrollmentId: string | null = null;
-      let isNewEnrollment = false;
+      let enrollmentId: string | null = upsertResult?.id || existing?.id || null;
+      let isNewEnrollment = !!upsertResult;
 
-      if (!existing) {
-        // Create new enrollment
-        const { data: newEnrollment } = await supabaseClient
-          .from('enrollments')
-          .insert({
-            student_id: studentId,
-            program_id: programId,
-            status: 'active',
-            payment_status: 'paid',
-            enrolled_at: new Date().toISOString(),
-          })
-          .select('id')
-          .single();
-
-        enrollmentId = newEnrollment?.id || null;
-        isNewEnrollment = true;
-
-        logger.info('[Webhook] ✅ Created new enrollment', {
+      if (isNewEnrollment) {
+        logger.info('[Webhook] ✅ Created/updated enrollment', {
           studentId,
           programId,
           enrollmentId,

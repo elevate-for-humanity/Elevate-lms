@@ -16,7 +16,7 @@ export async function GET() {
   const guard = await apiRequireAdmin();
   if (guard) return guard;
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     timestamp: new Date().toISOString(),
     environment: process.env.NODE_ENV,
     sezzle: {
@@ -51,4 +51,8 @@ export async function GET() {
       },
     },
   });
+
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  response.headers.set('Vary', 'Authorization, Cookie');
+  return response;
 }

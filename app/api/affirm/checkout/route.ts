@@ -63,10 +63,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Affirm minimum is $50
-    if (amount < 50) {
+    // Server-side price validation: enforce program minimum, not just Affirm limits.
+    const PROGRAM_MINIMUMS: Record<string, number> = {
+      'barber-apprenticeship': 1743, // Setup fee (35% of $4,980)
+    };
+    const programMinimum = PROGRAM_MINIMUMS[programSlug] || 50;
+    const effectiveMinimum = Math.max(50, programMinimum); // At least Affirm's $50 floor
+
+    if (amount < effectiveMinimum) {
       return NextResponse.json(
-        { error: 'Affirm requires a minimum purchase of $50' },
+        { error: `Minimum payment for this program is $${effectiveMinimum.toLocaleString()}` },
         { status: 400 }
       );
     }

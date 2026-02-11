@@ -104,14 +104,17 @@ export async function POST(request: NextRequest) {
   const signature = request.headers.get('sezzle-signature');
   const webhookSecret = process.env.SEZZLE_WEBHOOK_SECRET;
 
-  // Verify signature if secret is configured
+  // Verify signature — required in production
   if (webhookSecret) {
     if (!verifyWebhookSignature(payload, signature, webhookSecret)) {
       logger.warn('[Sezzle Webhook] Signature verification failed');
       return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
+  } else if (process.env.NODE_ENV === 'production') {
+    logger.error('[Sezzle Webhook] SEZZLE_WEBHOOK_SECRET not set in production — rejecting request');
+    return NextResponse.json({ error: 'Webhook not configured' }, { status: 503 });
   } else {
-    logger.warn('[Sezzle Webhook] SEZZLE_WEBHOOK_SECRET not set — skipping signature verification');
+    logger.warn('[Sezzle Webhook] SEZZLE_WEBHOOK_SECRET not set — skipping signature verification (dev only)');
   }
 
   // After signature verification, always return 200 to prevent retries
@@ -129,6 +132,26 @@ export async function POST(request: NextRequest) {
     const supabase = createAdminClient();
     if (!supabase) {
       logger.error('[Sezzle Webhook] createAdminClient returned null — SUPABASE_SERVICE_ROLE_KEY likely missing. DB writes will be skipped.');
+    }
+
+    // Deduplicate by order_uuid + event_type: if we already have a
+    // captured payment for this order, skip re-processing
+    if (supabase && event.data.order_uuid && event.event_type === 'order.captured') {
+      const { data: existing } = await supabase
+        .from('payments')
+        .select('id')
+        .eq('provider_order_id', event.data.order_uuid)
+        .eq('status', 'captured')
+        .maybeSingle();
+
+      if (existing) {
+        logger.info('[Sezzle Webhook] Duplicate capture event — already processed', {
+          eventId: event.event_id,
+          orderUuid: event.data.order_uuid,
+          existingPaymentId: existing.id,
+        });
+        return NextResponse.json({ received: true, duplicate: true });
+      }
     }
 
     switch (event.event_type) {

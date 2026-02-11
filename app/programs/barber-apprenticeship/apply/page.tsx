@@ -116,7 +116,8 @@ export default function BarberApprenticeshipApplyPage() {
         // 1. Get checkout config from our API
         // 2. Load Affirm JS SDK
         // 3. Call affirm.checkout() which opens their modal
-        const affirmAmount = Math.max(50, customAmount);
+        // Minimum is the setup fee ($1,743)
+        const affirmAmount = Math.max(PRICING.setupFee, customAmount);
         checkoutResponse = await fetch('/api/affirm/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -184,8 +185,8 @@ export default function BarberApprenticeshipApplyPage() {
         }
         return;
       } else if (paymentOption === 'sezzle') {
-        // Sezzle - pay over time with user-selected amount
-        const sezzleAmount = Math.min(2500, Math.max(35, customAmount));
+        // Sezzle - pay over time. Minimum is the setup fee ($1,743).
+        const sezzleAmount = Math.min(2500, Math.max(PRICING.setupFee, customAmount));
         checkoutResponse = await fetch('/api/sezzle/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -687,7 +688,7 @@ export default function BarberApprenticeshipApplyPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-blue-600 text-lg">You Choose</p>
-                        <p className="text-xs text-black">min $50</p>
+                        <p className="text-xs text-black">min ${PRICING.setupFee.toLocaleString()}</p>
                       </div>
                     </div>
                   </button>
@@ -696,7 +697,7 @@ export default function BarberApprenticeshipApplyPage() {
                   {paymentOption === 'affirm' && (
                     <div className="bg-blue-50 rounded-xl p-4 mb-3 border-2 border-blue-200">
                       <label className="block text-sm font-medium text-black mb-2">
-                        How much do you want to finance with Affirm? (min $50)
+                        How much do you want to finance with Affirm? (min ${PRICING.setupFee.toLocaleString()})
                       </label>
                       <div className="flex items-center gap-2">
                         <span className="text-2xl font-bold text-black">$</span>
@@ -710,7 +711,7 @@ export default function BarberApprenticeshipApplyPage() {
                             setCustomAmount(val ? parseInt(val) : 0);
                           }}
                           onBlur={() => {
-                            if (customAmount < 50) setCustomAmount(50);
+                            if (customAmount < PRICING.setupFee) setCustomAmount(PRICING.setupFee);
                             if (customAmount > PRICING.fullPrice) setCustomAmount(PRICING.fullPrice);
                           }}
                           className="w-full px-4 py-3 text-2xl font-bold border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -739,7 +740,7 @@ export default function BarberApprenticeshipApplyPage() {
                       </div>
                       <div className="text-right">
                         <p className="font-bold text-indigo-600 text-lg">You Choose</p>
-                        <p className="text-xs text-black">$35 - $2,500</p>
+                        <p className="text-xs text-black">${PRICING.setupFee.toLocaleString()} - $2,500</p>
                       </div>
                     </div>
                   </button>
@@ -748,7 +749,7 @@ export default function BarberApprenticeshipApplyPage() {
                   {paymentOption === 'sezzle' && (
                     <div className="bg-indigo-50 rounded-xl p-4 mb-3 border-2 border-indigo-200">
                       <label className="block text-sm font-medium text-black mb-2">
-                        How much do you want to pay with Sezzle? ($35 - $2,500)
+                        How much do you want to pay with Sezzle? (${PRICING.setupFee.toLocaleString()} - $2,500)
                       </label>
                       <div className="flex items-center gap-2">
                         <span className="text-2xl font-bold text-black">$</span>
@@ -762,7 +763,7 @@ export default function BarberApprenticeshipApplyPage() {
                             setCustomAmount(val ? parseInt(val) : 0);
                           }}
                           onBlur={() => {
-                            if (customAmount < 35) setCustomAmount(35);
+                            if (customAmount < PRICING.setupFee) setCustomAmount(PRICING.setupFee);
                             if (customAmount > 2500) setCustomAmount(2500);
                           }}
                           className="w-full px-4 py-3 text-2xl font-bold border-2 border-indigo-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"

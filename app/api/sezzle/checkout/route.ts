@@ -94,10 +94,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Sezzle limits: $35 min, $2,500 max
-    if (amount < 35) {
+    // Server-side price validation: enforce program minimum, not just Sezzle limits.
+    // The client can suggest an amount, but the server decides the floor.
+    const PROGRAM_MINIMUMS: Record<string, number> = {
+      'barber-apprenticeship': 1743, // Setup fee (35% of $4,980)
+    };
+    const programMinimum = PROGRAM_MINIMUMS[programSlug] || 35;
+    const effectiveMinimum = Math.max(35, programMinimum); // At least Sezzle's $35 floor
+
+    if (amount < effectiveMinimum) {
       return NextResponse.json(
-        { error: 'Sezzle requires a minimum purchase of $35' },
+        { error: `Minimum payment for this program is $${effectiveMinimum.toLocaleString()}` },
         { status: 400 }
       );
     }

@@ -61,30 +61,6 @@ export default async function SuccessStoriesPage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-12 bg-blue-900 text-white">
-        <div className="max-w-6xl mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-4xl font-bold">500+</div>
-              <div className="text-blue-200">Graduates Placed</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold">90%</div>
-              <div className="text-blue-200">Job Placement Rate</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold">$15K+</div>
-              <div className="text-blue-200">Avg Salary Increase</div>
-            </div>
-            <div>
-              <div className="text-4xl font-bold">150+</div>
-              <div className="text-blue-200">Employer Partners</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Gallery Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-6">

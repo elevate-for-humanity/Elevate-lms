@@ -77,8 +77,8 @@ export default function CookieConsent() {
   };
 
   const handleClose = () => {
-    setIsVisible(false);
-    setTimeout(() => setShowBanner(false), 300);
+    // Closing the banner = implicit accept (analytics stay granted by default)
+    handleAccept();
   };
 
   // Don't render anything until mounted (prevents SSR/hydration issues)

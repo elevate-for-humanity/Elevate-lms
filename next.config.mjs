@@ -247,8 +247,8 @@ const nextConfig = {
       { source: '/mentorship/apply', destination: '/apply', permanent: true },
       { source: '/mentorship/become-mentor', destination: '/contact', permanent: true },
 
-      // Partner (app-side)
-      { source: '/partner/refer', destination: '/partner-with-us', permanent: true },
+      // Partner (app-side) - skip /partner-with-us and /partners intermediaries
+      { source: '/partner/refer', destination: '/platform/partners', permanent: true },
 
       // Portal — exact match before wildcard
       { source: '/portal/staff/dashboard', destination: '/staff-portal/dashboard', permanent: true },
@@ -266,8 +266,8 @@ const nextConfig = {
       { source: '/staff-portal/processes', destination: '/staff-portal/qa-checklist', permanent: true },
 
       // Student portal
-      { source: '/student-portal/messages', destination: '/student/chat', permanent: true },
-      { source: '/student-portal/profile', destination: '/student/profile', permanent: true },
+      { source: '/student-portal/messages', destination: '/lms/chat', permanent: true },
+      { source: '/student-portal/profile', destination: '/lms/profile', permanent: true },
       { source: '/student-portal/settings', destination: '/lms/settings', permanent: true },
 
       // ============================================

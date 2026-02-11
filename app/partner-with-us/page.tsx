@@ -7,4 +7,4 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners' },
 };
 
-export default function Page() { redirect('/partners'); }
+export default function Page() { redirect('/platform/partners'); }

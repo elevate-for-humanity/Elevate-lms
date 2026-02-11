@@ -256,12 +256,11 @@ export async function POST(request: NextRequest) {
       referenceId,
     });
   } catch (error) {
-    logger.error('[Sezzle] Checkout session creation failed:', error);
-    // Log the technical error but return a user-friendly message
     const technicalMessage = error instanceof Error ? error.message : 'Unknown error';
-    logger.error('[Sezzle] Technical details:', { technicalMessage });
+    logger.error('[Sezzle] Checkout session creation failed:', { technicalMessage });
+    // TEMPORARY: surface technical error for diagnosis. Remove after fix.
     return NextResponse.json(
-      { error: 'Sezzle checkout could not be created. Please select Card, Payment Plan, or another option above.' },
+      { error: 'Sezzle checkout could not be created. Please select Card, Payment Plan, or another option above.', _debug: technicalMessage },
       { status: 500 }
     );
   }

@@ -60,6 +60,9 @@ jobs:
       - name: Analytics integrity check
         run: pnpm run integrity:analytics
 
+      - name: Self-service policy check
+        run: pnpm run integrity:self-service
+
       - name: Upload integrity reports
         if: always()
         uses: actions/upload-artifact@v4

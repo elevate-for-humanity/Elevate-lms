@@ -1,18 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { strictRateLimit } from '@/lib/rate-limit';
 
 const TRIAL_DURATION_DAYS = 14;
 
-// Simple in-memory rate limit: max 3 trials per email per hour
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+// In-memory fallback when Upstash Redis is not configured
+const rateLimitFallback = new Map<string, { count: number; resetAt: number }>();
 
-function checkRateLimit(email: string): boolean {
+async function checkTrialRateLimit(email: string): Promise<boolean> {
+  // Prefer Upstash Redis (persistent across serverless instances)
+  const limiter = strictRateLimit.get();
+  if (limiter) {
+    const result = await limiter.limit(`trial:${email}`);
+    return result.success;
+  }
+
+  // Fallback: in-memory (per-process only)
   const now = Date.now();
-  const entry = rateLimitMap.get(email);
+  const entry = rateLimitFallback.get(email);
 
   if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(email, { count: 1, resetAt: now + 60 * 60 * 1000 });
+    rateLimitFallback.set(email, { count: 1, resetAt: now + 60 * 60 * 1000 });
     return true;
   }
 
@@ -121,8 +130,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid email address', correlationId }, { status: 400 });
     }
 
-    // Rate limit
-    if (!checkRateLimit(email)) {
+    // Rate limit (Upstash Redis if available, in-memory fallback)
+    if (!(await checkTrialRateLimit(email))) {
       return NextResponse.json(
         { error: 'Too many trial requests. Please try again later.', correlationId },
         { status: 429 }

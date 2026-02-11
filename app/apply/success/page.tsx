@@ -17,8 +17,9 @@ export const dynamic = 'force-dynamic';
 export default async function ApplicationSuccessPage({
   searchParams,
 }: {
-  searchParams: { role?: string };
+  searchParams: Promise<{ role?: string; ref?: string }>;
 }) {
+  const params = await searchParams;
   const supabase = await createClient();
 
   if (!supabase) {
@@ -31,7 +32,8 @@ export default async function ApplicationSuccessPage({
       </div>
     );
   }
-  const role = searchParams.role || 'student';
+  const role = params.role || 'student';
+  const referenceNumber = params.ref || null;
 
   // Get next steps content from database
   const { data: nextStepsContent } = await supabase
@@ -125,6 +127,12 @@ export default async function ApplicationSuccessPage({
             {currentRole.title}
           </h1>
           <p className="text-lg text-gray-600">{currentRole.message}</p>
+          {referenceNumber && (
+            <div className="mt-4 inline-block bg-green-50 border border-green-200 rounded-lg px-4 py-2">
+              <span className="text-sm text-green-700">Confirmation ID: </span>
+              <span className="font-mono font-bold text-green-900">{referenceNumber}</span>
+            </div>
+          )}
         </div>
 
         {/* Next Steps */}

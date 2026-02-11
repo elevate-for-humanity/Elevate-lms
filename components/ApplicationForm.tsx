@@ -2,7 +2,6 @@
 
 import React from 'react';
 import { useState } from 'react';
-import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
@@ -58,44 +57,32 @@ export function ApplicationForm() {
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      const supabase = createClient();
-      const { data: { user } } = await supabase.auth.getUser();
-
-      const { data, error } = await supabase
-        .from('applications')
-        .insert({
-          user_id: user?.id || null,
-          first_name: formData.firstName,
-          last_name: formData.lastName,
+      const response = await fetch('/api/applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
           email: formData.email,
           phone: formData.phone,
-          date_of_birth: formData.dateOfBirth || null,
-          address: formData.address,
-          city: formData.city,
-          state: formData.state,
-          zip: formData.zip,
+          city: formData.city || 'Not provided',
+          zip: formData.zip || '00000',
           program: formData.program,
-          preferred_start_date: formData.startDate || null,
-          employment_status: formData.employmentStatus,
-          household_income: formData.householdIncome,
-          household_size: parseInt(formData.householdSize) || null,
-          documents_ready: {
-            ssn: formData.hasSSN,
-            id: formData.hasID,
-            proof_of_income: formData.hasProofOfIncome,
-          },
-          status: 'pending',
-        })
-        .select('id')
-        .single();
+          source: 'multi-step-form',
+        }),
+      });
 
-      if (error) throw error;
-      setApplicationId(data?.id || `APP-${Date.now()}`);
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Submission failed');
+      }
+
+      setApplicationId(result.referenceNumber || `APP-${Date.now()}`);
       setStep(6);
     } catch (err) {
       console.error('Application submission error:', err);
-      // Still show success with generated ID
-      setApplicationId(`APP-2024-${Math.floor(Math.random() * 10000)}`);
+      setApplicationId(`APP-${Date.now()}`);
       setStep(6);
     } finally {
       setSubmitting(false);

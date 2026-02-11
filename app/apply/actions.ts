@@ -1,23 +1,15 @@
 'use server';
 
-import { createClient, createAdminClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
+import { createAdminClient } from '@/lib/supabase/server';
 import { revalidatePath } from 'next/cache';
-import { sendWelcomeEmail } from '@/lib/email/send';
 
 /**
- * UNIFIED APPLICATION ACTIONS
- *
- * Server-side role assignment and application processing.
- * Each role gets ONE submission path with deterministic outcomes.
+ * Application-only submission. No auth user created at submit time.
+ * User accounts are created later upon admin approval.
+ * All inserts use admin client (service role) to bypass RLS.
  */
 
-export type ApplicationRole =
-  | 'student'
-  | 'program_holder'
-  | 'employer'
-  | 'staff'
-  | 'instructor';
+export type ApplicationRole = 'student' | 'program_holder' | 'employer' | 'staff' | 'instructor';
 
 export interface BaseApplicationData {
   firstName: string;
@@ -76,393 +68,205 @@ export type ApplicationData =
   | EmployerApplicationData
   | StaffApplicationData;
 
-/**
- * Submit Student Application
- * Creates user account with 'student' role and redirects to LMS dashboard
- */
+function generateReferenceNumber(): string {
+  return `EFH-${Date.now().toString(36).toUpperCase()}`;
+}
+
+async function insertApplication(payload: {
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  city: string;
+  zip: string;
+  programInterest: string;
+  supportNotes: string;
+  source: string;
+}): Promise<{ success: true; applicationId: string; referenceNumber: string } | { success: false; error: string }> {
+  const supabase = createAdminClient();
+
+  if (!supabase) {
+    return { success: false, error: 'Application system is temporarily unavailable. Please try again later.' };
+  }
+
+  const referenceNumber = generateReferenceNumber();
+
+  try {
+    const { data, error } = await supabase
+      .from('applications')
+      .insert({
+        first_name: payload.firstName,
+        last_name: payload.lastName,
+        email: payload.email,
+        phone: payload.phone,
+        city: payload.city,
+        zip: payload.zip,
+        program_interest: payload.programInterest,
+        support_notes: `Reference: ${referenceNumber} | ${payload.supportNotes}`,
+        status: 'pending',
+        source: payload.source,
+      })
+      .select('id')
+      .single();
+
+    if (error) {
+      console.error(`[Application] Insert failed for ${payload.email}:`, error.message);
+      return { success: false, error: 'Failed to save application. Please try again or call (317) 314-3757.' };
+    }
+
+    console.log(`[Application] Saved: id=${data.id} ref=${referenceNumber} email=${payload.email} source=${payload.source}`);
+
+    try {
+      await fetch(
+        `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/api/email/send`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: payload.email,
+            subject: `Application Received [${referenceNumber}] - Elevate for Humanity`,
+            html: `<p>Hi ${payload.firstName},</p><p>We received your application (Ref: <strong>${referenceNumber}</strong>). Our team will review it and contact you within 2 business days.</p><p>— Elevate for Humanity</p>`,
+          }),
+        }
+      );
+    } catch {
+      // Email failure must not block submission
+    }
+
+    revalidatePath('/admin/applications');
+    return { success: true, applicationId: data.id, referenceNumber };
+  } catch (error) {
+    console.error(`[Application] Unexpected error for ${payload.email}:`, error);
+    return { success: false, error: error instanceof Error ? error.message : 'Failed to submit application' };
+  }
+}
+
 export async function submitStudentApplication(data: StudentApplicationData) {
-  const supabase = await createClient();
-  const adminClient = createAdminClient();
+  const result = await insertApplication({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    city: data.city || 'Not provided',
+    zip: data.zipCode || '00000',
+    programInterest: data.programInterest || 'Not specified',
+    supportNotes: [
+      data.employmentStatus ? `Employment: ${data.employmentStatus}` : '',
+      data.educationLevel ? `Education: ${data.educationLevel}` : '',
+      data.goals ? `Goals: ${data.goals}` : '',
+      data.dateOfBirth ? `DOB: ${data.dateOfBirth}` : '',
+      data.address ? `Address: ${data.address}` : '',
+      data.state ? `State: ${data.state}` : '',
+    ].filter(Boolean).join(' | '),
+    source: 'student-application',
+  });
 
-  // Use admin client for DB writes (bypasses RLS), fall back to regular client
-  const dbClient = adminClient || supabase;
-
-  try {
-    // 1. Store application in the canonical applications table FIRST
-    // This is the most important step — never lose an application
-    const { error: appError } = await dbClient
-      .from('applications')
-      .insert({
-        first_name: data.firstName,
-        last_name: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        program_id: data.programInterest || null,
-        status: 'pending',
-        notes: JSON.stringify({
-          role: 'student',
-          date_of_birth: data.dateOfBirth,
-          address: data.address,
-          city: data.city,
-          state: data.state,
-          zip_code: data.zipCode,
-          employment_status: data.employmentStatus,
-          education_level: data.educationLevel,
-          goals: data.goals,
-        }),
-        submitted_at: new Date().toISOString(),
-      });
-
-    if (appError) throw appError;
-
-    // 2. Try to create auth user (non-blocking — application is already saved)
-    let userId: string | null = null;
-    try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: data.email,
-        password: generateTemporaryPassword(),
-        options: {
-          data: {
-            first_name: data.firstName,
-            last_name: data.lastName,
-            phone: data.phone,
-            role: 'student',
-          },
-          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-        },
-      });
-
-      if (!authError && authData.user) {
-        userId = authData.user.id;
-
-        // 3. Create profile (best-effort, uses admin client to bypass RLS)
-        await dbClient.from('profiles').upsert({
-          id: authData.user.id,
-          email: data.email,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          phone: data.phone,
-          role: 'student',
-          tenant_id: process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID || null,
-        }, { onConflict: 'id' });
-      }
-    } catch {
-      // Auth/profile creation failed — application is still saved
-      console.warn('[apply] Auth creation failed for', data.email, '— application saved');
-    }
-
-    // 4. Send welcome email (best-effort)
-    try {
-      await sendWelcomeEmail(data.email, data.firstName, 'student');
-    } catch {
-      console.warn('[apply] Welcome email failed for', data.email);
-    }
-
-    revalidatePath('/admin/applications');
-
-    return {
-      success: true,
-      userId: userId,
-      redirectTo: '/apply/success?role=student',
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'Failed to submit application',
-    };
+  if (result.success) {
+    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?role=student&ref=${result.referenceNumber}` };
   }
+  return result;
 }
 
-/**
- * Submit Program Holder Application
- * Creates user account with 'program_holder' role and sets onboarding flag
- */
-export async function submitProgramHolderApplication(
-  data: ProgramHolderApplicationData
-) {
-  const supabase = await createClient();
-  const adminClient = createAdminClient();
-  const dbClient = adminClient || supabase;
+export async function submitProgramHolderApplication(data: ProgramHolderApplicationData) {
+  const result = await insertApplication({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    city: 'Not provided',
+    zip: '00000',
+    programInterest: 'Program Holder',
+    supportNotes: [
+      `Organization: ${data.organizationName}`,
+      data.organizationType ? `Type: ${data.organizationType}` : '',
+      data.website ? `Website: ${data.website}` : '',
+      data.numberOfStudents ? `Students: ${data.numberOfStudents}` : '',
+      data.programsOffered ? `Programs: ${data.programsOffered}` : '',
+      data.partnershipGoals ? `Goals: ${data.partnershipGoals}` : '',
+    ].filter(Boolean).join(' | '),
+    source: 'program-holder-application',
+  });
 
-  try {
-    // 1. Create auth user
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: data.email,
-      password: generateTemporaryPassword(),
-      options: {
-        data: {
-          first_name: data.firstName,
-          last_name: data.lastName,
-          phone: data.phone,
-          role: 'program_holder',
-          organization_name: data.organizationName,
-        },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-      },
-    });
-
-    if (authError) throw authError;
-    if (!authData.user) throw new Error('Failed to create user');
-
-    // 2. Create profile with program_holder role
-    const { error: profileError } = await dbClient.from('profiles').insert({
-      id: authData.user.id,
-      email: data.email,
-      first_name: data.firstName,
-      last_name: data.lastName,
-      phone: data.phone,
-      role: 'program_holder',
-      tenant_id: process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID || null,
-      onboarding_completed: false,
-    });
-
-    if (profileError) throw profileError;
-
-    // 3. Store application in the canonical applications table
-    const { error: appError } = await dbClient
-      .from('applications')
-      .insert({
-        first_name: data.firstName,
-        last_name: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        program_id: 'program_holder',
-        status: 'pending',
-        notes: JSON.stringify({
-          role: 'program_holder',
-          organization_name: data.organizationName,
-          organization_type: data.organizationType,
-          website: data.website,
-          number_of_students: data.numberOfStudents,
-          programs_offered: data.programsOffered,
-          partnership_goals: data.partnershipGoals,
-        }),
-        submitted_at: new Date().toISOString(),
-      });
-
-    if (appError) throw appError;
-
-    revalidatePath('/admin/applications');
-
-    return {
-      success: true,
-      userId: authData.user.id,
-      redirectTo: '/apply/success?role=program-holder',
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'Failed to submit application',
-    };
+  if (result.success) {
+    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?role=program-holder&ref=${result.referenceNumber}` };
   }
+  return result;
 }
 
-/**
- * Submit Employer Application
- * Creates user account with 'employer' role and sets verification flag
- */
 export async function submitEmployerApplication(data: EmployerApplicationData) {
-  const supabase = await createClient();
-  const adminClient = createAdminClient();
-  const dbClient = adminClient || supabase;
+  const result = await insertApplication({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    city: 'Not provided',
+    zip: '00000',
+    programInterest: 'Employer Partnership',
+    supportNotes: [
+      `Company: ${data.companyName}`,
+      data.industry ? `Industry: ${data.industry}` : '',
+      data.companySize ? `Size: ${data.companySize}` : '',
+      data.website ? `Website: ${data.website}` : '',
+      data.hiringNeeds ? `Hiring: ${data.hiringNeeds}` : '',
+      data.positionsAvailable ? `Positions: ${data.positionsAvailable}` : '',
+    ].filter(Boolean).join(' | '),
+    source: 'employer-application',
+  });
 
-  try {
-    // 1. Create auth user
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: data.email,
-      password: generateTemporaryPassword(),
-      options: {
-        data: {
-          first_name: data.firstName,
-          last_name: data.lastName,
-          phone: data.phone,
-          role: 'employer',
-          company_name: data.companyName,
-        },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-      },
-    });
-
-    if (authError) throw authError;
-    if (!authData.user) throw new Error('Failed to create user');
-
-    // 2. Create profile with employer role
-    const { error: profileError } = await dbClient.from('profiles').insert({
-      id: authData.user.id,
-      email: data.email,
-      first_name: data.firstName,
-      last_name: data.lastName,
-      phone: data.phone,
-      role: 'employer',
-      tenant_id: process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID || null,
-      verified: false,
-    });
-
-    if (profileError) throw profileError;
-
-    // 3. Store application in the canonical applications table
-    const { error: appError } = await dbClient
-      .from('applications')
-      .insert({
-        first_name: data.firstName,
-        last_name: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        program_id: 'employer',
-        status: 'pending',
-        notes: JSON.stringify({
-          role: 'employer',
-          company_name: data.companyName,
-          industry: data.industry,
-          company_size: data.companySize,
-          website: data.website,
-          hiring_needs: data.hiringNeeds,
-          positions_available: data.positionsAvailable,
-        }),
-        submitted_at: new Date().toISOString(),
-      });
-
-    if (appError) throw appError;
-
-    revalidatePath('/admin/applications');
-
-    return {
-      success: true,
-      userId: authData.user.id,
-      redirectTo: '/apply/success?role=employer',
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'Failed to submit application',
-    };
+  if (result.success) {
+    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?role=employer&ref=${result.referenceNumber}` };
   }
+  return result;
 }
 
-/**
- * Submit Staff/Instructor Application
- * Creates user account with 'staff' or 'instructor' role and requires admin approval
- */
 export async function submitStaffApplication(data: StaffApplicationData) {
-  const supabase = await createClient();
-  const adminClient = createAdminClient();
-  const dbClient = adminClient || supabase;
+  const result = await insertApplication({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    email: data.email,
+    phone: data.phone,
+    city: 'Not provided',
+    zip: '00000',
+    programInterest: `Staff: ${data.position}`,
+    supportNotes: [
+      `Role: ${data.role}`,
+      `Position: ${data.position}`,
+      data.experience ? `Experience: ${data.experience}` : '',
+      data.education ? `Education: ${data.education}` : '',
+      data.certifications ? `Certifications: ${data.certifications}` : '',
+      data.availability ? `Availability: ${data.availability}` : '',
+      data.coverLetter ? 'Cover letter provided' : '',
+    ].filter(Boolean).join(' | '),
+    source: 'staff-application',
+  });
 
-  try {
-    // 1. Create auth user
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: data.email,
-      password: generateTemporaryPassword(),
-      options: {
-        data: {
-          first_name: data.firstName,
-          last_name: data.lastName,
-          phone: data.phone,
-          role: data.role,
-          position: data.position,
-        },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-      },
-    });
-
-    if (authError) throw authError;
-    if (!authData.user) throw new Error('Failed to create user');
-
-    // 2. Create profile with staff/instructor role (inactive until approved)
-    const { error: profileError } = await dbClient.from('profiles').insert({
-      id: authData.user.id,
-      email: data.email,
-      first_name: data.firstName,
-      last_name: data.lastName,
-      phone: data.phone,
-      role: data.role,
-      tenant_id: process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID || null,
-      active: false, // Requires admin approval
-    });
-
-    if (profileError) throw profileError;
-
-    // 3. Store application in the canonical applications table
-    const { error: appError } = await dbClient
-      .from('applications')
-      .insert({
-        first_name: data.firstName,
-        last_name: data.lastName,
-        email: data.email,
-        phone: data.phone,
-        program_id: data.role,
-        status: 'pending',
-        notes: JSON.stringify({
-          role: data.role,
-          position: data.position,
-          experience: data.experience,
-          education: data.education,
-          certifications: data.certifications,
-          availability: data.availability,
-          cover_letter: data.coverLetter,
-        }),
-        submitted_at: new Date().toISOString(),
-      });
-
-    if (appError) throw appError;
-
-    revalidatePath('/admin/applications');
-
-    return {
-      success: true,
-      userId: authData.user.id,
-      redirectTo: '/apply/success?role=staff',
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : 'Failed to submit application',
-    };
+  if (result.success) {
+    return { success: true, applicationId: result.applicationId, referenceNumber: result.referenceNumber, redirectTo: `/apply/success?role=staff&ref=${result.referenceNumber}` };
   }
+  return result;
 }
 
-/**
- * Generate temporary password for new users
- * Users will be prompted to set their own password on first login
- */
-function generateTemporaryPassword(): string {
-  const length = 16;
-  const charset =
-    'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*';
-  let password = '';
-  for (let i = 0; i < length; i++) {
-    password += charset.charAt(Math.floor(Math.random() * charset.length));
-  }
-  return password;
-}
+export async function getApplicationStatus(identifier: string) {
+  const supabase = createAdminClient();
+  if (!supabase) return null;
 
-/**
- * Get application status for a user
- */
-export async function getApplicationStatus(userId: string) {
-  const supabase = await createClient();
-
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('role')
-    .eq('id', userId)
-    .single();
-
-  if (!profile) return null;
-
-  const tableName = `${profile.role}_applications`;
-
-  const { data, error }: any = await supabase
-    .from(tableName)
+  const { data: byRef } = await supabase
+    .from('applications')
     .select('*')
-    .eq('user_id', userId)
+    .ilike('support_notes', `%${identifier}%`)
+    .order('created_at', { ascending: false })
+    .limit(1)
     .single();
 
-  if (error) return null;
+  if (byRef) return byRef;
 
-  return data;
+  const { data: byEmail } = await supabase
+    .from('applications')
+    .select('*')
+    .eq('email', identifier)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  return byEmail;
 }

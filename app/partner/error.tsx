@@ -14,8 +14,8 @@ export default function PartnerError({
       error={error}
       reset={reset}
       title="Partner Portal Error"
-      backHref="/partner"
-      backLabel="Back to Partner Portal"
+      backHref="/platform/partners"
+      backLabel="Back to Partners"
     />
   );
 }

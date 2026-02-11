@@ -14,7 +14,6 @@
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { createEnrollmentFromPayment } from '@/lib/enrollment/create-enrollment';
@@ -68,8 +67,7 @@ interface SezzleWebhookEvent {
 }
 
 /**
- * Verify Sezzle webhook signature
- * Sezzle uses HMAC-SHA256 for webhook verification
+ * Verify Sezzle webhook signature (HMAC-SHA256)
  */
 function verifyWebhookSignature(
   payload: string,
@@ -85,39 +83,50 @@ function verifyWebhookSignature(
     .update(payload)
     .digest('hex');
 
-  return crypto.timingSafeEqual(
-    Buffer.from(signature),
-    Buffer.from(expectedSignature)
-  );
+  // timingSafeEqual requires equal-length buffers
+  const sigBuf = Buffer.from(signature);
+  const expectedBuf = Buffer.from(expectedSignature);
+  if (sigBuf.length !== expectedBuf.length) {
+    return false;
+  }
+
+  return crypto.timingSafeEqual(sigBuf, expectedBuf);
 }
 
 export async function POST(request: NextRequest) {
+  let payload: string;
   try {
-    const payload = await request.text();
-    const signature = request.headers.get('sezzle-signature');
-    const webhookSecret = process.env.SEZZLE_WEBHOOK_SECRET;
+    payload = await request.text();
+  } catch {
+    return NextResponse.json({ error: 'Bad request' }, { status: 400 });
+  }
 
-    // Verify signature in production
-    if (process.env.NODE_ENV === 'production' && webhookSecret) {
-      if (!verifyWebhookSignature(payload, signature, webhookSecret)) {
-        logger.warn('Sezzle webhook signature verification failed');
-        return NextResponse.json(
-          { error: 'Invalid signature' },
-          { status: 401 }
-        );
-      }
+  const signature = request.headers.get('sezzle-signature');
+  const webhookSecret = process.env.SEZZLE_WEBHOOK_SECRET;
+
+  // Verify signature if secret is configured
+  if (webhookSecret) {
+    if (!verifyWebhookSignature(payload, signature, webhookSecret)) {
+      logger.warn('[Sezzle Webhook] Signature verification failed');
+      return NextResponse.json({ error: 'Invalid signature' }, { status: 401 });
     }
+  } else {
+    logger.warn('[Sezzle Webhook] SEZZLE_WEBHOOK_SECRET not set — skipping signature verification');
+  }
 
+  // After signature verification, always return 200 to prevent retries
+  try {
     const event: SezzleWebhookEvent = JSON.parse(payload);
 
-    logger.info('Sezzle webhook received', {
+    logger.info('[Sezzle Webhook] Event received', {
       eventId: event.event_id,
       eventType: event.event_type,
       orderUuid: event.data.order_uuid,
       referenceId: event.data.reference_id,
     });
 
-    const supabase = await createClient();
+    // Use admin client — webhooks have no user session, RLS would block writes
+    const supabase = createAdminClient();
 
     switch (event.event_type) {
       case 'order.authorized':
@@ -141,17 +150,14 @@ export async function POST(request: NextRequest) {
         break;
 
       default:
-        logger.info('Unhandled Sezzle webhook event', { eventType: event.event_type });
+        logger.info('[Sezzle Webhook] Unhandled event type', { eventType: event.event_type });
     }
-
-    return NextResponse.json({ received: true });
   } catch (error) {
-    logger.error('Sezzle webhook error:', error);
-    return NextResponse.json(
-      { error: 'Webhook processing failed' },
-      { status: 500 }
-    );
+    // Log but still return 200 — don't let processing errors cause retries
+    logger.error('[Sezzle Webhook] Processing error:', error);
   }
+
+  return NextResponse.json({ received: true });
 }
 
 async function handleOrderAuthorized(event: SezzleWebhookEvent, supabase: any) {
@@ -222,7 +228,6 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
     // For barber program, create barber_subscriptions record
     if (programSlug === 'barber-apprenticeship') {
       try {
-        const adminClient = createAdminClient();
         const amountPaidCents = capture?.amount?.amount_in_cents || 0;
         const transferHours = parseInt(metadata?.transfer_hours || '0');
         const hoursPerWeek = parseInt(metadata?.hours_per_week || '40');
@@ -230,7 +235,7 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
         const hoursRemaining = Math.max(0, totalHoursRequired - transferHours);
         const weeksRemaining = Math.ceil(hoursRemaining / hoursPerWeek);
 
-        await adminClient.from('barber_subscriptions').insert({
+        await supabase.from('barber_subscriptions').insert({
           customer_email: customer.email,
           customer_name: `${customer.first_name || ''} ${customer.last_name || ''}`.trim(),
           status: 'active',

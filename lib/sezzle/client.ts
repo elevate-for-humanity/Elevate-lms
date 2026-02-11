@@ -139,6 +139,17 @@ class SezzleClient {
   private authToken: string | null = null;
   private tokenExpiration: Date | null = null;
 
+  /** Safely parse JSON — some Sezzle endpoints return empty 200 responses */
+  private async safeJson(response: Response): Promise<any> {
+    const text = await response.text();
+    if (!text || text.trim() === '') return {};
+    try {
+      return JSON.parse(text);
+    } catch {
+      return {};
+    }
+  }
+
   private getBaseUrl(): string {
     if (!this.config) throw new Error('Sezzle not configured');
     return this.config.environment === 'production' 
@@ -291,11 +302,11 @@ class SezzleClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
+      const error = await this.safeJson(response);
       throw new Error(`Sezzle capture failed: ${error.message || response.statusText}`);
     }
 
-    return response.json();
+    return this.safeJson(response);
   }
 
   /**
@@ -320,11 +331,11 @@ class SezzleClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
+      const error = await this.safeJson(response);
       throw new Error(`Sezzle refund failed: ${error.message || response.statusText}`);
     }
 
-    return response.json();
+    return this.safeJson(response);
   }
 
   /**
@@ -349,11 +360,11 @@ class SezzleClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
+      const error = await this.safeJson(response);
       throw new Error(`Sezzle release failed: ${error.message || response.statusText}`);
     }
 
-    return response.json();
+    return this.safeJson(response);
   }
 
   /**
@@ -375,11 +386,11 @@ class SezzleClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
+      const error = await this.safeJson(response);
       throw new Error(`Sezzle update order failed: ${error.message || response.statusText}`);
     }
 
-    return response.json();
+    return this.safeJson(response);
   }
 
   /**
@@ -397,7 +408,7 @@ class SezzleClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
+      const error = await this.safeJson(response);
       throw new Error(`Sezzle delete checkout failed: ${error.message || response.statusText}`);
     }
   }

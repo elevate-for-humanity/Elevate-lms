@@ -59,18 +59,22 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create staff application record
+    // Create staff application in canonical applications table
     const { data: application, error: appError } = await supabase
-      .from('staff_applications')
+      .from('applications')
       .insert({
-        tenant_id: defaultTenant.id,
-        role: data.role,
         first_name: data.first_name,
         last_name: data.last_name,
         email: data.email,
         phone: data.phone,
-        qualifications: data.qualifications,
-        status: 'pending_review',
+        program_id: data.role,
+        status: 'pending',
+        notes: JSON.stringify({
+          type: 'staff',
+          tenant_id: defaultTenant.id,
+          role: data.role,
+          qualifications: data.qualifications,
+        }),
         submitted_at: new Date().toISOString(),
       })
       .select()

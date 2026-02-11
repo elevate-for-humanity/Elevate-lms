@@ -55,20 +55,24 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create employer application record
+    // Create employer application in canonical applications table
     const { data: application, error: appError } = await supabase
-      .from('employer_applications')
+      .from('applications')
       .insert({
-        tenant_id: defaultTenant.id,
-        company_name: data.company_name,
-        industry: data.industry,
-        company_size: data.company_size,
-        contact_first_name: data.first_name,
-        contact_last_name: data.last_name,
-        contact_email: data.email,
-        contact_phone: data.phone,
-        hiring_needs: data.hiring_needs,
-        status: 'pending_verification',
+        first_name: data.first_name,
+        last_name: data.last_name,
+        email: data.email,
+        phone: data.phone,
+        program_id: 'employer',
+        status: 'pending',
+        notes: JSON.stringify({
+          type: 'employer',
+          tenant_id: defaultTenant.id,
+          company_name: data.company_name,
+          industry: data.industry,
+          company_size: data.company_size,
+          hiring_needs: data.hiring_needs,
+        }),
         submitted_at: new Date().toISOString(),
       })
       .select()

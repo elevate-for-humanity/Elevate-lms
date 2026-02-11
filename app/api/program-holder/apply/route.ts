@@ -57,10 +57,11 @@ export async function POST(req: NextRequest) {
 
     // Check for duplicate by email
     const supabase = supabaseServer();
+    // Check for duplicate by email
     const { data: existing } = await supabase
-      .from('program_holder_applications')
+      .from('applications')
       .select('id, status')
-      .eq('contact_email', body.contactEmail.toLowerCase())
+      .eq('email', body.contactEmail.toLowerCase())
       .eq('status', 'pending')
       .single();
 
@@ -74,27 +75,30 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Insert application
+    // Insert into canonical applications table
     const { data: application, error: insertError } = await supabase
-      .from('program_holder_applications')
+      .from('applications')
       .insert({
-        organization_name: body.organizationName,
-        organization_type: body.organizationType || 'other',
-        contact_name: body.contactName,
-        contact_email: body.contactEmail.toLowerCase(),
-        contact_phone: body.contactPhone || null,
-        address: body.address || null,
-        city: body.city || null,
-        state: body.state || 'IN',
-        zip: body.zip || null,
-        programs_interested: body.programsInterested,
-        estimated_students: body.estimatedStudents
-          ? parseInt(body.estimatedStudents, 10)
-          : null,
-        how_heard_about_us: body.howHeardAboutUs || null,
-        additional_info: body.additionalInfo || null,
+        first_name: body.contactName?.split(' ')[0] || body.contactName,
+        last_name: body.contactName?.split(' ').slice(1).join(' ') || '',
+        email: body.contactEmail.toLowerCase(),
+        phone: body.contactPhone || null,
+        program_id: 'program_holder',
         status: 'pending',
-        created_at: new Date().toISOString(),
+        notes: JSON.stringify({
+          type: 'program_holder',
+          organization_name: body.organizationName,
+          organization_type: body.organizationType || 'other',
+          address: body.address,
+          city: body.city,
+          state: body.state || 'IN',
+          zip: body.zip,
+          programs_interested: body.programsInterested,
+          estimated_students: body.estimatedStudents,
+          how_heard_about_us: body.howHeardAboutUs,
+          additional_info: body.additionalInfo,
+        }),
+        submitted_at: new Date().toISOString(),
       })
       .select('id')
       .single();

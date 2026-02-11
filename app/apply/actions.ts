@@ -1,6 +1,6 @@
 'use server';
 
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { revalidatePath } from 'next/cache';
 import { sendWelcomeEmail } from '@/lib/email/send';
@@ -82,11 +82,15 @@ export type ApplicationData =
  */
 export async function submitStudentApplication(data: StudentApplicationData) {
   const supabase = await createClient();
+  const adminClient = createAdminClient();
+
+  // Use admin client for DB writes (bypasses RLS), fall back to regular client
+  const dbClient = adminClient || supabase;
 
   try {
     // 1. Store application in the canonical applications table FIRST
     // This is the most important step — never lose an application
-    const { error: appError } = await supabase
+    const { error: appError } = await dbClient
       .from('applications')
       .insert({
         first_name: data.firstName,
@@ -131,8 +135,8 @@ export async function submitStudentApplication(data: StudentApplicationData) {
       if (!authError && authData.user) {
         userId = authData.user.id;
 
-        // 3. Create profile (best-effort)
-        await supabase.from('profiles').upsert({
+        // 3. Create profile (best-effort, uses admin client to bypass RLS)
+        await dbClient.from('profiles').upsert({
           id: authData.user.id,
           email: data.email,
           first_name: data.firstName,
@@ -178,6 +182,8 @@ export async function submitProgramHolderApplication(
   data: ProgramHolderApplicationData
 ) {
   const supabase = await createClient();
+  const adminClient = createAdminClient();
+  const dbClient = adminClient || supabase;
 
   try {
     // 1. Create auth user
@@ -200,7 +206,7 @@ export async function submitProgramHolderApplication(
     if (!authData.user) throw new Error('Failed to create user');
 
     // 2. Create profile with program_holder role
-    const { error: profileError } = await supabase.from('profiles').insert({
+    const { error: profileError } = await dbClient.from('profiles').insert({
       id: authData.user.id,
       email: data.email,
       first_name: data.firstName,
@@ -214,7 +220,7 @@ export async function submitProgramHolderApplication(
     if (profileError) throw profileError;
 
     // 3. Store application in the canonical applications table
-    const { error: appError } = await supabase
+    const { error: appError } = await dbClient
       .from('applications')
       .insert({
         first_name: data.firstName,
@@ -259,6 +265,8 @@ export async function submitProgramHolderApplication(
  */
 export async function submitEmployerApplication(data: EmployerApplicationData) {
   const supabase = await createClient();
+  const adminClient = createAdminClient();
+  const dbClient = adminClient || supabase;
 
   try {
     // 1. Create auth user
@@ -281,7 +289,7 @@ export async function submitEmployerApplication(data: EmployerApplicationData) {
     if (!authData.user) throw new Error('Failed to create user');
 
     // 2. Create profile with employer role
-    const { error: profileError } = await supabase.from('profiles').insert({
+    const { error: profileError } = await dbClient.from('profiles').insert({
       id: authData.user.id,
       email: data.email,
       first_name: data.firstName,
@@ -295,7 +303,7 @@ export async function submitEmployerApplication(data: EmployerApplicationData) {
     if (profileError) throw profileError;
 
     // 3. Store application in the canonical applications table
-    const { error: appError } = await supabase
+    const { error: appError } = await dbClient
       .from('applications')
       .insert({
         first_name: data.firstName,
@@ -340,6 +348,8 @@ export async function submitEmployerApplication(data: EmployerApplicationData) {
  */
 export async function submitStaffApplication(data: StaffApplicationData) {
   const supabase = await createClient();
+  const adminClient = createAdminClient();
+  const dbClient = adminClient || supabase;
 
   try {
     // 1. Create auth user
@@ -362,7 +372,7 @@ export async function submitStaffApplication(data: StaffApplicationData) {
     if (!authData.user) throw new Error('Failed to create user');
 
     // 2. Create profile with staff/instructor role (inactive until approved)
-    const { error: profileError } = await supabase.from('profiles').insert({
+    const { error: profileError } = await dbClient.from('profiles').insert({
       id: authData.user.id,
       email: data.email,
       first_name: data.firstName,
@@ -376,7 +386,7 @@ export async function submitStaffApplication(data: StaffApplicationData) {
     if (profileError) throw profileError;
 
     // 3. Store application in the canonical applications table
-    const { error: appError } = await supabase
+    const { error: appError } = await dbClient
       .from('applications')
       .insert({
         first_name: data.firstName,

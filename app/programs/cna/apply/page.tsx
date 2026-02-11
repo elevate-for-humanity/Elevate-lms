@@ -1,112 +1,63 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowLeft, CheckCircle, Clock, DollarSign, Calendar } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Apply for CNA Certification | Elevate for Humanity',
-  description: 'Apply for our CNA Certification program. Free training with WIOA funding. Start your healthcare career in 6-8 weeks.',
+  description: 'Apply for our CNA Certification program. WIOA-funded training available in Indianapolis.',
 };
 
-export default function CNAApplyPage() {
+export default function ApplyPage() {
   return (
     <main className="min-h-screen bg-white">
-      {/* Header */}
-      <div className="bg-blue-900 text-white py-8">
-        <div className="max-w-4xl mx-auto px-6">
-          <Breadcrumbs
-            items={[
-              { label: 'Programs', href: '/programs' },
-              { label: 'CNA Certification', href: '/programs/cna' },
-              { label: 'Apply' },
-            ]}
-            className="text-blue-200 mb-4"
-          />
-          <h1 className="text-3xl md:text-4xl font-bold">Apply for CNA Certification</h1>
-          <p className="text-blue-100 mt-2">Start your healthcare career in 6-8 weeks</p>
-        </div>
+      <div className="relative h-[40vh] min-h-[300px] max-h-[400px]">
+        <Image src="/images/cna-certification.jpg" alt="CNA Certification" fill className="object-cover" priority />
       </div>
 
-      <div className="max-w-4xl mx-auto px-6 py-12">
-        {/* Program Summary */}
-        <div className="bg-gray-50 rounded-2xl p-6 mb-8">
-          <h2 className="text-xl font-bold text-black mb-4">Program Overview</h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-blue-600" />
-              <div>
-                <p className="text-sm text-gray-600">Duration</p>
-                <p className="font-semibold text-black">6-8 Weeks</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <DollarSign className="w-5 h-5 text-green-600" />
-              <div>
-                <p className="text-sm text-gray-600">Cost</p>
-                <p className="font-semibold text-black">Free with WIOA</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <Calendar className="w-5 h-5 text-orange-600" />
-              <div>
-                <p className="text-sm text-gray-600">Next Start</p>
-                <p className="font-semibold text-black">Rolling Enrollment</p>
-              </div>
-            </div>
+      <div className="max-w-4xl mx-auto px-6 py-4">
+        <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'CNA', href: '/programs/cna' }, { label: 'Apply' }]} />
+      </div>
+
+      <div className="max-w-4xl mx-auto px-6 py-8">
+        <div className="grid md:grid-cols-3 gap-6 mb-10">
+          <div className="rounded-2xl overflow-hidden shadow-sm">
+            <Image src="/images/healthcare/cna-training.jpg" alt="CNA Certification training" width={400} height={300} className="w-full h-48 object-cover" />
+            <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Duration</p><p className="text-black">6-8 Weeks</p></div>
+          </div>
+          <div className="rounded-2xl overflow-hidden shadow-sm">
+            <Image src="/images/healthcare/cna-poster.jpg" alt="CNA Certification program" width={400} height={300} className="w-full h-48 object-cover" />
+            <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Cost</p><p className="text-black">Free with WIOA funding</p></div>
+          </div>
+          <div className="rounded-2xl overflow-hidden shadow-sm">
+            <Image src="/images/cna-certification.jpg" alt="CNA Certification career" width={400} height={300} className="w-full h-48 object-cover" />
+            <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Format</p><p className="text-black">Rolling enrollment</p></div>
           </div>
         </div>
 
-        {/* Eligibility */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-black mb-4">Eligibility Requirements</h2>
-          <ul className="space-y-3">
-            {[
-              'Must be 16 years or older',
-              'High school diploma or GED (or currently enrolled)',
-              'Pass background check',
-              'Physically able to perform CNA duties',
-              'Indiana resident or authorized to work in US',
-            ].map((req, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                <span className="text-black">{req}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Application Form Link */}
-        <div className="bg-blue-50 rounded-2xl p-8 text-center">
-          <h2 className="text-2xl font-bold text-black mb-4">Ready to Apply?</h2>
-          <p className="text-gray-600 mb-6">
-            Complete our online application to check your eligibility for free WIOA-funded training.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply?program=cna"
-              className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
-            >
-              Start Application
-            </Link>
-            <Link
-              href="/wioa-eligibility"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-bold rounded-lg border-2 border-blue-600 hover:bg-blue-50 transition"
-            >
-              Check WIOA Eligibility
-            </Link>
-          </div>
-        </div>
-
-        {/* Back Link */}
-        <div className="mt-8">
-          <Link
-            href="/programs/cna"
-            className="inline-flex items-center text-blue-600 hover:text-blue-700"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to CNA Program Details
+        <div className="grid md:grid-cols-2 gap-6 mb-10">
+          <Link href="/inquiry?program=cna" className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border">
+            <Image src="/images/healthcare/cna-training.jpg" alt="Request information about CNA Certification" width={600} height={300} className="w-full h-52 object-cover" />
+            <div className="p-6 text-center">
+              <h3 className="text-2xl font-bold text-black mb-2">Request Information</h3>
+              <p className="text-black mb-4">Get program details, schedules, and eligibility info sent to you.</p>
+              <span className="inline-flex items-center px-8 py-4 border-2 border-black text-black text-lg font-bold rounded-full">Get Info</span>
+            </div>
+          </Link>
+          <Link href="/apply/student?program=cna" className="block bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow border">
+            <Image src="/images/healthcare/cna-poster.jpg" alt="Apply for CNA Certification" width={600} height={300} className="w-full h-52 object-cover" />
+            <div className="p-6 text-center">
+              <h3 className="text-2xl font-bold text-black mb-2">Start Application</h3>
+              <p className="text-black mb-4">Ready to enroll? Complete your application online now.</p>
+              <span className="inline-flex items-center px-8 py-4 bg-green-600 text-white text-lg font-bold rounded-full">Apply Now <ArrowRight className="w-5 h-5 ml-2" /></span>
+            </div>
           </Link>
         </div>
+
+        <Link href="/programs/cna" className="inline-flex items-center text-lg text-black font-semibold hover:underline">
+          <ArrowLeft className="w-5 h-5 mr-2" /> Back to CNA
+        </Link>
       </div>
     </main>
   );

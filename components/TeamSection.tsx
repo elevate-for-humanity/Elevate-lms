@@ -27,12 +27,6 @@ const teamMembers = [
     bio: "Sharon brings 30+ years as a Respiratory Therapist with a Master's in Health Informatics. She supports healthcare training programs and workforce readiness initiatives.",
   },
   {
-    name: "Ameco Martin",
-    title: "Director of Staffing",
-    image: "/images/ameco-martin.jpg",
-    bio: "Ameco oversees workforce placement and employer partnerships, connecting program graduates with employment opportunities across Indiana.",
-  },
-  {
     name: "Leslie Wafford",
     title: "Director of Community Services",
     image: "/images/leslie-wafford.jpg",
@@ -43,12 +37,6 @@ const teamMembers = [
     title: "Psychiatric Mental Health Nurse Practitioner",
     image: "/images/alina-smith.jpg",
     bio: "Alina is a board-certified PMHNP from Purdue University, providing mental health assessments, interventions, and medication management for program participants.",
-  },
-  {
-    name: "Clystjah Woodley",
-    title: "Lead Life Coach & Personal Development Specialist",
-    image: "/images/clystjah-woodley.jpg",
-    bio: "Clystjah provides one-on-one coaching and personal development programming, specializing in helping justice-involved individuals overcome barriers.",
   },
   {
     name: "Delores Reynolds",

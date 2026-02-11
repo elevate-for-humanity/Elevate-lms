@@ -49,14 +49,6 @@ const fallbackTeam = [
   },
   {
     id: '5',
-    name: 'Ameco Martin',
-    title: 'Director of Staffing',
-    image_url: '/images/ameco-martin.jpg',
-    bio: 'Ameco oversees workforce placement and employer partnerships, connecting program graduates with employment opportunities across Indiana.',
-    email: 'ameco@elevateforhumanity.org',
-  },
-  {
-    id: '6',
     name: 'Leslie Wafford',
     title: 'Director of Community Services',
     image_url: '/images/leslie-wafford.jpg',
@@ -64,7 +56,7 @@ const fallbackTeam = [
     email: 'leslie@elevateforhumanity.org',
   },
   {
-    id: '7',
+    id: '6',
     name: 'Alina Smith, PMHNP',
     title: 'Psychiatric Mental Health Nurse Practitioner',
     image_url: '/images/alina-smith.jpg',
@@ -72,15 +64,7 @@ const fallbackTeam = [
     email: 'alina@elevateforhumanity.org',
   },
   {
-    id: '8',
-    name: 'Clystjah Woodley',
-    title: 'Lead Life Coach & Personal Development Specialist',
-    image_url: '/images/clystjah-woodley.jpg',
-    bio: 'Clystjah provides one-on-one coaching and personal development programming, specializing in helping justice-involved individuals overcome barriers.',
-    email: 'clystjah@elevateforhumanity.org',
-  },
-  {
-    id: '9',
+    id: '7',
     name: 'Delores Reynolds',
     title: 'Social Media & Digital Engagement Coordinator',
     image_url: '/images/delores-reynolds.jpg',

@@ -201,20 +201,25 @@ function InquiryForm() {
               <optgroup label="Healthcare">
                 <option value="CNA (Certified Nursing Assistant)">CNA (Certified Nursing Assistant)</option>
                 <option value="Medical Assistant">Medical Assistant</option>
-                <option value="Home Health Aide">Home Health Aide</option>
                 <option value="Phlebotomy">Phlebotomy</option>
+                <option value="CPR & First Aid (HSI)">CPR & First Aid (HSI)</option>
+                <option value="Direct Support Professional">Direct Support Professional</option>
+                <option value="Drug Collector">Drug Collector</option>
+                <option value="Sanitation & Infection Control">Sanitation & Infection Control</option>
               </optgroup>
               <optgroup label="Skilled Trades">
                 <option value="HVAC Technician">HVAC Technician</option>
                 <option value="Electrical">Electrical</option>
                 <option value="Plumbing">Plumbing</option>
-                <option value="Building Maintenance">Building Maintenance</option>
-                <option value="Construction">Construction</option>
+                <option value="Welding">Welding</option>
+                <option value="Building Services Technician">Building Services Technician</option>
+                <option value="Diesel Mechanic">Diesel Mechanic</option>
               </optgroup>
               <optgroup label="Barber & Beauty">
                 <option value="Barber Apprenticeship">Barber Apprenticeship</option>
-                <option value="Cosmetology">Cosmetology</option>
-                <option value="Esthetics">Esthetics</option>
+                <option value="Cosmetology Apprenticeship">Cosmetology Apprenticeship</option>
+                <option value="Esthetician Apprenticeship">Esthetician Apprenticeship</option>
+                <option value="Nail Technician Apprenticeship">Nail Technician Apprenticeship</option>
               </optgroup>
               <optgroup label="Technology">
                 <option value="IT Support">IT Support</option>
@@ -228,6 +233,9 @@ function InquiryForm() {
               </optgroup>
               <optgroup label="Transportation">
                 <option value="CDL (Commercial Driver License)">CDL (Commercial Driver License)</option>
+              </optgroup>
+              <optgroup label="Apprenticeships">
+                <option value="Youth Culinary Apprenticeship">Youth Culinary Apprenticeship</option>
               </optgroup>
               <option value="Not Sure - Help Me Choose">Not Sure - Help Me Choose</option>
             </select>

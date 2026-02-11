@@ -16,25 +16,16 @@ export const metadata: Metadata = {
   },
 };
 
-// Program-specific redirects to modern intake forms
-const programRedirects: Record<string, string> = {
-  'barber-apprenticeship': '/forms/barber-apprenticeship-inquiry',
-  'barber': '/forms/barber-apprenticeship-inquiry',
-  'cna': '/inquiry?program=cna',
-  'hvac': '/inquiry?program=hvac',
-  'medical-assistant': '/inquiry?program=medical-assistant',
-};
-
 export default async function ApplyPage({
   searchParams,
 }: {
-  searchParams: Promise<{ program?: string }>;
+  searchParams: Promise<{ program?: string; pathway?: string }>;
 }) {
   const params = await searchParams;
-  // Redirect program-specific apply links to modern forms
-  const program = (params?.program || '').toLowerCase();
-  if (program && programRedirects[program]) {
-    redirect(programRedirects[program]);
+  const program = (params?.program || params?.pathway || '').toLowerCase();
+  // Any program param goes straight to the student application form
+  if (program) {
+    redirect(`/apply/student?program=${program}`);
   }
   return (
     <div className="min-h-screen bg-slate-50">

@@ -40,6 +40,7 @@ import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { createEnrollmentCase, submitCaseForSignatures } from '@/lib/workflow/case-management';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
+import { createOrUpdateEnrollment } from '@/lib/enrollment-service';
 import { 
   getBillingAuthority, 
   getUpdatableFields,
@@ -1396,43 +1397,24 @@ export async function POST(request: NextRequest) {
 
         const programId = program?.id || enrollmentConfig.program_id;
 
-        // UPSERT program_enrollments - idempotent on (student_id, program_slug)
-        // Handles Stripe retries, double-fires, and race conditions
-        const newStatus = enrollmentConfig.is_deposit ? 'DEPOSIT_PAID' : 'ACTIVE';
-        const newPaymentStatus = enrollmentConfig.is_deposit ? 'DEPOSIT_PAID' : 'PAID';
+        // Canonical enrollment write via enrollment service
+        const enrollResult = await createOrUpdateEnrollment(supabase, {
+          studentId,
+          programId,
+          programSlug: enrollmentConfig.program_slug,
+          fundingSource: enrollmentConfig.funding_source || 'SELF_PAY',
+          isDeposit: enrollmentConfig.is_deposit,
+          amountPaidCents: session.amount_total || 0,
+          stripeCheckoutSessionId: session.id,
+          stripePaymentIntentId: session.payment_intent as string,
+        });
 
-        const { data: upsertedEnrollment, error: enrollError } = await supabase
-          .from('program_enrollments')
-          .upsert({
-            student_id: studentId,
-            program_id: programId,
-            program_slug: enrollmentConfig.program_slug,
-            funding_source: enrollmentConfig.funding_source,
-            status: newStatus,
-            payment_status: newPaymentStatus,
-            enrollment_state: 'confirmed',
-            enrollment_confirmed_at: new Date().toISOString(),
-            next_required_action: 'ORIENTATION',
-            stripe_checkout_session_id: session.id,
-            stripe_payment_intent_id: session.payment_intent as string,
-            amount_paid_cents: session.amount_total || 0,
-            enrolled_at: new Date().toISOString(),
-          }, {
-            onConflict: 'student_id,program_slug',
-            ignoreDuplicates: false, // update on conflict
-          })
-          .select('id')
-          .single();
-
-        let enrollmentResult: string;
-
-        if (enrollError) {
-          console.error('[webhook] Failed to upsert enrollment:', enrollError);
+        if (enrollResult.error) {
+          console.error('[webhook] Enrollment service error:', enrollResult.error);
           break;
-          }
-        } else {
-          enrollmentResult = `upserted:${upsertedEnrollment?.id}`;
         }
+
+        const enrollmentResult = `${enrollResult.action}:${enrollResult.id}`;
 
         // Log the successful enrollment
         console.log('[webhook] ✅ Payment Link enrollment processed:', {

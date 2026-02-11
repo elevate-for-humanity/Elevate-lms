@@ -5,11 +5,17 @@
 
 import crypto from 'crypto';
 
-// Encryption key should come from environment
-const ENCRYPTION_KEY = process.env.SSN_ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
+// Encryption key MUST come from environment — random fallback would cause data loss on serverless cold starts
+const ENCRYPTION_KEY = process.env.SSN_ENCRYPTION_KEY;
+if (!ENCRYPTION_KEY && typeof window === 'undefined') {
+  console.error('[SECURITY] SSN_ENCRYPTION_KEY is not set. SSN encrypt/decrypt operations will fail.');
+}
 const IV_LENGTH = 16;
 
 export function encryptSSN(ssn: string): string {
+  if (!ENCRYPTION_KEY) {
+    throw new Error('SSN_ENCRYPTION_KEY is not configured. Cannot encrypt SSN data.');
+  }
   const iv = crypto.randomBytes(IV_LENGTH);
   const cipher = crypto.createCipheriv('aes-256-cbc', Buffer.from(ENCRYPTION_KEY, 'hex'), iv);
   let encrypted = cipher.update(ssn, 'utf8', 'hex');
@@ -18,6 +24,9 @@ export function encryptSSN(ssn: string): string {
 }
 
 export function decryptSSN(encryptedSSN: string): string {
+  if (!ENCRYPTION_KEY) {
+    throw new Error('SSN_ENCRYPTION_KEY is not configured. Cannot decrypt SSN data.');
+  }
   const parts = encryptedSSN.split(':');
   const iv = Buffer.from(parts[0], 'hex');
   const encrypted = parts[1];

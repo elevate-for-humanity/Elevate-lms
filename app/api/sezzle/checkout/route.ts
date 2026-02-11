@@ -19,7 +19,17 @@ import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
-    // Check if Sezzle is configured
+    // Lazy config: if singleton missed env vars at module load (cold start),
+    // try again now — handles key rotation and delayed env injection
+    if (!sezzle.isConfigured() && process.env.SEZZLE_PUBLIC_KEY && process.env.SEZZLE_PRIVATE_KEY) {
+      sezzle.configure({
+        publicKey: process.env.SEZZLE_PUBLIC_KEY,
+        privateKey: process.env.SEZZLE_PRIVATE_KEY,
+        environment: (process.env.SEZZLE_ENVIRONMENT as 'sandbox' | 'production') || 'sandbox',
+      });
+      logger.info('[Sezzle] Late-configured from env vars (missed at module load)');
+    }
+
     if (!sezzle.isConfigured()) {
       logger.error('[Sezzle] Checkout attempted but client not configured', {
         hasPubKey: !!process.env.SEZZLE_PUBLIC_KEY,
@@ -255,6 +265,15 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    // Lazy config re-check
+    if (!sezzle.isConfigured() && process.env.SEZZLE_PUBLIC_KEY && process.env.SEZZLE_PRIVATE_KEY) {
+      sezzle.configure({
+        publicKey: process.env.SEZZLE_PUBLIC_KEY,
+        privateKey: process.env.SEZZLE_PRIVATE_KEY,
+        environment: (process.env.SEZZLE_ENVIRONMENT as 'sandbox' | 'production') || 'sandbox',
+      });
+    }
+
     if (!sezzle.isConfigured()) {
       logger.error('[Sezzle] Status check attempted but client not configured');
       return NextResponse.json(

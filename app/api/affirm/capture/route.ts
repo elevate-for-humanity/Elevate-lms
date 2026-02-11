@@ -17,6 +17,9 @@ import { logger } from '@/lib/logger';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 
 export async function GET(request: NextRequest) {
+  // Lazy config: re-read env vars if missed at module load
+  affirm.tryLateConfig();
+
   const searchParams = request.nextUrl.searchParams;
   const checkoutToken = searchParams.get('checkout_token');
   const orderId = searchParams.get('order_id');

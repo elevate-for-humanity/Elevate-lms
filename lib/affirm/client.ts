@@ -68,6 +68,19 @@ class AffirmClient {
     return !!(this.publicKey && this.privateKey);
   }
 
+  /** Re-read env vars if not configured at module load (serverless cold start edge case) */
+  tryLateConfig(): void {
+    if (this.isConfigured()) return;
+    const pubKey = process.env.AFFIRM_PUBLIC_KEY || process.env.NEXT_PUBLIC_AFFIRM_PUBLIC_KEY;
+    const privKey = process.env.AFFIRM_PRIVATE_KEY;
+    if (pubKey && privKey) {
+      this.publicKey = pubKey;
+      this.privateKey = privKey;
+      const isSandbox = (process.env.AFFIRM_ENVIRONMENT || 'production') === 'sandbox';
+      this.transactionsUrl = isSandbox ? SANDBOX_CONFIG.transactionsUrl : AFFIRM_CONFIG.transactionsUrl;
+    }
+  }
+
   getPublicKey(): string | undefined {
     return this.publicKey;
   }

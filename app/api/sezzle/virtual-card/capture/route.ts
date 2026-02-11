@@ -20,6 +20,15 @@ interface CaptureRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    // Lazy config re-check
+    if (!sezzle.isConfigured() && process.env.SEZZLE_PUBLIC_KEY && process.env.SEZZLE_PRIVATE_KEY) {
+      sezzle.configure({
+        publicKey: process.env.SEZZLE_PUBLIC_KEY,
+        privateKey: process.env.SEZZLE_PRIVATE_KEY,
+        environment: (process.env.SEZZLE_ENVIRONMENT as 'sandbox' | 'production') || 'sandbox',
+      });
+    }
+
     if (!sezzle.isConfigured()) {
       return NextResponse.json(
         { error: 'Sezzle is not configured' },

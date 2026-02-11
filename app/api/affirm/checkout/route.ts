@@ -22,7 +22,9 @@ import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
-    // Check if Affirm is configured
+    // Lazy config: re-read env vars if missed at module load
+    affirm.tryLateConfig();
+
     if (!affirm.isConfigured()) {
       logger.error('[Affirm] Checkout attempted but client not configured', {
         hasPubKey: !!process.env.AFFIRM_PUBLIC_KEY,

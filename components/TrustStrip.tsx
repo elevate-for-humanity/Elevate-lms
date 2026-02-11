@@ -42,6 +42,27 @@ export default function TrustStrip({ variant = 'default', showAnimation = true, 
     async function fetchStats() {
       const supabase = createClient();
 
+      // Use fallback stats when Supabase is not configured
+      const fallbackStats: TrustStats = {
+        studentsEnrolled: 2500,
+        programsOffered: 56,
+        jobPlacementRate: 94,
+        certificatesIssued: 1800,
+        employerPartners: 150,
+        fundingSecured: 5000000,
+      };
+
+      if (!supabase) {
+        setStats(fallbackStats);
+        if (showAnimation) {
+          animateNumbers(fallbackStats);
+        } else {
+          setAnimatedStats(fallbackStats);
+        }
+        setLoading(false);
+        return;
+      }
+
       try {
         // Fetch real stats from database
         const [
@@ -80,15 +101,6 @@ export default function TrustStrip({ variant = 'default', showAnimation = true, 
         }
       } catch (err) {
         console.error('Error fetching trust stats:', err);
-        // Use fallback stats
-        const fallbackStats: TrustStats = {
-          studentsEnrolled: 2500,
-          programsOffered: 56,
-          jobPlacementRate: 94,
-          certificatesIssued: 1800,
-          employerPartners: 150,
-          fundingSecured: 5000000,
-        };
         setStats(fallbackStats);
         setAnimatedStats(fallbackStats);
       } finally {

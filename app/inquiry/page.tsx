@@ -30,6 +30,18 @@ function InquiryForm() {
         'plumbing': 'Plumbing',
         'it-support': 'IT Support',
         'cybersecurity': 'Cybersecurity',
+        'building-services-technician': 'Building Services Technician',
+        'culinary-apprenticeship': 'Youth Culinary Apprenticeship',
+        'sanitation-infection-control': 'Sanitation & Infection Control',
+        'welding': 'Welding',
+        'phlebotomy': 'Phlebotomy',
+        'cosmetology-apprenticeship': 'Cosmetology Apprenticeship',
+        'esthetician-apprenticeship': 'Esthetician Apprenticeship',
+        'nail-technician-apprenticeship': 'Nail Technician Apprenticeship',
+        'cpr-first-aid-hsi': 'CPR & First Aid (HSI)',
+        'diesel-mechanic': 'Diesel Mechanic',
+        'direct-support-professional': 'Direct Support Professional',
+        'drug-collector': 'Drug Collector',
       };
       setSelectedProgram(programMap[programParam.toLowerCase()] || '');
     }

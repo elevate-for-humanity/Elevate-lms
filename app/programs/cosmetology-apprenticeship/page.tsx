@@ -231,7 +231,7 @@ export default async function CosmetologyApprenticeshipPage() {
               <h3 className="text-lg font-bold text-black">Payment Options</h3>
               
               <Link
-                href="/apply?program=cosmetology-apprenticeship&payment=?method=full"
+                href="/apply?program=cosmetology-apprenticeship&payment_method=full"
                 className="w-full flex items-center justify-between px-6 py-4 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold rounded-lg transition-all"
               >
                 <div>
@@ -242,7 +242,7 @@ export default async function CosmetologyApprenticeshipPage() {
               </Link>
 
               <Link
-                href="/apply?program=cosmetology-apprenticeship&payment=?method=plan&months=4"
+                href="/apply?program=cosmetology-apprenticeship&payment_method=plan&months=4"
                 className="w-full flex items-center justify-between px-6 py-4 bg-white border-2 border-fuchsia-300 hover:border-fuchsia-500 text-black font-bold rounded-lg transition-all"
               >
                 <div>
@@ -253,7 +253,7 @@ export default async function CosmetologyApprenticeshipPage() {
               </Link>
 
               <Link
-                href="/apply?program=cosmetology-apprenticeship&payment=?method=plan&months=6"
+                href="/apply?program=cosmetology-apprenticeship&payment_method=plan&months=6"
                 className="w-full flex items-center justify-between px-6 py-4 bg-white border-2 border-fuchsia-300 hover:border-fuchsia-500 text-black font-bold rounded-lg transition-all"
               >
                 <div>
@@ -264,7 +264,7 @@ export default async function CosmetologyApprenticeshipPage() {
               </Link>
 
               <Link
-                href="/apply?program=cosmetology-apprenticeship&payment=?method=plan&months=12"
+                href="/apply?program=cosmetology-apprenticeship&payment_method=plan&months=12"
                 className="w-full flex items-center justify-between px-6 py-4 bg-white border-2 border-fuchsia-300 hover:border-fuchsia-500 text-black font-bold rounded-lg transition-all"
               >
                 <div>

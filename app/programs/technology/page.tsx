@@ -66,7 +66,7 @@ export default function TechnologyProgramsPage() {
       <HeroVideoWithVoiceover
         videoSrc="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
         posterSrc="/images/technology-vibrant.jpg"
-        voiceoverSrc="/videos/technology-welcome.mp3"
+        voiceoverSrc="/videos/program-hero.mp3"
       >
         <div className="flex items-center min-h-[50vh] sm:min-h-[60vh]">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

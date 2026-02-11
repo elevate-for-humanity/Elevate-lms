@@ -209,7 +209,7 @@ export default async function NailTechnicianApprenticeshipPage() {
               <h3 className="text-lg font-bold text-black">Payment Options</h3>
               
               <Link
-                href="/apply?program=nail-technician-apprenticeship&payment=?method=full"
+                href="/apply?program=nail-technician-apprenticeship&payment_method=full"
                 className="w-full flex items-center justify-between px-6 py-4 bg-pink-600 hover:bg-pink-700 text-white font-bold rounded-lg transition-all"
               >
                 <div>
@@ -220,7 +220,7 @@ export default async function NailTechnicianApprenticeshipPage() {
               </Link>
 
               <Link
-                href="/apply?program=nail-technician-apprenticeship&payment=?method=plan&months=4"
+                href="/apply?program=nail-technician-apprenticeship&payment_method=plan&months=4"
                 className="w-full flex items-center justify-between px-6 py-4 bg-white border-2 border-pink-300 hover:border-pink-500 text-black font-bold rounded-lg transition-all"
               >
                 <div>
@@ -231,7 +231,7 @@ export default async function NailTechnicianApprenticeshipPage() {
               </Link>
 
               <Link
-                href="/apply?program=nail-technician-apprenticeship&payment=?method=plan&months=6"
+                href="/apply?program=nail-technician-apprenticeship&payment_method=plan&months=6"
                 className="w-full flex items-center justify-between px-6 py-4 bg-white border-2 border-pink-300 hover:border-pink-500 text-black font-bold rounded-lg transition-all"
               >
                 <div>

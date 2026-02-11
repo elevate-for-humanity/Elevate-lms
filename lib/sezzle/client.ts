@@ -194,8 +194,8 @@ class SezzleClient {
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      throw new Error(`Sezzle authentication failed: ${error.message || response.statusText}`);
+      const error = await this.safeJson(response);
+      throw new Error(`Sezzle authentication failed: ${error.message || response.statusText} (${this.config.environment} → ${this.getBaseUrl()})`);
     }
 
     const data: SezzleAuthResponse = await response.json();

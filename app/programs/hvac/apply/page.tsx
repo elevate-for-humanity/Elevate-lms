@@ -15,7 +15,7 @@ export default function ApplyPage() {
       {/* Hero Banner */}
       <section className="relative h-[40vh] min-h-[300px] max-h-[400px]">
         <Image
-          src="/images/hvac/hvac-hero.jpg"
+          src="/images/trades/hero-program-hvac.jpg"
           alt="HVAC Technician Training"
           fill
           className="object-cover"

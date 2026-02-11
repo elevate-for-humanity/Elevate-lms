@@ -29,6 +29,10 @@ export default async function ApplyPage({
   if (rawProgram) {
     const entry = resolveProgram(rawProgram);
     if (entry) {
+      // Programs with dedicated enrollment pages (e.g., barber with payment integration)
+      if (entry.dedicatedApplyPage) {
+        redirect(entry.dedicatedApplyPage);
+      }
       const dest = entry.formType === 'apply'
         ? `/apply/student?program=${entry.slug}`
         : `/inquiry?program=${entry.slug}`;

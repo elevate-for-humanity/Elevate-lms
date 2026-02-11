@@ -14,6 +14,8 @@ export type ProgramEntry = {
   /** 'apply' routes to /apply/student, 'inquiry' routes to /inquiry */
   formType: 'apply' | 'inquiry';
   active: boolean;
+  /** If set, /apply?program=slug redirects here instead of the generic form */
+  dedicatedApplyPage?: string;
 };
 
 export const PROGRAMS: ProgramEntry[] = [
@@ -31,7 +33,7 @@ export const PROGRAMS: ProgramEntry[] = [
   { slug: 'building-maintenance-tech', name: 'Building Maintenance Technician', category: 'Skilled Trades', formType: 'apply', active: true },
 
   // Barber & Beauty
-  { slug: 'barber-apprenticeship', name: 'Barber Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true },
+  { slug: 'barber-apprenticeship', name: 'Barber Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true, dedicatedApplyPage: '/programs/barber-apprenticeship/apply' },
   { slug: 'professional-esthetician', name: 'Esthetician & Skincare Specialist', category: 'Barber & Beauty', formType: 'apply', active: true },
   { slug: 'beauty-career-educator', name: 'Beauty & Career Educator', category: 'Barber & Beauty', formType: 'apply', active: true },
 

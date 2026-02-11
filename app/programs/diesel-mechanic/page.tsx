@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   },
 };
 
-const APPLY_LINK = '/programs/diesel-mechanic/apply';
+const APPLY_LINK = '/apply?program=diesel-mechanic';
 
 export default function DieselMechanicPage() {
   return (

@@ -43,6 +43,25 @@ export const PROGRAMS: ProgramEntry[] = [
   { slug: 'certified-peer-recovery-coach', name: 'Certified Peer Recovery Coach', category: 'Human Services', formType: 'apply', active: true },
   { slug: 'public-safety-reentry-specialist', name: 'Public Safety Reentry Specialist', category: 'Human Services', formType: 'apply', active: true },
   { slug: 'drug-alcohol-specimen-collector', name: 'Drug & Alcohol Specimen Collector', category: 'Human Services', formType: 'apply', active: true },
+  { slug: 'direct-support-professional', name: 'Direct Support Professional', category: 'Human Services', formType: 'apply', active: true },
+  { slug: 'sanitation-infection-control', name: 'Sanitation & Infection Control', category: 'Human Services', formType: 'apply', active: true },
+
+  // Technology
+  { slug: 'it-support', name: 'IT Support Specialist', category: 'Technology', formType: 'apply', active: true },
+  { slug: 'cybersecurity', name: 'Cybersecurity Fundamentals', category: 'Technology', formType: 'apply', active: true },
+
+  // Additional Skilled Trades
+  { slug: 'electrical', name: 'Electrical Apprenticeship', category: 'Skilled Trades', formType: 'apply', active: true },
+  { slug: 'plumbing', name: 'Plumbing Apprenticeship', category: 'Skilled Trades', formType: 'apply', active: true },
+  { slug: 'welding', name: 'Welding Certification', category: 'Skilled Trades', formType: 'apply', active: true },
+  { slug: 'diesel-mechanic', name: 'Diesel Mechanic', category: 'Skilled Trades', formType: 'apply', active: true },
+
+  // Additional Barber & Beauty
+  { slug: 'cosmetology-apprenticeship', name: 'Cosmetology Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true },
+  { slug: 'nail-technician-apprenticeship', name: 'Nail Technician Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true },
+
+  // Additional Programs
+  { slug: 'culinary-apprenticeship', name: 'Youth Culinary Apprenticeship', category: 'Skilled Trades', formType: 'apply', active: true },
 ];
 
 /** All valid canonical slugs */
@@ -55,10 +74,12 @@ const SLUG_ALIASES: Record<string, string> = {
   'hvac': 'hvac-technician',
   'cdl': 'cdl-training',
   'esthetician': 'professional-esthetician',
+  'esthetician-apprenticeship': 'professional-esthetician',
   'phlebotomy': 'phlebotomy-technician',
   'tax-prep': 'tax-prep-financial-services',
   'tax-preparation': 'tax-prep-financial-services',
   'building-maintenance': 'building-maintenance-tech',
+  'building-services-technician': 'building-maintenance-tech',
   'peer-recovery': 'certified-peer-recovery-coach',
   'drug-collector': 'drug-alcohol-specimen-collector',
   'reentry': 'public-safety-reentry-specialist',
@@ -67,12 +88,8 @@ const SLUG_ALIASES: Record<string, string> = {
   'first-aid': 'cpr-first-aid-hsi',
   'beauty-educator': 'beauty-career-educator',
   'business': 'business-startup-marketing',
-  'electrical': 'hvac-technician',
-  'plumbing': 'hvac-technician',
-  'welding': 'hvac-technician',
-  'cosmetology': 'professional-esthetician',
-  'it-support': 'cpr-first-aid-hsi', // placeholder until IT launches
-  'cybersecurity': 'cpr-first-aid-hsi', // placeholder until cyber launches
+  'cosmetology': 'cosmetology-apprenticeship',
+  'nail-tech': 'nail-technician-apprenticeship',
 };
 
 /**

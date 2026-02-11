@@ -1,4 +1,34 @@
 // @ts-nocheck
+/**
+ * Canonical Stripe Webhook Handler
+ * 
+ * This is the ONLY webhook endpoint that should be registered in Stripe.
+ * Path: /api/webhooks/stripe
+ * 
+ * Event handlers (line numbers approximate):
+ *   checkout.session.completed:
+ *     - kind=program_enrollment    → upserts student_enrollments
+ *     - type=donation              → inserts donations
+ *     - kind=apprenticeship_enrollment → updates applications + student_enrollments
+ *     - kind=license_purchase      → creates licenses + tenants
+ *     - kind=store_purchase        → creates orders
+ *     - kind=course_purchase       → creates enrollments
+ *     - (default checkout)         → various enrollment paths
+ *   payment_intent.succeeded       → logs to payment_logs
+ *   payment_intent.payment_failed  → logs failure
+ *   customer.subscription.created  → updates licenses
+ *   customer.subscription.updated  → updates licenses
+ *   customer.subscription.deleted  → suspends/cancels license
+ *   invoice.payment_succeeded      → extends license period
+ *   invoice.payment_failed         → flags license
+ *   charge.refunded                → processes refund
+ * 
+ * Tables written: student_enrollments, program_enrollments, enrollments,
+ *   licenses, license_events, donations, payments, payment_logs,
+ *   audit_logs, tenants, applications
+ * 
+ * TODO: Decompose into lib/webhooks/handle-*.ts modules
+ */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;

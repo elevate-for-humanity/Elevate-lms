@@ -222,28 +222,39 @@ async function handleOrderAuthorized(event: SezzleWebhookEvent, supabase: any) {
 async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
   const { order_uuid, reference_id, capture, customer, metadata } = event.data;
 
-  logger.info('Sezzle order captured - processing enrollment', {
+  // Read server-authoritative price resolution from metadata
+  const paymentOption = metadata?.payment_option || 'deposit';
+  const requiredAmountCents = parseInt(metadata?.required_amount_cents || '0');
+  const paidAmountCents = capture?.amount?.amount_in_cents || 0;
+  const overpayAmountCents = parseInt(metadata?.overpay_amount_cents || '0');
+
+  logger.info('[Sezzle Webhook] Order captured — processing enrollment', {
     orderUuid: order_uuid,
     referenceId: reference_id,
-    captured: capture?.captured,
-    amount: capture?.amount?.amount_in_cents,
+    paymentOption,
+    requiredAmountCents,
+    paidAmountCents,
+    overpayAmountCents,
     customerEmail: customer?.email,
   });
 
   if (!supabase) return;
 
-  // Update payment record
+  // Update payment record with resolution data
   await supabase
     .from('payments')
     .update({
       status: 'captured',
       captured_at: new Date().toISOString(),
-      captured_amount_cents: capture?.amount?.amount_in_cents,
+      captured_amount_cents: paidAmountCents,
+      metadata: {
+        payment_option: paymentOption,
+        required_amount_cents: requiredAmountCents,
+        overpay_amount_cents: overpayAmountCents,
+      },
     })
     .eq('provider_order_id', order_uuid);
 
-  // Parse reference_id to get program and application info
-  // Format: "EFH-{timestamp}-{random}" or custom format with metadata
   const programId = metadata?.program_id;
   const programSlug = metadata?.program_slug;
   const applicationId = metadata?.application_id;
@@ -254,35 +265,39 @@ async function handleOrderCaptured(event: SezzleWebhookEvent, supabase: any) {
     // For barber program, create barber_subscriptions record
     if (programSlug === 'barber-apprenticeship') {
       try {
-        const amountPaidCents = capture?.amount?.amount_in_cents || 0;
         const transferHours = parseInt(metadata?.transfer_hours || '0');
         const hoursPerWeek = parseInt(metadata?.hours_per_week || '40');
         const totalHoursRequired = BARBER_PRICING.totalHoursRequired || 2000;
         const hoursRemaining = Math.max(0, totalHoursRequired - transferHours);
         const weeksRemaining = Math.ceil(hoursRemaining / hoursPerWeek);
+        // Remaining balance: full tuition minus what was paid
+        const remainingBalance = Math.max(0, (BARBER_PRICING.fullPrice * 100 - paidAmountCents) / 100);
 
         await supabase.from('barber_subscriptions').insert({
           customer_email: customer.email,
           customer_name: `${customer.first_name || ''} ${customer.last_name || ''}`.trim(),
           status: 'active',
           full_tuition_amount: BARBER_PRICING.fullPrice,
-          amount_paid_at_checkout: amountPaidCents / 100,
-          remaining_balance: Math.max(0, (BARBER_PRICING.fullPrice * 100 - amountPaidCents) / 100),
+          amount_paid_at_checkout: paidAmountCents / 100,
+          remaining_balance: remainingBalance,
           payment_method: 'sezzle',
           bnpl_provider: 'sezzle',
-          fully_paid: amountPaidCents >= BARBER_PRICING.fullPrice * 100,
-          weekly_payment_cents: 0, // Sezzle handles payments
-          weeks_remaining: weeksRemaining,
+          fully_paid: paymentOption === 'full' || paidAmountCents >= BARBER_PRICING.fullPrice * 100,
+          weekly_payment_cents: paymentOption === 'full' ? 0 : (weeksRemaining > 0 ? Math.round(remainingBalance / weeksRemaining * 100) : 0),
+          weeks_remaining: paymentOption === 'full' ? 0 : weeksRemaining,
           hours_per_week: hoursPerWeek,
           transferred_hours_verified: transferHours,
-          payment_model: 'bnpl_sezzle',
+          payment_model: `bnpl_sezzle_${paymentOption}`,
           created_at: new Date().toISOString(),
         });
 
-        logger.info('Barber subscription created for Sezzle payment', {
+        logger.info('[Sezzle Webhook] Barber subscription created', {
           customerEmail: customer.email,
           orderUuid: order_uuid,
-          amountPaidCents,
+          paymentOption,
+          paidAmountCents,
+          requiredAmountCents,
+          remainingBalance,
         });
       } catch (dbError) {
         logger.error('Failed to create barber_subscriptions record for Sezzle:', dbError);

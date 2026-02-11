@@ -16,6 +16,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sezzle, SezzleSessionRequest } from '@/lib/sezzle/client';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { resolvePaymentAmount } from '@/lib/payments/resolve-amount';
 
 export async function POST(request: NextRequest) {
   try {
@@ -94,26 +95,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Server-side price validation: enforce program minimum, not just Sezzle limits.
-    // The client can suggest an amount, but the server decides the floor.
-    const PROGRAM_MINIMUMS: Record<string, number> = {
-      'barber-apprenticeship': 1743, // Setup fee (35% of $4,980)
-    };
-    const programMinimum = PROGRAM_MINIMUMS[programSlug] || 35;
-    const effectiveMinimum = Math.max(35, programMinimum); // At least Sezzle's $35 floor
+    // Server-side price resolution: required_amount from (program_slug, payment_option).
+    // Client amount is treated as paid_amount, never as entitlement.
+    const resolution = resolvePaymentAmount(
+      programSlug,
+      body.paymentOption, // 'deposit' | 'full' — client sends this
+      amount,
+      35,    // Sezzle platform minimum
+      2500,  // Sezzle platform maximum
+    );
 
-    if (amount < effectiveMinimum) {
-      return NextResponse.json(
-        { error: `Minimum payment for this program is $${effectiveMinimum.toLocaleString()}` },
-        { status: 400 }
-      );
-    }
-
-    if (amount > 2500) {
-      return NextResponse.json(
-        { error: 'Sezzle has a maximum purchase limit of $2,500' },
-        { status: 400 }
-      );
+    if (!resolution.ok) {
+      return NextResponse.json({ error: resolution.error }, { status: resolution.status });
     }
 
     const supabase = await createClient();
@@ -200,6 +193,11 @@ export async function POST(request: NextRequest) {
           application_id: applicationId || '',
           enrollment_id: enrollmentId || '',
           student_id: studentId || '',
+          // Price resolution (server-authoritative)
+          payment_option: resolution.paymentOption,
+          required_amount_cents: String(Math.round(resolution.requiredAmount * 100)),
+          paid_amount_cents: String(Math.round(resolution.paidAmount * 100)),
+          overpay_amount_cents: String(Math.round(resolution.overpayAmount * 100)),
           // Barber-specific metadata
           transfer_hours: String(transferHours || 0),
           hours_per_week: String(hoursPerWeek || 40),
@@ -237,12 +235,14 @@ export async function POST(request: NextRequest) {
         .eq('id', applicationId);
     }
 
-    // Log for tracking
-    logger.info('Sezzle checkout session created', {
+    logger.info('[Sezzle] Checkout session created', {
       sessionUuid: session.uuid,
       orderUuid: session.order?.uuid,
       referenceId,
-      amount,
+      paidAmount: resolution.paidAmount,
+      requiredAmount: resolution.requiredAmount,
+      overpayAmount: resolution.overpayAmount,
+      paymentOption: resolution.paymentOption,
       email,
       programSlug,
       intent,

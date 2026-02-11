@@ -19,6 +19,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getAffirmCheckoutConfig, affirm } from '@/lib/affirm/client';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { resolvePaymentAmount } from '@/lib/payments/resolve-amount';
 
 export async function POST(request: NextRequest) {
   try {
@@ -63,18 +64,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Server-side price validation: enforce program minimum, not just Affirm limits.
-    const PROGRAM_MINIMUMS: Record<string, number> = {
-      'barber-apprenticeship': 1743, // Setup fee (35% of $4,980)
-    };
-    const programMinimum = PROGRAM_MINIMUMS[programSlug] || 50;
-    const effectiveMinimum = Math.max(50, programMinimum); // At least Affirm's $50 floor
+    // Server-side price resolution
+    const resolution = resolvePaymentAmount(
+      programSlug,
+      body.paymentOption,
+      amount,
+      50,    // Affirm platform minimum
+      null,  // Affirm has no platform maximum
+    );
 
-    if (amount < effectiveMinimum) {
-      return NextResponse.json(
-        { error: `Minimum payment for this program is $${effectiveMinimum.toLocaleString()}` },
-        { status: 400 }
-      );
+    if (!resolution.ok) {
+      return NextResponse.json({ error: resolution.error }, { status: resolution.status });
     }
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
@@ -96,9 +96,12 @@ export async function POST(request: NextRequest) {
         hours_per_week: hoursPerWeek || 40,
         has_host_shop: hasHostShop || null,
         host_shop_name: hostShopName || null,
-        amount_cents: Math.round(amount * 100),
-        payment_type: 'bnpl',
+        amount_cents: Math.round(resolution.paidAmount * 100),
+        payment_type: resolution.paymentOption,
         status: 'pending',
+        // Server-authoritative price resolution
+        required_amount_cents: Math.round(resolution.requiredAmount * 100),
+        overpay_amount_cents: Math.round(resolution.overpayAmount * 100),
       })
       .select('id')
       .single();
@@ -123,10 +126,13 @@ export async function POST(request: NextRequest) {
       cancelUrl: `${siteUrl}/programs/barber-apprenticeship/apply?canceled=true&provider=affirm`,
     });
 
-    logger.info('Affirm checkout context created', {
+    logger.info('[Affirm] Checkout context created', {
       contextId: context.id,
       orderId,
-      amount,
+      paidAmount: resolution.paidAmount,
+      requiredAmount: resolution.requiredAmount,
+      overpayAmount: resolution.overpayAmount,
+      paymentOption: resolution.paymentOption,
       email,
       programSlug,
     });

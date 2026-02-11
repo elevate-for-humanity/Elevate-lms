@@ -116,7 +116,6 @@ export default function BarberApprenticeshipApplyPage() {
         // 1. Get checkout config from our API
         // 2. Load Affirm JS SDK
         // 3. Call affirm.checkout() which opens their modal
-        // Minimum is the setup fee ($1,743)
         const affirmAmount = Math.max(PRICING.setupFee, customAmount);
         checkoutResponse = await fetch('/api/affirm/checkout', {
           method: 'POST',
@@ -130,6 +129,7 @@ export default function BarberApprenticeshipApplyPage() {
             programSlug: 'barber-apprenticeship',
             programName: 'Barber Apprenticeship Program',
             amount: affirmAmount,
+            paymentOption: affirmAmount >= PRICING.fullPrice ? 'full' : 'deposit',
             applicationId: applicationId,
             transferHours: transferHours,
             hoursPerWeek: hoursPerWeek,
@@ -199,9 +199,9 @@ export default function BarberApprenticeshipApplyPage() {
             programSlug: 'barber-apprenticeship',
             programName: 'Barber Apprenticeship Program',
             amount: sezzleAmount,
+            paymentOption: sezzleAmount >= PRICING.fullPrice ? 'full' : 'deposit',
             description: `Barber Apprenticeship - $${sezzleAmount} payment via Sezzle`,
             applicationId: applicationId,
-            // Barber-specific metadata for enrollment creation
             transferHours: transferHours,
             hoursPerWeek: hoursPerWeek,
             hasHostShop: formData.hasHostShop,

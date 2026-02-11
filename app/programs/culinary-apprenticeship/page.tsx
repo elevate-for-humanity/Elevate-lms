@@ -62,7 +62,7 @@ export default function CulinaryApprenticeshipPage() {
       <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/programs/culinary-apprenticeship/apply"
+            href="/apply?program=culinary-apprenticeship"
             className="inline-flex items-center justify-center px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-500 transition text-lg"
           >
             Apply Now
@@ -379,7 +379,7 @@ export default function CulinaryApprenticeshipPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Start Your Culinary Career?</h2>
           <p className="text-xl text-slate-300 mb-8">Join our Youth Culinary Apprenticeship and become a certified Production Cook.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/programs/culinary-apprenticeship/apply" className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white font-bold rounded-full hover:bg-orange-400">
+            <Link href="/apply?program=culinary-apprenticeship" className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white font-bold rounded-full hover:bg-orange-400">
               Apply Now
             </Link>
             <Link href="/inquiry?program=culinary-apprenticeship" className="inline-flex items-center justify-center px-8 py-4 bg-slate-700 text-white font-bold rounded-full hover:bg-slate-600 border border-slate-600">

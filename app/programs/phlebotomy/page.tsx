@@ -153,7 +153,7 @@ export default function PhlebotomyProgramPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/wioa-eligibility" className="inline-flex items-center justify-center px-8 py-4 bg-red-500 hover:bg-red-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-red-500/30">
+                <Link href="/apply?program=phlebotomy-technician" className="inline-flex items-center justify-center px-8 py-4 bg-red-500 hover:bg-red-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-red-500/30">
                   Check Your Eligibility<ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
                 <Link href="#curriculum" className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-semibold rounded-full transition-all">
@@ -278,10 +278,10 @@ export default function PhlebotomyProgramPage() {
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Start Your Phlebotomy Career?</h2>
           <p className="text-xl text-red-100 mb-8 max-w-2xl mx-auto">Get certified in just 12 weeks. Check your eligibility for free WIOA-funded training.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/wioa-eligibility" className="inline-flex items-center justify-center px-8 py-4 bg-white text-red-600 font-semibold rounded-full hover:bg-red-50 transition-all transform hover:scale-105 shadow-lg">
+            <Link href="/apply?program=phlebotomy-technician" className="inline-flex items-center justify-center px-8 py-4 bg-white text-red-600 font-semibold rounded-full hover:bg-red-50 transition-all transform hover:scale-105 shadow-lg">
               Check Eligibility Now<ArrowRight className="w-5 h-5 ml-2" />
             </Link>
-            <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-full transition-all">
+            <Link href="/inquiry?program=phlebotomy-technician" className="inline-flex items-center justify-center px-8 py-4 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-full transition-all">
               <Phone className="w-5 h-5 mr-2" />Talk to an Advisor
             </Link>
           </div>

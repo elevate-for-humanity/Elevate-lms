@@ -82,7 +82,7 @@ export default async function Page() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
-                  href="/apply"
+                  href="/apply?program=tax-prep-financial-services"
                   className="inline-flex items-center justify-center px-8 py-4 bg-white text-green-600 font-bold rounded-xl hover:bg-gray-100 transition text-lg shadow-lg"
                 >
                   Start Free Training
@@ -380,7 +380,7 @@ export default async function Page() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/apply"
+              href="/apply?program=tax-prep-financial-services"
               className="inline-flex items-center justify-center px-10 py-5 bg-white text-green-600 font-bold rounded-lg hover:bg-green-50 transition text-lg"
             >
               Apply Now

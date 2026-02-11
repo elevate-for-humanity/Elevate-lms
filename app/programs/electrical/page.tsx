@@ -161,7 +161,7 @@ export default function ElectricalProgramPage() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/wioa-eligibility"
+                  href="/apply?program=electrical"
                   className="inline-flex items-center justify-center px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-yellow-500/30"
                 >
                   Check Your Eligibility
@@ -413,14 +413,14 @@ export default function ElectricalProgramPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/wioa-eligibility"
+              href="/apply?program=electrical"
               className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white font-semibold rounded-full hover:bg-slate-800 transition-all transform hover:scale-105 shadow-lg"
             >
               Check Eligibility Now
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
-              href="/contact"
+              href="/inquiry?program=electrical"
               className="inline-flex items-center justify-center px-8 py-4 bg-yellow-700 hover:bg-yellow-800 text-white font-semibold rounded-full transition-all"
             >
               <Phone className="w-5 h-5 mr-2" />

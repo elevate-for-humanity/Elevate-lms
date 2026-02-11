@@ -129,7 +129,7 @@ export default function CPRFirstAidPage() {
               Get certified in one day. Learn life-saving skills that could help you save a coworker, family member, or stranger.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/contact" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+              <Link href="/inquiry?program=cpr-first-aid-hsi" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
                 Schedule a Class <ArrowRight className="w-5 h-5" />
               </Link>
               <a href="tel:+13173143757" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
@@ -361,7 +361,7 @@ export default function CPRFirstAidPage() {
             Classes available weekly. Group training by appointment.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/contact" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/inquiry?program=cpr-first-aid-hsi" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Schedule a Class <ArrowRight className="w-5 h-5" />
             </Link>
             <a href="tel:+13173143757" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">

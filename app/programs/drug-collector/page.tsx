@@ -272,7 +272,7 @@ export default async function Page() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/apply"
+              href="/apply?program=drug-alcohol-specimen-collector"
               className="px-8 py-4 bg-white text-blue-600 hover:bg-gray-100 font-bold rounded-lg transition-all text-center"
             >
               Apply Now

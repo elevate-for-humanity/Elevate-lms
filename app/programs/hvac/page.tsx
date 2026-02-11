@@ -496,7 +496,7 @@ export default function HVACProgramPage() {
             <Link href="/inquiry?program=hvac" className="inline-flex items-center justify-center px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:bg-green-400">
               Start Free Application <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
-            <Link href="/programs/hvac/apply" className="inline-flex items-center justify-center px-8 py-4 bg-slate-700 text-white font-bold rounded-full hover:bg-slate-600 border border-slate-600">
+            <Link href="/apply?program=hvac-technician" className="inline-flex items-center justify-center px-8 py-4 bg-slate-700 text-white font-bold rounded-full hover:bg-slate-600 border border-slate-600">
               View Application Details
             </Link>
           </div>

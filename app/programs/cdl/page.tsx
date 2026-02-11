@@ -157,7 +157,7 @@ export default function CDLProgramPage() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/wioa-eligibility"
+                  href="/apply?program=cdl-training"
                   className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 hover:bg-orange-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-orange-500/30"
                 >
                   Check Your Eligibility
@@ -438,14 +438,14 @@ export default function CDLProgramPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/wioa-eligibility"
+              href="/apply?program=cdl-training"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-orange-600 font-semibold rounded-full hover:bg-orange-50 transition-all transform hover:scale-105 shadow-lg"
             >
               Check Eligibility Now
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
-              href="/contact"
+              href="/inquiry?program=cdl-training"
               className="inline-flex items-center justify-center px-8 py-4 bg-orange-700 hover:bg-orange-600 text-white font-semibold rounded-full transition-all"
             >
               <Phone className="w-5 h-5 mr-2" />

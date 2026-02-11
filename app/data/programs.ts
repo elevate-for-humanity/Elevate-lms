@@ -133,12 +133,12 @@ export const programs: Program[] = [
       'Students preparing for apprenticeships or OJT',
     ],
     ctaPrimary: {
-      label: 'Contact Us',
-      href: '/contact',
+      label: 'Apply Now',
+      href: '/apply?program=hvac-technician',
     },
     ctaSecondary: {
       label: 'Talk to a Career Coach',
-      href: '/contact?topic=hvac-technician',
+      href: '/inquiry?program=hvac-technician',
     },
   },
   {
@@ -214,11 +214,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/contact?topic=barber-apprenticeship',
+      href: '/apply?program=barber-apprenticeship',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/programs/barber-apprenticeship',
+      label: 'Request Information',
+      href: '/inquiry?program=barber-apprenticeship',
     },
     price: 4980, // Self-pay option price
   },
@@ -281,11 +281,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Enroll Now - $1,200',
-      href: '/programs/cna-certification/enroll',
+      href: '/apply?program=cna-certification',
     },
     ctaSecondary: {
       label: 'Talk to Healthcare Career Coach',
-      href: '/contact?topic=cna',
+      href: '/inquiry?program=cna-certification',
     },
     price: 1200,
     downPayment: 200,
@@ -356,11 +356,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply for CDL Training',
-      href: '/contact?topic=cdl',
+      href: '/apply?program=cdl-training',
     },
     ctaSecondary: {
       label: 'Request CDL Info Session',
-      href: '/contact?topic=cdl',
+      href: '/inquiry?program=cdl-training',
     },
   },
   {
@@ -439,11 +439,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/contact?topic=building-maintenance',
+      href: '/apply?program=building-maintenance-tech',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=building-maintenance',
+      label: 'Request Information',
+      href: '/inquiry?program=building-maintenance-tech',
     },
   },
   {
@@ -515,11 +515,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/contact',
+      href: '/apply?program=beauty-career-educator',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=beauty-educator',
+      label: 'Request Information',
+      href: '/inquiry?program=beauty-career-educator',
     },
     price: 4730,
   },
@@ -596,11 +596,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/contact',
+      href: '/apply?program=business-startup-marketing',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=business-startup',
+      label: 'Request Information',
+      href: '/inquiry?program=business-startup-marketing',
     },
     price: 4550,
   },
@@ -678,11 +678,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/contact',
+      href: '/apply?program=emergency-health-safety-tech',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=emergency-health-safety',
+      label: 'Request Information',
+      href: '/inquiry?program=emergency-health-safety-tech',
     },
     price: 4950,
   },
@@ -768,11 +768,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/contact',
+      href: '/apply?program=professional-esthetician',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=esthetician',
+      label: 'Request Information',
+      href: '/inquiry?program=professional-esthetician',
     },
     price: 4575,
   },
@@ -860,11 +860,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/contact',
+      href: '/apply?program=certified-peer-recovery-coach',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=peer-recovery',
+      label: 'Request Information',
+      href: '/inquiry?program=certified-peer-recovery-coach',
     },
     price: 4750,
   },
@@ -951,11 +951,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/contact',
+      href: '/apply?program=tax-prep-financial-services',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=tax-prep',
+      label: 'Request Information',
+      href: '/inquiry?program=tax-prep-financial-services',
     },
     price: 4750,
   },
@@ -1030,11 +1030,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/apply',
+      href: '/apply?program=phlebotomy-technician',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=phlebotomy-technician',
+      label: 'Request Information',
+      href: '/inquiry?program=phlebotomy-technician',
     },
     price: 2800,
   },
@@ -1085,12 +1085,12 @@ export const programs: Program[] = [
       'Attend full day of training',
     ],
     ctaPrimary: {
-      label: 'Enroll Now',
-      href: '/apply',
+      label: 'Apply Now',
+      href: '/apply?program=cpr-first-aid-hsi',
     },
     ctaSecondary: {
       label: 'View Schedule',
-      href: '/contact?topic=cpr-first-aid',
+      href: '/inquiry?program=cpr-first-aid-hsi',
     },
     price: 575,
   },
@@ -1153,11 +1153,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/apply',
+      href: '/apply?program=home-health-aide',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=home-health-aide',
+      label: 'Request Information',
+      href: '/inquiry?program=home-health-aide',
     },
     price: 4700,
   },
@@ -1217,11 +1217,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/apply',
+      href: '/apply?program=medical-assistant',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=medical-assistant',
+      label: 'Request Information',
+      href: '/inquiry?program=medical-assistant',
     },
     price: 4325,
   },
@@ -1289,11 +1289,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/apply',
+      href: '/apply?program=public-safety-reentry-specialist',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=public-safety-reentry',
+      label: 'Request Information',
+      href: '/inquiry?program=public-safety-reentry-specialist',
     },
     price: 4750,
   },
@@ -1364,11 +1364,11 @@ export const programs: Program[] = [
     ],
     ctaPrimary: {
       label: 'Apply Now',
-      href: '/apply',
+      href: '/apply?program=drug-alcohol-specimen-collector',
     },
     ctaSecondary: {
-      label: 'Learn More',
-      href: '/contact?topic=drug-collector',
+      label: 'Request Information',
+      href: '/inquiry?program=drug-alcohol-specimen-collector',
     },
     price: 504,
   },

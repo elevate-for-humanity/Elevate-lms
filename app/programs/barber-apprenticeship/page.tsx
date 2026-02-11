@@ -115,7 +115,7 @@ export default async function BarberApprenticeshipPage() {
             <p className="text-lg text-black mb-8">Apply now or request more information about the program</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
-                href="/programs/barber-apprenticeship/apply"
+                href="/apply?program=barber-apprenticeship"
                 className="bg-brand-red-600 text-white px-10 py-5 rounded-lg font-semibold text-xl hover:bg-brand-red-700 transition-colors"
               >
                 Apply Now
@@ -671,7 +671,7 @@ export default async function BarberApprenticeshipPage() {
           </p>
           <div className="mt-10 flex justify-center gap-4 flex-col sm:flex-row">
             <Link
-              href="/programs/barber-apprenticeship/apply"
+              href="/apply?program=barber-apprenticeship"
               className="rounded-2xl bg-brand-red-600 text-white px-8 py-4 font-semibold hover:bg-brand-red-700 transition"
             >
               Enroll & Pay Now

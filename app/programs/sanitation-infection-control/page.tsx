@@ -26,7 +26,7 @@ export default function SanitationInfectionControlPage() {
               Specialized training for high-risk environments including hospitals, military bases, and government facilities.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/programs/sanitation-infection-control/apply" className="inline-flex items-center px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:bg-green-400">
+              <Link href="/apply?program=sanitation-infection-control" className="inline-flex items-center px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:bg-green-400">
                 Apply Now <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
               <Link href="/inquiry?program=sanitation-infection-control" className="inline-flex items-center px-8 py-4 bg-white text-slate-900 font-bold rounded-full hover:bg-slate-100">
@@ -428,7 +428,7 @@ export default function SanitationInfectionControlPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Start Your Career in Sanitation & Infection Control?</h2>
           <p className="text-xl text-slate-300 mb-8">Join the 2Exclusive Apprenticeship Program and become a certified professional in high-demand sanitation services.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/programs/sanitation-infection-control/apply" className="inline-flex items-center justify-center px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:bg-green-400">
+            <Link href="/apply?program=sanitation-infection-control" className="inline-flex items-center justify-center px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:bg-green-400">
               Apply Now <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link href="/inquiry?program=sanitation-infection-control" className="inline-flex items-center justify-center px-8 py-4 bg-slate-700 text-white font-bold rounded-full hover:bg-slate-600 border border-slate-600">

@@ -161,7 +161,7 @@ export default function WeldingProgramPage() {
 
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
-                  href="/wioa-eligibility"
+                  href="/apply?program=welding"
                   className="inline-flex items-center justify-center px-8 py-4 bg-red-500 hover:bg-red-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-red-500/30"
                 >
                   Check Your Eligibility
@@ -424,14 +424,14 @@ export default function WeldingProgramPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/wioa-eligibility"
+              href="/apply?program=welding"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-red-600 font-semibold rounded-full hover:bg-red-50 transition-all transform hover:scale-105 shadow-lg"
             >
               Check Eligibility Now
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
-              href="/contact"
+              href="/inquiry?program=welding"
               className="inline-flex items-center justify-center px-8 py-4 bg-red-700 hover:bg-red-600 text-white font-semibold rounded-full transition-all"
             >
               <Phone className="w-5 h-5 mr-2" />

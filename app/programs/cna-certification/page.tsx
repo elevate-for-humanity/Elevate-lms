@@ -237,7 +237,7 @@ export default function CNACertificationPage() {
             Classes starting soon. Limited seats available.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/apply?program=cna-certification" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
             <a href="tel:+13173143757" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">

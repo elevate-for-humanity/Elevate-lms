@@ -62,7 +62,7 @@ export default function BuildingServicesTechnicianPage() {
       <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/programs/building-services-technician/apply"
+            href="/apply?program=building-maintenance-tech"
             className="inline-flex items-center justify-center px-8 py-4 bg-green-600 text-white font-bold rounded-full hover:bg-green-500 transition text-lg"
           >
             Apply Now
@@ -350,7 +350,7 @@ export default function BuildingServicesTechnicianPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Start Your Career?</h2>
           <p className="text-xl text-slate-300 mb-8">Join our Building Services Technician Apprenticeship and earn while you learn.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/programs/building-services-technician/apply" className="inline-flex items-center justify-center px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:bg-green-400">
+            <Link href="/apply?program=building-maintenance-tech" className="inline-flex items-center justify-center px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:bg-green-400">
               Apply Now
             </Link>
             <Link href="/inquiry?program=building-services-technician" className="inline-flex items-center justify-center px-8 py-4 bg-slate-700 text-white font-bold rounded-full hover:bg-slate-600 border border-slate-600">

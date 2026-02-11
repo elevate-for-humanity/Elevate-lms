@@ -153,7 +153,7 @@ export default function PlumbingProgramPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/wioa-eligibility" className="inline-flex items-center justify-center px-8 py-4 bg-cyan-500 hover:bg-cyan-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-cyan-500/30">
+                <Link href="/apply?program=plumbing" className="inline-flex items-center justify-center px-8 py-4 bg-cyan-500 hover:bg-cyan-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-cyan-500/30">
                   Check Your Eligibility<ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
                 <Link href="#curriculum" className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-semibold rounded-full transition-all">
@@ -278,10 +278,10 @@ export default function PlumbingProgramPage() {
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Start Your Plumbing Career?</h2>
           <p className="text-xl text-cyan-100 mb-8 max-w-2xl mx-auto">Join a trade that's always in demand. Check your eligibility for free WIOA-funded training.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/wioa-eligibility" className="inline-flex items-center justify-center px-8 py-4 bg-white text-cyan-600 font-semibold rounded-full hover:bg-cyan-50 transition-all transform hover:scale-105 shadow-lg">
+            <Link href="/apply?program=plumbing" className="inline-flex items-center justify-center px-8 py-4 bg-white text-cyan-600 font-semibold rounded-full hover:bg-cyan-50 transition-all transform hover:scale-105 shadow-lg">
               Check Eligibility Now<ArrowRight className="w-5 h-5 ml-2" />
             </Link>
-            <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-cyan-700 hover:bg-cyan-600 text-white font-semibold rounded-full transition-all">
+            <Link href="/inquiry?program=plumbing" className="inline-flex items-center justify-center px-8 py-4 bg-cyan-700 hover:bg-cyan-600 text-white font-semibold rounded-full transition-all">
               <Phone className="w-5 h-5 mr-2" />Talk to an Advisor
             </Link>
           </div>

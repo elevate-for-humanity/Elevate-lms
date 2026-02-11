@@ -413,4 +413,12 @@ if (process.env.SEZZLE_PUBLIC_KEY && process.env.SEZZLE_PRIVATE_KEY) {
     privateKey: process.env.SEZZLE_PRIVATE_KEY,
     environment: (process.env.SEZZLE_ENVIRONMENT as 'sandbox' | 'production') || 'sandbox',
   });
+} else {
+  // Log which vars are missing to help diagnose Netlify config issues
+  if (typeof process !== 'undefined' && process.env) {
+    const missing = [];
+    if (!process.env.SEZZLE_PUBLIC_KEY) missing.push('SEZZLE_PUBLIC_KEY');
+    if (!process.env.SEZZLE_PRIVATE_KEY) missing.push('SEZZLE_PRIVATE_KEY');
+    console.warn(`[Sezzle] Not configured - missing env vars: ${missing.join(', ')}`);
+  }
 }

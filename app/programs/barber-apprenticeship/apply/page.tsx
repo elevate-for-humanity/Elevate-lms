@@ -109,7 +109,10 @@ export default function BarberApprenticeshipApplyPage() {
       };
 
       if (paymentOption === 'affirm') {
-        // Affirm - Pay over time with user-selected amount
+        // Affirm uses a client-side JS SDK flow:
+        // 1. Get checkout config from our API
+        // 2. Load Affirm JS SDK
+        // 3. Call affirm.checkout() which opens their modal
         const affirmAmount = Math.max(50, customAmount);
         checkoutResponse = await fetch('/api/affirm/checkout', {
           method: 'POST',
@@ -123,9 +126,7 @@ export default function BarberApprenticeshipApplyPage() {
             programSlug: 'barber-apprenticeship',
             programName: 'Barber Apprenticeship Program',
             amount: affirmAmount,
-            description: `Barber Apprenticeship - $${affirmAmount} payment via Affirm`,
             applicationId: applicationId,
-            // Barber-specific metadata for enrollment creation
             transferHours: transferHours,
             hoursPerWeek: hoursPerWeek,
             hasHostShop: formData.hasHostShop,
@@ -134,12 +135,46 @@ export default function BarberApprenticeshipApplyPage() {
         });
         
         const affirmData = await checkoutResponse.json();
-        console.log('Affirm response:', affirmData);
         
-        if (checkoutResponse.ok && affirmData.checkoutUrl) {
-          window.location.href = affirmData.checkoutUrl;
-        } else {
+        if (!checkoutResponse.ok || !affirmData.checkoutConfig) {
           setError(affirmData.error || 'Unable to create Affirm checkout. Please try another payment method.');
+          setLoading(false);
+          return;
+        }
+
+        // Load Affirm JS SDK dynamically
+        try {
+          const affirmJsUrl = affirmData.affirmJsUrl || 'https://cdn1.affirm.com/js/v2/affirm.js';
+          
+          // Set up Affirm config on window before loading SDK
+          (window as any)._affirm_config = {
+            public_api_key: affirmData.publicKey,
+            script: affirmJsUrl,
+          };
+
+          // Load the SDK if not already loaded
+          if (!(window as any).affirm) {
+            await new Promise<void>((resolve, reject) => {
+              const script = document.createElement('script');
+              script.src = affirmJsUrl;
+              script.async = true;
+              script.onload = () => resolve();
+              script.onerror = () => reject(new Error('Failed to load Affirm SDK'));
+              document.head.appendChild(script);
+            });
+          }
+
+          // Open Affirm checkout modal
+          const affirmSdk = (window as any).affirm;
+          if (affirmSdk?.checkout) {
+            affirmSdk.checkout(affirmData.checkoutConfig);
+            affirmSdk.checkout.open();
+          } else {
+            throw new Error('Affirm SDK not available after loading');
+          }
+        } catch (sdkError) {
+          console.error('Affirm SDK error:', sdkError);
+          setError('Unable to load Affirm checkout. Please try another payment method.');
           setLoading(false);
         }
         return;

@@ -21,8 +21,13 @@ export async function POST(request: NextRequest) {
   try {
     // Check if Sezzle is configured
     if (!sezzle.isConfigured()) {
+      logger.error('[Sezzle] Checkout attempted but client not configured', {
+        hasPubKey: !!process.env.SEZZLE_PUBLIC_KEY,
+        hasPrivKey: !!process.env.SEZZLE_PRIVATE_KEY,
+        env: process.env.SEZZLE_ENVIRONMENT || 'not set',
+      });
       return NextResponse.json(
-        { error: 'Sezzle is not configured. Please contact support.' },
+        { error: 'Sezzle payment is temporarily unavailable. Please choose another payment option or contact support.' },
         { status: 503 }
       );
     }
@@ -249,6 +254,7 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     if (!sezzle.isConfigured()) {
+      logger.error('[Sezzle] Status check attempted but client not configured');
       return NextResponse.json(
         { error: 'Sezzle is not configured' },
         { status: 503 }

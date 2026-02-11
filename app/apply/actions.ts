@@ -84,69 +84,81 @@ export async function submitStudentApplication(data: StudentApplicationData) {
   const supabase = await createClient();
 
   try {
-    // 1. Create auth user
-    const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: data.email,
-      password: generateTemporaryPassword(),
-      options: {
-        data: {
-          first_name: data.firstName,
-          last_name: data.lastName,
-          phone: data.phone,
-          role: 'student',
-        },
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
-      },
-    });
-
-    if (authError) throw authError;
-    if (!authData.user) throw new Error('Failed to create user');
-
-    // 2. Create profile with student role
-    const { error: profileError } = await supabase.from('profiles').insert({
-      id: authData.user.id,
-      email: data.email,
-      first_name: data.firstName,
-      last_name: data.lastName,
-      phone: data.phone,
-      role: 'student',
-      tenant_id: process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID || null,
-    });
-
-    if (profileError) throw profileError;
-
-    // 3. Store application details
+    // 1. Store application in the canonical applications table FIRST
+    // This is the most important step — never lose an application
     const { error: appError } = await supabase
-      .from('student_applications')
+      .from('applications')
       .insert({
-        user_id: authData.user.id,
-        email: data.email,
         first_name: data.firstName,
         last_name: data.lastName,
+        email: data.email,
         phone: data.phone,
-        date_of_birth: data.dateOfBirth,
-        address: data.address,
-        city: data.city,
-        state: data.state,
-        zip_code: data.zipCode,
-        program_interest: data.programInterest,
-        employment_status: data.employmentStatus,
-        education_level: data.educationLevel,
-        goals: data.goals,
+        program_id: data.programInterest || null,
         status: 'pending',
+        notes: JSON.stringify({
+          role: 'student',
+          date_of_birth: data.dateOfBirth,
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          zip_code: data.zipCode,
+          employment_status: data.employmentStatus,
+          education_level: data.educationLevel,
+          goals: data.goals,
+        }),
         submitted_at: new Date().toISOString(),
       });
 
     if (appError) throw appError;
 
-    // Send welcome email
-    await sendWelcomeEmail(data.email, data.firstName, 'student');
+    // 2. Try to create auth user (non-blocking — application is already saved)
+    let userId: string | null = null;
+    try {
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: data.email,
+        password: generateTemporaryPassword(),
+        options: {
+          data: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+            phone: data.phone,
+            role: 'student',
+          },
+          emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`,
+        },
+      });
+
+      if (!authError && authData.user) {
+        userId = authData.user.id;
+
+        // 3. Create profile (best-effort)
+        await supabase.from('profiles').upsert({
+          id: authData.user.id,
+          email: data.email,
+          first_name: data.firstName,
+          last_name: data.lastName,
+          phone: data.phone,
+          role: 'student',
+          tenant_id: process.env.NEXT_PUBLIC_DEFAULT_TENANT_ID || null,
+        }, { onConflict: 'id' });
+      }
+    } catch {
+      // Auth/profile creation failed — application is still saved
+      console.warn('[apply] Auth creation failed for', data.email, '— application saved');
+    }
+
+    // 4. Send welcome email (best-effort)
+    try {
+      await sendWelcomeEmail(data.email, data.firstName, 'student');
+    } catch {
+      console.warn('[apply] Welcome email failed for', data.email);
+    }
 
     revalidatePath('/admin/applications');
 
     return {
       success: true,
-      userId: authData.user.id,
+      userId: userId,
       redirectTo: '/apply/success?role=student',
     };
   } catch (error) {
@@ -201,22 +213,25 @@ export async function submitProgramHolderApplication(
 
     if (profileError) throw profileError;
 
-    // 3. Store application details
+    // 3. Store application in the canonical applications table
     const { error: appError } = await supabase
-      .from('program_holder_applications')
+      .from('applications')
       .insert({
-        user_id: authData.user.id,
-        email: data.email,
         first_name: data.firstName,
         last_name: data.lastName,
+        email: data.email,
         phone: data.phone,
-        organization_name: data.organizationName,
-        organization_type: data.organizationType,
-        website: data.website,
-        number_of_students: data.numberOfStudents,
-        programs_offered: data.programsOffered,
-        partnership_goals: data.partnershipGoals,
-        status: 'pending_verification',
+        program_id: 'program_holder',
+        status: 'pending',
+        notes: JSON.stringify({
+          role: 'program_holder',
+          organization_name: data.organizationName,
+          organization_type: data.organizationType,
+          website: data.website,
+          number_of_students: data.numberOfStudents,
+          programs_offered: data.programsOffered,
+          partnership_goals: data.partnershipGoals,
+        }),
         submitted_at: new Date().toISOString(),
       });
 
@@ -279,22 +294,25 @@ export async function submitEmployerApplication(data: EmployerApplicationData) {
 
     if (profileError) throw profileError;
 
-    // 3. Store application details
+    // 3. Store application in the canonical applications table
     const { error: appError } = await supabase
-      .from('employer_applications')
+      .from('applications')
       .insert({
-        user_id: authData.user.id,
-        email: data.email,
         first_name: data.firstName,
         last_name: data.lastName,
+        email: data.email,
         phone: data.phone,
-        company_name: data.companyName,
-        industry: data.industry,
-        company_size: data.companySize,
-        website: data.website,
-        hiring_needs: data.hiringNeeds,
-        positions_available: data.positionsAvailable,
-        status: 'pending_verification',
+        program_id: 'employer',
+        status: 'pending',
+        notes: JSON.stringify({
+          role: 'employer',
+          company_name: data.companyName,
+          industry: data.industry,
+          company_size: data.companySize,
+          website: data.website,
+          hiring_needs: data.hiringNeeds,
+          positions_available: data.positionsAvailable,
+        }),
         submitted_at: new Date().toISOString(),
       });
 
@@ -357,23 +375,25 @@ export async function submitStaffApplication(data: StaffApplicationData) {
 
     if (profileError) throw profileError;
 
-    // 3. Store application details
+    // 3. Store application in the canonical applications table
     const { error: appError } = await supabase
-      .from('staff_applications')
+      .from('applications')
       .insert({
-        user_id: authData.user.id,
-        email: data.email,
         first_name: data.firstName,
         last_name: data.lastName,
+        email: data.email,
         phone: data.phone,
-        role: data.role,
-        position: data.position,
-        experience: data.experience,
-        education: data.education,
-        certifications: data.certifications,
-        availability: data.availability,
-        cover_letter: data.coverLetter,
-        status: 'pending_approval',
+        program_id: data.role,
+        status: 'pending',
+        notes: JSON.stringify({
+          role: data.role,
+          position: data.position,
+          experience: data.experience,
+          education: data.education,
+          certifications: data.certifications,
+          availability: data.availability,
+          cover_letter: data.coverLetter,
+        }),
         submitted_at: new Date().toISOString(),
       });
 

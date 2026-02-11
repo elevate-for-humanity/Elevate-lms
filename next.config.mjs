@@ -387,6 +387,31 @@ const nextConfig = {
       { source: '/about/founder', destination: '/about/team', permanent: true },
       { source: '/etpl-programs', destination: '/pathways', permanent: true },
       { source: '/intake', destination: '/apply', permanent: true },
+
+      // ============================================
+      // ENROLL / APPLY CONSOLIDATION
+      // Single redirect authority — all enroll/apply routing lives here.
+      // ============================================
+
+      // /enroll → /apply (was in netlify.toml, now canonical here)
+      { source: '/enroll', destination: '/apply', permanent: true },
+
+      // Barber enrollment: 1-hop to dedicated apply page (kills 3-hop chain)
+      { source: '/enroll/barber-apprenticeship', destination: '/programs/barber-apprenticeship/apply', permanent: true },
+
+      // Duplicate student forms → canonical /apply/student
+      { source: '/apply/quick', destination: '/apply/student', permanent: true },
+      { source: '/apply/full', destination: '/apply/student', permanent: true },
+
+      // Duplicate status pages → canonical /apply/track
+      { source: '/apply/status', destination: '/apply/track', permanent: true },
+
+      // Duplicate success pages → canonical /apply/success
+      { source: '/apply/confirmation', destination: '/apply/success', permanent: true },
+
+      // Program holder apply alias (was in netlify.toml)
+      { source: '/program-holder/apply', destination: '/apply/program-holder', permanent: true },
+
       // /scholarships → /funding handled by Netlify (public SEO route, Rule A)
       { source: '/health-services', destination: '/programs/healthcare', permanent: true },
       // Donate page has its own content now

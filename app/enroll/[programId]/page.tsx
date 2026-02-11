@@ -60,11 +60,13 @@ export default function EnrollPage() {
       
       // Apprenticeships require approval flow - redirect to application
       const isApprenticeship = data?.category?.toLowerCase().includes('apprenticeship') ||
-        data?.slug && APPRENTICESHIP_SLUGS.includes(data.slug) ||
+        (data?.slug && APPRENTICESHIP_SLUGS.includes(data.slug)) ||
         data?.name?.toLowerCase().includes('apprenticeship');
       
       if (isApprenticeship) {
-        router.replace(`/apply?program=${programId}`);
+        // Use slug (not UUID) so /apply can resolve via program-registry
+        const identifier = data?.slug || programId;
+        router.replace(`/apply?program=${identifier}`);
         return;
       }
       

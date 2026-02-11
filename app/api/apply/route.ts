@@ -156,7 +156,7 @@ export const POST = withRateLimit(
       }
 
       return NextResponse.redirect(
-        new URL('/apply/confirmation', req.url),
+        new URL('/apply/success', req.url),
         { status: 303 }
       );
     } catch (err: any) {

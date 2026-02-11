@@ -27,7 +27,7 @@ export async function POST(req: Request) {
     if (error) throw error;
 
     return NextResponse.redirect(
-      new URL("/apply/confirmation", req.url),
+      new URL("/apply/success", req.url),
       { status: 303 }
     );
   } catch (err) {

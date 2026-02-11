@@ -241,12 +241,7 @@
   status = 302
   force = true
 
-# Redirect /enroll to /apply - prevents "no programs available" dead end
-[[redirects]]
-  from = "/enroll"
-  to = "/apply"
-  status = 302
-  force = true
+# /enroll and /apply redirects consolidated in next.config.js
 
 # Scholarships alias to funding
 [[redirects]]
@@ -362,11 +357,7 @@
   status = 301
   force = true
 
-[[redirects]]
-  from = "/program-holder/apply"
-  to = "/apply"
-  status = 308
-  force = true
+# /program-holder/apply redirect consolidated in next.config.js
 
 [[redirects]]
   from = "/index.html"

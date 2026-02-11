@@ -53,46 +53,46 @@ export default function HomePage() {
       {/* ===== VIDEO HERO ===== */}
       <section className="relative h-[70vh] min-h-[500px] max-h-[700px]">
         <HomeHeroVideo />
-        <div className="absolute inset-0 bg-black/50 z-20" />
-        <div className="absolute inset-0 z-30 flex flex-col items-center justify-center text-center px-6">
-          <h1 className="text-4xl sm:text-5xl md:text-7xl font-black text-white mb-4 leading-tight tracking-tight">
-            FREE CAREER TRAINING
-          </h1>
-          <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-2">
-            WIOA Funded &bull; Earn While You Learn &bull; Job Placement
-          </p>
-          <p className="text-lg sm:text-xl text-white/90 mb-8 max-w-3xl">
-            Healthcare, Skilled Trades, CDL, Barbering, Technology — get certified and hired in weeks, not years.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/apply/student" className="bg-green-500 hover:bg-green-400 text-white text-xl sm:text-2xl font-black px-10 py-5 rounded-full transition-colors">
-              APPLY NOW — IT&apos;S FREE
-            </Link>
-            <Link href="/programs" className="bg-white/20 hover:bg-white/30 backdrop-blur text-white text-xl sm:text-2xl font-bold px-10 py-5 rounded-full border-2 border-white transition-colors">
-              VIEW PROGRAMS
-            </Link>
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10 z-20" />
+        <div className="absolute inset-0 z-30 flex flex-col items-end justify-end text-left px-8 pb-12 sm:px-12 sm:pb-16 md:px-20 md:pb-20">
+          <div className="max-w-2xl">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-3 leading-tight drop-shadow-lg">
+              Free Career Training
+            </h1>
+            <p className="text-xl sm:text-2xl text-white/95 mb-6 drop-shadow-md">
+              WIOA &amp; JRI funded programs. Earn while you learn. Get certified and hired in weeks.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg sm:text-xl font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center">
+                Apply Now — It&apos;s Free
+              </Link>
+              <Link href="/programs" className="bg-white/95 hover:bg-white text-black text-lg sm:text-xl font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center backdrop-blur-sm">
+                View Programs
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ===== EARN WHILE YOU LEARN ===== */}
-      <section className="py-12 sm:py-16 bg-black text-white">
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-stone-50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="relative h-[350px] sm:h-[420px] rounded-3xl overflow-hidden shadow-xl ring-1 ring-black/5">
+              <Image src="/images/homepage/earn-while-you-learn.png" alt="Earn while you learn - apprenticeship training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+            </div>
             <div>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6 leading-tight">EARN WHILE<br />YOU LEARN</h2>
-              <p className="text-xl sm:text-2xl text-white/90 mb-6">
+              <p className="text-brand-red-600 font-bold text-lg mb-2 tracking-wide uppercase">Why Elevate</p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-6 leading-tight">Earn While You Learn</h2>
+              <p className="text-xl text-slate-700 mb-5 leading-relaxed">
                 Get paid during your apprenticeship. Our JRI and WIOA-funded programs cover tuition, supplies, and connect you with employers who hire on the spot.
               </p>
-              <p className="text-xl sm:text-2xl text-green-400 font-bold mb-8">
+              <p className="text-xl text-green-700 font-bold mb-8">
                 $0 cost to you. Real certifications. Real jobs.
               </p>
-              <Link href="/wioa-eligibility" className="inline-block bg-white text-black text-xl font-bold px-8 py-4 rounded-full hover:bg-green-400 hover:text-black transition-colors">
-                CHECK YOUR ELIGIBILITY
+              <Link href="/wioa-eligibility" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg">
+                Check Your Eligibility
               </Link>
-            </div>
-            <div className="relative h-[350px] sm:h-[400px] rounded-2xl overflow-hidden">
-              <Image src="/images/homepage/earn-while-you-learn.png" alt="Earn while you learn - apprenticeship training" fill className="object-cover" />
             </div>
           </div>
         </div>
@@ -102,25 +102,25 @@ export default function HomePage() {
       <TrustStrip variant="compact" />
 
       {/* ===== PARTNERS ===== */}
-      <section className="py-8 sm:py-10 bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-center text-black font-black text-lg sm:text-xl mb-6 tracking-widest uppercase">Approved Training Provider</p>
+      <section className="py-12 bg-white border-y border-stone-200">
+        <div className="max-w-7xl mx-auto px-6">
+          <p className="text-center text-slate-500 font-semibold text-base mb-8 tracking-widest uppercase">Approved Training Provider</p>
           <div className="flex flex-wrap items-center justify-center gap-10 sm:gap-14 md:gap-20">
-            <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={64} height={64} className="w-14 h-14 sm:w-16 sm:h-16" />
-            <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={64} height={64} className="w-14 h-14 sm:w-16 sm:h-16" />
-            <Image src="/images/partners/workone.webp" alt="WorkOne" width={64} height={64} className="w-14 h-14 sm:w-16 sm:h-16" />
-            <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={64} height={64} className="w-14 h-14 sm:w-16 sm:h-16" />
+            <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
+            <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
+            <Image src="/images/partners/workone.webp" alt="WorkOne" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
+            <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
           </div>
         </div>
       </section>
 
       {/* ===== PROGRAMS ===== */}
-      <section className="py-14 sm:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 sm:mb-14">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-black mb-4">TRAINING PROGRAMS</h2>
-            <p className="text-xl sm:text-2xl text-black max-w-3xl mx-auto">
-              Industry-recognized certifications. Start your new career in weeks.
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-stone-50 to-white">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-4">Training Programs</h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              Industry-recognized certifications in high-demand fields. Start your new career in weeks.
             </p>
           </div>
           
@@ -129,17 +129,17 @@ export default function HomePage() {
               <Link 
                 key={program.name}
                 href={program.href}
-                className="group bg-white rounded-2xl overflow-hidden border border-slate-200 hover:shadow-2xl transition-all"
+                className="group bg-white rounded-2xl overflow-hidden border border-stone-200 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
               >
-                <div className="relative w-full h-48 sm:h-56">
-                  <Image src={program.image} alt={program.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover" />
+                <div className="relative w-full aspect-[4/3] bg-stone-100">
+                  <Image src={program.image} alt={program.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl sm:text-2xl font-black text-black mb-2 group-hover:text-brand-red-600 transition-colors">
+                  <h3 className="text-xl sm:text-2xl font-bold text-black mb-2 group-hover:text-brand-red-600 transition-colors">
                     {program.name}
                   </h3>
-                  <p className="text-lg text-black mb-4">{program.description}</p>
-                  <span className="text-brand-red-600 font-bold text-lg group-hover:underline">
+                  <p className="text-lg text-slate-600 mb-4">{program.description}</p>
+                  <span className="text-brand-red-600 font-semibold text-lg group-hover:underline">
                     Learn More →
                   </span>
                 </div>
@@ -147,37 +147,37 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="text-center mt-10">
-            <Link href="/programs" className="inline-block bg-black text-white text-xl font-bold px-10 py-5 rounded-full hover:bg-brand-red-600 transition-colors">
-              VIEW ALL PROGRAMS
+          <div className="text-center mt-12">
+            <Link href="/programs" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-10 py-4 rounded-full transition-all hover:scale-105 shadow-lg">
+              View All Programs
             </Link>
           </div>
         </div>
       </section>
 
       {/* ===== HOW IT WORKS ===== */}
-      <section className="py-14 sm:py-20 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-16 sm:py-20 bg-stone-50">
+        <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-black mb-4">HOW IT WORKS</h2>
-            <p className="text-xl sm:text-2xl text-black">Four steps to your new career</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-4">How It Works</h2>
+            <p className="text-xl text-slate-600">Four steps to your new career</p>
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
             {[
-              { num: '1', title: 'Check Eligibility', desc: 'Quick 2-minute assessment — see if you qualify for free training', img: '/images/homepage/funding-navigation.png' },
+              { num: '1', title: 'Check Eligibility', desc: 'Quick 2-minute assessment to see if you qualify for free training', img: '/images/homepage/funding-navigation.png' },
               { num: '2', title: 'Choose Program', desc: 'Pick the career path that fits your goals and schedule', img: '/images/homepage/training-program-collage.png' },
               { num: '3', title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification', img: '/images/homepage/certificate-of-completion.png' },
               { num: '4', title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates', img: '/images/homepage/employer-partnership.png' },
             ].map((step) => (
-              <div key={step.num} className="bg-white rounded-2xl overflow-hidden shadow-sm">
-                <div className="relative h-48 sm:h-56">
-                  <Image src={step.img} alt={step.title} fill className="object-cover" />
-                  <div className="absolute top-4 left-4 w-12 h-12 bg-brand-red-600 rounded-xl flex items-center justify-center text-white font-black text-2xl">{step.num}</div>
+              <div key={step.num} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-100 hover:shadow-lg transition-shadow duration-300">
+                <div className="relative aspect-square bg-stone-100">
+                  <Image src={step.img} alt={step.title} fill className="object-cover" sizes="(max-width: 640px) 50vw, 25vw" />
+                  <div className="absolute top-3 left-3 w-10 h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-md">{step.num}</div>
                 </div>
                 <div className="p-5">
-                  <h3 className="font-black text-black text-xl sm:text-2xl mb-2">{step.title}</h3>
-                  <p className="text-black text-base sm:text-lg">{step.desc}</p>
+                  <h3 className="font-bold text-black text-lg sm:text-xl mb-2">{step.title}</h3>
+                  <p className="text-slate-600 text-base sm:text-lg">{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -186,19 +186,19 @@ export default function HomePage() {
       </section>
 
       {/* ===== FOUNDER ===== */}
-      <section className="py-14 sm:py-20 bg-white">
+      <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-stone-50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-10 items-center">
-            <div className="relative h-[400px] sm:h-[500px] rounded-2xl overflow-hidden">
-              <Image src="/images/team/founder/elizabeth-greene-founder-hero-01.jpg" alt="Elizabeth Greene, Founder of Elevate for Humanity" fill className="object-cover" />
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <div className="relative h-[400px] sm:h-[480px] rounded-3xl overflow-hidden shadow-xl ring-1 ring-black/5">
+              <Image src="/images/team/founder/elizabeth-greene-founder-hero-01.jpg" alt="Elizabeth Greene, Founder of Elevate for Humanity" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
             <div>
-              <p className="text-lg font-bold text-brand-red-600 mb-2 uppercase tracking-wide">Our Founder</p>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-black mb-6">Elizabeth Greene</h2>
-              <p className="text-xl sm:text-2xl text-black mb-6 leading-relaxed">
+              <p className="text-brand-red-600 font-bold text-lg mb-2 tracking-wide uppercase">Our Founder</p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-6">Elizabeth Greene</h2>
+              <p className="text-xl text-slate-700 mb-6 leading-relaxed">
                 Elizabeth founded Elevate for Humanity to connect everyday people to free workforce training. She also owns Textures Institute of Cosmetology, Greene Staffing Solutions, and Greene Property Management — creating a full ecosystem for training, employment, and housing.
               </p>
-              <Link href="/about/team" className="inline-block text-xl font-bold text-brand-red-600 hover:underline">
+              <Link href="/about/team" className="inline-block text-lg font-bold text-brand-red-600 hover:text-brand-red-700 hover:underline transition-colors">
                 Meet the Full Team →
               </Link>
             </div>
@@ -207,18 +207,19 @@ export default function HomePage() {
       </section>
 
       {/* ===== CTA ===== */}
-      <section className="py-16 sm:py-24 bg-brand-red-600">
-        <div className="max-w-4xl mx-auto px-6 text-center">
-          <h2 className="text-3xl sm:text-4xl md:text-6xl font-black text-white mb-6">START YOUR NEW CAREER TODAY</h2>
-          <p className="text-xl sm:text-2xl text-white mb-10">
+      <section className="py-16 sm:py-24 bg-gradient-to-br from-brand-red-600 via-brand-red-600 to-brand-red-700 relative overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
+        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-6">Start Your New Career Today</h2>
+          <p className="text-xl sm:text-2xl text-white/95 mb-10">
             Check your eligibility in 2 minutes. Most students begin training within 2-4 weeks.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/apply/student" className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-black text-xl sm:text-2xl hover:bg-green-400 hover:text-black transition-colors">
-              APPLY NOW
+            <Link href="/apply/student" className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition-all hover:scale-105 shadow-lg">
+              Apply Now
             </Link>
-            <Link href="/wioa-eligibility" className="border-3 border-white text-white px-10 py-5 rounded-full font-bold text-xl sm:text-2xl hover:bg-white/20 transition-colors">
-              CHECK ELIGIBILITY
+            <Link href="/wioa-eligibility" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition-all backdrop-blur-sm">
+              Check Eligibility
             </Link>
           </div>
         </div>

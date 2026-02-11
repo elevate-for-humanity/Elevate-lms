@@ -167,24 +167,24 @@ export default function TrustStrip({ variant = 'default', showAnimation = true, 
 
   if (variant === 'compact') {
     return (
-      <section className={`py-6 bg-gradient-to-r from-blue-600 to-indigo-700 text-white ${className || ''}`}>
+      <section className={`py-8 bg-gradient-to-r from-brand-red-600 to-brand-red-700 text-white ${className || ''}`}>
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16">
             <div className="text-center">
-              <div className="text-2xl font-bold">{formatNumber(animatedStats.studentsEnrolled)}+</div>
-              <div className="text-sm text-blue-100">Students Trained</div>
+              <div className="text-3xl font-extrabold">{formatNumber(animatedStats.studentsEnrolled)}+</div>
+              <div className="text-sm text-red-100 font-medium">Students Trained</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">{animatedStats.jobPlacementRate}%</div>
-              <div className="text-sm text-blue-100">Job Placement</div>
+              <div className="text-3xl font-extrabold">{animatedStats.jobPlacementRate}%</div>
+              <div className="text-sm text-red-100 font-medium">Job Placement</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">$0</div>
-              <div className="text-sm text-blue-100">Cost to Students</div>
+              <div className="text-3xl font-extrabold">$0</div>
+              <div className="text-sm text-red-100 font-medium">Cost to Students</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold">100%</div>
-              <div className="text-sm text-blue-100">Funded Programs</div>
+              <div className="text-3xl font-extrabold">100%</div>
+              <div className="text-sm text-red-100 font-medium">Funded Programs</div>
             </div>
           </div>
         </div>

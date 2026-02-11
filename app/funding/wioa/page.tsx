@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -19,7 +19,7 @@ export default async function WioaPage() {
   let wioaInfo = null;
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
     if (supabase) {
       const { data } = await supabase
         .from('funding_options')

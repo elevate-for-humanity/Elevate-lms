@@ -1,55 +1,17 @@
 'use client';
 import Turnstile from '@/components/Turnstile';
 
-import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { submitStudentApplication } from '../actions';
+import { getActiveProgramsByCategory } from '@/lib/program-registry';
 
-const programMap: Record<string, string> = {
-  'barber-apprenticeship': 'barber-apprenticeship',
-  'barber': 'barber-apprenticeship',
-  'hvac-technician': 'hvac',
-  'hvac': 'hvac',
-  'cna-certification': 'cna',
-  'cna': 'cna',
-  'medical-assistant': 'medical-assistant',
-  'cdl': 'cdl',
-  'electrical': 'electrical',
-  'plumbing': 'plumbing',
-  'it-support': 'it-support',
-  'cybersecurity': 'cybersecurity',
-  'building-services-technician': 'building-services-technician',
-  'culinary-apprenticeship': 'culinary-apprenticeship',
-  'sanitation-infection-control': 'sanitation-infection-control',
-  'welding': 'welding',
-  'phlebotomy': 'phlebotomy',
-  'cosmetology-apprenticeship': 'cosmetology-apprenticeship',
-  'esthetician-apprenticeship': 'esthetician-apprenticeship',
-  'nail-technician-apprenticeship': 'nail-technician-apprenticeship',
-  'cpr-first-aid-hsi': 'cpr-first-aid-hsi',
-  'diesel-mechanic': 'diesel-mechanic',
-  'direct-support-professional': 'direct-support-professional',
-  'drug-collector': 'drug-collector',
-  'web-development': 'web-development',
-  'technology': 'it-support',
-  'healthcare': 'cna',
-  'skilled-trades': 'hvac',
-};
+const programGroups = getActiveProgramsByCategory();
 
-export default function StudentApplicationForm() {
+export default function StudentApplicationForm({ initialProgram = '' }: { initialProgram?: string }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [selectedProgram, setSelectedProgram] = useState('');
-
-  useEffect(() => {
-    const param = searchParams.get('program');
-    if (param) {
-      const mapped = programMap[param.toLowerCase()] || param.toLowerCase();
-      setSelectedProgram(mapped);
-    }
-  }, [searchParams]);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -273,45 +235,17 @@ export default function StudentApplicationForm() {
             <select
               id="programInterest"
               name="programInterest"
-              value={selectedProgram}
-              onChange={(e) => setSelectedProgram(e.target.value)}
+              defaultValue={initialProgram}
               className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             >
               <option value="">Select a program</option>
-              <optgroup label="Healthcare">
-                <option value="cna">CNA (Certified Nursing Assistant)</option>
-                <option value="medical-assistant">Medical Assistant</option>
-                <option value="phlebotomy">Phlebotomy</option>
-                <option value="cpr-first-aid-hsi">CPR & First Aid (HSI)</option>
-                <option value="direct-support-professional">Direct Support Professional</option>
-                <option value="drug-collector">Drug Collector</option>
-                <option value="sanitation-infection-control">Sanitation & Infection Control</option>
-              </optgroup>
-              <optgroup label="Skilled Trades">
-                <option value="hvac">HVAC Technician</option>
-                <option value="electrical">Electrical</option>
-                <option value="plumbing">Plumbing</option>
-                <option value="welding">Welding</option>
-                <option value="building-services-technician">Building Services Technician</option>
-                <option value="diesel-mechanic">Diesel Mechanic</option>
-              </optgroup>
-              <optgroup label="Barber & Beauty">
-                <option value="barber-apprenticeship">Barber Apprenticeship</option>
-                <option value="cosmetology-apprenticeship">Cosmetology Apprenticeship</option>
-                <option value="esthetician-apprenticeship">Esthetician Apprenticeship</option>
-                <option value="nail-technician-apprenticeship">Nail Technician Apprenticeship</option>
-              </optgroup>
-              <optgroup label="Technology">
-                <option value="it-support">IT Support</option>
-                <option value="cybersecurity">Cybersecurity</option>
-                <option value="web-development">Web Development</option>
-              </optgroup>
-              <optgroup label="Transportation">
-                <option value="cdl">CDL (Commercial Driver License)</option>
-              </optgroup>
-              <optgroup label="Apprenticeships">
-                <option value="culinary-apprenticeship">Youth Culinary Apprenticeship</option>
-              </optgroup>
+              {programGroups.map((group) => (
+                <optgroup key={group.category} label={group.category}>
+                  {group.programs.map((p) => (
+                    <option key={p.slug} value={p.slug}>{p.name}</option>
+                  ))}
+                </optgroup>
+              ))}
               <option value="not-sure">Not Sure Yet</option>
             </select>
           </div>

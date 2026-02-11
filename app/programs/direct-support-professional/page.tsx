@@ -4,7 +4,7 @@ export const revalidate = 86400;
 
 import { Metadata } from 'next';
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Heart, CheckCircle, Users, Award, Clock, DollarSign } from 'lucide-react';
@@ -32,7 +32,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   if (!supabase) {
     return (

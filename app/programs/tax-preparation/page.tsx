@@ -3,7 +3,7 @@ export const dynamic = 'force-static';
 export const revalidate = 86400;
 
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ExternalLink } from 'lucide-react';
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   if (!supabase) {
     return (

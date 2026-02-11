@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import Image from 'next/image';
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import { programs } from '@/app/data/programs';
 import { Shield, CheckCircle, Users, Award } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -31,7 +31,7 @@ const federalFundedSlugs = [
 ];
 
 export default async function FederalFundedProgramsPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   if (!supabase) {
     return (

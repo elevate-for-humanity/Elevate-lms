@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { Building2, Users, Briefcase, GraduationCap, Handshake, Award } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   title: 'Our Partners | Elevate for Humanity',
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 };
 
 export default async function PartnersPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   // Fetch partners by type
   const { data: allPartners } = await supabase

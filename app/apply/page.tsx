@@ -7,6 +7,7 @@ export const revalidate = 0;
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { MessageSquare, GraduationCap, Phone, Clock, CheckCircle, AlertCircle } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
+import { resolveProgram } from '@/lib/program-registry';
 
 export const metadata: Metadata = {
   title: 'Apply | Elevate for Humanity',
@@ -22,10 +23,18 @@ export default async function ApplyPage({
   searchParams: Promise<{ program?: string; pathway?: string }>;
 }) {
   const params = await searchParams;
-  const program = (params?.program || params?.pathway || '').toLowerCase();
-  // Any program param goes straight to the student application form
-  if (program) {
-    redirect(`/apply/student?program=${program}`);
+  const rawProgram = (params?.program || params?.pathway || '').trim();
+
+  // If a program slug (or alias) is provided, resolve it and redirect to the correct intake form
+  if (rawProgram) {
+    const entry = resolveProgram(rawProgram);
+    if (entry) {
+      const dest = entry.formType === 'apply'
+        ? `/apply/student?program=${entry.slug}`
+        : `/inquiry?program=${entry.slug}`;
+      redirect(dest);
+    }
+    // Unknown slug — fall through to the generic page
   }
   return (
     <div className="min-h-screen bg-slate-50">

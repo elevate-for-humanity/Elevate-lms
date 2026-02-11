@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   alternates: {
@@ -74,7 +74,7 @@ const fallbackTeam = [
 ];
 
 export default async function TeamPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   // Fetch team members from database
   const { data: teamMembers } = await supabase

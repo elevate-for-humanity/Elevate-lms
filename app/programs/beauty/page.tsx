@@ -7,7 +7,7 @@ import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import PageAvatar from '@/components/PageAvatar';
 import Image from 'next/image';
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import ModernLandingHero from '@/components/landing/ModernLandingHero';
 import { ArrowRight, Clock, DollarSign, Award, CheckCircle } from 'lucide-react';
 import { HostShopRequirements } from '@/components/compliance/HostShopRequirements';
@@ -68,7 +68,7 @@ const beautyPrograms = [
 ];
 
 export default async function BeautyProgramsPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   if (!supabase) {
     return (

@@ -7,7 +7,7 @@ import { FundingBadge } from '@/components/programs/FundingBadge';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import PageAvatar from '@/components/PageAvatar';
 import type { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 };
 
 export default async function CosmetologyApprenticeshipPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   if (!supabase) {
     return (

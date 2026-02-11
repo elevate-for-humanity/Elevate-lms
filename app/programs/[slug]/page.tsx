@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import fs from 'fs';
 import path from 'path';
 import { programs, type Program } from '@/app/data/programs';
@@ -132,7 +132,7 @@ export default async function ProgramDetailPage({
   let dbRequirements: { requirement: string }[] = [];
 
   try {
-    const supabase = await createClient();
+    const supabase = createPublicClient();
 
     if (!supabase) {
       // Fallback to static data if Supabase unavailable

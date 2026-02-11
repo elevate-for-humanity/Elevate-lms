@@ -415,7 +415,8 @@ const nextConfig = {
   },
   async headers() {
     const isProduction = process.env.NODE_ENV === 'production';
-    const isPreview = process.env.NODE_ENV === 'preview';
+    // Netlify sets CONTEXT (not NODE_ENV) to 'deploy-preview' or 'branch-deploy'
+    const isPreview = process.env.CONTEXT === 'deploy-preview' || process.env.CONTEXT === 'branch-deploy';
     const host = process.env.URL || '';
     
     // No special handling needed - single canonical domain: www.elevateforhumanity.org

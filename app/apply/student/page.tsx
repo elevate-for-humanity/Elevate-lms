@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
 import StudentApplicationForm from './StudentApplicationForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { resolveSlug } from '@/lib/program-registry';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,25 +13,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default async function StudentApplicationPage() {
-  const supabase = await createClient();
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch available programs for application
-  const { data: programs } = await supabase
-    .from('programs')
-    .select('id, name, slug')
-    .eq('accepting_applications', true);
+export default async function StudentApplicationPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ program?: string }>;
+}) {
+  const params = await searchParams;
+  const initialProgram = resolveSlug(params?.program || '') || '';
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Breadcrumbs */}
@@ -58,7 +46,7 @@ export default async function StudentApplicationPage() {
       </section>
 
       <section className="max-w-4xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
-        <StudentApplicationForm />
+        <StudentApplicationForm initialProgram={initialProgram} />
       </section>
     </div>
   );

@@ -5,7 +5,7 @@ export const revalidate = 86400;
 import type { Metadata } from 'next';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import PageAvatar from '@/components/PageAvatar';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 };
 
 export default async function TaxEntrepreneurshipPage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   if (!supabase) {
     return (

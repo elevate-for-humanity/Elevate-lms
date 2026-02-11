@@ -5,6 +5,9 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ModernLandingHero from '@/components/landing/ModernLandingHero';
 import Turnstile from '@/components/Turnstile';
+import { resolveProgram, getActiveProgramsByCategory } from '@/lib/program-registry';
+
+const programGroups = getActiveProgramsByCategory();
 
 function InquiryForm() {
   const searchParams = useSearchParams();
@@ -14,36 +17,14 @@ function InquiryForm() {
   const [error, setError] = useState('');
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
+  // Preselect program from URL param using canonical registry
   useEffect(() => {
     const programParam = searchParams.get('program');
     if (programParam) {
-      const programMap: Record<string, string> = {
-        'barber-apprenticeship': 'Barber Apprenticeship',
-        'barber': 'Barber Apprenticeship',
-        'hvac-technician': 'HVAC Technician',
-        'hvac': 'HVAC Technician',
-        'cna-certification': 'CNA (Certified Nursing Assistant)',
-        'cna': 'CNA (Certified Nursing Assistant)',
-        'medical-assistant': 'Medical Assistant',
-        'cdl': 'CDL (Commercial Driver License)',
-        'electrical': 'Electrical',
-        'plumbing': 'Plumbing',
-        'it-support': 'IT Support',
-        'cybersecurity': 'Cybersecurity',
-        'building-services-technician': 'Building Services Technician',
-        'culinary-apprenticeship': 'Youth Culinary Apprenticeship',
-        'sanitation-infection-control': 'Sanitation & Infection Control',
-        'welding': 'Welding',
-        'phlebotomy': 'Phlebotomy',
-        'cosmetology-apprenticeship': 'Cosmetology Apprenticeship',
-        'esthetician-apprenticeship': 'Esthetician Apprenticeship',
-        'nail-technician-apprenticeship': 'Nail Technician Apprenticeship',
-        'cpr-first-aid-hsi': 'CPR & First Aid (HSI)',
-        'diesel-mechanic': 'Diesel Mechanic',
-        'direct-support-professional': 'Direct Support Professional',
-        'drug-collector': 'Drug Collector',
-      };
-      setSelectedProgram(programMap[programParam.toLowerCase()] || '');
+      const entry = resolveProgram(programParam);
+      if (entry) {
+        setSelectedProgram(entry.slug);
+      }
     }
   }, [searchParams]);
 
@@ -198,46 +179,14 @@ function InquiryForm() {
               className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
             >
               <option value="">Select program...</option>
-              <optgroup label="Healthcare">
-                <option value="CNA (Certified Nursing Assistant)">CNA (Certified Nursing Assistant)</option>
-                <option value="Medical Assistant">Medical Assistant</option>
-                <option value="Phlebotomy">Phlebotomy</option>
-                <option value="CPR & First Aid (HSI)">CPR & First Aid (HSI)</option>
-                <option value="Direct Support Professional">Direct Support Professional</option>
-                <option value="Drug Collector">Drug Collector</option>
-                <option value="Sanitation & Infection Control">Sanitation & Infection Control</option>
-              </optgroup>
-              <optgroup label="Skilled Trades">
-                <option value="HVAC Technician">HVAC Technician</option>
-                <option value="Electrical">Electrical</option>
-                <option value="Plumbing">Plumbing</option>
-                <option value="Welding">Welding</option>
-                <option value="Building Services Technician">Building Services Technician</option>
-                <option value="Diesel Mechanic">Diesel Mechanic</option>
-              </optgroup>
-              <optgroup label="Barber & Beauty">
-                <option value="Barber Apprenticeship">Barber Apprenticeship</option>
-                <option value="Cosmetology Apprenticeship">Cosmetology Apprenticeship</option>
-                <option value="Esthetician Apprenticeship">Esthetician Apprenticeship</option>
-                <option value="Nail Technician Apprenticeship">Nail Technician Apprenticeship</option>
-              </optgroup>
-              <optgroup label="Technology">
-                <option value="IT Support">IT Support</option>
-                <option value="Cybersecurity">Cybersecurity</option>
-                <option value="Web Development">Web Development</option>
-              </optgroup>
-              <optgroup label="Business">
-                <option value="Accounting">Accounting</option>
-                <option value="Business Management">Business Management</option>
-                <option value="Entrepreneurship">Entrepreneurship</option>
-              </optgroup>
-              <optgroup label="Transportation">
-                <option value="CDL (Commercial Driver License)">CDL (Commercial Driver License)</option>
-              </optgroup>
-              <optgroup label="Apprenticeships">
-                <option value="Youth Culinary Apprenticeship">Youth Culinary Apprenticeship</option>
-              </optgroup>
-              <option value="Not Sure - Help Me Choose">Not Sure - Help Me Choose</option>
+              {programGroups.map((group) => (
+                <optgroup key={group.category} label={group.category}>
+                  {group.programs.map((p) => (
+                    <option key={p.slug} value={p.slug}>{p.name}</option>
+                  ))}
+                </optgroup>
+              ))}
+              <option value="not-sure">Not Sure - Help Me Choose</option>
             </select>
           </div>
 

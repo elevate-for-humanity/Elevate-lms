@@ -34,6 +34,7 @@ function getNextFriday(): string {
 export default function BarberApprenticeshipApplyPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [errorSeverity, setErrorSeverity] = useState<'info' | 'critical'>('info');
   const [nextFriday, setNextFriday] = useState('Friday');
   
   // Payment calculator state
@@ -68,11 +69,13 @@ export default function BarberApprenticeshipApplyPage() {
   const handlePayNow = async () => {
     if (!formData.email || !formData.firstName || !formData.lastName || !formData.phone) {
       setError('Please fill in all required fields');
+      setErrorSeverity('info');
       return;
     }
 
     setLoading(true);
     setError('');
+    setErrorSeverity('info');
 
     try {
       // Save application first
@@ -137,7 +140,8 @@ export default function BarberApprenticeshipApplyPage() {
         const affirmData = await checkoutResponse.json();
         
         if (!checkoutResponse.ok || !affirmData.checkoutConfig) {
-          setError(affirmData.error || 'Unable to create Affirm checkout. Please try another payment method.');
+          setError(affirmData.error || 'Affirm is temporarily unavailable. Please select Card, Payment Plan, or another option above.');
+          setErrorSeverity('info');
           setLoading(false);
           return;
         }
@@ -174,7 +178,8 @@ export default function BarberApprenticeshipApplyPage() {
           }
         } catch (sdkError) {
           console.error('Affirm SDK error:', sdkError);
-          setError('Unable to load Affirm checkout. Please try another payment method.');
+          setError('Affirm checkout could not load. Please select Card, Payment Plan, or another option above.');
+          setErrorSeverity('info');
           setLoading(false);
         }
         return;
@@ -209,7 +214,8 @@ export default function BarberApprenticeshipApplyPage() {
         if (checkoutResponse.ok && sezzleData.checkoutUrl) {
           window.location.href = sezzleData.checkoutUrl;
         } else {
-          setError(sezzleData.error || 'Unable to create Sezzle checkout. Please try another payment method.');
+          setError(sezzleData.error || 'Sezzle is temporarily unavailable. Please select Card, Payment Plan, or another option above.');
+          setErrorSeverity('info');
           setLoading(false);
         }
         return;
@@ -254,12 +260,14 @@ export default function BarberApprenticeshipApplyPage() {
         window.location.href = checkoutData.url;
       } else {
         console.error('Checkout error:', checkoutData);
-        setError(checkoutData.error || checkoutData.details || 'Unable to create checkout. Please call (317) 314-3757.');
+        setError(checkoutData.error || checkoutData.details || 'Unable to create checkout. Please try again or select a different payment option.');
+        setErrorSeverity('critical');
         setLoading(false);
       }
     } catch (err) {
       console.error('Checkout exception:', err);
-      setError('Unable to process. Please call (317) 314-3757.');
+      setError('Something went wrong. Please try again or select a different payment option.');
+      setErrorSeverity('critical');
       setLoading(false);
     }
   };
@@ -400,14 +408,22 @@ export default function BarberApprenticeshipApplyPage() {
           {/* Right Column - Form & Payment */}
           <div className="lg:col-span-3">
             {error && (
-              <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                <p className="text-red-800 font-medium">{error}</p>
-                <a 
-                  href="tel:317-314-3757" 
-                  className="inline-block mt-2 text-red-600 font-medium hover:underline"
-                >
-                  Call (317) 314-3757 for help
-                </a>
+              <div className={`mb-6 p-4 rounded-lg border ${
+                errorSeverity === 'critical' 
+                  ? 'bg-red-50 border-red-200' 
+                  : 'bg-amber-50 border-amber-200'
+              }`}>
+                <p className={`font-medium ${
+                  errorSeverity === 'critical' ? 'text-red-800' : 'text-amber-800'
+                }`}>{error}</p>
+                {errorSeverity === 'critical' && (
+                  <a 
+                    href="tel:317-314-3757" 
+                    className="inline-block mt-2 text-red-600 font-medium hover:underline"
+                  >
+                    Need help? Call (317) 314-3757
+                  </a>
+                )}
               </div>
             )}
 

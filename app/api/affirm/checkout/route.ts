@@ -24,8 +24,13 @@ export async function POST(request: NextRequest) {
   try {
     // Check if Affirm is configured
     if (!affirm.isConfigured()) {
+      logger.error('[Affirm] Checkout attempted but client not configured', {
+        hasPubKey: !!process.env.AFFIRM_PUBLIC_KEY,
+        hasNextPubKey: !!process.env.NEXT_PUBLIC_AFFIRM_PUBLIC_KEY,
+        hasPrivKey: !!process.env.AFFIRM_PRIVATE_KEY,
+      });
       return NextResponse.json(
-        { error: 'Affirm is not configured. Please contact support.' },
+        { error: 'Affirm is temporarily unavailable. Please select Card, Payment Plan, or another option above.' },
         { status: 503 }
       );
     }

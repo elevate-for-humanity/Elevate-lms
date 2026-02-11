@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         env: process.env.SEZZLE_ENVIRONMENT || 'not set',
       });
       return NextResponse.json(
-        { error: 'Sezzle payment is temporarily unavailable. Please choose another payment option or contact support.' },
+        { error: 'Sezzle is temporarily unavailable. Please select Card, Payment Plan, or another option above.' },
         { status: 503 }
       );
     }
@@ -239,10 +239,12 @@ export async function POST(request: NextRequest) {
       referenceId,
     });
   } catch (error) {
-    logger.error('Sezzle checkout error:', error);
-    const message = error instanceof Error ? error.message : 'Failed to create Sezzle checkout';
+    logger.error('[Sezzle] Checkout session creation failed:', error);
+    // Log the technical error but return a user-friendly message
+    const technicalMessage = error instanceof Error ? error.message : 'Unknown error';
+    logger.error('[Sezzle] Technical details:', { technicalMessage });
     return NextResponse.json(
-      { error: message },
+      { error: 'Sezzle checkout could not be created. Please select Card, Payment Plan, or another option above.' },
       { status: 500 }
     );
   }

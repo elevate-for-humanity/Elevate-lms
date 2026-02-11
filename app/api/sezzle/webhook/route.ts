@@ -127,6 +127,9 @@ export async function POST(request: NextRequest) {
 
     // Use admin client — webhooks have no user session, RLS would block writes
     const supabase = createAdminClient();
+    if (!supabase) {
+      logger.error('[Sezzle Webhook] createAdminClient returned null — SUPABASE_SERVICE_ROLE_KEY likely missing. DB writes will be skipped.');
+    }
 
     switch (event.event_type) {
       case 'order.authorized':

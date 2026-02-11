@@ -51,6 +51,11 @@ export async function createEnrollmentFromPayment(
     const { createAdminClient } = await import('@/lib/supabase/admin');
     const supabaseAdmin = createAdminClient();
 
+    if (!supabaseAdmin) {
+      logger.error('[Enrollment] createAdminClient returned null — SUPABASE_SERVICE_ROLE_KEY missing');
+      return { success: false, error: 'Database configuration error' };
+    }
+
     let finalStudentId = initialStudentId;
     let isNewUser = false;
     let tempPassword = '';

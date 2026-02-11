@@ -54,8 +54,8 @@ export default async function SuccessStoriesPage() {
             </div>
           ) : (
             <div className="text-center py-16">
-              <h2 className="text-2xl font-bold mb-4">Success Stories Coming Soon</h2>
-              <p className="text-gray-600 mb-8">Check back soon to read about our graduates.</p>
+              <h2 className="text-2xl font-bold mb-4">Read Transformative Success Stories from Our Community</h2>
+              <p className="text-gray-600 mb-8">Our graduates are building careers across Indiana. Explore our programs to start your journey.</p>
               <Link href="/programs" className="inline-flex px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700">
                 Explore Programs
               </Link>

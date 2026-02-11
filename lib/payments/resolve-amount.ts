@@ -27,7 +27,7 @@ const PROGRAM_PRICING: Record<string, ProgramPricing> = {
   },
 };
 
-export interface AmountResolution {
+export type AmountResolution = {
   ok: true;
   requiredAmount: number;
   paidAmount: number;

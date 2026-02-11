@@ -1,3 +1,12 @@
+/**
+ * DEPRECATED: This webhook handler is superseded by /api/webhooks/stripe (canonical).
+ * 
+ * This endpoint should be removed from Stripe webhook configuration.
+ * It remains functional to avoid dropping events during migration,
+ * but logs a deprecation warning on every invocation.
+ * 
+ * TODO: Remove after confirming Stripe dashboard only points to /api/webhooks/stripe
+ */
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 

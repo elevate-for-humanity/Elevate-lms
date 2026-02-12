@@ -145,7 +145,7 @@ export default function DieselMechanicPage() {
                   </div>
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="bg-white border border-blue-200 rounded-lg p-4 mb-6">
                   <p className="text-sm text-blue-800">
                     <strong>Self-Pay Program:</strong> This program is not covered by workforce funding. 
                     Payment plans available.
@@ -163,7 +163,7 @@ export default function DieselMechanicPage() {
                 
                 <Link
                   href="/contact?program=diesel-mechanic"
-                  className="block w-full bg-white text-blue-600 text-center py-4 rounded-full font-semibold border-2 border-blue-600 hover:bg-blue-50 transition-colors"
+                  className="block w-full bg-white text-blue-600 text-center py-4 rounded-full font-semibold border-2 border-blue-600 hover:bg-white transition-colors"
                 >
                   Request Information
                 </Link>
@@ -186,7 +186,7 @@ export default function DieselMechanicPage() {
             href={APPLY_LINK}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block bg-white text-blue-600 px-8 py-3 font-semibold rounded-full hover:bg-blue-50 transition-colors"
+            className="inline-block bg-white text-blue-600 px-8 py-3 font-semibold rounded-full hover:bg-white transition-colors"
           >
             Enroll Now
           </a>

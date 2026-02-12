@@ -234,7 +234,7 @@ export default async function BeautyProgramsPage() {
       />
 
       {/* Important Notice */}
-      <section className="py-12 bg-amber-50 border-y border-amber-200">
+      <section className="py-12 bg-white border-y border-amber-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <h3 className="text-xl font-bold text-amber-800 mb-4">Important Notice</h3>

@@ -380,7 +380,7 @@ export default function HealthcareProgramsPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/apply?program=healthcare"
-              className="inline-block bg-white text-blue-600 px-8 py-4 font-semibold rounded-full hover:bg-blue-50 transition-colors"
+              className="inline-block bg-white text-blue-600 px-8 py-4 font-semibold rounded-full hover:bg-white transition-colors"
             >
               Apply Now
             </Link>

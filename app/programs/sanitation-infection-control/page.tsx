@@ -16,7 +16,7 @@ export default function SanitationInfectionControlPage() {
         <div className="absolute inset-0 bg-gradient-to-r from-slate-900 to-slate-800" />
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-7xl mx-auto px-4 w-full">
-            <span className="inline-block px-4 py-2 bg-green-500 text-white text-sm font-bold rounded-full mb-4">
+            <span className="inline-block px-4 py-2 bg-white0 text-white text-sm font-bold rounded-full mb-4">
               DOL REGISTERED APPRENTICESHIP
             </span>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
@@ -26,7 +26,7 @@ export default function SanitationInfectionControlPage() {
               Specialized training for high-risk environments including hospitals, military bases, and government facilities.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/apply?program=sanitation-infection-control" className="inline-flex items-center px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:bg-green-400">
+              <Link href="/apply?program=sanitation-infection-control" className="inline-flex items-center px-8 py-4 bg-white0 text-white font-bold rounded-full hover:bg-green-400">
                 Apply Now <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
               <Link href="/inquiry?program=sanitation-infection-control" className="inline-flex items-center px-8 py-4 bg-white text-slate-900 font-bold rounded-full hover:bg-slate-100">
@@ -82,7 +82,7 @@ export default function SanitationInfectionControlPage() {
       </section>
 
       {/* CIP CODE & PREREQUISITES */}
-      <section className="py-12 bg-blue-50">
+      <section className="py-12 bg-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-xl p-6">
@@ -134,7 +134,7 @@ export default function SanitationInfectionControlPage() {
           {/* Phase 1 */}
           <div className="mb-12">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-xl font-bold">1</div>
+              <div className="w-12 h-12 bg-white0 rounded-full flex items-center justify-center text-xl font-bold">1</div>
               <div>
                 <h3 className="text-2xl font-bold">Introduction to Sanitation and Infection Control</h3>
                 <p className="text-slate-400">Duration: 4 Weeks</p>
@@ -179,7 +179,7 @@ export default function SanitationInfectionControlPage() {
           {/* Phase 2 */}
           <div className="mb-12">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center text-xl font-bold">2</div>
+              <div className="w-12 h-12 bg-white0 rounded-full flex items-center justify-center text-xl font-bold">2</div>
               <div>
                 <h3 className="text-2xl font-bold">Advanced Cleaning Techniques and Holistic Wellness</h3>
                 <p className="text-slate-400">Duration: 6 Weeks</p>
@@ -225,7 +225,7 @@ export default function SanitationInfectionControlPage() {
           {/* Phase 3 */}
           <div className="mb-12">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center text-xl font-bold">3</div>
+              <div className="w-12 h-12 bg-white0 rounded-full flex items-center justify-center text-xl font-bold">3</div>
               <div>
                 <h3 className="text-2xl font-bold">Hazardous Waste Management and Specialized Cleaning</h3>
                 <p className="text-slate-400">Duration: 8 Weeks</p>
@@ -271,7 +271,7 @@ export default function SanitationInfectionControlPage() {
           {/* Phase 4 */}
           <div className="mb-12">
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center text-xl font-bold">4</div>
+              <div className="w-12 h-12 bg-white0 rounded-full flex items-center justify-center text-xl font-bold">4</div>
               <div>
                 <h3 className="text-2xl font-bold">On-the-Job Training and Real-World Applications</h3>
                 <p className="text-slate-400">Duration: 12 Weeks (Paid)</p>
@@ -317,7 +317,7 @@ export default function SanitationInfectionControlPage() {
           {/* Phase 5 */}
           <div>
             <div className="flex items-center gap-4 mb-6">
-              <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center text-xl font-bold">5</div>
+              <div className="w-12 h-12 bg-white0 rounded-full flex items-center justify-center text-xl font-bold">5</div>
               <div>
                 <h3 className="text-2xl font-bold">Certification and Final Evaluation</h3>
                 <p className="text-slate-400">Duration: 2 Weeks</p>
@@ -348,28 +348,28 @@ export default function SanitationInfectionControlPage() {
           <h2 className="text-3xl font-bold text-slate-900 text-center mb-12">Certifications You'll Earn</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-slate-50 rounded-xl p-6 text-center">
-              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-white0 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-white" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">OSHA 10/30</h3>
               <p className="text-sm text-slate-600">Workplace safety certification required for all sanitation professionals.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6 text-center">
-              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-white0 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-white" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Infection Control</h3>
               <p className="text-sm text-slate-600">Certified in infection prevention and control protocols for healthcare settings.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6 text-center">
-              <div className="w-16 h-16 bg-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-white0 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-white" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Hazardous Waste</h3>
               <p className="text-sm text-slate-600">HAZMAT certified for handling and disposing of hazardous materials.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6 text-center">
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-white0 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-white" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Holistic Wellness</h3>
@@ -428,7 +428,7 @@ export default function SanitationInfectionControlPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Start Your Career in Sanitation & Infection Control?</h2>
           <p className="text-xl text-slate-300 mb-8">Join the 2Exclusive Apprenticeship Program and become a certified professional in high-demand sanitation services.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply?program=sanitation-infection-control" className="inline-flex items-center justify-center px-8 py-4 bg-green-500 text-white font-bold rounded-full hover:bg-green-400">
+            <Link href="/apply?program=sanitation-infection-control" className="inline-flex items-center justify-center px-8 py-4 bg-white0 text-white font-bold rounded-full hover:bg-green-400">
               Apply Now <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link href="/inquiry?program=sanitation-infection-control" className="inline-flex items-center justify-center px-8 py-4 bg-slate-700 text-white font-bold rounded-full hover:bg-slate-600 border border-slate-600">

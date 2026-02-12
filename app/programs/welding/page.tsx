@@ -7,7 +7,7 @@ import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import { 
-  Clock, DollarSign, TrendingUp, CheckCircle, ArrowRight, 
+  Clock, DollarSign, TrendingUp, ArrowRight, 
   Flame, Award, Users, Calendar, ChevronDown, ChevronUp, 
   Play, Phone, GraduationCap, Briefcase, Shield, Factory,
   Wrench, HardHat, Zap, Target
@@ -162,7 +162,7 @@ export default function WeldingProgramPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/apply?program=welding"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-red-500 hover:bg-red-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-red-500/30"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white0 hover:bg-red-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-red-500/30"
                 >
                   Check Your Eligibility
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -302,12 +302,12 @@ export default function WeldingProgramPage() {
                     <div className="grid md:grid-cols-2 gap-4 mb-4">
                       {module.topics.map((topic, i) => (
                         <div key={i} className="flex items-center gap-2">
-                          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                          <span className="w-2 h-2 bg-slate-400 rounded-full flex-shrink-0 mt-2" />
                           <span className="text-gray-700">{topic}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="bg-red-50 rounded-lg p-4 mt-4">
+                    <div className="bg-white rounded-lg p-4 mt-4">
                       <span className="text-sm font-semibold text-red-700">Milestone:</span>
                       <span className="text-sm text-red-600 ml-2">{module.project}</span>
                     </div>
@@ -359,7 +359,7 @@ export default function WeldingProgramPage() {
                 transition={{ delay: index * 0.1 }}
                 className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center"
               >
-                <div className="w-16 h-16 bg-red-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-white0 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <cert.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">{cert.title}</h3>
@@ -425,7 +425,7 @@ export default function WeldingProgramPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply?program=welding"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-red-600 font-semibold rounded-full hover:bg-red-50 transition-all transform hover:scale-105 shadow-lg"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-red-600 font-semibold rounded-full hover:bg-white transition-all transform hover:scale-105 shadow-lg"
             >
               Check Eligibility Now
               <ArrowRight className="w-5 h-5 ml-2" />

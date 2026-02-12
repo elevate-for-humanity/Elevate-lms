@@ -7,7 +7,7 @@ import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, CheckCircle, Users, Award, Clock, DollarSign } from 'lucide-react';
+import { Heart, Users, Award, Clock, DollarSign } from 'lucide-react';
 import { CompactHero } from '@/components/heroes/CompactHero';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
@@ -109,7 +109,7 @@ export default async function Page() {
               />
             </div>
           </div>
-          <div className="bg-blue-50 p-8 rounded-lg">
+          <div className="bg-white p-8 rounded-lg">
             <h3 className="text-2xl font-bold text-black mb-4">
               Quick Facts
             </h3>

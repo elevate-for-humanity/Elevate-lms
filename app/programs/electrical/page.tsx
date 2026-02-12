@@ -7,7 +7,7 @@ import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import { 
-  Clock, DollarSign, TrendingUp, CheckCircle, ArrowRight, 
+  Clock, DollarSign, TrendingUp, ArrowRight, 
   Zap, Award, Users, Calendar, ChevronDown, ChevronUp, 
   Play, Phone, GraduationCap, Briefcase, Shield, Building,
   Lightbulb, Gauge, Home, Factory
@@ -162,7 +162,7 @@ export default function ElectricalProgramPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/apply?program=electrical"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-yellow-500 hover:bg-yellow-400 text-slate-900 font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-yellow-500/30"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white0 hover:bg-yellow-400 text-slate-900 font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-yellow-500/30"
                 >
                   Check Your Eligibility
                   <ArrowRight className="w-5 h-5 ml-2" />
@@ -293,7 +293,7 @@ export default function ElectricalProgramPage() {
               >
                 <div className="flex flex-col lg:flex-row lg:items-start gap-6">
                   <div className="flex-shrink-0">
-                    <div className="w-20 h-20 bg-yellow-500 rounded-2xl flex items-center justify-center text-slate-900">
+                    <div className="w-20 h-20 bg-white0 rounded-2xl flex items-center justify-center text-slate-900">
                       <span className="text-sm font-bold">{module.week}</span>
                     </div>
                   </div>
@@ -302,12 +302,12 @@ export default function ElectricalProgramPage() {
                     <div className="grid md:grid-cols-2 gap-4 mb-4">
                       {module.topics.map((topic, i) => (
                         <div key={i} className="flex items-center gap-2">
-                          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                          <span className="w-2 h-2 bg-slate-400 rounded-full flex-shrink-0 mt-2" />
                           <span className="text-gray-700">{topic}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="bg-yellow-50 rounded-lg p-4 mt-4">
+                    <div className="bg-white rounded-lg p-4 mt-4">
                       <span className="text-sm font-semibold text-yellow-700">Hands-On Project:</span>
                       <span className="text-sm text-yellow-600 ml-2">{module.project}</span>
                     </div>
@@ -346,7 +346,7 @@ export default function ElectricalProgramPage() {
                 className="bg-white/10 backdrop-blur rounded-xl p-6 text-center relative"
               >
                 {index < 3 && (
-                  <div className="hidden md:block absolute top-1/2 -right-3 w-6 h-0.5 bg-yellow-500" />
+                  <div className="hidden md:block absolute top-1/2 -right-3 w-6 h-0.5 bg-white0" />
                 )}
                 <div className="text-3xl font-bold text-yellow-400 mb-2">{index + 1}</div>
                 <h3 className="font-bold mb-1">{step.title}</h3>
@@ -403,7 +403,7 @@ export default function ElectricalProgramPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-yellow-500 text-slate-900">
+      <section className="py-20 bg-white0 text-slate-900">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
             Ready to Power Your Future?

@@ -7,7 +7,7 @@ import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import { 
-  Clock, DollarSign, TrendingUp, CheckCircle, ArrowRight, 
+  Clock, DollarSign, TrendingUp, ArrowRight, 
   Shield, Award, Users, Calendar, ChevronDown, ChevronUp, 
   Play, Phone, GraduationCap, Briefcase, Lock, Server,
   Eye, AlertTriangle, Network, FileKey
@@ -153,7 +153,7 @@ export default function CybersecurityProgramPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/apply?program=cybersecurity" className="inline-flex items-center justify-center px-8 py-4 bg-emerald-500 hover:bg-emerald-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/30">
+                <Link href="/apply?program=cybersecurity" className="inline-flex items-center justify-center px-8 py-4 bg-white0 hover:bg-emerald-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/30">
                   Check Your Eligibility<ArrowRight className="w-5 h-5 ml-2" />
                 </Link>
                 <Link href="#curriculum" className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-semibold rounded-full transition-all">
@@ -233,12 +233,12 @@ export default function CybersecurityProgramPage() {
                     <div className="grid md:grid-cols-2 gap-4 mb-4">
                       {module.topics.map((topic, i) => (
                         <div key={i} className="flex items-center gap-2">
-                          <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                          <span className="w-2 h-2 bg-slate-400 rounded-full flex-shrink-0 mt-2" />
                           <span className="text-gray-700">{topic}</span>
                         </div>
                       ))}
                     </div>
-                    <div className="bg-emerald-50 rounded-lg p-4 mt-4">
+                    <div className="bg-white rounded-lg p-4 mt-4">
                       <span className="text-sm font-semibold text-emerald-700">Lab Project:</span>
                       <span className="text-sm text-emerald-600 ml-2">{module.project}</span>
                     </div>
@@ -265,7 +265,7 @@ export default function CybersecurityProgramPage() {
               { title: "CompTIA CySA+", description: "Advanced certification for threat detection and response. A natural next step after Security+ for SOC analysts.", icon: Eye }
             ].map((cert, index) => (
               <motion.div key={index} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="bg-white/10 backdrop-blur rounded-2xl p-8 text-center">
-                <div className="w-16 h-16 bg-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <div className="w-16 h-16 bg-white0 rounded-2xl flex items-center justify-center mx-auto mb-4">
                   <cert.icon className="w-8 h-8 text-white" />
                 </div>
                 <h3 className="text-xl font-bold mb-2">{cert.title}</h3>
@@ -304,7 +304,7 @@ export default function CybersecurityProgramPage() {
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Defend the Digital World?</h2>
           <p className="text-xl text-emerald-100 mb-8 max-w-2xl mx-auto">Join the fight against cyber threats. Check your eligibility for free WIOA-funded training.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply?program=cybersecurity" className="inline-flex items-center justify-center px-8 py-4 bg-white text-emerald-600 font-semibold rounded-full hover:bg-emerald-50 transition-all transform hover:scale-105 shadow-lg">
+            <Link href="/apply?program=cybersecurity" className="inline-flex items-center justify-center px-8 py-4 bg-white text-emerald-600 font-semibold rounded-full hover:bg-white transition-all transform hover:scale-105 shadow-lg">
               Check Eligibility Now<ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link href="/inquiry?program=cybersecurity" className="inline-flex items-center justify-center px-8 py-4 bg-emerald-700 hover:bg-emerald-600 text-white font-semibold rounded-full transition-all">

@@ -64,7 +64,7 @@ export default async function NailTechnicianApprenticeshipPage() {
         <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
         <div className="relative z-10 mx-auto max-w-6xl px-6 py-32 md:py-40">
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <FundingBadge type="self-pay" className="bg-amber-500 text-white border-0" />
+            <FundingBadge type="self-pay" className="bg-white0 text-white border-0" />
             <span className="px-3 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
               DOL Registered
             </span>
@@ -85,7 +85,7 @@ export default async function NailTechnicianApprenticeshipPage() {
           <div className="mt-8 flex flex-col sm:flex-row gap-4">
             <Link
               href="/apply?pathway=nail-technician-apprenticeship"
-              className="inline-flex items-center justify-center rounded-lg bg-pink-500 px-8 py-4 text-lg font-bold text-white hover:bg-pink-600 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
+              className="inline-flex items-center justify-center rounded-lg bg-white0 px-8 py-4 text-lg font-bold text-white hover:bg-pink-600 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
             >
               Start Eligibility & Choose a Career Path
             </Link>
@@ -103,7 +103,7 @@ export default async function NailTechnicianApprenticeshipPage() {
       <section className="bg-white py-16">
         <div className="mx-auto max-w-4xl px-6">
           <h2 className="text-3xl font-bold text-black mb-6">Program Description</h2>
-          <div className="bg-pink-50 border-2 border-pink-200 rounded-xl p-6 mb-8">
+          <div className="bg-white border-2 border-pink-200 rounded-xl p-6 mb-8">
             <p className="text-lg text-black leading-relaxed">
               <strong>Registered Nail Technician Apprenticeship Sponsorship, Oversight & Related Instruction (Milady Theory).</strong>
             </p>
@@ -115,7 +115,7 @@ export default async function NailTechnicianApprenticeshipPage() {
           </div>
 
           {/* Indiana Requirements */}
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-8">
+          <div className="bg-white border-2 border-blue-200 rounded-xl p-6 mb-8">
             <h3 className="text-xl font-bold text-blue-900 mb-3">Indiana Nail Technician Requirements</h3>
             <ul className="space-y-2 text-blue-900">
               <li className="flex items-start gap-2">
@@ -135,7 +135,7 @@ export default async function NailTechnicianApprenticeshipPage() {
 
           {/* What's Included vs Not Included */}
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6">
+            <div className="bg-white border-2 border-green-200 rounded-xl p-6">
               <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
                 <CheckCircle className="w-6 h-6" />
                 What the Program Fee Covers
@@ -164,7 +164,7 @@ export default async function NailTechnicianApprenticeshipPage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6">
+            <div className="bg-white border-2 border-red-200 rounded-xl p-6">
               <h3 className="text-xl font-bold text-red-900 mb-4 flex items-center gap-2">
                 <XCircle className="w-6 h-6" />
                 What the Program Fee Does NOT Cover
@@ -199,7 +199,7 @@ export default async function NailTechnicianApprenticeshipPage() {
               <div className="text-xl text-slate-600 mt-2">Flat Program Fee</div>
             </div>
 
-            <div className="bg-pink-50 border border-pink-200 rounded-lg p-4 mb-6">
+            <div className="bg-white border border-pink-200 rounded-lg p-4 mb-6">
               <p className="text-pink-900 text-center">
                 <strong>The program fee applies regardless of transferred hours.</strong> Credit for prior learning may reduce the duration of participation but does not alter the program fee. The fee reflects apprenticeship sponsorship, compliance oversight, employer coordination, related instruction, and completion under the sponsor&apos;s registered apprenticeship program.
               </p>
@@ -326,7 +326,7 @@ export default async function NailTechnicianApprenticeshipPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply?program=nail-technician-apprenticeship"
-              className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-4 text-lg font-bold text-pink-600 hover:bg-pink-50 transition-all shadow-xl"
+              className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-4 text-lg font-bold text-pink-600 hover:bg-white transition-all shadow-xl"
             >
               Apply Now
             </Link>

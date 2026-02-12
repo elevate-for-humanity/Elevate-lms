@@ -191,7 +191,7 @@ export default function CNACertificationPage() {
               'Reliable transportation',
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <div className="w-6 h-6 bg-green-500 rounded-full flex-shrink-0" />
+                <div className="w-6 h-6 bg-white0 rounded-full flex-shrink-0" />
                 <span className="font-medium text-slate-700">{item}</span>
               </div>
             ))}

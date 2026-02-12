@@ -45,7 +45,7 @@ export default function CulinaryApprenticeshipPage() {
               ]}
               className="text-white/80 mb-4"
             />
-            <span className="inline-block px-4 py-2 bg-orange-500 text-white text-sm font-bold rounded-full mb-4">
+            <span className="inline-block px-4 py-2 bg-white0 text-white text-sm font-bold rounded-full mb-4">
               DOL REGISTERED APPRENTICESHIP
             </span>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
@@ -63,7 +63,7 @@ export default function CulinaryApprenticeshipPage() {
         <div className="max-w-4xl mx-auto px-6 flex flex-col sm:flex-row gap-4 justify-center">
           <Link
             href="/apply?program=culinary-apprenticeship"
-            className="inline-flex items-center justify-center px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-500 transition text-lg"
+            className="inline-flex items-center justify-center px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-white0 transition text-lg"
           >
             Apply Now
           </Link>
@@ -267,21 +267,21 @@ export default function CulinaryApprenticeshipPage() {
           <h2 className="text-3xl font-bold text-center mb-12">Credentials You'll Earn</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-slate-800 rounded-xl p-6 text-center">
-              <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-white0 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🏆</span>
               </div>
               <h3 className="font-bold text-lg mb-2">DOL Journeyworker Certificate</h3>
               <p className="text-slate-400 text-sm">Nationally recognized credential upon completing 2,000 hours as a Production Cook</p>
             </div>
             <div className="bg-slate-800 rounded-xl p-6 text-center">
-              <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-white0 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">🛡️</span>
               </div>
               <h3 className="font-bold text-lg mb-2">ServSafe Food Manager</h3>
               <p className="text-slate-400 text-sm">WRG-approved food safety certification required by employers</p>
             </div>
             <div className="bg-slate-800 rounded-xl p-6 text-center">
-              <div className="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-white0 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl">📋</span>
               </div>
               <h3 className="font-bold text-lg mb-2">Competency Certificate</h3>
@@ -379,7 +379,7 @@ export default function CulinaryApprenticeshipPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Start Your Culinary Career?</h2>
           <p className="text-xl text-slate-300 mb-8">Join our Youth Culinary Apprenticeship and become a certified Production Cook.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply?program=culinary-apprenticeship" className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white font-bold rounded-full hover:bg-orange-400">
+            <Link href="/apply?program=culinary-apprenticeship" className="inline-flex items-center justify-center px-8 py-4 bg-white0 text-white font-bold rounded-full hover:bg-orange-400">
               Apply Now
             </Link>
             <Link href="/inquiry?program=culinary-apprenticeship" className="inline-flex items-center justify-center px-8 py-4 bg-slate-700 text-white font-bold rounded-full hover:bg-slate-600 border border-slate-600">

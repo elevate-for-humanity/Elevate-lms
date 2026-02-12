@@ -199,7 +199,7 @@ export default async function BarberApprenticeshipPage() {
               begin your career as a licensed barber.
             </p>
           </div>
-          <div className="bg-blue-50 rounded-2xl p-8">
+          <div className="bg-white rounded-2xl p-8">
             <h3 className="text-xl font-bold text-black mb-6">Program at a Glance</h3>
             <div className="space-y-4">
               <div className="flex justify-between border-b border-blue-100 pb-3">
@@ -523,11 +523,11 @@ export default async function BarberApprenticeshipPage() {
             <h3 className="text-xl font-bold text-black mb-4 text-center">Career Paths After Licensure</h3>
             <div className="grid sm:grid-cols-2 gap-4">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-white0 rounded-full"></div>
                 <span className="text-black">Work at an established barbershop</span>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 bg-green-500 rounded-full"></div>
+                <div className="w-3 h-3 bg-white0 rounded-full"></div>
                 <span className="text-black">Rent a chair and build clientele</span>
               </div>
               <div className="flex items-center gap-3">

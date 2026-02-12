@@ -308,7 +308,7 @@ export default async function FederalFundedProgramsPage() {
             </Link>
             <Link
               href="/wioa-eligibility"
-              className="inline-flex px-8 py-4 bg-white border-2 border-brand-green-600 text-brand-green-600 font-bold rounded-lg hover:bg-green-50 transition text-lg"
+              className="inline-flex px-8 py-4 bg-white border-2 border-brand-green-600 text-brand-green-600 font-bold rounded-lg hover:bg-white transition text-lg"
             >
               Check Eligibility
             </Link>

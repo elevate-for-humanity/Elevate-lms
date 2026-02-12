@@ -53,10 +53,10 @@ export default async function TaxEntrepreneurshipPage() {
       <section className="bg-white text-white py-20">
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex items-center gap-3 mb-4">
-            <span className="px-4 py-2 bg-green-500 text-white text-sm font-bold rounded-full">
+            <span className="px-4 py-2 bg-white0 text-white text-sm font-bold rounded-full">
               Free with funding
             </span>
-            <span className="px-4 py-2 bg-blue-500 text-white text-sm font-bold rounded-full">
+            <span className="px-4 py-2 bg-white0 text-white text-sm font-bold rounded-full">
               Online / Hybrid
             </span>
           </div>
@@ -176,23 +176,23 @@ export default async function TaxEntrepreneurshipPage() {
           </h2>
           <p className="text-black mb-6">You may qualify for:</p>
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">WIOA</h3>
               <p className="text-black text-sm">
                 Workforce Innovation and Opportunity Act funding
               </p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">WRG</h3>
               <p className="text-black text-sm">Workforce Ready Grant</p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">JRI</h3>
               <p className="text-black text-sm">
                 Justice Reinvestment Initiative
               </p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">
                 Employer Sponsorship
               </h3>
@@ -248,15 +248,15 @@ export default async function TaxEntrepreneurshipPage() {
           </h2>
           <p className="text-black mb-6">Students typically move into:</p>
           <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-green-50 rounded-lg p-6 text-center">
+            <div className="bg-white rounded-lg p-6 text-center">
               <h3 className="font-bold text-black mb-2">Tax Preparer</h3>
             </div>
-            <div className="bg-green-50 rounded-lg p-6 text-center">
+            <div className="bg-white rounded-lg p-6 text-center">
               <h3 className="font-bold text-black mb-2">
                 Small Business Owner
               </h3>
             </div>
-            <div className="bg-green-50 rounded-lg p-6 text-center">
+            <div className="bg-white rounded-lg p-6 text-center">
               <h3 className="font-bold text-black mb-2">Entrepreneur</h3>
             </div>
           </div>

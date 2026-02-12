@@ -175,7 +175,7 @@ export default function CPRFirstAidPage() {
       </section>
 
       {/* Why CPR Matters */}
-      <section className="py-16 bg-red-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -311,7 +311,7 @@ export default function CPRFirstAidPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/employers" className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-all">
+              <Link href="/employers" className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-white transition-all">
                 Request Group Training <ArrowRight className="w-5 h-5" />
               </Link>
             </div>

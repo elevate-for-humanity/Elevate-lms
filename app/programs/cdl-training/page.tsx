@@ -165,7 +165,7 @@ export default function CDLTrainingPage() {
       </section>
 
       {/* Why Trucking */}
-      <section className="py-16 bg-blue-50">
+      <section className="py-16 bg-white">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>

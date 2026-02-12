@@ -64,7 +64,7 @@ export default async function CosmetologyApprenticeshipPage() {
         {/* overlay removed */}
         <div className="relative z-10 mx-auto max-w-6xl px-6 py-32 md:py-40">
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <FundingBadge type="self-pay" className="bg-amber-500 text-white border-0" />
+            <FundingBadge type="self-pay" className="bg-white0 text-white border-0" />
             <span className="px-3 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
               DOL Registered
             </span>
@@ -137,7 +137,7 @@ export default async function CosmetologyApprenticeshipPage() {
           </div>
 
           {/* Indiana Requirements */}
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-8">
+          <div className="bg-white border-2 border-blue-200 rounded-xl p-6 mb-8">
             <h3 className="text-xl font-bold text-blue-900 mb-3">Indiana Cosmetology Requirements</h3>
             <ul className="space-y-2 text-blue-900">
               <li className="flex items-start gap-2">
@@ -157,7 +157,7 @@ export default async function CosmetologyApprenticeshipPage() {
 
           {/* What's Included vs Not Included */}
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6">
+            <div className="bg-white border-2 border-green-200 rounded-xl p-6">
               <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
                 <CheckCircle className="w-6 h-6" />
                 What the Program Fee Covers
@@ -186,7 +186,7 @@ export default async function CosmetologyApprenticeshipPage() {
               </ul>
             </div>
 
-            <div className="bg-red-50 border-2 border-red-200 rounded-xl p-6">
+            <div className="bg-white border-2 border-red-200 rounded-xl p-6">
               <h3 className="text-xl font-bold text-red-900 mb-4 flex items-center gap-2">
                 <XCircle className="w-6 h-6" />
                 What the Program Fee Does NOT Cover

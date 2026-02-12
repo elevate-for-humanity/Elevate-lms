@@ -68,7 +68,7 @@ export default function JRIProgramsPage() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/apply?program=jri"
-                className="inline-flex items-center gap-2 bg-white text-indigo-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-all"
+                className="inline-flex items-center gap-2 bg-white text-indigo-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-white transition-all"
               >
                 Apply Now - It&apos;s Free
                 <ArrowRight className="w-5 h-5" />
@@ -167,7 +167,7 @@ export default function JRIProgramsPage() {
             <h2 className="text-3xl font-black text-slate-900 mb-4">Who Qualifies for JRI?</h2>
             <p className="text-lg text-slate-600">JRI programs are available to Indiana residents who meet the following criteria</p>
           </div>
-          <div className="bg-indigo-50 rounded-2xl p-8">
+          <div className="bg-white rounded-2xl p-8">
             <ul className="space-y-4">
               {[
                 'Currently on probation, parole, or community corrections supervision',
@@ -219,7 +219,7 @@ export default function JRIProgramsPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/apply?program=jri"
-              className="inline-flex items-center gap-2 bg-white text-indigo-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-indigo-50 transition-all"
+              className="inline-flex items-center gap-2 bg-white text-indigo-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-white transition-all"
             >
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>

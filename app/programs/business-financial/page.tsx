@@ -184,23 +184,23 @@ export default async function BusinessFinancialPage() {
           </h2>
           <p className="text-black mb-6">You may qualify for:</p>
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">WIOA</h3>
               <p className="text-black text-sm">
                 Workforce Innovation and Opportunity Act funding
               </p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">WRG</h3>
               <p className="text-black text-sm">Workforce Ready Grant</p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">JRI</h3>
               <p className="text-black text-sm">
                 Justice Reinvestment Initiative
               </p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-white rounded-lg p-6">
               <h3 className="font-bold text-black mb-2">
                 Employer Sponsorship
               </h3>
@@ -256,17 +256,17 @@ export default async function BusinessFinancialPage() {
           </h2>
           <p className="text-black mb-6">Students typically move into:</p>
           <div className="grid md:grid-cols-3 gap-4">
-            <div className="bg-green-50 rounded-lg p-6 text-center">
+            <div className="bg-white rounded-lg p-6 text-center">
               <h3 className="font-bold text-black mb-2">
                 Administrative Assistant
               </h3>
             </div>
-            <div className="bg-green-50 rounded-lg p-6 text-center">
+            <div className="bg-white rounded-lg p-6 text-center">
               <h3 className="font-bold text-black mb-2">
                 Financial Services Rep
               </h3>
             </div>
-            <div className="bg-green-50 rounded-lg p-6 text-center">
+            <div className="bg-white rounded-lg p-6 text-center">
               <h3 className="font-bold text-black mb-2">
                 Customer Service Specialist
               </h3>

@@ -101,7 +101,7 @@ export default function SkilledTradesProgramsPage() {
             <div className="flex flex-wrap gap-4">
               <Link 
                 href="/apply?program=skilled-trades"
-                className="inline-flex items-center justify-center bg-orange-500 text-white px-8 py-4 rounded-full font-semibold hover:bg-orange-600 transition-colors text-lg"
+                className="inline-flex items-center justify-center bg-white0 text-white px-8 py-4 rounded-full font-semibold hover:bg-orange-600 transition-colors text-lg"
               >
                 Apply Now
               </Link>
@@ -158,7 +158,7 @@ export default function SkilledTradesProgramsPage() {
                       role="img"
                       aria-label={program.name}
                     />
-                    <div className="absolute top-3 right-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+                    <div className="absolute top-3 right-3 bg-white0 text-white px-3 py-1 rounded-full text-xs font-semibold">
                       {program.duration_weeks ? (program.duration_weeks > 20 ? `${Math.round(program.duration_weeks / 4)} Months` : `${program.duration_weeks} Weeks`) : 'Flexible'}
                     </div>
                     {program.price === 0 && (
@@ -364,14 +364,14 @@ export default function SkilledTradesProgramsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-orange-500">
+      <section className="py-16 bg-white0">
         <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Trades Career?</h2>
           <p className="text-orange-100 mb-8">Free training available for eligible Indiana residents.</p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/apply?program=skilled-trades"
-              className="inline-block bg-white text-orange-600 px-8 py-4 font-semibold rounded-full hover:bg-orange-50 transition-colors"
+              className="inline-block bg-white text-orange-600 px-8 py-4 font-semibold rounded-full hover:bg-white transition-colors"
             >
               Apply Now
             </Link>

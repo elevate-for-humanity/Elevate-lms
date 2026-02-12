@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import ApplyHeroVideo from './ApplyHeroVideo';
+import ApplyAvatarGuide from './ApplyAvatarGuide';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -39,160 +41,208 @@ export default async function ApplyPage({
   return (
     <div className="min-h-screen bg-white">
       {/* Breadcrumbs */}
-      <div className="bg-slate-50 border-b">
+      <div className="bg-white border-b border-slate-100">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Apply' }]} />
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="py-10 sm:py-14 px-4 bg-white border-b border-slate-100">
+      {/* Hero banner — full width video, top of page */}
+      <section className="relative w-full h-[180px] sm:h-[280px] md:h-[380px] overflow-hidden">
+        <ApplyHeroVideo />
+      </section>
+
+      {/* Avatars — overlapping bottom of hero */}
+      <div className="flex items-center justify-center -space-x-4 -mt-10 sm:-mt-12 relative z-20">
+        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+          <Image src="/avatars/avatar-1.jpg" alt="Student" width={80} height={80} className="object-cover w-full h-full" />
+        </div>
+        <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-4 border-white shadow-lg">
+          <Image src="/avatars/avatar-2.jpg" alt="Graduate" width={96} height={96} className="object-cover w-full h-full" />
+        </div>
+        <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full overflow-hidden border-4 border-white shadow-lg">
+          <Image src="/avatars/avatar-3.jpg" alt="Professional" width={80} height={80} className="object-cover w-full h-full" />
+        </div>
+      </div>
+
+      {/* Heading */}
+      <section className="pt-4 pb-8 px-4 bg-white">
         <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">
-            Start Here
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-2">
+            Start Your New Career
           </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Pick the path that fits you. Each application takes 5-10 minutes and does not require an account.
+          <p className="text-slate-600 max-w-xl mx-auto">
+            Pick the path that fits you. Each application takes 5-10 minutes, no account needed. Most programs are free.
           </p>
         </div>
       </section>
 
-      {/* Application blocks */}
-      <section className="max-w-6xl mx-auto px-4 py-10 sm:py-14 space-y-6">
+      {/* Avatar guide with voiceover */}
+      <ApplyAvatarGuide />
 
-        {/* Student — full width, primary */}
+      {/* Application cards */}
+      <section className="max-w-6xl mx-auto px-4 pb-10 sm:pb-14 space-y-8">
+
+        {/* Student — full width, image fills left side */}
         <Link
           href="/apply/student"
-          className="block relative overflow-hidden rounded-2xl group"
+          className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
         >
-          <div className="relative h-[340px] sm:h-[380px]">
-            <Image
-              src="/hero-images/programs-hero.jpg"
-              alt="Students in career training programs"
-              fill
-              className="object-cover"
-              priority
-            />
-            <div className="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-slate-900/40" />
-            <div className="absolute inset-0 flex items-center">
-              <div className="px-6 sm:px-10 md:px-14 max-w-2xl">
-                <span className="inline-block bg-emerald-500 text-white text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-4">
-                  Most Popular
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-bold text-white mb-3">
-                  Student Application
-                </h2>
-                <p className="text-white/90 text-base sm:text-lg mb-2">
-                  Apply for career training in healthcare, skilled trades, barbering, IT, and more.
-                  Most programs are <strong>100% free</strong> through WIOA, WRG, and JRI funding.
-                </p>
-                <ul className="text-white/80 text-sm space-y-1 mb-5">
-                  <li>- No tuition for qualifying Indiana residents</li>
-                  <li>- Pick your program during the application</li>
-                  <li>- We check your funding eligibility for you</li>
-                  <li>- Response within 1-2 business days</li>
-                </ul>
-                <span className="inline-flex items-center gap-2 bg-white text-slate-900 font-semibold px-6 py-3 rounded-lg group-hover:gap-3 transition-all text-sm sm:text-base">
-                  Apply Now <ArrowRight className="w-4 h-4" />
-                </span>
-              </div>
+          <div className="flex flex-col md:flex-row">
+            <div className="relative w-full md:w-2/5 h-[200px] md:h-auto md:min-h-[280px]">
+              <Image
+                src="/images/hero/hero-hands-on-training.jpg"
+                alt="Students in hands-on career training"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="flex-1 bg-white p-6 sm:p-8">
+              <span className="inline-block bg-blue-600 text-white text-xs font-bold uppercase tracking-wider px-3 py-0.5 rounded-full mb-3">
+                Most Popular
+              </span>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
+                Student Application
+              </h2>
+              <p className="text-slate-700 mb-3">
+                Apply for career training in healthcare, skilled trades, barbering, IT, and more.
+                Most programs are <strong>100% free</strong> through WIOA, WRG, and JRI funding.
+              </p>
+              <ul className="text-slate-600 text-sm space-y-1 mb-4 list-disc list-inside">
+                <li>No tuition for qualifying Indiana residents</li>
+                <li>Pick your program during the application</li>
+                <li>We check your funding eligibility for you</li>
+                <li>Response within 1-2 business days</li>
+              </ul>
+              <span className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg group-hover:gap-3 transition-all text-sm">
+                Apply Now <ArrowRight className="w-4 h-4" />
+              </span>
             </div>
           </div>
         </Link>
 
-        {/* Three secondary blocks */}
-        <div className="grid md:grid-cols-3 gap-6">
+        {/* Secondary cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
 
           {/* Employer */}
           <Link
             href="/apply/employer"
-            className="block relative overflow-hidden rounded-2xl group"
+            className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
           >
-            <div className="relative h-[280px]">
+            <div className="relative h-[180px]">
               <Image
-                src="/hero-images/employer-hero.jpg"
-                alt="Employer meeting with workforce team"
+                src="/images/heroes-hq/employer-hero.jpg"
+                alt="Employer partnership meeting"
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-slate-900/20" />
-              <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
-                <h2 className="text-xl font-bold text-white mb-2">
-                  Employer Partnership
-                </h2>
-                <p className="text-white/85 text-sm mb-3 leading-relaxed">
-                  Hire pre-trained candidates at no cost. We handle recruiting, screening, and
-                  skills training. You get job-ready workers with industry certifications.
-                  WOTC tax credits may apply.
-                </p>
-                <span className="inline-flex items-center gap-2 text-white font-semibold text-sm group-hover:gap-3 transition-all">
-                  Partner With Us <ArrowRight className="w-4 h-4" />
-                </span>
+            </div>
+            <div className="bg-white p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <h2 className="text-lg font-bold text-slate-900">Employer Partnership</h2>
+                <Image src="/logo.png" alt="Elevate" width={18} height={18} className="opacity-30" />
               </div>
+              <p className="text-slate-600 text-sm leading-relaxed mb-3">
+                Hire pre-trained candidates at no cost. We handle recruiting, screening, and
+                skills training. WOTC tax credits may apply.
+              </p>
+              <span className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm group-hover:gap-3 transition-all">
+                Partner With Us <ArrowRight className="w-4 h-4" />
+              </span>
             </div>
           </Link>
 
           {/* Staff / Instructor */}
           <Link
             href="/apply/staff"
-            className="block relative overflow-hidden rounded-2xl group"
+            className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
           >
-            <div className="relative h-[280px]">
+            <div className="relative h-[180px]">
               <Image
-                src="/images/heroes/hero-students.jpg"
-                alt="Instructor working with students"
+                src="/images/efh/sections/staffing.jpg"
+                alt="Staff and instructors working with students"
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-slate-900/20" />
-              <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
-                <h2 className="text-xl font-bold text-white mb-2">
-                  Staff &amp; Instructor
-                </h2>
-                <p className="text-white/85 text-sm mb-3 leading-relaxed">
-                  Teach career skills or support student success as an advisor, case manager,
-                  or admin. Flexible schedules, competitive pay, and the chance to change lives
-                  in your community.
-                </p>
-                <span className="inline-flex items-center gap-2 text-white font-semibold text-sm group-hover:gap-3 transition-all">
-                  Join Our Team <ArrowRight className="w-4 h-4" />
-                </span>
-              </div>
             </div>
-          </Link>
-
-          {/* Program Holder */}
-          <Link
-            href="/apply/program-holder"
-            className="block relative overflow-hidden rounded-2xl group"
-          >
-            <div className="relative h-[280px]">
-              <Image
-                src="/images/heroes/partner-hero.jpg"
-                alt="Organization leaders discussing training programs"
-                fill
-                className="object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/50 to-slate-900/20" />
-              <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
-                <h2 className="text-xl font-bold text-white mb-2">
-                  Program Holder
-                </h2>
-                <p className="text-white/85 text-sm mb-3 leading-relaxed">
-                  License our LMS platform and curriculum to run training programs under your
-                  own brand. We provide the tech, content, and compliance — you serve your
-                  community.
-                </p>
-                <span className="inline-flex items-center gap-2 text-white font-semibold text-sm group-hover:gap-3 transition-all">
-                  Become a Program Holder <ArrowRight className="w-4 h-4" />
-                </span>
+            <div className="bg-white p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <h2 className="text-lg font-bold text-slate-900">Staff &amp; Instructor</h2>
+                <Image src="/logo.png" alt="Elevate" width={18} height={18} className="opacity-30" />
               </div>
+              <p className="text-slate-600 text-sm leading-relaxed mb-3">
+                Teach career skills or support student success as an advisor, case manager,
+                or admin. Flexible schedules, competitive pay.
+              </p>
+              <span className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm group-hover:gap-3 transition-all">
+                Join Our Team <ArrowRight className="w-4 h-4" />
+              </span>
             </div>
           </Link>
         </div>
 
+        {/* Support Bundle */}
+        <div className="bg-slate-50 rounded-2xl p-6 sm:p-10 border border-slate-100">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 text-center">
+            Every Applicant Gets a Support Bundle
+          </h2>
+          <p className="text-slate-600 text-center mb-8 max-w-2xl mx-auto">
+            Training is just the start. We wrap services around you so nothing gets in the way of finishing.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5">
+            {[
+              {
+                image: '/images/heroes/hero-federal-funding.jpg',
+                alt: 'Funding assistance',
+                title: 'Funding Assistance',
+                desc: 'We check your eligibility for WIOA, WRG, JRI, and other grants. Most students pay $0.',
+              },
+
+              {
+                image: '/images/hero/hero-early-childhood.jpg',
+                alt: 'Childcare support',
+                title: 'Childcare Support',
+                desc: 'Referrals and assistance finding affordable childcare during training hours.',
+              },
+              {
+                image: '/images/career-services/job-fair.jpg',
+                alt: 'Career placement services',
+                title: 'Career Placement',
+                desc: 'Resume help, interview prep, and direct employer connections before you graduate.',
+              },
+              {
+                image: '/images/efh/sections/coaching.jpg',
+                alt: 'Case management team',
+                title: 'Case Management',
+                desc: 'A dedicated advisor checks in weekly to help you stay on track.',
+              },
+              {
+                image: '/images/hero/hero-certifications.jpg',
+                alt: 'Credential and certification support',
+                title: 'Credential Support',
+                desc: 'Exam prep, testing fees, and licensing assistance included with your program.',
+              },
+            ].map((item) => (
+              <div key={item.title} className="bg-white rounded-xl overflow-hidden border border-slate-100">
+                <div className="relative h-32 sm:h-36">
+                  <Image
+                    src={item.image}
+                    alt={item.alt}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-4">
+                  <h3 className="font-semibold text-slate-900 mb-1">{item.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
         {/* Track existing application */}
-        <div className="text-center pt-4">
+        <div className="text-center pt-2">
           <p className="text-slate-500 text-sm">
             Already applied?{' '}
             <Link href="/apply/track" className="text-blue-600 hover:underline font-medium">

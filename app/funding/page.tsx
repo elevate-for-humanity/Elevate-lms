@@ -1,220 +1,542 @@
-export const dynamic = 'force-dynamic';
+'use client';
 
-import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight } from 'lucide-react';
+import {
+  DollarSign,
+  Users,
+  FileText,
+  Building2,
+  Handshake,
+  TrendingUp,
+  Shield,
+  CheckCircle,
+  ArrowRight,
+  Briefcase,
+  Clock,
+} from 'lucide-react';
 
-export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/funding' },
-  title: 'Funding & Financial Aid | Elevate For Humanity',
-  description: 'Explore funding options for your career training — WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded training.',
-};
+
 
 export default function FundingPage() {
+  const fundingResources = [
+    {
+      title: 'WIOA Eligibility',
+      description: 'Check if you qualify for free training.',
+      fullDescription: 'Most adults qualify based on income, public assistance, veteran status, or job displacement.',
+      href: '/wioa-eligibility',
+      icon: CheckCircle,
+      color: 'green',
+      category: 'Eligibility',
+      image: '/images/business/collaboration-1.jpg',
+    },
+    {
+      title: 'Grants',
+      description: '100% funding with no repayment.',
+      fullDescription: 'Federal and state grants cover tuition, books, and supplies.',
+      href: '/grants',
+      icon: DollarSign,
+      color: 'emerald',
+      category: 'Funding',
+      image: '/images/business/partnership-1.jpg',
+    },
+    {
+      title: 'JRI Funding',
+      description: 'For justice-involved individuals.',
+      fullDescription: 'Training and support for successful reintegration.',
+      href: '/jri',
+      icon: Shield,
+      color: 'blue',
+      category: 'Funding',
+      image: '/images/business/team-1.jpg',
+    },
+    {
+      title: 'SNAP E&T',
+      description: 'Training for SNAP recipients.',
+      fullDescription: 'Job training and support services for food stamp recipients.',
+      href: '/snap-et-partner',
+      icon: Users,
+      color: 'orange',
+      category: 'Funding',
+      image: '/images/business/team-2.jpg',
+    },
+    {
+      title: 'FSSA Partnership',
+      description: 'Programs for vulnerable populations.',
+      fullDescription: 'Training and support through FSSA partnerships.',
+      href: '/fssa-partnership-request',
+      icon: Handshake,
+      color: 'pink',
+      category: 'Partnerships',
+      image: '/images/business/team-3.jpg',
+    },
+    {
+      title: 'OJT & Funding',
+      description: 'Earn while you learn.',
+      fullDescription: 'Get hired and trained with employer wage reimbursement.',
+      href: '/ojt-and-funding',
+      icon: Briefcase,
+      color: 'indigo',
+      category: 'Programs',
+      image: '/images/business/team-4.jpg',
+    },
+    {
+      title: 'Funding Impact',
+      description: 'See real success stories.',
+      fullDescription: 'How funding transforms lives across Indiana.',
+      href: '/fundingimpact',
+      icon: TrendingUp,
+      color: 'cyan',
+      category: 'Impact',
+      image: '/images/business/professional-1.jpg',
+    },
+    {
+      title: 'Workforce Partners',
+      description: 'Our partner network.',
+      fullDescription: 'WorkOne centers and community organizations.',
+      href: '/workforce-partners',
+      icon: Users,
+      color: 'violet',
+      category: 'Partnerships',
+      image: '/images/business/tax-prep-certification.jpg',
+    },
+    {
+      title: 'WorkOne Partner Packet',
+      description: 'For WorkOne staff.',
+      fullDescription: 'Resources for career advisors and workforce staff.',
+      href: '/workone-partner-packet',
+      icon: FileText,
+      color: 'rose',
+      category: 'Resources',
+      image: '/images/business/professional-2.jpg',
+    },
+    {
+      title: 'Partner Agencies',
+      description: 'Government and community partners.',
+      fullDescription: 'DWD, FSSA, DOC, and community organizations.',
+      href: '/agencies',
+      icon: Building2,
+      color: 'amber',
+      category: 'Partnerships',
+      image: '/images/business/handshake-1.jpg',
+    },
+    {
+      title: 'Government Programs',
+      description: 'Federal and state programs.',
+      fullDescription: 'WIOA, SNAP E&T, Workforce Ready Grant.',
+      href: '/government',
+      icon: Shield,
+      color: 'lime',
+      category: 'Programs',
+      image: '/images/business/success-1.jpg',
+    },
+    {
+      title: 'Federal Compliance',
+      description: 'Our compliance standards.',
+      fullDescription: 'Meeting all federal workforce regulations.',
+      href: '/federal-compliance',
+      icon: CheckCircle,
+      color: 'teal',
+      category: 'Compliance',
+      image: '/images/business/collaboration-1.jpg',
+    },
+    {
+      title: 'Equal Opportunity',
+      description: 'Non-discrimination commitment.',
+      fullDescription: 'All programs available to eligible individuals.',
+      href: '/equal-opportunity',
+      icon: Users,
+      color: 'sky',
+      category: 'Compliance',
+      image: '/images/business/partnership-1.jpg',
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-white">
+      {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Funding & Financial Aid' }]} />
+          <Breadcrumbs items={[{ label: 'Funding' }]} />
         </div>
       </div>
 
-      {/* Hero */}
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/homepage/funding-navigation.png" alt="Funding and financial aid" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
-          <div className="max-w-4xl mx-auto">
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Funding & Financial Aid</h1>
-            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
-              Multiple funding options are available to help cover your training costs. Many students qualify for state and federal programs that pay for tuition, books, and certifications.
+      {/* Hero - Clean image, no text overlay */}
+      <section className="relative h-[50vh] overflow-hidden">
+        <Image
+          src="/images/heroes-hq/funding-hero.jpg"
+          alt="Free career training funding"
+          fill
+          className="object-cover"
+          priority
+        />
+      </section>
+
+      {/* Indiana Career Connect Instructions */}
+      <section className="py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-black text-gray-900 mb-4">
+              How to Get Free Training Through Indiana Career Connect
+            </h2>
+            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+              Follow these steps to apply for WIOA funding and get your training paid for
+            </p>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-8 mb-10">
+            <h3 className="text-2xl font-bold text-blue-900 mb-6 text-center">
+              Step-by-Step Instructions
+            </h3>
+            
+            <div className="space-y-6">
+              <div className="flex items-start gap-4 bg-white rounded-xl p-6 shadow-sm">
+                <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+                <div>
+                  <h4 className="font-bold text-gray-900 text-lg mb-2">Create Your Indiana Career Connect Account</h4>
+                  <p className="text-gray-600 mb-3">
+                    Go to <strong>indianacareerconnect.com</strong> and click &quot;Create Account.&quot; 
+                    You&apos;ll need your email address, Social Security number, and basic contact information.
+                    This is the state&apos;s official workforce system - it&apos;s free and secure.
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• Have your ID and Social Security card ready</li>
+                    <li>• Use an email you check regularly</li>
+                    <li>• Complete your full profile including work history</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 bg-white rounded-xl p-6 shadow-sm">
+                <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+                <div>
+                  <h4 className="font-bold text-gray-900 text-lg mb-2">Schedule an Appointment with WorkOne</h4>
+                  <p className="text-gray-600 mb-3">
+                    After creating your account, schedule an appointment with a WorkOne career advisor.
+                    You can do this online through Indiana Career Connect or by calling your local WorkOne office.
+                    The advisor will review your eligibility for WIOA funding.
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• Appointments are free and typically 30-60 minutes</li>
+                    <li>• Bring your ID, Social Security card, and proof of income</li>
+                    <li>• Tell them you want to enroll in training at Elevate for Humanity</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 bg-white rounded-xl p-6 shadow-sm">
+                <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+                <div>
+                  <h4 className="font-bold text-gray-900 text-lg mb-2">Get Your Eligibility Verified</h4>
+                  <p className="text-gray-600 mb-3">
+                    Your WorkOne advisor will verify your eligibility for WIOA funding based on your 
+                    income, employment status, and other factors. Most people who are unemployed, 
+                    underemployed, or low-income qualify.
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• Eligibility is based on household income and size</li>
+                    <li>• Veterans and their spouses get priority</li>
+                    <li>• Public assistance recipients often qualify automatically</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 bg-white rounded-xl p-6 shadow-sm">
+                <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">4</div>
+                <div>
+                  <h4 className="font-bold text-gray-900 text-lg mb-2">Receive Your Training Voucher (ITA)</h4>
+                  <p className="text-gray-600 mb-3">
+                    Once approved, you&apos;ll receive an Individual Training Account (ITA) voucher.
+                    This voucher covers 100% of your tuition at Elevate for Humanity.
+                    Bring this voucher to us to complete your enrollment.
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• The ITA covers tuition, books, and certification fees</li>
+                    <li>• You may also qualify for support services (transportation, childcare)</li>
+                    <li>• Processing typically takes 1-2 weeks</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-4 bg-white rounded-xl p-6 shadow-sm">
+                <div className="w-10 h-10 bg-green-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">5</div>
+                <div>
+                  <h4 className="font-bold text-gray-900 text-lg mb-2">Start Your Training!</h4>
+                  <p className="text-gray-600 mb-3">
+                    Bring your ITA voucher to Elevate for Humanity and we&apos;ll complete your enrollment.
+                    You&apos;ll start your training program with $0 out of pocket.
+                    We&apos;ll also help you track your progress and prepare for employment.
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li>• We handle all paperwork with WorkOne</li>
+                    <li>• Career coaching and job placement included</li>
+                    <li>• Support services available throughout your training</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* CTA Button */}
+          <div className="text-center">
+            <a
+              href="https://www.indianacareerconnect.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-3 bg-blue-600 text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-blue-700 transition-colors shadow-lg"
+            >
+              Make Your Appointment on Indiana Career Connect
+              <ArrowRight className="w-6 h-6" />
+            </a>
+            <p className="text-gray-500 mt-4 text-sm">
+              Opens indianacareerconnect.com in a new tab
             </p>
           </div>
         </div>
       </section>
 
-      {/* Funding Options */}
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-2">Funding Options</h2>
-          <p className="text-slate-500 text-sm text-center mb-6 sm:mb-8">Eligibility is determined by WorkOne, not Elevate. Register and schedule an appointment to find out what you qualify for.</p>
-
-          <div className="space-y-5 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6">
-            {/* WIOA */}
-            <div className="rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative h-[180px]">
-                <Image src="/images/heroes/workforce-partner-1.jpg" alt="WIOA funding" fill className="object-cover" />
-                <div className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Federal</div>
+      {/* What Happens After */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-3xl font-black text-gray-900 mb-8 text-center">
+            What Happens After You Make Your Appointment?
+          </h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
+                <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
-              <div className="p-5">
-                <h3 className="font-bold text-slate-900 text-lg mb-2">WIOA — Workforce Innovation & Opportunity Act</h3>
-                <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                  Federal funding that covers tuition, books, exam fees, and support services for qualifying adults and dislocated workers.
-                </p>
-                <div className="space-y-2 mb-4">
-                  {['Covers tuition and training costs', 'Books and supplies included', 'Certification exam fees', 'Support services (childcare, transportation)'].map((item) => (
-                    <div key={item} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0" />
-                      <span className="text-slate-700 text-sm">{item}</span>
-                    </div>
-                  ))}
-                </div>
-                <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm hover:underline">
-                  Learn about WIOA eligibility <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+              <h3 className="font-bold text-gray-900 text-lg mb-2">We Track Your Progress</h3>
+              <p className="text-gray-600">
+                Once you start the process, we monitor your application status and help 
+                resolve any issues. You&apos;ll receive updates at each milestone.
+              </p>
             </div>
-
-            {/* WRG */}
-            <div className="rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative h-[180px]">
-                <Image src="/images/heroes/workforce-partner-2.jpg" alt="Workforce Ready Grant" fill className="object-cover" />
-                <div className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-blue-600" />
               </div>
-              <div className="p-5">
-                <h3 className="font-bold text-slate-900 text-lg mb-2">WRG — Workforce Ready Grant</h3>
-                <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                  Indiana state grant that covers tuition for high-demand certificate programs. Designed to get Hoosiers into high-wage careers quickly.
-                </p>
-                <div className="space-y-2 mb-4">
-                  {['Covers tuition for eligible programs', 'High-demand industry certifications', 'No repayment required', 'Available to Indiana residents'].map((item) => (
-                    <div key={item} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-orange-500 rounded-full flex-shrink-0" />
-                      <span className="text-slate-700 text-sm">{item}</span>
-                    </div>
-                  ))}
-                </div>
-                <a href="https://www.nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm hover:underline">
-                  Learn about WRG at Next Level Jobs <ArrowRight className="w-4 h-4" />
-                </a>
-              </div>
+              <h3 className="font-bold text-gray-900 text-lg mb-2">Dedicated Support</h3>
+              <p className="text-gray-600">
+                Our enrollment team is available to answer questions and guide you 
+                through the process. Contact us at (317) 314-3757 anytime.
+              </p>
             </div>
-
-            {/* JRI */}
-            <div className="rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative h-[180px]">
-                <Image src="/images/heroes/workforce-partner-3.jpg" alt="JRI funding" fill className="object-cover" />
-                <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                <FileText className="w-6 h-6 text-blue-600" />
               </div>
-              <div className="p-5">
-                <h3 className="font-bold text-slate-900 text-lg mb-2">JRI — Justice Reinvestment Initiative</h3>
-                <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                  State funding for justice-involved individuals. Covers training, certifications, and wraparound support services to help build a new career.
-                </p>
-                <div className="space-y-2 mb-4">
-                  {['Full tuition coverage', 'Certification and exam fees', 'Transportation assistance', 'Case management support'].map((item) => (
-                    <div key={item} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-red-500 rounded-full flex-shrink-0" />
-                      <span className="text-slate-700 text-sm">{item}</span>
-                    </div>
-                  ))}
-                </div>
-                <Link href="/programs/jri" className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm hover:underline">
-                  Learn about JRI <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+              <h3 className="font-bold text-gray-900 text-lg mb-2">Paperwork Assistance</h3>
+              <p className="text-gray-600">
+                Need help with forms or documentation? We can help you gather 
+                the required documents and complete applications correctly.
+              </p>
             </div>
-
-            {/* OJT */}
-            <div className="rounded-xl overflow-hidden border border-slate-200">
-              <div className="relative h-[180px]">
-                <Image src="/images/heroes/workforce-partner-5.jpg" alt="On the job training" fill className="object-cover" />
-                <div className="absolute top-3 left-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
+            <div className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4">
+                <Clock className="w-6 h-6 text-orange-600" />
               </div>
-              <div className="p-5">
-                <h3 className="font-bold text-slate-900 text-lg mb-2">OJT — On-the-Job Training</h3>
-                <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                  Get hired and earn a paycheck while you train. Employers receive wage reimbursement from WorkOne, making them eager to hire and train you.
-                </p>
-                <div className="space-y-2 mb-4">
-                  {['Paid from day one', 'Employer wage reimbursement (50-75%)', 'Leads to permanent employment', 'Available across industries'].map((item) => (
-                    <div key={item} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-green-600 rounded-full flex-shrink-0" />
-                      <span className="text-slate-700 text-sm">{item}</span>
-                    </div>
-                  ))}
-                </div>
-                <Link href="/ojt-and-funding" className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm hover:underline">
-                  Learn about OJT <ArrowRight className="w-4 h-4" />
-                </Link>
-              </div>
+              <h3 className="font-bold text-gray-900 text-lg mb-2">Fast Processing</h3>
+              <p className="text-gray-600">
+                Most applications are processed within 1-2 weeks. We work with 
+                WorkOne to expedite your approval so you can start training quickly.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Self-Pay Options */}
-      <section className="py-8 sm:py-14 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-2">Self-Pay Options</h2>
-          <p className="text-slate-500 text-sm text-center mb-6 sm:mb-8">If you don&apos;t qualify for state or federal funding, we offer flexible payment options.</p>
-          <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4">
-            {[
-              { title: 'Pay in Full', desc: 'One-time payment at enrollment. Some programs offer a discount for full payment.', tag: 'Best Value' },
-              { title: 'Payment Plan', desc: 'Split your tuition into monthly installments. No interest. Set up at enrollment.', tag: 'Flexible' },
-              { title: 'Sezzle / Affirm', desc: 'Buy now, pay later. Break payments into 4-6 installments with Sezzle or Affirm.', tag: 'BNPL' },
-            ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5">
-                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">{item.tag}</span>
-                <h3 className="font-bold text-slate-900 mt-3 mb-2">{item.title}</h3>
-                <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How to Get Funded */}
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">How to Get Funded</h2>
-          <div className="space-y-3">
-            {[
-              { step: '1', title: 'Register at Indiana Career Connect', desc: 'Create your free account at indianacareerconnect.com.', link: 'https://www.indianacareerconnect.com', linkText: 'Register Now →' },
-              { step: '2', title: 'Schedule a WorkOne Appointment', desc: 'Visit your local WorkOne office to discuss funding options.', link: 'https://www.in.gov/dwd/workone/workone-locations/', linkText: 'Find WorkOne Locations →' },
-              { step: '3', title: 'Get Your Eligibility Determined', desc: 'WorkOne reviews your situation and determines which programs you qualify for.' },
-              { step: '4', title: 'Apply at Elevate', desc: 'Submit your student application and select your training program.', link: '/apply', linkText: 'Apply Now →' },
-              { step: '5', title: 'Start Training', desc: 'Begin your program with funding in place.' },
-            ].map((item) => (
-              <div key={item.step} className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
+      {/* Who Qualifies Section */}
+      <section className="py-16 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-black text-black mb-8 text-center">
+            Who Qualifies for Free Training?
+          </h2>
+          
+          <div className="grid md:grid-cols-2 gap-8 mb-12">
+            <div className="bg-green-50 border-2 border-green-200 rounded-xl p-8">
+              <h3 className="text-2xl font-bold text-black mb-4">WIOA Eligibility</h3>
+              <p className="text-black mb-4">Most adults qualify if you meet ONE of these:</p>
+              <ul className="space-y-2 text-black">
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+                  <span>Low income (based on family size)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+                  <span>Receiving public assistance (SNAP, TANF, SSI)</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+                  <span>Veteran or military spouse</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+                  <span>Displaced worker or laid off</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+                  <span>Individual with a disability</span>
+                </li>
+              </ul>
+            </div>
+            
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-8">
+              <h3 className="text-2xl font-bold text-black mb-4">Other Funding Options</h3>
+              <div className="space-y-4 text-black">
                 <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
-                  <p className="text-slate-600 text-sm">{item.desc}</p>
-                  {item.link && (
-                    item.link.startsWith('http') ? (
-                      <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 text-sm font-semibold hover:underline mt-1 inline-block">
-                        {item.linkText}
-                      </a>
-                    ) : (
-                      <Link href={item.link} className="text-blue-600 text-sm font-semibold hover:underline mt-1 inline-block">
-                        {item.linkText}
-                      </Link>
-                    )
-                  )}
+                  <strong className="text-blue-900">JRI Funding:</strong> For individuals with criminal justice involvement
+                </div>
+                <div>
+                  <strong className="text-blue-900">SNAP E&T:</strong> For SNAP (food stamps) recipients
+                </div>
+                <div>
+                  <strong className="text-blue-900">Workforce Ready Grant:</strong> For high-demand programs like HVAC
+                </div>
+                <div>
+                  <strong className="text-blue-900">Employer Sponsorship:</strong> Some employers pay for employee training
                 </div>
               </div>
-            ))}
+            </div>
           </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="py-8 sm:py-14 bg-blue-600">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Find Out What You Qualify For</h2>
-          <p className="text-white/90 mb-6 text-sm">Register at Indiana Career Connect and schedule a WorkOne appointment to explore your funding options.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
-              className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
-              Register at Indiana Career Connect <ArrowRight className="w-4 h-4 inline ml-1" />
-            </a>
-            <Link href="/apply" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
-              Apply for Training
+          
+          <div className="bg-orange-50 border-2 border-orange-300 rounded-xl p-8 text-center">
+            <p className="text-xl text-black mb-4">
+              <strong>Not sure if you qualify?</strong> Most people do! The WorkOne advisor will help you determine eligibility during your appointment.
+            </p>
+            <Link
+              href="https://www.indianacareerconnect.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 bg-orange-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-orange-700 transition-all"
+            >
+              <span>Schedule Your Appointment on Indiana Career Connect</span>
+              <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Recommended Resources Section */}
+      <section className="py-20 px-4 bg-gray-50">
+        <div className="max-w-7xl mx-auto">
+          {/* Section Header */}
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-black text-black mb-4">
+              Explore Funding Resources
+            </h2>
+            <p className="text-xl text-black max-w-3xl mx-auto">
+              Learn about federal funding programs, eligibility requirements,
+              and partnership opportunities
+            </p>
+          </div>
+
+          {/* Resource Cards Grid */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {fundingResources.map((resource) => {
+              const Icon = resource.icon;
+              return (
+                <div
+                  key={resource.href}
+                  className="group bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all border-2 border-gray-100 hover:border-green-500"
+                >
+                  {/* Image */}
+                  {resource.image && (
+                    <div className="relative h-48 w-full overflow-hidden">
+                      <Image
+                        src={resource.image}
+                        alt={resource.title}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {/* Category Badge Overlay */}
+                      <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                        <span className="text-xs font-bold text-black uppercase tracking-wider">
+                          {resource.category}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Card Content */}
+                  <div className="p-6">
+                    {/* Icon */}
+                    <div
+                      className={`w-14 h-14 bg-${resource.color}-100 rounded-xl flex items-center justify-center mb-4`}
+                    >
+                      <Icon className={`w-7 h-7 text-${resource.color}-600`} />
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-xl font-bold text-black mb-3">
+                      {resource.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p className="text-black mb-4 leading-relaxed">
+                      {resource.description}
+                    </p>
+                    
+                    {/* Full Description (if available) */}
+                    {resource.fullDescription && (
+                      <p className="text-sm text-black mb-6 leading-relaxed border-t border-gray-200 pt-4">
+                        {resource.fullDescription}
+                      </p>
+                    )}
+
+                    {/* Learn More Button */}
+                    <Link
+                      href={resource.href}
+                      className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition-all w-full justify-center"
+                    >
+                      <span>Learn More</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Apply CTA */}
+          <div className="mt-16 text-center">
+            <Link
+              href="/apply"
+              className="inline-flex items-center gap-3 bg-orange-500 text-white px-10 py-5 rounded-xl text-lg font-black shadow-xl hover:shadow-2xl hover:scale-105 transition-all uppercase"
+            >
+              <span>Apply for Free Training</span>
+              <ArrowRight className="w-6 h-6" />
+            </Link>
+            <p className="text-black mt-4">
+              Takes 5 minutes • No commitment required
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <section className="py-12 px-4 bg-white border-t border-gray-200">
+        <div className="max-w-4xl mx-auto text-center">
+          <p className="text-black mb-2">
+            Questions about funding eligibility?
+          </p>
+          <p className="text-sm text-black">
+            Contact us at{' '}
+            <a
+              href="mailto:elevate4humanityedu@gmail.com"
+              className="text-green-600 hover:underline font-semibold"
+            >
+              elevate4humanityedu@gmail.com
+            </a>{' '}
+            or call{' '}
+            <a
+              href="tel:+13173143757"
+              className="text-green-600 hover:underline font-semibold"
+            >
+              (317) 314-3757
+            </a>
+          </p>
         </div>
       </section>
     </div>

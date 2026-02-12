@@ -3,8 +3,9 @@
  * Called by both /api/license/webhook and /api/licenses/webhook.
  */
 
-import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
+import { getStripe } from '@/lib/stripe/client';
+import { createAdminClient } from '@/lib/supabase/admin';
 
 export interface LinkingMetadata {
   license_id?: string;
@@ -18,12 +19,6 @@ export interface LinkResult {
   license_id?: string;
   tenant_id?: string;
   error?: string;
-}
-
-function getStripe(): Stripe {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) throw new Error('STRIPE_SECRET_KEY not configured');
-  return new Stripe(key);
 }
 
 /**

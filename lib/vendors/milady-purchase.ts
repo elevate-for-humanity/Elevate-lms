@@ -12,12 +12,10 @@
  * - Bulk license codes (pre-purchased)
  */
 
-import Stripe from 'stripe';
+import { getStripe, stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-10-29.clover',
-});
+
 
 // Milady pricing per program
 const MILADY_COSTS: Record<string, number> = {

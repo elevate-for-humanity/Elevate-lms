@@ -21,7 +21,6 @@ import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 
-
 interface FinalizePaymentRequest {
   enrollmentId: string;
   paymentMode: 'sponsored' | 'self_pay' | 'employer' | 'scholarship';

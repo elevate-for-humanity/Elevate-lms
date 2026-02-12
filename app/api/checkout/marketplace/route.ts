@@ -11,7 +11,6 @@ import {
 } from '@/lib/rateLimit';
 import { toError, toErrorMessage } from '@/lib/safe';
 
-
 export async function POST(req: Request) {
   // Rate limiting: 10 checkouts per minute per IP
   const identifier = getClientIdentifier(req.headers);

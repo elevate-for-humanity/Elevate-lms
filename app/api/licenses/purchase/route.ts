@@ -1,16 +1,6 @@
+import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
-
-// Initialize Stripe only if key is available
-const getStripe = () => {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    return null;
-  }
-  return new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2025-10-29.clover',
-  });
-};
 
 export async function POST(request: NextRequest) {
   try {

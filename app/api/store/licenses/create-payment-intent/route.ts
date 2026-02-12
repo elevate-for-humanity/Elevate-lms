@@ -8,7 +8,6 @@ import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { getProductBySlug } from '@/app/data/store-products';
 
-
 interface CustomerInfo {
   email: string;
   contactName: string;

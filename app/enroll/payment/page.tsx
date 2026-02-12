@@ -4,25 +4,26 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, CreditCard, Calendar, Loader2, AlertCircle } from 'lucide-react';
+import { BARBER_PRICING } from '@/lib/programs/pricing';
 
-// Pricing configuration
+// Pricing derived from canonical source
 const PRICING = {
   full: {
-    amount: 4980,
+    amount: BARBER_PRICING.fullPrice,
     label: 'Full Payment',
     description: 'Pay in full today',
     savings: 'Best value',
   },
   deposit: {
-    amount: 999,
+    amount: BARBER_PRICING.setupFee,
     label: 'Deposit',
-    description: '$999 now, balance due before training starts',
+    description: `$${BARBER_PRICING.setupFee.toLocaleString()} now, balance paid weekly during training`,
     savings: 'Reserve your spot',
   },
   installment: {
-    amount: 4980,
+    amount: BARBER_PRICING.fullPrice,
     label: 'Payment Plan',
-    description: 'Split into monthly payments',
+    description: 'Split into weekly payments',
     savings: 'Flexible payments',
   },
 };

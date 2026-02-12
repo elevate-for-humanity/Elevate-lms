@@ -8,7 +8,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 
-
 export async function POST(req: NextRequest) {
   const supabase = createSupabaseClient();
   const { email } = await req.json();

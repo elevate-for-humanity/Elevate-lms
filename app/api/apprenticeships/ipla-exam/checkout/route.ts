@@ -5,7 +5,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { stripe } from '@/lib/stripe/client';
 
-
 export async function POST(request: NextRequest) {
   try {
     if (!stripe) {

@@ -9,8 +9,6 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 
-
-
 export async function POST(req: Request) {
   try {
     const {

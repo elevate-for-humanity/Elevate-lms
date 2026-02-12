@@ -1,11 +1,6 @@
 
 import Stripe from 'stripe';
-
-// Initialize Stripe with secret key
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  // @ts-expect-error - Using stable API version
-  apiVersion: '2024-06-20',
-});
+import { getStripe } from '@/lib/stripe/client';
 
 export interface PaymentIntent {
   id: string;

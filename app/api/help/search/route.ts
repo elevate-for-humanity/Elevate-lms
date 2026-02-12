@@ -7,7 +7,6 @@ import { NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { sanitizeSearchInput } from '@/lib/utils';
 
-
 export async function GET(request: Request) {
   const supabase = createSupabaseClient();
   const { searchParams } = new URL(request.url);

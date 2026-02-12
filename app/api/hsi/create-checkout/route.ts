@@ -10,7 +10,6 @@ import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 
-
 export async function POST(request: NextRequest) {
   const supabase = createAdminClient();
   if (!stripe) {

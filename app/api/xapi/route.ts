@@ -8,7 +8,6 @@ import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { logger } from '@/lib/logger';
 
-
 export async function POST(request: Request) {
   const supabase = createSupabaseClient();
   // xAPI endpoint for receiving learning activity statements

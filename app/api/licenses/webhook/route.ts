@@ -1,3 +1,4 @@
+import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import {
@@ -7,14 +8,6 @@ import {
   handleSubscriptionDeleted,
   handlePaymentFailed,
 } from '@/lib/license/linkStripeToLicense';
-
-function getStripe() {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error('STRIPE_SECRET_KEY is not configured');
-  }
-  return new Stripe(process.env.STRIPE_SECRET_KEY);
-}
-
 function getWebhookSecret() {
   return process.env.STRIPE_WEBHOOK_SECRET_LICENSES || process.env.STRIPE_WEBHOOK_SECRET || '';
 }

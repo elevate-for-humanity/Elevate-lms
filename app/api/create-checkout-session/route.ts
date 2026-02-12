@@ -1,19 +1,14 @@
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
+import { getStripe, stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
-import Stripe from 'stripe';
 import { logger } from '@/lib/logger';
 import { getRAPIDSMetadata, isRAPIDSProgram } from '@/lib/compliance/rapids-config';
 
-const stripeKey = process.env.STRIPE_SECRET_KEY || '';
-const stripe = stripeKey
-  ? new Stripe(stripeKey, {
-      apiVersion: '2025-10-29.clover',
-    })
-  : null;
+
 
 export async function POST(request: NextRequest) {
   // Log for debugging (remove in production)

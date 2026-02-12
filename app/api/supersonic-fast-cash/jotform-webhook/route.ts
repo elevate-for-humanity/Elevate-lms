@@ -36,7 +36,6 @@ export async function POST(request: NextRequest) {
     // Step 2: Parse submission into structured client data
     const clientData = jotFormIntegration.parseSubmission(submission);
 
-
     // Step 3: Create or update client in database
     // Securely hash SSN before storage
     const ssnData = clientData.ssn ? prepareSSNForStorage(clientData.ssn) : {};
@@ -94,7 +93,6 @@ export async function POST(request: NextRequest) {
       },
       credits: {},
     });
-
 
     // Step 5: Save tax return to database
     const { data: taxReturn, error: returnError } = await supabase

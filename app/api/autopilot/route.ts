@@ -15,7 +15,6 @@ import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
-
 const DATA_PATH = path.join(process.cwd(), '.data', 'autopilot.json');
 
 interface AutopilotState {

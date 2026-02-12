@@ -91,7 +91,6 @@ export async function blacklistIP(
 ): Promise<void> {
   blacklist.add(ip);
 
-
   // In production, store in database
   // await db.blacklist.create({ ip, reason, timestamp: new Date() });
 }

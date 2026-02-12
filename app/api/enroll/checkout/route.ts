@@ -25,7 +25,6 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 
-
 interface CheckoutRequest {
   firstName: string;
   lastName: string;

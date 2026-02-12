@@ -6,7 +6,6 @@ import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 
-
 export async function POST(req: Request) {
   try {
     const body = await req.json();

@@ -1,13 +1,6 @@
+import { getStripe } from '@/lib/stripe/client';
 
-import Stripe from 'stripe';
 
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not set');
-}
-
-export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-11-20.acacia',
-});
 
 export async function createCheckoutSession(params: {
   amount: number;
@@ -16,7 +9,7 @@ export async function createCheckoutSession(params: {
   cancelUrl: string;
   metadata?: Record<string, string>;
 }) {
-  return await stripe.checkout.sessions.create({
+  return await getStripe().checkout.sessions.create({
     mode: 'payment',
     customer_email: params.customerEmail,
     line_items: [
@@ -42,5 +35,5 @@ export async function constructWebhookEvent(
   signature: string,
   secret: string
 ) {
-  return stripe.webhooks.constructEvent(body, signature, secret);
+  return getStripe().webhooks.constructEvent(body, signature, secret);
 }

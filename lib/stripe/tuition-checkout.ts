@@ -9,11 +9,10 @@
  */
 
 import Stripe from 'stripe';
+import { getStripe, stripe } from '@/lib/stripe/client';
 import { getTuitionConfig, PAYMENT_METHODS, INSTALLMENT_RULES } from './tuition-config';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-10-29.clover',
-});
+
 
 export type PaymentOption = 'pay_in_full' | 'bnpl' | 'installment_plan';
 

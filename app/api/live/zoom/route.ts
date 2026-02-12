@@ -13,7 +13,6 @@ import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 
-
 export async function POST(request: NextRequest) {
   const supabase = createSupabaseClient();
   try {

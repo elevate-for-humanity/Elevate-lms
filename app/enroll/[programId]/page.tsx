@@ -50,10 +50,14 @@ export default function EnrollPage() {
   const loadProgram = async () => {
     setLoading(true);
     try {
+      // Try slug first (public-friendly), fall back to UUID
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(programId);
+      const column = isUUID ? 'id' : 'slug';
+
       const { data, error } = await supabase
         .from('programs')
         .select('*')
-        .eq('id', programId)
+        .eq(column, programId)
         .single();
 
       if (error) throw error;

@@ -5,21 +5,13 @@
  * Set up in Vercel: cron: "0 6 * * *" (6 AM daily)
  */
 
+import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import Stripe from 'stripe';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
-
-// Lazy initialization to avoid build-time errors when env var is missing
-function getStripe() {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) {
-    throw new Error('STRIPE_SECRET_KEY is not configured');
-  }
-  return new Stripe(key, { apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion });
-}
 
 export async function GET(request: NextRequest) {
   // Verify cron secret (for security)

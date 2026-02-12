@@ -1,3 +1,4 @@
+import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
@@ -7,17 +8,6 @@ import { APP_STORE_PRODUCTS } from '@/lib/stripe/app-store-products';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-
-// Lazy initialization to avoid build-time errors
-function getStripe() {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) {
-    throw new Error('STRIPE_SECRET_KEY is not configured');
-  }
-  return new Stripe(key, {
-    apiVersion: '2025-10-29.clover' as Stripe.LatestApiVersion,
-  });
-}
 
 // Use env var with fallback to canonical domain
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';

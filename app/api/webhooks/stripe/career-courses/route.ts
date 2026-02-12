@@ -1,19 +1,10 @@
+import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
 
 export const dynamic = 'force-dynamic';
-
-function getStripe() {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error('STRIPE_SECRET_KEY is not configured');
-  }
-  return new Stripe(process.env.STRIPE_SECRET_KEY, {
-    apiVersion: '2024-12-18.acacia',
-  });
-}
-
 function getWebhookSecret() {
   return process.env.STRIPE_WEBHOOK_SECRET_CAREER_COURSES || process.env.STRIPE_WEBHOOK_SECRET || '';
 }

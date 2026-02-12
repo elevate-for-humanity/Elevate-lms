@@ -3,24 +3,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+import Stripe from 'stripe';
+import { getStripe, stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
-import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
 import { toError, toErrorMessage } from '@/lib/safe';
 
-// Initialize Stripe with proper error handling
-const stripeKey = process.env.STRIPE_SECRET_KEY;
-if (!stripeKey) {
-  // Error logged
-}
 
-const stripe = stripeKey
-  ? new Stripe(stripeKey, {
-      apiVersion: '2025-10-29.clover',
-      typescript: true,
-    })
-  : null;
 
 interface CheckoutRequest {
   programId: string;

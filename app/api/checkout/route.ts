@@ -1,24 +1,13 @@
+import Stripe from 'stripe';
+import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
-import Stripe from 'stripe';
 import { billingConfigs } from '../../../lms-data/billingConfig';
 import { logger } from '@/lib/logger';
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-
-if (!stripeSecretKey) {
-  logger.warn(
-    '[Elevate] STRIPE_SECRET_KEY is not set. /api/checkout will return 500 until configured.'
-  );
-}
-
-const stripe = stripeSecretKey
-  ? new Stripe(stripeSecretKey, {
-      apiVersion: '2025-10-29.clover',
-    })
-  : null;
+const stripe = getStripe();
 
 export async function POST(req: NextRequest) {
   try {

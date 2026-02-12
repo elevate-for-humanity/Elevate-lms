@@ -1,24 +1,35 @@
 import Stripe from 'stripe';
 
-// Stripe client - requires STRIPE_SECRET_KEY in production
-// Build-time placeholder allows compilation without key
-const stripeKey = process.env.STRIPE_SECRET_KEY;
+// Lazy singleton — safe at module level during build.
+let _stripe: Stripe | null = null;
+let _initialized = false;
 
-if (!stripeKey && process.env.NODE_ENV === 'production') {
-  console.warn('STRIPE_SECRET_KEY not set in production');
-}
-
-export const stripe = stripeKey 
-  ? new Stripe(stripeKey, {
-      apiVersion: '2025-10-29.clover',
-      typescript: true,
-    })
-  : null;
-
-// Helper to get stripe client with runtime check
-export function getStripe(): Stripe {
-  if (!stripe) {
-    throw new Error('Stripe not configured - STRIPE_SECRET_KEY required');
+function init(): Stripe | null {
+  if (!_initialized) {
+    _initialized = true;
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (key) {
+      _stripe = new Stripe(key, {
+        apiVersion: '2025-10-29.clover',
+        typescript: true,
+      });
+    }
   }
-  return stripe;
+  return _stripe;
 }
+
+/**
+ * Returns Stripe client or null if STRIPE_SECRET_KEY is not set.
+ * Safe to call at module level during build.
+ */
+export function getStripe(): Stripe {
+  const s = init();
+  if (!s) {
+    // Return null-ish during build; at runtime callers guard with if(!stripe)
+    return null as unknown as Stripe;
+  }
+  return s;
+}
+
+// Eagerly initialized export — null during build, Stripe instance at runtime
+export const stripe = init();

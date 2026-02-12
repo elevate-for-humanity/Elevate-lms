@@ -3,22 +3,14 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+import Stripe from 'stripe';
+import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { sendMarketplaceSaleNotification } from '@/lib/email/resend';
-import Stripe from 'stripe';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { randomBytes } from 'node:crypto';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
 import { toError, toErrorMessage } from '@/lib/safe';
-
-
-function getStripe() {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) throw new Error('STRIPE_SECRET_KEY not configured');
-  return new Stripe(key, {
-    apiVersion: '2025-10-29.clover' as any,
-  });
-}
 
 export async function POST(req: Request) {
   const supabase = createAdminClient();

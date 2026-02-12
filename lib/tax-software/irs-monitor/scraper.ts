@@ -80,8 +80,6 @@ export const IRS_SOURCES = {
   }
 };
 
-
-
 /**
  * IRS Scraper Service
  */

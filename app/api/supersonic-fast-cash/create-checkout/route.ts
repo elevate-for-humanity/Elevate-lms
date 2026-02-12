@@ -5,7 +5,6 @@ export const runtime = 'edge';
 export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 
-
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();

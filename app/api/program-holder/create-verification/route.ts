@@ -7,7 +7,6 @@ import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe/client';
 
-
 export async function POST(request: NextRequest) {
   try {
     if (!stripe) {

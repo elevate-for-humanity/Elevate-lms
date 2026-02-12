@@ -2,18 +2,13 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+import Stripe from 'stripe';
+import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
-import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
-
-function getStripe() {
-  const stripeKey = process.env.STRIPE_SECRET_KEY;
-  if (!stripeKey) return null;
-  return new Stripe(stripeKey, { apiVersion: '2025-10-29.clover' });
-}
 
 function getSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

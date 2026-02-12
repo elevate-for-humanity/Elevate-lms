@@ -1,3 +1,4 @@
+import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -48,9 +49,7 @@ export async function POST(req: Request) {
 
       // Import Stripe
       const Stripe = (await import('stripe')).default;
-      const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-        apiVersion: '2024-12-18.acacia',
-      });
+      const stripe = getStripe();
 
       const results = [];
 

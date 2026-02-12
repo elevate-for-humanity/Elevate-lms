@@ -1,12 +1,7 @@
+import Stripe from 'stripe';
+import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import Stripe from 'stripe';
-
-// Initialize Stripe only if key exists
-const stripeKey = process.env.STRIPE_SECRET_KEY;
-const stripe = stripeKey 
-  ? new Stripe(stripeKey, { apiVersion: '2024-12-18.acacia' as Stripe.LatestApiVersion })
-  : null;
 
 // Barber Apprenticeship pricing (configured in Stripe Dashboard)
 const PRICING = {
@@ -149,6 +144,7 @@ export async function POST(request: NextRequest) {
       }),
     };
 
+    const stripe = getStripe();
     const session = await stripe.checkout.sessions.create(sessionConfig);
 
     // Log the checkout attempt

@@ -90,7 +90,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       return;
     }
 
-
     // Check if customer already has an access key
     const { data: existingKey } = await supabase
       .from('training_access_keys')

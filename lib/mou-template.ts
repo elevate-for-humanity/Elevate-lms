@@ -355,7 +355,6 @@ Name: _____________________________
 Title: ______________________________
 Date: ______________________________
 
-
 PROGRAM HOLDER / TRAINING PROVIDER
 
 Organization: ${data.programHolderName}
@@ -363,7 +362,6 @@ By: _______________________________
 Name: ${data.contactName || '_____________________________'}
 Title: ______________________________
 Date: ${data.date}
-
 
 ---
 

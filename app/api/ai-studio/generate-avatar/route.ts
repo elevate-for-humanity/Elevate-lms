@@ -13,7 +13,6 @@ import { promisify } from 'util';
 
 export const dynamic = 'force-dynamic';
 
-
 const execAsync = promisify(exec);
 
 /**

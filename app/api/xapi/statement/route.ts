@@ -10,8 +10,6 @@ import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { logger } from '@/lib/logger';
 
-
-
 /**
  * POST /api/xapi/statement
  * Receive and store xAPI statements

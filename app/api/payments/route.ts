@@ -1,13 +1,14 @@
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
+import Stripe from 'stripe';
+import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { apiAuthGuard } from '@/lib/authGuards';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { createClient } from '@/lib/supabase/server';
-import Stripe from 'stripe';
 import {
   createCoursePaymentIntent,
   createSubscriptionPaymentIntent,
@@ -23,13 +24,6 @@ import {
   verifyWebhookSignature,
   handleStripeWebhook,
 } from '@/lib/payments';
-
-// Initialize Stripe for payment method ownership verification
-const stripe = process.env.STRIPE_SECRET_KEY
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-11-20.acacia' as Stripe.LatestApiVersion,
-    })
-  : null;
 
 /**
  * Verify that the Stripe customer ID belongs to the authenticated user.

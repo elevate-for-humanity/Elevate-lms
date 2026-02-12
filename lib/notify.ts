@@ -22,8 +22,6 @@ export async function notifyTeams(message: string) {
   });
 }
 
-
-
 export async function notifySendgrid(subject: string, text: string) {
   if (!SENDGRID_KEY || !SENDGRID_FROM || !ALERT_EMAIL_TO) return;
 

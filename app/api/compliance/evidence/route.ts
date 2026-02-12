@@ -7,7 +7,6 @@ import { createClient } from "@/lib/supabase/server";
 import { uploadComplianceEvidenceFile } from "@/lib/storage/complianceEvidence";
 import { toError, toErrorMessage } from '@/lib/safe';
 
-
 export async function POST(request: Request) {
   const supabase = await createClient();
   const {

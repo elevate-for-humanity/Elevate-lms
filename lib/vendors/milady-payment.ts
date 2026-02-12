@@ -3,12 +3,9 @@
  * Processes Milady enrollment and payment automatically
  */
 
+import { getStripe, stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
-import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2025-10-29.clover',
-});
 
 const MILADY_COST = 295; // $295 per enrollment
 
@@ -46,7 +43,6 @@ export async function processMiladyPayment(params: MiladyPaymentParams) {
       throw new Error('Milady enrollment API failed');
     }
 
-
     // STEP 2: Record vendor payment in database
     // This tracks that Milady needs to be paid
     const { error: paymentError } = await supabase
@@ -77,7 +73,6 @@ export async function processMiladyPayment(params: MiladyPaymentParams) {
         method: 'automatic',
       },
     });
-
 
     return {
       success: true,

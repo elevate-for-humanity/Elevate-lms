@@ -33,9 +33,10 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
+import Stripe from 'stripe';
+import { getStripe, stripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 import { createEnrollmentCase, submitCaseForSignatures } from '@/lib/workflow/case-management';
@@ -48,12 +49,7 @@ import {
   assertSubscriptionData,
 } from '@/lib/licensing/billing-authority';
 
-const stripeKey = process.env.STRIPE_SECRET_KEY;
-const stripe = stripeKey
-  ? new Stripe(stripeKey, {
-      apiVersion: '2025-10-29.clover',
-    })
-  : null;
+
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
@@ -66,7 +62,7 @@ const supabase =
 export async function POST(request: NextRequest) {
   // Stage 0: Log env var presence for debugging
   console.log('[webhook] Env check:', {
-    hasStripeKey: !!stripeKey,
+    hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
     hasWebhookSecret: !!webhookSecret,
     hasSupabaseUrl: !!supabaseUrl,
     hasSupabaseKey: !!supabaseKey,

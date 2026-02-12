@@ -1,14 +1,10 @@
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
+import { getStripe, stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import Stripe from 'stripe';
 
-const stripeKey = process.env.STRIPE_SECRET_KEY || '';
-const stripe = stripeKey
-  ? new Stripe(stripeKey, { apiVersion: '2025-10-29.clover' })
-  : null;
 
 interface CartItem {
   product_id: string;

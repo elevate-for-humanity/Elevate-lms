@@ -1,15 +1,9 @@
-import Stripe from 'stripe';
-
+import { getStripe } from '@/lib/stripe/client';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  const stripe = new Stripe(
-    process.env.STRIPE_SECRET_KEY || 'sk_test_Content',
-    {
-      apiVersion: '2025-10-29.clover',
-    }
-  );
+  const stripe = getStripe();
   const body = await req.json();
 
   const session = await stripe.checkout.sessions.create({

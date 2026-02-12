@@ -1,21 +1,5 @@
-import Stripe from "stripe";
+import { getStripe } from '@/lib/stripe/client';
 import { gh, parseRepo } from "../github";
-
-let stripeInstance: Stripe | null = null;
-
-function getStripe(): Stripe {
-  if (!process.env.STRIPE_SECRET_KEY) {
-    throw new Error('STRIPE_SECRET_KEY is not set');
-  }
-
-  if (!stripeInstance) {
-    stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2025-10-29.clover',
-    });
-  }
-
-  return stripeInstance;
-}
 
 export async function createProduct(title: string, price: number) {
   const stripe = getStripe();

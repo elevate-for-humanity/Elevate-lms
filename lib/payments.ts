@@ -1,12 +1,8 @@
 
-import { createClient } from '@/lib/supabase/server';
 import Stripe from 'stripe';
-// Initialize Stripe (only if key is available)
-const stripe = process.env.STRIPE_SECRET_KEY
-  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-11-20.acacia' as any as any, // Type assertion for compatibility
-    })
-  : null;
+import { getStripe } from '@/lib/stripe/client';
+import { createClient } from '@/lib/supabase/server';
+
 // =====================================================
 // PAYMENT TYPES
 // =====================================================

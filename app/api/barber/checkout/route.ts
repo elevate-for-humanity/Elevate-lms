@@ -1,21 +1,12 @@
+import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import Stripe from 'stripe';
 import {
   BARBER_PRICING,
   calculateWeeklyPayment,
   getBillingCycleAnchor,
   formatFirstBillingDate,
 } from '@/lib/programs/pricing';
-
-// Initialize Stripe lazily to avoid errors when key is not set
-function getStripe() {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) {
-    throw new Error('STRIPE_SECRET_KEY is not configured');
-  }
-  return new Stripe(key);
-}
 
 /**
  * POST /api/barber/checkout

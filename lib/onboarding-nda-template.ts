@@ -304,7 +304,6 @@ Name: _____________________________
 Title: ______________________________
 Date: ______________________________
 
-
 RECIPIENT
 
 Name: ${data.recipientName}
@@ -313,7 +312,6 @@ Signature: _______________________________
 Date: ${data.effectiveDate}
 ${data.recipientEmail ? `Email: ${data.recipientEmail}` : ''}
 ${data.recipientAddress ? `Address: ${data.recipientAddress}` : ''}
-
 
 ---
 

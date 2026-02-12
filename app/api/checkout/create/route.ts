@@ -4,20 +4,15 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 // app/api/checkout/create/route.ts - Create Stripe checkout for course
+import { getStripe, stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
-import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { toError, toErrorMessage } from '@/lib/safe';
 
-const stripeKey = process.env.STRIPE_SECRET_KEY || '';
-const stripe = stripeKey
-  ? new Stripe(stripeKey, {
-      apiVersion: '2025-10-29.clover',
-    })
-  : null;
+
 
 export async function POST(request: NextRequest) {
   if (!stripe) {

@@ -10,7 +10,6 @@ import { toError, toErrorMessage } from '@/lib/safe';
 import { createClient } from '@/lib/supabase/server';
 import { paymentRateLimit } from '@/lib/rate-limit';
 
-
 export async function POST(req: Request) {
   try {
     // Rate limiting

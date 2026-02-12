@@ -1,3 +1,4 @@
+import { getStripe, stripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'nodejs';
@@ -5,16 +6,10 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import type { NextRequest } from 'next/server';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
-import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 
-const stripeKey = process.env.STRIPE_SECRET_KEY;
-const stripe = stripeKey
-  ? new Stripe(stripeKey, {
-      apiVersion: '2025-10-29.clover',
-    })
-  : null;
+
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;

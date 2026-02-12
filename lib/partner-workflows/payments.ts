@@ -4,12 +4,9 @@
  * Handles Stripe payments for paid certifications
  */
 
+import { getStripe, stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/client';
-import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16',
-});
 
 export interface PaymentRequest {
   studentId: string;

@@ -1,14 +1,6 @@
+import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
-
-function getStripe() {
-  const key = process.env.STRIPE_SECRET_KEY;
-  if (!key) {
-    throw new Error('STRIPE_SECRET_KEY is not configured');
-  }
-  return new Stripe(key);
-}
 
 /**
  * POST /api/barber/checkout/full

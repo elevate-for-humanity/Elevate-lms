@@ -9,7 +9,6 @@ import { createSupabaseClient } from "@/lib/supabase-api";
 import { cacheGet, cacheSet } from '@/lib/cache';
 import { toError, toErrorMessage } from '@/lib/safe';
 
-
 export async function GET(_req: NextRequest) {
   const supabase = createSupabaseClient();
   const cacheKey = 'programs:featured';

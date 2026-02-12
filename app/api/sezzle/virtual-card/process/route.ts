@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       sezzle.configure({
         publicKey: process.env.SEZZLE_PUBLIC_KEY,
         privateKey: process.env.SEZZLE_PRIVATE_KEY,
-        environment: (process.env.SEZZLE_ENVIRONMENT as 'sandbox' | 'production') || 'sandbox',
+        environment: (process.env.SEZZLE_ENVIRONMENT as 'sandbox' | 'production') || 'production',
       });
     }
 

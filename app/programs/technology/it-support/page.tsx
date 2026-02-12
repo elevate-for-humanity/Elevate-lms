@@ -86,9 +86,9 @@ export default function ITSupportPage() {
             <Link href="/apply?program=it-support" className="bg-blue-600 text-white px-10 py-5 rounded-lg font-semibold text-xl hover:bg-blue-700 transition-colors">
               Apply Now
             </Link>
-            <Link href="/wioa-eligibility" className="bg-white border-2 border-blue-600 text-blue-600 px-10 py-5 rounded-lg font-semibold text-xl hover:bg-blue-50 transition-colors">
-              Check Eligibility
-            </Link>
+            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="bg-white border-2 border-blue-600 text-blue-600 px-10 py-5 rounded-lg font-semibold text-xl hover:bg-blue-50 transition-colors">
+              Register at Indiana Career Connect
+            </a>
           </div>
         </div>
       </section>
@@ -224,9 +224,9 @@ export default function ITSupportPage() {
             <Link href="/apply?program=it-support" className="bg-white text-blue-700 px-10 py-5 rounded-lg font-semibold text-xl hover:bg-blue-50 transition inline-flex items-center justify-center gap-2">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/wioa-eligibility" className="border-2 border-white text-white px-10 py-5 rounded-lg font-semibold text-xl hover:bg-white/10 transition">
-              Check Eligibility
-            </Link>
+            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="border-2 border-white text-white px-10 py-5 rounded-lg font-semibold text-xl hover:bg-white/10 transition">
+              Register at Indiana Career Connect
+            </a>
           </div>
         </div>
       </section>

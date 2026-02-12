@@ -81,10 +81,10 @@ export default function TechnologyProgramsPage() {
                   Apply Now
                 </Link>
                 <Link 
-                  href="/wioa-eligibility"
+                  href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
                   className="inline-flex items-center text-white text-lg border-b-2 border-white pb-1 hover:border-blue-400 hover:text-blue-400 transition-all duration-300"
                 >
-                  Check Eligibility
+                  Register at Indiana Career Connect
                 </Link>
               </div>
             </div>
@@ -352,10 +352,10 @@ export default function TechnologyProgramsPage() {
               Apply Now
             </Link>
             <Link
-              href="/wioa-eligibility"
+              href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
               className="inline-block border-2 border-white text-white px-8 py-4 font-semibold rounded-full hover:bg-white/10 transition-colors"
             >
-              Check Eligibility
+              Register at Indiana Career Connect
             </Link>
           </div>
         </div>

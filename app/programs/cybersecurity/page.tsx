@@ -305,7 +305,7 @@ export default function CybersecurityProgramPage() {
           <p className="text-xl text-emerald-100 mb-8 max-w-2xl mx-auto">Join the fight against cyber threats. Check your eligibility for free WIOA-funded training.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/apply?program=cybersecurity" className="inline-flex items-center justify-center px-8 py-4 bg-white text-emerald-600 font-semibold rounded-full hover:bg-white transition-all transform hover:scale-105 shadow-lg">
-              Check Eligibility Now<ArrowRight className="w-5 h-5 ml-2" />
+              Register at Indiana Career Connect<ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link href="/inquiry?program=cybersecurity" className="inline-flex items-center justify-center px-8 py-4 bg-emerald-700 hover:bg-emerald-600 text-white font-semibold rounded-full transition-all">
               <Phone className="w-5 h-5 mr-2" />Talk to an Advisor

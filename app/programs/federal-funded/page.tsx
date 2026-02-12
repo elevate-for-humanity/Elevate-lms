@@ -138,10 +138,10 @@ export default async function FederalFundedProgramsPage() {
                 job training and employment services.
               </p>
               <Link
-                href="/wioa-eligibility"
+                href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
                 className="text-brand-green-600 font-semibold hover:underline"
               >
-                Check Eligibility →
+                Register at Indiana Career Connect →
               </Link>
             </div>
 
@@ -307,10 +307,10 @@ export default async function FederalFundedProgramsPage() {
               Apply Now
             </Link>
             <Link
-              href="/wioa-eligibility"
+              href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
               className="inline-flex px-8 py-4 bg-white border-2 border-brand-green-600 text-brand-green-600 font-bold rounded-lg hover:bg-white transition text-lg"
             >
-              Check Eligibility
+              Register at Indiana Career Connect
             </Link>
           </div>
         </div>

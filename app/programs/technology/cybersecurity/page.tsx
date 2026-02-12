@@ -88,10 +88,10 @@ export default function CybersecurityPage() {
               Apply Now
             </Link>
             <Link
-              href="/wioa-eligibility"
+              href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center border-2 border-blue-600 text-blue-600 px-8 py-4 rounded-full font-semibold hover:bg-blue-50 transition-colors text-lg"
             >
-              Check Eligibility
+              Register at Indiana Career Connect
             </Link>
           </div>
         </div>

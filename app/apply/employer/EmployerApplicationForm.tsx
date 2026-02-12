@@ -35,7 +35,13 @@ export default function EmployerApplicationForm() {
     if (result.success) {
       router.push(result.redirectTo!);
     } else {
-      setError(result.error || 'Failed to submit application');
+      const subject = encodeURIComponent(`Employer Application: ${data.firstName} ${data.lastName} - ${data.companyName}`);
+      const body = encodeURIComponent(
+        `Name: ${data.firstName} ${data.lastName}\nCompany: ${data.companyName}\n` +
+        `Email: ${data.email}\nPhone: ${data.phone}\n` +
+        `Industry: ${data.industry || 'N/A'}\nHiring Needs: ${data.hiringNeeds || 'N/A'}\n`
+      );
+      window.location.href = `mailto:elevate4humanityedu@gmail.com?subject=${subject}&body=${body}`;
       setLoading(false);
     }
   }

@@ -128,9 +128,9 @@ export default function CDLTrainingPage() {
               <Link href="/apply?program=cdl-training" className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
                 Apply Now <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
-                Check Eligibility
-              </Link>
+              <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-full font-bold text-lg transition-all border border-white/40">
+                Register at Indiana Career Connect
+              </a>
             </div>
           </div>
         </div>
@@ -298,9 +298,9 @@ export default function CDLTrainingPage() {
             ))}
           </div>
           
-          <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+          <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
             Check Your Eligibility <ArrowRight className="w-5 h-5" />
-          </Link>
+          </a>
         </div>
       </section>
 

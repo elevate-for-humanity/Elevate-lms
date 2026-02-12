@@ -42,7 +42,19 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
     if (result.success) {
       router.push(result.redirectTo!);
     } else {
-      setError(result.error || 'Failed to submit application');
+      // Fallback: open pre-filled email if system is unavailable
+      const subject = encodeURIComponent(`Student Application: ${data.firstName} ${data.lastName}`);
+      const body = encodeURIComponent(
+        `Name: ${data.firstName} ${data.lastName}\n` +
+        `Email: ${data.email}\n` +
+        `Phone: ${data.phone}\n` +
+        `City: ${data.city || 'N/A'}, ${data.state || 'N/A'} ${data.zipCode || ''}\n` +
+        `Program Interest: ${data.programInterest || 'Not specified'}\n` +
+        `Employment: ${data.employmentStatus || 'N/A'}\n` +
+        `Education: ${data.educationLevel || 'N/A'}\n` +
+        `Goals: ${data.goals || 'N/A'}\n`
+      );
+      window.location.href = `mailto:elevate4humanityedu@gmail.com?subject=${subject}&body=${body}`;
       setLoading(false);
     }
   }

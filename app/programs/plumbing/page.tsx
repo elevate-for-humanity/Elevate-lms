@@ -279,7 +279,7 @@ export default function PlumbingProgramPage() {
           <p className="text-xl text-cyan-100 mb-8 max-w-2xl mx-auto">Join a trade that's always in demand. Check your eligibility for free WIOA-funded training.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/apply?program=plumbing" className="inline-flex items-center justify-center px-8 py-4 bg-white text-cyan-600 font-semibold rounded-full hover:bg-cyan-50 transition-all transform hover:scale-105 shadow-lg">
-              Check Eligibility Now<ArrowRight className="w-5 h-5 ml-2" />
+              Register at Indiana Career Connect<ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link href="/inquiry?program=plumbing" className="inline-flex items-center justify-center px-8 py-4 bg-cyan-700 hover:bg-cyan-600 text-white font-semibold rounded-full transition-all">
               <Phone className="w-5 h-5 mr-2" />Talk to an Advisor

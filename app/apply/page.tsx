@@ -106,12 +106,13 @@ export default async function ApplyPage({
               </h2>
               <p className="text-slate-700 mb-3">
                 Apply for career training in healthcare, skilled trades, barbering, IT, and more.
-                Most programs are <strong>100% free</strong> through WIOA, WRG, and JRI funding.
+                Many programs are funded through WIOA, WRG, and JRI grants. Some programs
+                have tuition with flexible payment options available.
               </p>
               <ul className="text-slate-600 text-sm space-y-1 mb-4 list-disc list-inside">
-                <li>No tuition for qualifying Indiana residents</li>
+                <li>Register at indianacareerconnect.com for funding</li>
                 <li>Pick your program during the application</li>
-                <li>We check your funding eligibility for you</li>
+                <li>Payment plans and BNPL options for paid programs</li>
                 <li>Response within 1-2 business days</li>
               </ul>
               <span className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg group-hover:gap-3 transition-all text-sm">
@@ -126,10 +127,10 @@ export default async function ApplyPage({
 
           {/* Employer */}
           <Link
-            href="/apply/employer"
+            href="/employer"
             className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
           >
-            <div className="relative h-[180px]">
+            <div className="relative h-[200px]">
               <Image
                 src="/images/heroes-hq/employer-hero.jpg"
                 alt="Employer partnership meeting"
@@ -142,41 +143,62 @@ export default async function ApplyPage({
                 <h2 className="text-lg font-bold text-slate-900">Employer Partnership</h2>
                 <Image src="/logo.png" alt="Elevate" width={18} height={18} className="opacity-30" />
               </div>
-              <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                Hire pre-trained candidates at no cost. We handle recruiting, screening, and
-                skills training. WOTC tax credits may apply.
+              <p className="text-slate-600 text-sm leading-relaxed mb-2">
+                Partner with Elevate to access pre-screened, trained candidates ready to work.
+                We handle recruiting, skills training, and onboarding so you get job-ready hires.
               </p>
-              <span className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm group-hover:gap-3 transition-all">
+              <p className="text-slate-700 text-sm font-semibold mb-2">Available grants and tax credits:</p>
+              <div className="space-y-1.5 mb-3" onClick={(e) => e.stopPropagation()}>
+                <Link href="/employer" className="block text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                  <strong>WOTC</strong> — Work Opportunity Tax Credit up to $9,600 per hire
+                </Link>
+                <Link href="/ojt-and-funding" className="block text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                  <strong>OJT</strong> — On-the-Job Training reimbursement covers 50-75% of wages
+                </Link>
+                <Link href="/funding" className="block text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                  <strong>WIOA</strong> — Workforce Innovation and Opportunity Act funds upskilling
+                </Link>
+                <Link href="/funding" className="block text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                  <strong>WRG</strong> — Workforce Ready Grant covers high-demand certifications
+                </Link>
+              </div>
+              <span className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm group-hover:gap-3 transition-all">
                 Partner With Us <ArrowRight className="w-4 h-4" />
               </span>
             </div>
           </Link>
 
-          {/* Staff / Instructor */}
+          {/* Program Holder — CTA card with full image background */}
           <Link
-            href="/apply/staff"
-            className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
+            href="/apply/program-holder"
+            className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group relative"
           >
-            <div className="relative h-[180px]">
+            <div className="relative h-[420px] sm:h-[460px]">
               <Image
-                src="/images/efh/sections/staffing.jpg"
-                alt="Staff and instructors working with students"
+                src="/images/store/platform-hero.jpg"
+                alt="Program holder using the Elevate LMS platform"
                 fill
                 className="object-cover"
               />
-            </div>
-            <div className="bg-white p-5">
-              <div className="flex items-center gap-2 mb-2">
-                <h2 className="text-lg font-bold text-slate-900">Staff &amp; Instructor</h2>
-                <Image src="/logo.png" alt="Elevate" width={18} height={18} className="opacity-30" />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Become a Program Holder</h2>
+                <p className="text-white/90 text-sm leading-relaxed mb-3">
+                  Launch your own workforce training program with Elevate&apos;s LMS, curriculum,
+                  and compliance infrastructure. We guide you through securing WIOA, WRG, and
+                  JRI funding so qualifying students can train at reduced or no cost.
+                </p>
+                <ul className="text-white/80 text-sm space-y-1 mb-4 list-disc list-inside">
+                  <li>White-label LMS platform under your brand</li>
+                  <li>Pre-built curriculum for 20+ career pathways</li>
+                  <li>Guidance on WIOA/WRG/JRI grant applications</li>
+                  <li>Compliance, reporting, and audit-ready docs</li>
+                  <li>Dedicated onboarding and ongoing support</li>
+                </ul>
+                <span className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg group-hover:gap-3 transition-all text-sm">
+                  Apply to Become a Program Holder <ArrowRight className="w-4 h-4" />
+                </span>
               </div>
-              <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                Teach career skills or support student success as an advisor, case manager,
-                or admin. Flexible schedules, competitive pay.
-              </p>
-              <span className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm group-hover:gap-3 transition-all">
-                Join Our Team <ArrowRight className="w-4 h-4" />
-              </span>
             </div>
           </Link>
         </div>
@@ -194,8 +216,10 @@ export default async function ApplyPage({
               {
                 image: '/images/heroes/hero-federal-funding.jpg',
                 alt: 'Funding assistance',
-                title: 'Funding Assistance',
-                desc: 'We check your eligibility for WIOA, WRG, JRI, and other grants. Most students pay $0.',
+                title: 'Funding & Grants',
+                desc: 'WIOA covers tuition, books, and supplies for qualifying adults and dislocated workers. WRG (Workforce Ready Grant) funds high-demand certifications in Indiana. JRI (Justice Reinvestment Initiative) supports individuals with justice involvement.',
+                link: '/funding',
+                linkLabel: 'View Funding Options',
               },
 
               {
@@ -209,12 +233,20 @@ export default async function ApplyPage({
                 alt: 'Career placement services',
                 title: 'Career Placement',
                 desc: 'Resume help, interview prep, and direct employer connections before you graduate.',
+                link: '/career-services',
+                linkLabel: 'View Career Services',
               },
               {
                 image: '/images/efh/sections/coaching.jpg',
                 alt: 'Case management team',
                 title: 'Case Management',
                 desc: 'A dedicated advisor checks in weekly to help you stay on track.',
+              },
+              {
+                image: '/images/barber/training.jpg',
+                alt: 'Barber apprenticeship training in a real barbershop',
+                title: 'Barber Apprenticeship',
+                desc: 'Train in a real barbershop, earn while you learn, and get your Indiana barber license. 2,000 hours of hands-on experience.',
               },
               {
                 image: '/images/hero/hero-certifications.jpg',
@@ -235,6 +267,25 @@ export default async function ApplyPage({
                 <div className="p-4">
                   <h3 className="font-semibold text-slate-900 mb-1">{item.title}</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                  {'link' in item && item.link && (
+                    item.link.startsWith('http') ? (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm mt-3 hover:bg-blue-700 transition-colors"
+                      >
+                        {('linkLabel' in item && item.linkLabel) || 'Learn More'} <ArrowRight className="w-4 h-4" />
+                      </a>
+                    ) : (
+                      <Link
+                        href={item.link}
+                        className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm mt-3 hover:bg-blue-700 transition-colors"
+                      >
+                        {('linkLabel' in item && item.linkLabel) || 'Learn More'} <ArrowRight className="w-4 h-4" />
+                      </Link>
+                    )
+                  )}
                 </div>
               </div>
             ))}

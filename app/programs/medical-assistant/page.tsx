@@ -279,7 +279,7 @@ export default function MedicalAssistantProgramPage() {
           <p className="text-xl text-rose-100 mb-8 max-w-2xl mx-auto">Join a rewarding profession helping patients every day. Check your eligibility for free WIOA-funded training.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/apply?program=medical-assistant" className="inline-flex items-center justify-center px-8 py-4 bg-white text-rose-600 font-semibold rounded-full hover:bg-rose-50 transition-all transform hover:scale-105 shadow-lg">
-              Check Eligibility Now<ArrowRight className="w-5 h-5 ml-2" />
+              Register at Indiana Career Connect<ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link href="/inquiry?program=medical-assistant" className="inline-flex items-center justify-center px-8 py-4 bg-rose-700 hover:bg-rose-600 text-white font-semibold rounded-full transition-all">
               <Phone className="w-5 h-5 mr-2" />Talk to an Advisor

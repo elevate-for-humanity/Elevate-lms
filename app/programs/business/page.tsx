@@ -313,10 +313,10 @@ export default function BusinessPage() {
               Apply Now
             </Link>
             <Link
-              href="/wioa-eligibility"
+              href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-8 py-4 border-2 border-white text-white text-base font-medium rounded-full hover:bg-white/10 transition-colors"
             >
-              Check Eligibility
+              Register at Indiana Career Connect
             </Link>
           </div>
         </div>

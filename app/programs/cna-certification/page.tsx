@@ -197,9 +197,9 @@ export default function CNACertificationPage() {
             ))}
           </div>
           
-          <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+          <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
             Check Your Eligibility <ArrowRight className="w-5 h-5" />
-          </Link>
+          </a>
         </div>
       </section>
 
@@ -211,7 +211,7 @@ export default function CNACertificationPage() {
           <div className="grid md:grid-cols-4 gap-6">
             {[
               { num: 1, title: 'Apply Online', desc: 'Complete our simple application' },
-              { num: 2, title: 'Check Eligibility', desc: 'Verify WIOA funding eligibility' },
+              { num: 2, title: 'Register at Indiana Career Connect', desc: 'Verify WIOA funding eligibility' },
               { num: 3, title: 'Orientation', desc: 'Attend program orientation' },
               { num: 4, title: 'Start Training', desc: 'Begin your CNA journey' },
             ].map((step, i) => (

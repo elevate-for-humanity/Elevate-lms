@@ -416,7 +416,7 @@ export default function ElectricalProgramPage() {
               href="/apply?program=electrical"
               className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white font-semibold rounded-full hover:bg-slate-800 transition-all transform hover:scale-105 shadow-lg"
             >
-              Check Eligibility Now
+              Register at Indiana Career Connect
               <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link

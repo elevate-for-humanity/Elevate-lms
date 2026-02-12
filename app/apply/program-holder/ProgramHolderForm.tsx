@@ -35,7 +35,13 @@ export default function ProgramHolderForm() {
     if (result.success) {
       router.push(result.redirectTo!);
     } else {
-      setError(result.error || 'Failed to submit application');
+      const subject = encodeURIComponent(`Program Holder Application: ${data.firstName} ${data.lastName} - ${data.organizationName}`);
+      const body = encodeURIComponent(
+        `Name: ${data.firstName} ${data.lastName}\nOrganization: ${data.organizationName}\n` +
+        `Email: ${data.email}\nPhone: ${data.phone}\n` +
+        `Programs Offered: ${data.programsOffered || 'N/A'}\nGoals: ${data.partnershipGoals || 'N/A'}\n`
+      );
+      window.location.href = `mailto:elevate4humanityedu@gmail.com?subject=${subject}&body=${body}`;
       setLoading(false);
     }
   }

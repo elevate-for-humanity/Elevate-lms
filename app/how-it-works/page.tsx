@@ -2,117 +2,17 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'How It Works | Elevate for Humanity',
-  description:
-    'Learn how Elevate for Humanity helps you get trained, certified, and hired.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/how-it-works',
-  },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/how-it-works' },
+  title: 'How It Works | Elevate For Humanity',
+  description: 'From registration to employment in 5 steps. See exactly how Elevate career training works.',
 };
-
-const steps = [
-  {
-    step: 1,
-    title: 'Apply',
-    description: 'Complete a simple online application or contact us.',
-    image: '/images/success-new/success-1.jpg',
-    href: '/apply',
-  },
-  {
-    step: 2,
-    title: 'Get Matched',
-    description: 'We connect you with the right training program.',
-    image: '/images/success-new/success-2.jpg',
-    href: '/programs',
-  },
-  {
-    step: 3,
-    title: 'Train',
-    description: 'Complete your training with hands-on instruction.',
-    image: '/images/success-new/success-3.jpg',
-    href: '/programs',
-  },
-  {
-    step: 4,
-    title: 'Get Hired',
-    description: 'Earn your credential and connect with employers.',
-    image: '/images/success-new/success-4.jpg',
-    href: '/career-services',
-  },
-];
-
-const resources = [
-  {
-    title: 'WIOA Eligibility',
-    description: 'Find out if you qualify for free training.',
-    image: '/images/heroes-hq/funding-hero.jpg',
-    href: '/wioa-eligibility',
-  },
-  {
-    title: 'Funding Options',
-    description: 'Learn about grants and payment options.',
-    image: '/images/heroes-hq/career-services-hero.jpg',
-    href: '/funding',
-  },
-  {
-    title: 'Training Programs',
-    description: 'Explore healthcare, trades, technology, and more.',
-    image: '/images/heroes-hq/programs-hero.jpg',
-    href: '/programs',
-  },
-  {
-    title: 'FAQ',
-    description: 'Get answers to common questions.',
-    image: '/images/heroes-hq/contact-hero.jpg',
-    href: '/faq',
-  },
-];
-
-const programs = [
-  {
-    title: 'Healthcare',
-    description: 'CNA, Medical Assistant, Phlebotomy',
-    image: '/images/healthcare/hero-programs-healthcare.jpg',
-    href: '/programs/healthcare',
-  },
-  {
-    title: 'Skilled Trades',
-    description: 'HVAC, Electrical, Welding, Plumbing',
-    image: '/images/trades/hero-program-hvac.jpg',
-    href: '/programs/skilled-trades',
-  },
-  {
-    title: 'Technology',
-    description: 'IT Support, Cybersecurity, Web Development',
-    image: '/images/technology/hero-program-it-support.jpg',
-    href: '/programs/technology',
-  },
-  {
-    title: 'CDL Training',
-    description: 'Commercial Driver License',
-    image: '/images/trades/hero-program-cdl.jpg',
-    href: '/programs/cdl-training',
-  },
-  {
-    title: 'Barber Apprenticeship',
-    description: 'USDOL Registered Program',
-    image: '/images/barber/training.jpg',
-    href: '/programs/barber-apprenticeship',
-  },
-  {
-    title: 'Business',
-    description: 'Tax Preparation, Entrepreneurship',
-    image: '/images/heroes/hero-state-funding.jpg',
-    href: '/programs/business',
-  },
-];
 
 export default function HowItWorksPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'How It Works' }]} />
@@ -120,145 +20,70 @@ export default function HowItWorksPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] min-h-[350px] flex items-center justify-center">
-        <Image
-          src="/images/heroes-hq/how-it-works-hero.jpg"
-          alt="Career training"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="relative z-10 text-center text-white px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">How It Works</h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">Your path to a new career in 4 simple steps</p>
-        </div>
-      </section>
-
-      {/* Steps */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            How It Works
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {steps.map((item) => (
-              <Link
-                key={item.step}
-                href={item.href}
-                className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
-              >
-                <div className="relative h-48">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                  />
-                  <div className="absolute top-4 left-4 w-10 h-10 bg-orange-500 text-white rounded-full flex items-center justify-center text-lg font-bold">
-                    {item.step}
-                  </div>
-                </div>
-                <div className="p-5">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm">{item.description}</p>
-                </div>
-              </Link>
-            ))}
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image src="/hero-images/how-it-works-hero.jpg" alt="How Elevate works" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">How It Works</h1>
+            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
+              From signup to your new career in 5 clear steps. No confusion, no runaround.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Resources */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Resources
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {resources.map((item) => (
-              <Link
-                key={item.title}
-                href={item.href}
-                className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
-              >
-                <div className="relative h-40">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                  />
+      {/* 5 Steps — visual journey */}
+      <section className="py-8 sm:py-14 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="space-y-5">
+            {[
+              { step: '1', title: 'Register at Indiana Career Connect', desc: 'Create a free account at indianacareerconnect.com. This is the state workforce portal — it takes about 10 minutes. You will need your ID and Social Security number.', image: '/images/homepage/funding-navigation.png', cta: 'Register Now', href: 'https://www.indianacareerconnect.com', external: true },
+              { step: '2', title: 'Schedule a WorkOne Appointment', desc: 'Call or visit your local WorkOne center to schedule an eligibility meeting. A case manager will review your situation and determine which funding programs you qualify for (WIOA, WRG, JRI).', image: '/images/heroes-hq/career-services-hero.jpg', cta: 'Find WorkOne Locations', href: 'https://www.in.gov/dwd/workone/workone-locations/', external: true },
+              { step: '3', title: 'Choose Your Program', desc: 'Browse our training programs and pick the career path that fits your goals. Healthcare, skilled trades, CDL, IT, barbering, and more. Your WorkOne case manager can help you decide.', image: '/images/homepage/training-program-collage.png', cta: 'View Programs', href: '/programs', external: false },
+              { step: '4', title: 'Complete Training & Get Certified', desc: 'Attend classes, complete hands-on training, and earn your industry certification. Most programs take 4-16 weeks. Some programs let you earn while you learn through apprenticeships.', image: '/images/homepage/certificate-of-completion.png', cta: 'Learn About Earn While You Learn', href: '/ojt-and-funding', external: false },
+              { step: '5', title: 'Get Hired', desc: 'Our career services team helps you build your resume, practice interviews, and connects you directly with employers who are hiring. Many students get job offers before finishing training.', image: '/images/homepage/employer-partnership.png', cta: 'Career Services', href: '/career-services', external: false },
+            ].map((item) => (
+              <div key={item.step} className="flex flex-col sm:flex-row gap-0 sm:gap-5 rounded-xl overflow-hidden border border-slate-200 bg-white">
+                <div className="relative w-full h-[180px] sm:w-64 sm:h-auto sm:min-h-[200px] flex-shrink-0">
+                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <div className="absolute top-3 left-3 w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow">{item.step}</div>
                 </div>
-                <div className="p-5">
-                  <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-blue-600">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-600 text-sm">{item.description}</p>
+                <div className="p-5 flex-1">
+                  <h3 className="font-bold text-slate-900 text-base sm:text-lg mb-2">{item.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed mb-3">{item.desc}</p>
+                  {item.external ? (
+                    <a href={item.href} target="_blank" rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                      {item.cta} <ArrowRight className="w-4 h-4" />
+                    </a>
+                  ) : (
+                    <Link href={item.href}
+                      className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                      {item.cta} <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  )}
                 </div>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Programs */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-12">
-            Training Programs
-          </h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {programs.map((item) => (
-              <Link
-                key={item.title}
-                href={item.href}
-                className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow"
-              >
-                <div className="relative h-52">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600">
-                    {item.title}
-                  </h3>
-                  <p className="text-gray-600">{item.description}</p>
-                </div>
-              </Link>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600">
-        <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">
-            Ready to Start?
-          </h2>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply"
-              className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100"
-            >
-              Apply Now
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-block border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-700"
-            >
-              Contact Us
+      <section className="py-8 sm:py-14 bg-blue-600">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready to Begin?</h2>
+          <p className="text-white/90 mb-6 text-sm">Start with step 1 — register at Indiana Career Connect.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
+              className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
+              Register Now <ArrowRight className="w-4 h-4 inline ml-1" />
+            </a>
+            <Link href="/apply" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
+              Apply for Training
             </Link>
           </div>
-          <p className="text-blue-100 text-sm mt-4">
-            After applying, a workforce advisor will confirm your eligibility and start date.
-          </p>
         </div>
       </section>
     </div>

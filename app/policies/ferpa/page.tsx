@@ -2,6 +2,8 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 // Force static generation - FERPA is a trust page that must never hang
+export const dynamic = 'force-static';
+export const revalidate = 86400; // 24 hours
 
 export const metadata: Metadata = {
   title: 'FERPA Privacy Policy | Elevate for Humanity',

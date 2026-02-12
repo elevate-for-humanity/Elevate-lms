@@ -1,4 +1,6 @@
 // Force static generation for performance
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
 import PageAvatar from '@/components/PageAvatar';
 import Image from "next/image";

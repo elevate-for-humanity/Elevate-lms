@@ -3,6 +3,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { FileText, DollarSign, Clock, CheckCircle } from 'lucide-react';
 
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
 export const metadata = {
   title: 'Tax Preparation Services | Supersonic Fast Cash',

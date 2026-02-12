@@ -4,6 +4,8 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 
 // Force static generation
+export const dynamic = 'force-static';
+export const revalidate = 86400;
 
 export const metadata: Metadata = {
   title: 'Cybersecurity Training | Elevate for Humanity',

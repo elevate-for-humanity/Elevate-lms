@@ -1,138 +1,248 @@
-import { Metadata } from 'next';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight } from 'lucide-react';
+import { 
+  Clock, DollarSign, Award, ArrowRight, 
+  Users, BookOpen, GraduationCap, Phone
+} from 'lucide-react';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'CNA Certification Training | Healthcare Training Indianapolis | Elevate',
-  description: 'Become a Certified Nursing Assistant in 4-6 weeks. CNA training in Indianapolis with state certification exam included. Funding available for qualifying students.',
+  title: 'CNA Certification Training | Free Healthcare Training Indianapolis | Elevate',
+  description: 'Become a Certified Nursing Assistant in 4-6 weeks. Free CNA training through WIOA funding in Indianapolis. State certification exam included. 89% job placement rate.',
   alternates: { canonical: `${SITE_URL}/programs/cna-certification` },
+  keywords: [
+    'CNA certification Indianapolis',
+    'free CNA training Indiana',
+    'certified nursing assistant program',
+    'WIOA CNA training',
+    'healthcare training Indianapolis',
+    'nursing assistant school Indiana',
+    'CNA classes near me',
+    'free healthcare certification',
+    'CNA state exam prep',
+    'nursing home jobs Indianapolis',
+    'hospital CNA jobs Indiana',
+    'home health aide training',
+    'medical career training free',
+    'WorkOne CNA program',
+  ],
   openGraph: {
-    title: 'CNA Certification Training | Indianapolis',
-    description: 'Become a CNA in 4-6 weeks with state certification exam included.',
+    title: 'CNA Certification Training | Free Healthcare Training Indianapolis',
+    description: 'Become a Certified Nursing Assistant in 4-6 weeks. Free training through WIOA funding. State certification exam included.',
     url: `${SITE_URL}/programs/cna-certification`,
-    images: [{ url: `${SITE_URL}/images/heroes/programs/healthcare/hero-program-cna.jpg`, width: 1200, height: 630 }],
+    siteName: 'Elevate for Humanity',
+    images: [{ url: `${SITE_URL}/images/healthcare/hero-programs-healthcare.jpg`, width: 1200, height: 630, alt: 'CNA Training Program' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CNA Certification Training | Free Healthcare Training',
+    description: 'Become a Certified Nursing Assistant in 4-6 weeks. Free training through WIOA funding.',
+    images: [`${SITE_URL}/images/healthcare/hero-programs-healthcare.jpg`],
   },
 };
+
+const programDetails = {
+  duration: '4-6 weeks',
+  hours: '75+ classroom hours',
+  clinicals: '16+ clinical hours',
+  certification: 'Indiana State CNA Certification',
+  salary: '$32,000 - $45,000/year',
+  jobGrowth: '8% (faster than average)',
+};
+
+const curriculum = [
+  { title: 'Patient Care Fundamentals', desc: 'Vital signs, hygiene, mobility assistance' },
+  { title: 'Medical Terminology', desc: 'Healthcare language and documentation' },
+  { title: 'Infection Control', desc: 'Safety protocols and prevention' },
+  { title: 'Communication Skills', desc: 'Patient and family interaction' },
+  { title: 'Clinical Rotations', desc: 'Hands-on experience in healthcare facilities' },
+  { title: 'State Exam Prep', desc: 'Written and skills test preparation' },
+];
+
+const careers = [
+  { title: 'Nursing Homes', salary: '$30K-$38K' },
+  { title: 'Hospitals', salary: '$35K-$45K' },
+  { title: 'Home Health', salary: '$32K-$42K' },
+  { title: 'Assisted Living', salary: '$30K-$40K' },
+];
 
 export default function CNACertificationPage() {
   return (
     <div className="min-h-screen bg-white">
+      {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Healthcare', href: '/programs/healthcare' }, { label: 'CNA Certification' }]} />
+          <Breadcrumbs items={[
+            { label: 'Programs', href: '/programs' }, 
+            { label: 'Healthcare', href: '/programs/healthcare' }, 
+            { label: 'CNA Certification' }
+          ]} />
         </div>
       </div>
 
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/heroes/programs/healthcare/hero-program-cna.jpg" alt="CNA Certification Training" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
-          <div className="max-w-4xl mx-auto">
-            <span className="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">CNA Certification</h1>
-            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
-              Become a Certified Nursing Assistant in 4-6 weeks. State certification exam included. Start a career in healthcare.
-            </p>
+      {/* Hero - Clean image only, no text */}
+      <section className="relative h-[50vh] min-h-[400px]">
+        <Image 
+          src="/images/healthcare/hero-programs-healthcare.jpg" 
+          alt="CNA Training Program" 
+          fill sizes="100vw"
+          className="object-cover" 
+          priority 
+        />
+      </section>
+
+      {/* Quick Stats */}
+      <section className="py-8 bg-slate-900">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div>
+              <Clock className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-white">{programDetails.duration}</div>
+              <div className="text-slate-400 text-sm">Program Length</div>
+            </div>
+            <div>
+              <DollarSign className="w-8 h-8 text-green-400 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-white">Funded</div>
+              <div className="text-slate-400 text-sm">For Qualifying Students</div>
+            </div>
+            <div>
+              <Award className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-white">State Cert</div>
+              <div className="text-slate-400 text-sm">Included</div>
+            </div>
+            <div>
+              <Users className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+              <div className="text-2xl font-bold text-white">High</div>
+              <div className="text-slate-400 text-sm">Job Demand</div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="bg-slate-900 py-5">
-        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-          {[
-            { val: '4-6 Weeks', label: 'Program Length' },
-            { val: 'State Cert', label: 'Exam Included' },
-            { val: '$30K-$42K', label: 'Salary Range' },
-            { val: '105+', label: 'Training Hours' },
-          ].map((s) => (
-            <div key={s.label}>
-              <div className="text-lg sm:text-xl font-bold text-white">{s.val}</div>
-              <div className="text-slate-400 text-xs">{s.label}</div>
-            </div>
-          ))}
+      {/* What You'll Learn */}
+      <section className="py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-black text-center mb-4">What You&apos;ll Learn</h2>
+          <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+            Comprehensive training covering everything you need to pass the state exam and succeed as a CNA.
+          </p>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {curriculum.map((item, i) => (
+              <div key={i} className="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow">
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
+                  <BookOpen className="w-6 h-6 text-blue-600" />
+                </div>
+                <h3 className="font-bold text-lg text-slate-900 mb-2">{item.title}</h3>
+                <p className="text-slate-600">{item.desc}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="py-8 sm:py-14 bg-white">
+      {/* Career Opportunities */}
+      <section className="py-16 bg-blue-600">
         <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row gap-5 items-start">
-            <div className="relative w-full h-[200px] sm:w-72 sm:h-[280px] rounded-xl overflow-hidden flex-shrink-0">
-              <Image src="/images/healthcare/program-cna-training.jpg" alt="CNA student training" fill className="object-cover" />
-            </div>
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-3">Classroom instruction and clinical hours to prepare for the state CNA exam.</p>
-              <div className="space-y-2">
-                {['Patient care fundamentals and safety', 'Vital signs monitoring (blood pressure, pulse, temperature)', 'Infection control and hygiene procedures', 'Patient mobility and transfer techniques', 'Nutrition and feeding assistance', 'Medical terminology and documentation', 'Clinical rotation at a healthcare facility'].map((item) => (
-                  <div key={item} className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0" />
-                    <span className="text-slate-700 text-sm">{item}</span>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div className="text-white">
+              <h2 className="text-3xl md:text-4xl font-black mb-6">Career Opportunities</h2>
+              <p className="text-blue-100 mb-8">
+                CNAs are in high demand across Indiana. After certification, you can work in various healthcare settings.
+              </p>
+              <div className="grid grid-cols-2 gap-4">
+                {careers.map((career, i) => (
+                  <div key={i} className="bg-white/10 rounded-xl p-4">
+                    <h3 className="font-bold text-white">{career.title}</h3>
+                    <p className="text-blue-200 text-sm">{career.salary}/year</p>
                   </div>
                 ))}
               </div>
             </div>
+            <div className="relative h-80 rounded-2xl overflow-hidden shadow-2xl">
+              <Image 
+                src="/images/healthcare/program-cna-overview.jpg" 
+                alt="CNA at work" 
+                fill sizes="100vw"
+                className="object-cover" 
+              />
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="py-8 sm:py-14 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">Where CNAs Work</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {/* Eligibility */}
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl md:text-4xl font-black mb-4">Eligibility Requirements</h2>
+          <p className="text-slate-600 mb-8">Most adults qualify for free training through WIOA funding</p>
+          
+          <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-8">
             {[
-              { title: 'Hospitals', salary: '$34K-$42K' },
-              { title: 'Nursing Homes', salary: '$30K-$38K' },
-              { title: 'Home Health', salary: '$28K-$36K' },
-              { title: 'Assisted Living', salary: '$30K-$37K' },
-              { title: 'Rehabilitation Centers', salary: '$32K-$40K' },
-              { title: 'Clinics', salary: '$30K-$38K' },
-            ].map((c) => (
-              <div key={c.title} className="bg-white rounded-xl border border-slate-200 p-4">
-                <h3 className="font-bold text-slate-900 text-sm">{c.title}</h3>
-                <div className="text-blue-600 font-bold text-sm">{c.salary}</div>
+              '18+ years old',
+              'High school diploma or GED',
+              'Pass background check',
+              'Physical ability to lift 50 lbs',
+              'TB test (we can help)',
+              'Reliable transportation',
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+                <div className="w-6 h-6 bg-white0 rounded-full flex-shrink-0" />
+                <span className="font-medium text-slate-700">{item}</span>
               </div>
             ))}
           </div>
+          
+          <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+            Check Your Eligibility <ArrowRight className="w-5 h-5" />
+          </a>
         </div>
       </section>
 
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">How to Enroll</h2>
-          <div className="space-y-3">
+      {/* Next Steps */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-black text-center mb-12">How to Enroll</h2>
+          
+          <div className="grid md:grid-cols-4 gap-6">
             {[
-              { step: '1', title: 'Apply Online', desc: 'Submit your student application.' },
-              { step: '2', title: 'Background Check', desc: 'Required for clinical placement.' },
-              { step: '3', title: 'Complete Training', desc: 'Classroom instruction and clinical hours.' },
-              { step: '4', title: 'Pass State Exam', desc: 'Take the Indiana CNA certification exam.' },
-            ].map((s) => (
-              <div key={s.step} className="flex items-start gap-4 bg-slate-50 rounded-lg p-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
-                  <p className="text-slate-600 text-sm">{s.desc}</p>
+              { num: 1, title: 'Apply Online', desc: 'Complete our simple application' },
+              { num: 2, title: 'Register at Indiana Career Connect', desc: 'Verify WIOA funding eligibility' },
+              { num: 3, title: 'Orientation', desc: 'Attend program orientation' },
+              { num: 4, title: 'Start Training', desc: 'Begin your CNA journey' },
+            ].map((step, i) => (
+              <div key={i} className="text-center">
+                <div className="w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                  {step.num}
                 </div>
+                <h3 className="font-bold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-slate-600 text-sm">{step.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-8 sm:py-14 bg-blue-600">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Healthcare Career</h2>
-          <p className="text-white/90 mb-6 text-sm">CNA is one of the fastest paths into healthcare. Apply today.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=cna-certification" className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
-              Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
+      {/* CTA */}
+      <section className="py-20 bg-slate-900">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-4xl md:text-5xl font-black text-white mb-6">
+            Start Your Healthcare Career
+          </h2>
+          <p className="text-xl text-slate-300 mb-8">
+            Classes starting soon. Limited seats available.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link href="/apply?program=cna-certification" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+              Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
-            <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
-              Explore Funding Options
-            </Link>
+            <a href="tel:+13173143757" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">
+              <Phone className="w-5 h-5" /> (317) 314-3757
+            </a>
           </div>
         </div>
       </section>

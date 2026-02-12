@@ -72,7 +72,7 @@ export default async function ApplyPage({
             Start Your New Career
           </h1>
           <p className="text-slate-600 max-w-xl mx-auto">
-            Pick the path that fits you. Each application takes 5-10 minutes, no account needed. Most programs are free.
+            Pick the path that fits you. Each application takes 5-10 minutes, no account needed. Funding available for qualifying students.
           </p>
         </div>
       </section>
@@ -126,10 +126,7 @@ export default async function ApplyPage({
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
 
           {/* Employer */}
-          <Link
-            href="/employer"
-            className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
-          >
+          <div className="rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow">
             <div className="relative h-[200px]">
               <Image
                 src="/images/heroes-hq/employer-hero.jpg"
@@ -148,7 +145,7 @@ export default async function ApplyPage({
                 We handle recruiting, skills training, and onboarding so you get job-ready hires.
               </p>
               <p className="text-slate-700 text-sm font-semibold mb-2">Available grants and tax credits:</p>
-              <div className="space-y-1.5 mb-3" onClick={(e) => e.stopPropagation()}>
+              <div className="space-y-1.5 mb-3">
                 <Link href="/employer" className="block text-sm text-blue-600 hover:text-blue-800 hover:underline">
                   <strong>WOTC</strong> — Work Opportunity Tax Credit up to $9,600 per hire
                 </Link>
@@ -162,11 +159,11 @@ export default async function ApplyPage({
                   <strong>WRG</strong> — Workforce Ready Grant covers high-demand certifications
                 </Link>
               </div>
-              <span className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm group-hover:gap-3 transition-all">
+              <Link href="/employer" className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-blue-700 transition-colors">
                 Partner With Us <ArrowRight className="w-4 h-4" />
-              </span>
+              </Link>
             </div>
-          </Link>
+          </div>
 
           {/* Program Holder — CTA card with full image background */}
           <Link

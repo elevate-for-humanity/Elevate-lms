@@ -22,7 +22,7 @@ const AFFIRM_CONFIG = {
   transactionsUrl: process.env.AFFIRM_API_URL || 'https://api.affirm.com/api/v1/transactions',
   baseUrl: process.env.AFFIRM_BASE_URL || 'https://api.affirm.com',
   publicKey: process.env.AFFIRM_PUBLIC_KEY || process.env.NEXT_PUBLIC_AFFIRM_PUBLIC_KEY,
-  privateKey: process.env.AFFIRM_PRIVATE_KEY,
+  privateKey: process.env.AFFIRM_PRIVATE_KEY || process.env.AFFIRM_PRIVATE_API_KEY,
   environment: process.env.AFFIRM_ENVIRONMENT || 'production',
 };
 
@@ -72,7 +72,7 @@ class AffirmClient {
   tryLateConfig(): void {
     if (this.isConfigured()) return;
     const pubKey = process.env.AFFIRM_PUBLIC_KEY || process.env.NEXT_PUBLIC_AFFIRM_PUBLIC_KEY;
-    const privKey = process.env.AFFIRM_PRIVATE_KEY;
+    const privKey = process.env.AFFIRM_PRIVATE_KEY || process.env.AFFIRM_PRIVATE_API_KEY;
     if (pubKey && privKey) {
       this.publicKey = pubKey;
       this.privateKey = privKey;

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import HomeHeroVideo from './HomeHeroVideo';
 import MarqueeBanner from '@/components/MarqueeBanner';
+import PageAvatar from '@/components/PageAvatar';
 import TrustStrip from '@/components/TrustStrip';
 
 const programs = [
@@ -71,6 +72,16 @@ export default function HomePage() {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ===== AVATAR EXPLAINER ===== */}
+      <section className="py-12 sm:py-16 bg-white">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <PageAvatar 
+            videoSrc="/videos/avatars/home-welcome.mp4"
+            title="Welcome to Elevate for Humanity"
+          />
         </div>
       </section>
 

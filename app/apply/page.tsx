@@ -165,37 +165,28 @@ export default async function ApplyPage({
             </div>
           </div>
 
-          {/* Program Holder — CTA card with full image background */}
+          {/* Staff */}
           <Link
-            href="/apply/program-holder"
-            className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group relative"
+            href="/apply/staff"
+            className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
           >
-            <div className="relative h-[420px] sm:h-[460px]">
+            <div className="relative h-[200px]">
               <Image
-                src="/images/store/platform-hero.jpg"
-                alt="Program holder using the Elevate LMS platform"
+                src="/images/efh/sections/staffing.jpg"
+                alt="Staff and instructors at Elevate"
                 fill
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-6">
-                <h2 className="text-xl sm:text-2xl font-bold text-white mb-2">Become a Program Holder</h2>
-                <p className="text-white/90 text-sm leading-relaxed mb-3">
-                  Launch your own workforce training program with Elevate&apos;s LMS, curriculum,
-                  and compliance infrastructure. We guide you through securing WIOA, WRG, and
-                  JRI funding so qualifying students can train at reduced or no cost.
-                </p>
-                <ul className="text-white/80 text-sm space-y-1 mb-4 list-disc list-inside">
-                  <li>White-label LMS platform under your brand</li>
-                  <li>Pre-built curriculum for 20+ career pathways</li>
-                  <li>Guidance on WIOA/WRG/JRI grant applications</li>
-                  <li>Compliance, reporting, and audit-ready docs</li>
-                  <li>Dedicated onboarding and ongoing support</li>
-                </ul>
-                <span className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-lg group-hover:gap-3 transition-all text-sm">
-                  Apply to Become a Program Holder <ArrowRight className="w-4 h-4" />
-                </span>
-              </div>
+            </div>
+            <div className="bg-white p-5">
+              <h2 className="text-lg font-bold text-slate-900 mb-2">Staff & Instructor</h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-3">
+                Join our team as an instructor, case manager, or support staff.
+                Help students build real careers while growing your own.
+              </p>
+              <span className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm group-hover:gap-3 transition-all">
+                Apply for Staff <ArrowRight className="w-4 h-4" />
+              </span>
             </div>
           </Link>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 export default function MarqueeBanner() {
-  const text = "FREE CAREER TRAINING • WIOA FUNDED • EARN WHILE YOU LEARN • JRI PROGRAMS • APPLY NOW • ";
+  const text = "CAREER TRAINING • WIOA FUNDED • EARN WHILE YOU LEARN • JRI PROGRAMS • APPLY NOW • ";
   
   return (
     <div className="bg-brand-red-600 text-white py-3 overflow-hidden">

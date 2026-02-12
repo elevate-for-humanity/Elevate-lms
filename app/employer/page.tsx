@@ -1,234 +1,125 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, CheckCircle, Users, DollarSign, Award, Briefcase } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'For Employers | Elevate for Humanity',
-  description: 'Hire trained workers. No recruiting fees. Build your workforce pipeline.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/employer',
-  },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/employer' },
+  title: 'Employer Partnership | Elevate For Humanity',
+  description: 'Hire pre-screened, trained candidates. Access WOTC tax credits, OJT wage reimbursement, and WIOA-funded upskilling at no cost.',
 };
 
 export default function EmployerPage() {
   return (
-    <>
-      {/* Breadcrumbs */}
+    <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Employer' }]} />
+          <Breadcrumbs items={[{ label: 'Employer Partnership' }]} />
         </div>
       </div>
 
-      {/* Hero with Image */}
-      <section className="relative min-h-[550px] flex items-center overflow-hidden">
-        <Image
-          src="/images/heroes-hq/employer-hero.jpg"
-          alt="Employer partnership"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-20 w-full">
-          <div className="max-w-2xl bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-6">
-              <Briefcase className="w-4 h-4" />
-              For Employers
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-black text-gray-900 leading-tight mb-6">
-              Hire Trained, Job-Ready Workers
+      {/* Hero */}
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image src="/hero-images/employer-hero.jpg" alt="Employer partnership" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
+          <div className="max-w-4xl mx-auto">
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">
+              Hire Trained, Job-Ready Candidates
             </h1>
-            <p className="text-xl text-gray-700 mb-8">
-              Access a pipeline of candidates with industry credentials and hands-on training. 
-              No recruiting fees. We handle the training, you get qualified workers.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/contact?type=employer"
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-blue-600 text-white text-base font-semibold rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                Partner With Us
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="/hire-graduates"
-                className="inline-flex items-center justify-center px-8 py-4 bg-gray-100 text-gray-900 text-base font-semibold rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                View Candidates
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Quick Links to Subpages */}
-      <section className="py-6 bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/hire-graduates" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
-              Hire Graduates
-            </Link>
-            <Link href="/ojt-and-funding" className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
-              OJT & Funding
-            </Link>
-            <Link href="/workforce-partners" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
-              Workforce Partners
-            </Link>
-            <Link href="/partners" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
-              Partner With Us
-            </Link>
-            <Link href="/programs" className="px-4 py-2 bg-gray-200 text-gray-800 rounded-full text-sm font-medium hover:bg-gray-300 transition-colors">
-              View Programs
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Benefits */}
-      <section className="py-20 lg:py-28 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Why Partner With Elevate for Humanity?
-            </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We solve your hiring challenges by providing trained, motivated workers ready to contribute from day one.
+            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
+              We recruit, screen, and train workers for your open positions. You interview and hire — no recruiting fees.
             </p>
           </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4">
-                <DollarSign className="w-6 h-6 text-green-600" />
+        </div>
+      </section>
+
+      {/* How It Works — single column on mobile */}
+      <section className="py-8 sm:py-14 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">How It Works</h2>
+          <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-4 sm:gap-5">
+            {[
+              { step: '1', title: 'Tell Us Your Needs', desc: 'Submit your hiring needs — roles, skills, and timeline.', image: '/images/heroes/workforce-partner-3.jpg' },
+              { step: '2', title: 'We Train Candidates', desc: 'We recruit and train workers in your specific skill requirements.', image: '/images/homepage/training-program-collage.png' },
+              { step: '3', title: 'You Interview', desc: 'Meet pre-screened candidates. Only interview qualified people.', image: '/images/heroes-hq/career-services-hero.jpg' },
+              { step: '4', title: 'Hire & Save', desc: 'Hire with tax credits and wage reimbursements.', image: '/images/homepage/employer-partnership.png' },
+            ].map((item) => (
+              <div key={item.step} className="flex sm:flex-col gap-4 sm:gap-0 rounded-xl overflow-hidden border border-slate-200 bg-white">
+                <div className="relative w-28 h-28 sm:w-full sm:h-[140px] flex-shrink-0 sm:flex-shrink">
+                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <div className="absolute top-2 left-2 w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">{item.step}</div>
+                </div>
+                <div className="py-3 pr-3 sm:p-4 flex-1">
+                  <h3 className="font-bold text-slate-900 text-sm mb-1">{item.title}</h3>
+                  <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
+                </div>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Zero Recruiting Fees</h3>
-              <p className="text-gray-600">
-                Access our talent pipeline at no cost. We&apos;re funded by WIOA, JRI, and workforce development grants - not employer fees.
-              </p>
-            </div>
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                <Award className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Certified & Job-Ready</h3>
-              <p className="text-gray-600">
-                Every candidate completes industry-recognized training with certifications. They arrive ready to work, not ready to learn basics.
-              </p>
-            </div>
-            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">Retention Support</h3>
-              <p className="text-gray-600">
-                We don&apos;t disappear after placement. Our team provides ongoing support to help new hires succeed and stay.
-              </p>
-            </div>
-          </div>
-          <div className="text-center mt-12">
-            <Link
-              href="/contact?type=employer"
-              className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all"
-            >
-              Start Hiring Today <ArrowRight className="w-5 h-5" />
-            </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Industries */}
-      <section className="py-20 lg:py-28 bg-white">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-12">
-            Industries we serve
-          </h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="p-6 bg-gray-50 rounded-2xl text-center">
-              <p className="font-semibold text-gray-900">Healthcare</p>
-            </div>
-            <div className="p-6 bg-gray-50 rounded-2xl text-center">
-              <p className="font-semibold text-gray-900">Skilled Trades</p>
-            </div>
-            <div className="p-6 bg-gray-50 rounded-2xl text-center">
-              <p className="font-semibold text-gray-900">Technology</p>
-            </div>
-            <div className="p-6 bg-gray-50 rounded-2xl text-center">
-              <p className="font-semibold text-gray-900">Business</p>
-            </div>
+      {/* Grants & Tax Credits — stacked on mobile */}
+      <section className="py-8 sm:py-14 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-2">Save Money When You Hire</h2>
+          <p className="text-slate-500 text-sm text-center mb-6 sm:mb-8">Grants and tax credits for qualifying hires</p>
+          <div className="space-y-4 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-5">
+            {[
+              { title: 'WOTC Tax Credit', amount: 'Up to $9,600 per hire', desc: 'Federal tax credit for hiring veterans, SNAP recipients, ex-felons, and other target groups. We help you file.', image: '/images/heroes/workforce-partner-4.jpg', href: '/funding' },
+              { title: 'On-the-Job Training (OJT)', amount: '50-75% wage reimbursement', desc: 'Get reimbursed for training new hires. WorkOne pays a portion of wages during the training period.', image: '/images/heroes/workforce-partner-5.jpg', href: '/ojt-and-funding' },
+              { title: 'WIOA Upskilling', amount: 'Tuition covered', desc: 'Upskill current employees with WIOA-funded training in healthcare, IT, skilled trades, and more.', image: '/images/heroes/hero-federal-funding.jpg', href: '/wioa-eligibility' },
+              { title: 'Workforce Ready Grant', amount: 'State-funded certifications', desc: 'Indiana covers tuition for high-demand certifications through the WRG program.', image: '/images/heroes/hero-state-funding.jpg', href: '/funding' },
+            ].map((item) => (
+              <Link key={item.title} href={item.href} className="flex gap-4 bg-white rounded-xl border border-slate-200 p-4 hover:shadow-lg transition-shadow group">
+                <div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-lg overflow-hidden flex-shrink-0">
+                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
+                  <p className="text-blue-600 font-semibold text-sm mb-1">{item.amount}</p>
+                  <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="py-20 lg:py-28 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              How it works
-            </h2>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-gray-900">1</span>
+      {/* What You Get */}
+      <section className="py-8 sm:py-14 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">What You Get</h2>
+          <div className="space-y-2 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-3">
+            {['Pre-screened candidates', 'Skills-matched to your roles', 'No recruiting fees', 'Background checks included', 'Onboarding support', 'Ongoing retention help', 'Tax credit filing assistance', 'Dedicated account manager', 'Custom training programs'].map((item) => (
+              <div key={item} className="flex items-center gap-3 bg-slate-50 rounded-lg px-4 py-3">
+                <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0" />
+                <span className="text-slate-700 text-sm">{item}</span>
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Connect</h3>
-              <p className="text-gray-600">
-                Tell us about your hiring needs and timeline
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-gray-900">2</span>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Match</h3>
-              <p className="text-gray-600">
-                We send you qualified, pre-screened candidates
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <span className="text-2xl font-bold text-gray-900">3</span>
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">Hire</h3>
-              <p className="text-gray-600">
-                Interview and hire with ongoing support from our team
-              </p>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
       {/* CTA */}
-      <section className="py-20 lg:py-28 bg-brand-blue-700">
-        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">
-            Ready to Build Your Workforce Pipeline?
-          </h2>
-          <p className="text-xl text-blue-100 mb-4">
-            Join 50+ Indiana employers who hire from our trained talent pool.
-          </p>
-          <p className="text-lg text-blue-200 mb-8">
-            No recruiting fees. Pre-screened candidates. Ongoing retention support.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href="/contact?type=employer"
-              className="inline-flex items-center gap-2 px-10 py-5 bg-white text-brand-blue-700 text-lg font-bold rounded-full hover:bg-gray-100 transition-colors"
-            >
-              Partner With Us <ArrowRight className="w-5 h-5" />
+      <section className="py-8 sm:py-14 bg-blue-600">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Hiring Today</h2>
+          <p className="text-white/90 mb-6 text-sm">Submit your hiring needs and we will match you with trained candidates.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/apply/employer" className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
+              Submit Hiring Needs <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
-            <Link
-              href="/hire-graduates"
-              className="inline-flex items-center px-10 py-5 bg-transparent border-2 border-white text-white text-lg font-bold rounded-full hover:bg-white/10 transition-colors"
-            >
-              View Available Candidates
+            <Link href="/programs" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
+              View Training Programs
             </Link>
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

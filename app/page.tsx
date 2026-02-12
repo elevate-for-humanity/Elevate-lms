@@ -57,14 +57,14 @@ export default function HomePage() {
         <div className="absolute inset-0 z-30 flex flex-col items-end justify-end text-left px-8 pb-12 sm:px-12 sm:pb-16 md:px-20 md:pb-20">
           <div className="max-w-2xl">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-3 leading-tight drop-shadow-lg">
-              Career Training That Works
+              Free Career Training
             </h1>
             <p className="text-xl sm:text-2xl text-white/95 mb-6 drop-shadow-md">
-              WIOA &amp; JRI funded programs available. Earn while you learn. Get certified and hired in weeks.
+              WIOA &amp; JRI funded programs. Earn while you learn. Get certified and hired in weeks.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
               <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg sm:text-xl font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center">
-                Apply Now
+                Apply Now — It&apos;s Free
               </Link>
               <Link href="/programs" className="bg-white/95 hover:bg-white text-black text-lg sm:text-xl font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center backdrop-blur-sm">
                 View Programs
@@ -85,19 +85,14 @@ export default function HomePage() {
               <p className="text-brand-red-600 font-bold text-lg mb-2 tracking-wide uppercase">Why Elevate</p>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-6 leading-tight">Earn While You Learn</h2>
               <p className="text-xl text-slate-700 mb-5 leading-relaxed">
-                Get paid during your apprenticeship. Many of our JRI and WIOA-funded programs cover tuition and supplies. Some programs have tuition with flexible payment options.
+                Get paid during your apprenticeship. Our JRI and WIOA-funded programs cover tuition, supplies, and connect you with employers who hire on the spot.
               </p>
               <p className="text-xl text-green-700 font-bold mb-8">
-                Funding available for qualifying students. Real certifications. Real jobs.
+                $0 cost to you. Real certifications. Real jobs.
               </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg">
-                  Register at Indiana Career Connect
-                </a>
-                <Link href="/funding" className="inline-block border-2 border-brand-red-600 text-brand-red-600 text-lg font-bold px-8 py-4 rounded-full transition-all hover:bg-brand-red-50 hover:scale-105">
-                  Learn More About Funding →
-                </Link>
-              </div>
+              <Link href="/wioa-eligibility" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg">
+                Check Your Eligibility
+              </Link>
             </div>
           </div>
         </div>
@@ -111,18 +106,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <p className="text-center text-slate-500 font-semibold text-base mb-8 tracking-widest uppercase">Approved Training Provider</p>
           <div className="flex flex-wrap items-center justify-center gap-10 sm:gap-14 md:gap-20">
-            <a href="https://www.dol.gov" target="_blank" rel="noopener noreferrer">
-              <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
-            </a>
-            <a href="https://www.in.gov/dwd" target="_blank" rel="noopener noreferrer">
-              <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
-            </a>
-            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer">
-              <Image src="/images/partners/workone.webp" alt="WorkOne" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
-            </a>
-            <a href="https://nextleveljobs.org" target="_blank" rel="noopener noreferrer">
-              <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
-            </a>
+            <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
+            <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
+            <Image src="/images/partners/workone.webp" alt="WorkOne" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
+            <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20 grayscale hover:grayscale-0 transition-all duration-300" />
           </div>
         </div>
       </section>
@@ -178,10 +165,10 @@ export default function HomePage() {
           
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
             {[
-              { num: '1', title: 'Register at WorkOne', desc: 'Sign up at indianacareerconnect.com and schedule an appointment with WorkOne to determine your funding eligibility', img: '/images/homepage/funding-navigation.png', href: '/funding', linkLabel: 'Learn More' },
-              { num: '2', title: 'Choose Program', desc: 'Pick the career path that fits your goals and schedule', img: '/images/homepage/training-program-collage.png', href: '/programs', linkLabel: 'View Programs' },
-              { num: '3', title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification', img: '/images/homepage/certificate-of-completion.png', href: '/how-it-works', linkLabel: 'Learn More' },
-              { num: '4', title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates', img: '/images/homepage/employer-partnership.png', href: '/career-services', linkLabel: 'Career Services' },
+              { num: '1', title: 'Check Eligibility', desc: 'Quick 2-minute assessment to see if you qualify for free training', img: '/images/homepage/funding-navigation.png' },
+              { num: '2', title: 'Choose Program', desc: 'Pick the career path that fits your goals and schedule', img: '/images/homepage/training-program-collage.png' },
+              { num: '3', title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification', img: '/images/homepage/certificate-of-completion.png' },
+              { num: '4', title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates', img: '/images/homepage/employer-partnership.png' },
             ].map((step) => (
               <div key={step.num} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-100 hover:shadow-lg transition-shadow duration-300">
                 <div className="relative aspect-square bg-stone-100">
@@ -190,10 +177,7 @@ export default function HomePage() {
                 </div>
                 <div className="p-5">
                   <h3 className="font-bold text-black text-lg sm:text-xl mb-2">{step.title}</h3>
-                  <p className="text-slate-600 text-base sm:text-lg mb-3">{step.desc}</p>
-                  <Link href={step.href} className="text-brand-red-600 font-semibold text-sm hover:underline">
-                    {step.linkLabel} →
-                  </Link>
+                  <p className="text-slate-600 text-base sm:text-lg">{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -212,7 +196,7 @@ export default function HomePage() {
               <p className="text-brand-red-600 font-bold text-lg mb-2 tracking-wide uppercase">Our Founder</p>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-6">Elizabeth Greene</h2>
               <p className="text-xl text-slate-700 mb-6 leading-relaxed">
-                Elizabeth founded Elevate for Humanity to connect everyday people to workforce training. She also owns Textures Institute of Cosmetology, Greene Staffing Solutions, and Greene Property Management — creating a full ecosystem for training, employment, and housing.
+                Elizabeth founded Elevate for Humanity to connect everyday people to free workforce training. She also owns Textures Institute of Cosmetology, Greene Staffing Solutions, and Greene Property Management — creating a full ecosystem for training, employment, and housing.
               </p>
               <Link href="/about/team" className="inline-block text-lg font-bold text-brand-red-600 hover:text-brand-red-700 hover:underline transition-colors">
                 Meet the Full Team →
@@ -228,15 +212,15 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-6">Start Your New Career Today</h2>
           <p className="text-xl sm:text-2xl text-white/95 mb-10">
-            Apply in minutes. Most students begin training within 2-4 weeks.
+            Check your eligibility in 2 minutes. Most students begin training within 2-4 weeks.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link href="/apply/student" className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition-all hover:scale-105 shadow-lg">
               Apply Now
             </Link>
-            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition-all backdrop-blur-sm">
-              Register at Indiana Career Connect
-            </a>
+            <Link href="/wioa-eligibility" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition-all backdrop-blur-sm">
+              Check Eligibility
+            </Link>
           </div>
         </div>
       </section>

@@ -574,7 +574,7 @@ export default async function GovernmentPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="tel:+13173143757"
+              href="mailto:elevate4humanityedu@gmail.com"
               className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-gray-100 transition-colors"
             >
               <Phone className="w-5 h-5 mr-2" />

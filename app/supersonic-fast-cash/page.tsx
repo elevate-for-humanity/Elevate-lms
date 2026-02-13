@@ -310,7 +310,7 @@ export default function SupersonicFastCashPage() {
                   <Phone className="w-8 h-8 text-red-400 flex-shrink-0" />
                   <div>
                     <h3 className="font-bold text-lg">Contact Us</h3>
-                    <p className="text-blue-200">(317) 314-3757</p>
+                    <p className="text-blue-200">Schedule a Meeting</p>
                   </div>
                 </div>
               </div>
@@ -415,7 +415,7 @@ export default function SupersonicFastCashPage() {
             </Link>
           </div>
           <p className="mt-6 text-red-200 text-sm">
-            Or contact us at <a href="tel:3173143757" className="underline font-bold text-white">(317) 314-3757</a>
+            Or contact us at <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="underline font-bold text-white">Schedule a Meeting</a>
           </p>
         </div>
       </section>

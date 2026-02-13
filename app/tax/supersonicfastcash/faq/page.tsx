@@ -177,7 +177,7 @@ export default function FAQPage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a
-            href="tel:3173143757"
+            href="mailto:elevate4humanityedu@gmail.com"
             className="px-6 py-3 rounded-lg bg-brand-blue-600 text-white font-semibold hover:bg-brand-blue-700 transition"
           >
             Call 317-314-3757

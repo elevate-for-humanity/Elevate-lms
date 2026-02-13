@@ -164,7 +164,7 @@ export default async function PublicAssistancePage() {
               Apply Now
             </Link>
             <a
-              href="tel:3173143757"
+              href="mailto:elevate4humanityedu@gmail.com"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 transition"
             >
               <Phone className="w-5 h-5" />

@@ -111,7 +111,7 @@ async function insertApplication(payload: {
 
     if (error) {
       console.error(`[Application] Insert failed for ${payload.email}:`, error.message);
-      return { success: false, error: 'Failed to save application. Please try again or call (317) 314-3757.' };
+      return { success: false, error: 'Failed to save application. Please try again or email elevate4humanityedu@gmail.com.' };
     }
 
     console.log(`[Application] Saved: id=${data.id} ref=${referenceNumber} email=${payload.email} source=${payload.source}`);

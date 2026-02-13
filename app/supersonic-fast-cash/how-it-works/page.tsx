@@ -274,7 +274,7 @@ export default function HowItWorksPage() {
               Book Appointment
             </Link>
             <a
-              href="tel:+13173143757"
+              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-full font-bold text-lg transition-colors border border-white/30"
             >
               <Phone className="w-5 h-5" /> (317) 314-3757

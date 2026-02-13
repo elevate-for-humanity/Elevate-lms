@@ -309,7 +309,7 @@ export default function FederalCompliancePage() {
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="tel:3173143757"
+              href="mailto:elevate4humanityedu@gmail.com"
               className="inline-flex items-center gap-2 bg-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-800 transition border border-white/30"
             >
               <Phone className="w-5 h-5" /> (317) 314-3757

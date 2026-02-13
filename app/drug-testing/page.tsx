@@ -117,7 +117,7 @@ export default function DrugTestingLandingPage() {
             
             <div className="flex flex-col sm:flex-row gap-4">
               <a
-                href="tel:+13173143757"
+                href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition text-lg"
               >
                 <Phone className="w-5 h-5" />
@@ -360,7 +360,7 @@ export default function DrugTestingLandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="tel:+13173143757"
+              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
             >
               <Phone className="w-5 h-5" />

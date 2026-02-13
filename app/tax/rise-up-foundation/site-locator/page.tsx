@@ -113,7 +113,7 @@ export default function SiteLocatorPage() {
             <p className="text-black mt-2">
               Phone:{' '}
               <a
-                href="tel:3173143757"
+                href="mailto:elevate4humanityedu@gmail.com"
                 className="text-brand-green-600 hover:underline"
               >
                 317-314-3757
@@ -201,7 +201,7 @@ export default function SiteLocatorPage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a
-            href="tel:3173143757"
+            href="mailto:elevate4humanityedu@gmail.com"
             className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
           >
             Call 317-314-3757

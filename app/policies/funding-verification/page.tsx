@@ -129,7 +129,7 @@ export default function FundingVerificationPage() {
               <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
                 <Mail className="w-4 h-4" /> Email Us
               </a>
-              <a href="tel:317-314-3757" className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
+              <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">
                 <Phone className="w-4 h-4" /> (317) 314-3757
               </a>
               <Link href="/check-eligibility" className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">

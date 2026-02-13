@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { CheckCircle, ArrowRight, Mail, Phone, Calendar } from 'lucide-react';
+import { CheckCircle, ArrowRight, Mail, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -70,7 +70,7 @@ export default async function ApplicationSuccessPage({
         "Thank you for your interest in partnering with us. We'll review your application and contact you soon.",
       nextSteps: [
         'Our team will review your organization details',
-        "We'll schedule a call to discuss partnership opportunities",
+        'Check your email — we will send next steps within 1-2 business days',
         'You will receive information about licensing options',
         'Access to partner portal upon approval',
       ],
@@ -152,21 +152,23 @@ export default async function ApplicationSuccessPage({
 
         {/* Contact Info */}
         <div className="bg-blue-50 rounded-xl p-6 mb-6">
-          <h3 className="font-semibold mb-4">Questions? Contact Us</h3>
+          <h3 className="font-semibold mb-4">Questions?</h3>
           <div className="flex flex-col sm:flex-row gap-4">
-            <a
-              href="tel:3173143757"
-              className="flex items-center gap-2 text-blue-600 hover:underline"
-            >
-              <Phone className="w-5 h-5" />
-              (317) 314-3757
-            </a>
             <a
               href="mailto:elevate4humanityedu@gmail.com"
               className="flex items-center gap-2 text-blue-600 hover:underline"
             >
               <Mail className="w-5 h-5" />
               elevate4humanityedu@gmail.com
+            </a>
+            <a
+              href="https://calendly.com/elevate-for-humanity/advisor-call"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-blue-600 hover:underline"
+            >
+              <Calendar className="w-5 h-5" />
+              Schedule a Meeting
             </a>
           </div>
         </div>
@@ -188,15 +190,17 @@ export default async function ApplicationSuccessPage({
           </Link>
         </div>
 
-        {/* Schedule Call */}
+        {/* Schedule a Meeting */}
         <div className="mt-8 text-center">
-          <Link
-            href="/booking"
+          <a
+            href="https://calendly.com/elevate-for-humanity/advisor-call"
+            target="_blank"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
           >
             <Calendar className="w-5 h-5" />
-            Schedule a call with our team
-          </Link>
+            Schedule a Meeting With an Advisor
+          </a>
         </div>
       </div>
       </div>

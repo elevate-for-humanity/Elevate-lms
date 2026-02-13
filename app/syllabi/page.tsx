@@ -694,7 +694,7 @@ export default function SyllabiPage() {
             </a>
             <span className="text-slate-400">|</span>
             <a
-              href="tel:317-314-3757"
+              href="mailto:elevate4humanityedu@gmail.com"
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               317-314-3757

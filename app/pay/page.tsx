@@ -143,7 +143,7 @@ export default function PayPage() {
             View Programs & Enroll
           </Link>
           <p className="mt-4 text-slate-600">
-            Questions? Call <a href="tel:3173143757" className="text-orange-600 font-bold">317-314-3757</a>
+            Questions? Call <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="text-orange-600 font-bold">Schedule a Meeting</a>
           </p>
         </div>
       </section>

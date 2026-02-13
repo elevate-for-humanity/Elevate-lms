@@ -86,7 +86,7 @@ export default function DivorceSupportPage() {
               Get Support
             </Link>
             <a 
-              href="tel:3173143757"
+              href="mailto:elevate4humanityedu@gmail.com"
               className="inline-flex items-center justify-center gap-2 border border-rose-600 text-rose-600 px-6 py-3 rounded-lg font-semibold hover:bg-rose-50 transition"
             >
               <Phone className="w-5 h-5" />

@@ -166,7 +166,7 @@ export default async function FerpaHelpPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Phone</p>
-                    <a href="tel:+13173143757" className="text-blue-600 hover:text-blue-700">
+                    <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:text-blue-700">
                       (317) 314-3757
                     </a>
                   </div>

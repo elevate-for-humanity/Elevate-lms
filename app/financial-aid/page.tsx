@@ -92,7 +92,7 @@ export default function FinancialAidPage() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="tel:317-314-3757"
+                href="mailto:elevate4humanityedu@gmail.com"
                 className="inline-flex items-center gap-2 bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
               >
                 <Phone className="w-4 h-4" />

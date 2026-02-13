@@ -242,7 +242,7 @@ export default function CourseEnrollPage({
         <div className="mt-8 text-center">
           <p className="text-black mb-2">Have questions?</p>
           <a
-            href="tel:317-314-3757"
+            href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
             className="text-xl font-bold text-orange-600 hover:text-orange-700"
           >
             Call 317-314-3757

@@ -481,7 +481,7 @@ export default async function ProgramHolderOnboarding() {
                 </a>{' '}
                 or call{' '}
                 <a
-                  href="tel:3173143757"
+                  href="mailto:elevate4humanityedu@gmail.com"
                   className="text-blue-700 font-semibold hover:underline"
                 >
                   317-314-3757

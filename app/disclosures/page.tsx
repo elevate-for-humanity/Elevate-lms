@@ -407,7 +407,7 @@ export default function DisclosuresPage() {
                   </div>
                   <div>
                     <p className="text-gray-400 text-sm">Phone</p>
-                    <a href="tel:317-314-3757" className="text-white hover:text-orange-400">
+                    <a href="mailto:elevate4humanityedu@gmail.com" className="text-white hover:text-orange-400">
                       (317) 314-3757
                     </a>
                   </div>

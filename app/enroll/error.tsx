@@ -49,7 +49,7 @@ export default function EnrollmentError({
           </Link>
           
           <a
-            href="tel:+13173143757"
+            href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
             className="w-full flex items-center justify-center gap-2 text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
           >
             <Phone className="w-4 h-4" />

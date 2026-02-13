@@ -38,7 +38,7 @@ export default function InquirySuccessPage() {
           <p className="text-gray-600">Can't wait? Contact us now:</p>
           <div className="flex justify-center gap-4">
             <a
-              href="tel:317-314-3757"
+              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
               className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
             >
               <Phone className="w-4 h-4" />

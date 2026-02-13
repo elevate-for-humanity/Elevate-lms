@@ -349,7 +349,7 @@ export default function BookAppointmentPage() {
                 <div>
                   <div className="font-semibold text-sm">Phone</div>
                   <a
-                    href="tel:3173143757"
+                    href="mailto:elevate4humanityedu@gmail.com"
                     className="text-brand-blue-600 hover:underline"
                   >
                     317-314-3757

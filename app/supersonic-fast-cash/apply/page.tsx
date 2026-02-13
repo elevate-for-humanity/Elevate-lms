@@ -58,7 +58,7 @@ export default function RefundApplyPage() {
           </p>
           <div className="bg-white rounded-xl border p-6 mb-6">
             <p className="text-sm text-gray-500 mb-2">Need immediate assistance?</p>
-            <a href="tel:3173143757" className="text-2xl font-bold text-orange-600 hover:text-orange-700">
+            <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="text-2xl font-bold text-orange-600 hover:text-orange-700">
               (317) 314-3757
             </a>
           </div>
@@ -353,7 +353,7 @@ export default function RefundApplyPage() {
           {/* Call CTA */}
           <div className="mt-8 bg-orange-50 rounded-xl p-6 text-center">
             <p className="text-gray-600 mb-2">Prefer to talk to someone now?</p>
-            <a href="tel:3173143757" className="inline-flex items-center gap-2 text-2xl font-bold text-orange-600 hover:text-orange-700">
+            <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-2xl font-bold text-orange-600 hover:text-orange-700">
               <Phone className="w-6 h-6" />
               (317) 314-3757
             </a>

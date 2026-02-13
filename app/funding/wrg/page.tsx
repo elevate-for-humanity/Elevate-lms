@@ -306,7 +306,7 @@ export default async function WrgPage() {
                 <p className="text-black">
                   Call{' '}
                   <a
-                    href="tel:3173143757"
+                    href="mailto:elevate4humanityedu@gmail.com"
                     className="text-brand-green-600 font-bold"
                   >
                     317-314-3757
@@ -492,7 +492,7 @@ export default async function WrgPage() {
           </Link>
           <p className="mt-6 text-black">
             Questions? Call{' '}
-            <a href="tel:3173143757" className="font-bold underline">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="font-bold underline">
               317-314-3757
             </a>
           </p>

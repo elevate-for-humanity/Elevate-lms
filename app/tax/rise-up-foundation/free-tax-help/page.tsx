@@ -213,7 +213,7 @@ export default function FreeTaxHelpPage() {
 
         <div className="mt-8 flex flex-wrap gap-4">
           <a
-            href="tel:3173143757"
+            href="mailto:elevate4humanityedu@gmail.com"
             className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
           >
             Call 317-314-3757

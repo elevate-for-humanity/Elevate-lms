@@ -195,7 +195,7 @@ export default async function PartnerLearningPage({ params }: Props) {
         <div className="mt-8 text-center text-gray-500 text-sm">
           <p>
             Having trouble? Contact Elevate for Humanity support at{' '}
-            <a href="tel:317-314-3757" className="text-blue-600 hover:underline">
+            <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
               317-314-3757
             </a>
           </p>

@@ -177,7 +177,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
                 Submit a Ticket
               </Link>
               <a
-                href="tel:+13173143757"
+                href="mailto:elevate4humanityedu@gmail.com"
                 className="px-6 py-3 bg-white text-black font-semibold rounded-lg hover:bg-gray-100 transition border border-gray-200"
               >
                 Call (317) 314-3757

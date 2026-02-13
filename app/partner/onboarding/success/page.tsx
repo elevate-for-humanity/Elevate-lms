@@ -86,7 +86,7 @@ export default function PartnerOnboardingSuccessPage() {
 
           <p className="mt-8 text-sm text-slate-500">
             Questions? Contact us at{' '}
-            <a href="tel:3173143757" className="text-blue-600 hover:underline">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">
               (317) 314-3757
             </a>
           </p>

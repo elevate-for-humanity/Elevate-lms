@@ -258,7 +258,7 @@ export default function GrantsPage() {
           </p>
           <p className="text-slate-700">
             Contact us at{' '}
-            <a href="tel:+13173143757" className="font-semibold text-blue-600 hover:underline">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="font-semibold text-blue-600 hover:underline">
               (317) 314-3757
             </a>{' '}
             or email{' '}

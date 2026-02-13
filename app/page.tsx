@@ -122,38 +122,38 @@ export default function HomePage() {
             <h2 className="text-3xl sm:text-4xl font-extrabold text-black mb-3">Approved Training Provider</h2>
             <p className="text-lg text-slate-600">We are approved and funded through these workforce partners</p>
           </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-            <a href="https://www.dol.gov" target="_blank" rel="noopener noreferrer" className="group bg-slate-50 rounded-2xl p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
-              <div className="flex justify-center mb-4">
-                <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <a href="https://www.dol.gov" target="_blank" rel="noopener noreferrer" className="group bg-white rounded-2xl p-8 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
+              <div className="flex justify-center mb-5">
+                <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={96} height={96} className="w-24 h-24" />
               </div>
-              <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">US Department of Labor</h3>
-              <p className="text-slate-500 text-xs sm:text-sm mb-3">Registered apprenticeship sponsor</p>
-              <span className="inline-block bg-blue-600 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
+              <h3 className="font-bold text-black text-lg mb-2">US Department of Labor</h3>
+              <p className="text-slate-600 text-base mb-4">Registered apprenticeship sponsor</p>
+              <span className="inline-block bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
             </a>
-            <a href="https://www.in.gov/dwd" target="_blank" rel="noopener noreferrer" className="group bg-slate-50 rounded-2xl p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
-              <div className="flex justify-center mb-4">
-                <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24" />
+            <a href="https://www.in.gov/dwd" target="_blank" rel="noopener noreferrer" className="group bg-white rounded-2xl p-8 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
+              <div className="flex justify-center mb-5">
+                <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={96} height={96} className="w-24 h-24" />
               </div>
-              <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">Indiana DWD</h3>
-              <p className="text-slate-500 text-xs sm:text-sm mb-3">Department of Workforce Development</p>
-              <span className="inline-block bg-blue-600 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
+              <h3 className="font-bold text-black text-lg mb-2">Indiana DWD</h3>
+              <p className="text-slate-600 text-base mb-4">Department of Workforce Development</p>
+              <span className="inline-block bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
             </a>
-            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="group bg-slate-50 rounded-2xl p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
-              <div className="flex justify-center mb-4">
-                <Image src="/images/partners/workone.webp" alt="WorkOne" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24" />
+            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="group bg-white rounded-2xl p-8 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
+              <div className="flex justify-center mb-5">
+                <Image src="/images/partners/workone.webp" alt="WorkOne" width={96} height={96} className="w-24 h-24" />
               </div>
-              <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">WorkOne</h3>
-              <p className="text-slate-500 text-xs sm:text-sm mb-3">Register here for funding eligibility</p>
-              <span className="inline-block bg-brand-red-600 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full group-hover:bg-brand-red-700 transition-colors">Register Now →</span>
+              <h3 className="font-bold text-black text-lg mb-2">WorkOne</h3>
+              <p className="text-slate-600 text-base mb-4">Register here for funding eligibility</p>
+              <span className="inline-block bg-brand-red-600 text-white text-sm font-bold px-5 py-2.5 rounded-full group-hover:bg-brand-red-700 transition-colors">Register Now →</span>
             </a>
-            <a href="https://nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="group bg-slate-50 rounded-2xl p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
-              <div className="flex justify-center mb-4">
-                <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24" />
+            <a href="https://nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="group bg-white rounded-2xl p-8 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
+              <div className="flex justify-center mb-5">
+                <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={96} height={96} className="w-24 h-24" />
               </div>
-              <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">Next Level Jobs</h3>
-              <p className="text-slate-500 text-xs sm:text-sm mb-3">Indiana workforce training grants</p>
-              <span className="inline-block bg-blue-600 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
+              <h3 className="font-bold text-black text-lg mb-2">Next Level Jobs</h3>
+              <p className="text-slate-600 text-base mb-4">Indiana workforce training grants</p>
+              <span className="inline-block bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
             </a>
           </div>
         </div>
@@ -202,7 +202,7 @@ export default function HomePage() {
             <p className="text-xl text-slate-600">Four steps to your new career</p>
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               { title: 'Register at WorkOne', desc: 'Sign up at indianacareerconnect.com and schedule an appointment with WorkOne to determine your funding eligibility', img: '/images/artlist/office-meeting.jpg', href: '/funding', linkLabel: 'Learn More' },
               { title: 'Choose Program', desc: 'Pick the career path that fits your goals and schedule', img: '/images/heroes-hq/programs-hero.jpg', href: '/programs', linkLabel: 'View Programs' },
@@ -211,10 +211,10 @@ export default function HomePage() {
             ].map((step) => (
               <Link key={step.title} href={step.href} className="group hover:-translate-y-1 transition-all duration-300">
                 <div className="relative aspect-[3/2] rounded-2xl overflow-hidden mb-3">
-                  <Image src={step.img} alt={step.title} fill className="object-cover object-center group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 50vw, 25vw" />
+                  <Image src={step.img} alt={step.title} fill className="object-cover object-center group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                 </div>
-                <h3 className="font-bold text-slate-900 text-base sm:text-lg mb-1">{step.title}</h3>
-                <p className="text-slate-600 text-xs sm:text-sm mb-2">{step.desc}</p>
+                <h3 className="font-bold text-black text-lg mb-1">{step.title}</h3>
+                <p className="text-slate-600 text-base mb-2">{step.desc}</p>
                 <span className="text-blue-600 font-semibold text-sm group-hover:underline">{step.linkLabel} →</span>
               </Link>
             ))}

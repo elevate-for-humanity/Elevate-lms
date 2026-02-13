@@ -141,7 +141,7 @@ export default function DotTestingPage() {
             Full compliance with 49 CFR Part 40.
           </p>
           <a
-            href="tel:+13173143757"
+            href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-orange-500 text-white px-8 py-4 rounded-lg font-bold hover:bg-orange-600 transition text-lg"
           >
             <Phone className="w-5 h-5" />
@@ -249,7 +249,7 @@ export default function DotTestingPage() {
                   </ul>
                   
                   <a
-                    href="tel:+13173143757"
+                    href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
                     className="block w-full text-center bg-orange-500 text-white px-4 py-2 rounded-lg font-bold hover:bg-orange-600 transition text-sm"
                   >
                     Schedule Now
@@ -279,7 +279,7 @@ export default function DotTestingPage() {
                 and passing a return-to-duty test under direct observation.
               </p>
               <a
-                href="tel:+13173143757"
+                href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700 transition"
               >
                 <Phone className="w-4 h-4" />
@@ -316,7 +316,7 @@ export default function DotTestingPage() {
                 ))}
               </ul>
               <a
-                href="tel:+13173143757"
+                href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-orange-500 text-white px-8 py-4 rounded-lg font-bold hover:bg-orange-600 transition"
               >
                 <Phone className="w-5 h-5" />
@@ -343,7 +343,7 @@ export default function DotTestingPage() {
             We ensure full compliance with all FMCSA regulations. Schedule online for same-day appointments.
           </p>
           <a
-            href="tel:+13173143757"
+            href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-white text-orange-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
           >
             <Phone className="w-5 h-5" />

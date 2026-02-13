@@ -217,7 +217,7 @@ export default function WorkforcePartnersPage() {
             <Link href="/contact" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-bold transition-all hover:scale-105">
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
-            <a href="tel:+13173143757" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-full font-bold transition-all border border-white/30">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-full font-bold transition-all border border-white/30">
               <Phone className="w-5 h-5" /> (317) 314-3757
             </a>
           </div>

@@ -371,7 +371,7 @@ export default async function EmployerDashboardOrchestrated() {
               Our team is here to help you find the right candidates.
             </p>
             <a
-              href="tel:+13173143757"
+              href="mailto:elevate4humanityedu@gmail.com"
               className="block w-full text-center px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
             >
               Call (317) 314-3757

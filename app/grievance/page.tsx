@@ -172,7 +172,7 @@ export default function GrievancePage() {
                 <p className="font-semibold text-black mb-2">Phone:</p>
                 <p className="text-black">
                   <a
-                    href="tel:+13173143757"
+                    href="mailto:elevate4humanityedu@gmail.com"
                     className="text-brand-blue-600 hover:underline"
                   >
                     (317) 314-3757
@@ -215,7 +215,7 @@ export default function GrievancePage() {
               <br />
               Phone:{' '}
               <a
-                href="tel:+13173143757"
+                href="mailto:elevate4humanityedu@gmail.com"
                 className="text-brand-blue-600 hover:underline"
               >
                 (317) 314-3757

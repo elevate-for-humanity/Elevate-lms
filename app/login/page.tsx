@@ -200,7 +200,7 @@ function LoginForm() {
             <p>
               Need help? Call{' '}
               <a
-                href="tel:3173143757"
+                href="mailto:elevate4humanityedu@gmail.com"
                 className="text-brand-blue-600 font-semibold"
               >
                 317-314-3757

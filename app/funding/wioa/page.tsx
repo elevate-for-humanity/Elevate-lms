@@ -349,7 +349,7 @@ export default async function WioaPage() {
             <p className="text-orange-900 mb-4">
               <strong>Need help navigating the process?</strong> We work with
               WorkOne centers every day. Contact us at{' '}
-              <a href="tel:3173143757" className="font-bold underline">
+              <a href="mailto:elevate4humanityedu@gmail.com" className="font-bold underline">
                 317-314-3757
               </a>{' '}
               and we'll guide you through it.
@@ -436,7 +436,7 @@ export default async function WioaPage() {
           </div>
           <p className="mt-6 text-black">
             Questions? Call{' '}
-            <a href="tel:3173143757" className="font-bold underline">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="font-bold underline">
               317-314-3757
             </a>
           </p>

@@ -176,7 +176,7 @@ export default function ApplyPage() {
         <div className="bg-slate-900 text-white rounded-xl p-6 text-center">
           <p className="mb-2">Questions about the program?</p>
           <p className="text-lg">
-            Call <a href="tel:317-314-3757" className="text-green-400 font-bold hover:underline">(317) 314-3757</a> or email{' '}
+            Call <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="text-green-400 font-bold hover:underline">Schedule a Meeting</a> or email{' '}
             <a href="mailto:elevate4humanityedu@gmail.com" className="text-green-400 font-bold hover:underline">elevate4humanityedu@gmail.com</a>
           </p>
         </div>

@@ -182,7 +182,7 @@ export default async function GetInvolvedPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="tel:+13173143757"
+              href="mailto:elevate4humanityedu@gmail.com"
               className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100"
             >
               <Phone className="w-5 h-5" /> Contact Us

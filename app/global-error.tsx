@@ -103,7 +103,7 @@ export default function GlobalError({
                 </a>
                 <span className="hidden sm:inline text-gray-400">•</span>
                 <a 
-                  href="tel:+13175551234" 
+                  href="mailto:elevate4humanityedu@gmail.com" 
                   className="text-orange-600 hover:text-orange-700 font-semibold hover:underline"
                 >
                   Call Support

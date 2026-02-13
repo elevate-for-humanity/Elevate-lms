@@ -10,6 +10,12 @@ export const metadata: Metadata = {
   title: 'Business & Entrepreneurship Programs | Elevate',
   description: 'Business and entrepreneurship training in Indianapolis. Tax preparation, financial services, and business startup programs.',
   alternates: { canonical: `${SITE_URL}/programs/business` },
+  openGraph: {
+    title: 'Business & Entrepreneurship Programs | Elevate',
+    description: 'Tax preparation, financial services, and business startup programs in Indianapolis.',
+    url: `${SITE_URL}/programs/business`,
+    images: [{ url: `${SITE_URL}/images/hero/hero-business.jpg`, width: 1200, height: 630 }],
+  },
 };
 
 export default function BusinessPage() {

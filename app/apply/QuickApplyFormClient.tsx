@@ -252,19 +252,21 @@ Preferred Contact: ${form.preferredContact}`,
           {/* Contact Info */}
           <div className="mt-8 pt-6 border-t border-slate-200">
             <p className="text-sm text-black">
-              Questions? Contact us at{' '}
-              <a
-                href="tel:3173143757"
-                className="font-bold text-brand-orange-600 hover:text-brand-orange-700"
-              >
-                (317) 314-3757
-              </a>{' '}
-              or email{' '}
+              Questions? Email{' '}
               <a
                 href="mailto:elevate4humanityedu@gmail.com"
                 className="font-bold text-brand-orange-600 hover:text-brand-orange-700"
               >
                 elevate4humanityedu@gmail.com
+              </a>{' '}
+              or{' '}
+              <a
+                href="https://calendly.com/elevate-for-humanity/advisor-call"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-brand-orange-600 hover:text-brand-orange-700"
+              >
+                schedule a free meeting
               </a>
             </p>
           </div>

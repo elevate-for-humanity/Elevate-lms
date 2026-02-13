@@ -123,13 +123,13 @@ export default async function ThankyouPage() {
           <h2 className="text-2xl font-bold text-center mb-8">Questions? Contact Us</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <a 
-              href="tel:3173143757" 
+              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" 
               className="flex items-center gap-4 bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition"
             >
               <Phone className="w-8 h-8 text-blue-600" />
               <div>
                 <div className="font-semibold">Contact Us</div>
-                <div className="text-gray-600">(317) 314-3757</div>
+                <div className="text-gray-600">Schedule a Meeting</div>
               </div>
             </a>
             <a 

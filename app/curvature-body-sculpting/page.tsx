@@ -374,7 +374,7 @@ export default function CurvatureBodySculptingPage() {
               Book Free Consultation
             </Link>
             <a
-              href="tel:3173143757"
+              href="mailto:elevate4humanityedu@gmail.com"
               className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition flex items-center gap-2"
             >
               <Phone className="w-5 h-5" />

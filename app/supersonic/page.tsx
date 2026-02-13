@@ -137,7 +137,7 @@ export default function SupersonicPage() {
               Apply Now
             </Link>
             <a
-              href="tel:317-314-3757"
+              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
               <Phone className="w-4 h-4" />

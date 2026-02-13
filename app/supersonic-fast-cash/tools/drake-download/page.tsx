@@ -154,7 +154,7 @@ export default function DrakeDownloadPage() {
               </p>
               <div className="space-y-2 text-sm">
                 <div>📧 Email: <a href="mailto:supersonicfastcashllc@gmail.com" className="text-white hover:underline">supersonicfastcashllc@gmail.com</a></div>
-                <div>📞 Phone: <a href="tel:+13173143757" className="text-white hover:underline">(317) 314-3757</a></div>
+                <div>📞 Phone: <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="text-white hover:underline">Schedule a Meeting</a></div>
               </div>
             </div>
           </div>

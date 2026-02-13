@@ -408,7 +408,7 @@ export default function WorkOnePartnerPacketPage() {
             Contact our WorkOne liaison to set up your referral process or request additional information.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="tel:+13173143757" className="inline-flex items-center justify-center px-8 py-4 bg-white text-teal-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center justify-center px-8 py-4 bg-white text-teal-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">
               <Phone className="w-5 h-5 mr-2" />
               (317) 314-3757
             </a>

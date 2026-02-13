@@ -326,7 +326,7 @@ function EnrollPaymentContent() {
 
         {/* Contact */}
         <p className="text-center text-gray-500 text-sm mt-6">
-          Questions? Call <a href="tel:317-314-3757" className="text-blue-600 underline">(317) 314-3757</a>
+          Questions? Call <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Schedule a Meeting</a>
         </p>
       </div>
     </div>

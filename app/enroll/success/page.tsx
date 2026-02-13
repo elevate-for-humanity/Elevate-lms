@@ -131,11 +131,11 @@ export default async function EnrollSuccessPage() {
           <h3 className="font-bold text-lg mb-4">Questions? Contact Us</h3>
           <div className="space-y-3">
             <a 
-              href="tel:3173143757" 
+              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" 
               className="flex items-center gap-3 text-gray-700 hover:text-blue-600"
             >
               <Phone className="w-5 h-5" />
-              <span>(317) 314-3757</span>
+              <span>Schedule a Meeting</span>
             </a>
             <a 
               href="mailto:elevate4humanityedu@gmail.com" 

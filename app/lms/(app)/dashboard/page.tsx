@@ -258,7 +258,7 @@ export default async function StudentDashboardOrchestrated() {
             </div>
           </div>
           <p className="text-amber-700 text-sm mt-4">
-            Questions? Call <a href="tel:317-314-3757" className="underline">(317) 314-3757</a>
+            Questions? Call <a href="mailto:elevate4humanityedu@gmail.com" className="underline">elevate4humanityedu@gmail.com</a>
           </p>
         </div>
       )}
@@ -502,7 +502,7 @@ export default async function StudentDashboardOrchestrated() {
                 Your advisor is here to support you every step of the way.
               </p>
               <a
-                href="tel:+13173143757"
+                href="mailto:elevate4humanityedu@gmail.com"
                 className="block w-full text-center px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
               >
                 Call (317) 314-3757

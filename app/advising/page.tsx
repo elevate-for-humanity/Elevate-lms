@@ -71,12 +71,14 @@ export default function AdvisingPage() {
             and options so you don&apos;t have to figure it out alone.
           </p>
           <p className="mt-4 text-sm text-black">
-            <strong>Prefer to call?</strong> Reach us at{' '}
+            <strong>Prefer to talk?</strong>{' '}
             <a
-              href="tel:3173143757"
+              href="https://calendly.com/elevate-for-humanity/advisor-call"
+              target="_blank"
+              rel="noopener noreferrer"
               className="text-indigo-600 font-semibold hover:underline"
             >
-              317-314-3757
+              Schedule a free meeting
             </a>
           </p>
         </header>
@@ -106,12 +108,12 @@ export default function AdvisingPage() {
               1-2 business days.
             </p>
             <p className="text-sm text-black">
-              Need immediate assistance? Contact us at{' '}
+              Need assistance? Email{' '}
               <a
-                href="tel:3173143757"
+                href="mailto:elevate4humanityedu@gmail.com"
                 className="text-indigo-600 font-semibold hover:underline"
               >
-                317-314-3757
+                elevate4humanityedu@gmail.com
               </a>
             </p>
           </section>

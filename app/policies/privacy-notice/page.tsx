@@ -437,7 +437,7 @@ export default function PrivacyNoticePage() {
           </p>
           <p className="mb-2">
             <strong>Phone:</strong>{' '}
-            <a href="tel:+13173143757" className="text-blue-600 hover:text-blue-800">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:text-blue-800">
               (317) 314-3757
             </a>
           </p>
@@ -505,7 +505,7 @@ export default function PrivacyNoticePage() {
             elevate4humanityedu@gmail.com
           </a>{' '}
           or call{' '}
-          <a href="tel:+13173143757" className="text-green-900 font-semibold hover:underline">
+          <a href="mailto:elevate4humanityedu@gmail.com" className="text-green-900 font-semibold hover:underline">
             (317) 314-3757
           </a>.
         </p>

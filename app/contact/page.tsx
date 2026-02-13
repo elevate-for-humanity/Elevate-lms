@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Mail, Phone, MapPin, Clock, Send, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Calendar, Send, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
+import RequestMeeting from '@/components/RequestMeeting';
 import Turnstile from '@/components/Turnstile';
 
 const contactInfo = [
-  { icon: Phone, title: 'Phone', value: '(317) 314-3757', subtitle: 'Mon-Fri 8am-6pm EST', href: 'tel:317-314-3757' },
   { icon: Mail, title: 'Email', value: 'elevate4humanityedu@gmail.com', subtitle: 'We respond within 24 hours', href: 'mailto:elevate4humanityedu@gmail.com' },
+  { icon: Calendar, title: 'Schedule a Meeting', value: 'Book online', subtitle: 'Free advisor meeting — no commitment', href: 'https://calendly.com/elevate-for-humanity/advisor-call' },
   { icon: MapPin, title: 'Address', value: 'Indianapolis, IN', subtitle: 'Central Indiana', href: null },
   { icon: Clock, title: 'Hours', value: 'Mon-Fri 8am-6pm', subtitle: 'Sat 9am-1pm EST', href: null },
 ];
@@ -97,7 +98,11 @@ export default function ContactPage() {
               </div>
               <h2 className="font-semibold text-gray-900">{info.title}</h2>
               {info.href ? (
-                <a href={info.href} className="text-blue-600 hover:underline mt-1 block">{info.value}</a>
+                <a
+                  href={info.href}
+                  className="text-blue-600 hover:underline mt-1 block"
+                  {...(info.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                >{info.value}</a>
               ) : (
                 <p className="text-gray-900 mt-1">{info.value}</p>
               )}
@@ -268,18 +273,32 @@ export default function ContactPage() {
               <p className="text-gray-600">Indianapolis, Indiana</p>
               <p className="text-gray-600">Central Indiana Region</p>
               <p className="text-gray-600 mt-4">Multiple training locations available</p>
-              <div className="mt-4 pt-4 border-t">
+              <div className="mt-4 pt-4 border-t flex flex-col gap-2">
                 <a
-                  href="tel:317-314-3757"
+                  href="mailto:elevate4humanityedu@gmail.com"
                   className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
                 >
-                  <Phone className="w-4 h-4" />
-                  Call (317) 314-3757
+                  <Mail className="w-4 h-4" />
+                  elevate4humanityedu@gmail.com
+                </a>
+                <a
+                  href="https://calendly.com/elevate-for-humanity/advisor-call"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
+                >
+                  <Calendar className="w-4 h-4" />
+                  Schedule a Meeting
                 </a>
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Request a Meeting */}
+      <div className="max-w-3xl mx-auto px-4 pt-8 pb-4">
+        <RequestMeeting context="Prefer to talk through your questions? Schedule a free meeting with an Elevate advisor — no commitment required." />
       </div>
 
       {/* FAQ */}

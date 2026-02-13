@@ -74,7 +74,7 @@ export default function ContactPage() {
               <Phone className="w-8 h-8 text-blue-600" />
             </div>
             <h3 className="text-xl font-bold text-black mb-3">Phone</h3>
-            <a href="tel:+13173143757" className="text-blue-600 hover:text-blue-800 font-semibold text-lg">
+            <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800 font-semibold text-lg">
               (317) 314-3757
             </a>
             <p className="text-gray-600 mt-2 text-sm">Contact us for immediate assistance</p>

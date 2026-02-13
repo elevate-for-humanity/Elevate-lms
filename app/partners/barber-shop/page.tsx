@@ -58,7 +58,7 @@ export default function BarberShopPartnerPage() {
           </p>
           <p className="text-gray-700 mb-8">
             Questions? Contact us at{' '}
-            <a href="tel:+13173143757" className="text-brand-orange-600 font-semibold">(317) 314-3757</a>
+            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-orange-600 font-semibold">Schedule a Meeting</a>
           </p>
           <Link
             href="/programs/barber"
@@ -314,7 +314,7 @@ export default function BarberShopPartnerPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="tel:+13173143757"
+                  href="mailto:elevate4humanityedu@gmail.com"
                   className="inline-flex items-center justify-center gap-2 bg-slate-100 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-slate-200"
                 >
                   <Phone className="w-5 h-5" />

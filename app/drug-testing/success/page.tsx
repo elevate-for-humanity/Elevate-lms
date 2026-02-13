@@ -69,7 +69,7 @@ export default function DrugTestingSuccessPage() {
           <h3 className="font-bold mb-4">Need Help?</h3>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="tel:+13173143757"
+              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-bold hover:bg-brand-blue-700"
             >
               <Phone className="w-5 h-5" />

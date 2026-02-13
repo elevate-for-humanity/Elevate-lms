@@ -63,7 +63,7 @@ export default function FranchisePage() {
                 View Franchise Packages
               </Link>
               <a
-                href="tel:3173143757"
+                href="mailto:elevate4humanityedu@gmail.com"
                 className="inline-block px-8 py-4 bg-white/10 text-white font-bold rounded-lg hover:bg-white/20 transition text-lg border-2 border-white text-center"
               >
                 Call 317-314-3757
@@ -475,7 +475,7 @@ export default function FranchisePage() {
               Request Franchise Information
             </Link>
             <a
-              href="tel:3173143757"
+              href="mailto:elevate4humanityedu@gmail.com"
               className="inline-block px-10 py-5 bg-white border-2 border-orange-600 text-orange-600 font-bold rounded-lg hover:bg-orange-50 transition text-lg"
             >
               Call 317-314-3757

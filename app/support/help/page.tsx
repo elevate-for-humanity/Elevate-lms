@@ -189,7 +189,7 @@ export default async function HelpCenterPage({
               Submit a Ticket
             </Link>
             <a
-              href="tel:+13173143757"
+              href="mailto:elevate4humanityedu@gmail.com"
               className="px-6 py-3 bg-gray-100 text-black font-semibold rounded-lg hover:bg-gray-200 transition"
             >
               Call (317) 314-3757

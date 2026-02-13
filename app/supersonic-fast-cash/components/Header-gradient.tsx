@@ -119,7 +119,7 @@ export function SupersonicHeader() {
 
           <div className="flex items-center gap-4">
             <a
-              href="tel:+13173143757"
+              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
               className="hidden sm:block font-bold text-lg hover:text-red-400 transition-colors"
             >
               <Phone className="w-5 h-5 inline-block" /> (317) 314-3757

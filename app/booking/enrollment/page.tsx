@@ -316,7 +316,7 @@ export default function EnrollmentBookingPage() {
         {/* Call CTA */}
         <div className="mt-8 bg-gray-100 rounded-xl p-6 text-center">
           <p className="text-gray-600 mb-2">Prefer to speak with someone now?</p>
-          <a href="tel:3173143757" className="inline-flex items-center gap-2 text-xl font-bold text-blue-600 hover:text-blue-700">
+          <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-xl font-bold text-blue-600 hover:text-blue-700">
             <Phone className="w-5 h-5" />
             (317) 314-3757
           </a>

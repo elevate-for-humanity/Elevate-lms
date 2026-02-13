@@ -103,10 +103,12 @@ export default async function ApplicationSuccessPage() {
 
         <div className="space-y-3">
           <a
-            href="tel:13173143757"
+            href="https://calendly.com/elevate-for-humanity/advisor-call"
+            target="_blank"
+            rel="noopener noreferrer"
             className="block w-full rounded-xl bg-brand-blue-600 px-6 py-3 text-center font-semibold text-white hover:bg-brand-blue-700 transition-colors"
           >
-            Need help now? Call 317-314-3757
+            Schedule a Meeting With an Advisor
           </a>
           <Link
             href="/"

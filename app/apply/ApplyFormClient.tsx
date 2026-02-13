@@ -213,14 +213,16 @@ export default function ApplyFormClient() {
             you.
           </p>
           <p className="text-lg text-black mb-6">
-            Contact us at{' '}
+            Fill out the quick inquiry form below, or{' '}
             <a
-              href="tel:3173143757"
+              href="https://calendly.com/elevate-for-humanity/advisor-call"
+              target="_blank"
+              rel="noopener noreferrer"
               className="font-bold text-brand-orange-600 hover:text-brand-orange-700"
             >
-              317-314-3757
+              schedule a free meeting
             </a>{' '}
-            or fill out the quick inquiry form below.
+            with an advisor.
           </p>
 
           <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-6 mb-8">

@@ -205,7 +205,7 @@ export default async function SupportPage() {
           <div className="flex flex-wrap gap-6 justify-center">
             <div className="text-white">
               <p className="text-sm text-slate-400">Phone</p>
-              <a href="tel:+13173143757" className="text-lg font-semibold hover:text-blue-400">(317) 314-3757</a>
+              <a href="mailto:elevate4humanityedu@gmail.com" className="text-lg font-semibold hover:text-blue-400">Schedule a Meeting</a>
             </div>
             <div className="text-white">
               <p className="text-sm text-slate-400">Email</p>

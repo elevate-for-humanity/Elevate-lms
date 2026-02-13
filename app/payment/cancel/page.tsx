@@ -87,7 +87,7 @@ export default async function PaymentCancelPage() {
             <p className="text-sm text-black">
               Questions? Contact us at{' '}
               <a
-                href="tel:317-314-3757"
+                href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
                 className="text-brand-orange-600 hover:underline"
               >
                 317-314-3757

@@ -8,19 +8,19 @@ const programs = [
   { 
     name: 'Healthcare', 
     href: '/programs/healthcare', 
-    image: '/images/homepage/medical-assistant-training.png', 
+    image: '/images/heroes/programs/healthcare/hero-program-medical-assistant.jpg', 
     description: 'CNA, Medical Assistant, Phlebotomy — get certified and working in weeks',
   },
   { 
     name: 'Skilled Trades', 
     href: '/programs/skilled-trades', 
-    image: '/images/homepage/hvac-technician-training.png', 
+    image: '/images/trades/hero-program-hvac.jpg', 
     description: 'HVAC, Electrical, Welding, Plumbing — hands-on training, real job placement',
   },
   { 
     name: 'Barber Apprenticeship', 
     href: '/programs/barber-apprenticeship', 
-    image: '/images/homepage/barber-apprenticeship-training.png', 
+    image: '/images/barber-hero-new.jpg', 
     description: 'Earn while you learn — get paid during your apprenticeship',
   },
   { 
@@ -38,7 +38,7 @@ const programs = [
   { 
     name: 'CPR & First Aid', 
     href: '/programs/cpr-first-aid-hsi', 
-    image: '/images/homepage/cpr-aed-first-aid-training.png', 
+    image: '/images/courses/cpr-aed-first-aid-10002448-cover.jpg', 
     description: 'HSI certified — same-day certification available',
   },
 ];
@@ -178,10 +178,10 @@ export default function HomePage() {
           
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6">
             {[
-              { num: '1', title: 'Register at WorkOne', desc: 'Sign up at indianacareerconnect.com and schedule an appointment with WorkOne to determine your funding eligibility', img: '/images/homepage/funding-navigation.png', href: '/funding', linkLabel: 'Learn More' },
-              { num: '2', title: 'Choose Program', desc: 'Pick the career path that fits your goals and schedule', img: '/images/homepage/training-program-collage.png', href: '/programs', linkLabel: 'View Programs' },
-              { num: '3', title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification', img: '/images/homepage/certificate-of-completion.png', href: '/how-it-works', linkLabel: 'Learn More' },
-              { num: '4', title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates', img: '/images/homepage/employer-partnership.png', href: '/career-services', linkLabel: 'Career Services' },
+              { num: '1', title: 'Register at WorkOne', desc: 'Sign up at indianacareerconnect.com and schedule an appointment with WorkOne to determine your funding eligibility', img: '/images/heroes-hq/funding-hero.jpg', href: '/funding', linkLabel: 'Learn More' },
+              { num: '2', title: 'Choose Program', desc: 'Pick the career path that fits your goals and schedule', img: '/images/heroes-hq/programs-hero.jpg', href: '/programs', linkLabel: 'View Programs' },
+              { num: '3', title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification', img: '/images/hero/hero-certifications.jpg', href: '/how-it-works', linkLabel: 'Learn More' },
+              { num: '4', title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates', img: '/images/heroes-hq/career-services-hero.jpg', href: '/career-services', linkLabel: 'Career Services' },
             ].map((step) => (
               <div key={step.num} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-100 hover:shadow-lg transition-shadow duration-300">
                 <div className="relative aspect-square bg-stone-100">

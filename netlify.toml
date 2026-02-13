@@ -117,6 +117,31 @@
   status = 301
   force = true
 
+# Old .institute domain -> canonical .org (preserves path + query)
+[[redirects]]
+  from = "https://www.elevateforhumanity.institute/*"
+  to = "https://www.elevateforhumanity.org/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "https://elevateforhumanity.institute/*"
+  to = "https://www.elevateforhumanity.org/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://www.elevateforhumanity.institute/*"
+  to = "https://www.elevateforhumanity.org/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "http://elevateforhumanity.institute/*"
+  to = "https://www.elevateforhumanity.org/:splat"
+  status = 301
+  force = true
+
 # ============================================
 # API REDIRECTS TO NETLIFY FUNCTIONS
 # ============================================

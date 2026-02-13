@@ -84,7 +84,8 @@ async function actionServer(
   entry_id: string
 ) {
   'use server';
-  await postJSON(`/api/time/approve`, { action, entry_id });
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+  await postJSON(`${baseUrl}/api/time/approve`, { action, entry_id });
 }
 
 function minutesToHrsMin(m: number) {
@@ -98,19 +99,20 @@ function minutesToHrsMin(m: number) {
 export default async function MentorApprovalsPage({
   searchParams,
 }: {
-  searchParams?: {
+  searchParams?: Promise<{
     status?: string;
     funding_phase?: string;
     hour_type?: string;
     from?: string;
     to?: string;
-  };
+  }>;
 }) {
-  const status = searchParams?.status ?? 'SUBMITTED';
-  const funding_phase = searchParams?.funding_phase ?? '';
-  const hour_type = searchParams?.hour_type ?? '';
-  const from = searchParams?.from ?? '';
-  const to = searchParams?.to ?? '';
+  const params = await searchParams;
+  const status = params?.status ?? 'SUBMITTED';
+  const funding_phase = params?.funding_phase ?? '';
+  const hour_type = params?.hour_type ?? '';
+  const from = params?.from ?? '';
+  const to = params?.to ?? '';
 
   const qs = new URLSearchParams();
   qs.set('status', status);
@@ -119,9 +121,18 @@ export default async function MentorApprovalsPage({
   if (from) qs.set('from', from);
   if (to) qs.set('to', to);
 
-  const { entries } = await fetchJSON<{ entries: Entry[] }>(
-    `/api/time/approve?${qs.toString()}`
-  );
+  // Use absolute URL for server-side fetch
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+  let entries: Entry[] = [];
+  try {
+    const result = await fetchJSON<{ entries: Entry[] }>(
+      `${baseUrl}/api/time/approve?${qs.toString()}`
+    );
+    entries = result.entries;
+  } catch {
+    // API may fail if user is not authenticated or table doesn't exist
+    entries = [];
+  }
 
   return (
     <div className="p-6 space-y-4 max-w-7xl mx-auto">

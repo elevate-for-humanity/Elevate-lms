@@ -39,6 +39,7 @@ const EXCLUDED_PREFIXES = [
   '/dashboard',
   '/portals',
   '/approvals',
+  '/mentor',
   '/reports',
   '/analytics',
   '/performance-report',

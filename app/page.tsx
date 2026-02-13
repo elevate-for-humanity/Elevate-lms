@@ -2,8 +2,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import HomeHeroVideo from './HomeHeroVideo';
 import MarqueeBanner from '@/components/MarqueeBanner';
-import PageAvatar from '@/components/PageAvatar';
-
 import { StatStrip } from '@/components/StatStrip';
 import { TestimonialCarousel } from '@/components/TestimonialCarousel';
 import NewsletterSignup from '@/components/NewsletterSignup';
@@ -82,16 +80,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== AVATAR GUIDE ===== */}
-      <section className="py-8 sm:py-12 bg-white">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <PageAvatar 
-            videoSrc="/videos/avatars/home-welcome.mp4"
-            title="Welcome to Elevate for Humanity"
-          />
-        </div>
-      </section>
-
       {/* ===== EARN WHILE YOU LEARN ===== */}
       <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-stone-50">
         <div className="max-w-7xl mx-auto px-6">
@@ -131,45 +119,69 @@ export default function HomePage() {
             <p className="text-lg text-slate-700 max-w-2xl mx-auto">We are approved and funded through these workforce partners</p>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
-              <div className="flex justify-center mb-6">
-                <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={80} height={80} className="w-20 h-20" />
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
+              <div className="relative h-40">
+                <Image src="/images/students-new/student-5.jpg" alt="Apprenticeship training" fill className="object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4">
+                  <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={48} height={48} className="w-12 h-12 bg-white rounded-lg p-1" />
+                </div>
               </div>
-              <h3 className="font-bold text-slate-900 text-xl mb-3">US Department of Labor</h3>
-              <p className="text-slate-600 text-base mb-6 leading-relaxed">We are a federally registered apprenticeship sponsor, providing DOL-approved training programs with nationally recognized credentials.</p>
-              <a href="https://www.dol.gov" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-blue-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                Learn More
-              </a>
+              <div className="p-6 text-center">
+                <h3 className="font-bold text-slate-900 text-xl mb-3">US Department of Labor</h3>
+                <p className="text-slate-600 text-sm mb-4 leading-relaxed">Federally registered apprenticeship sponsor with DOL-approved training programs.</p>
+                <a href="https://www.dol.gov" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-blue-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                  Learn More
+                </a>
+              </div>
             </div>
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
-              <div className="flex justify-center mb-6">
-                <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={80} height={80} className="w-20 h-20" />
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
+              <div className="relative h-40">
+                <Image src="/images/students-new/student-12.jpg" alt="Workforce training" fill className="object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4">
+                  <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={48} height={48} className="w-12 h-12 bg-white rounded-lg p-1" />
+                </div>
               </div>
-              <h3 className="font-bold text-slate-900 text-xl mb-3">Indiana DWD</h3>
-              <p className="text-slate-600 text-base mb-6 leading-relaxed">Approved by Indiana Department of Workforce Development for WIOA funding, enabling eligible students to train at no cost.</p>
-              <a href="https://www.in.gov/dwd" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-blue-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                Learn More
-              </a>
+              <div className="p-6 text-center">
+                <h3 className="font-bold text-slate-900 text-xl mb-3">Indiana DWD</h3>
+                <p className="text-slate-600 text-sm mb-4 leading-relaxed">Approved for WIOA funding, enabling eligible students to train at no cost.</p>
+                <a href="https://www.in.gov/dwd" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-blue-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                  Learn More
+                </a>
+              </div>
             </div>
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
-              <div className="flex justify-center mb-6">
-                <Image src="/images/partners/workone.webp" alt="WorkOne" width={80} height={80} className="w-20 h-20" />
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
+              <div className="relative h-40">
+                <Image src="/images/students-new/student-3.jpg" alt="Career services" fill className="object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4">
+                  <Image src="/images/partners/workone.webp" alt="WorkOne" width={48} height={48} className="w-12 h-12 bg-white rounded-lg p-1" />
+                </div>
               </div>
-              <h3 className="font-bold text-slate-900 text-xl mb-3">WorkOne</h3>
-              <p className="text-slate-600 text-base mb-6 leading-relaxed">Register with WorkOne to determine your eligibility for free training through WIOA, WRG, and other workforce programs.</p>
-              <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-brand-red-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors">
-                Register Now
-              </a>
+              <div className="p-6 text-center">
+                <h3 className="font-bold text-slate-900 text-xl mb-3">WorkOne</h3>
+                <p className="text-slate-600 text-sm mb-4 leading-relaxed">Register to determine your eligibility for free training through WIOA and WRG.</p>
+                <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-brand-red-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors">
+                  Register Now
+                </a>
+              </div>
             </div>
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
-              <div className="flex justify-center mb-6">
-                <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={80} height={80} className="w-20 h-20" />
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
+              <div className="relative h-40">
+                <Image src="/images/success-new/success-3.jpg" alt="Graduate success" fill className="object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                <div className="absolute bottom-4 left-4">
+                  <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={48} height={48} className="w-12 h-12 bg-white rounded-lg p-1" />
+                </div>
               </div>
-              <h3 className="font-bold text-slate-900 text-xl mb-3">Next Level Jobs</h3>
-              <p className="text-slate-600 text-base mb-6 leading-relaxed">Indiana&apos;s Workforce Ready Grant covers tuition for high-demand certifications. We are an approved WRG training provider.</p>
-              <a href="https://nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-blue-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
-                Learn More
-              </a>
+              <div className="p-6 text-center">
+                <h3 className="font-bold text-slate-900 text-xl mb-3">Next Level Jobs</h3>
+                <p className="text-slate-600 text-sm mb-4 leading-relaxed">Workforce Ready Grant covers tuition for high-demand certifications.</p>
+                <a href="https://nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-blue-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                  Learn More
+                </a>
+              </div>
             </div>
           </div>
         </div>

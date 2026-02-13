@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import RequestMeeting from '@/components/RequestMeeting';
 
 export const metadata: Metadata = {
   title: 'Apply for Medical Assistant | Elevate for Humanity',

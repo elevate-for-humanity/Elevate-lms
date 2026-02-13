@@ -14,7 +14,7 @@ export const metadata: Metadata = {
     title: 'Beauty & Cosmetology Programs | Indianapolis',
     description: 'Cosmetology, nail technician, and esthetician training with apprenticeship options.',
     url: `${SITE_URL}/programs/beauty`,
-    images: [{ url: `${SITE_URL}/images/hero/hero-beauty-wellness.jpg`, width: 1200, height: 630 }],
+    images: [{ url: `${SITE_URL}/images/beauty/program-beauty-training.jpg`, width: 1400, height: 788 }],
   },
 };
 
@@ -28,7 +28,7 @@ export default function BeautyPage() {
       </div>
 
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/hero/hero-beauty-wellness.jpg" alt="Beauty & Cosmetology Programs" fill className="object-cover" priority />
+        <Image src="/images/beauty/program-beauty-training.jpg" alt="Beauty & Cosmetology Programs" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">

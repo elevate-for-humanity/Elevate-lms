@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import RequestMeeting from '@/components/RequestMeeting';
 
 export const metadata: Metadata = {
   title: 'Apply for Electrical | Elevate for Humanity',
@@ -53,6 +54,10 @@ export default function ApplyPage() {
               <span className="inline-flex items-center px-8 py-4 bg-green-600 text-white text-lg font-bold rounded-full">Apply Now <ArrowRight className="w-5 h-5 ml-2" /></span>
             </div>
           </Link>
+        </div>
+
+        <div className="mt-8">
+          <RequestMeeting context="Have questions about the Electrical program or need help applying? Schedule a free meeting with an advisor." />
         </div>
 
         <Link href="/programs/electrical" className="inline-flex items-center text-lg text-black font-semibold hover:underline">

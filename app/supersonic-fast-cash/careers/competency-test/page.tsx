@@ -171,19 +171,19 @@ const COMPETENCY_QUESTIONS: Question[] = [
     category: 'Deadlines',
   },
 
-  // SupersonicFastCash Questions
+  // SupersonicFastCash Tax Software Questions
   {
     id: 16,
-    question: 'In SupersonicFastCash, which key opens the forms view?',
-    options: ['F1', 'F5', 'F9', 'F12'],
+    question: 'In SupersonicFastCash, what is the first step when starting a new client return?',
+    options: ['Print prior year return', 'Enter client demographics', 'Run diagnostics', 'Transmit to IRS'],
     correctAnswer: 1,
     category: 'SupersonicFastCash',
   },
   {
     id: 17,
-    question: "SupersonicFastCash's e-file transmission is accessed through:",
-    options: ['File menu', 'Tools menu', 'Transmit menu', 'E-File menu'],
-    correctAnswer: 2,
+    question: 'Before e-filing a return in SupersonicFastCash, you must first:',
+    options: ['Print the return', 'Run error check and review diagnostics', 'Email the client', 'Upload to cloud storage'],
+    correctAnswer: 1,
     category: 'SupersonicFastCash',
   },
   {
@@ -191,9 +191,9 @@ const COMPETENCY_QUESTIONS: Question[] = [
     question: "What does SupersonicFastCash's 'Calculate' function do?",
     options: [
       'Only checks for errors',
-      'Computes tax liability and generates forms',
-      'Transmits the return',
-      'Prints the return',
+      'Computes tax liability and generates all required forms',
+      'Transmits the return to the IRS',
+      'Prints the return for client review',
     ],
     correctAnswer: 1,
     category: 'SupersonicFastCash',

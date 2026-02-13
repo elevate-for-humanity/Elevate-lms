@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
-  Building2, Calendar, Circle, 
+  Building2, Circle, 
   ArrowRight, Users, Briefcase, CreditCard, Phone
 } from 'lucide-react';
 
@@ -284,11 +284,10 @@ export default async function TuitionPage() {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
-              href="/schedule"
+              href="/apply"
               className="inline-flex items-center justify-center gap-2 bg-orange-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-orange-700 transition"
             >
-              <Calendar className="w-5 h-5" />
-              Schedule a Call
+              Apply Now
             </Link>
             <Link 
               href="/contact"

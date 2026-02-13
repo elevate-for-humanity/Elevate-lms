@@ -161,7 +161,7 @@ export default function MultiSitePage() {
                 href="/supersonic-fast-cash/contact"
                 className="inline-flex items-center justify-center gap-2 bg-blue-500/30 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-500/40 transition-colors border border-white/30"
               >
-                Schedule a Call
+                Get Started
               </Link>
             </div>
           </div>

@@ -163,7 +163,7 @@ export default async function WorkforceBoardPage() {
               href="/contact"
               className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur text-white px-8 py-4 rounded-lg font-semibold text-lg transition border border-white/30"
             >
-              Request Access
+              Apply for Access
             </Link>
           </div>
         </div>

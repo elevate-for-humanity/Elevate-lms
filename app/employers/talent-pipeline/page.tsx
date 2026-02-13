@@ -314,22 +314,21 @@ export default async function TalentPipelinePage() {
             Ready to Build Your Talent Pipeline?
           </h2>
           <p className="text-xl text-orange-100 mb-8">
-            Contact us today to discuss your hiring needs and learn how we can help you 
-            find qualified candidates for your open positions.
+            Post jobs and browse pre-trained, certified candidates online.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/contact"
+              href="/apply/employer"
               className="px-8 py-4 bg-white text-orange-600 font-bold rounded-full hover:bg-orange-50 transition-all"
             >
-              Contact Our Team
+              Employer Application
             </Link>
-            <a
-              href="tel:317-314-3757"
+            <Link
+              href="/employer"
               className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-orange-600 transition-all"
             >
-              Call 317-314-3757
-            </a>
+              Employer Portal
+            </Link>
           </div>
         </div>
       </section>

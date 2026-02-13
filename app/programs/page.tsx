@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Training Programs | Free Career Training',
-  description: 'Explore free career training programs in healthcare, skilled trades, technology, CDL, barbering, and business. WIOA-funded programs available. Start your new career today.',
+  title: 'Training Programs | Career Training | Elevate',
+  description: 'Career training programs in healthcare, skilled trades, technology, CDL, barbering, and business. Funding available for qualifying students. Start your new career today.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/programs',
   },

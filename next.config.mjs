@@ -344,10 +344,14 @@ const nextConfig = {
       { source: '/programs/building-maintenance-tech', destination: '/programs/skilled-trades', permanent: true },
       { source: '/programs/drug-collector', destination: '/programs/healthcare', permanent: true },
       { source: '/programs/drug-alcohol-specimen-collector', destination: '/programs/healthcare', permanent: true },
-      { source: '/programs/esthetician-apprenticeship/:path*', destination: '/programs/professional-esthetician/:path*', permanent: true },
-      { source: '/programs/esthetician-apprenticeship', destination: '/programs/professional-esthetician', permanent: true },
-      { source: '/programs/tax-preparation/:path*', destination: '/programs/tax-prep-financial-services/:path*', permanent: true },
-      { source: '/programs/tax-preparation', destination: '/programs/tax-prep-financial-services', permanent: true },
+      { source: '/programs/esthetician-apprenticeship/:path*', destination: '/programs/beauty', permanent: true },
+      { source: '/programs/esthetician-apprenticeship', destination: '/programs/beauty', permanent: true },
+      { source: '/programs/professional-esthetician/:path*', destination: '/programs/beauty', permanent: true },
+      { source: '/programs/professional-esthetician', destination: '/programs/beauty', permanent: true },
+      { source: '/programs/tax-preparation/:path*', destination: '/programs/tax-entrepreneurship', permanent: true },
+      { source: '/programs/tax-preparation', destination: '/programs/tax-entrepreneurship', permanent: true },
+      { source: '/programs/tax-prep-financial-services/:path*', destination: '/programs/tax-entrepreneurship', permanent: true },
+      { source: '/programs/tax-prep-financial-services', destination: '/programs/tax-entrepreneurship', permanent: true },
 
       // Career consolidation — /career-center handled by Netlify (Rule A)
       { source: '/career-fair/:path*', destination: '/career-services/:path*', permanent: true },

@@ -38,7 +38,7 @@ const programs = [
   { 
     name: 'CPR & First Aid', 
     href: '/programs/cpr-first-aid-hsi', 
-    image: '/images/programs/cpr-group-training-hd.jpg', 
+    image: '/images/programs/cpr-certification-group-hd.jpg', 
     description: 'HSI certified — same-day certification available',
   },
 ];
@@ -116,25 +116,44 @@ export default function HomePage() {
 
 
       {/* ===== PARTNERS ===== */}
-      <section className="py-12 bg-white border-y border-stone-200">
+      <section className="py-14 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="text-center text-blue-600 font-bold text-lg sm:text-xl mb-8 tracking-wide">Approved Training Provider</p>
-          <div className="flex flex-wrap items-center justify-center gap-10 sm:gap-14 md:gap-20">
-            <a href="https://www.dol.gov" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2">
-              <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20" />
-              <span className="text-slate-700 text-xs sm:text-sm font-medium">US Department of Labor</span>
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-black mb-3">Approved Training Provider</h2>
+            <p className="text-lg text-slate-600">We are approved and funded through these workforce partners</p>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+            <a href="https://www.dol.gov" target="_blank" rel="noopener noreferrer" className="group bg-slate-50 rounded-2xl p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
+              <div className="flex justify-center mb-4">
+                <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24" />
+              </div>
+              <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">US Department of Labor</h3>
+              <p className="text-slate-500 text-xs sm:text-sm mb-3">Registered apprenticeship sponsor</p>
+              <span className="inline-block bg-blue-600 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
             </a>
-            <a href="https://www.in.gov/dwd" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2">
-              <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20" />
-              <span className="text-slate-700 text-xs sm:text-sm font-medium">Indiana DWD</span>
+            <a href="https://www.in.gov/dwd" target="_blank" rel="noopener noreferrer" className="group bg-slate-50 rounded-2xl p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
+              <div className="flex justify-center mb-4">
+                <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24" />
+              </div>
+              <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">Indiana DWD</h3>
+              <p className="text-slate-500 text-xs sm:text-sm mb-3">Department of Workforce Development</p>
+              <span className="inline-block bg-blue-600 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
             </a>
-            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2">
-              <Image src="/images/partners/workone.webp" alt="WorkOne" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20" />
-              <span className="text-slate-700 text-xs sm:text-sm font-medium">WorkOne</span>
+            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="group bg-slate-50 rounded-2xl p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
+              <div className="flex justify-center mb-4">
+                <Image src="/images/partners/workone.webp" alt="WorkOne" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24" />
+              </div>
+              <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">WorkOne</h3>
+              <p className="text-slate-500 text-xs sm:text-sm mb-3">Register here for funding eligibility</p>
+              <span className="inline-block bg-brand-red-600 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full group-hover:bg-brand-red-700 transition-colors">Register Now →</span>
             </a>
-            <a href="https://nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2">
-              <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={80} height={80} className="w-16 h-16 sm:w-20 sm:h-20" />
-              <span className="text-slate-700 text-xs sm:text-sm font-medium">Next Level Jobs</span>
+            <a href="https://nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="group bg-slate-50 rounded-2xl p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
+              <div className="flex justify-center mb-4">
+                <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={80} height={80} className="w-20 h-20 sm:w-24 sm:h-24" />
+              </div>
+              <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">Next Level Jobs</h3>
+              <p className="text-slate-500 text-xs sm:text-sm mb-3">Indiana workforce training grants</p>
+              <span className="inline-block bg-blue-600 text-white text-xs sm:text-sm font-bold px-4 py-2 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
             </a>
           </div>
         </div>

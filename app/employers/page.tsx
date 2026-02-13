@@ -9,7 +9,7 @@ import {
   Clock,
   CheckCircle,
   ArrowRight,
-  Phone,
+
   Building2,
 } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
@@ -64,13 +64,13 @@ export default function EmployersPage() {
                 Partner With Us
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              <a
-                href="tel:317-314-3757"
+              <Link
+                href="/employer"
                 className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-gray-100 hover:bg-gray-200 text-gray-900 font-semibold rounded-lg transition-colors"
               >
-                <Phone className="w-5 h-5" />
-                (317) 314-3757
-              </a>
+                Employer Portal
+                <ArrowRight className="w-5 h-5" />
+              </Link>
             </div>
           </div>
         </div>
@@ -258,23 +258,23 @@ export default function EmployersPage() {
             Ready to Build Your Team?
           </h2>
           <p className="text-xl text-orange-100 mb-8">
-            Contact us to discuss your hiring needs and access our talent pipeline.
+            Post jobs, browse candidates, and access tax credits — all online.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/contact?type=employer"
+              href="/apply/employer"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-orange-600 font-semibold rounded-full hover:bg-gray-100 transition-colors"
             >
-              Contact Us
+              Employer Application
               <ArrowRight className="w-5 h-5" />
             </Link>
-            <a
-              href="tel:317-314-3757"
+            <Link
+              href="/employer"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-orange-700 text-white font-semibold rounded-full hover:bg-orange-800 transition-colors"
             >
-              <Phone className="w-5 h-5" />
-              (317) 314-3757
-            </a>
+              <ArrowRight className="w-5 h-5" />
+              Employer Portal
+            </Link>
           </div>
         </div>
       </section>

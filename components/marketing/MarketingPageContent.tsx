@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowRight, CheckCircle } from 'lucide-react';
+import { sanitizeHtml } from '@/lib/sanitize';
 import type { MarketingPage, MarketingSection } from '@/lib/api/marketing';
 
 interface MarketingPageContentProps {
@@ -68,7 +69,7 @@ function TextSection({ section }: { section: MarketingSection }) {
         <h2 className="text-3xl font-bold text-gray-900 mb-6">{section.heading}</h2>
         <div 
           className="prose prose-lg max-w-none text-gray-700"
-          dangerouslySetInnerHTML={{ __html: section.body }}
+          dangerouslySetInnerHTML={{ __html: sanitizeHtml(section.body || '') }}
         />
       </div>
     </section>

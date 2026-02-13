@@ -1,7 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { programs } from '@/app/data/programs';
+import { createClient } from '@/lib/supabase/server';
+
+async function guardAdmin() {
+  const supabase = await createClient();
+  if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  return null;
+}
 
 export async function GET(request: NextRequest) {
+  const denied = await guardAdmin();
+  if (denied) return denied;
   const { searchParams } = new URL(request.url);
   const format = searchParams.get('format') || 'html';
 

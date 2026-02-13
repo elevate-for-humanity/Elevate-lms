@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { ArrowLeft, Clock, ThumbsUp, ThumbsDown, Share2, Printer } from 'lucide-react';
+import { sanitizeHtml } from '@/lib/sanitize';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = { title: 'Help Article | Elevate LMS' };
@@ -66,7 +67,7 @@ export default function HelpArticlePage({ params }: { params: { id: string } }) 
               <span>Last updated: {article.updated}</span>
             </div>
           </div>
-          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: article.content }} />
+          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(article.content) }} />
           <div className="mt-8 pt-8 border-t">
             <p className="text-gray-700 mb-4">Was this article helpful?</p>
             <div className="flex items-center gap-4">

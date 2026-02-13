@@ -1,11 +1,26 @@
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 
+async function guardAdmin() {
+  const supabase = await createClient();
+  if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  return null;
+}
+
 // GET - Fetch all career courses with modules
 export async function GET() {
+  const denied = await guardAdmin();
+  if (denied) return denied;
   try {
     const supabase = createAdminClient();
 
@@ -31,6 +46,8 @@ export async function GET() {
 
 // POST - Create Stripe products for career courses
 export async function POST(req: Request) {
+  const denied = await guardAdmin();
+  if (denied) return denied;
   try {
     const { action } = await req.json();
 

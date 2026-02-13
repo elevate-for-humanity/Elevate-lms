@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -151,6 +152,17 @@ function determineRouteStatus(route: typeof ROUTES_TO_AUDIT[0], tableAudits: Tab
 }
 
 export async function GET() {
+  // Require admin auth — this endpoint exposes infrastructure details
+  const authClient = await createClient();
+  if (authClient) {
+    const { data: { user } } = await authClient.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { data: profile } = await authClient.from('profiles').select('role').eq('id', user.id).single();
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  }
+
   const timestamp = new Date().toISOString();
   const commitSha = process.env.COMMIT_REF || process.env.COMMIT_SHA || 'local-dev';
   

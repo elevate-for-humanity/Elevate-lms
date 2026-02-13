@@ -7,6 +7,17 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
 export async function GET() {
+  // Require admin auth — this endpoint exposes infrastructure details
+  const supabase = await createClient();
+  if (supabase) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+    if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  }
+
   const startTime = Date.now();
   
   try {

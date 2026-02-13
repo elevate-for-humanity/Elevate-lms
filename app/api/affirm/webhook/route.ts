@@ -26,12 +26,24 @@ interface AffirmWebhookEvent {
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify webhook authenticity via shared secret header
+    const webhookSecret = process.env.AFFIRM_WEBHOOK_SECRET;
+    if (webhookSecret) {
+      const providedSecret = request.headers.get('x-affirm-webhook-secret') 
+        || request.headers.get('authorization')?.replace('Bearer ', '');
+      if (providedSecret !== webhookSecret) {
+        logger.warn('Affirm webhook: invalid secret');
+        return NextResponse.json({ error: 'Invalid webhook secret' }, { status: 401 });
+      }
+    }
+
     const payload = await request.text();
-    
-    // TODO: Verify webhook signature if Affirm provides one
-    // const signature = request.headers.get('affirm-signature');
-    
     const event: AffirmWebhookEvent = JSON.parse(payload);
+
+    // Reject if missing required fields
+    if (!event.type || !event.data?.order_id) {
+      return NextResponse.json({ error: 'Invalid payload' }, { status: 400 });
+    }
 
     logger.info('Affirm webhook received', {
       type: event.type,
@@ -40,6 +52,18 @@ export async function POST(request: NextRequest) {
     });
 
     const supabase = await createClient();
+
+    // Validate the order_id exists in our system before processing
+    const { data: existingApp } = await supabase
+      .from('applications')
+      .select('id, affirm_order_id')
+      .eq('affirm_order_id', event.data.order_id)
+      .single();
+
+    if (!existingApp) {
+      logger.warn('Affirm webhook: unknown order_id', { orderId: event.data.order_id });
+      return NextResponse.json({ error: 'Unknown order' }, { status: 404 });
+    }
 
     switch (event.type) {
       case 'charge.authorized':

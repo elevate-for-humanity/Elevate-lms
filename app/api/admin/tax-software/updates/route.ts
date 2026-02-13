@@ -4,14 +4,29 @@
  */
 
 import { NextResponse } from 'next/server';
+import { createClient } from '@/lib/supabase/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
+
+async function guardAdmin() {
+  const supabase = await createClient();
+  if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single();
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  return null;
+}
 
 /**
  * GET - List pending updates and alerts
  */
 export async function GET() {
+  const denied = await guardAdmin();
+  if (denied) return denied;
   try {
     const { createMonitor } = await import('@/lib/tax-software/irs-monitor');
     const monitor = createMonitor();
@@ -43,6 +58,8 @@ export async function GET() {
  * POST - Approve or reject an update
  */
 export async function POST(req: Request) {
+  const denied = await guardAdmin();
+  if (denied) return denied;
   try {
     const { createMonitor } = await import('@/lib/tax-software/irs-monitor');
     const body = await req.json();

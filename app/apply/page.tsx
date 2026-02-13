@@ -217,7 +217,7 @@ export default async function ApplyPage({
                 desc: 'Referrals and assistance finding affordable childcare during training hours.',
               },
               {
-                image: '/images/heroes-hq/success-hero.jpg',
+                image: '/images/career-services/job-fair.jpg',
                 alt: 'Career placement services',
                 title: 'Career Placement',
                 desc: 'Resume help, interview prep, and direct employer connections before you graduate.',
@@ -225,7 +225,7 @@ export default async function ApplyPage({
                 linkLabel: 'View Career Services',
               },
               {
-                image: '/images/heroes-hq/about-hero.jpg',
+                image: '/images/efh/sections/coaching.jpg',
                 alt: 'Case management team',
                 title: 'Case Management',
                 desc: 'A dedicated advisor checks in weekly to help you stay on track.',

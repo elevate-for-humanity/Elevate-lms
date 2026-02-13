@@ -1,361 +1,157 @@
-'use client';
-
+import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowRight } from 'lucide-react';
 
-import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
-import PathwayDisclosure from '@/components/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
-import HeroVideoWithVoiceover from '@/components/HeroVideoWithVoiceover';
+const SITE_URL = 'https://www.elevateforhumanity.org';
 
-interface Program {
-  id: string;
-  slug: string;
-  name: string;
-  description: string;
-  category: string;
-  duration_weeks: number;
-  price: number;
-  certification: string;
-  is_active: boolean;
-}
-
-const programImages: Record<string, string> = {
-  'it-support-specialist': '/images/technology/hero-program-it-support.jpg',
-  'it-support': '/images/technology/hero-program-it-support.jpg',
-  'cybersecurity-analyst': '/images/technology/hero-program-cybersecurity.jpg',
-  'cybersecurity': '/images/technology/hero-program-cybersecurity.jpg',
-  'web-development': '/images/technology/hero-program-web-dev.jpg',
-  'data-analytics': '/images/technology/hero-program-it-support.jpg',
-  'default': '/images/technology/hero-programs-technology.jpg',
+export const metadata: Metadata = {
+  title: 'Technology Training | IT Support, Cybersecurity | Elevate',
+  description: 'Technology career training in Indianapolis. IT Support, Cybersecurity, and more. Industry certifications with funding available for qualifying students.',
+  alternates: { canonical: `${SITE_URL}/programs/technology` },
+  openGraph: {
+    title: 'Technology Training | IT Support, Cybersecurity',
+    description: 'IT Support, Cybersecurity — high-demand tech careers with industry certifications.',
+    url: `${SITE_URL}/programs/technology`,
+    images: [{ url: `${SITE_URL}/images/hero/hero-tech-careers.jpg`, width: 1200, height: 630 }],
+  },
 };
 
-export default function TechnologyProgramsPage() {
-  const [showContent, setShowContent] = useState(false);
-  const [programs, setPrograms] = useState<Program[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchPrograms() {
-      try {
-        const res = await fetch('/api/programs?category=technology');
-        const data = await res.json();
-        if (data.status === 'success' && data.programs?.length > 0) {
-          setPrograms(data.programs);
-        }
-      } catch (error) {
-        console.error('Failed to fetch programs:', error);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchPrograms();
-  }, []);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setShowContent(true), 100);
-    return () => clearTimeout(timer);
-  }, []);
-
+export default function TechnologyPage() {
   return (
     <div className="min-h-screen bg-white">
-
-
-      {/* Hero */}
-      <HeroVideoWithVoiceover
-        videoSrc="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4"
-        posterSrc="/images/technology-vibrant.jpg"
-        voiceoverSrc="/videos/program-hero.mp3"
-      >
-        <div className="flex items-center min-h-[50vh] sm:min-h-[60vh]">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className={`transition-all duration-700 ease-out ${showContent ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'}`}>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">Technology Programs</h1>
-              <p className="text-xl text-white/90 max-w-2xl mb-8">Launch your tech career with free, WIOA-funded training programs</p>
-              <div className="flex flex-wrap gap-4">
-                <Link 
-                  href="/apply?program=technology"
-                  className="inline-flex items-center justify-center bg-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-blue-700 transition-colors text-lg"
-                >
-                  Apply Now
-                </Link>
-                <Link 
-                  href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
-                  className="inline-flex items-center text-white text-lg border-b-2 border-white pb-1 hover:border-blue-400 hover:text-blue-400 transition-all duration-300"
-                >
-                  Register at Indiana Career Connect
-                </Link>
-              </div>
-            </div>
-          </div>
+      <div className="bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Technology' }]} />
         </div>
-      </HeroVideoWithVoiceover>
+      </div>
 
-      {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/ai-tutor.mp4" 
-        title="Technology Programs Guide" 
-      />
-
-      {/* Breadcrumbs */}
-      <Breadcrumbs />
-
-      {/* Pathway Disclosure */}
-      <PathwayDisclosure programName="Technology" programSlug="technology" />
-
-      {/* Programs Grid */}
-      <section className="py-16 lg:py-24 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <p className="text-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Technology Programs</p>
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Choose Your Tech Path</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">All programs are free for eligible participants through WIOA funding.</p>
-          </div>
-          
-          {loading ? (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="bg-white rounded-2xl h-96 animate-pulse shadow-lg" />
-              ))}
-            </div>
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {programs.map((program) => (
-                <Link
-                  key={program.id || program.slug}
-                  href={`/programs/${program.slug}`}
-                  className="group bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all hover:-translate-y-1 border border-slate-100"
-                >
-                  <div className="aspect-[4/3] relative overflow-hidden">
-                    <div 
-                      className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-300"
-                      style={{ backgroundImage: `url(${programImages[program.slug] || programImages['default']})` }}
-                      role="img"
-                      aria-label={program.name}
-                    />
-                    <div className="absolute top-3 right-3 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                      {program.duration_weeks ? `${program.duration_weeks} Weeks` : 'Flexible'}
-                    </div>
-                    {program.price === 0 && (
-                      <div className="absolute top-3 left-3 bg-green-600 text-white px-3 py-1 rounded-full text-xs font-semibold">
-                        Free
-                      </div>
-                    )}
-                  </div>
-                  <div className="p-5">
-                    <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
-                      {program.name}
-                    </h3>
-                    <p className="text-slate-600 text-sm mb-3 line-clamp-2">{program.description}</p>
-                    <span className="text-blue-600 font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
-                      Learn More <span>→</span>
-                    </span>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* What You'll Learn */}
-      <section className="py-16 lg:py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">What You&apos;ll Learn</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Industry-recognized skills and certifications for in-demand tech careers.
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image src="/images/hero/hero-tech-careers.jpg" alt="Technology Training Programs" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
+          <div className="max-w-4xl mx-auto">
+            <span className="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Technology Programs</h1>
+            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
+              IT Support, Cybersecurity, and more. Industry certifications for high-demand tech careers.
             </p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-slate-50 rounded-2xl p-6">
-              <h3 className="font-bold text-slate-900 mb-4">IT Support</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li>• Hardware troubleshooting</li>
-                <li>• Operating systems (Windows, Mac, Linux)</li>
-                <li>• Network fundamentals</li>
-                <li>• Help desk procedures</li>
-                <li>• CompTIA A+ certification prep</li>
-              </ul>
-            </div>
-            <div className="bg-slate-50 rounded-2xl p-6">
-              <h3 className="font-bold text-slate-900 mb-4">Cybersecurity</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li>• Security fundamentals</li>
-                <li>• Threat detection and prevention</li>
-                <li>• Network security</li>
-                <li>• Compliance and regulations</li>
-                <li>• CompTIA Security+ prep</li>
-              </ul>
-            </div>
-            <div className="bg-slate-50 rounded-2xl p-6">
-              <h3 className="font-bold text-slate-900 mb-4">Professional Skills</h3>
-              <ul className="space-y-2 text-gray-600 text-sm">
-                <li>• Technical documentation</li>
-                <li>• Customer service</li>
-                <li>• Problem-solving methodology</li>
-                <li>• Team collaboration</li>
-                <li>• Project management basics</li>
-              </ul>
-            </div>
-          </div>
         </div>
       </section>
 
-      {/* Requirements */}
-      <section className="py-16 lg:py-24 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Requirements</h2>
-            <p className="text-lg text-slate-600">What you need to start technology training.</p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h3 className="text-xl font-bold text-green-700 mb-4">Basic Requirements</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">18 years or older</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">High school diploma or GED</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Basic computer literacy</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Access to a computer for coursework</span>
-                </li>
-              </ul>
+      <section className="bg-slate-900 py-5">
+        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          {[
+            { val: '8-16 Weeks', label: 'Program Length' },
+            { val: 'CompTIA+', label: 'Certifications' },
+            { val: '$40K-$85K', label: 'Salary Range' },
+            { val: 'Remote OK', label: 'Work Options' },
+          ].map((s) => (
+            <div key={s.label}>
+              <div className="text-lg sm:text-xl font-bold text-white">{s.val}</div>
+              <div className="text-slate-400 text-xs">{s.label}</div>
             </div>
-            
-            <div className="bg-white rounded-2xl p-8 shadow-sm">
-              <h3 className="text-xl font-bold text-blue-600 mb-4">For Free Training (WIOA)</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Indiana resident</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">Unemployed or underemployed</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">OR receiving public assistance</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  <span className="text-gray-700">OR veteran status</span>
-                </li>
-              </ul>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* Outcomes */}
-      <section className="py-16 lg:py-24 bg-slate-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Career Outcomes</h2>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Tech careers offer strong wages, growth potential, and job security.
-            </p>
-          </div>
-          
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="text-5xl font-black text-white mb-2">$18-$28</div>
-              <p className="text-slate-400">Starting hourly wage</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-black text-white mb-2">85%+</div>
-              <p className="text-slate-400">Job placement rate</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-black text-white mb-2">8-16 wks</div>
-              <p className="text-slate-400">Typical program duration</p>
-            </div>
-            <div className="text-center">
-              <div className="text-5xl font-black text-white mb-2">Growing</div>
-              <p className="text-slate-400">Industry demand</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="py-16 lg:py-24 bg-white">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-8 text-center">Technology Program FAQ</h2>
-          
-          <div className="space-y-4">
+      <section className="py-8 sm:py-14 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 text-center">Choose Your Path</h2>
+          <div className="grid grid-cols-2 gap-4">
             {[
-              { q: 'What technology programs do you offer?', a: 'IT Support Specialist, Cybersecurity Analyst, and related tech programs. Availability varies by funding and demand.' },
-              { q: 'Do I need prior tech experience?', a: 'No prior experience required. We start with fundamentals and build your skills. Basic computer literacy (using email, web browsing) is helpful.' },
-              { q: 'What certifications will I earn?', a: 'Depends on your program. IT Support leads to CompTIA A+. Cybersecurity leads to CompTIA Security+. These are industry-recognized credentials.' },
-              { q: 'Is the training really free?', a: 'Yes, for eligible participants. WIOA funding covers tuition, certification exams, and materials. Check your eligibility to see if you qualify.' },
-              { q: 'How long are the programs?', a: 'Most programs are 8-16 weeks. Some include additional lab time and exam preparation.' },
-              { q: 'What if I have a criminal record?', a: 'Many tech employers are open to candidates with records. We work with justice-involved individuals and can help identify opportunities.' },
-              { q: 'Do you help with job placement?', a: 'Yes! We have partnerships with IT companies, help desks, and managed service providers. We provide resume help and interview preparation.' },
-              { q: 'Can I work while in training?', a: 'Yes, many students work part-time while in training. Some programs offer evening or weekend options.' },
-            ].map((faq, i) => (
-              <details key={i} className="group bg-slate-50 rounded-2xl overflow-hidden">
-                <summary className="flex items-center justify-between p-5 cursor-pointer list-none font-semibold text-slate-900">
-                  {faq.q}
-                  <svg className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform flex-shrink-0 ml-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                  </svg>
-                </summary>
-                <div className="px-5 pb-5">
-                  <p className="text-slate-600">{faq.a}</p>
+              { name: 'IT Support', href: '/programs/technology/it-support', img: '/images/programs-hq/it-support.jpg', duration: '8-12 weeks', desc: 'Help desk, troubleshooting, CompTIA A+' },
+              { name: 'Cybersecurity', href: '/programs/technology/cybersecurity', img: '/images/technology/cybersecurity-hero.jpg', duration: '12-16 weeks', desc: 'Network security, CompTIA Security+' },
+            ].map((p) => (
+              <Link key={p.name} href={p.href} className="group">
+                <div className="relative aspect-[3/2] rounded-xl overflow-hidden mb-2">
+                  <Image src={p.img} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 50vw, 50vw" />
                 </div>
-              </details>
+                <h3 className="font-bold text-slate-900 text-sm">{p.name}</h3>
+                <p className="text-slate-500 text-xs">{p.duration} — {p.desc}</p>
+              </Link>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 bg-blue-600">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Start Your Tech Career?</h2>
-          <p className="text-blue-100 mb-8">Free training available for eligible Indiana residents.</p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link
-              href="/apply?program=technology"
-              className="inline-block bg-white text-blue-600 px-8 py-4 font-semibold rounded-full hover:bg-white transition-colors"
-            >
-              Apply Now
+      <section className="py-8 sm:py-14 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex flex-col sm:flex-row gap-5 items-start">
+            <div className="relative w-full h-[200px] sm:w-72 sm:h-[280px] rounded-xl overflow-hidden flex-shrink-0">
+              <Image src="/images/technology/hero-program-cybersecurity.jpg" alt="Tech training" fill className="object-cover" />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-3">Hands-on labs and coursework aligned with industry certification exams.</p>
+              <div className="space-y-2">
+                {['Hardware and software troubleshooting', 'Network configuration and administration', 'Operating systems (Windows, Linux, macOS)', 'Cybersecurity fundamentals and threat analysis', 'Cloud computing basics (AWS, Azure)', 'CompTIA A+, Network+, and Security+ exam prep'].map((item) => (
+                  <div key={item} className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0" />
+                    <span className="text-slate-700 text-sm">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-8 sm:py-14 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">Career Outcomes</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[
+              { title: 'Help Desk Tech', salary: '$35K-$50K' },
+              { title: 'IT Support Specialist', salary: '$40K-$60K' },
+              { title: 'Network Admin', salary: '$50K-$75K' },
+              { title: 'Security Analyst', salary: '$55K-$85K' },
+              { title: 'Systems Admin', salary: '$50K-$80K' },
+              { title: 'Cloud Technician', salary: '$50K-$75K' },
+            ].map((c) => (
+              <div key={c.title} className="bg-slate-50 rounded-xl border border-slate-200 p-4">
+                <h3 className="font-bold text-slate-900 text-sm">{c.title}</h3>
+                <div className="text-blue-600 font-bold text-sm">{c.salary}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-8 sm:py-14 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">How to Enroll</h2>
+          <div className="space-y-3">
+            {[
+              { step: '1', title: 'Apply Online', desc: 'Submit your student application.' },
+              { step: '2', title: 'Check Funding', desc: 'Register at indianacareerconnect.com for WIOA/JRI eligibility.' },
+              { step: '3', title: 'Complete Training', desc: 'Hands-on labs and coursework.' },
+              { step: '4', title: 'Get Certified & Hired', desc: 'Pass your CompTIA exam and connect with employers.' },
+            ].map((s) => (
+              <div key={s.step} className="flex items-start gap-4 bg-white rounded-lg p-4">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
+                  <p className="text-slate-600 text-sm">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-8 sm:py-14 bg-blue-600">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Tech Career</h2>
+          <p className="text-white/90 mb-6 text-sm">High demand, remote-friendly. Apply today.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/apply?program=technology" className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
+              Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
-            <Link
-              href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
-              className="inline-block border-2 border-white text-white px-8 py-4 font-semibold rounded-full hover:bg-white/10 transition-colors"
-            >
-              Register at Indiana Career Connect
+            <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
+              Explore Funding Options
             </Link>
           </div>
         </div>

@@ -1,193 +1,137 @@
-// Force static generation for performance
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Clock, DollarSign, Award, Wrench, Truck, CheckCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+
+const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'Diesel Mechanic Training | Elevate for Humanity',
-  description: 'Learn diesel engine repair and maintenance. Self-paced training program with industry certification.',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/programs/diesel-mechanic',
+  title: 'Diesel Mechanic Training | Heavy Equipment Repair | Elevate',
+  description: 'Diesel mechanic training in Indianapolis. Learn diesel engine repair, diagnostics, and maintenance. Funding available for qualifying students.',
+  alternates: { canonical: `${SITE_URL}/programs/diesel-mechanic` },
+  openGraph: {
+    title: 'Diesel Mechanic Training | Indianapolis',
+    description: 'Diesel engine repair, diagnostics, and maintenance training.',
+    url: `${SITE_URL}/programs/diesel-mechanic`,
+    images: [{ url: `${SITE_URL}/images/transportation/hero-program-automotive.jpg`, width: 1200, height: 630 }],
   },
 };
-
-const APPLY_LINK = '/apply?program=diesel-mechanic';
 
 export default function DieselMechanicPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero */}
-      <section className="relative w-full h-[50vh] sm:h-[60vh]">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/trades/hero-program-cdl.jpg"
-            alt="Diesel Mechanic Training"
-            fill sizes="100vw"
-            className="object-cover"
-            priority
-          />
+      <div className="bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Skilled Trades', href: '/programs/skilled-trades' }, { label: 'Diesel Mechanic' }]} />
         </div>
-        <div className="absolute inset-0 flex items-end">
-          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-8 sm:pb-12">
-            <span className="inline-block bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
-              Self-Pay Program
-            </span>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 drop-shadow-lg">
-              Diesel Mechanic Training
-            </h1>
-            <p className="text-lg sm:text-xl text-white max-w-2xl drop-shadow-md">
-              Master diesel engine diagnostics, repair, and maintenance
+      </div>
+
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image src="/images/transportation/hero-program-automotive.jpg" alt="Diesel Mechanic Training" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
+          <div className="max-w-4xl mx-auto">
+            <span className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Diesel Mechanic</h1>
+            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
+              Learn diesel engine repair, diagnostics, and preventive maintenance for trucks and heavy equipment.
             </p>
           </div>
         </div>
       </section>
 
-      {/* Breadcrumbs */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-        <Breadcrumbs items={[
-          { label: 'Programs', href: '/programs' },
-          { label: 'Skilled Trades', href: '/programs/skilled-trades' },
-          { label: 'Diesel Mechanic' }
-        ]} />
-      </div>
-
-      {/* Program Overview */}
-      <section className="py-12 lg:py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              <h2 className="text-2xl font-bold text-slate-900 mb-6">Program Overview</h2>
-              <p className="text-slate-600 mb-6">
-                Our Diesel Mechanic Training program provides hands-on instruction in diesel engine 
-                systems, diagnostics, and repair. Learn to work on commercial trucks, buses, 
-                construction equipment, and agricultural machinery.
-              </p>
-              
-              <h3 className="text-xl font-bold text-slate-900 mb-4">What You Will Learn</h3>
-              <ul className="space-y-3 mb-8">
-                {[
-                  'Diesel engine fundamentals and theory',
-                  'Fuel injection systems and diagnostics',
-                  'Electrical systems and troubleshooting',
-                  'Brake systems and hydraulics',
-                  'Preventive maintenance procedures',
-                  'Emissions systems and compliance',
-                  'Computer diagnostics and scan tools',
-                  'Safety protocols and best practices',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-slate-700">{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <h3 className="text-xl font-bold text-slate-900 mb-4">Career Opportunities</h3>
-              <p className="text-slate-600 mb-4">
-                Diesel mechanics are in high demand across multiple industries. Graduates can pursue careers as:
-              </p>
-              <div className="grid sm:grid-cols-2 gap-4 mb-8">
-                {[
-                  'Fleet Maintenance Technician',
-                  'Heavy Equipment Mechanic',
-                  'Truck Service Technician',
-                  'Bus Maintenance Specialist',
-                  'Agricultural Equipment Tech',
-                  'Marine Diesel Mechanic',
-                ].map((career, i) => (
-                  <div key={i} className="flex items-center gap-2 text-slate-700">
-                    <Wrench className="w-4 h-4 text-blue-600" />
-                    {career}
-                  </div>
-                ))}
-              </div>
+      <section className="bg-slate-900 py-5">
+        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          {[
+            { val: '12-16 Weeks', label: 'Program Length' },
+            { val: 'ASE Prep', label: 'Certification' },
+            { val: '$42K-$65K', label: 'Salary Range' },
+            { val: 'High Demand', label: 'Job Market' },
+          ].map((s) => (
+            <div key={s.label}>
+              <div className="text-lg sm:text-xl font-bold text-white">{s.val}</div>
+              <div className="text-slate-400 text-xs">{s.label}</div>
             </div>
+          ))}
+        </div>
+      </section>
 
-            {/* Sidebar - Enrollment Card */}
-            <div className="lg:col-span-1">
-              <div className="bg-slate-50 rounded-2xl p-6 sticky top-24">
-                <h3 className="text-xl font-bold text-slate-900 mb-4">Program Details</h3>
-                
-                <div className="space-y-4 mb-6">
-                  <div className="flex items-center gap-3">
-                    <Clock className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="text-sm text-slate-500">Duration</p>
-                      <p className="font-semibold text-slate-900">12 Weeks</p>
-                    </div>
+      <section className="py-8 sm:py-14 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex flex-col sm:flex-row gap-5 items-start">
+            <div className="relative w-full h-[200px] sm:w-72 sm:h-[280px] rounded-xl overflow-hidden flex-shrink-0">
+              <Image src="/images/trades/program-building-construction.jpg" alt="Diesel mechanic training" fill className="object-cover" />
+            </div>
+            <div>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-3">Hands-on training in diesel engine systems and heavy equipment repair.</p>
+              <div className="space-y-2">
+                {['Diesel engine fundamentals and operation', 'Fuel injection systems and turbochargers', 'Electrical and electronic diagnostics', 'Brake systems and suspension', 'Preventive maintenance and inspections', 'DOT compliance and safety standards'].map((item) => (
+                  <div key={item} className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-orange-500 rounded-full flex-shrink-0" />
+                    <span className="text-slate-700 text-sm">{item}</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <DollarSign className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="text-sm text-slate-500">Tuition</p>
-                      <p className="font-semibold text-slate-900">$4,500</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Award className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="text-sm text-slate-500">Certification</p>
-                      <p className="font-semibold text-slate-900">Industry Certificate</p>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <Truck className="w-5 h-5 text-blue-600" />
-                    <div>
-                      <p className="text-sm text-slate-500">Format</p>
-                      <p className="font-semibold text-slate-900">Hands-On Training</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-white border border-blue-200 rounded-lg p-4 mb-6">
-                  <p className="text-sm text-blue-800">
-                    <strong>Self-Pay Program:</strong> This program is not covered by workforce funding. 
-                    Payment plans available.
-                  </p>
-                </div>
-
-                <a
-                  href={APPLY_LINK}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="block w-full bg-blue-600 text-white text-center py-4 rounded-full font-semibold hover:bg-blue-700 transition-colors mb-3"
-                >
-                  Enroll Now - $4,500
-                </a>
-                
-                <Link
-                  href="/contact?program=diesel-mechanic"
-                  className="block w-full bg-white text-blue-600 text-center py-4 rounded-full font-semibold border-2 border-blue-600 hover:bg-white transition-colors"
-                >
-                  Request Information
-                </Link>
-
-                <p className="text-xs text-slate-500 text-center mt-4">
-                  Payment plans available. Contact us for details.
-                </p>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-12 bg-blue-600">
-        <div className="max-w-3xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-2xl font-bold text-white mb-4">Ready to Start Your Diesel Mechanic Career?</h2>
-          <p className="text-blue-100 mb-6">Enroll today and begin your journey to a rewarding career in diesel technology.</p>
-          <a
-            href={APPLY_LINK}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block bg-white text-blue-600 px-8 py-3 font-semibold rounded-full hover:bg-white transition-colors"
-          >
-            Enroll Now
-          </a>
+      <section className="py-8 sm:py-14 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">Career Paths</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { title: 'Fleet Mechanic', salary: '$40K-$55K' },
+              { title: 'Diesel Technician', salary: '$45K-$65K' },
+              { title: 'Heavy Equipment Tech', salary: '$48K-$70K' },
+              { title: 'Shop Foreman', salary: '$55K-$80K' },
+            ].map((c) => (
+              <div key={c.title} className="bg-white rounded-xl border border-slate-200 p-4">
+                <h3 className="font-bold text-slate-900 text-sm">{c.title}</h3>
+                <div className="text-orange-500 font-bold text-sm">{c.salary}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-8 sm:py-14 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">How to Enroll</h2>
+          <div className="space-y-3">
+            {[
+              { step: '1', title: 'Apply Online', desc: 'Submit your student application.' },
+              { step: '2', title: 'Check Funding', desc: 'Register at indianacareerconnect.com for WIOA/JRI eligibility.' },
+              { step: '3', title: 'Start Training', desc: 'Hands-on shop instruction with certified technicians.' },
+              { step: '4', title: 'Get Certified & Hired', desc: 'Prepare for ASE certification and connect with employers.' },
+            ].map((s) => (
+              <div key={s.step} className="flex items-start gap-4 bg-slate-50 rounded-lg p-4">
+                <div className="w-8 h-8 bg-orange-500 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
+                  <p className="text-slate-600 text-sm">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-8 sm:py-14 bg-orange-500">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Diesel Mechanic Career</h2>
+          <p className="text-white/90 mb-6 text-sm">Trucks and heavy equipment need mechanics. Apply today.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/apply?program=diesel-mechanic" className="bg-white text-orange-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-orange-50 transition-colors text-center">
+              Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
+            </Link>
+            <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
+              Explore Funding Options
+            </Link>
+          </div>
         </div>
       </section>
     </div>

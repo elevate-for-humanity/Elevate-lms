@@ -1,390 +1,139 @@
-export const dynamic = 'force-dynamic';
-
-// Force static generation for performance
-
-import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
-import { FundingBadge } from '@/components/programs/FundingBadge';
-import PathwayDisclosure from '@/components/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
-import type { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/server';
+import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import {
-  CheckCircle,
-  XCircle,
-} from 'lucide-react';
-import { HostShopRequirements } from '@/components/compliance/HostShopRequirements';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowRight } from 'lucide-react';
 
+const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title:
-    'Registered Cosmetology Apprenticeship | DOL Sponsorship & Oversight | Indiana',
-  description:
-    'DOL Registered Cosmetology Apprenticeship sponsorship, oversight, and related instruction (Milady Theory) in Indiana. Federal apprenticeship sponsorship, employer coordination, compliance reporting. ETPL approved. This program does not grant cosmetology licensure or clock hours toward state exams.',
-  keywords:
-    'cosmetology apprenticeship Indiana, DOL registered apprenticeship, apprenticeship sponsorship, cosmetology training Indianapolis, RAPIDS registered, ETPL approved, beauty school apprenticeship',
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/programs/cosmetology-apprenticeship',
+  title: 'Cosmetology Apprenticeship | Earn While You Learn | Elevate',
+  description: 'Cosmetology apprenticeship in Indianapolis. Earn while you learn. Get your Indiana cosmetology license in 18 months.',
+  alternates: { canonical: `${SITE_URL}/programs/cosmetology-apprenticeship` },
+  openGraph: {
+    title: 'Cosmetology Apprenticeship | Earn While You Learn',
+    description: 'Get paid during your cosmetology apprenticeship. Licensed in 18 months.',
+    url: `${SITE_URL}/programs/cosmetology-apprenticeship`,
+    images: [{ url: `${SITE_URL}/images/efh/programs/beauty.jpg`, width: 1200, height: 630 }],
   },
 };
 
-export default async function CosmetologyApprenticeshipPage() {
-  const supabase = createPublicClient();
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h2>
-          <p className="text-gray-600">Please try again later.</p>
+export default function CosmetologyApprenticeshipPage() {
+  return (
+    <div className="min-h-screen bg-white">
+      <div className="bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Beauty', href: '/programs/beauty' }, { label: 'Cosmetology Apprenticeship' }]} />
         </div>
       </div>
-    );
-  }
-  
-  // Fetch cosmetology apprenticeship program
-  const { data: program } = await supabase
-    .from('programs')
-    .select('*')
-    .eq('slug', 'cosmetology-apprenticeship')
-    .single();
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      <Breadcrumbs
-        items={[
-          { label: 'Programs', href: '/programs' },
-          { label: 'Cosmetology Apprenticeship' },
-        ]}
-      />
-      {/* Hero Section */}
-      <section className="relative w-full -mt-[72px] min-h-[70vh] flex items-center bg-rose-500">
-        {/* overlay removed */}
-        <div className="relative z-10 mx-auto max-w-6xl px-6 py-32 md:py-40">
-          <div className="flex flex-wrap items-center gap-2 mb-4">
-            <FundingBadge type="self-pay" className="bg-white0 text-white border-0" />
-            <span className="px-3 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
-              DOL Registered
-            </span>
-            <span className="px-3 py-2 bg-blue-600 text-white text-sm font-bold rounded-full shadow-lg">
-              Apprenticeship Sponsorship
-            </span>
-          </div>
-
-          <h1 className="max-w-3xl text-4xl font-black leading-tight md:text-6xl text-white drop-shadow-2xl">
-            Registered Cosmetology Apprenticeship
-          </h1>
-
-          <p className="mt-6 max-w-2xl text-lg md:text-xl text-white leading-relaxed drop-shadow-lg">
-            Registered Cosmetology Apprenticeship Sponsorship, Oversight & Related Instruction (Milady Theory). 
-            This program provides federal apprenticeship sponsorship, employer coordination, compliance reporting, and related instruction.
-          </p>
-
-          <div className="mt-8 flex flex-col sm:flex-row gap-4">
-            <Link
-              href="/apply?pathway=cosmetology-apprenticeship"
-              className="inline-flex items-center justify-center rounded-lg bg-fuchsia-500 px-8 py-4 text-lg font-bold text-white hover:bg-fuchsia-600 transition-all shadow-xl hover:shadow-2xl transform hover:scale-105"
-            >
-              Start Eligibility & Choose a Career Path
-            </Link>
+      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
+        <Image src="/images/efh/programs/beauty.jpg" alt="Cosmetology Apprenticeship" fill className="object-cover" priority />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
+          <div className="max-w-4xl mx-auto">
+            <span className="inline-block bg-brand-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Earn While You Learn</span>
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Cosmetology Apprenticeship</h1>
+            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
+              Get paid during your apprenticeship. Become a licensed cosmetologist in 18 months with hands-on salon training.
+            </p>
           </div>
         </div>
       </section>
 
-      {/* Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/barber-guide.mp4" title="Cosmetology Apprenticeship Guide" />
+      <section className="bg-slate-900 py-5">
+        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          {[
+            { val: '18 Months', label: 'Apprenticeship' },
+            { val: 'State License', label: 'Cosmetology' },
+            { val: '$28K-$50K+', label: 'Earning Potential' },
+            { val: 'Paid', label: 'During Training' },
+          ].map((s) => (
+            <div key={s.label}>
+              <div className="text-lg sm:text-xl font-bold text-white">{s.val}</div>
+              <div className="text-slate-400 text-xs">{s.label}</div>
+            </div>
+          ))}
+        </div>
+      </section>
 
-      {/* Pathway Disclosure */}
-      <PathwayDisclosure programName="Cosmetology Apprenticeship" programSlug="cosmetology-apprenticeship" />
-
-      {/* Program Description */}
-      <section className="bg-white py-16">
-        <div className="mx-auto max-w-6xl px-6">
-          <div className="grid lg:grid-cols-2 gap-12 mb-12">
+      <section className="py-8 sm:py-14 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <div className="flex flex-col sm:flex-row gap-5 items-start">
+            <div className="relative w-full h-[200px] sm:w-72 sm:h-[280px] rounded-xl overflow-hidden flex-shrink-0">
+              <Image src="/images/hero/hero-beauty-wellness.jpg" alt="Cosmetology training" fill className="object-cover" />
+            </div>
             <div>
-              <h2 className="text-3xl font-bold text-black mb-6">Program Description</h2>
-              <p className="text-lg text-gray-700 mb-4">
-                Launch your career in the beauty industry through our DOL-registered apprenticeship program. 
-                Gain hands-on experience while earning, with comprehensive theory instruction through Milady.
-              </p>
-              <p className="text-gray-700">
-                Our program combines federal apprenticeship sponsorship with employer coordination and compliance 
-                reporting to ensure you meet all requirements for a successful career in cosmetology.
-              </p>
-            </div>
-            <div className="relative h-[350px] rounded-2xl overflow-hidden">
-              <Image
-                src="/images/pathways/beauty-hero.jpg"
-                alt="Cosmetology training"
-                fill sizes="100vw"
-                className="object-cover"
-              />
-            </div>
-          </div>
-        </div>
-        <div className="mx-auto max-w-4xl px-6">
-          <div className="bg-fuchsia-50 border-2 border-fuchsia-200 rounded-xl p-6 mb-8">
-            <p className="text-lg text-black leading-relaxed">
-              <strong>Registered Cosmetology Apprenticeship Sponsorship, Oversight & Related Instruction (Milady Theory).</strong>
-            </p>
-            <p className="text-black mt-4 leading-relaxed">
-              This program provides federal apprenticeship sponsorship, employer coordination, compliance reporting, and related instruction. 
-              Practical skills training and licensure-required instructional hours are provided by a licensed cosmetology school. 
-              This program does not grant cosmetology licensure or clock hours toward state exams.
-            </p>
-          </div>
-
-          {/* Indiana Requirements */}
-          <div className="bg-white border-2 border-blue-200 rounded-xl p-6 mb-8">
-            <h3 className="text-xl font-bold text-blue-900 mb-3">Indiana Cosmetology Requirements</h3>
-            <ul className="space-y-2 text-blue-900">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <span><strong>1,500 hours</strong> of cosmetology training required</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <span>Pass written and practical exams</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                <span>Prepares learners for licensure through <strong>Indiana Professional Licensing Agency (IPLA)</strong></span>
-              </li>
-            </ul>
-          </div>
-
-          {/* What's Included vs Not Included */}
-          <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white border-2 border-green-200 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
-                <CheckCircle className="w-6 h-6" />
-                What the Program Fee Covers
-              </h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3 text-green-900">
-                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>DOL Registered Apprenticeship sponsorship</span>
-                </li>
-                <li className="flex items-start gap-3 text-green-900">
-                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>Compliance and RAPIDS reporting</span>
-                </li>
-                <li className="flex items-start gap-3 text-green-900">
-                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>Employer (salon) coordination and OJT verification</span>
-                </li>
-                <li className="flex items-start gap-3 text-green-900">
-                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>Program monitoring and completion documentation</span>
-                </li>
-                <li className="flex items-start gap-3 text-green-900">
-                  <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>Related Instruction: Milady theory curriculum</span>
-                </li>
-              </ul>
-            </div>
-
-            <div className="bg-white border-2 border-red-200 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-red-900 mb-4 flex items-center gap-2">
-                <XCircle className="w-6 h-6" />
-                What the Program Fee Does NOT Cover
-              </h3>
-              <ul className="space-y-3">
-                <li className="flex items-start gap-3 text-red-900">
-                  <XCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>Practical hands-on cosmetology training</span>
-                </li>
-                <li className="flex items-start gap-3 text-red-900">
-                  <XCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>State licensure-required instructional hours</span>
-                </li>
-                <li className="flex items-start gap-3 text-red-900">
-                  <XCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-                  <span>Cosmetology school enrollment</span>
-                </li>
-              </ul>
+              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>
+              <p className="text-slate-600 text-sm leading-relaxed mb-3">Hands-on training in a real salon under a licensed instructor.</p>
+              <div className="space-y-2">
+                {['Hair cutting, coloring, and styling', 'Chemical services (perms, relaxers)', 'Skin care and facial treatments', 'Nail care and manicure/pedicure', 'Sanitation and infection control', 'Client consultation and salon management', 'Indiana State Board exam preparation'].map((item) => (
+                  <div key={item} className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full flex-shrink-0" />
+                    <span className="text-slate-700 text-sm">{item}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="bg-gray-50 py-16">
-        <div className="mx-auto max-w-4xl px-6">
-          <h2 className="text-3xl font-bold text-black mb-6">Program Fee</h2>
-          
-          <div className="bg-white border-2 border-slate-200 rounded-xl p-8 shadow-lg">
-            <div className="text-center mb-6">
-              <div className="text-5xl font-black text-fuchsia-600">$4,980</div>
-              <div className="text-xl text-slate-600 mt-2">Flat Program Fee</div>
-            </div>
-
-            <div className="bg-fuchsia-50 border border-fuchsia-200 rounded-lg p-4 mb-6">
-              <p className="text-fuchsia-900 text-center">
-                <strong>The program fee applies regardless of transferred hours.</strong> Credit for prior learning may reduce the duration of participation but does not alter the program fee. The fee reflects apprenticeship sponsorship, compliance oversight, employer coordination, related instruction, and completion under the sponsor&apos;s registered apprenticeship program.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              <h3 className="text-lg font-bold text-black">Payment Options</h3>
-              
-              <Link
-                href="/apply?program=cosmetology-apprenticeship&payment_method=full"
-                className="w-full flex items-center justify-between px-6 py-4 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-bold rounded-lg transition-all"
-              >
-                <div>
-                  <div className="font-bold text-lg">Pay in Full</div>
-                  <div className="text-sm text-fuchsia-200">One-time payment of $4,980</div>
-                </div>
-                <span className="text-2xl font-bold">$4,980</span>
-              </Link>
-
-              <Link
-                href="/apply?program=cosmetology-apprenticeship&payment_method=plan&months=4"
-                className="w-full flex items-center justify-between px-6 py-4 bg-white border-2 border-fuchsia-300 hover:border-fuchsia-500 text-black font-bold rounded-lg transition-all"
-              >
-                <div>
-                  <div className="font-bold text-lg">4-Month Plan</div>
-                  <div className="text-sm text-slate-600">4 payments of $1,245</div>
-                </div>
-                <span className="text-xl font-bold text-fuchsia-600">$1,245/mo</span>
-              </Link>
-
-              <Link
-                href="/apply?program=cosmetology-apprenticeship&payment_method=plan&months=6"
-                className="w-full flex items-center justify-between px-6 py-4 bg-white border-2 border-fuchsia-300 hover:border-fuchsia-500 text-black font-bold rounded-lg transition-all"
-              >
-                <div>
-                  <div className="font-bold text-lg">6-Month Plan</div>
-                  <div className="text-sm text-slate-600">6 payments of $830</div>
-                </div>
-                <span className="text-xl font-bold text-fuchsia-600">$830/mo</span>
-              </Link>
-
-              <Link
-                href="/apply?program=cosmetology-apprenticeship&payment_method=plan&months=12"
-                className="w-full flex items-center justify-between px-6 py-4 bg-white border-2 border-fuchsia-300 hover:border-fuchsia-500 text-black font-bold rounded-lg transition-all"
-              >
-                <div>
-                  <div className="font-bold text-lg">12-Month Plan</div>
-                  <div className="text-sm text-slate-600">12 payments of $415</div>
-                </div>
-                <span className="text-xl font-bold text-fuchsia-600">$415/mo</span>
-              </Link>
-            </div>
+      <section className="py-8 sm:py-14 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">Career Paths</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {[
+              { title: 'Salon Stylist', salary: '$28K-$45K' },
+              { title: 'Booth Rental', salary: '$35K-$60K+' },
+              { title: 'Salon Owner', salary: '$50K-$100K+' },
+              { title: 'Beauty Educator', salary: '$35K-$55K' },
+            ].map((c) => (
+              <div key={c.title} className="bg-white rounded-xl border border-slate-200 p-4">
+                <h3 className="font-bold text-slate-900 text-sm">{c.title}</h3>
+                <div className="text-brand-red-600 font-bold text-sm">{c.salary}</div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* FAQ Section */}
-      <section className="bg-white py-16">
-        <div className="mx-auto max-w-4xl px-6">
-          <h2 className="text-3xl font-bold text-black mb-8">Frequently Asked Questions</h2>
-          
-          <div className="space-y-6">
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-              <h3 className="text-lg font-bold text-black mb-2">
-                Does the $4,980 change if I transfer in hours?
-              </h3>
-              <p className="text-slate-700">
-                No. The program fee is a flat rate. Transferred hours reduce time-in-program, not the scope of services or fee.
-              </p>
-            </div>
-
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-              <h3 className="text-lg font-bold text-black mb-2">
-                Does this program replace cosmetology school?
-              </h3>
-              <p className="text-slate-700">
-                No. Apprentices must complete licensure-required instructional hours through a licensed cosmetology school.
-              </p>
-            </div>
-
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-              <h3 className="text-lg font-bold text-black mb-2">
-                What does the $4,980 cover?
-              </h3>
-              <p className="text-slate-700">
-                Federal apprenticeship sponsorship, compliance reporting, employer coordination, Milady theory instruction, and program completion documentation.
-              </p>
-            </div>
-
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-              <h3 className="text-lg font-bold text-black mb-2">
-                How many hours are required for an Indiana cosmetology license?
-              </h3>
-              <p className="text-slate-700">
-                Indiana requires 1,500 hours of cosmetology training to be eligible for licensure.
-              </p>
-            </div>
-
-            <div className="bg-slate-50 border border-slate-200 rounded-lg p-6">
-              <h3 className="text-lg font-bold text-black mb-2">
-                What&apos;s the difference between cosmetology and barber?
-              </h3>
-              <p className="text-slate-700">
-                Cosmetology covers hair styling, coloring, chemical treatments, skincare, and nail services. 
-                Barbering focuses on hair cutting, shaving, and beard trimming. Cosmetology requires 1,500 hours; barbering requires 2,000 hours in Indiana. 
-                but have different curricula and licensing exams.
-              </p>
-            </div>
+      <section className="py-8 sm:py-14 bg-white">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">How to Enroll</h2>
+          <div className="space-y-3">
+            {[
+              { step: '1', title: 'Apply Online', desc: 'Submit your apprenticeship application.' },
+              { step: '2', title: 'Get Matched', desc: 'Paired with a licensed cosmetology instructor at a salon.' },
+              { step: '3', title: 'Earn While You Learn', desc: 'Get paid while completing your training hours.' },
+              { step: '4', title: 'Get Licensed', desc: 'Pass the Indiana State Board cosmetology exam.' },
+            ].map((s) => (
+              <div key={s.step} className="flex items-start gap-4 bg-slate-50 rounded-lg p-4">
+                <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
+                  <p className="text-slate-600 text-sm">{s.desc}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Host Shop Requirements Section */}
-      <HostShopRequirements 
-        programTrack="cosmetology" 
-        showApprovalProcess={true}
-        showMultiRegion={true}
-      />
-
-      {/* Credentials & Outcomes */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-6">
-          <CredentialsOutcomes
-            programName="Cosmetology Apprenticeship"
-            partnerCertifications={[
-              'Indiana Cosmetology License (issued by Indiana Professional Licensing Agency)',
-              'USDOL Registered Apprenticeship Certificate of Completion',
-            ]}
-            employmentOutcomes={[
-              'Licensed Cosmetologist',
-              'Hair Stylist',
-              'Salon Owner/Operator',
-              'Cosmetology Instructor',
-            ]}
-          />
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-16 bg-fuchsia-600">
-        <div className="mx-auto max-w-4xl px-6 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Get Started?</h2>
-          <p className="text-fuchsia-100 text-lg mb-8">
-            Apply now to begin your journey in the Registered Cosmetology Apprenticeship program.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply?program=cosmetology-apprenticeship"
-              className="inline-flex items-center justify-center rounded-lg bg-white px-8 py-4 text-lg font-bold text-fuchsia-600 hover:bg-fuchsia-50 transition-all shadow-xl"
-            >
-              Apply Now
+      <section className="py-8 sm:py-14 bg-brand-red-600">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Cosmetology Career</h2>
+          <p className="text-white/90 mb-6 text-sm">Earn while you learn. Apply today.</p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/apply?program=cosmetology-apprenticeship" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-red-50 transition-colors text-center">
+              Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
-            <Link
-              href="/contact"
-              className="inline-flex items-center justify-center rounded-lg border-2 border-white px-8 py-4 text-lg font-bold text-white hover:bg-white/10 transition-all"
-            >
-              Contact Us
+            <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
+              Explore Funding Options
             </Link>
           </div>
         </div>
       </section>
-
-
     </div>
   );
 }

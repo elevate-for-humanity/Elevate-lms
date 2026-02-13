@@ -1,15 +1,21 @@
-export const dynamic = 'force-dynamic';
-
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
+const SITE_URL = 'https://www.elevateforhumanity.org';
+
 export const metadata: Metadata = {
-  alternates: { canonical: 'https://www.elevateforhumanity.org/programs/jri' },
-  title: 'Justice Reinvestment Initiative (JRI) | Elevate For Humanity',
-  description: 'Free career training and support for justice-involved individuals in Indiana through the JRI program.',
+  title: 'JRI Programs | Justice Reinvestment Initiative | Elevate',
+  description: 'JRI career training in Indianapolis. Earn while you learn. Tuition, supplies, and certification covered for qualifying individuals.',
+  alternates: { canonical: `${SITE_URL}/programs/jri` },
+  openGraph: {
+    title: 'JRI Programs | Justice Reinvestment Initiative',
+    description: 'Earn while you learn — JRI covers tuition for qualifying individuals.',
+    url: `${SITE_URL}/programs/jri`,
+    images: [{ url: `${SITE_URL}/images/heroes-hq/jri-hero.jpg`, width: 1200, height: 630 }],
+  },
 };
 
 export default function JRIPage() {
@@ -17,112 +23,93 @@ export default function JRIPage() {
     <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'JRI' }]} />
+          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'JRI Programs' }]} />
         </div>
       </div>
 
-      {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/heroes/workforce-partner-3.jpg" alt="JRI career training" fill className="object-cover" priority />
+        <Image src="/images/heroes-hq/jri-hero.jpg" alt="JRI Programs" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Justice Reinvestment Initiative (JRI)</h1>
+            <span className="inline-block bg-brand-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Earn While You Learn</span>
+            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">JRI Programs</h1>
             <p className="text-sm sm:text-lg text-white/90 max-w-xl">
-              Career training and wraparound support for justice-involved individuals. A second chance starts here.
+              Justice Reinvestment Initiative — career training with tuition, supplies, and certification fees covered for qualifying individuals.
             </p>
           </div>
         </div>
       </section>
 
-      {/* What is JRI */}
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row gap-5 items-start">
-            <div className="relative w-full h-[200px] sm:w-72 sm:h-[240px] rounded-xl overflow-hidden flex-shrink-0">
-              <Image src="/images/homepage/funding-navigation.png" alt="JRI funding" fill className="object-cover" />
+      <section className="bg-slate-900 py-5">
+        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+          {[
+            { val: 'Tuition Covered', label: 'For Qualifying' },
+            { val: 'Paid Training', label: 'Earn While You Learn' },
+            { val: 'Certifications', label: 'Included' },
+            { val: 'Job Placement', label: 'Assistance' },
+          ].map((s) => (
+            <div key={s.label}>
+              <div className="text-lg sm:text-xl font-bold text-white">{s.val}</div>
+              <div className="text-slate-400 text-xs">{s.label}</div>
             </div>
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What is JRI?</h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                The Justice Reinvestment Initiative is an Indiana state program that funds career training, support services, and job placement for individuals who have been involved in the justice system. The goal is to reduce recidivism by providing real career pathways.
-              </p>
-              <p className="text-slate-600 text-sm leading-relaxed">
-                JRI funding is administered through WorkOne and the Indiana Department of Workforce Development. Eligibility is determined by your WorkOne case manager based on your background and circumstances.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
-      {/* What JRI Covers */}
-      <section className="py-8 sm:py-14 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">What JRI Covers</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
-            {[
-              { title: 'Tuition', desc: 'Full training program costs', icon: '📋' },
-              { title: 'Certifications', desc: 'Exam fees and credentials', icon: '🎓' },
-              { title: 'Transportation', desc: 'Help getting to class', icon: '🚗' },
-              { title: 'Support Services', desc: 'Case management and more', icon: '🤝' },
-            ].map((item) => (
-              <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-4 text-center">
-                <div className="text-2xl mb-2">{item.icon}</div>
-                <h3 className="font-bold text-slate-900 text-sm mb-1">{item.title}</h3>
-                <p className="text-slate-500 text-xs">{item.desc}</p>
+      <section className="py-8 sm:py-14 bg-white">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What JRI Covers</h2>
+          <p className="text-slate-600 text-sm leading-relaxed mb-3">The Justice Reinvestment Initiative provides workforce training and support for justice-involved individuals re-entering the workforce.</p>
+          <div className="space-y-2">
+            {['Tuition and training fees', 'Books, supplies, and uniforms', 'Certification and exam fees', 'Transportation assistance', 'Case management and mentoring', 'Job placement and career coaching', 'Supportive services (childcare, housing referrals)'].map((item) => (
+              <div key={item} className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 bg-brand-red-600 rounded-full flex-shrink-0" />
+                <span className="text-slate-700 text-sm">{item}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Programs Available */}
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">Programs Available Through JRI</h2>
-          <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-4">
+      <section className="py-8 sm:py-14 bg-slate-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-6 text-center">Eligible Programs</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {[
-              { title: 'CDL Training', desc: 'Commercial driving license — 4 weeks', href: '/programs/cdl-training', image: '/images/cdl/hero.jpg' },
-              { title: 'CNA Certification', desc: 'Certified Nursing Assistant — 6 weeks', href: '/programs/cna-certification', image: '/images/cna/hero.jpg' },
-              { title: 'HVAC Technician', desc: 'Heating, ventilation, and AC — 12 weeks', href: '/programs/hvac-technician', image: '/images/hvac/hero.jpg' },
-              { title: 'IT Support', desc: 'CompTIA A+ certification — 10 weeks', href: '/programs/technology/it-support', image: '/images/it/hero.jpg' },
-            ].map((item) => (
-              <Link key={item.title} href={item.href} className="flex gap-4 items-center bg-white rounded-lg border border-slate-200 p-3 hover:border-blue-300 transition-colors">
-                <div className="relative w-20 h-20 rounded-lg overflow-hidden flex-shrink-0">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+              { name: 'Healthcare', href: '/programs/healthcare', img: '/images/hero/hero-healthcare.jpg' },
+              { name: 'Skilled Trades', href: '/programs/skilled-trades', img: '/images/trades/hero-program-hvac.jpg' },
+              { name: 'CDL Training', href: '/programs/cdl-training', img: '/images/trades/hero-program-cdl.jpg' },
+              { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', img: '/images/barber-hero-new.jpg' },
+              { name: 'Technology', href: '/programs/technology', img: '/images/hero/hero-tech-careers.jpg' },
+              { name: 'Culinary', href: '/programs/culinary-apprenticeship', img: '/images/culinary/hero-program-culinary.jpg' },
+            ].map((p) => (
+              <Link key={p.name} href={p.href} className="group">
+                <div className="relative aspect-[3/2] rounded-xl overflow-hidden mb-2">
+                  <Image src={p.img} alt={p.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 50vw, 33vw" />
                 </div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
-                  <p className="text-slate-500 text-xs">{item.desc}</p>
-                </div>
+                <h3 className="font-bold text-slate-900 text-sm">{p.name}</h3>
               </Link>
             ))}
           </div>
-          <div className="text-center mt-5">
-            <Link href="/programs" className="text-blue-600 font-semibold text-sm hover:underline">
-              View All Programs →
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* How to Apply */}
-      <section className="py-8 sm:py-14 bg-slate-50">
+      <section className="py-8 sm:py-14 bg-white">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">How to Apply for JRI Funding</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">How to Enroll</h2>
           <div className="space-y-3">
             {[
-              { step: '1', title: 'Register at Indiana Career Connect', desc: 'Create your account at indianacareerconnect.com.' },
-              { step: '2', title: 'Schedule a WorkOne Appointment', desc: 'Tell them you are interested in JRI-funded training.' },
-              { step: '3', title: 'Eligibility Review', desc: 'Your case manager reviews your background and determines JRI eligibility.' },
-              { step: '4', title: 'Choose Your Program', desc: 'Pick a training program at Elevate that fits your career goals.' },
-              { step: '5', title: 'Start Training', desc: 'Begin your program with JRI covering the costs.' },
-            ].map((item) => (
-              <div key={item.step} className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
+              { step: '1', title: 'Register Online', desc: 'Create an account at indianacareerconnect.com.' },
+              { step: '2', title: 'Schedule WorkOne Appointment', desc: 'Meet with a counselor to determine JRI eligibility.' },
+              { step: '3', title: 'Choose Your Program', desc: 'Select from JRI-eligible training programs.' },
+              { step: '4', title: 'Start Training', desc: 'Begin your funded career training and earn while you learn.' },
+            ].map((s) => (
+              <div key={s.step} className="flex items-start gap-4 bg-slate-50 rounded-lg p-4">
+                <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
                 <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
-                  <p className="text-slate-600 text-sm">{item.desc}</p>
+                  <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
+                  <p className="text-slate-600 text-sm">{s.desc}</p>
                 </div>
               </div>
             ))}
@@ -130,19 +117,17 @@ export default function JRIPage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-8 sm:py-14 bg-blue-600">
+      <section className="py-8 sm:py-14 bg-brand-red-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready for a Fresh Start?</h2>
-          <p className="text-white/90 mb-6 text-sm">Register at Indiana Career Connect and schedule your WorkOne appointment to get started.</p>
+          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your New Career</h2>
+          <p className="text-white/90 mb-6 text-sm">JRI funding available for qualifying individuals. Apply today.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
-              className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
-              Register Now <ArrowRight className="w-4 h-4 inline ml-1" />
-            </a>
-            <Link href="/apply" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
-              Apply for Training
+            <Link href="/apply?program=jri" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-red-50 transition-colors text-center">
+              Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
+            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
+              Register at Indiana Career Connect
+            </a>
           </div>
         </div>
       </section>

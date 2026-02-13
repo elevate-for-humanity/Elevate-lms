@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Accessibility, Mail, Calendar } from 'lucide-react';
+import { Accessibility, Mail, Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -154,14 +154,12 @@ export default function AccessibilityPage() {
               </a>
             </div>
             <div className="flex items-center gap-3">
-              <Calendar className="w-5 h-5 text-brand-blue-600" />
+              <Phone className="w-5 h-5 text-brand-blue-600" />
               <a
-                href="https://calendly.com/elevate-for-humanity/advisor-call"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/support"
                 className="text-brand-blue-600 hover:underline font-semibold"
               >
-                Schedule a Meeting
+                Visit Support Center
               </a>
             </div>
           </div>

@@ -7,6 +7,8 @@ import { CareerServicesHook } from './CareerServicesHook';
 import VideoHeroBanner from '@/components/home/VideoHeroBanner';
 import { EligibilityNotice } from '@/components/EligibilityNotice';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { WhatYouWillLearn } from '@/components/WhatYouWillLearn';
+import ProgramPaymentOptions from '@/components/ProgramPaymentOptions';
 
 // Apprenticeship programs hide pricing until after application
 const APPRENTICESHIP_SLUGS = ['barber', 'barber-apprenticeship', 'cosmetology-apprenticeship', 'esthetician-apprenticeship', 'nail-technician-apprenticeship'];
@@ -118,6 +120,20 @@ export function ProgramTemplate({ program }: { program: Program }) {
                   </li>
                 ))}
             </ul>
+
+            {/* What You'll Learn */}
+            {program.whatYouLearn && program.whatYouLearn.length > 0 && (
+              <div className="mt-8">
+                <WhatYouWillLearn items={program.whatYouLearn} title="What You'll Learn" />
+              </div>
+            )}
+
+            {/* Payment Options */}
+            {!isApprenticeship && (
+              <div className="mt-8">
+                <ProgramPaymentOptions programName={program.name} programSlug={program.slug} price={program.price || 0} duration={program.duration || '8-12 weeks'} />
+              </div>
+            )}
 
             {/* Credentials & Outcomes Box */}
             <div className="mt-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6">
@@ -485,11 +501,11 @@ export function ProgramTemplate({ program }: { program: Program }) {
               {program.ctaPrimary.label}
             </Link>
             <a
-              href="tel:3173143757"
+              href="/support"
               className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/20 border-2 border-white text-white px-10 py-5 rounded-xl font-bold text-lg transition"
             >
               <Phone className="w-5 h-5" />
-              (317) 314-3757
+              Get Help Online
             </a>
             <a
               href="mailto:info@www.elevateforhumanity.org"
@@ -502,7 +518,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
 
           <div className="pt-8 border-t border-white/20">
             <p className="text-sm text-white/70">
-              Questions? Call us at (317) 314-3757 or email
+              Questions? Call us at Get Help Online or email
               info@www.elevateforhumanity.org
             </p>
           </div>

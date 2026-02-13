@@ -10,6 +10,8 @@ import {
   Target, Calendar, MessageSquare, BarChart3, Clock,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import EnhancedDashboard from '@/components/EnhancedDashboard';
+import ReferralDashboard from '@/components/ReferralDashboard';
 
 export const metadata: Metadata = {
   title: 'Learning Dashboard | Elevate for Humanity',
@@ -338,6 +340,16 @@ export default async function LMSPage() {
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Enhanced Dashboard */}
+          <div className="mt-8">
+            <EnhancedDashboard role={profile?.role || 'student'} userId={user.id} />
+          </div>
+
+          {/* Referral Dashboard */}
+          <div className="mt-8">
+            <ReferralDashboard userId={user.id} />
           </div>
         </div>
       </div>

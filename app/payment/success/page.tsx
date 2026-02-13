@@ -87,10 +87,10 @@ export default async function PaymentSuccessPage() {
             <p className="text-sm text-black">
               Questions? Contact us at{' '}
               <a
-                href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                href="/support"
                 className="text-brand-orange-600 hover:underline"
               >
-                317-314-3757
+                support center
               </a>{' '}
               or{' '}
               <a

@@ -128,14 +128,13 @@ export default async function EnrollSuccessPage() {
 
         {/* Contact Info */}
         <div className="bg-blue-50 rounded-xl p-6 mb-6">
-          <h3 className="font-bold text-lg mb-4">Questions? Contact Us</h3>
+          <h3 className="font-bold text-lg mb-4">Need Help?</h3>
           <div className="space-y-3">
             <a 
-              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" 
+              href="/support" 
               className="flex items-center gap-3 text-gray-700 hover:text-blue-600"
             >
-              <Phone className="w-5 h-5" />
-              <span>Schedule a Meeting</span>
+              <span>Visit our Help Center →</span>
             </a>
             <a 
               href="mailto:elevate4humanityedu@gmail.com" 

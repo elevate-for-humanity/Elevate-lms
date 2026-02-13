@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { FileText, Clock, CheckCircle, AlertCircle, Calendar, Upload, ChevronRight, Filter, BookOpen } from 'lucide-react';
+import AssignmentSubmission from '@/components/AssignmentSubmission';
 
 export const metadata: Metadata = {
   title: 'My Assignments | Student Portal',
@@ -246,6 +247,11 @@ export default async function AssignmentsPage() {
               </Link>
             </div>
           )}
+        </div>
+
+        {/* Assignment Submission Widget */}
+        <div className="mt-8">
+          <AssignmentSubmission />
         </div>
       </div>
     </div>

@@ -103,7 +103,7 @@ export default function PrivacyPolicyPage() {
             <p className="text-gray-700">
               Supersonic Fast Cash LLC<br />
               Email: privacy@supersonicfastcash.com<br />
-              Phone: (317) 314-3757
+              Phone: Get Help Online
             </p>
           </section>
 

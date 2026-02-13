@@ -242,11 +242,11 @@ export default function CommunityServicesPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-700 transition"
             >
               <Phone className="w-5 h-5" />
-              (317) 314-3757
+              Get Help Online
             </a>
             <Link
               href="/contact"

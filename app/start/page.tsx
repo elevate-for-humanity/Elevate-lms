@@ -16,7 +16,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
   title: 'Find Your Pathway | Start Your Career Training Journey',
-  description: 'Call (317) 314-3757 or apply online for a new career. Explore training programs, check eligibility for funding, and connect with employers in Indiana.',
+  description: 'Call Get Help Online or apply online for a new career. Explore training programs, check eligibility for funding, and connect with employers in Indiana.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/start',
   },
@@ -133,7 +133,7 @@ export default async function StartPage() {
             Find Your Pathway
           </h1>
           <p className="text-xl md:text-2xl text-blue-100 mb-8">
-            Call (317) 314-3757 or apply online for a new career. We'll help you find the right program and funding.
+            Call Get Help Online or apply online for a new career. We'll help you find the right program and funding.
           </p>
         </div>
       </section>
@@ -286,11 +286,11 @@ export default async function StartPage() {
               Apply Now
             </Link>
             <a
-              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition"
             >
               <Phone className="w-5 h-5" />
-              (317) 314-3757
+              Get Help Online
             </a>
           </div>
         </div>

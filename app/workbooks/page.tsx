@@ -245,10 +245,10 @@ export default function WorkbooksPage() {
             </a>
             <span className="text-slate-400">|</span>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
-              317-314-3757
+              support center
             </a>
           </div>
         </div>

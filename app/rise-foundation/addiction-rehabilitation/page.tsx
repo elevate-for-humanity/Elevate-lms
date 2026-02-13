@@ -176,7 +176,7 @@ export default async function AddictionRehabilitationPage() {
               Get Help Now
             </Link>
             <a 
-              href="tel:3173143757"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 border border-teal-600 text-teal-600 px-6 py-3 rounded-lg font-semibold hover:bg-teal-50 transition"
             >
               <Phone className="w-5 h-5" />

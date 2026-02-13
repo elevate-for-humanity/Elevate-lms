@@ -30,11 +30,11 @@ export default function PageCTA({
           </Link>
           {showPhone && (
             <a
-              href="tel:317-314-3757"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Get Help
             </a>
           )}
         </div>

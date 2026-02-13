@@ -164,7 +164,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
               Book Appointment
             </Link>
             <a
-              href="tel:+13175551234"
+              href="/support"
               className="inline-flex items-center px-8 py-4 bg-blue-500 text-white rounded-lg text-lg font-bold hover:bg-blue-400 transition-colors"
             >
               <Phone className="mr-2 w-5 h-5" />

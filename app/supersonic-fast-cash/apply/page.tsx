@@ -58,8 +58,8 @@ export default function RefundApplyPage() {
           </p>
           <div className="bg-white rounded-xl border p-6 mb-6">
             <p className="text-sm text-gray-500 mb-2">Need immediate assistance?</p>
-            <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="text-2xl font-bold text-orange-600 hover:text-orange-700">
-              (317) 314-3757
+            <a href="/support" className="text-2xl font-bold text-orange-600 hover:text-orange-700">
+              Visit Support Center
             </a>
           </div>
           <Link href="/supersonic-fast-cash" className="text-orange-600 hover:text-orange-700 font-medium">
@@ -353,9 +353,9 @@ export default function RefundApplyPage() {
           {/* Call CTA */}
           <div className="mt-8 bg-orange-50 rounded-xl p-6 text-center">
             <p className="text-gray-600 mb-2">Prefer to talk to someone now?</p>
-            <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-2xl font-bold text-orange-600 hover:text-orange-700">
+            <a href="/support" className="inline-flex items-center gap-2 text-2xl font-bold text-orange-600 hover:text-orange-700">
               <Phone className="w-6 h-6" />
-              (317) 314-3757
+              Visit Support Center
             </a>
             <p className="text-sm text-gray-500 mt-2">Mon-Fri 9am-8pm, Sat 9am-5pm, Sun 12pm-5pm</p>
           </div>

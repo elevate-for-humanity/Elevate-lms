@@ -1,137 +1,345 @@
-import { Metadata } from 'next';
+export const dynamic = 'force-dynamic';
+
+// Force static generation for performance
+
+import type { Metadata } from 'next';
+import PathwayDisclosure from '@/components/PathwayDisclosure';
+import PageAvatar from '@/components/PageAvatar';
+import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
+import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight } from 'lucide-react';
 
-const SITE_URL = 'https://www.elevateforhumanity.org';
 
 export const metadata: Metadata = {
-  title: 'Tax Preparation & Entrepreneurship Training | Elevate',
-  description: 'Tax preparation and entrepreneurship training in Indianapolis. Learn tax prep, business startup, and financial services. Start your own business.',
-  alternates: { canonical: `${SITE_URL}/programs/tax-entrepreneurship` },
-  openGraph: {
-    title: 'Tax Preparation & Entrepreneurship | Indianapolis',
-    description: 'Tax prep and business startup training. Start your own tax office.',
-    url: `${SITE_URL}/programs/tax-entrepreneurship`,
-    images: [{ url: `${SITE_URL}/images/hero/hero-business.jpg`, width: 1200, height: 630 }],
+  title: 'Tax Preparation & Entrepreneurship',
+  description:
+    'Tax preparation certification and small business development training. Free with funding when eligible.',
+  alternates: {
+    canonical: 'https://www.elevateforhumanity.org/programs/tax-entrepreneurship',
   },
 };
 
-export default function TaxEntrepreneurshipPage() {
-  return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-slate-50 border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Tax Prep & Entrepreneurship' }]} />
+export default async function TaxEntrepreneurshipPage() {
+  const supabase = createPublicClient();
+
+  if (!supabase) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h2>
+          <p className="text-gray-600">Please try again later.</p>
         </div>
       </div>
-
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/hero/hero-business.jpg" alt="Tax Preparation & Entrepreneurship" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
-          <div className="max-w-4xl mx-auto">
-            <span className="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Business Training</span>
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Tax Prep &amp; Entrepreneurship</h1>
-            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
-              Learn tax preparation, business startup, and financial services. Start your own tax office or financial services business.
-            </p>
+    );
+  }
+  
+  // Fetch tax entrepreneurship program
+  const { data: program } = await supabase
+    .from('programs')
+    .select('*')
+    .eq('slug', 'tax-entrepreneurship')
+    .single();
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Breadcrumbs
+        items={[
+          { label: 'Programs', href: '/programs' },
+          { label: 'Tax Entrepreneurship' },
+        ]}
+      />
+      {/* Hero */}
+      <section className="bg-white text-white py-20">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="flex items-center gap-3 mb-4">
+            <span className="px-4 py-2 bg-white0 text-white text-sm font-bold rounded-full">
+              Free with funding
+            </span>
+            <span className="px-4 py-2 bg-white0 text-white text-sm font-bold rounded-full">
+              Online / Hybrid
+            </span>
           </div>
-        </div>
-      </section>
 
-      <section className="bg-slate-900 py-5">
-        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-          {[
-            { val: '4-8 Weeks', label: 'Program Length' },
-            { val: 'IRS PTIN', label: 'Certification' },
-            { val: '$30K-$80K+', label: 'Earning Potential' },
-            { val: 'Own Business', label: 'Opportunity' },
-          ].map((s) => (
-            <div key={s.label}>
-              <div className="text-lg sm:text-xl font-bold text-white">{s.val}</div>
-              <div className="text-slate-400 text-xs">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
+          <h1 className="text-4xl sm:text-5xl font-bold mb-4">
+            Tax Preparation & Entrepreneurship
+          </h1>
+          <p className="text-xl text-black mb-8 max-w-3xl">
+            Tax preparation certification and small business development
+            training
+          </p>
 
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row gap-5 items-start">
-            <div className="relative w-full h-[200px] sm:w-72 sm:h-[280px] rounded-xl overflow-hidden flex-shrink-0">
-              <Image src="/images/programs-hq/business-training.jpg" alt="Tax prep training" fill className="object-cover" />
-            </div>
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-3">Tax preparation skills and business startup fundamentals.</p>
-              <div className="space-y-2">
-                {['Individual and small business tax preparation', 'IRS regulations and tax code basics', 'Tax software operation (Drake, TaxSlayer)', 'Business plan development', 'Marketing and client acquisition', 'Financial literacy and bookkeeping', 'How to open your own tax office'].map((item) => (
-                  <div key={item} className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0" />
-                    <span className="text-slate-700 text-sm">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-8 sm:py-14 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">Career Paths</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { title: 'Tax Preparer', salary: '$30K-$50K' },
-              { title: 'Tax Office Owner', salary: '$50K-$100K+' },
-              { title: 'Bookkeeper', salary: '$35K-$55K' },
-              { title: 'Financial Coach', salary: '$40K-$70K' },
-            ].map((c) => (
-              <div key={c.title} className="bg-white rounded-xl border border-slate-200 p-4">
-                <h3 className="font-bold text-slate-900 text-sm">{c.title}</h3>
-                <div className="text-blue-600 font-bold text-sm">{c.salary}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">How to Enroll</h2>
-          <div className="space-y-3">
-            {[
-              { step: '1', title: 'Apply Online', desc: 'Submit your student application.' },
-              { step: '2', title: 'Complete Training', desc: 'Tax prep coursework and business fundamentals.' },
-              { step: '3', title: 'Get Your PTIN', desc: 'Register with the IRS as a tax preparer.' },
-              { step: '4', title: 'Start Earning', desc: 'Work for a tax firm or open your own office.' },
-            ].map((s) => (
-              <div key={s.step} className="flex items-start gap-4 bg-slate-50 rounded-lg p-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
-                  <p className="text-slate-600 text-sm">{s.desc}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="py-8 sm:py-14 bg-blue-600">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Business Career</h2>
-          <p className="text-white/90 mb-6 text-sm">Learn tax prep and start your own business. Apply today.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=tax-entrepreneurship" className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
-              Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Link
+              href="/apply"
+              className="px-8 py-4 bg-brand-orange-600 hover:bg-brand-orange-600 text-white font-bold rounded-lg transition-all text-center"
+            >
+              Apply Now
             </Link>
-            <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
-              Explore Funding Options
+            <Link
+              href="/contact"
+              className="px-8 py-4 bg-white hover:bg-gray-100 text-blue-900 font-bold rounded-lg transition-all text-center"
+            >
+              Get Free Info
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* Avatar Guide */}
+      <PageAvatar videoSrc="/videos/avatars/financial-guide.mp4" title="Tax Entrepreneurship Program Guide" />
+
+      {/* Pathway Disclosure */}
+      <PathwayDisclosure programName="Tax Entrepreneurship" programSlug="tax-entrepreneurship" />
+
+      {/* At-a-Glance */}
+      <section className="bg-white py-16">
+        <div className="mx-auto max-w-7xl px-6">
+          <h2 className="text-3xl font-bold text-black mb-8">At-a-Glance</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="flex items-start gap-4">
+              <Image src="/images/icons/clock.png" alt="Duration" width={24} height={24} className="flex-shrink-0 mt-1" loading="lazy" />
+              <div>
+                <h3 className="font-bold text-black mb-1">Duration</h3>
+                <p className="text-black">6-12 weeks</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <Image src="/images/icons/dollar.png" alt="Cost" width={24} height={24} className="flex-shrink-0 mt-1" loading="lazy" />
+              <div>
+                <h3 className="font-bold text-black mb-1">Cost</h3>
+                <p className="text-black">Free with funding when eligible</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <Image src="/images/icons/shield.png" alt="Format" width={24} height={24} className="flex-shrink-0 mt-1" loading="lazy" />
+              <div>
+                <h3 className="font-bold text-black mb-1">Format</h3>
+                <p className="text-black">Online / Hybrid</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <Image src="/images/icons/award.png" alt="Outcome" width={24} height={24} className="flex-shrink-0 mt-1" loading="lazy" />
+              <div>
+                <h3 className="font-bold text-black mb-1">Outcome</h3>
+                <p className="text-black">
+                  Tax prep certification + Business skills
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Who This Program Is For */}
+      <section className="bg-gray-50 py-16">
+        <div className="mx-auto max-w-4xl px-6">
+          <h2 className="text-3xl font-bold text-black mb-6">
+            Who This Program Is For
+          </h2>
+          <div className="bg-white rounded-xl p-8 shadow-sm">
+            <ul className="space-y-4">
+              <li className="flex items-start gap-3">
+                <Image src="/images/icons/check-circle.png" alt="Check" width={24} height={24} className="flex-shrink-0 mt-0.5" loading="lazy" />
+                <span className="text-black">
+                  Individuals seeking career change or advancement
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Image src="/images/icons/check-circle.png" alt="Check" width={24} height={24} className="flex-shrink-0 mt-0.5" loading="lazy" />
+                <span className="text-black">
+                  No prior experience required for most programs
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Image src="/images/icons/check-circle.png" alt="Check" width={24} height={24} className="flex-shrink-0 mt-0.5" loading="lazy" />
+                <span className="text-black">
+                  Justice-impacted individuals welcome
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Image src="/images/icons/check-circle.png" alt="Check" width={24} height={24} className="flex-shrink-0 mt-0.5" loading="lazy" />
+                <span className="text-black">
+                  Barriers support available
+                </span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Funding Options */}
+      <section className="bg-white py-16">
+        <div className="mx-auto max-w-4xl px-6">
+          <h2 className="text-3xl font-bold text-black mb-6">
+            Funding Options
+          </h2>
+          <p className="text-black mb-6">You may qualify for:</p>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="font-bold text-black mb-2">WIOA</h3>
+              <p className="text-black text-sm">
+                Workforce Innovation and Opportunity Act funding
+              </p>
+            </div>
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="font-bold text-black mb-2">WRG</h3>
+              <p className="text-black text-sm">Workforce Ready Grant</p>
+            </div>
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="font-bold text-black mb-2">JRI</h3>
+              <p className="text-black text-sm">
+                Justice Reinvestment Initiative
+              </p>
+            </div>
+            <div className="bg-white rounded-lg p-6">
+              <h3 className="font-bold text-black mb-2">
+                Employer Sponsorship
+              </h3>
+              <p className="text-black text-sm">
+                Some employers sponsor training
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Support Services */}
+      <section className="bg-gray-50 py-16">
+        <div className="mx-auto max-w-4xl px-6">
+          <h2 className="text-3xl font-bold text-black mb-6">
+            Support Services
+          </h2>
+          <p className="text-black mb-6">We help coordinate:</p>
+          <div className="bg-white rounded-xl p-8 shadow-sm">
+            <ul className="space-y-3">
+              <li className="flex items-start gap-3">
+                <Image src="/images/icons/users.png" alt="Users" width={20} height={20} className="flex-shrink-0 mt-0.5" loading="lazy" />
+                <span className="text-black">Case management</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Image src="/images/icons/users.png" alt="Users" width={20} height={20} className="flex-shrink-0 mt-0.5" loading="lazy" />
+                <span className="text-black">
+                  Justice navigation for returning citizens
+                </span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Image src="/images/icons/users.png" alt="Users" width={20} height={20} className="flex-shrink-0 mt-0.5" loading="lazy" />
+                <span className="text-black">Transportation resources</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Image src="/images/icons/users.png" alt="Users" width={20} height={20} className="flex-shrink-0 mt-0.5" loading="lazy" />
+                <span className="text-black">Childcare referrals</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <Image src="/images/icons/users.png" alt="Users" width={20} height={20} className="flex-shrink-0 mt-0.5" loading="lazy" />
+                <span className="text-black">Documentation support</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* Outcomes */}
+      <section className="bg-white py-16">
+        <div className="mx-auto max-w-4xl px-6">
+          <h2 className="text-3xl font-bold text-black mb-6">
+            Career Outcomes
+          </h2>
+          <p className="text-black mb-6">Students typically move into:</p>
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="bg-white rounded-lg p-6 text-center">
+              <h3 className="font-bold text-black mb-2">Tax Preparer</h3>
+            </div>
+            <div className="bg-white rounded-lg p-6 text-center">
+              <h3 className="font-bold text-black mb-2">
+                Small Business Owner
+              </h3>
+            </div>
+            <div className="bg-white rounded-lg p-6 text-center">
+              <h3 className="font-bold text-black mb-2">Entrepreneur</h3>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Next Steps */}
+      <section className="bg-white text-white py-16">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <h2 className="text-3xl font-bold mb-6">Next Steps</h2>
+          <div className="space-y-4 text-left max-w-2xl mx-auto mb-8">
+            <div className="flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white font-bold flex items-center justify-center flex-shrink-0">
+                1
+              </div>
+              <div>
+                <h3 className="font-bold mb-1">Apply</h3>
+                <p className="text-black text-sm">
+                  Submit your application online
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white font-bold flex items-center justify-center flex-shrink-0">
+                2
+              </div>
+              <div>
+                <h3 className="font-bold mb-1">Meet with advisor</h3>
+                <p className="text-black text-sm">
+                  Discuss your goals and eligibility
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white font-bold flex items-center justify-center flex-shrink-0">
+                3
+              </div>
+              <div>
+                <h3 className="font-bold mb-1">Confirm eligibility</h3>
+                <p className="text-black text-sm">
+                  We help with funding paperwork
+                </p>
+              </div>
+            </div>
+            <div className="flex items-start gap-4">
+              <div className="w-8 h-8 rounded-full bg-brand-orange-600 text-white font-bold flex items-center justify-center flex-shrink-0">
+                4
+              </div>
+              <div>
+                <h3 className="font-bold mb-1">Enroll</h3>
+                <p className="text-black text-sm">
+                  Start your training program
+                </p>
+              </div>
+            </div>
+          </div>
+          <Link
+            href="/apply"
+            className="inline-block px-10 py-5 bg-brand-orange-600 hover:bg-brand-orange-600 text-white font-bold text-xl rounded-lg transition-all shadow-lg hover:shadow-xl"
+          >
+            Apply Now
+          </Link>
+        </div>
+      </section>
+
+      {/* Credentials & Outcomes */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-4xl mx-auto px-6">
+          <CredentialsOutcomes
+            programName="Tax Entrepreneurship"
+            partnerCertifications={[
+              'IRS PTIN (Preparer Tax Identification Number)',
+              'IRS Annual Filing Season Program (AFSP)',
+              'QuickBooks Certified User (issued by Intuit)',
+              'Enrolled Agent (EA) exam preparation',
+            ]}
+            employmentOutcomes={[
+              'Tax Business Owner',
+              'Independent Tax Preparer',
+              'Tax Franchise Operator',
+              'Bookkeeping Service Provider',
+            ]}
+          />
         </div>
       </section>
     </div>

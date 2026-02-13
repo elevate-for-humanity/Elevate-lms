@@ -11,5 +11,5 @@ export const metadata: Metadata = {
 
 // Redirect to help page
 export default function DocumentationPage() {
-  redirect('/help');
+  redirect('/help/articles');
 }

@@ -113,10 +113,10 @@ export default function SiteLocatorPage() {
             <p className="text-black mt-2">
               Phone:{' '}
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="/support"
                 className="text-brand-green-600 hover:underline"
               >
-                317-314-3757
+                support center
               </a>
               <br />
               Email:{' '}
@@ -201,10 +201,10 @@ export default function SiteLocatorPage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a
-            href="mailto:elevate4humanityedu@gmail.com"
+            href="/support"
             className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
           >
-            Call 317-314-3757
+            Call support center
           </a>
           <Link
             href="/tax/rise-up-foundation/free-tax-help"

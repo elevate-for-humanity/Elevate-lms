@@ -30,9 +30,9 @@ function VITAHeader() {
             </Link>
           </nav>
           <div className="flex items-center gap-4">
-            <a href="mailto:elevate4humanityedu@gmail.com" className="flex items-center gap-2 hover:text-green-200">
+            <a href="/support" className="flex items-center gap-2 hover:text-green-200">
               <Phone className="w-4 h-4" />
-              <span className="hidden lg:inline">Schedule a Meeting</span>
+              <span className="hidden lg:inline">Get Help Online</span>
             </a>
           </div>
         </div>
@@ -74,7 +74,7 @@ function VITAFooter() {
             <ul className="space-y-3 text-sm text-black">
               <li className="flex items-start gap-2">
                 <Phone className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <a href="mailto:elevate4humanityedu@gmail.com" className="hover:text-white">Schedule a Meeting</a>
+                <a href="/support" className="hover:text-white">Get Help Online</a>
               </li>
               <li className="flex items-start gap-2">
                 <Mail className="w-4 h-4 mt-0.5 flex-shrink-0" />

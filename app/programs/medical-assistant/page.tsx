@@ -1,141 +1,292 @@
-import { Metadata } from 'next';
+'use client';
+
+import { useState } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
+import { motion } from 'framer-motion';
+import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight } from 'lucide-react';
+import { FundingBadge } from '@/components/programs/FundingBadge';
+import { 
+  Clock, DollarSign, TrendingUp, ArrowRight, 
+  Stethoscope, Award, Users, Calendar, ChevronDown, ChevronUp, 
+  Play, Phone, GraduationCap, Briefcase, Heart, ClipboardList,
+  Syringe, Activity, Building, UserCheck
+} from 'lucide-react';
 
-const SITE_URL = 'https://www.elevateforhumanity.org';
+export default function MedicalAssistantProgramPage() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
 
-export const metadata: Metadata = {
-  title: 'Medical Assistant Training | Healthcare Certification | Elevate',
-  description: 'Medical assistant training in Indianapolis. Clinical and administrative skills. Certification included. Funding available for qualifying students.',
-  alternates: { canonical: `${SITE_URL}/programs/medical-assistant` },
-  openGraph: {
-    title: 'Medical Assistant Training | Indianapolis',
-    description: 'Clinical and administrative medical assistant training with certification.',
-    url: `${SITE_URL}/programs/medical-assistant`,
-    images: [{ url: `${SITE_URL}/images/heroes/programs/healthcare/hero-program-medical-assistant.jpg`, width: 1200, height: 630 }],
-  },
-};
+  const faqs = [
+    {
+      question: "What does a Medical Assistant do?",
+      answer: "Medical Assistants perform both clinical and administrative tasks in healthcare settings. Clinical duties include taking vital signs, preparing patients for exams, assisting with procedures, and administering medications. Administrative duties include scheduling, medical records, billing, and patient communication."
+    },
+    {
+      question: "Do I need healthcare experience to enroll?",
+      answer: "No prior healthcare experience is required. We teach everything from medical terminology to clinical procedures. A genuine interest in helping patients and attention to detail are the most important qualities."
+    },
+    {
+      question: "What certifications will I earn?",
+      answer: "You'll be prepared for the Certified Medical Assistant (CMA) exam through AAMA or the Registered Medical Assistant (RMA) through AMT. You'll also earn CPR/BLS certification and may add phlebotomy certification."
+    },
+    {
+      question: "How long is the program?",
+      answer: "The program is 16-20 weeks including classroom instruction, lab practice, and a clinical externship at a healthcare facility. The externship provides real-world experience that employers value."
+    },
+    {
+      question: "Where do Medical Assistants work?",
+      answer: "Medical Assistants work in physician offices, outpatient clinics, urgent care centers, hospitals, specialty practices, and community health centers. The variety of settings means you can find a work environment that fits your preferences."
+    },
+    {
+      question: "What's the job outlook?",
+      answer: "Medical Assistant is one of the fastest-growing occupations. The Bureau of Labor Statistics projects 14% growth through 2032 - much faster than average. Healthcare expansion and an aging population drive this demand."
+    },
+    {
+      question: "What's the salary potential?",
+      answer: "Entry-level Medical Assistants in Indiana earn $32,000-$38,000. With certification and experience, salaries reach $40,000-$48,000. Specialized MAs in surgery or cardiology can earn more. Benefits packages in healthcare are typically strong."
+    },
+    {
+      question: "Can I advance my career from Medical Assistant?",
+      answer: "Absolutely. Many MAs advance to office managers, clinical supervisors, or specialized roles. Others use MA experience as a foundation for nursing, physician assistant, or other healthcare degrees."
+    }
+  ];
 
-export default function MedicalAssistantPage() {
+  const curriculum = [
+    {
+      week: "Weeks 1-2",
+      title: "Medical Terminology & Anatomy",
+      topics: ["Medical word building and abbreviations", "Body systems and organs", "Common diseases and conditions", "Medical documentation standards"],
+      project: "Master 500+ medical terms and abbreviations"
+    },
+    {
+      week: "Weeks 3-4",
+      title: "Administrative Procedures",
+      topics: ["Patient scheduling and registration", "Medical records management", "Insurance and billing basics", "HIPAA compliance and privacy"],
+      project: "Process patient intake and schedule appointments"
+    },
+    {
+      week: "Weeks 5-6",
+      title: "Clinical Fundamentals",
+      topics: ["Vital signs measurement", "Patient positioning and draping", "Infection control and sterilization", "Medical asepsis techniques"],
+      project: "Accurately measure and document vital signs"
+    },
+    {
+      week: "Weeks 7-8",
+      title: "Clinical Procedures",
+      topics: ["Assisting with physical exams", "Specimen collection techniques", "Wound care and bandaging", "Medication administration basics"],
+      project: "Assist with complete patient examination"
+    },
+    {
+      week: "Weeks 9-10",
+      title: "Phlebotomy & Lab Procedures",
+      topics: ["Venipuncture techniques", "Capillary puncture", "Specimen handling and processing", "Point-of-care testing"],
+      project: "Perform successful blood draws"
+    },
+    {
+      week: "Weeks 11-12",
+      title: "EKG & Diagnostic Testing",
+      topics: ["12-lead EKG placement and recording", "Pulmonary function testing", "Vision and hearing screening", "Diagnostic equipment operation"],
+      project: "Perform and document EKG procedure"
+    },
+    {
+      week: "Weeks 13-14",
+      title: "Pharmacology & Injections",
+      topics: ["Drug classifications and actions", "Prescription processing", "Injection techniques (IM, SubQ, ID)", "Medication safety protocols"],
+      project: "Administer injections on simulation models"
+    },
+    {
+      week: "Weeks 15-20",
+      title: "Clinical Externship",
+      topics: ["160+ hours at healthcare facility", "Real patient interaction", "Professional workplace experience", "Certification exam preparation"],
+      project: "Complete externship and pass CMA/RMA exam"
+    }
+  ];
+
+  const stats = [
+    { value: "14%", label: "Job Growth Rate", icon: TrendingUp },
+    { value: "$38K", label: "Average Starting Salary", icon: DollarSign },
+    { value: "20", label: "Weeks to Career", icon: Calendar },
+    { value: "92%", label: "Job Placement Rate", icon: Briefcase }
+  ];
+
   return (
-    <div className="min-h-screen bg-white">
+    <>
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Healthcare', href: '/programs/healthcare' }, { label: 'Medical Assistant' }]} />
+          <Breadcrumbs items={[
+            { label: 'Programs', href: '/programs' },
+            { label: 'Healthcare', href: '/programs/healthcare' },
+            { label: 'Medical Assistant' }
+          ]} />
         </div>
       </div>
 
-      <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/heroes/programs/healthcare/hero-program-medical-assistant.jpg" alt="Medical Assistant Training" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
-          <div className="max-w-4xl mx-auto">
-            <span className="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
-            <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Medical Assistant</h1>
-            <p className="text-sm sm:text-lg text-white/90 max-w-xl">
-              Learn clinical and administrative skills. Get certified and start working in clinics, hospitals, and medical offices.
-            </p>
+      {/* Hero */}
+      <section className="relative bg-rose-700 text-white overflow-hidden">
+        <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
+        
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
+          <div className="max-w-2xl">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+              <FundingBadge type="funded" />
+              
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mt-6 mb-6 leading-tight">
+                Become a Certified
+                <span className="text-rose-300"> Medical Assistant</span>
+              </h1>
+              
+              <p className="text-xl text-rose-100 mb-8 leading-relaxed">
+                Launch your healthcare career helping patients and supporting physicians. 
+                Learn clinical and administrative skills for one of the <strong className="text-white">fastest-growing healthcare roles.</strong>
+              </p>
+
+              <div className="flex flex-wrap gap-4 mb-10">
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
+                  <Clock className="w-4 h-4 text-rose-300" />16-20 Weeks
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
+                  <DollarSign className="w-4 h-4 text-green-400" />$0 with WIOA Funding
+                </span>
+                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
+                  <TrendingUp className="w-4 h-4 text-rose-300" />14% Job Growth
+                </span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/apply?program=medical-assistant" className="inline-flex items-center justify-center px-8 py-4 bg-rose-500 hover:bg-rose-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-rose-500/30">
+                  Check Your Eligibility<ArrowRight className="w-5 h-5 ml-2" />
+                </Link>
+                <Link href="#curriculum" className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-semibold rounded-full transition-all">
+                  <Play className="w-5 h-5 mr-2" />View Curriculum
+                </Link>
+              </div>
+            </motion.div>
           </div>
         </div>
       </section>
 
-      <section className="bg-slate-900 py-5">
-        <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
-          {[
-            { val: '8-12 Weeks', label: 'Program Length' },
-            { val: 'CCMA/RMA', label: 'Certification' },
-            { val: '$32K-$45K', label: 'Salary Range' },
-            { val: 'High Demand', label: 'Job Market' },
-          ].map((s) => (
-            <div key={s.label}>
-              <div className="text-lg sm:text-xl font-bold text-white">{s.val}</div>
-              <div className="text-slate-400 text-xs">{s.label}</div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-5xl mx-auto px-4">
-          <div className="flex flex-col sm:flex-row gap-5 items-start">
-            <div className="relative w-full h-[200px] sm:w-72 sm:h-[280px] rounded-xl overflow-hidden flex-shrink-0">
-              <Image src="/images/healthcare/program-medical-assistant.jpg" alt="Medical assistant student" fill className="object-cover" />
-            </div>
-            <div>
-              <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-3">Clinical and administrative training for medical office settings.</p>
-              <div className="space-y-2">
-                {['Vital signs and patient intake', 'Phlebotomy and specimen collection', 'EKG and diagnostic procedures', 'Medical records and scheduling', 'Insurance billing and coding basics', 'Infection control and OSHA compliance', 'Patient communication and professionalism'].map((item) => (
-                  <div key={item} className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0" />
-                    <span className="text-slate-700 text-sm">{item}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-8 sm:py-14 bg-slate-50">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">Where MAs Work</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {[
-              { title: 'Doctor\'s Offices', salary: '$32K-$40K' },
-              { title: 'Hospitals', salary: '$35K-$45K' },
-              { title: 'Urgent Care', salary: '$33K-$42K' },
-              { title: 'Specialty Clinics', salary: '$34K-$44K' },
-              { title: 'Outpatient Centers', salary: '$33K-$42K' },
-              { title: 'Community Health', salary: '$32K-$40K' },
-            ].map((c) => (
-              <div key={c.title} className="bg-white rounded-xl border border-slate-200 p-4">
-                <h3 className="font-bold text-slate-900 text-sm">{c.title}</h3>
-                <div className="text-blue-600 font-bold text-sm">{c.salary}</div>
-              </div>
+      {/* Stats */}
+      <section className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+            {stats.map((stat, index) => (
+              <motion.div key={index} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="text-center">
+                <stat.icon className="w-8 h-8 text-rose-600 mx-auto mb-2" />
+                <div className="text-3xl font-bold text-gray-900">{stat.value}</div>
+                <div className="text-sm text-gray-500">{stat.label}</div>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-8 sm:py-14 bg-white">
-        <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">How to Enroll</h2>
-          <div className="space-y-3">
+      {/* Why Medical Assistant */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="inline-block bg-rose-100 text-rose-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">Why Medical Assistant?</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">The Heart of Healthcare</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">Medical Assistants are essential to patient care. You'll make a difference every day.</p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
-              { step: '1', title: 'Apply Online', desc: 'Submit your student application.' },
-              { step: '2', title: 'Check Funding', desc: 'Register at indianacareerconnect.com for WIOA/JRI eligibility.' },
-              { step: '3', title: 'Complete Training', desc: 'Classroom instruction and clinical externship.' },
-              { step: '4', title: 'Get Certified & Hired', desc: 'Pass your CCMA/RMA exam and start working.' },
-            ].map((s) => (
-              <div key={s.step} className="flex items-start gap-4 bg-slate-50 rounded-lg p-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
-                <div>
-                  <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
-                  <p className="text-slate-600 text-sm">{s.desc}</p>
+              { icon: Heart, title: "Help Patients Daily", description: "Be the friendly face patients see. Comfort anxious patients, answer questions, and ensure they receive quality care." },
+              { icon: TrendingUp, title: "Rapid Job Growth", description: "14% projected growth through 2032. Healthcare expansion means consistent demand for qualified Medical Assistants." },
+              { icon: Building, title: "Work Anywhere", description: "Physician offices, clinics, hospitals, urgent care, specialty practices. Choose the setting that fits your lifestyle." },
+              { icon: ClipboardList, title: "Variety of Tasks", description: "No two days are the same. Mix of clinical procedures, patient interaction, and administrative work keeps things interesting." },
+              { icon: UserCheck, title: "Quick Entry to Healthcare", description: "Start your healthcare career in months, not years. MA is a proven pathway to nursing and other advanced roles." },
+              { icon: Activity, title: "Job Security", description: "Healthcare is recession-resistant. People always need medical care, ensuring stable employment opportunities." }
+            ].map((item, index) => (
+              <motion.div key={index} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} className="bg-white rounded-2xl p-8 shadow-sm hover:shadow-md transition-shadow">
+                <div className="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center mb-4">
+                  <item.icon className="w-6 h-6 text-rose-600" />
                 </div>
-              </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
+                <p className="text-gray-600">{item.description}</p>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-8 sm:py-14 bg-blue-600">
-        <div className="max-w-3xl mx-auto px-4 text-center">
-          <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Medical Assistant Career</h2>
-          <p className="text-white/90 mb-6 text-sm">High demand in every healthcare setting. Apply today.</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=medical-assistant" className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
-              Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
+      {/* Curriculum */}
+      <section id="curriculum" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="inline-block bg-green-100 text-green-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">Training Program</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">20-Week Medical Assistant Curriculum</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">Comprehensive training including clinical externship. Graduate ready for CMA certification.</p>
+          </div>
+
+          <div className="space-y-6">
+            {curriculum.map((module, index) => (
+              <motion.div key={index} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.05 }} className="bg-slate-50 rounded-2xl p-6 lg:p-8">
+                <div className="flex flex-col lg:flex-row lg:items-start gap-6">
+                  <div className="flex-shrink-0">
+                    <div className="w-20 h-20 bg-rose-600 rounded-2xl flex items-center justify-center text-white">
+                      <span className="text-sm font-bold">{module.week}</span>
+                    </div>
+                  </div>
+                  <div className="flex-grow">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">{module.title}</h3>
+                    <div className="grid md:grid-cols-2 gap-4 mb-4">
+                      {module.topics.map((topic, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <span className="w-2 h-2 bg-slate-400 rounded-full flex-shrink-0 mt-2" />
+                          <span className="text-gray-700">{topic}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="bg-rose-50 rounded-lg p-4 mt-4">
+                      <span className="text-sm font-semibold text-rose-700">Milestone:</span>
+                      <span className="text-sm text-rose-600 ml-2">{module.project}</span>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <span className="inline-block bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">Common Questions</span>
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
+          </div>
+
+          <div className="space-y-4">
+            {faqs.map((faq, index) => (
+              <motion.div key={index} initial={{ opacity: 0, y: 10 }} whileInView={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.05 }} className="bg-white rounded-xl shadow-sm overflow-hidden">
+                <button onClick={() => setOpenFaq(openFaq === index ? null : index)} className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-slate-50 transition-colors">
+                  <span className="font-semibold text-gray-900 pr-4">{faq.question}</span>
+                  {openFaq === index ? <ChevronUp className="w-5 h-5 text-gray-400 flex-shrink-0" /> : <ChevronDown className="w-5 h-5 text-gray-400 flex-shrink-0" />}
+                </button>
+                {openFaq === index && <div className="px-6 pb-5"><p className="text-gray-600 leading-relaxed">{faq.answer}</p></div>}
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-20 bg-rose-600 text-white">
+        <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold mb-6">Ready to Start Your Healthcare Career?</h2>
+          <p className="text-xl text-rose-100 mb-8 max-w-2xl mx-auto">Join a rewarding profession helping patients every day. Check your eligibility for free WIOA-funded training.</p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/apply?program=medical-assistant" className="inline-flex items-center justify-center px-8 py-4 bg-white text-rose-600 font-semibold rounded-full hover:bg-rose-50 transition-all transform hover:scale-105 shadow-lg">
+              Register at Indiana Career Connect<ArrowRight className="w-5 h-5 ml-2" />
             </Link>
-            <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">
-              Explore Funding Options
+            <Link href="/inquiry?program=medical-assistant" className="inline-flex items-center justify-center px-8 py-4 bg-rose-700 hover:bg-rose-600 text-white font-semibold rounded-full transition-all">
+              <ArrowRight className="w-5 h-5 mr-2" />Get Free Info
             </Link>
           </div>
         </div>
       </section>
-    </div>
+    </>
   );
 }

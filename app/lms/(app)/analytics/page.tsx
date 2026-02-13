@@ -5,6 +5,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import LearningAnalyticsDashboard from '@/components/LearningAnalyticsDashboard';
+import StudentEngagementAnalytics from '@/components/StudentEngagementAnalytics';
 import {
   BarChart3,
   TrendingUp,
@@ -375,6 +377,16 @@ export default async function AnalyticsPage() {
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Learning Analytics */}
+          <div className="mt-8">
+            <LearningAnalyticsDashboard />
+          </div>
+
+          {/* Student Engagement */}
+          <div className="mt-8">
+            <StudentEngagementAnalytics />
           </div>
         </div>
       </div>

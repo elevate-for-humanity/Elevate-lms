@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { LiveStreamingClassroom } from '@/components/LiveStreamingClassroom';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/lms/video' },
@@ -36,6 +37,11 @@ export default async function VideoPage() {
               </div>
             </div>
           )) : <div className="col-span-full bg-white rounded-lg shadow-sm border p-8 text-center text-gray-500">No videos available</div>}
+        </div>
+
+        {/* Live Streaming Classroom */}
+        <div className="mt-12">
+          <LiveStreamingClassroom sessionId="live-session" />
         </div>
       </div>
     </div>

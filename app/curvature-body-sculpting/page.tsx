@@ -123,7 +123,7 @@ export default function CurvatureBodySculptingPage() {
           <div className="mt-8 flex flex-wrap justify-center gap-6 text-sm text-pink-200">
             <span className="flex items-center gap-2">
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Get Help Online
             </span>
             <span className="flex items-center gap-2">
               <MapPin className="w-4 h-4" />
@@ -374,11 +374,11 @@ export default function CurvatureBodySculptingPage() {
               Book Free Consultation
             </Link>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition flex items-center gap-2"
             >
               <Phone className="w-5 h-5" />
-              (317) 314-3757
+              Get Help Online
             </a>
           </div>
         </div>

@@ -22,6 +22,8 @@ import {
 } from 'lucide-react';
 import { DiscussionForum } from '@/components/DiscussionForum';
 import AIInstructor from '@/components/AIInstructor';
+import AvatarCourseGuide from '@/components/AvatarCourseGuide';
+import VoiceoverPlayer from '@/components/VoiceoverPlayer';
 
 type Params = Promise<{ courseId: string }>;
 
@@ -411,6 +413,25 @@ export default async function CoursePage({ params }: { params: Params }) {
               <AIInstructor />
             </div>
           </div>
+        </div>
+
+        {/* Avatar Course Guide */}
+        {enrollment && (
+          <div className="mt-8">
+            <AvatarCourseGuide
+              avatarName="Elevate Guide"
+              avatarRole="Course Assistant"
+              steps={[
+                { title: 'Welcome', message: `Welcome to ${course?.title || 'this course'}! Let me guide you through the content.`, videoUrl: '' },
+                { title: 'Getting Started', message: 'Start with the first lesson and work through each module at your own pace.', videoUrl: '' },
+              ]}
+            />
+          </div>
+        )}
+
+        {/* Voiceover Player */}
+        <div className="mt-4">
+          <VoiceoverPlayer text={`Welcome to ${course?.title || 'this course'}. Let's get started with your learning journey.`} />
         </div>
 
         {/* Course Discussion Forum */}

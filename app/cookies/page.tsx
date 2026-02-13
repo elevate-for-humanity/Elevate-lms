@@ -190,10 +190,10 @@ export default async function CookiesPage() {
               <p className="text-black mb-2">
                 Phone:{' '}
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="/support"
                   className="text-brand-blue-600 hover:underline"
                 >
-                  317-314-3757
+                  support center
                 </a>
               </p>
               <p className="text-black">

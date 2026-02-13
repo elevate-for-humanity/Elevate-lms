@@ -124,7 +124,7 @@ export default function DisclosuresPage() {
                 <div className="space-y-3 text-gray-700">
                   <p><span className="font-semibold text-gray-900">Legal Name:</span> 2EXCLUSIVE LLC-S dba Elevate for Humanity</p>
                   <p><span className="font-semibold text-gray-900">Location:</span> Indianapolis, Indiana</p>
-                  <p><span className="font-semibold text-gray-900">Phone:</span> (317) 314-3757</p>
+                  <p><span className="font-semibold text-gray-900">Phone:</span> Get Help Online</p>
                   <p><span className="font-semibold text-gray-900">Email:</span> elevate4humanityedu@gmail.com</p>
                   <p><span className="font-semibold text-gray-900">RAPIDS #:</span> 2025-IN-132301</p>
                 </div>
@@ -407,8 +407,8 @@ export default function DisclosuresPage() {
                   </div>
                   <div>
                     <p className="text-gray-400 text-sm">Phone</p>
-                    <a href="mailto:elevate4humanityedu@gmail.com" className="text-white hover:text-orange-400">
-                      (317) 314-3757
+                    <a href="/support" className="text-white hover:text-orange-400">
+                      Get Help Online
                     </a>
                   </div>
                 </div>

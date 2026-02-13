@@ -139,10 +139,10 @@ export default async function EnrollmentSuccessPage({
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-colors"
             >
-              Call 317-314-3757
+              Call support center
             </a>
             <a
               href="mailto:elevate4humanityedu@gmail.com"

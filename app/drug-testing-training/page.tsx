@@ -152,10 +152,10 @@ export default async function DrugTestingTrainingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
-                href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                href="/support"
                 className="inline-block px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-blue-50"
               >
-                Call (317) 314-3757
+                Call Visit Support Center
               </a>
               <Link
                 href="/contact"
@@ -255,7 +255,7 @@ export default async function DrugTestingTrainingPage() {
                   ${course.price}
                 </div>
                 <a
-                  href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                  href="/support"
                   className="block w-full text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700"
                 >
                   Enroll Now
@@ -297,7 +297,7 @@ export default async function DrugTestingTrainingPage() {
                   ${course.price}
                 </div>
                 <a
-                  href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                  href="/support"
                   className="block w-full text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700"
                 >
                   Enroll Now
@@ -336,7 +336,7 @@ export default async function DrugTestingTrainingPage() {
                   ${course.price}
                 </div>
                 <a
-                  href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                  href="/support"
                   className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 text-sm"
                 >
                   Enroll Now
@@ -368,7 +368,7 @@ export default async function DrugTestingTrainingPage() {
                   ${course.price}
                 </div>
                 <a
-                  href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                  href="/support"
                   className="block w-full text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700"
                 >
                   Enroll Now
@@ -403,7 +403,7 @@ export default async function DrugTestingTrainingPage() {
                   ${course.price}
                 </div>
                 <a
-                  href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                  href="/support"
                   className="block w-full text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700"
                 >
                   Enroll Now
@@ -428,7 +428,7 @@ export default async function DrugTestingTrainingPage() {
               <div>
                 <h3 className="text-xl font-bold mb-2">Enroll in Course</h3>
                 <p className="text-black">
-                  Call (317) 314-3757 to enroll. We'll set up your account and
+                  Call Visit Support Center to enroll. We'll set up your account and
                   provide access.
                 </p>
               </div>
@@ -496,11 +496,11 @@ export default async function DrugTestingTrainingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-blue-50"
             >
               <Phone className="w-5 h-5" />
-              Call (317) 314-3757
+              Call Visit Support Center
             </a>
             <Link
               href="/contact"

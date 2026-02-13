@@ -39,7 +39,7 @@ export default function BarberShopPartnerPage() {
       if (!res.ok) throw new Error('Failed to submit');
       setSuccess(true);
     } catch (err) {
-      setError('Something went wrong. Please contact us at (317) 314-3757.');
+      setError('Something went wrong. Please contact us at Get Help Online.');
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ export default function BarberShopPartnerPage() {
           </p>
           <p className="text-gray-700 mb-8">
             Questions? Contact us at{' '}
-            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-orange-600 font-semibold">Schedule a Meeting</a>
+            <a href="/support" className="text-brand-orange-600 font-semibold">Get Help Online</a>
           </p>
           <Link
             href="/programs/barber"
@@ -314,11 +314,11 @@ export default function BarberShopPartnerPage() {
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="/support"
                   className="inline-flex items-center justify-center gap-2 bg-slate-100 text-gray-800 px-6 py-3 rounded-lg font-medium hover:bg-slate-200"
                 >
                   <Phone className="w-5 h-5" />
-                  (317) 314-3757
+                  Get Help Online
                 </a>
                 <a
                   href="mailto:partners@elevateforhumanity.org"

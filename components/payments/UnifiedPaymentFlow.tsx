@@ -377,8 +377,8 @@ export default function UnifiedPaymentFlow({
         </p>
         <p className="mt-2">
           Need help? Call us at{' '}
-          <a href="tel:317-314-3757" className="text-blue-600 hover:underline font-semibold">
-            317-314-3757
+          <a href="/support" className="text-blue-600 hover:underline font-semibold">
+            support center
           </a>
         </p>
       </div>

@@ -269,7 +269,7 @@ export default async function VerificationPage() {
                   Email Support
                 </a>
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="/support"
                   className="inline-flex items-center text-blue-900 hover:text-blue-700 font-medium"
                 >
                   <Phone className="h-4 w-4 mr-2" />

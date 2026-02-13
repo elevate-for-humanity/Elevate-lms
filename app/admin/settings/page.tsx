@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import FrameworkSettingsPanel from '@/components/FrameworkSettingsPanel';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/admin/settings' },
@@ -42,6 +43,11 @@ export default async function SettingsPage() {
             </div>
           </div>
           <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Settings</button>
+
+          {/* Framework Settings */}
+          <div className="mt-8">
+            <FrameworkSettingsPanel />
+          </div>
         </div>
       </div>
     </div>

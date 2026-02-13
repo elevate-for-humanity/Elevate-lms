@@ -225,7 +225,7 @@ export default function EqualOpportunityPage() {
                 Email: <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">elevate4humanityedu@gmail.com</a>
               </p>
               <p className="text-gray-900">
-                Phone: <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">elevate4humanityedu@gmail.com</a>
+                Phone: <a href="/support" className="text-blue-600 hover:underline">Visit Support Center</a>
               </p>
               <p className="mt-4">
                 <Link href="/policies/grievance" className="text-blue-600 hover:underline text-sm font-medium">
@@ -278,10 +278,10 @@ export default function EqualOpportunityPage() {
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="inline-flex items-center gap-2 bg-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-800 transition border border-white/30"
             >
-              <Phone className="w-5 h-5" /> (317) 314-3757
+              <Phone className="w-5 h-5" /> Visit Support Center
             </a>
             <Link
               href="/apply"

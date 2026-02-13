@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Training Programs | Career Training | Elevate',
-  description: 'Career training programs in healthcare, skilled trades, technology, CDL, barbering, and business. Funding available for qualifying students. Start your new career today.',
+  title: 'Training Programs | Free Career Training',
+  description: 'Explore free career training programs in healthcare, skilled trades, technology, CDL, barbering, and business. WIOA-funded programs available. Start your new career today.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/programs',
   },
@@ -15,6 +15,9 @@ export const metadata: Metadata = {
 import { PathwayBlock } from '@/components/PathwayBlock';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
 import { createPublicClient } from '@/lib/supabase/public';
+import ProgramCTA from '@/components/ProgramCTA';
+import ProgramOutcomesTracker from '@/components/ProgramOutcomesTracker';
+import EnrollmentProcess from '@/components/EnrollmentProcess';
 
 // Cache for 10 minutes - program listings don't change frequently
 export const revalidate = 600;
@@ -340,6 +343,19 @@ export default async function ProgramsPage() {
         </div>
       </section>
 
+      {/* ENROLLMENT PROCESS */}
+      <EnrollmentProcess />
+
+      {/* OUTCOMES TRACKER */}
+      <section className="py-16 lg:py-24 bg-white">
+        <div className="max-w-6xl mx-auto px-4">
+          <ProgramOutcomesTracker />
+        </div>
+      </section>
+
+      {/* PROGRAM CTA */}
+      <ProgramCTA programName="our training programs" />
+
       {/* DISCLOSURE */}
       <section className="py-8 bg-slate-100">
         <div className="max-w-4xl mx-auto px-4">
@@ -359,8 +375,8 @@ export default async function ProgramsPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
-            <Link href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center gap-2 text-white border-2 border-white/50 px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/10 transition-all">
-              (317) 314-3757
+            <Link href="/support" className="inline-flex items-center gap-2 text-white border-2 border-white/50 px-8 py-4 rounded-full font-semibold text-lg hover:bg-white/10 transition-all">
+              Get Help Online
             </Link>
           </div>
           <p className="text-blue-200 text-sm mt-4">

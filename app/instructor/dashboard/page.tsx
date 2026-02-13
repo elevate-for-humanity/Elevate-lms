@@ -4,6 +4,7 @@ import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import { safeFormatDate } from '@/lib/format-utils';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import InstructorPerformanceDashboard from '@/components/InstructorPerformanceDashboard';
 export const dynamic = 'force-dynamic';
 
 import {
@@ -294,6 +295,11 @@ export default async function ProgramHolderDashboard() {
                   </Link>
                 </div>
               </div>
+            </div>
+
+            {/* Instructor Performance */}
+            <div className="mt-8">
+              <InstructorPerformanceDashboard />
             </div>
           </div>
         </div>

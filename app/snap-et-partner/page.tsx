@@ -67,10 +67,10 @@ export default function SNAPETPartnerPage() {
                 View Capabilities
               </Link>
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="/support"
                 className="inline-block px-8 py-4 bg-white/10 text-white font-bold rounded-lg hover:bg-white/20 transition text-lg border-2 border-white text-center"
               >
-                Partner Inquiry: 317-314-3757
+                Partner Inquiry: support center
               </a>
             </div>
           </div>
@@ -464,10 +464,10 @@ export default function SNAPETPartnerPage() {
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-white text-blue-600 font-bold rounded-lg hover:bg-gray-50 transition text-lg"
             >
-              <Phone className="w-5 h-5" /> (317) 314-3757
+              <Phone className="w-5 h-5" /> Get Help Online
             </a>
           </div>
           <p className="mt-6 text-blue-200">Elizabeth Greene, Founder & CEO</p>

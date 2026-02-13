@@ -203,8 +203,8 @@ export const Footer: React.FC = () => {
               </div>
 
               <p className="text-sm text-slate-400 mt-2">
-                <a href="tel:+13173143757" className="hover:text-white transition-colors">
-                  (317) 314-3757
+                <a href="/support" className="hover:text-white transition-colors">
+                  Get Help
                 </a>
               </p>
             </div>

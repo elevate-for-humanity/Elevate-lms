@@ -4,6 +4,17 @@ import HomeHeroVideo from './HomeHeroVideo';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import PageAvatar from '@/components/PageAvatar';
 
+import TrustStrip from '@/components/TrustStrip';
+import { StatStrip } from '@/components/StatStrip';
+import { TestimonialCarousel } from '@/components/TestimonialCarousel';
+import EnrollmentCounter from '@/components/EnrollmentCounter';
+import NewsletterSignup from '@/components/NewsletterSignup';
+import { TrustBadges } from '@/components/TrustBadges';
+import { ComplianceBadges } from '@/components/ComplianceBadges';
+import ProgramFinder from '@/components/ProgramFinder';
+import ProgramHighlights from '@/components/ProgramHighlights';
+import { HomeHeroWithVoiceover } from '@/components/HomeHeroWithVoiceover';
+
 const programs = [
   { 
     name: 'Healthcare', 
@@ -74,6 +85,9 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ===== HERO WITH VOICEOVER ===== */}
+      <HomeHeroWithVoiceover />
+
       {/* ===== AVATAR GUIDE ===== */}
       <section className="py-8 sm:py-12 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
@@ -114,6 +128,12 @@ export default function HomePage() {
       </section>
 
 
+
+      {/* ===== TRUST STRIP ===== */}
+      <TrustStrip variant="default" showAnimation={true} />
+
+      {/* ===== ENROLLMENT COUNTER ===== */}
+      <EnrollmentCounter />
 
       {/* ===== PARTNERS ===== */}
       <section className="py-14 sm:py-20 bg-white">
@@ -193,6 +213,12 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ===== PROGRAM FINDER ===== */}
+      <ProgramFinder />
+
+      {/* ===== PROGRAM HIGHLIGHTS ===== */}
+      <ProgramHighlights />
 
       {/* ===== HOW IT WORKS ===== */}
       <section className="py-16 sm:py-20 bg-stone-50">
@@ -328,6 +354,32 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ===== TESTIMONIALS ===== */}
+      <section className="py-16 sm:py-20 bg-stone-50">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-black mb-4">What Our Students Say</h2>
+            <p className="text-xl text-slate-600">Real stories from real graduates</p>
+          </div>
+          <TestimonialCarousel />
+        </div>
+      </section>
+
+      {/* ===== TRUST BADGES & COMPLIANCE ===== */}
+      <section className="py-12 bg-white border-t border-stone-200">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-wrap items-center justify-center gap-8">
+            <TrustBadges />
+          </div>
+          <div className="mt-8 flex justify-center">
+            <ComplianceBadges />
+          </div>
+        </div>
+      </section>
+
+      {/* ===== NEWSLETTER ===== */}
+      <NewsletterSignup />
 
       {/* ===== CTA ===== */}
       <section className="py-16 sm:py-24 bg-gradient-to-br from-brand-red-600 via-brand-red-600 to-brand-red-700 relative overflow-hidden">

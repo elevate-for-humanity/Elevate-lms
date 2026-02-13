@@ -5,6 +5,8 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
+import { AchievementsBadges } from '@/components/AchievementsBadges';
+import MicroCredentialsBadges from '@/components/MicroCredentialsBadges';
 import {
   Trophy,
   Star,
@@ -432,6 +434,16 @@ export default async function AchievementsPage() {
             </Link>
           </div>
         )}
+
+        {/* Achievements Badges */}
+        <div className="mt-12">
+          <AchievementsBadges userId={user.id} />
+        </div>
+
+        {/* Micro-Credentials */}
+        <div className="mt-12">
+          <MicroCredentialsBadges />
+        </div>
 
         {/* Back Link */}
         <div className="mt-8 text-center">

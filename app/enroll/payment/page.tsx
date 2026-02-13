@@ -326,7 +326,7 @@ function EnrollPaymentContent() {
 
         {/* Contact */}
         <p className="text-center text-gray-500 text-sm mt-6">
-          Questions? Call <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Schedule a Meeting</a>
+          Questions? <a href="/faq" className="text-blue-600 underline">Check our FAQ</a> or <a href="/support" className="text-blue-600 underline">contact support</a>
         </p>
       </div>
     </div>

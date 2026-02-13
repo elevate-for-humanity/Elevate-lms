@@ -17,6 +17,10 @@ import {
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { SystemStatusPanel } from '@/components/admin/SystemStatusPanel';
+import ModerationDashboard from '@/components/ModerationDashboard';
+import OrchestratorAdmin from '@/components/OrchestratorAdmin';
+import DataExportDialog from '@/components/DataExportDialog';
+import PageManager from '@/components/PageManager';
 
 export const metadata: Metadata = {
   title: 'Admin Dashboard | Elevate For Humanity',
@@ -1588,6 +1592,26 @@ export default async function AdminDashboardOrchestrated() {
             </Link>
           </div>
         </div>
+      </section>
+
+      {/* Moderation Dashboard */}
+      <section className="max-w-7xl mx-auto px-4 py-8">
+        <ModerationDashboard />
+      </section>
+
+      {/* Orchestrator Admin */}
+      <section className="max-w-7xl mx-auto px-4 py-8">
+        <OrchestratorAdmin />
+      </section>
+
+      {/* Data Export */}
+      <section className="max-w-7xl mx-auto px-4 py-8">
+        <DataExportDialog />
+      </section>
+
+      {/* Page Manager */}
+      <section className="max-w-7xl mx-auto px-4 py-8">
+        <PageManager />
       </section>
     </div>
   );

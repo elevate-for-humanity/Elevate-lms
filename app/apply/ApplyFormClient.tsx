@@ -206,23 +206,21 @@ export default function ApplyFormClient() {
       <section className="max-w-4xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
           <h1 className="text-4xl md:text-5xl font-bold text-black mb-4">
-            Talk to an Advisor
+            Start Your Application
           </h1>
           <p className="text-base md:text-lg text-black mb-6">
-            Let's discuss your goals and find the right training program for
+            Tell us about your goals and we'll match you with the right training program. No phone call needed — complete everything online and get a response within 24 hours for
             you.
           </p>
           <p className="text-lg text-black mb-6">
-            Fill out the quick inquiry form below, or{' '}
+            Contact us at{' '}
             <a
-              href="https://calendly.com/elevate-for-humanity/advisor-call"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/support"
               className="font-bold text-brand-orange-600 hover:text-brand-orange-700"
             >
-              schedule a free meeting
+              support center
             </a>{' '}
-            with an advisor.
+            or fill out the quick inquiry form below.
           </p>
 
           <div className="bg-orange-50 border-2 border-orange-200 rounded-xl p-6 mb-8">
@@ -337,7 +335,7 @@ export default function ApplyFormClient() {
                     setFormData({ ...formData, phone: e.target.value })
                   }
                   className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                  placeholder="(317) 314-3757"
+                  placeholder="Get Help Online"
                 />
               </div>
 
@@ -438,7 +436,7 @@ export default function ApplyFormClient() {
                 <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-red-800">
                     Something went wrong. Please try again or contact us at
-                    317-314-3757.
+                    support center.
                   </p>
                 </div>
               )}

@@ -92,11 +92,11 @@ export default function FinancialAidPage() {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="/support"
                 className="inline-flex items-center gap-2 bg-gray-100 text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
               >
                 <Phone className="w-4 h-4" />
-                Call (317) 314-3757
+                Call Get Help Online
               </Link>
             </div>
           </div>

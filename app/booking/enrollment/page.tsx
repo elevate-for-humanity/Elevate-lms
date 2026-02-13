@@ -313,12 +313,11 @@ export default function EnrollmentBookingPage() {
           </div>
         )}
 
-        {/* Call CTA */}
+        {/* Help CTA */}
         <div className="mt-8 bg-gray-100 rounded-xl p-6 text-center">
-          <p className="text-gray-600 mb-2">Prefer to speak with someone now?</p>
-          <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-xl font-bold text-blue-600 hover:text-blue-700">
-            <Phone className="w-5 h-5" />
-            (317) 314-3757
+          <p className="text-gray-600 mb-2">Need help with your enrollment?</p>
+          <a href="/faq" className="inline-flex items-center gap-2 text-xl font-bold text-blue-600 hover:text-blue-700">
+            Visit our FAQ & Help Center →
           </a>
         </div>
       </div>

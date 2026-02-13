@@ -48,7 +48,7 @@ export default function ProgramPaymentOptions({
         }
       }
     } catch (error) {
-      alert('Payment failed. Please call 317-314-3757 for assistance.');
+      alert('Payment failed. Please call support center for assistance.');
     }
   };
 
@@ -216,10 +216,10 @@ export default function ProgramPaymentOptions({
           Questions about payment options?
         </p>
         <a
-          href="tel:3173143757"
+          href="/support"
           className="text-orange-600 font-bold underline"
         >
-          Call 317-314-3757
+          Call support center
         </a>
       </div>
     </div>

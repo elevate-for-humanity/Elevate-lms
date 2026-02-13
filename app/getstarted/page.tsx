@@ -114,10 +114,10 @@ export default function Page() {
               <p className="text-sm text-black">
                 Contact us anytime:{' '}
                 <a
-                  href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                  href="/support"
                   className="text-brand-blue-600 font-semibold"
                 >
-                  317-314-3757
+                  support center
                 </a>
               </p>
             </div>

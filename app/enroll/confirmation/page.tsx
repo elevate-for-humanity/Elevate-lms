@@ -258,7 +258,7 @@ function EnrollConfirmationContent() {
         <div className="text-center">
           <p className="text-gray-600 mb-2">Questions about your enrollment?</p>
           <p className="text-gray-900">
-            Call <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="text-blue-600 font-semibold underline">Schedule a Meeting</a>
+            <a href="/support" className="text-blue-600 font-semibold underline">Visit our Help Center</a> or <a href="/faq" className="text-blue-600 font-semibold underline">check our FAQ</a>
             {' '}or email{' '}
             <a href="mailto:enroll@elevateforhumanity.org" className="text-blue-600 font-semibold underline">
               enroll@elevateforhumanity.org

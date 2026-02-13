@@ -40,7 +40,7 @@ export default function CareersApplyPage() {
 
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit. Please try again or call (317) 314-3757.');
+      setError(err instanceof Error ? err.message : 'Failed to submit. Please try again or call Get Help Online.');
     } finally {
       setLoading(false);
     }

@@ -419,10 +419,10 @@ export default function BarberApprenticeshipApplyPage() {
                 }`}>{error}</p>
                 {errorSeverity === 'critical' && (
                   <a 
-                    href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" 
+                    href="/support" 
                     className="inline-block mt-2 text-red-600 font-medium hover:underline"
                   >
-                    Need help? Call (317) 314-3757
+                    Need help? Call Get Help Online
                   </a>
                 )}
               </div>

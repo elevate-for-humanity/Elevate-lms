@@ -200,10 +200,10 @@ function LoginForm() {
             <p>
               Need help? Call{' '}
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="/support"
                 className="text-brand-blue-600 font-semibold"
               >
-                317-314-3757
+                support center
               </a>
             </p>
           </div>

@@ -6,6 +6,8 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Plus, BarChart3, Users, Calendar, Send, Eye, MousePointer } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { EmailCampaignManager } from '@/components/EmailCampaignManager';
+import { SMSNotificationSystem } from '@/components/SMSNotificationSystem';
 
 export const metadata: Metadata = {
   title: 'Campaigns | Admin | Elevate For Humanity',
@@ -237,6 +239,16 @@ export default async function AdminCampaignsPage() {
               </tbody>
             </table>
           )}
+        </div>
+
+        {/* Email Campaign Manager */}
+        <div className="mt-8">
+          <EmailCampaignManager />
+        </div>
+
+        {/* SMS Notification System */}
+        <div className="mt-8">
+          <SMSNotificationSystem />
         </div>
       </div>
     </div>

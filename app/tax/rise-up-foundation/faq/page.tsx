@@ -39,7 +39,7 @@ export default function FAQPage() {
     {
       question: 'Do I need an appointment?',
       answer:
-        'Yes, appointments are required. Call 317-314-3757 to schedule. Walk-ins may experience very long wait times or may not be seen.',
+        'Yes, appointments are required. Call support center to schedule. Walk-ins may experience very long wait times or may not be seen.',
     },
     {
       question: 'What documents do I need to bring?',
@@ -126,10 +126,10 @@ export default function FAQPage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a
-            href="mailto:elevate4humanityedu@gmail.com"
+            href="/support"
             className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
           >
-            Call 317-314-3757
+            Call support center
           </a>
           <a
             href="mailto:elevate4humanityedu@gmail.com"

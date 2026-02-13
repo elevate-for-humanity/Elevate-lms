@@ -3,6 +3,8 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { CalendarWidget } from '@/components/CalendarWidget';
+import { CalendarIntegration } from '@/components/CalendarIntegration';
 import { 
   Calendar as CalendarIcon, 
   Clock, 
@@ -310,6 +312,16 @@ export default async function CalendarPage() {
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Calendar Widget */}
+          <div className="mt-8">
+            <CalendarWidget userId={user.id} />
+          </div>
+
+          {/* Calendar Integration */}
+          <div className="mt-8">
+            <CalendarIntegration />
           </div>
         </div>
       </div>

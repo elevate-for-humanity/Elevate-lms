@@ -25,12 +25,79 @@ const StickyMobileCTA = dynamic(
   { ssr: false, loading: () => null }
 );
 
+// Mobile bottom navigation for authenticated users
+const BottomNav = dynamic(
+  () => import('@/components/BottomNav').then(mod => ({ default: mod.BottomNav })),
+  { ssr: false, loading: () => null }
+);
+
+// Cookie consent banner (separate from CookieConsent already in layout)
+const CookieBanner = dynamic(
+  () => import('@/components/CookieBanner').then(mod => ({ default: mod.CookieBanner })),
+  { ssr: false, loading: () => null }
+);
+
+// Search dialog - cmd+k global search
+const SearchDialog = dynamic(
+  () => import('@/components/SearchDialog').then(mod => ({ default: mod.SearchDialog })),
+  { ssr: false, loading: () => null }
+);
+
+// Scroll unlock failsafe on route changes
+const ScrollUnlocker = dynamic(
+  () => import('@/components/ScrollUnlocker'),
+  { ssr: false, loading: () => null }
+);
+
+// Version guard - auto-refresh on stale deployments
+const VersionGuard = dynamic(
+  () => import('@/components/VersionGuard').then(mod => ({ default: mod.VersionGuard })),
+  { ssr: false, loading: () => null }
+);
+
+// Security monitor - tracks suspicious client-side activity
+const SecurityMonitor = dynamic(
+  () => import('@/components/SecurityMonitor').then(mod => ({ default: mod.SecurityMonitor })),
+  { ssr: false, loading: () => null }
+);
+
+// Offline indicator - shows when user loses connectivity
+const OfflineIndicator = dynamic(
+  () => import('@/components/offline-indicator').then(mod => ({ default: mod.OfflineIndicator })),
+  { ssr: false, loading: () => null }
+);
+
+// Sentry error monitoring init
+const SentryInit = dynamic(
+  () => import('@/components/sentry-init').then(mod => ({ default: mod.SentryInit })),
+  { ssr: false, loading: () => null }
+);
+
+// Voice assistant - global voice interaction
+const VoiceAssistant = dynamic(
+  () => import('@/components/VoiceAssistant').then(mod => ({ default: mod.VoiceAssistant })),
+  { ssr: false, loading: () => null }
+);
+
+// Global avatar guide
+const GlobalAvatar = dynamic(
+  () => import('@/components/GlobalAvatar'),
+  { ssr: false, loading: () => null }
+);
+
+// Mobile voiceover for accessibility
+const MobileVoiceOver = dynamic(
+  () => import('@/components/MobileVoiceOver').then(mod => ({ default: mod.MobileVoiceOver })),
+  { ssr: false, loading: () => null }
+);
+
 // Avatar is now added to each page individually via PageAvatar component
 // This ensures proper positioning under hero banners
 
 export default function ClientWidgets() {
   const [showChat, setShowChat] = useState(false);
   const [showFundingToast, setShowFundingToast] = useState(false);
+  const [showDeferredWidgets, setShowDeferredWidgets] = useState(false);
   const pathname = usePathname();
 
   // Show sticky CTA on program pages, apply page, and inquiry page
@@ -38,6 +105,15 @@ export default function ClientWidgets() {
                         pathname === '/apply' || 
                         pathname === '/inquiry' ||
                         pathname?.startsWith('/forms/');
+
+  // Show bottom nav on authenticated app pages
+  const showBottomNav = pathname?.startsWith('/lms') ||
+                        pathname?.startsWith('/dashboard') ||
+                        pathname?.startsWith('/achievements') ||
+                        pathname?.startsWith('/leaderboard') ||
+                        pathname?.startsWith('/profile') ||
+                        pathname?.startsWith('/settings') ||
+                        pathname?.startsWith('/notifications');
 
   useEffect(() => {
     // Defer chat widget loading:
@@ -67,8 +143,12 @@ export default function ClientWidgets() {
     // Show funding toast after short delay (handled internally by component)
     setShowFundingToast(true);
 
+    // Load deferred widgets after 2 seconds
+    const deferredTimer = setTimeout(() => setShowDeferredWidgets(true), 2000);
+
     return () => {
       clearTimeout(timer);
+      clearTimeout(deferredTimer);
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('click', handleClick);
     };
@@ -76,14 +156,35 @@ export default function ClientWidgets() {
 
   return (
     <>
+      {/* Immediate: scroll unlock + version guard + sentry */}
+      <ScrollUnlocker />
+      <VersionGuard />
+      <SentryInit />
+
       {/* Funding Toast - WIOA/free tuition notification */}
       {showFundingToast && <FundingToast />}
       
       {/* Sticky Mobile CTA - Apply/Contact buttons on program pages */}
       {showStickyCTA && <StickyMobileCTA />}
+
+      {/* Mobile bottom nav for authenticated pages */}
+      {showBottomNav && <BottomNav />}
       
       {/* AI Chat Widget - deferred load for performance */}
       {showChat && <FloatingChatWidget />}
+
+      {/* Deferred widgets - load after initial paint */}
+      {showDeferredWidgets && (
+        <>
+          <CookieBanner />
+          <SearchDialog />
+          <SecurityMonitor />
+          <OfflineIndicator />
+          <VoiceAssistant />
+          <GlobalAvatar />
+          <MobileVoiceOver />
+        </>
+      )}
     </>
   );
 }

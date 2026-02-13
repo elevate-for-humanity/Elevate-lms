@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { LazyLMSDiscussionForum as DiscussionForum } from '@/components/LazyComponents';
 import { QuizSystem } from '@/components/lms/QuizSystem';
+import { NoteTaking } from '@/components/NoteTaking';
+import DigitalBinder from '@/components/DigitalBinder';
 
 export default function LessonPage() {
   const params = useParams();
@@ -419,6 +421,16 @@ export default function LessonPage() {
               Next Lesson
               <ChevronRight className="w-5 h-5" />
             </button>
+          </div>
+
+          {/* Note Taking */}
+          <div className="mt-8">
+            <NoteTaking courseId={courseId} lessonId={lessonId} />
+          </div>
+
+          {/* Digital Binder */}
+          <div className="mt-8">
+            <DigitalBinder />
           </div>
         </div>
       </div>

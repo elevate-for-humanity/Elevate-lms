@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Briefcase, GraduationCap, Calendar, Settings } from 'lucide-react';
+import { Briefcase, GraduationCap, Phone, Settings } from 'lucide-react';
 
 export default function ContactClient() {
   const contactOptions = [
@@ -151,23 +151,21 @@ export default function ContactClient() {
             <div className="bg-white rounded-3xl p-10 shadow-xl">
               <div className="w-20 h-20 bg-zinc-900   rounded-3xl flex items-center justify-center mb-6 transform hover:scale-110 transition-transform">
                 <span className="text-4xl">
-                  <Calendar className="w-5 h-5 inline-block text-white" />
+                  <Phone className="w-5 h-5 inline-block" />
                 </span>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold text-black mb-4">
-                Prefer to talk it through?
+                Prefer to get started?
               </h2>
               <p className="text-black mb-6 leading-relaxed">
-                Schedule a free meeting with an advisor. Pick a time that works
-                for you — no commitment required.
+                You can reach us Monday-Friday, 8am-5pm EST. Our advisors are
+                ready to help you find the right program.
               </p>
               <a
-                href="https://calendly.com/elevate-for-humanity/advisor-call"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/support"
                 className="inline-flex items-center justify-center bg-zinc-900   text-white px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-xl hover:scale-105 transition-all"
               >
-                Schedule a Meeting
+                support center
               </a>
             </div>
 

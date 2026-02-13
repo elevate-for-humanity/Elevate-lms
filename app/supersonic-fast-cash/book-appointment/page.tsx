@@ -53,28 +53,28 @@ export default function BookAppointment() {
     {
       id: 'basic',
       name: 'Basic Tax Filing',
-      price: 'Call for Pricing',
+      price: 'Request a Quote',
       description: 'W-2 income only, standard deduction',
       duration: '30 minutes',
     },
     {
       id: 'deluxe',
       name: 'Deluxe Tax Filing',
-      price: 'Call for Pricing',
+      price: 'Request a Quote',
       description: 'Multiple income sources, itemized deductions',
       duration: '45 minutes',
     },
     {
       id: 'premium',
       name: 'Premium Tax Filing',
-      price: 'Call for Pricing',
+      price: 'Request a Quote',
       description: 'Business income, rental property, investments',
       duration: '60 minutes',
     },
     {
       id: 'refund-advance',
       name: 'Tax Refund Advance',
-      price: 'Call for Pricing',
+      price: 'Request a Quote',
       description: 'Get $250-$7,500 same day + tax filing',
       duration: '45 minutes',
     },
@@ -573,7 +573,7 @@ export default function BookAppointment() {
                     })
                   }
                   className="w-full px-4 py-3 border rounded-lg"
-                  placeholder="(317) 314-3757"
+                  placeholder="Get Help Online"
                 />
               </div>
 

@@ -91,8 +91,8 @@ export default function ThankYouPage() {
           <div className="bg-gray-100 p-6 rounded-xl mb-8">
             <h3 className="font-semibold text-gray-900 mb-3">Questions?</h3>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-blue-600">
-                <Phone className="w-4 h-4" /> (317) 314-3757
+              <a href="/support" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-blue-600">
+                <Phone className="w-4 h-4" /> Get Help Online
               </a>
               <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-blue-600">
                 <Mail className="w-4 h-4" /> elevate4humanityedu@gmail.com

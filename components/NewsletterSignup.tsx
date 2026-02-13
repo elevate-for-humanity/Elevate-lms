@@ -3,15 +3,11 @@
 import React from 'react';
 
 import { useState } from 'react';
-<<<<<<< HEAD
 import { Mail, CheckCircle, AlertCircle } from 'lucide-react';
-=======
-import { Mail, Circle, AlertCircle } from 'lucide-react';
-import { createClient } from '@/lib/supabase/client';
->>>>>>> d5f142eac (Add database integration to all components with createClient)
 
 export default function NewsletterSignup() {
   const [email, setEmail] = useState('');
+  const [website, setWebsite] = useState(''); // honeypot
   const [status, setStatus] = useState<
     'idle' | 'loading' | 'success' | 'error'
   >('idle');
@@ -19,32 +15,39 @@ export default function NewsletterSignup() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setStatus('loading');
 
-    try {
-      const supabase = createClient();
-      
-      // Save to newsletter_subscribers table
-      const { error } = await supabase
-        .from('newsletter_subscribers')
-        .upsert({
-          email: email.toLowerCase().trim(),
-          subscribed_at: new Date().toISOString(),
-          status: 'pending_confirmation',
-          source: 'website_signup',
-        }, {
-          onConflict: 'email',
-        });
-
-      if (error && error.code !== '23505') { // Ignore duplicate key errors
-        throw error;
-      }
-
+    // Honeypot: if filled, silently fake success
+    if (website) {
       setStatus('success');
       setMessage('Thanks for subscribing! Check your email to confirm.');
       setEmail('');
+      setTimeout(() => { setStatus('idle'); setMessage(''); }, 5000);
+      return;
+    }
 
-      // Reset after 5 seconds
+    setStatus('loading');
+
+    try {
+      const res = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'homepage' }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Signup failed');
+      }
+
+      setStatus('success');
+      setMessage(
+        data.duplicate
+          ? "You're already subscribed!"
+          : 'Thanks for subscribing! Check your email to confirm.'
+      );
+      setEmail('');
+
       setTimeout(() => {
         setStatus('idle');
         setMessage('');
@@ -80,6 +83,17 @@ export default function NewsletterSignup() {
             onSubmit={handleSubmit}
             className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto"
           >
+            {/* Honeypot — hidden from humans, bots fill it */}
+            <input
+              type="text"
+              name="website"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+              aria-hidden="true"
+              style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0, width: 0 }}
+            />
             <input
               type="email"
               value={email}

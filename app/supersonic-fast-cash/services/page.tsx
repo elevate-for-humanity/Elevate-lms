@@ -158,10 +158,10 @@ export default async function ServicesPage() {
                     Schedule Consultation
                   </Link>
                   <Link
-                    href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                    href="/support"
                     className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
                   >
-                    Call (317) 314-3757
+                    Call Get Help Online
                   </Link>
                 </div>
               </div>
@@ -280,10 +280,10 @@ export default async function ServicesPage() {
               Book Appointment
             </Link>
             <Link
-              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+              href="/support"
               className="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-bold rounded hover:bg-orange-600 transition-colors border-2 border-white"
             >
-              Call (317) 314-3757
+              Call Get Help Online
             </Link>
           </div>
         </div>

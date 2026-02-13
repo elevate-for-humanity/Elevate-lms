@@ -247,10 +247,10 @@ export default function DemosPage() {
               Schedule Demo
             </Link>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 bg-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-600 transition-colors border border-blue-500"
             >
-              Call (317) 314-3757
+              Call Get Help Online
             </a>
           </div>
         </div>

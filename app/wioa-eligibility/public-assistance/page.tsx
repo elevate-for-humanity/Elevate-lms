@@ -164,11 +164,11 @@ export default async function PublicAssistancePage() {
               Apply Now
             </Link>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 transition"
             >
               <Phone className="w-5 h-5" />
-              (317) 314-3757
+              Get Help Online
             </a>
           </div>
         </div>

@@ -107,10 +107,10 @@ export default function SupportPage() {
               <Phone className="w-8 h-8 text-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Phone</h3>
               <a 
-                href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" 
+                href="/support" 
                 className="text-blue-600 font-medium hover:text-blue-700"
               >
-                (317) 314-3757
+                Get Help Online
               </a>
             </div>
 

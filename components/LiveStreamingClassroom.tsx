@@ -39,7 +39,11 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
   const [activePanel, setActivePanel] = useState<'chat' | 'participants' | 'polls'>('chat');
   const [handRaised, setHandRaised] = useState(false);
   const [participants, setParticipants] = useState<Participant[]>([]);
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>([
+    { id: '1', author: 'Alex Chen', message: 'Could you explain the closure example again?', timestamp: '10:23 AM' },
+    { id: '2', author: 'Dr. Emily Rodriguez', message: 'Sure! Let me share my screen and walk through it step by step.', timestamp: '10:24 AM' },
+    { id: '3', author: 'Sarah Williams', message: 'This is really helpful, thank you!', timestamp: '10:25 AM' },
+  ]);
 
   const fetchSessionData = useCallback(async () => {
     if (!sessionId) return;
@@ -111,26 +115,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
     },
   ];
 
-  const chatMessages: ChatMessage[] = [
-    {
-      id: '1',
-      author: 'Alex Chen',
-      message: 'Could you explain the closure example again?',
-      timestamp: '10:23 AM',
-    },
-    {
-      id: '2',
-      author: 'Dr. Emily Rodriguez',
-      message: 'Sure! Let me share my screen and walk through it step by step.',
-      timestamp: '10:24 AM',
-    },
-    {
-      id: '3',
-      author: 'Sarah Williams',
-      message: 'This is really helpful, thank you!',
-      timestamp: '10:25 AM',
-    },
-  ];
+  // Chat messages initialized in useState above
 
   const poll: Poll = {
     id: '1',

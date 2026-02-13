@@ -172,10 +172,10 @@ export default function GrievancePage() {
                 <p className="font-semibold text-black mb-2">Phone:</p>
                 <p className="text-black">
                   <a
-                    href="mailto:elevate4humanityedu@gmail.com"
+                    href="/support"
                     className="text-brand-blue-600 hover:underline"
                   >
-                    (317) 314-3757
+                    Get Help Online
                   </a>
                 </p>
               </div>
@@ -215,10 +215,10 @@ export default function GrievancePage() {
               <br />
               Phone:{' '}
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="/support"
                 className="text-brand-blue-600 hover:underline"
               >
-                (317) 314-3757
+                Get Help Online
               </a>
               <br />
               Email:{' '}

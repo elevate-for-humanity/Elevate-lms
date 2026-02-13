@@ -239,7 +239,7 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 Ready to Take the First Step?
               </h3>
               <p className="text-black mb-6">
-                Call us at <a href="tel:3173143757" className="text-orange-600 font-bold hover:underline">317-314-3757</a> or apply online to get started today.
+                Call us at <a href="/support" className="text-orange-600 font-bold hover:underline">support center</a> or apply online to get started today.
               </p>
               <div className="flex flex-wrap gap-4 justify-center">
                 <Link
@@ -249,7 +249,7 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   Apply Now
                 </Link>
                 <a
-                  href="tel:3173143757"
+                  href="/support"
                   className="px-8 py-4 border-2 border-orange-600 text-orange-600 font-bold rounded-full hover:bg-orange-50 transition text-lg"
                 >
                   Call Us
@@ -289,10 +289,10 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     {ctaButtonText}
                   </Link>
                   <a
-                    href="tel:3173143757"
+                    href="/support"
                     className="px-8 py-4 border-2 border-orange-600 text-orange-600 font-bold rounded-full hover:bg-orange-50 transition text-lg"
                   >
-                    Call 317-314-3757
+                    Call support center
                   </a>
                 </div>
               </div>

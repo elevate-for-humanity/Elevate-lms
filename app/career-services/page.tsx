@@ -5,6 +5,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
+import SkillsGapAnalysis from '@/components/SkillsGapAnalysis';
+import VirtualCareerFair from '@/components/VirtualCareerFair';
+import { StudentSuccessCoaching } from '@/components/StudentSuccessCoaching';
+import WorkOneLocator from '@/components/WorkOneLocator';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/career-services' },
@@ -81,6 +85,34 @@ export default function CareerServicesPage() {
               </div>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* Skills Gap Analysis */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <SkillsGapAnalysis />
+        </div>
+      </section>
+
+      {/* Virtual Career Fair */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <VirtualCareerFair />
+        </div>
+      </section>
+
+      {/* Student Success Coaching */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <StudentSuccessCoaching />
+        </div>
+      </section>
+
+      {/* WorkOne Locator */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <WorkOneLocator />
         </div>
       </section>
 

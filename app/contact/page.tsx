@@ -3,14 +3,15 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Mail, Phone, MapPin, Clock, Calendar, Send, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
-import RequestMeeting from '@/components/RequestMeeting';
 import Turnstile from '@/components/Turnstile';
+import CallTextButton from '@/components/CallTextButton';
+import FeedbackWidget from '@/components/FeedbackWidget';
 
 const contactInfo = [
+  { icon: Phone, title: 'Phone', value: 'Get Help Online', subtitle: 'Mon-Fri 8am-6pm EST', href: 'tel:support center' },
   { icon: Mail, title: 'Email', value: 'elevate4humanityedu@gmail.com', subtitle: 'We respond within 24 hours', href: 'mailto:elevate4humanityedu@gmail.com' },
-  { icon: Calendar, title: 'Schedule a Meeting', value: 'Book online', subtitle: 'Free advisor meeting — no commitment', href: 'https://calendly.com/elevate-for-humanity/advisor-call' },
   { icon: MapPin, title: 'Address', value: 'Indianapolis, IN', subtitle: 'Central Indiana', href: null },
   { icon: Clock, title: 'Hours', value: 'Mon-Fri 8am-6pm', subtitle: 'Sat 9am-1pm EST', href: null },
 ];
@@ -98,11 +99,7 @@ export default function ContactPage() {
               </div>
               <h2 className="font-semibold text-gray-900">{info.title}</h2>
               {info.href ? (
-                <a
-                  href={info.href}
-                  className="text-blue-600 hover:underline mt-1 block"
-                  {...(info.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-                >{info.value}</a>
+                <a href={info.href} className="text-blue-600 hover:underline mt-1 block">{info.value}</a>
               ) : (
                 <p className="text-gray-900 mt-1">{info.value}</p>
               )}
@@ -273,32 +270,18 @@ export default function ContactPage() {
               <p className="text-gray-600">Indianapolis, Indiana</p>
               <p className="text-gray-600">Central Indiana Region</p>
               <p className="text-gray-600 mt-4">Multiple training locations available</p>
-              <div className="mt-4 pt-4 border-t flex flex-col gap-2">
+              <div className="mt-4 pt-4 border-t">
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="/support"
                   className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
                 >
-                  <Mail className="w-4 h-4" />
-                  elevate4humanityedu@gmail.com
-                </a>
-                <a
-                  href="https://calendly.com/elevate-for-humanity/advisor-call"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
-                >
-                  <Calendar className="w-4 h-4" />
-                  Schedule a Meeting
+                  <Phone className="w-4 h-4" />
+                  Call Get Help Online
                 </a>
               </div>
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Request a Meeting */}
-      <div className="max-w-3xl mx-auto px-4 pt-8 pb-4">
-        <RequestMeeting context="Prefer to talk through your questions? Schedule a free meeting with an Elevate advisor — no commitment required." />
       </div>
 
       {/* FAQ */}
@@ -307,7 +290,7 @@ export default function ContactPage() {
         <div className="space-y-4">
           {[
             { q: 'What are your office hours?', a: 'Our team is available Monday-Friday, 9am-5pm EST. You can leave a message anytime and we\'ll respond within 1-2 business days.' },
-            { q: 'How quickly will I get a response?', a: 'We typically respond to inquiries within 1-2 business days. For urgent matters, please contact us directly at (317) 314-3757.' },
+            { q: 'How quickly will I get a response?', a: 'We typically respond to inquiries within 1-2 business days. For urgent matters, please contact us directly at Get Help Online.' },
             { q: 'Can I visit your office in person?', a: 'Yes, but please schedule an appointment first. Training locations vary by program. Contact us to arrange a visit.' },
             { q: 'Who should I contact about enrollment?', a: 'For enrollment questions, select "Enrollment Questions" in the contact form or contact us directly. Our enrollment team will assist you.' },
             { q: 'How do I check my application status?', a: 'Log into your student dashboard to check status, or contact us with your name and the program you applied for.' },
@@ -324,6 +307,16 @@ export default function ContactPage() {
             </details>
           ))}
         </div>
+      </div>
+
+      {/* Call/Text Button */}
+      <div className="max-w-4xl mx-auto px-4 py-8 flex justify-center">
+        <CallTextButton variant="both" size="lg" />
+      </div>
+
+      {/* Feedback Widget */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <FeedbackWidget userId="" />
       </div>
     </div>
   );

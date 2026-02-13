@@ -36,12 +36,12 @@ export default function AdvisingPage() {
         setIsSubmitted(true);
       } else {
         alert(
-          'There was an error submitting your request. Please contact us at 317-314-3757.'
+          'There was an error submitting your request. Please contact us at support center.'
         );
       }
     } catch (error) { /* Error handled silently */ 
       alert(
-        'There was an error submitting your request. Please contact us at 317-314-3757.'
+        'There was an error submitting your request. Please contact us at support center.'
       );
     } finally {
       setIsSubmitting(false);
@@ -71,14 +71,12 @@ export default function AdvisingPage() {
             and options so you don&apos;t have to figure it out alone.
           </p>
           <p className="mt-4 text-sm text-black">
-            <strong>Prefer to talk?</strong>{' '}
+            <strong>Prefer to call?</strong> Reach us at{' '}
             <a
-              href="https://calendly.com/elevate-for-humanity/advisor-call"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/support"
               className="text-indigo-600 font-semibold hover:underline"
             >
-              Schedule a free meeting
+              support center
             </a>
           </p>
         </header>
@@ -108,12 +106,12 @@ export default function AdvisingPage() {
               1-2 business days.
             </p>
             <p className="text-sm text-black">
-              Need assistance? Email{' '}
+              Need immediate assistance? Contact us at{' '}
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="/support"
                 className="text-indigo-600 font-semibold hover:underline"
               >
-                elevate4humanityedu@gmail.com
+                support center
               </a>
             </p>
           </section>

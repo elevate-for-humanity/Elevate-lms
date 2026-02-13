@@ -94,7 +94,7 @@ export default function FooterPageTemplate({
                     Contact Us
                   </Link>
                   <a
-                    href="tel:3173143757"
+                    href="/support"
                     className="px-6 py-3 border-2 border-orange-600 text-orange-600 font-bold rounded-full hover:bg-orange-50 transition"
                   >
                     Call 317-314-3757

@@ -61,7 +61,33 @@ export default async function AchievementsPage() {
   const { data: { user }, error: authError } = await supabase.auth.getUser();
   
   if (authError || !user) {
-    redirect('/login?redirect=/achievements');
+    // Show public preview instead of blocking with login
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="bg-white border-b">
+          <div className="max-w-6xl mx-auto px-4 py-3">
+            <Breadcrumbs items={[{ label: 'Achievements' }]} />
+          </div>
+        </div>
+        <section className="bg-gradient-to-br from-yellow-500 to-orange-500 text-white py-16">
+          <div className="max-w-4xl mx-auto px-4 text-center">
+            <Trophy className="w-16 h-16 mx-auto mb-4" />
+            <h1 className="text-4xl font-extrabold mb-4">Earn Achievements & Badges</h1>
+            <p className="text-xl text-white/90 mb-8">Complete courses, hit milestones, and earn badges that showcase your skills to employers. Every step of your learning journey is recognized.</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+              <div className="bg-white/20 rounded-xl p-4"><Star className="w-8 h-8 mx-auto mb-2" /><p className="font-bold">First Steps</p><p className="text-sm text-white/80">Complete your first lesson</p></div>
+              <div className="bg-white/20 rounded-xl p-4"><BookOpen className="w-8 h-8 mx-auto mb-2" /><p className="font-bold">Course Complete</p><p className="text-sm text-white/80">Finish an entire course</p></div>
+              <div className="bg-white/20 rounded-xl p-4"><Flame className="w-8 h-8 mx-auto mb-2" /><p className="font-bold">Streak Master</p><p className="text-sm text-white/80">7-day learning streak</p></div>
+              <div className="bg-white/20 rounded-xl p-4"><Award className="w-8 h-8 mx-auto mb-2" /><p className="font-bold">Certified</p><p className="text-sm text-white/80">Earn a certification</p></div>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/signup" className="bg-white text-orange-600 font-bold px-8 py-4 rounded-lg hover:bg-orange-50 transition">Create Free Account</Link>
+              <Link href="/programs" className="border-2 border-white text-white font-bold px-8 py-4 rounded-lg hover:bg-white/10 transition">Browse Programs</Link>
+            </div>
+          </div>
+        </section>
+      </div>
+    );
   }
 
   // Fetch user's earned achievements

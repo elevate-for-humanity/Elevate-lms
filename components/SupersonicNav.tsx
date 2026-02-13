@@ -144,7 +144,7 @@ export function SupersonicNav() {
                   📚 Training
                 </Link>
                 <a
-                  href="tel:+13173143757"
+                  href="/support"
                   className="block py-2 px-3 hover:bg-gray-50 hover:text-blue-900 rounded transition-colors"
                 >
                   📞 Contact Us
@@ -156,10 +156,10 @@ export function SupersonicNav() {
           {/* Right Side - Phone & CTA */}
           <div className="flex items-center gap-3">
             <a
-              href="tel:+13173143757"
+              href="/support"
               className="hidden md:flex items-center gap-2 font-bold hover:text-red-500 transition-colors"
             >
-              📞 (317) 314-3757
+              📞 Get Help Online
             </a>
             <Link
               href="/supersonic-fast-cash/apply"
@@ -266,7 +266,7 @@ export function SupersonicNav() {
                 Careers
               </Link>
               <a
-                href="tel:+13173143757"
+                href="/support"
                 className="block py-2 pl-4 hover:bg-blue-800 rounded"
               >
                 Contact Us

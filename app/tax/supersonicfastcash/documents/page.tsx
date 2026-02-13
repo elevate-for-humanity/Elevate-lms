@@ -171,7 +171,7 @@ export default function DocumentUploadPage() {
                 setContactInfo({ ...contactInfo, phone: e.target.value })
               }
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="(317) 314-3757"
+              placeholder="Get Help Online"
             />
           </div>
         </div>
@@ -384,10 +384,10 @@ export default function DocumentUploadPage() {
         </p>
         <div className="flex flex-wrap gap-4 justify-center">
           <a
-            href="mailto:elevate4humanityedu@gmail.com"
+            href="/support"
             className="px-6 py-3 rounded-lg bg-brand-blue-600 text-white font-semibold hover:bg-brand-blue-700 transition"
           >
-            Call 317-314-3757
+            Call support center
           </a>
           <Link
             href="/tax/book-appointment"

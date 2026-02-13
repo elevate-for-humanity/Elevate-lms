@@ -77,7 +77,7 @@ export function AIAssistantBubble() {
     } catch (error) {
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: "I'm having trouble connecting. Please call us at 317-314-3757 for immediate assistance." 
+        content: "I'm having trouble connecting. Please call us at support center for immediate assistance." 
       }]);
     } finally {
       setIsLoading(false);
@@ -234,7 +234,7 @@ export function AIAssistantBubble() {
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-2 text-center">
-              Call <a href="tel:317-314-3757" className="text-brand-orange-600 hover:underline">317-314-3757</a> for immediate help
+              Call <a href="/support" className="text-brand-orange-600 hover:underline">support center</a> for immediate help
             </p>
           </div>
         </div>

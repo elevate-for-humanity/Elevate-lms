@@ -133,12 +133,11 @@ export default function TrainingProvidersPage() {
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <a
-                href="https://calendly.com/elevate-for-humanity/advisor-call"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/support"
                 className="inline-flex items-center justify-center gap-2 bg-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition border border-blue-600"
               >
-                Schedule a Meeting
+                <Phone className="w-5 h-5" />
+                Call Get Help Online
               </a>
             </div>
           </div>
@@ -314,12 +313,11 @@ export default function TrainingProvidersPage() {
               <ArrowRight className="w-5 h-5" />
             </Link>
             <a
-              href="https://calendly.com/elevate-for-humanity/advisor-call"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition border-2 border-gray-200 text-lg"
             >
-              Schedule a Meeting
+              <Phone className="w-5 h-5" />
+              Call Get Help Online
             </a>
           </div>
           <p className="mt-8 text-gray-500">

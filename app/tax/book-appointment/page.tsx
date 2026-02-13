@@ -227,7 +227,7 @@ export default function BookAppointmentPage() {
                       setFormData({ ...formData, phone: e.target.value })
                     }
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    placeholder="(317) 314-3757"
+                    placeholder="Get Help Online"
                   />
                 </div>
               </div>
@@ -317,7 +317,7 @@ export default function BookAppointmentPage() {
                 <div className="rounded-lg bg-red-50 border border-red-200 p-4">
                   <p className="text-red-800 text-sm">
                     Something went wrong. Please try again or contact us at
-                    317-314-3757.
+                    support center.
                   </p>
                 </div>
               )}
@@ -349,10 +349,10 @@ export default function BookAppointmentPage() {
                 <div>
                   <div className="font-semibold text-sm">Phone</div>
                   <a
-                    href="mailto:elevate4humanityedu@gmail.com"
+                    href="/support"
                     className="text-brand-blue-600 hover:underline"
                   >
-                    317-314-3757
+                    support center
                   </a>
                 </div>
               </div>

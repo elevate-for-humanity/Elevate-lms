@@ -81,10 +81,10 @@ export default function ServicesPage() {
             Upload Documents
           </Link>
           <a
-            href="mailto:elevate4humanityedu@gmail.com"
+            href="/support"
             className="px-6 py-3 rounded-lg border font-semibold hover:bg-gray-50 transition"
           >
-            Call 317-314-3757
+            Call support center
           </a>
         </div>
       </section>
@@ -359,10 +359,10 @@ export default function ServicesPage() {
             Upload Documents
           </Link>
           <a
-            href="mailto:elevate4humanityedu@gmail.com"
+            href="/support"
             className="px-6 py-3 rounded-lg border-2 border-brand-blue-600 text-brand-blue-600 font-semibold hover:bg-gray-50 transition"
           >
-            Call 317-314-3757
+            Call support center
           </a>
           <Link
             href="/supersonic-fast-cash"

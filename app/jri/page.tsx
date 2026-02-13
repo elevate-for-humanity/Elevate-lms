@@ -158,11 +158,11 @@ export default function JRIPage() {
                 <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="/support"
                 className="inline-flex items-center justify-center bg-white text-gray-900 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition text-lg"
               >
                 <Phone className="mr-2 w-5 h-5" />
-                (317) 314-3757
+                Get Help Online
               </a>
             </div>
           </div>
@@ -260,10 +260,10 @@ export default function JRIPage() {
                   Start Your Application
                 </Link>
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="/support"
                   className="block w-full border-2 border-gray-300 text-gray-700 text-center px-6 py-4 rounded-lg font-semibold hover:bg-gray-50 transition"
                 >
-                  Contact Us: (317) 314-3757
+                  Contact Us: Get Help Online
                 </a>
               </div>
             </div>
@@ -363,11 +363,11 @@ export default function JRIPage() {
               Apply Now — It&apos;s Free
             </Link>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="inline-flex items-center justify-center border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-green-700 transition"
             >
               <Phone className="mr-2 w-5 h-5" />
-              (317) 314-3757
+              Get Help Online
             </a>
           </div>
           <p className="text-green-200 text-sm mt-6">

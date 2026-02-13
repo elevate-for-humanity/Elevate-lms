@@ -134,7 +134,7 @@ export function EnrollmentStatusTracker({
 
       {/* Help Text */}
       <p className="mt-4 text-xs text-slate-500">
-        Questions? Call <a href="tel:317-314-3757" className="text-blue-600 hover:underline">(317) 314-3757</a>
+        Questions? Call <a href="/support" className="text-blue-600 hover:underline">Get Help</a>
       </p>
     </div>
   );

@@ -144,10 +144,10 @@ d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                   Contact Us for Help
                 </Link>
                 <a
-                  href="tel:317-314-3757"
+                  href="/support"
                   className="inline-block px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-slate-50 transition-all border-2 border-slate-200 text-center"
                 >
-                  Call 317-314-3757
+                  Call support center
                 </a>
               </div>
             </div>

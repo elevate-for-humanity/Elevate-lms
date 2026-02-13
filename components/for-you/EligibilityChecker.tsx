@@ -190,11 +190,11 @@ export function EligibilityChecker() {
                     </li>
                   </ul>
                   <a
-                    href="tel:+13173143757"
+                    href="/support"
                     className="flex items-center justify-center gap-2 bg-yellow-600 text-white py-3 px-6 rounded-lg font-bold hover:bg-yellow-700 transition"
                   >
                     <Phone className="h-5 w-5" />
-                    Call (317) 314-3757
+                    Call Get Help Online
                   </a>
                 </div>
               </>

@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import {
+  Phone,
   Mail,
   MapPin,
   Clock,
@@ -45,22 +46,20 @@ export default function CareerServicesContactPage() {
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-8">
-            {/* Schedule */}
+            {/* Phone */}
             <div className="bg-gray-50 rounded-xl p-8 text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-blue-600" />
+                <Phone className="w-8 h-8 text-blue-600" />
               </div>
-              <h2 className="text-xl font-bold text-gray-900 mb-2">Schedule a Meeting</h2>
-              <p className="text-gray-600 mb-4">Book a free meeting with a career advisor</p>
+              <h2 className="text-xl font-bold text-gray-900 mb-2">Contact Us</h2>
+              <p className="text-gray-600 mb-4">Speak directly with a career advisor</p>
               <a
-                href="https://calendly.com/elevate-for-humanity/advisor-call"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-lg font-bold text-blue-600 hover:text-blue-700"
+                href="/support"
+                className="text-2xl font-bold text-blue-600 hover:text-blue-700"
               >
-                Book Now →
+                Get Help Online
               </a>
-              <p className="text-sm text-gray-500 mt-2">Pick a time that works for you</p>
+              <p className="text-sm text-gray-500 mt-2">Mon-Fri, 9am-5pm EST</p>
             </div>
 
             {/* Email */}

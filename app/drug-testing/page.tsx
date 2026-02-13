@@ -117,11 +117,11 @@ export default function DrugTestingLandingPage() {
             
             <div className="flex flex-col sm:flex-row gap-4">
               <a
-                href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                href="/support"
                 className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition text-lg"
               >
                 <Phone className="w-5 h-5" />
-                (317) 314-3757
+                Get Help Online
               </a>
               <Link
                 href="#services"
@@ -328,7 +328,7 @@ export default function DrugTestingLandingPage() {
           </h2>
           <div className="space-y-8">
             {[
-              { step: 1, title: 'Order Your Test', desc: 'Call (317) 314-3757 or order online. We confirm your test type and send collection authorization.' },
+              { step: 1, title: 'Order Your Test', desc: 'Call Get Help Online or order online. We confirm your test type and send collection authorization.' },
               { step: 2, title: 'Visit Collection Site', desc: 'Go to any of our 20,000+ nationwide locations. Bring valid photo ID. Walk-ins welcome at most sites.' },
               { step: 3, title: 'Sample Collection', desc: 'Trained collector obtains your sample following proper chain of custody procedures.' },
               { step: 4, title: 'Lab Analysis', desc: 'Sample sent to SAMHSA-certified lab. Positive screens confirmed with GC/MS testing.' },
@@ -360,11 +360,11 @@ export default function DrugTestingLandingPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
-              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
             >
               <Phone className="w-5 h-5" />
-              (317) 314-3757
+              Get Help Online
             </a>
             <Link
               href="/contact"

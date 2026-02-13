@@ -7,6 +7,9 @@ import {
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { CourseCatalog } from '@/components/CourseCatalog';
+import { CourseCompletionTracking } from '@/components/CourseCompletionTracking';
+import { CoursePrerequisiteManagement } from '@/components/CoursePrerequisiteManagement';
 
 export const dynamic = 'force-dynamic';
 
@@ -285,6 +288,27 @@ export default async function CoursesPage() {
               Apply for Free Training <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
+        </div>
+      </section>
+
+      {/* COURSE CATALOG */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <CourseCatalog />
+        </div>
+      </section>
+
+      {/* COURSE COMPLETION TRACKING */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <CourseCompletionTracking />
+        </div>
+      </section>
+
+      {/* PREREQUISITES */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <CoursePrerequisiteManagement />
         </div>
       </section>
 

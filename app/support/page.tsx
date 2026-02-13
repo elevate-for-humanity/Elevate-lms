@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { LifeBuoy, MessageSquare, Phone, Mail, FileText, Clock } from 'lucide-react';
 import SupportForm from '@/components/support/SupportForm';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { LiveChatSupport } from '@/components/LiveChatSupport';
 
 export const metadata: Metadata = {
   title: 'Support | Elevate For Humanity',
@@ -40,7 +41,7 @@ export default async function SupportPage() {
   const supportOptions = [
     { icon: MessageSquare, title: 'Live Chat', desc: 'Chat with our support team', href: '/support/chat', available: 'Mon-Fri 9am-5pm EST' },
     { icon: Mail, title: 'Email Support', desc: 'Send us a message', href: '/contact', available: 'Response within 24 hours' },
-    { icon: Phone, title: 'Phone Support', desc: 'Call (317) 314-3757', href: 'tel:+13173143757', available: 'Mon-Fri 9am-5pm EST' },
+    { icon: Phone, title: 'Submit a Ticket', desc: 'Get a response within 24 hours', href: '/support/ticket', available: '24/7 Online' },
     { icon: FileText, title: 'Help Center', desc: 'Browse help articles', href: '/help', available: 'Available 24/7' },
   ];
 
@@ -180,7 +181,7 @@ export default async function SupportPage() {
                 </svg>
               </summary>
               <div className="px-5 pb-5 text-gray-600">
-                For WIOA funding questions, contact your WorkOne case manager directly. For general funding questions, email us at elevate4humanityedu@gmail.com or call (317) 314-3757.
+                For WIOA funding questions, contact your WorkOne case manager directly. For general funding questions, email us at elevate4humanityedu@gmail.com or call Get Help Online.
               </div>
             </details>
             
@@ -205,7 +206,7 @@ export default async function SupportPage() {
           <div className="flex flex-wrap gap-6 justify-center">
             <div className="text-white">
               <p className="text-sm text-slate-400">Phone</p>
-              <a href="mailto:elevate4humanityedu@gmail.com" className="text-lg font-semibold hover:text-blue-400">Schedule a Meeting</a>
+              <a href="/support" className="text-lg font-semibold hover:text-blue-400">Get Help Online</a>
             </div>
             <div className="text-white">
               <p className="text-sm text-slate-400">Email</p>
@@ -213,6 +214,11 @@ export default async function SupportPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Live Chat Support */}
+      <div className="max-w-4xl mx-auto px-4 py-8">
+        <LiveChatSupport />
       </div>
     </div>
   );

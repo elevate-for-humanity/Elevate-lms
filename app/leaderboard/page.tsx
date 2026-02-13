@@ -24,10 +24,6 @@ const topLearners = [
 ];
 
 export default async function LeaderboardPage() {
-  const supabase = await createClient();
-  if (!supabase) redirect('/login');
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect('/login?redirect=/leaderboard');
 
   return (
     <div className="min-h-screen bg-gray-50">

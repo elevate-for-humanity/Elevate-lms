@@ -268,7 +268,7 @@ export default function AttendancePolicyPage() {
             <strong>Effective Date:</strong> January 2026
           </p>
           <p className="text-gray-600 text-sm mb-6">
-            Questions about attendance? Contact your program coordinator or call (317) 314-3757.
+            Questions about attendance? Contact your program coordinator or call Get Help Online.
           </p>
           <div className="flex flex-wrap gap-4 text-sm">
             <Link href="/disclosures" className="text-orange-600 hover:underline">Student Disclosures</Link>
@@ -290,11 +290,11 @@ export default function AttendancePolicyPage() {
               Apply Now
             </Link>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
-              (317) 314-3757
+              Get Help Online
             </a>
           </div>
         </div>

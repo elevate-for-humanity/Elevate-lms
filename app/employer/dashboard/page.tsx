@@ -24,6 +24,7 @@ import {
   Building2,
   TrendingUp,
 } from 'lucide-react';
+import EmployerWorkforceAnalytics from '@/components/EmployerWorkforceAnalytics';
 
 /**
  * EMPLOYER PORTAL - PROGRESSION LOGIC
@@ -371,10 +372,10 @@ export default async function EmployerDashboardOrchestrated() {
               Our team is here to help you find the right candidates.
             </p>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="block w-full text-center px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
             >
-              Call (317) 314-3757
+              Call Get Help Online
             </a>
           </div>
 
@@ -434,6 +435,11 @@ export default async function EmployerDashboardOrchestrated() {
                 Settings
               </Link>
             </div>
+          </div>
+
+          {/* Workforce Analytics */}
+          <div className="mt-8">
+            <EmployerWorkforceAnalytics />
           </div>
         </div>
       </div>

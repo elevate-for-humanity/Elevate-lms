@@ -481,10 +481,10 @@ export default async function ProgramHolderOnboarding() {
                 </a>{' '}
                 or call{' '}
                 <a
-                  href="mailto:elevate4humanityedu@gmail.com"
+                  href="/support"
                   className="text-blue-700 font-semibold hover:underline"
                 >
-                  317-314-3757
+                  support center
                 </a>{' '}
                 for immediate assistance.
               </p>

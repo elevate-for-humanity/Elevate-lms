@@ -313,8 +313,8 @@ export default function VerifyCredentialsPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Phone</p>
-                    <a href="mailto:elevate4humanityedu@gmail.com" className="font-medium text-gray-900 hover:text-blue-600">
-                      (317) 314-3757
+                    <a href="/support" className="font-medium text-gray-900 hover:text-blue-600">
+                      Get Help Online
                     </a>
                   </div>
                 </div>

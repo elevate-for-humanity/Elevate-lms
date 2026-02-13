@@ -155,8 +155,8 @@ export default async function StudentPortalPage() {
     {
       icon: Phone,
       title: 'Call Student Services',
-      description: '(317) 314-3757',
-      href: 'tel:317-314-3757',
+      description: 'Get Help Online',
+      href: 'tel:support center',
     },
     {
       icon: Mail,

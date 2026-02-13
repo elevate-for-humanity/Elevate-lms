@@ -18,7 +18,7 @@ Key Information:
 - Programs: Medical Assistant, Barber Apprenticeship, HVAC, Building Maintenance, CDL, Workforce Readiness
 - Funding: WRG, WIOA, JRI - most programs are free or low-cost
 - Apply: /apply or /start
-- Contact: /contact or call (317) 314-3757
+- Contact: /contact for all inquiries
 - Partners: We work with barbershops, clinics, employers, workforce boards
 
 Response Style:
@@ -75,7 +75,7 @@ export async function POST(req: Request) {
 
     const response =
       completion.choices[0]?.message?.content ||
-      "I apologize, I'm having trouble responding right now. Please call us at (317) 314-3757 or visit our contact page.";
+      "I apologize, I'm having trouble responding right now. Please visit /contact or /faq for help.";
 
     return NextResponse.json({ response });
   } catch (error) { /* Error handled silently */ 
@@ -84,7 +84,7 @@ export async function POST(req: Request) {
     // Return helpful fallback
     return NextResponse.json({
       response:
-        "I'm having a brief technical issue. For immediate assistance, please call (317) 314-3757 or email Elevate4humanityedu@gmail.com. I apologize for the inconvenience!",
+        "I'm having a brief technical issue. For immediate assistance, please visit /contact or email info@elevateforhumanity.org. I apologize for the inconvenience!",
     });
   }
 }
@@ -131,7 +131,7 @@ function getFallbackResponse(message: string): string {
     lowerMessage.includes('person') ||
     lowerMessage.includes('human')
   ) {
-    return "I'd be happy to connect you with our team! You can call us at (317) 314-3757, text us at the same number, email Elevate4humanityedu@gmail.com, or fill out our contact form at /contact. Would you like me to schedule a callback for you?";
+    return "I'd be happy to connect you with our team! You can email info@elevateforhumanity.org or fill out our contact form at /contact. Would you like me to help you with something specific?";
   }
 
   // Hours/location

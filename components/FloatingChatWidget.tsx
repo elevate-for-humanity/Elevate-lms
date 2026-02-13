@@ -4,7 +4,7 @@ import React from 'react';
 
 
 import { useState, useRef, useEffect } from "react";
-import { CONTACT_INFO } from "@/lib/contact-info";
+
 
 interface Message {
   role: "user" | "assistant";
@@ -66,7 +66,7 @@ export default function FloatingChatWidget() {
       // Error: $1
       const errorMessage: Message = {
         role: "assistant",
-        content: `I'm having trouble connecting. Please call us at ${CONTACT_INFO.phone.display} or try again.`,
+        content: "I'm having trouble connecting. Please visit /contact or /faq for help, or try again.",
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -211,7 +211,7 @@ d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
           {/* Footer */}
           <div className="border-t border-slate-200 bg-slate-50 px-4 py-2 text-center">
             <p className="text-xs text-black">
-              Need help? <a href={`tel:${CONTACT_INFO.phone.tel}`} className="text-blue-600 hover:text-blue-700 font-medium">Call {CONTACT_INFO.phone.display}</a>
+              Need more help? <a href="/contact" className="text-blue-600 hover:text-blue-700 font-medium">Contact Support</a>
             </p>
           </div>
         </div>

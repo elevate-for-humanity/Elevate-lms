@@ -4,6 +4,8 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import { ProgressDashboard } from '@/components/ProgressDashboard';
+import { ProgressTrackingDashboard } from '@/components/ProgressTrackingDashboard';
 import { 
   TrendingUp, 
   Clock, 
@@ -411,6 +413,16 @@ export default async function ProgressPage() {
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* Progress Dashboard */}
+          <div className="mt-8">
+            <ProgressDashboard userId={user.id} />
+          </div>
+
+          {/* Progress Tracking */}
+          <div className="mt-8">
+            <ProgressTrackingDashboard />
           </div>
         </div>
       </div>

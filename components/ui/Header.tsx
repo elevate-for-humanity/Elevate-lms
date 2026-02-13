@@ -449,10 +449,10 @@ export const Header: React.FC<HeaderProps> = ({ onSearchClick }) => {
                     Need Help?
                   </p>
                   <a
-                    href="tel:3173143757"
+                    href="/support"
                     className="block text-sm text-orange-600 font-medium hover:text-orange-700"
                   >
-                    Call: (317) 314-3757
+                    Call: Get Help
                   </a>
                   <p className="text-xs text-black mt-2">
                     Monday-Friday, 9am-5pm EST

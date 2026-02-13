@@ -3,6 +3,8 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import AdaptiveLearningPath from '@/components/AdaptiveLearningPath';
+import CompetencyTracking from '@/components/CompetencyTracking';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/lms/adaptive' },
@@ -49,6 +51,16 @@ export default async function AdaptivePage() {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Adaptive Learning Path */}
+        <div className="mt-8">
+          <AdaptiveLearningPath />
+        </div>
+
+        {/* Competency Tracking */}
+        <div className="mt-8">
+          <CompetencyTracking />
         </div>
       </div>
     </div>

@@ -5,7 +5,7 @@
 import React from 'react';
 
 import { useState, useEffect } from 'react';
-import { Search, CheckCircle, Clock, XCircle, Phone, Mail, Calendar } from 'lucide-react';
+import { Search, CheckCircle, Clock, XCircle, Phone, Mail } from 'lucide-react';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -33,13 +33,13 @@ const statusConfig = {
     description: 'Your application is being reviewed by our team.',
   },
   contacted: {
-    icon: Mail,
+    icon: Phone,
     color: 'text-brand-blue-600',
     bg: 'bg-blue-50',
     border: 'border-blue-200',
     label: 'Contacted',
     description:
-      'An advisor has reached out to you. Please check your email.',
+      'An advisor has reached out to you. Please check your email or phone.',
   },
   approved: {
     icon: CheckCircle,
@@ -327,7 +327,7 @@ export default function TrackApplicationPage() {
                     • An advisor will review your application within 24 hours
                   </p>
                   <p>• We'll contact you within 1-2 business days</p>
-                  <p>• Check your email for updates</p>
+                  <p>• Check your email and phone for updates</p>
                 </div>
               )}
 
@@ -335,7 +335,7 @@ export default function TrackApplicationPage() {
                 <div className="space-y-3 text-sm text-black">
                   <p>• Please respond to our advisor's message</p>
                   <p>• Check your email inbox and spam folder</p>
-                  <p>• Email elevate4humanityedu@gmail.com if you haven&apos;t heard back</p>
+                  <p>• Contact us if you haven't heard from us: Get Help Online</p>
                 </div>
               )}
 
@@ -349,9 +349,9 @@ export default function TrackApplicationPage() {
 
               {application.status === 'rejected' && (
                 <div className="space-y-3 text-sm text-black">
-                  <p>• Email elevate4humanityedu@gmail.com to discuss alternative options</p>
+                  <p>• Contact us to discuss alternative options</p>
                   <p>• We may have other programs that fit your needs</p>
-                  <p>• <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="text-brand-orange-600 hover:underline">Schedule a meeting</a> to explore other paths</p>
+                  <p>• Contact us at Get Help Online for more information</p>
                 </div>
               )}
             </div>
@@ -361,18 +361,16 @@ export default function TrackApplicationPage() {
         {/* Help Section */}
         <div className="grid md:grid-cols-2 gap-4">
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <Calendar className="w-8 h-8 text-brand-orange-600 mb-3" />
+            <Phone className="w-8 h-8 text-brand-orange-600 mb-3" />
             <h3 className="font-bold text-black mb-2">Need Help?</h3>
             <p className="text-sm text-black mb-3">
-              Schedule a free meeting with an advisor
+              Contact us Monday-Friday, 9am-5pm
             </p>
             <a
-              href="https://calendly.com/elevate-for-humanity/advisor-call"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/support"
               className="inline-block text-brand-orange-600 hover:text-brand-orange-700 font-semibold text-sm"
             >
-              Schedule a Meeting
+              Get Help Online
             </a>
           </div>
 

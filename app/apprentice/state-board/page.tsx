@@ -359,12 +359,10 @@ export default async function StateBoardExamPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <a
-              href="https://calendly.com/elevate-for-humanity/advisor-call"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/support"
               className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium hover:bg-blue-200"
             >
-              Schedule a Meeting
+              Call: 317-314-3757
             </a>
             <a
               href="mailto:elevate4humanityedu@gmail.com"

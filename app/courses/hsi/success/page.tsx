@@ -181,9 +181,9 @@ export default async function HSISuccessPage({
                 Questions about your enrollment or funding?
               </p>
               <div className="space-y-2">
-                <a href="mailto:elevate4humanityedu@gmail.com" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                <a href="/support" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
                   <Phone className="w-4 h-4" />
-                  (317) 314-3757
+                  Get Help Online
                 </a>
                 <a href="mailto:elevateforhumanity@gmail.com" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
                   <Mail className="w-4 h-4" />

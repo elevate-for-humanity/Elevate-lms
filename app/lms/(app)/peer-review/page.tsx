@@ -7,6 +7,7 @@ import {
   Users, FileText, CheckCircle, Clock, Star,
   AlertCircle, ChevronRight, Eye
 } from 'lucide-react';
+import PeerReviewSystem from '@/components/PeerReviewSystem';
 
 export const dynamic = 'force-dynamic';
 
@@ -200,6 +201,11 @@ export default async function PeerReviewPage() {
             <li>• Highlight both strengths and areas for improvement</li>
             <li>• Complete reviews within the deadline to help your peers</li>
           </ul>
+        </div>
+
+        {/* Peer Review System */}
+        <div className="mt-8">
+          <PeerReviewSystem />
         </div>
       </div>
     </div>

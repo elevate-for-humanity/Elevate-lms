@@ -159,7 +159,7 @@ export default async function TraumaRecoveryPage() {
               Get Support
             </Link>
             <a 
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 border border-blue-600 text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"
             >
               <Phone className="w-5 h-5" />

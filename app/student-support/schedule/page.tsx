@@ -18,7 +18,30 @@ export default async function SchedulePage() {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect('/login?redirect=/student-support/schedule');
+    return (
+      <div className="min-h-screen bg-gray-50 py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <nav className="flex items-center gap-2 text-sm text-gray-600 mb-6">
+            <Link href="/" className="hover:text-orange-600">Home</Link>
+            <ChevronRight className="w-4 h-4" />
+            <Link href="/student-support" className="hover:text-orange-600">Student Support</Link>
+            <ChevronRight className="w-4 h-4" />
+            <span className="text-gray-900">Schedule Appointment</span>
+          </nav>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Schedule an Appointment</h1>
+          <p className="text-gray-600 mb-8">Book a meeting with an advisor or counselor. Available Monday–Friday, 9 AM – 5 PM EST.</p>
+          <div className="bg-white rounded-xl border p-8 text-center">
+            <h2 className="text-xl font-bold mb-4">Sign in to schedule your appointment</h2>
+            <p className="text-gray-600 mb-6">Create a free account or sign in to book a time with one of our advisors. No phone call needed — pick a time that works for you.</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/login?redirect=/student-support/schedule" className="bg-blue-600 text-white font-bold px-8 py-3 rounded-lg hover:bg-blue-700 transition">Sign In</Link>
+              <Link href="/signup" className="border-2 border-blue-600 text-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-blue-50 transition">Create Free Account</Link>
+            </div>
+            <p className="text-sm text-gray-500 mt-6">Or get immediate help: <Link href="/support" className="text-blue-600 hover:underline">Visit our Help Center</Link> or <Link href="/faq" className="text-blue-600 hover:underline">check our FAQ</Link></p>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const { data: profile } = await supabase

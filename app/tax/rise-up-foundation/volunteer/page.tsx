@@ -169,7 +169,7 @@ export default function VolunteerPage() {
             <div>
               <h3 className="font-semibold text-lg">Express Interest</h3>
               <p className="text-black mt-1">
-                Contact us at 317-314-3757 or email to express your interest in
+                Contact us at support center or email to express your interest in
                 volunteering.
               </p>
             </div>
@@ -279,10 +279,10 @@ export default function VolunteerPage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a
-            href="mailto:elevate4humanityedu@gmail.com"
+            href="/support"
             className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
           >
-            Call 317-314-3757
+            Call support center
           </a>
           <a
             href="mailto:elevate4humanityedu@gmail.com"

@@ -3,9 +3,6 @@
 import React from 'react';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
-import { createClient } from '@/lib/supabase/client';
 
 interface Message {
   id: string;
@@ -28,20 +25,15 @@ export function LiveChatSupport() {
   const [sessionId, setSessionId] = useState<string | null>(null);
 
   const initSession = useCallback(async () => {
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const { data } = await supabase
-      .from('live_chat_sessions')
-      .insert({
-        user_id: user?.id || null,
-        status: 'active',
-        started_at: new Date().toISOString(),
-      })
-      .select('id')
-      .single();
-    
-    if (data) setSessionId(data.id);
+    try {
+      const res = await fetch('/api/chat/session', { method: 'POST' });
+      const data = await res.json();
+      if (res.ok && data.session_id) {
+        setSessionId(data.session_id);
+      }
+    } catch {
+      // Session creation failed — chat still works locally
+    }
   }, []);
 
   useEffect(() => {
@@ -60,33 +52,43 @@ export function LiveChatSupport() {
       timestamp: new Date().toLocaleTimeString(),
     };
 
-    setMessages([...messages, newMessage]);
+    setMessages(prev => [...prev, newMessage]);
     setMessage('');
 
-    // Save to database
-    const supabase = createClient();
-    await supabase.from('live_chat_messages').insert({
-      session_id: sessionId,
-      sender: 'user',
-      content: message,
-    }).catch(() => {});
+    // Persist via API route
+    if (sessionId) {
+      fetch('/api/chat/message', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          session_id: sessionId,
+          sender_type: 'user',
+          body: message,
+        }),
+      }).catch(() => {});
+    }
 
-    // Auto-response (would be replaced by real agent in production)
-    setTimeout(async () => {
+    // Auto-response (would be replaced by real agent or AI in production)
+    setTimeout(() => {
       const agentResponse: Message = {
         id: (Date.now() + 1).toString(),
         sender: 'agent',
-        text: 'Thank you for your message. An agent will respond shortly. For immediate help, call (317) 314-3757.',
+        text: 'Thank you for your message. An agent will respond shortly. You can also visit our FAQ at /faq or submit a request at /contact.',
         timestamp: new Date().toLocaleTimeString(),
       };
       setMessages(prev => [...prev, agentResponse]);
-      
-      await supabase.from('live_chat_messages').insert({
-        session_id: sessionId,
-        sender: 'agent',
-        content: agentResponse.text,
-        is_auto_response: true,
-      }).catch(() => {});
+
+      if (sessionId) {
+        fetch('/api/chat/message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session_id: sessionId,
+            sender_type: 'agent',
+            body: agentResponse.text,
+          }),
+        }).catch(() => {});
+      }
     }, 1000);
   };
 

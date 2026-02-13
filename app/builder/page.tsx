@@ -3,6 +3,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send, Loader2, ArrowRight, Check, RefreshCw } from 'lucide-react';
+import AIPageBuilder from '@/components/AIPageBuilder';
 
 interface Message {
   id: string;
@@ -458,6 +459,11 @@ export default function BuildPage() {
           </div>
         </div>
       )}
+
+      {/* AI Page Builder */}
+      <div className="mt-8">
+        <AIPageBuilder />
+      </div>
     </div>
   );
 }

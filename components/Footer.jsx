@@ -56,7 +56,7 @@ const Footer = () => {
           Elevate for Humanity is an equal opportunity provider. We do not discriminate on the basis of race, color, national origin, sex, disability, or age in our programs, activities, or employment.
         </p>
         <p style={{ marginTop: '0.5rem', fontSize: '0.875rem' }}>
-          Contact: <a href="tel:317-314-3757" style={{ color: 'inherit', textDecoration: 'underline' }}>317-314-3757</a> | <a href="mailto:elevateforhumanity.edu@gmail.com" style={{ color: 'inherit', textDecoration: 'underline' }}>elevateforhumanity.edu@gmail.com</a>
+          Contact: <a href="/support" style={{ color: 'inherit', textDecoration: 'underline' }}>support center</a> | <a href="mailto:elevateforhumanity.edu@gmail.com" style={{ color: 'inherit', textDecoration: 'underline' }}>elevateforhumanity.edu@gmail.com</a>
         </p>
       </div>
     </footer>

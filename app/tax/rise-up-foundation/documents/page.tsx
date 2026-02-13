@@ -338,10 +338,10 @@ export default function DocumentsPage() {
         </p>
         <div className="flex flex-wrap gap-4">
           <a
-            href="mailto:elevate4humanityedu@gmail.com"
+            href="/support"
             className="px-6 py-3 rounded-lg bg-brand-green-600 text-white font-semibold hover:bg-green-700 transition"
           >
-            Call 317-314-3757
+            Call support center
           </a>
           <Link
             href="/tax/rise-up-foundation/free-tax-help"

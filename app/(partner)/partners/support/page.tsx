@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 const supportChannels = [
-  { icon: Phone, title: 'Phone Support', description: 'Speak with a partner success manager', detail: '(317) 314-3757', href: 'tel:+13173143757', cta: 'Call Now' },
+  { icon: Phone, title: 'Partner Support', description: 'Submit a support request and get a response within 24 hours', detail: 'Online Support Portal', href: '/support', cta: 'Get Help' },
   { icon: Mail, title: 'Email Support', description: 'Send us a detailed message', detail: 'elevate4humanityedu@gmail.com', href: 'mailto:elevate4humanityedu@gmail.com', cta: 'Send Email' },
   { icon: MessageSquare, title: 'Live Chat', description: 'Chat with support during business hours', detail: 'Mon-Fri 9am-5pm EST', href: '/support/chat', cta: 'Start Chat' },
   { icon: FileText, title: 'Help Center', description: 'Browse guides and documentation', detail: 'Self-service knowledge base', href: '/docs', cta: 'View Docs' },

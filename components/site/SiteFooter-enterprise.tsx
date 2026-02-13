@@ -44,11 +44,11 @@ export default function SiteFooterEnterprise() {
               Need Help? Talk to an Advisor
             </h3>
             <a
-              href="tel:+13173143757"
+              href="/support"
               className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
             >
               <Phone className="h-5 w-5" />
-              Call (317) 314-3757
+              Call Get Help
             </a>
           </div>
         </div>

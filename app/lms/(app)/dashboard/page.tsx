@@ -38,6 +38,8 @@ import { BadgeShowcase } from '@/components/gamification/BadgeShowcase';
 import { StreakTracker } from '@/components/gamification/StreakTracker';
 import { ApprenticeProgressWidget } from '@/components/apprenticeship/ApprenticeProgressWidget';
 import { MiladyAccessCard } from '@/components/apprenticeship/MiladyAccessCard';
+import { TutorialSystem } from '@/components/TutorialSystem';
+import PeerTutoringMarketplace from '@/components/PeerTutoringMarketplace';
 
 /**
  * STUDENT PORTAL - ORCHESTRATED
@@ -258,7 +260,7 @@ export default async function StudentDashboardOrchestrated() {
             </div>
           </div>
           <p className="text-amber-700 text-sm mt-4">
-            Questions? Call <a href="mailto:elevate4humanityedu@gmail.com" className="underline">elevate4humanityedu@gmail.com</a>
+            Questions? Call <a href="/support" className="underline">Get Help Online</a>
           </p>
         </div>
       )}
@@ -502,10 +504,10 @@ export default async function StudentDashboardOrchestrated() {
                 Your advisor is here to support you every step of the way.
               </p>
               <a
-                href="mailto:elevate4humanityedu@gmail.com"
+                href="/support"
                 className="block w-full text-center px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
               >
-                Call (317) 314-3757
+                Call Get Help Online
               </a>
             </div>
 
@@ -600,6 +602,16 @@ export default async function StudentDashboardOrchestrated() {
                   Support
                 </Link>
               </div>
+            </div>
+
+            {/* Tutorial System */}
+            <div className="mt-6">
+              <TutorialSystem userId={user.id} userRole="student" />
+            </div>
+
+            {/* Peer Tutoring */}
+            <div className="mt-6">
+              <PeerTutoringMarketplace />
             </div>
           </div>
         </div>

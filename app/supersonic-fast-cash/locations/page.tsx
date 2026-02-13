@@ -80,10 +80,10 @@ export default async function LocationsPage() {
                       Phone
                     </div>
                     <a
-                      href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                      href="/support"
                       className="text-blue-600 hover:text-blue-700"
                     >
-                      (317) 314-3757
+                      Get Help Online
                     </a>
                   </div>
                 </div>
@@ -323,10 +323,10 @@ export default async function LocationsPage() {
               Book Appointment
             </Link>
             <Link
-              href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+              href="/support"
               className="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-semibold rounded-lg hover:bg-blue-800 transition-colors border-2 border-white"
             >
-              Call (317) 314-3757
+              Call Get Help Online
             </Link>
           </div>
         </div>

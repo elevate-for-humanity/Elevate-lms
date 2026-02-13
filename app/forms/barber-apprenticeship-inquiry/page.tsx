@@ -39,10 +39,10 @@ export default function BarberApprenticeshipInquiryPage() {
       if (response.ok) {
         setIsSubmitted(true);
       } else {
-        alert(result.error || 'There was an error submitting your inquiry. Please call (317) 314-3757 for assistance.');
+        alert(result.error || 'There was an error submitting your inquiry. Please try again or visit /contact for help.');
       }
     } catch {
-      alert('Unable to submit. Please call (317) 314-3757 for assistance.');
+      alert('Unable to submit. Please try again or visit /contact for help.');
     } finally {
       setIsSubmitting(false);
     }

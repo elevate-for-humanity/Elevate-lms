@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 
 export default function CoreDemoPage() {
   // Redirect to the live interactive demo
-  redirect('/demo/learner');
+  redirect('/store/demo');
 }

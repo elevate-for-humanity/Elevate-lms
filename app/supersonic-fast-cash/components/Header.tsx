@@ -30,9 +30,9 @@ export function SupersonicHeader() {
               <Shield className="w-4 h-4" />
               <span className="hidden sm:inline">Secure Tax Preparation</span>
             </div>
-            <a href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-blue-200">
+            <a href="/support" className="flex items-center gap-2 hover:text-blue-200">
               <Phone className="w-4 h-4" />
-              <span>Schedule a Meeting</span>
+              <span>Get Help Online</span>
             </a>
           </div>
         </div>

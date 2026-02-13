@@ -270,7 +270,7 @@ export default async function RiseFoundationPage() {
               Get Started
             </Link>
             <a
-              href="mailto:elevate4humanityedu@gmail.com"
+              href="/support"
               className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-400 border-2 border-white"
             >
               <Phone className="w-5 h-5" /> Get Help

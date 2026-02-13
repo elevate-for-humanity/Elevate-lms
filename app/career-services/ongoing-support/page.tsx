@@ -14,7 +14,9 @@ export const dynamic = 'force-dynamic';
 
 export default async function OngoingSupportPage() {
   const supabase = await createClient();
-  if (!supabase) { redirect("/login"); }
+  if (!supabase) {
+    return <div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-center"><h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1><p className="text-gray-600">Please try again later.</p></div></div>;
+  }
   const { data: { user } } = await supabase.auth.getUser();
 
   // Get alumni count
@@ -204,12 +206,10 @@ export default async function OngoingSupportPage() {
                 Contact Career Services
               </Link>
               <a
-                href="https://calendly.com/elevate-for-humanity/advisor-call"
-                target="_blank"
-                rel="noopener noreferrer"
+                href="/support"
                 className="flex items-center justify-center gap-2 text-pink-600 font-medium"
               >
-                Schedule a Meeting
+                <Phone className="w-4 h-4" /> Get Help Online
               </a>
             </div>
 

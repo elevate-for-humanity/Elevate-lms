@@ -62,7 +62,7 @@ export default async function PaymentCancelPage() {
               <li>💳 Try a different payment method</li>
               <li>
                 <Phone className="w-5 h-5 inline-block" /> Contact us to discuss
-                payment plans: 317-314-3757
+                payment plans: support center
               </li>
               <li>💬 Chat with our enrollment team</li>
             </ul>
@@ -87,10 +87,10 @@ export default async function PaymentCancelPage() {
             <p className="text-sm text-black">
               Questions? Contact us at{' '}
               <a
-                href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                href="/support"
                 className="text-brand-orange-600 hover:underline"
               >
-                317-314-3757
+                support center
               </a>{' '}
               or{' '}
               <a

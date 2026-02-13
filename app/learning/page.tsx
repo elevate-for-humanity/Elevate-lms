@@ -153,14 +153,12 @@ export default async function LearningHubPage() {
             >
               Apply Now
             </Link>
-            <a
-              href="https://calendly.com/elevate-for-humanity/advisor-call"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/inquiry"
               className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
             >
-              Schedule a Meeting
-            </a>
+              Ask a Question
+            </Link>
           </div>
         </div>
       </section>

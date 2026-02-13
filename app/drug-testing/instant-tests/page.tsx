@@ -172,7 +172,7 @@ export default function InstantTestsPage() {
                   </div>
                   
                   <a
-                    href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+                    href="/support"
                     className="block w-full text-center bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-700 transition"
                   >
                     Order Now
@@ -212,11 +212,11 @@ export default function InstantTestsPage() {
             Schedule online to schedule instant testing at a location near you.
           </p>
           <a
-            href="https://calendly.com/elevate-for-humanity/advisor-call" target="_blank" rel="noopener noreferrer"
+            href="/support"
             className="inline-flex items-center gap-2 bg-white text-green-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
           >
             <Phone className="w-5 h-5" />
-            (317) 314-3757
+            Get Help Online
           </a>
         </div>
       </section>

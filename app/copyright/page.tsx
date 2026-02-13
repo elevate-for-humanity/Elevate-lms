@@ -199,7 +199,7 @@ export default async function CopyrightPage() {
 
           <div>
             <h4 className="font-bold text-black mb-2">
-              Paid Tax Services (SupersonicFastCash)
+              Paid Tax Services (Tax Services)
             </h4>
             <ul className="space-y-1 text-black text-sm">
               <li>• Operates as a for-profit entity</li>

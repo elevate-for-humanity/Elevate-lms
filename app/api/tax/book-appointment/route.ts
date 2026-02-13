@@ -82,13 +82,13 @@ export async function POST(req: Request) {
     // Send confirmation email to customer
     try {
       await resend.emails.send({
-        from: 'SupersonicFastCash <noreply@www.elevateforhumanity.org>',
+        from: 'Elevate Tax Services <noreply@www.elevateforhumanity.org>',
         to: appointmentData.email,
-        subject: 'Tax Appointment Confirmation - SupersonicFastCash',
+        subject: 'Tax Appointment Confirmation - Elevate Tax Services',
         html: `
           <h2>Your Tax Appointment is Confirmed!</h2>
           <p>Hi ${appointmentData.firstName},</p>
-          <p>Thank you for booking with SupersonicFastCash. Here are your appointment details:</p>
+          <p>Thank you for booking with Elevate Tax Services. Here are your appointment details:</p>
           <ul>
             <li><strong>Service:</strong> ${appointmentData.serviceType}</li>
             <li><strong>Type:</strong> ${appointmentData.appointmentType}</li>
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
           </ul>
           <p>We'll send you a reminder 24 hours before your appointment.</p>
           <p>If you need to reschedule, please call us at (317) 314-3757.</p>
-          <p>Best regards,<br>SupersonicFastCash Team</p>
+          <p>Best regards,<br>Elevate Tax Services Team</p>
         `,
       });
     } catch (emailError) {
@@ -107,7 +107,7 @@ export async function POST(req: Request) {
     // Send notification to staff
     try {
       await resend.emails.send({
-        from: 'SupersonicFastCash <noreply@www.elevateforhumanity.org>',
+        from: 'Elevate Tax Services <noreply@www.elevateforhumanity.org>',
         to: 'elevate4humanityedu@gmail.com',
         subject: 'New Tax Appointment Booked',
         html: `

@@ -6,7 +6,7 @@ import { ExternalLink, FileText, Shield, Scale, Receipt } from 'lucide-react';
 interface QuickSummaryProps {
   title: string;
   bullets: string[];
-  showSupersonicScope?: boolean;
+  showTaxScope?: boolean;
   elevateCanonicalPath: string;
 }
 
@@ -15,7 +15,7 @@ const ELEVATE_BASE = 'https://www.elevateforhumanity.org';
 export function QuickSummary({ 
   title, 
   bullets, 
-  showSupersonicScope = false,
+  showTaxScope = false,
   elevateCanonicalPath 
 }: QuickSummaryProps) {
   return (
@@ -37,7 +37,7 @@ export function QuickSummary({
       </ul>
 
       <p className="text-sm text-slate-600 mb-4 italic">
-        Supersonic Fast Cash governance is defined by the canonical Elevate for Humanity governance documents.
+        Elevate Tax Services governance is defined by the canonical Elevate for Humanity governance documents.
       </p>
 
       <div className="flex flex-wrap gap-2">
@@ -78,10 +78,10 @@ export function QuickSummary({
         </Link>
       </div>
 
-      {showSupersonicScope && (
+      {showTaxScope && (
         <div className="mt-4 pt-4 border-t border-emerald-200">
           <p className="text-xs text-slate-500">
-            This page applies to Supersonic Fast Cash LLC tax preparation and optional refund-based advance services.
+            This page applies to Elevate Tax Services LLC tax preparation and optional refund-based advance services.
           </p>
         </div>
       )}

@@ -195,7 +195,7 @@ export const PAGE_SCRIPTS: Record<string, {
     nextAction: `Click 'Schedule Appointment' to book your session.`,
   },
 
-  '/supersonic-fast-cash': {
+  '/tax-services': {
     opening: `Professional tax prep with same-day refund advance up to $7,500. Fees deducted from refund. Advance depends on approval.`,
     nextAction: `Click 'Book Appointment' to schedule.`,
   },

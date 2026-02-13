@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 
 export const metadata = {
-  title: 'Professional Tax Services | Supersonic Fast Cash',
+  title: 'Professional Tax Services | Elevate Tax Services',
   description: 'Professional paid tax preparation services for complex returns.',
 };
 
@@ -35,7 +35,7 @@ export default function ProfessionalTaxPage() {
           <div className="bg-white rounded-lg shadow-sm border p-8">
             <h2 className="text-2xl font-bold mb-6">Professional Tax Preparation</h2>
             <p className="text-black mb-6">
-              For returns that don't qualify for free VITA services, we offer professional tax preparation through Supersonic Fast Cash.
+              For returns that don't qualify for free VITA services, we offer professional tax preparation through Elevate Tax Services.
             </p>
             <div className="bg-orange-50 rounded-lg p-6 border border-orange-200 mb-6">
               <h3 className="text-xl font-semibold mb-3">Services Include</h3>
@@ -51,13 +51,13 @@ export default function ProfessionalTaxPage() {
             </div>
             <div className="flex gap-4">
               <Link
-                href="/supersonic-fast-cash"
+                href="/tax-services"
                 className="inline-block bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
               >
-                Visit Supersonic Fast Cash
+                Visit Elevate Tax Services
               </Link>
               <Link
-                href="/supersonic-fast-cash/book-appointment"
+                href="/tax-services/book-appointment"
                 className="inline-block bg-gray-200 hover:bg-gray-300 text-black px-8 py-3 rounded-lg font-semibold transition-colors"
               >
                 Book Appointment

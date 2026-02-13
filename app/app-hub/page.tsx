@@ -54,14 +54,7 @@ const apps = [
     downloads: '5K+',
     platforms: ['ios', 'android'],
   },
-  {
-    name: 'SupersonicFastCash',
-    description: 'Track your tax refund and manage documents',
-    icon: '💰',
-    rating: 4.7,
-    downloads: '15K+',
-    platforms: ['ios', 'android'],
-  },
+
 ];
 
 export default function AppHubPage() {

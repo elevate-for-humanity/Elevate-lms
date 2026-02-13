@@ -84,7 +84,7 @@ const documents = [
     number: 6,
     title: 'Tax Preparation & Refund Advance Operations',
     icon: Receipt,
-    covers: 'Supersonic Fast Cash LLC services',
+    covers: 'Elevate for Humanity services',
     description: 'How tax preparation works and how optional refund-based advances are positioned and controlled.',
     governs: [
       'Tax filing workflow',

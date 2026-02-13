@@ -5,7 +5,7 @@ import { FileText, Download, ChevronRight, Calculator, DollarSign, Shield, Clock
 
 export const metadata: Metadata = {
   title: 'Tax Preparation and Refund Advance Operations | Elevate For Humanity',
-  description: 'Supersonic Fast Cash tax preparation services, refund advance loans, IRS compliance, and operational procedures.',
+  description: 'Elevate Tax Services tax preparation services, refund advance loans, IRS compliance, and operational procedures.',
 };
 
 export default function TaxOperationsPage() {
@@ -24,7 +24,7 @@ export default function TaxOperationsPage() {
             <span className="text-white">Tax Operations</span>
           </div>
           <h1 className="text-3xl font-bold mb-2">Tax Preparation and Refund Advance Operations</h1>
-          <p className="text-gray-300">Supersonic Fast Cash services, compliance, and operational procedures</p>
+          <p className="text-gray-300">Elevate Tax Services services, compliance, and operational procedures</p>
           <div className="flex items-center gap-6 mt-6 text-sm">
             <span className="flex items-center gap-2"><FileText className="w-4 h-4" />EFH-TAX-001</span>
             <span>Version 1.0</span>
@@ -38,7 +38,7 @@ export default function TaxOperationsPage() {
         <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-8 flex items-center justify-between">
           <div>
             <p className="font-medium text-red-900">Official Tax Operations Document</p>
-            <p className="text-sm text-red-700">Authoritative reference for Supersonic Fast Cash tax services and refund advances.</p>
+            <p className="text-sm text-red-700">Authoritative reference for Elevate Tax Services tax services and refund advances.</p>
           </div>
           <a href="/docs/Tax_Preparation_Refund_Advance_Operations.pdf" download className="flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
             <Download className="w-4 h-4" /> PDF
@@ -66,7 +66,7 @@ export default function TaxOperationsPage() {
             1. Purpose & Scope
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">1.1 Purpose</h3>
-          <p className="text-gray-700 mb-4">This document governs all tax preparation services operated under the Supersonic Fast Cash brand, including individual tax return preparation, refund advance loans, and related financial products. It ensures IRS compliance, consumer protection, and operational excellence.</p>
+          <p className="text-gray-700 mb-4">This document governs all tax preparation services operated under the Elevate Tax Services brand, including individual tax return preparation, refund advance loans, and related financial products. It ensures IRS compliance, consumer protection, and operational excellence.</p>
           
           <h3 className="text-lg font-semibold mt-6 mb-3">1.2 Scope</h3>
           <ul className="list-disc pl-6 space-y-2 text-gray-700">
@@ -78,7 +78,7 @@ export default function TaxOperationsPage() {
           </ul>
           
           <h3 className="text-lg font-semibold mt-6 mb-3">1.3 Operating Entity</h3>
-          <p className="text-gray-700"><strong>Supersonic Fast Cash</strong> operates as a DBA of Elevate For Humanity LLC, registered in Indiana. Tax preparation services are provided by licensed tax preparers with valid PTINs.</p>
+          <p className="text-gray-700"><strong>Elevate Tax Services</strong> operates as a DBA of Elevate For Humanity LLC, registered in Indiana. Tax preparation services are provided by licensed tax preparers with valid PTINs.</p>
         </section>
 
         <section id="services" className="mb-12">
@@ -172,7 +172,7 @@ export default function TaxOperationsPage() {
           <h3 className="text-lg font-semibold mt-6 mb-3">4.3 Eligibility Requirements</h3>
           <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
             <li>Federal refund of at least $500</li>
-            <li>Tax return prepared by Supersonic Fast Cash</li>
+            <li>Tax return prepared by Elevate Tax Services</li>
             <li>Valid government-issued ID</li>
             <li>Bank account or prepaid card for funding</li>
             <li>Pass bank's underwriting criteria</li>
@@ -286,7 +286,7 @@ export default function TaxOperationsPage() {
           </table>
           
           <h3 className="text-lg font-semibold mt-6 mb-3">7.3 Accuracy Guarantee</h3>
-          <p className="text-gray-700">If an error on a return prepared by Supersonic Fast Cash results in IRS penalties or interest, we will reimburse the client for those penalties and interest (up to $10,000) and prepare the amended return at no charge.</p>
+          <p className="text-gray-700">If an error on a return prepared by Elevate Tax Services results in IRS penalties or interest, we will reimburse the client for those penalties and interest (up to $10,000) and prepare the amended return at no charge.</p>
         </section>
 
         <section id="responsibilities" className="mb-12">

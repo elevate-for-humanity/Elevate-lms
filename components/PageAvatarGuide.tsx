@@ -120,12 +120,12 @@ export const AVATAR_CONFIGS: Record<string, {
     context: 'vita',
     videoFile: '/videos/avatars/vita-guide.mp4',
   },
-  supersonic: {
+  elevate: {
     avatarName: 'Rachel',
     avatarRole: 'Tax Prep Guide',
     welcomeMessage: "Hey! I'm Rachel. Get your tax refund TODAY - up to $7,500 in just 15 minutes! Ready to get paid fast?",
-    context: 'supersonic',
-    videoFile: '/videos/avatars/supersonic-guide.mp4',
+    context: 'elevate',
+    videoFile: '/videos/avatars/elevate-guide.mp4',
   },
   
   // === LMS ===

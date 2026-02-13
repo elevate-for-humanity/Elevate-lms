@@ -64,9 +64,9 @@ export default async function NonprofitPage() {
       icon: Heart,
     },
     {
-      title: 'Supersonic Fast Cash',
+      title: 'Elevate Tax Services',
       description: 'Quick financial assistance and emergency support services.',
-      href: '/supersonic-fast-cash',
+      href: '/tax-services',
       icon: Gift,
     },
     {

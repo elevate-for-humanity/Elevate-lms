@@ -128,7 +128,7 @@ export default async function RefundPolicyPage() {
               Tax Refund Advances
             </h2>
             <p className="text-black mb-6">
-              Refund advances (Supersonic Fast Cash) are loans provided by
+              Refund advances (Elevate Tax Services) are loans provided by
               third-party lenders and are subject to separate terms and
               conditions:
             </p>

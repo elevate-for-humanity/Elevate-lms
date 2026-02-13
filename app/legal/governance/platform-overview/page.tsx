@@ -143,12 +143,12 @@ export default function PlatformOverviewPage() {
             <div className="border rounded-lg p-6">
               <div className="flex items-center gap-3 mb-3">
                 <FileText className="w-6 h-6 text-blue-600" />
-                <h3 className="text-lg font-semibold">2.4 Supersonic Fast Cash (Tax Services)</h3>
+                <h3 className="text-lg font-semibold">2.4 Elevate Tax Services (Tax Services)</h3>
               </div>
               <p className="text-gray-700 mb-3"><strong>Function:</strong> Tax preparation services and optional refund advance products.</p>
               <p className="text-gray-700 mb-3"><strong>Primary Users:</strong> Tax clients (students and community members).</p>
               <p className="text-gray-700 mb-3"><strong>Key Capabilities:</strong> Tax intake, document collection, return preparation, e-filing, refund tracking, optional refund advance application.</p>
-              <p className="text-gray-700"><strong>Legal Entity:</strong> Operated by Supersonic Fast Cash LLC, a separate legal entity. See Tax Preparation and Refund Advance Operations document for complete details.</p>
+              <p className="text-gray-700"><strong>Legal Entity:</strong> Operated by Elevate for Humanity, a separate legal entity. See Tax Preparation and Refund Advance Operations document for complete details.</p>
             </div>
           </div>
         </section>

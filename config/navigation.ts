@@ -158,7 +158,6 @@ export const headerNav: NavSection[] = [
       { label: 'Career Services', href: '/career-services' },
       { label: 'Mentorship', href: '/mentorship' },
       { label: 'Tax Services', href: '/tax-services' },
-      { label: 'Supersonic Fast Cash', href: '/supersonic-fast-cash' },
     ],
   },
   {

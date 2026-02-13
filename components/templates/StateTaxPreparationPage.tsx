@@ -17,7 +17,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
-          <Breadcrumbs items={[{ label: 'Tax Preparation', href: '/supersonic-fast-cash' }, { label: state.name }]} />
+          <Breadcrumbs items={[{ label: 'Tax Preparation', href: '/tax-services' }, { label: state.name }]} />
         </div>
       </div>
 
@@ -135,7 +135,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
             {otherStates.map((s) => (
               <Link
                 key={s.slug}
-                href={`/supersonic-fast-cash/tax-preparation-${s.slug}`}
+                href={`/tax-services/tax-preparation-${s.slug}`}
                 className="p-4 bg-white rounded-lg hover:bg-blue-50 transition-colors text-center shadow-sm"
               >
                 <span className="font-medium text-gray-900">{s.name}</span>

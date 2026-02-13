@@ -80,7 +80,7 @@ export const mainNavigation: NavItem[] = [
       },
       {
         label: 'Paid Tax Services',
-        href: '/tax/supersonicfastcash',
+        href: '/tax/tax-services',
         description: 'Professional tax services'
       },
       {
@@ -126,7 +126,7 @@ export const footerNavigation = {
     title: 'Services',
     links: [
       { label: 'Free Tax Prep', href: '/tax/vita' },
-      { label: 'Paid Tax Services', href: '/tax/supersonicfastcash' },
+      { label: 'Paid Tax Services', href: '/tax/tax-services' },
       { label: 'Case Management', href: '/resources#students' },
       { label: 'Career Counseling', href: '/resources#students' },
     ]

@@ -66,7 +66,7 @@ export default function SecurityStatementPage() {
             1. Security Purpose & Principles
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">1.1 Purpose</h3>
-          <p className="text-gray-700 mb-4">This document defines how Elevate For Humanity protects user data, maintains system security, and responds to security events. It applies to all platform components: main website, LMS, Store, and Supersonic Fast Cash.</p>
+          <p className="text-gray-700 mb-4">This document defines how Elevate For Humanity protects user data, maintains system security, and responds to security events. It applies to all platform components: main website, LMS, Store, and Elevate Tax Services.</p>
           
           <h3 className="text-lg font-semibold mt-6 mb-3">1.2 Security Principles</h3>
           <ul className="list-disc pl-6 space-y-2 text-gray-700">
@@ -98,7 +98,7 @@ export default function SecurityStatementPage() {
               <p className="text-gray-700 text-sm">Billing address, order history, payment method tokens (not full card numbers)</p>
             </div>
             <div className="border rounded-lg p-4">
-              <h4 className="font-semibold">Supersonic Fast Cash</h4>
+              <h4 className="font-semibold">Elevate Tax Services</h4>
               <p className="text-gray-700 text-sm">Tax documents, SSN (encrypted), income information, bank account details for refunds</p>
             </div>
           </div>

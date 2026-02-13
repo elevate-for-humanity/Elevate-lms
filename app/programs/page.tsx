@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // Programs page - pulls from database with ISR caching
 import { Metadata } from 'next';
 import Link from 'next/link';

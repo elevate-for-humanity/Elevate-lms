@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 // Force static generation for performance
 
 import { Metadata } from 'next';

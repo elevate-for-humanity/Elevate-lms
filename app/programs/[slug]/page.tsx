@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from 'next/navigation';
 import { createPublicClient } from '@/lib/supabase/server';
 import fs from 'fs';

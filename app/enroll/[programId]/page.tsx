@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 'use client';
 
@@ -198,8 +197,6 @@ export default function EnrollPage() {
           return;
         }
       }
-
-
     } catch (error: any) {
       setMessage(`Error: ${error.message}`);
     } finally {

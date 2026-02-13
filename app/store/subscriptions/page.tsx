@@ -1,4 +1,3 @@
-export const dynamic = 'force-dynamic';
 
 'use client';
 
@@ -394,8 +393,6 @@ function SubscriptionsContent() {
     </div>
   );
 }
-
-
 
 export default function SubscriptionsPage() {
   return (

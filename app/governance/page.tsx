@@ -93,7 +93,7 @@ export default function GovernancePage() {
           </h1>
           <p className="text-slate-300 text-lg max-w-2xl">
             This page provides a clear overview of how the platform is governed, documented, 
-            and controlled across the public site, LMS, Store, and Elevate Tax Services services.
+            and controlled across the public site, LMS, Store, and Supersonic Fast Cash services.
           </p>
           <div className="mt-6 text-sm text-slate-400">
             Last reviewed: {currentDate} • Owner: Platform Governance

@@ -34,7 +34,11 @@ const sitemapSections = [
     title: 'Tax Services',
     links: [
       { name: 'Tax Services Overview', href: '/tax' },
-
+      { name: 'SupersonicFastCash', href: '/supersonic-fast-cash' },
+      { name: 'SupersonicFastCash Pricing', href: '/supersonic-fast-cash/pricing' },
+      { name: 'SupersonicFastCash Services', href: '/supersonic-fast-cash/services' },
+      { name: 'SupersonicFastCash Locations', href: '/supersonic-fast-cash/locations' },
+      { name: 'SupersonicFastCash Careers', href: '/supersonic-fast-cash/careers' },
     ],
   },
   {

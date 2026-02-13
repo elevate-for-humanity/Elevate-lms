@@ -16,6 +16,7 @@ export interface EnvConfig {
   STRIPE_PUBLISHABLE_KEY?: string;
   RESEND_API_KEY?: string;
   OPENAI_API_KEY?: string;
+  DRAKE_API_KEY?: string;
   JOTFORM_API_KEY?: string;
   SENTRY_DSN?: string;
 }
@@ -69,6 +70,7 @@ export const services = {
   stripe: () => isServiceAvailable('STRIPE_SECRET_KEY'),
   resend: () => isServiceAvailable('RESEND_API_KEY'),
   openai: () => isServiceAvailable('OPENAI_API_KEY'),
+  drake: () => isServiceAvailable('DRAKE_API_KEY'),
   jotform: () => isServiceAvailable('JOTFORM_API_KEY'),
   sentry: () => isServiceAvailable('SENTRY_DSN'),
   supabaseAdmin: () => isServiceAvailable('SUPABASE_SERVICE_ROLE_KEY'),
@@ -82,6 +84,7 @@ export function getServiceStatus() {
     stripe: services.stripe(),
     resend: services.resend(),
     openai: services.openai(),
+    drake: services.drake(),
     jotform: services.jotform(),
     sentry: services.sentry(),
     supabaseAdmin: services.supabaseAdmin(),

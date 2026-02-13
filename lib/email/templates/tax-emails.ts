@@ -1,7 +1,7 @@
 /**
  * Tax Services Email Templates
  * PART A: Rise Up Foundation (FREE - VITA Compliant)
- * PART B: Tax Services (PAID)
+ * PART B: SupersonicFastCash (PAID)
  *
  * CRITICAL: These must remain completely separated for IRS compliance
  */
@@ -174,21 +174,21 @@ Rise Up Foundation
 };
 
 // ============================================================================
-// PART B: PAID TAX SERVICES
+// PART B: SUPERSONICFASTCASH (PAID TAX SERVICES)
 // ============================================================================
 
-export const elevateFastCashEmails = {
+export const supersonicFastCashEmails = {
   /**
    * EMAIL 1: Paid Tax Appointment Confirmed
    */
   appointmentConfirmed: {
-    from: 'billing@elevateforhumanity.org',
+    from: 'billing@supersonicfastcash.com',
     subject: 'Your tax appointment is confirmed',
     getHtml: (data: { firstName: string }) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
         <p>Hello ${data.firstName},</p>
 
-        <p>Your tax appointment with Tax Services is confirmed.</p>
+        <p>Your tax appointment with SupersonicFastCash is confirmed.</p>
 
         <div style="background-color: #eff6ff; padding: 15px; border-radius: 6px; margin: 20px 0; border-left: 4px solid #3b82f6;">
           <p style="margin: 0;"><strong>Next steps:</strong></p>
@@ -204,14 +204,14 @@ export const elevateFastCashEmails = {
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;" />
 
         <p style="color: #666; font-size: 14px;">
-          <strong>Tax Services</strong>
+          <strong>SupersonicFastCash</strong>
         </p>
       </div>
     `,
     getText: (data: { firstName: string }) => `
 Hello ${data.firstName},
 
-Your tax appointment with Tax Services is confirmed.
+Your tax appointment with SupersonicFastCash is confirmed.
 
 Next steps:
 • Upload your documents securely
@@ -221,7 +221,7 @@ Next steps:
 No charges will be processed until services are reviewed and approved.
 
 —
-Tax Services
+SupersonicFastCash
     `
   },
 
@@ -229,7 +229,7 @@ Tax Services
    * EMAIL 2: Payment Request (Invoice)
    */
   paymentRequest: {
-    from: 'billing@elevateforhumanity.org',
+    from: 'billing@supersonicfastcash.com',
     subject: 'Tax preparation invoice',
     getHtml: (data: {
       firstName: string;
@@ -260,7 +260,7 @@ Tax Services
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;" />
 
         <p style="color: #666; font-size: 14px;">
-          <strong>Tax Services</strong><br />
+          <strong>SupersonicFastCash</strong><br />
           Professional Tax Preparation Services
         </p>
       </div>
@@ -285,7 +285,7 @@ ${data.stripeInvoiceLink}
 Please review our refund and service policies before submitting payment.
 
 —
-Tax Services
+SupersonicFastCash
 Professional Tax Preparation Services
     `
   },
@@ -294,7 +294,7 @@ Professional Tax Preparation Services
    * EMAIL 3: Payment Confirmation
    */
   paymentConfirmation: {
-    from: 'billing@elevateforhumanity.org',
+    from: 'billing@supersonicfastcash.com',
     subject: 'Payment received — next steps',
     getHtml: (data: { firstName: string }) => `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -316,7 +316,7 @@ Professional Tax Preparation Services
         <hr style="border: none; border-top: 1px solid #ddd; margin: 30px 0;" />
 
         <p style="color: #666; font-size: 14px;">
-          <strong>Tax Services</strong>
+          <strong>SupersonicFastCash</strong>
         </p>
       </div>
     `,
@@ -333,7 +333,7 @@ Next steps:
 We'll keep you updated throughout the process.
 
 —
-Tax Services
+SupersonicFastCash
     `
   }
 };

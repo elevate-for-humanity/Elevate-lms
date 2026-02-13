@@ -64,7 +64,7 @@ export default function FAQPage() {
     {
       question: 'Can I get a refund advance?',
       answer:
-        'No, VITA does not offer refund advances. If you need immediate cash, consider our paid service Tax Services which offers refund advances up to $7,500.',
+        'No, VITA does not offer refund advances. If you need immediate cash, consider our paid service SupersonicFastCash which offers refund advances up to $7,500.',
     },
     {
       question: 'What if I owe taxes?',

@@ -143,7 +143,7 @@ export default function RiseUpFoundationPage() {
         <p className="mt-2 text-black">
           Rise Up Foundation operates as a separate 501(c)(3) nonprofit
           organization providing free VITA tax services. This program is
-          completely separate from Elevate Tax Services paid tax preparation
+          completely separate from SupersonicFastCash paid tax preparation
           services. All VITA services are provided by IRS-certified volunteers
           at no cost to qualifying taxpayers.
         </p>

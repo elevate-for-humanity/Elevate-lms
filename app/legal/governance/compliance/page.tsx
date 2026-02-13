@@ -72,7 +72,7 @@ export default function ComplianceFrameworkPage() {
           <ul className="list-disc pl-6 space-y-2 text-gray-700">
             <li>Educational services (LMS, courses, certifications)</li>
             <li>E-commerce operations (Store, digital products)</li>
-            <li>Tax preparation services (Elevate Tax Services)</li>
+            <li>Tax preparation services (Supersonic Fast Cash)</li>
             <li>Financial products (Refund Advance loans)</li>
             <li>Nonprofit operations (Rise Foundation)</li>
           </ul>
@@ -96,7 +96,7 @@ export default function ComplianceFrameworkPage() {
             <tbody>
               <tr><td className="border p-3">Elevate For Humanity LLC</td><td className="border p-3">LLC</td><td className="border p-3">Indiana</td><td className="border p-3">Platform operations, LMS, Store</td></tr>
               <tr className="bg-gray-50"><td className="border p-3">Rise Foundation</td><td className="border p-3">501(c)(3)</td><td className="border p-3">Indiana</td><td className="border p-3">Scholarships, grants, charitable programs</td></tr>
-              <tr><td className="border p-3">Elevate Tax Services</td><td className="border p-3">DBA</td><td className="border p-3">Indiana</td><td className="border p-3">Tax preparation services</td></tr>
+              <tr><td className="border p-3">Supersonic Fast Cash</td><td className="border p-3">DBA</td><td className="border p-3">Indiana</td><td className="border p-3">Tax preparation services</td></tr>
             </tbody>
           </table>
           

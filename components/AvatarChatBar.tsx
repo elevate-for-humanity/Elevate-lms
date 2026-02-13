@@ -24,8 +24,8 @@ const getAvatarConfig = (pathname: string) => {
     return { video: '/videos/avatars/store-assistant.mp4', name: 'Store Assistant', message: 'Looking for courses, licenses, or tools? I can help you find what you need!' };
   }
   // Tax preparation pages - separate from financial aid
-  if (pathname.includes('/tax') || pathname.includes('/tax-services')) {
-    return { video: '/videos/avatars/financial-guide.mp4', name: 'Tax Guide', message: 'Need help with tax preparation? I can guide you through free VITA services or Elevate Tax Services options!' };
+  if (pathname.includes('/tax') || pathname.includes('/supersonic-fast-cash')) {
+    return { video: '/videos/avatars/financial-guide.mp4', name: 'Tax Guide', message: 'Need help with tax preparation? I can guide you through free VITA services or Supersonic Fast Cash options!' };
   }
   // Financial aid and funding pages
   if (pathname.includes('/financial-aid') || pathname.includes('/funding') || pathname.includes('/wioa') || pathname.includes('/grants')) {

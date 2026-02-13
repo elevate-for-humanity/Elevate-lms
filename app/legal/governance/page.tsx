@@ -57,7 +57,7 @@ const documents = [
   {
     id: 'EFH-TAX-001',
     title: 'Tax Preparation and Refund Advance Operations',
-    description: 'Elevate Tax Services services, IRS compliance, refund advances, and data security.',
+    description: 'Supersonic Fast Cash services, IRS compliance, refund advances, and data security.',
     href: '/legal/governance/tax-operations',
     icon: Calculator,
     color: 'bg-red-100 text-red-700',

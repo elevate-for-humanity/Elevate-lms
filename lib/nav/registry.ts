@@ -40,7 +40,7 @@ export const NAV: NavItem[] = [
   // Tax Services
   { group: 'Tax', label: 'Tax Services', href: '/tax', showInHeader: true, description: 'Free and paid tax preparation' },
   { group: 'Tax', label: 'Rise Up Foundation (Free)', href: '/vita', showInHeader: true, description: 'Free tax help for eligible individuals' },
-
+  { group: 'Tax', label: 'SupersonicFastCash (Paid)', href: '/tax/supersonicfastcash', showInHeader: true, description: 'Professional tax preparation' },
   { group: 'Tax', label: 'VITA Volunteer', href: '/vita/volunteer', showInHeader: false },
   { group: 'Tax', label: 'VITA Training', href: '/vita/training', showInHeader: false },
   { group: 'Tax', label: 'Find VITA Site', href: '/vita/locations', showInHeader: false },

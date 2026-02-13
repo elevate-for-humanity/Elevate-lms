@@ -14,7 +14,7 @@ const PAGE_GUIDES: Record<string, {
   avatarName: string;
   avatarRole: string;
   welcomeMessage: string;
-  context: 'store' | 'home' | 'course' | 'financial' | 'vita' | 'general' | 'healthcare' | 'trades' | 'technology' | 'barber' | 'elevate' | 'programs';
+  context: 'store' | 'home' | 'course' | 'financial' | 'vita' | 'general' | 'healthcare' | 'trades' | 'technology' | 'barber' | 'supersonic' | 'programs';
   videoFile: string;
 }> = {
   home: {
@@ -108,12 +108,12 @@ const PAGE_GUIDES: Record<string, {
     context: 'vita',
     videoFile: '/videos/avatars/avatar-vita.mp4',
   },
-  elevate: {
+  supersonic: {
     avatarName: 'Rachel',
     avatarRole: 'Tax Preparation Guide',
-    welcomeMessage: "Hey! I'm Rachel from Elevate Tax Services. Get your tax refund TODAY - up to $7,500 in just 15 minutes! Ready to get paid?",
-    context: 'elevate',
-    videoFile: '/videos/avatars/avatar-elevate.mp4',
+    welcomeMessage: "Hey! I'm Rachel from Supersonic Fast Cash. Get your tax refund TODAY - up to $7,500 in just 15 minutes! Ready to get paid?",
+    context: 'supersonic',
+    videoFile: '/videos/avatars/avatar-supersonic.mp4',
   },
   aiTutor: {
     avatarName: 'Sophia',

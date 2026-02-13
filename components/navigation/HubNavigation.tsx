@@ -33,6 +33,7 @@ const DEFAULT_NAVIGATION: NavCategory[] = [
     slug: 'businesses',
     order_index: 1,
     items: [
+      { id: '1', name: 'Supersonic Fast Cash', href: '/supersonic-fast-cash', description: 'Tax preparation & financial services', order_index: 1 },
       { id: '2', name: 'Kingdom Konnect', href: '/kingdom-konnect', description: 'Faith-based community services', order_index: 2 },
       { id: '3', name: 'Serene Comfort Care', href: '/serene-comfort-care', description: 'Professional home care', order_index: 3 },
       { id: '4', name: 'Urban Build Crew', href: '/urban-build-crew', description: 'Construction & building services', order_index: 4 },

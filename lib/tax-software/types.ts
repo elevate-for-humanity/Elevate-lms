@@ -1,5 +1,5 @@
 /**
- * Elevate Tax Software - Core Types
+ * Supersonic Tax Software - Core Types
  * IRS MeF (Modernized e-File) Compatible
  */
 

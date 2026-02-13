@@ -9,7 +9,7 @@ export type UserRole =
   | 'instructor'
   | 'admin'
   | 'vita_staff'
-  | 'elevate_staff'
+  | 'supersonic_staff'
   | 'grant_client';
 
 export type CurrentProfile = {

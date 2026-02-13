@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     // Create unique path with timestamp and sanitized filename
     const timestamp = Date.now();
     const sanitizedFilename = filename.replace(/[^a-zA-Z0-9.-]/g, '_');
-    const path = `tax-uploads/${contactInfo.email}/${timestamp}-${sanitizedFilename}`;
+    const path = `supersonicfastcash/${contactInfo.email}/${timestamp}-${sanitizedFilename}`;
 
     // Generate signed upload URL (valid for 1 hour)
     const { data, error }: any = await supabase.storage

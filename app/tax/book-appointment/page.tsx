@@ -133,7 +133,7 @@ export default function BookAppointmentPage() {
                       Free Tax Help (VITA) - Income under $64,000
                     </option>
                   </optgroup>
-                  <optgroup label="Paid Services (Tax Services)">
+                  <optgroup label="Paid Services (SupersonicFastCash)">
                     <option value="individual-tax-prep">
                       Individual Tax Preparation
                     </option>

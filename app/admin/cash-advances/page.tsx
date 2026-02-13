@@ -90,7 +90,7 @@ export default async function CashAdvancesAdminPage() {
           Cash Advance Management
         </h1>
         <p className="text-black">
-          Manage Cash advance applications and approvals
+          Manage Supersonic Cash advance applications and approvals
         </p>
       </div>
 

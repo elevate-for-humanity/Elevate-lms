@@ -24,10 +24,10 @@ export const metadata: Metadata = {
   },
   title: 'Tax Preparation Services | Elevate For Humanity',
   description:
-    'Trusted tax help — free community-based VITA tax preparation and professional Elevate Tax Services tax services.',
+    'Trusted tax help — free community-based VITA tax preparation and professional Supersonic Fast Cash tax services.',
   openGraph: {
     title: 'Tax Preparation Services',
-    description: 'Free VITA tax preparation and professional Elevate Tax Services tax services.',
+    description: 'Free VITA tax preparation and professional Supersonic Fast Cash tax services.',
     url: 'https://www.elevateforhumanity.org/tax',
     siteName: 'Elevate for Humanity',
     images: [{ url: '/og-default.jpg', width: 1200, height: 630, alt: 'Tax Services' }],
@@ -62,7 +62,7 @@ export default function TaxServicesPage() {
             </h1>
             <p className="text-xl md:text-2xl text-blue-100 mb-8">
               Choose the tax service that fits your needs. Free VITA tax preparation for 
-              eligible individuals or professional services through Elevate Tax Services.
+              eligible individuals or professional services through Supersonic Fast Cash.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
@@ -74,11 +74,11 @@ export default function TaxServicesPage() {
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
-                href="/tax-services"
+                href="/supersonic-fast-cash"
                 className="inline-flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-colors"
               >
                 <Zap className="w-5 h-5" />
-                Elevate Tax Services
+                Supersonic Fast Cash
                 <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -93,8 +93,8 @@ export default function TaxServicesPage() {
             <Link href="/tax" className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
               VITA Free Tax Prep
             </Link>
-            <Link href="/tax-services" className="px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-medium hover:bg-red-200 transition-colors">
-              Elevate Tax Services
+            <Link href="/supersonic-fast-cash" className="px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-medium hover:bg-red-200 transition-colors">
+              Supersonic Fast Cash
             </Link>
             <Link href="/tax" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
               Locations
@@ -182,12 +182,12 @@ export default function TaxServicesPage() {
               </div>
             </div>
 
-            {/* Elevate Tax Services */}
+            {/* Supersonic Fast Cash */}
             <div className="bg-white rounded-2xl border-2 border-red-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
                   src="/images/success-new/success-14.jpg"
-                  alt="Elevate Tax Services Tax Services"
+                  alt="Supersonic Fast Cash Tax Services"
                   fill
                   className="object-cover"
                 />
@@ -203,7 +203,7 @@ export default function TaxServicesPage() {
                     <Zap className="w-6 h-6 text-red-600" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-gray-900">Elevate Tax Services</h3>
+                    <h3 className="text-2xl font-bold text-gray-900">Supersonic Fast Cash</h3>
                     <p className="text-red-600 font-semibold">Professional Tax Services</p>
                   </div>
                 </div>
@@ -233,7 +233,7 @@ export default function TaxServicesPage() {
                 </ul>
 
                 <Link
-                  href="/tax-services"
+                  href="/supersonic-fast-cash"
                   className="block w-full text-center px-6 py-4 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold transition-colors"
                 >
                   Get Started Now
@@ -260,7 +260,7 @@ export default function TaxServicesPage() {
                   a nonprofit organization. Services are free and performed by IRS-certified volunteers.
                 </p>
                 <p className="text-gray-700 leading-relaxed mb-2">
-                  <strong>Elevate Tax Services</strong> is a separate for-profit tax preparation business. 
+                  <strong>Supersonic Fast Cash</strong> is a separate for-profit tax preparation business. 
                   Fees apply for professional services.
                 </p>
                 <p className="text-gray-700 leading-relaxed">
@@ -446,10 +446,10 @@ export default function TaxServicesPage() {
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              href="/tax-services"
+              href="/supersonic-fast-cash"
               className="inline-flex items-center justify-center gap-2 bg-red-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-red-700 transition-colors"
             >
-              Elevate Tax Services
+              Supersonic Fast Cash
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>

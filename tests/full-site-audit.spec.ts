@@ -50,7 +50,7 @@ const servicePages = [
   '/career-services/interview-prep',
   '/advising',
   '/mentorship',
-  '/tax-services',
+  '/supersonic-fast-cash',
   '/vita',
 ];
 

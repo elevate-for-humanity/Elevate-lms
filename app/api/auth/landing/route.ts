@@ -81,8 +81,8 @@ export async function GET() {
       case 'vita_staff':
         redirectTo = '/tax';
         break;
-      case 'deprecated_supersonic':
-        redirectTo = '/dashboard';
+      case 'supersonic_staff':
+        redirectTo = '/app/supersonic';
         break;
       default:
         redirectTo = '/app/student/dashboard';

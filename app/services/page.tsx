@@ -20,9 +20,9 @@ const services = [
     image: '/images/heroes-hq/tax-refund-hero.jpg',
   },
   {
-    title: 'Elevate Tax Services',
+    title: 'Supersonic Fast Cash',
     description: 'Quick refund advances and fast cash services',
-    href: '/tax-services',
+    href: '/supersonic-fast-cash',
     image: '/images/business/program-tax-preparation.jpg',
   },
   {

@@ -67,11 +67,11 @@ export const PAGE_METADATA: Record<string, {
     path: '/store',
   },
 
-  // Elevate Tax Services (Tax)
-  elevateTax: {
-    title: 'Tax Preparation Services | Elevate for Humanity',
+  // Supersonic Fast Cash (Tax)
+  supersonicTax: {
+    title: 'Tax Preparation Services | Supersonic Fast Cash LLC',
     description: 'File your taxes through a guided, secure process. Optional refund-based advance available to eligible filers.',
-    path: '/tax-services',
+    path: '/supersonic-fast-cash',
   },
 
   // Security

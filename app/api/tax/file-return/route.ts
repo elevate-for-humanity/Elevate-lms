@@ -309,7 +309,7 @@ export async function POST(request: NextRequest) {
     if (resend && body.email) {
       try {
         await resend.emails.send({
-          from: 'Elevate Tax Services <noreply@elevateforhumanity.org>',
+          from: 'Supersonic Fast Cash <noreply@supersonicfastcash.com>',
           to: body.email,
           subject: `Tax Return ${SOFTWARE_ID === 'PENDING_APPROVAL' ? 'Prepared' : 'Filed'} - ${taxReturn.taxYear}`,
           html: generateConfirmationEmail(taxReturn, submission.submissionId, calculation)
@@ -522,7 +522,7 @@ function generateConfirmationEmail(taxReturn: TaxReturn, submissionId: string, c
       
       <p>Questions? Contact us at (317) 314-3757 or reply to this email.</p>
       
-      <p>Thank you for choosing Elevate Tax Services!</p>
+      <p>Thank you for choosing Supersonic Fast Cash!</p>
     </div>
   </div>
 </body>

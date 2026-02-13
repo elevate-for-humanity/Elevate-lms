@@ -1,5 +1,5 @@
 // Brand configuration for governance pages
-export type Brand = 'elevate' | 'elevate';
+export type Brand = 'elevate' | 'supersonic';
 
 export interface BrandConfig {
   name: string;
@@ -19,18 +19,18 @@ export const brandConfigs: Record<Brand, BrandConfig> = {
     primaryColor: 'blue',
     accentColor: 'slate',
   },
-  elevate: {
-    name: 'Elevate Tax Services',
-    shortName: 'Elevate Tax',
-    domain: 'www.elevateforhumanity.org',
+  supersonic: {
+    name: 'Supersonic Fast Cash',
+    shortName: 'Supersonic',
+    domain: 'www.supersonicfastermoney.com',
     canonicalDomain: 'www.elevateforhumanity.org', // Always canonical to Elevate
     primaryColor: 'emerald',
     accentColor: 'slate',
   },
 };
 
-// Elevate domain constant for middleware matching
-export const ELEVATE_GOVERNANCE_DOMAIN = '';
+// Supersonic domain constant for middleware matching
+export const SUPERSONIC_GOVERNANCE_DOMAIN = 'supersonicfastermoney.com';
 
 export function getCanonicalUrl(path: string): string {
   // All governance pages canonical to Elevate
@@ -38,8 +38,8 @@ export function getCanonicalUrl(path: string): string {
 }
 
 export function getBrandFromHost(host: string): Brand {
-  if (host.includes(ELEVATE_GOVERNANCE_DOMAIN)) {
-    return 'elevate';
+  if (host.includes(SUPERSONIC_GOVERNANCE_DOMAIN)) {
+    return 'supersonic';
   }
   return 'elevate';
 }

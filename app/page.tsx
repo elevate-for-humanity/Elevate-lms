@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import HomeHeroVideo from './HomeHeroVideo';
 import MarqueeBanner from '@/components/MarqueeBanner';
+import PageAvatar from '@/components/PageAvatar';
 import TrustStrip from '@/components/TrustStrip';
 
 const programs = [
@@ -74,12 +75,22 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ===== AVATAR GUIDE ===== */}
+      <section className="py-8 sm:py-12 bg-white">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <PageAvatar 
+            videoSrc="/videos/avatars/home-welcome.mp4"
+            title="Welcome to Elevate for Humanity"
+          />
+        </div>
+      </section>
+
       {/* ===== EARN WHILE YOU LEARN ===== */}
       <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-stone-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative h-[350px] sm:h-[420px] rounded-3xl overflow-hidden shadow-xl ring-1 ring-black/5">
-              <Image src="/images/homepage/earn-while-you-learn.png" alt="Earn while you learn - apprenticeship training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src="/images/hero-hands-on-training.jpg" alt="Hands-on career training" fill className="object-cover object-center" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
             <div>
               <p className="text-brand-red-600 font-bold text-lg mb-2 tracking-wide uppercase">Why Elevate</p>

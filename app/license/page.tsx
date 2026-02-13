@@ -1,5 +1,7 @@
+export const dynamic = 'force-dynamic';
+
 import { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { 
   ArrowRight, 
@@ -41,7 +43,7 @@ export default async function LicensePage() {
   let partners: any[] | null = null;
 
   try {
-    const supabase = createPublicClient();
+    const supabase = await createClient();
     const [tiersResult, testimonialsResult, partnersResult] = await Promise.allSettled([
       supabase.from('license_tiers').select('*').eq('is_active', true).order('price', { ascending: true }),
       supabase.from('testimonials').select('*').eq('is_featured', true).limit(3),

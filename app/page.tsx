@@ -32,7 +32,7 @@ const programs = [
   { 
     name: 'Technology', 
     href: '/programs/technology', 
-    image: '/images/technology/cybersecurity-hero.jpg', 
+    image: '/images/programs-hq/it-support.jpg', 
     description: 'IT Support, Cybersecurity — high-demand tech careers',
   },
   { 
@@ -145,7 +145,7 @@ export default function HomePage() {
                 className="group bg-white rounded-2xl overflow-hidden border border-stone-200 hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
               >
                 <div className="relative w-full aspect-[4/3] bg-stone-100">
-                  <Image src={program.image} alt={program.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <Image src={program.image} alt={program.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover object-center group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl sm:text-2xl font-bold text-black mb-2 group-hover:text-brand-red-600 transition-colors">
@@ -181,11 +181,11 @@ export default function HomePage() {
               { num: '1', title: 'Register at WorkOne', desc: 'Sign up at indianacareerconnect.com and schedule an appointment with WorkOne to determine your funding eligibility', img: '/images/heroes-hq/funding-hero.jpg', href: '/funding', linkLabel: 'Learn More' },
               { num: '2', title: 'Choose Program', desc: 'Pick the career path that fits your goals and schedule', img: '/images/heroes-hq/programs-hero.jpg', href: '/programs', linkLabel: 'View Programs' },
               { num: '3', title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification', img: '/images/hero/hero-certifications.jpg', href: '/how-it-works', linkLabel: 'Learn More' },
-              { num: '4', title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates', img: '/images/heroes-hq/career-services-hero.jpg', href: '/career-services', linkLabel: 'Career Services' },
+              { num: '4', title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates', img: '/images/heroes/success-story-1.jpg', href: '/career-services', linkLabel: 'Career Services' },
             ].map((step) => (
               <div key={step.num} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-stone-100 hover:shadow-lg transition-shadow duration-300">
-                <div className="relative aspect-square bg-stone-100">
-                  <Image src={step.img} alt={step.title} fill className="object-cover" sizes="(max-width: 640px) 50vw, 25vw" />
+                <div className="relative aspect-[4/3] bg-stone-100">
+                  <Image src={step.img} alt={step.title} fill className="object-cover object-center" sizes="(max-width: 640px) 50vw, 25vw" />
                   <div className="absolute top-3 left-3 w-10 h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-lg shadow-md">{step.num}</div>
                 </div>
                 <div className="p-5">

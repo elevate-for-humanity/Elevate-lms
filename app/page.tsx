@@ -4,16 +4,13 @@ import HomeHeroVideo from './HomeHeroVideo';
 import MarqueeBanner from '@/components/MarqueeBanner';
 import PageAvatar from '@/components/PageAvatar';
 
-import TrustStrip from '@/components/TrustStrip';
 import { StatStrip } from '@/components/StatStrip';
 import { TestimonialCarousel } from '@/components/TestimonialCarousel';
-import EnrollmentCounter from '@/components/EnrollmentCounter';
 import NewsletterSignup from '@/components/NewsletterSignup';
 import { TrustBadges } from '@/components/TrustBadges';
 import { ComplianceBadges } from '@/components/ComplianceBadges';
 import ProgramFinder from '@/components/ProgramFinder';
 import ProgramHighlights from '@/components/ProgramHighlights';
-import { HomeHeroWithVoiceover } from '@/components/HomeHeroWithVoiceover';
 
 const programs = [
   { 
@@ -85,9 +82,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== HERO WITH VOICEOVER ===== */}
-      <HomeHeroWithVoiceover />
-
       {/* ===== AVATAR GUIDE ===== */}
       <section className="py-8 sm:py-12 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
@@ -128,12 +122,6 @@ export default function HomePage() {
       </section>
 
 
-
-      {/* ===== TRUST STRIP ===== */}
-      <TrustStrip variant="default" showAnimation={true} />
-
-      {/* ===== ENROLLMENT COUNTER ===== */}
-      <EnrollmentCounter />
 
       {/* ===== PARTNERS ===== */}
       <section className="py-14 sm:py-20 bg-white">

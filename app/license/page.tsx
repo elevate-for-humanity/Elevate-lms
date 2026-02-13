@@ -1,7 +1,8 @@
+export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
 import Image from 'next/image';
-import { createPublicClient } from '@/lib/supabase/server';
+import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { 
   ArrowRight, 
@@ -34,7 +35,7 @@ export const metadata: Metadata = {
 };
 
 export default async function LicensePage() {
-  const supabase = createPublicClient();
+  const supabase = await createClient();
   const startingPrice = getStartingPrice();
 
   // Get license tiers from database

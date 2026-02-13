@@ -44,7 +44,7 @@ const programs = [
   { 
     name: 'CPR & First Aid', 
     href: '/programs/cpr-first-aid-hsi', 
-    image: '/images/programs/cpr-certification-group-hd.jpg', 
+    image: '/images/healthcare/healthcare-professional-portrait-1.jpg', 
     description: 'HSI certified — same-day certification available',
   },
 ];

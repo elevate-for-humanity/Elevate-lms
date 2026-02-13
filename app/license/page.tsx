@@ -1,8 +1,5 @@
-export const dynamic = 'force-dynamic';
-
 import { Metadata } from 'next';
-import Image from 'next/image';
-import { createClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { 
   ArrowRight, 
@@ -35,31 +32,27 @@ export const metadata: Metadata = {
 };
 
 export default async function LicensePage() {
-  const supabase = await createClient();
+
   const startingPrice = getStartingPrice();
 
-  // Get license tiers from database
-  const { data: licenseTiers } = await supabase
-    .from('license_tiers')
-    .select('*')
-    .eq('is_active', true)
-    .order('price', { ascending: true });
+  // Queries wrapped in try/catch — tables/columns may not exist in production yet
+  let licenseTiers: any[] | null = null;
+  let testimonials: any[] | null = null;
+  let partners: any[] | null = null;
 
-  // Get testimonials from licensees
-  const { data: testimonials } = await supabase
-    .from('testimonials')
-    .select('*')
-    .eq('category', 'licensee')
-    .eq('is_featured', true)
-    .limit(3);
-
-  // Get current licensees/partners
-  const { data: partners } = await supabase
-    .from('partners')
-    .select('id, name, logo_url')
-    .eq('type', 'licensee')
-    .eq('is_active', true)
-    .limit(6);
+  try {
+    const supabase = createPublicClient();
+    const [tiersResult, testimonialsResult, partnersResult] = await Promise.allSettled([
+      supabase.from('license_tiers').select('*').eq('is_active', true).order('price', { ascending: true }),
+      supabase.from('testimonials').select('*').eq('is_featured', true).limit(3),
+      supabase.from('partners').select('id, name').eq('is_active', true).limit(6),
+    ]);
+    if (tiersResult.status === 'fulfilled') licenseTiers = tiersResult.value.data;
+    if (testimonialsResult.status === 'fulfilled') testimonials = testimonialsResult.value.data;
+    if (partnersResult.status === 'fulfilled') partners = partnersResult.value.data;
+  } catch {
+    // DB unavailable — fall through to static fallbacks
+  }
 
   const displayTiers = licenseTiers && licenseTiers.length > 0 ? licenseTiers : LICENSE_TIERS;
 
@@ -306,11 +299,7 @@ export default async function LicensePage() {
             <div className="flex flex-wrap justify-center items-center gap-8">
               {partners.map((partner: any) => (
                 <div key={partner.id} className="grayscale hover:grayscale-0 transition relative h-12 w-32">
-                  {partner.logo_url ? (
-                    <Image src={partner.logo_url} alt={partner.name} fill className="object-contain" sizes="128px" />
-                  ) : (
-                    <span className="text-gray-400 font-medium">{partner.name}</span>
-                  )}
+                  <span className="text-gray-400 font-medium">{partner.name}</span>
                 </div>
               ))}
             </div>

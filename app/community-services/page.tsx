@@ -228,7 +228,7 @@ export default function CommunityServicesPage() {
             href="/wioa-eligibility"
             className="inline-flex items-center gap-2 mt-8 px-8 py-4 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-100 transition"
           >
-            Check Your Eligibility <ArrowRight className="w-5 h-5" />
+            Register at Indiana Career Connect <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </section>

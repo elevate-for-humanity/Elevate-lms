@@ -133,7 +133,7 @@ export default function FundingVerificationPage() {
                 <Phone className="w-4 h-4" /> (317) 314-3757
               </a>
               <Link href="/check-eligibility" className="inline-flex items-center gap-2 px-6 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition">
-                Check Eligibility <ArrowRight className="w-4 h-4" />
+                Register at Indiana Career Connect <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
           </div>

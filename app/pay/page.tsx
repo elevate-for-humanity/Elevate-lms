@@ -40,7 +40,7 @@ export default function PayPage() {
             href="/apply"
             className="inline-block px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
           >
-            Check Your Eligibility
+            Register at Indiana Career Connect
           </Link>
         </div>
 

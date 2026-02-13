@@ -68,7 +68,7 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-6">
             <h2 className="text-2xl sm:text-3xl font-bold text-black mb-2">Learn About Our Programs & Funding</h2>
-            <p className="text-lg text-gray-700">Watch our guide explain how free career training works</p>
+            <p className="text-lg text-gray-700">Watch our guide explain how career training and funding works</p>
           </div>
           <PageAvatar 
             videoSrc="/videos/avatars/home-welcome.mp4"
@@ -152,8 +152,8 @@ export default function HomePage() {
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4 w-9 h-9 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-lg">1</div>
               </div>
               <div className="p-4 sm:p-5 md:p-6">
-                <h3 className="font-bold text-slate-900 text-base sm:text-lg md:text-xl mb-1 sm:mb-2">Check Eligibility</h3>
-                <p className="text-slate-800 text-sm sm:text-base">Quick 2-minute assessment to see if you qualify for free training.</p>
+                <h3 className="font-bold text-slate-900 text-base sm:text-lg md:text-xl mb-1 sm:mb-2">Register</h3>
+                <p className="text-slate-800 text-sm sm:text-base">Sign up at indianacareerconnect.com and schedule a WorkOne appointment.</p>
               </div>
             </div>
             
@@ -229,21 +229,23 @@ export default function HomePage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-4 sm:mb-6">Ready to Start Your New Career?</h2>
           <p className="text-base sm:text-lg md:text-xl text-white mb-6 sm:mb-8 md:mb-10">
-            Check your eligibility in 2 minutes. Most students begin training within 2-4 weeks.
+            Apply in minutes. Most students begin training within 2-4 weeks.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
             <Link 
-              href="/wioa-eligibility"
+              href="/apply"
               className="bg-white text-brand-red-600 px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5 rounded-lg font-bold text-base sm:text-lg hover:bg-slate-100 transition-colors"
             >
-              Check Eligibility
+              Apply Now
             </Link>
-            <Link 
-              href="tel:317-314-3757"
+            <a 
+              href="https://www.indianacareerconnect.com"
+              target="_blank"
+              rel="noopener noreferrer"
               className="border-2 border-white text-white px-6 py-3 sm:px-8 sm:py-4 md:px-10 md:py-5 rounded-lg font-bold text-base sm:text-lg hover:bg-white/10 transition-colors"
             >
-              Call (317) 314-3757
-            </Link>
+              Register at Indiana Career Connect
+            </a>
           </div>
         </div>
       </section>

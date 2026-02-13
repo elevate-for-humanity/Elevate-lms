@@ -308,7 +308,7 @@ export default async function CoursesPage() {
               href="/wioa-eligibility"
               className="inline-flex items-center gap-2 bg-green-700 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-800 transition-all"
             >
-              Check Eligibility
+              Register at Indiana Career Connect
             </Link>
           </div>
         </div>

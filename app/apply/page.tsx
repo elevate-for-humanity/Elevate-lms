@@ -13,7 +13,7 @@ import { resolveProgram } from '@/lib/program-registry';
 
 export const metadata: Metadata = {
   title: 'Apply | Elevate for Humanity',
-  description: 'Apply for free workforce training programs, employer partnerships, or staff positions at Elevate for Humanity.',
+  description: 'Apply for workforce training programs, employer partnerships, or program holder positions at Elevate for Humanity.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/apply',
   },
@@ -165,28 +165,29 @@ export default async function ApplyPage({
             </div>
           </div>
 
-          {/* Staff */}
+          {/* Program Holder — full image CTA */}
           <Link
-            href="/apply/staff"
-            className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group"
+            href="/apply/program-holder"
+            className="block rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow group relative"
           >
-            <div className="relative h-[200px]">
+            <div className="relative h-[320px] sm:h-[360px]">
               <Image
-                src="/images/efh/sections/staffing.jpg"
-                alt="Staff and instructors at Elevate"
+                src="/images/store/platform-hero.jpg"
+                alt="Launch your own training program with Elevate"
                 fill
                 className="object-cover"
               />
-            </div>
-            <div className="bg-white p-5">
-              <h2 className="text-lg font-bold text-slate-900 mb-2">Staff & Instructor</h2>
-              <p className="text-slate-600 text-sm leading-relaxed mb-3">
-                Join our team as an instructor, case manager, or support staff.
-                Help students build real careers while growing your own.
-              </p>
-              <span className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm group-hover:gap-3 transition-all">
-                Apply for Staff <ArrowRight className="w-4 h-4" />
-              </span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-5">
+                <h2 className="text-lg sm:text-xl font-bold text-white mb-2">Become a Program Holder</h2>
+                <p className="text-white/90 text-sm leading-relaxed mb-3">
+                  Launch your own workforce training program on Elevate&apos;s platform.
+                  We provide the LMS, curriculum, and compliance infrastructure.
+                </p>
+                <span className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm group-hover:gap-3 transition-all">
+                  Get Started <ArrowRight className="w-4 h-4" />
+                </span>
+              </div>
             </div>
           </Link>
         </div>

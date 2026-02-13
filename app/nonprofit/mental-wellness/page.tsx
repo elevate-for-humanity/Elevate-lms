@@ -14,48 +14,26 @@ export const metadata: Metadata = {
   },
 };
 
-// Cache for 10 minutes - marketing content doesn't need real-time updates
-export const revalidate = 600;
-
 export default async function MentalWellnessPage() {
-  const supabase = createPublicClient();
+  let services: any[] | null = null;
+  let workshops: any[] | null = null;
+  let testimonials: any[] | null = null;
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
+  try {
+    const supabase = createPublicClient();
+    if (supabase) {
+      const [servicesRes, workshopsRes] = await Promise.all([
+        supabase.from('nonprofit_services').select('*').eq('category', 'mental-wellness').eq('is_active', true).order('order', { ascending: true }),
+        supabase.from('workshops').select('*').eq('category', 'mental-wellness').eq('is_active', true).gte('date', new Date().toISOString()).order('date', { ascending: true }).limit(3),
+      ]);
+      services = servicesRes.data;
+      workshops = workshopsRes.data;
+      const testimonialsRes = await supabase.from('testimonials').select('*').eq('category', 'mental-wellness').eq('is_featured', true).limit(2);
+      testimonials = testimonialsRes.data;
+    }
+  } catch {
+    // Supabase unavailable — use defaults
   }
-
-  // Get mental wellness services
-  const { data: services } = await supabase
-    .from('nonprofit_services')
-    .select('*')
-    .eq('category', 'mental-wellness')
-    .eq('is_active', true)
-    .order('order', { ascending: true });
-
-  // Get upcoming workshops
-  const { data: workshops } = await supabase
-    .from('workshops')
-    .select('*')
-    .eq('category', 'mental-wellness')
-    .eq('is_active', true)
-    .gte('date', new Date().toISOString())
-    .order('date', { ascending: true })
-    .limit(3);
-
-  // Get testimonials
-  const { data: testimonials } = await supabase
-    .from('testimonials')
-    .select('*')
-    .eq('category', 'mental-wellness')
-    .eq('is_featured', true)
-    .limit(2);
 
   const defaultServices = [
     { title: 'Mindfulness and Meditation', description: 'Learn techniques to calm your mind and find inner peace' },

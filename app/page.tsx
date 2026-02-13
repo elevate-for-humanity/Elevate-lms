@@ -124,45 +124,53 @@ export default function HomePage() {
 
 
       {/* ===== PARTNERS ===== */}
-      <section className="py-14 sm:py-20 bg-white">
+      <section className="py-14 sm:py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-black mb-3">Approved Training Provider</h2>
-            <p className="text-lg text-slate-600">We are approved and funded through these workforce partners</p>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Approved Training Provider</h2>
+            <p className="text-lg text-slate-700 max-w-2xl mx-auto">We are approved and funded through these workforce partners</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            <a href="https://www.dol.gov" target="_blank" rel="noopener noreferrer" className="group bg-white rounded-2xl p-8 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
-              <div className="flex justify-center mb-5">
-                <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={96} height={96} className="w-24 h-24" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
+              <div className="flex justify-center mb-6">
+                <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={80} height={80} className="w-20 h-20" />
               </div>
-              <h3 className="font-bold text-black text-lg mb-2">US Department of Labor</h3>
-              <p className="text-slate-600 text-base mb-4">Registered apprenticeship sponsor</p>
-              <span className="inline-block bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
-            </a>
-            <a href="https://www.in.gov/dwd" target="_blank" rel="noopener noreferrer" className="group bg-white rounded-2xl p-8 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
-              <div className="flex justify-center mb-5">
-                <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={96} height={96} className="w-24 h-24" />
+              <h3 className="font-bold text-slate-900 text-xl mb-3">US Department of Labor</h3>
+              <p className="text-slate-600 text-base mb-6 leading-relaxed">We are a federally registered apprenticeship sponsor, providing DOL-approved training programs with nationally recognized credentials.</p>
+              <a href="https://www.dol.gov" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-blue-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                Learn More
+              </a>
+            </div>
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
+              <div className="flex justify-center mb-6">
+                <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={80} height={80} className="w-20 h-20" />
               </div>
-              <h3 className="font-bold text-black text-lg mb-2">Indiana DWD</h3>
-              <p className="text-slate-600 text-base mb-4">Department of Workforce Development</p>
-              <span className="inline-block bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
-            </a>
-            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="group bg-white rounded-2xl p-8 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
-              <div className="flex justify-center mb-5">
-                <Image src="/images/partners/workone.webp" alt="WorkOne" width={96} height={96} className="w-24 h-24" />
+              <h3 className="font-bold text-slate-900 text-xl mb-3">Indiana DWD</h3>
+              <p className="text-slate-600 text-base mb-6 leading-relaxed">Approved by Indiana Department of Workforce Development for WIOA funding, enabling eligible students to train at no cost.</p>
+              <a href="https://www.in.gov/dwd" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-blue-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                Learn More
+              </a>
+            </div>
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
+              <div className="flex justify-center mb-6">
+                <Image src="/images/partners/workone.webp" alt="WorkOne" width={80} height={80} className="w-20 h-20" />
               </div>
-              <h3 className="font-bold text-black text-lg mb-2">WorkOne</h3>
-              <p className="text-slate-600 text-base mb-4">Register here for funding eligibility</p>
-              <span className="inline-block bg-brand-red-600 text-white text-sm font-bold px-5 py-2.5 rounded-full group-hover:bg-brand-red-700 transition-colors">Register Now →</span>
-            </a>
-            <a href="https://nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="group bg-white rounded-2xl p-8 text-center hover:shadow-lg hover:-translate-y-1 transition-all duration-300 border border-slate-200">
-              <div className="flex justify-center mb-5">
-                <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={96} height={96} className="w-24 h-24" />
+              <h3 className="font-bold text-slate-900 text-xl mb-3">WorkOne</h3>
+              <p className="text-slate-600 text-base mb-6 leading-relaxed">Register with WorkOne to determine your eligibility for free training through WIOA, WRG, and other workforce programs.</p>
+              <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-brand-red-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-brand-red-700 transition-colors">
+                Register Now
+              </a>
+            </div>
+            <div className="bg-white rounded-2xl p-8 text-center shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 border border-slate-100">
+              <div className="flex justify-center mb-6">
+                <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={80} height={80} className="w-20 h-20" />
               </div>
-              <h3 className="font-bold text-black text-lg mb-2">Next Level Jobs</h3>
-              <p className="text-slate-600 text-base mb-4">Indiana workforce training grants</p>
-              <span className="inline-block bg-blue-600 text-white text-sm font-bold px-5 py-2.5 rounded-full group-hover:bg-blue-700 transition-colors">Learn More →</span>
-            </a>
+              <h3 className="font-bold text-slate-900 text-xl mb-3">Next Level Jobs</h3>
+              <p className="text-slate-600 text-base mb-6 leading-relaxed">Indiana&apos;s Workforce Ready Grant covers tuition for high-demand certifications. We are an approved WRG training provider.</p>
+              <a href="https://nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="inline-block w-full bg-blue-600 text-white text-base font-semibold px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors">
+                Learn More
+              </a>
+            </div>
           </div>
         </div>
       </section>

@@ -24,7 +24,7 @@ This document outlines the revenue sharing structure, payment terms, and billing
 
 For the 40% share, main office provides:
 
-- ✅ Drake Software licenses (unlimited)
+- ✅ SupersonicFastCash tax software licenses (unlimited)
 - ✅ All training and onboarding
 - ✅ Technical support 24/7
 - ✅ Marketing materials
@@ -80,7 +80,7 @@ Unlike other programs, you do NOT pay for:
 
 **NO ADDITIONAL COSTS** - Everything is included:
 
-- ✅ **Drake Software:** Unlimited licenses for all preparers
+- ✅ **SupersonicFastCash:** Unlimited licenses for all preparers
 - ✅ **E-file Unlimited:** No per-return fees
 - ✅ **Technical Support:** 24/7 during tax season
 - ✅ **Software Updates:** Automatic, always current

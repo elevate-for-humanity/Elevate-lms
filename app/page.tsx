@@ -85,10 +85,10 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-center text-black font-bold text-base sm:text-lg mb-5 sm:mb-6 tracking-wide">APPROVED TRAINING PROVIDER</p>
           <div className="flex flex-wrap items-center justify-center gap-8 sm:gap-10 md:gap-14">
-            <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14" />
-            <Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14" />
-            <Image src="/images/partners/workone.webp" alt="WorkOne" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14" />
-            <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14" />
+            <a href="https://www.dol.gov" target="_blank" rel="noopener noreferrer"><Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14" /></a>
+            <a href="https://www.in.gov/dwd" target="_blank" rel="noopener noreferrer"><Image src="/images/partners/dwd.webp" alt="Indiana DWD" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14" /></a>
+            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"><Image src="/images/partners/workone.webp" alt="WorkOne" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14" /></a>
+            <a href="https://www.nextleveljobs.org" target="_blank" rel="noopener noreferrer"><Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={48} height={48} className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14" /></a>
           </div>
         </div>
       </section>
@@ -97,9 +97,9 @@ export default function HomePage() {
       <section className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-8 sm:mb-12 md:mb-16">
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">Career Training Programs</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-slate-900 mb-3 sm:mb-4">Career Training That Works</h2>
             <p className="text-base sm:text-lg md:text-xl text-slate-800 max-w-2xl mx-auto px-4">
-              Industry-recognized certifications in high-demand fields. Start your new career in weeks.
+              Industry-recognized certifications in high-demand fields. Funding available for qualifying students.
             </p>
           </div>
           
@@ -137,6 +137,13 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ===== FUNDING LINK ===== */}
+      <div className="text-center pb-8 sm:pb-12 bg-white">
+        <Link href="/funding" className="text-brand-red-600 font-semibold text-base sm:text-lg hover:underline">
+          Learn More About Funding →
+        </Link>
+      </div>
+
       {/* ===== HOW IT WORKS ===== */}
       <section className="py-14 sm:py-18 md:py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -146,18 +153,18 @@ export default function HomePage() {
           </div>
           
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6 lg:gap-8">
-            <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
+            <Link href="/funding" className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
               <div className="relative h-40 sm:h-48 md:h-52">
-                <Image src="/images/students-new/student-5.jpg" alt="Check eligibility" fill className="object-cover object-top" />
+                <Image src="/images/students-new/student-5.jpg" alt="Register for funding" fill className="object-cover object-top" />
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4 w-9 h-9 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-lg">1</div>
               </div>
               <div className="p-4 sm:p-5 md:p-6">
                 <h3 className="font-bold text-slate-900 text-base sm:text-lg md:text-xl mb-1 sm:mb-2">Register</h3>
                 <p className="text-slate-800 text-sm sm:text-base">Sign up at indianacareerconnect.com and schedule a WorkOne appointment.</p>
               </div>
-            </div>
+            </Link>
             
-            <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
+            <Link href="/programs" className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
               <div className="relative h-40 sm:h-48 md:h-52">
                 <Image src="/images/students-new/student-3.jpg" alt="Choose program" fill className="object-cover object-top" />
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4 w-9 h-9 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-lg">2</div>
@@ -166,9 +173,9 @@ export default function HomePage() {
                 <h3 className="font-bold text-slate-900 text-base sm:text-lg md:text-xl mb-1 sm:mb-2">Choose Program</h3>
                 <p className="text-slate-800 text-sm sm:text-base">Browse programs and select the career path that fits your goals.</p>
               </div>
-            </div>
+            </Link>
             
-            <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
+            <Link href="/how-it-works" className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
               <div className="relative h-40 sm:h-48 md:h-52">
                 <Image src="/images/students-new/student-7.jpg" alt="Complete training" fill className="object-cover object-top" />
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4 w-9 h-9 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-lg">3</div>
@@ -177,9 +184,9 @@ export default function HomePage() {
                 <h3 className="font-bold text-slate-900 text-base sm:text-lg md:text-xl mb-1 sm:mb-2">Complete Training</h3>
                 <p className="text-slate-800 text-sm sm:text-base">Attend classes, gain hands-on experience, earn your certification.</p>
               </div>
-            </div>
+            </Link>
             
-            <div className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm">
+            <Link href="/career-services" className="bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
               <div className="relative h-40 sm:h-48 md:h-52">
                 <Image src="/images/students-new/student-25.jpg" alt="Get hired" fill className="object-cover object-top" />
                 <div className="absolute top-3 left-3 sm:top-4 sm:left-4 w-9 h-9 sm:w-10 sm:h-10 bg-brand-red-600 rounded-lg flex items-center justify-center text-white font-bold text-base sm:text-lg">4</div>
@@ -188,7 +195,7 @@ export default function HomePage() {
                 <h3 className="font-bold text-slate-900 text-base sm:text-lg md:text-xl mb-1 sm:mb-2">Get Hired</h3>
                 <p className="text-slate-800 text-sm sm:text-base">Connect with employer partners who are actively hiring graduates.</p>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </section>

@@ -3,32 +3,57 @@ import fs from 'fs';
 import path from 'path';
 
 const ELEVATE_URL = 'https://www.elevateforhumanity.org';
-const SUPERSONIC_URL = 'https://www.supersonicfastmoney.com';
 
-// Routes that should NOT be in sitemap (private/auth routes)
+// Routes that should NOT be in sitemap (auth-gated, private, or separate-domain routes)
 const EXCLUDED_PREFIXES = [
   '/admin',
   '/lms',
   '/student',
   '/staff',
+  '/staff-portal',
+  '/student-portal',
+  '/partner-portal',
   '/api',
   '/auth',
   '/login',
   '/signup',
+  '/sign',
+  '/register',
+  '/reset',
+  '/reset-password',
+  '/verify-email',
+  '/verify-identity',
   '/partners/admin',
   '/partners/dashboard',
   '/checkout',
   '/payment',
+  '/pay',
   '/invoice',
+  '/billing',
   '/demo',
   '/test',
   '/dev',
   '/debug',
-];
-
-// Routes that belong to SupersonicFastMoney domain
-const SUPERSONIC_ROUTES = [
+  '/settings',
+  '/account',
+  '/dashboard',
+  '/portals',
+  '/approvals',
+  '/reports',
+  '/analytics',
+  '/performance-report',
+  '/cache-diagnostic',
+  '/sentry-test',
+  '/test-enrollment',
+  '/test-images',
+  '/unauthorized',
+  '/access-paused',
+  '/preview',
+  '/builder',
+  '/studio',
+  // Separate domain — not part of this sitemap
   '/supersonic-fast-cash',
+  '/supersonic',
 ];
 
 // Priority mapping based on route patterns
@@ -43,7 +68,6 @@ function getPriority(route: string): number {
   // State-specific SEO pages - high priority
   if (route.startsWith('/career-training-')) return 0.9;
   if (route.startsWith('/community-services-')) return 0.9;
-  if (route.startsWith('/supersonic-fast-cash/tax-preparation-')) return 0.9;
   if (route.startsWith('/courses')) return 0.8;
   if (route.startsWith('/store/guides')) return 0.8;
   if (route.startsWith('/blog') || route.startsWith('/resources')) return 0.7;
@@ -57,28 +81,11 @@ function getChangeFreq(route: string): 'always' | 'hourly' | 'daily' | 'weekly' 
   if (route.startsWith('/programs') || route.startsWith('/blog')) return 'weekly';
   // State-specific pages update monthly
   if (route.startsWith('/career-training-') || route.startsWith('/community-services-')) return 'monthly';
-  if (route.startsWith('/supersonic-fast-cash/tax-preparation-')) return 'monthly';
   if (route.startsWith('/policies') || route.startsWith('/privacy')) return 'yearly';
   return 'monthly';
 }
 
-// Determine which domain a route belongs to
-function getBaseUrl(route: string): string {
-  if (SUPERSONIC_ROUTES.some(prefix => route.startsWith(prefix))) {
-    // For supersonic routes, strip the prefix for the URL
-    return SUPERSONIC_URL;
-  }
-  return ELEVATE_URL;
-}
 
-// Transform route for the appropriate domain
-function transformRoute(route: string): string {
-  // SupersonicFastMoney routes: /supersonic-fast-cash/tax-preparation-indiana -> /tax-preparation-indiana
-  if (route.startsWith('/supersonic-fast-cash/')) {
-    return route.replace('/supersonic-fast-cash', '');
-  }
-  return route;
-}
 
 // Recursively find all page.tsx files
 function findAllPages(dir: string, basePath: string = ''): string[] {
@@ -125,18 +132,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     .filter(route => !EXCLUDED_PREFIXES.some(prefix => route.startsWith(prefix)))
     .sort();
   
-  // Generate sitemap entries with proper domain routing
-  const entries: MetadataRoute.Sitemap = publicRoutes.map(route => {
-    const baseUrl = getBaseUrl(route);
-    const transformedRoute = transformRoute(route);
-    
-    return {
-      url: `${baseUrl}${transformedRoute === '/' ? '' : transformedRoute}`,
-      lastModified: now,
-      changeFrequency: getChangeFreq(route),
-      priority: getPriority(route),
-    };
-  });
+  // Generate sitemap entries — all routes belong to elevateforhumanity.org
+  const entries: MetadataRoute.Sitemap = publicRoutes.map(route => ({
+    url: `${ELEVATE_URL}${route === '/' ? '' : route}`,
+    lastModified: now,
+    changeFrequency: getChangeFreq(route),
+    priority: getPriority(route),
+  }));
   
   return entries;
 }

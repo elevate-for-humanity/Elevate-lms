@@ -161,7 +161,7 @@ The entire process typically takes 2-3 weeks from your first appointment to prog
 
 ## Questions?
 
-Contact us at (317) 314-3757 or email info@elevateforhumanity.institute',
+Contact us at (317) 314-3757 or email info@elevateforhumanity.org',
   'Learn how to apply for WIOA funding to cover 100% of your training costs.',
   'Enrollment',
   ARRAY['wioa', 'funding', 'financial aid', 'free training'],
@@ -302,7 +302,7 @@ WIOA can also cover:
 
 ## Get Started
 
-Check your eligibility at elevateforhumanity.institute/wioa-eligibility or call (317) 314-3757.',
+Check your eligibility at elevateforhumanity.org/wioa-eligibility or call (317) 314-3757.',
   'Learn how WIOA funding makes career training completely free for eligible students.',
   'Financial Aid',
   ARRAY['free', 'wioa', 'funding', 'cost'],
@@ -317,7 +317,7 @@ If you forgot your password or need to change it, follow these steps:
 
 ### From the Login Page
 
-1. Go to elevateforhumanity.institute/login
+1. Go to elevateforhumanity.org/login
 2. Click "Forgot Password?"
 3. Enter your email address
 4. Check your email for a reset link
@@ -349,7 +349,7 @@ If you''re already logged in:
 
 ## Need Help?
 
-Contact support at support@elevateforhumanity.institute or call (317) 314-3757.',
+Contact support at support@elevateforhumanity.org or call (317) 314-3757.',
   'Step-by-step instructions for resetting your account password.',
   'Account',
   ARRAY['password', 'login', 'account', 'security'],
@@ -364,7 +364,7 @@ The student portal is your hub for coursework, grades, schedules, and resources.
 
 ### First-Time Login
 
-1. Go to elevateforhumanity.institute/login
+1. Go to elevateforhumanity.org/login
 2. Enter the email you used during enrollment
 3. If this is your first login, click "Set Password"
 4. Check your email for a password setup link
@@ -474,7 +474,7 @@ Career services are included with all programs at no extra cost. Contact us at (
 
 **Phone:** (317) 314-3757
 
-**Email:** info@elevateforhumanity.institute
+**Email:** info@elevateforhumanity.org
 
 ### Office Hours
 - Monday-Friday: 8:00 AM - 6:00 PM EST
@@ -492,7 +492,7 @@ Career services are included with all programs at no extra cost. Contact us at (
 For urgent matters outside business hours:
 - Submit a support ticket marked "Urgent"
 - Leave a voicemail at (317) 314-3757
-- Email support@elevateforhumanity.institute with "URGENT" in subject
+- Email support@elevateforhumanity.org with "URGENT" in subject
 
 ### Social Media
 - LinkedIn: linkedin.com/company/elevate-for-humanity

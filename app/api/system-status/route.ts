@@ -152,7 +152,7 @@ function determineRouteStatus(route: typeof ROUTES_TO_AUDIT[0], tableAudits: Tab
 
 export async function GET() {
   const timestamp = new Date().toISOString();
-  const commitSha = process.env.VERCEL_GIT_COMMIT_SHA || process.env.COMMIT_SHA || 'local-dev';
+  const commitSha = process.env.COMMIT_REF || process.env.COMMIT_SHA || 'local-dev';
   
   // Try to get Supabase admin client (service role for accurate counts)
   const supabase = await getSupabaseAdminClient();

@@ -77,8 +77,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Wait for Vercel deployment
-        run: sleep 60
+      - name: Wait for Netlify deployment
+        run: sleep 90
 
       - name: Check health endpoint
         run: |

@@ -31,7 +31,6 @@
 /.env* @elevateforhumanity
 /netlify.toml @elevateforhumanity
 /next.config.* @elevateforhumanity
-/vercel.json @elevateforhumanity
 /package.json @elevateforhumanity
 
 # Database migrations

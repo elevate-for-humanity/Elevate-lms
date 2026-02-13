@@ -362,7 +362,7 @@ function analyzeChecks(checks: any, blockers: Finding[], warnings: Finding[]) {
       },
       fix: {
         action: 'Add missing environment variables',
-        steps: checks.env.missing.map((key: string) => `Set ${key} in Vercel dashboard`),
+        steps: checks.env.missing.map((key: string) => `Set ${key} in Netlify dashboard`),
         owner: 'ops',
       },
     });

@@ -22,7 +22,7 @@ const SKIP_PATTERNS = [
   'dist/',
   'build/',
   '.turbo/',
-  '.vercel/',
+  '.netlify/',
   'coverage/',
   '*.lock',
   'pnpm-lock.yaml',

@@ -371,8 +371,8 @@
               test: () => checkFile('/Dockerfile'),
             },
             {
-              name: 'Vercel Configuration',
-              test: () => checkFile('/vercel.json'),
+              name: 'Netlify Configuration',
+              test: () => checkFile('/netlify.toml'),
             },
             { name: 'CI/CD Pipeline', test: () => checkDirectory('/.github') },
             { name: 'Security Headers', test: () => checkSecurityHeaders() },

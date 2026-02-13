@@ -619,7 +619,7 @@ export default async function SystemStatusPage() {
 
         {/* Build Info */}
         <div className="mt-8 text-center text-sm text-gray-500">
-          <p>Build: {process.env.VERCEL_GIT_COMMIT_SHA?.substring(0, 7) || 'local'}</p>
+          <p>Build: {process.env.COMMIT_REF?.substring(0, 7) || 'local'}</p>
           <p>Environment: {process.env.NODE_ENV}</p>
           <p>Timestamp: {timestamp}</p>
         </div>

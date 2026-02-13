@@ -571,7 +571,7 @@ const nextConfig = {
           { key: 'Expires', value: '0' },
           { key: 'Surrogate-Control', value: 'no-store' },
           { key: 'X-Build-ID', value: process.env.COMMIT_REF?.slice(0, 7) || 'dev' },
-          { key: 'X-Deployment-ID', value: process.env.VERCEL_DEPLOYMENT_ID || 'local' },
+          { key: 'X-Deployment-ID', value: process.env.DEPLOY_ID || 'local' },
           ...securityHeaders,
         ],
       },

@@ -213,8 +213,8 @@ export async function POST(request: NextRequest) {
       // Don't fail provisioning if email fails
     }
 
-    // DNS setup for custom domain is handled by Vercel/infrastructure
-    // Custom domains are configured in the Vercel dashboard or via API
+    // DNS setup for custom domain is handled by Netlify/infrastructure
+    // Custom domains are configured in the Netlify dashboard or via API
 
     return NextResponse.json({
       success: true,

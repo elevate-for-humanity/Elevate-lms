@@ -4,16 +4,16 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 
-// Deploy to Vercel or Netlify
+// Deploy to Netlify
 export async function POST(req: NextRequest) {
   const userId = req.headers.get('x-user-id');
 
   try {
     const { provider, repo, branch, project_id, token } = await req.json();
 
-    if (!provider || !repo || !branch) {
+    if (!repo || !branch) {
       return NextResponse.json(
-        { error: 'Missing required fields (provider, repo, branch)' },
+        { error: 'Missing required fields (repo, branch)' },
         { status: 400 }
       );
     }
@@ -21,33 +21,7 @@ export async function POST(req: NextRequest) {
     let deploymentUrl: string;
     let deploymentId: string;
 
-    if (provider === 'vercel') {
-      // Trigger Vercel deployment
-      const response = await fetch('https://api.vercel.com/v13/deployments', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token || process.env.VERCEL_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name: project_id || repo.split('/')[1],
-          gitSource: {
-            type: 'github',
-            repo,
-            ref: branch,
-          },
-        }),
-      });
-
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error.message || 'Vercel deployment failed');
-      }
-
-      deploymentId = data.id;
-      deploymentUrl = data.url;
-    } else if (provider === 'netlify') {
+    if (provider === 'netlify' || !provider) {
       // Trigger Netlify build hook or deployment
       const hookUrl = process.env.NETLIFY_BUILD_HOOK;
       
@@ -131,17 +105,7 @@ export async function GET(req: NextRequest) {
     let status: string;
     let url: string | null = null;
 
-    if (provider === 'vercel') {
-      const response = await fetch(`https://api.vercel.com/v13/deployments/${deploymentId}`, {
-        headers: {
-          'Authorization': `Bearer ${token || process.env.VERCEL_TOKEN}`,
-        },
-      });
-
-      const data = await response.json();
-      status = data.readyState || data.state;
-      url = data.url ? `https://${data.url}` : null;
-    } else if (provider === 'netlify') {
+    if (provider === 'netlify' || !provider) {
       const response = await fetch(`https://api.netlify.com/api/v1/deploys/${deploymentId}`, {
         headers: {
           'Authorization': `Bearer ${token || process.env.NETLIFY_TOKEN}`,

@@ -31,7 +31,7 @@ export function DeployPanel({ repo, branch, userId }: DeployPanelProps) {
   const [savedTokens, setSavedTokens] = useState<SavedToken[]>([]);
   const [loading, setLoading] = useState(false);
   const [deploying, setDeploying] = useState(false);
-  const [provider, setProvider] = useState<'vercel' | 'netlify'>('vercel');
+  const [provider, setProvider] = useState<'netlify'>('netlify');
   const [tokenInput, setTokenInput] = useState('');
   const [projectId, setProjectId] = useState('');
   const [showConfig, setShowConfig] = useState(false);
@@ -282,26 +282,6 @@ export function DeployPanel({ repo, branch, userId }: DeployPanelProps) {
         {/* Provider selection */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 12 }}>
           <button
-            onClick={() => setProvider('vercel')}
-            style={{
-              flex: 1,
-              padding: 8,
-              background: provider === 'vercel' ? '#000' : '#3c3c3c',
-              border: provider === 'vercel' ? '1px solid #fff' : '1px solid transparent',
-              borderRadius: 4,
-              color: '#fff',
-              cursor: 'pointer',
-              fontSize: 12,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 4,
-            }}
-          >
-            ▲ Vercel
-            {hasToken('vercel') && <span style={{ color: '#7ee787', fontSize: 10 }}>✓</span>}
-          </button>
-          <button
             onClick={() => setProvider('netlify')}
             style={{
               flex: 1,
@@ -328,7 +308,7 @@ export function DeployPanel({ repo, branch, userId }: DeployPanelProps) {
           <div style={{ marginBottom: 12, padding: 12, background: '#1e1e1e', borderRadius: 4 }}>
             <div style={{ marginBottom: 8 }}>
               <label style={{ display: 'block', fontSize: 11, color: '#888', marginBottom: 4 }}>
-                {provider === 'vercel' ? 'Vercel Token' : 'Netlify Token'}
+                Netlify Token
                 {hasToken(provider) && <span style={{ color: '#7ee787', marginLeft: 8 }}>Saved ✓</span>}
               </label>
               <input
@@ -412,7 +392,7 @@ export function DeployPanel({ repo, branch, userId }: DeployPanelProps) {
           style={{
             width: '100%',
             padding: 12,
-            background: deploying ? '#3c3c3c' : provider === 'vercel' ? '#000' : '#00ad9f',
+            background: deploying ? '#3c3c3c' : '#00ad9f',
             border: 'none',
             borderRadius: 4,
             color: '#fff',
@@ -421,7 +401,7 @@ export function DeployPanel({ repo, branch, userId }: DeployPanelProps) {
             fontWeight: 500,
           }}
         >
-          {deploying ? 'Deploying...' : `Deploy to ${provider === 'vercel' ? 'Vercel' : 'Netlify'}`}
+          {deploying ? 'Deploying...' : 'Deploy to Netlify'}
         </button>
         <div style={{ fontSize: 11, color: '#888', marginTop: 8, textAlign: 'center' }}>
           {branch} branch

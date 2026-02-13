@@ -1,7 +1,7 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Play, Volume2, VolumeX } from 'lucide-react';
+import { Play } from 'lucide-react';
 
 interface PageAvatarProps {
   videoSrc: string;
@@ -13,24 +13,13 @@ interface PageAvatarProps {
 
 export default function PageAvatar({ videoSrc, title, position = 'default', loop = false }: PageAvatarProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isMuted, setIsMuted] = useState(true);
   const [showPlay, setShowPlay] = useState(false);
 
   const handlePlay = () => {
     const video = videoRef.current;
     if (video) {
-      video.muted = false;
-      setIsMuted(false);
       video.play();
       setShowPlay(false);
-    }
-  };
-
-  const toggleMute = () => {
-    const video = videoRef.current;
-    if (video) {
-      video.muted = !video.muted;
-      setIsMuted(video.muted);
     }
   };
 
@@ -42,18 +31,11 @@ export default function PageAvatar({ videoSrc, title, position = 'default', loop
           className="w-full h-full object-cover"
           src={videoSrc}
           autoPlay
-          muted
           loop={loop}
           playsInline
           preload="auto"
           onPause={() => setShowPlay(true)}
         />
-        <button
-          onClick={toggleMute}
-          className="absolute bottom-1 right-1 p-1.5 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors"
-        >
-          {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-        </button>
       </div>
     );
   }
@@ -65,7 +47,6 @@ export default function PageAvatar({ videoSrc, title, position = 'default', loop
         className="absolute inset-0 w-full h-full object-cover"
         src={videoSrc}
         autoPlay
-        muted
         loop={loop}
         playsInline
         preload="auto"
@@ -82,12 +63,6 @@ export default function PageAvatar({ videoSrc, title, position = 'default', loop
           </div>
         </button>
       )}
-      <button
-        onClick={toggleMute}
-        className="absolute bottom-4 left-4 p-3 bg-black/60 rounded-full text-white hover:bg-black/80 transition-colors z-20"
-      >
-        {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
-      </button>
       {title && (
         <div className="absolute bottom-3 right-3 z-10 pointer-events-none">
           <span className="bg-black/70 text-white text-xs font-medium rounded px-2 py-1">{title}</span>

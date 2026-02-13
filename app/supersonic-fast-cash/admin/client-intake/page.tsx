@@ -24,7 +24,7 @@ interface Client {
   phone: string;
   filing_status: string;
   jotform_submission_id: string;
-  drake_return_id?: string;
+  sfc_return_id?: string;
   status: string;
   created_at: string;
 }
@@ -71,9 +71,9 @@ export default function ClientIntakeDashboard() {
     }
   };
 
-  const openInDrake = (drakeReturnId: string) => {
-    // In production, this would open Drake Software with the specific return
-    window.open(`drake://return/${drakeReturnId}`, '_blank');
+  const openInSupersonicFastCash = (sfcReturnId: string) => {
+    // In production, this would open SupersonicFastCash with the specific return
+    window.open(`supersonic://return/${sfcReturnId}`, '_blank');
   };
 
   const filteredClients = clients.filter((client) => {
@@ -98,7 +98,7 @@ export default function ClientIntakeDashboard() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Client Intake Dashboard</h1>
           <p className="text-black">
-            Manage JotForm submissions and Drake Software integration
+            Manage JotForm submissions and SupersonicFastCash integration
           </p>
         </div>
 
@@ -141,12 +141,12 @@ export default function ClientIntakeDashboard() {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-2">
               <span className="text-sm font-medium text-black">
-                Drake Returns
+                SupersonicFastCash Returns
               </span>
               <FileText className="w-5 h-5 text-blue-600" />
             </div>
             <div className="text-3xl font-bold">
-              {clients.filter((c) => c.drake_return_id).length}
+              {clients.filter((c) => c.sfc_return_id).length}
             </div>
           </div>
         </div>
@@ -219,7 +219,7 @@ export default function ClientIntakeDashboard() {
                   Status
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
-                  Drake
+                  SupersonicFastCash
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-black uppercase tracking-wider">
                   Actions
@@ -290,9 +290,9 @@ export default function ClientIntakeDashboard() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      {client.drake_return_id ? (
+                      {client.sfc_return_id ? (
                         <button
-                          onClick={() => openInDrake(client.drake_return_id!)}
+                          onClick={() => openInSupersonicFastCash(client.sfc_return_id!)}
                           className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-semibold"
                         >
                           <FileText className="w-4 h-4" />
@@ -360,7 +360,7 @@ export default function ClientIntakeDashboard() {
               <h4 className="font-semibold mb-2">3. Test Integration</h4>
               <p className="text-black">
                 Submit a test form and verify it appears here and creates a
-                Drake return.
+                SupersonicFastCash return.
               </p>
             </div>
           </div>

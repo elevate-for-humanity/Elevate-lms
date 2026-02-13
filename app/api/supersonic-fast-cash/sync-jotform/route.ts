@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jotFormIntegration } from '@/lib/integrations/jotform';
-import { drakeIntegration } from '@/lib/integrations/drake-software';
+import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { createClient } from '@supabase/supabase-js';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 
@@ -83,8 +83,8 @@ export async function POST(request: NextRequest) {
           continue;
         }
 
-        // Create Drake return
-        const drakeReturn = await drakeIntegration.createReturn({
+        // Create SupersonicFastCash return
+        const supersonicReturn = await supersonicTaxEngine.createReturn({
           id: '',
           taxpayer: {
             firstName: clientData.firstName,
@@ -118,7 +118,7 @@ export async function POST(request: NextRequest) {
           filing_status: clientData.filingStatus,
           service_type: 'professional',
           status: 'in_progress',
-          drake_return_id: drakeReturn.returnId,
+          supersonic_return_id: supersonicReturn.returnId,
           jotform_submission_id: submission.id,
           created_at: new Date().toISOString(),
         });

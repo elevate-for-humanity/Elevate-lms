@@ -177,7 +177,7 @@ export default function SubOfficeAgreementPage() {
               <strong>Main Office Responsibilities:</strong>
             </p>
             <ul className="list-disc ml-6 mb-4">
-              <li>Software licensing and systems (Drake)</li>
+              <li>Software licensing and systems (SupersonicFastCash)</li>
               <li>Pricing structure and fee determination</li>
               <li>Final review and filing authority</li>
               <li>Compliance oversight, corrections, notices, and audits</li>

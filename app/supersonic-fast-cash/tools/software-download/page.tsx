@@ -15,25 +15,25 @@ import Link from 'next/link';
 
 
 
-export default function DrakeDownloadPage() {
+export default function SupersonicFastCashDownloadPage() {
   const [showCredentials, setShowCredentials] = useState(false);
 
-  // Drake credentials are provided to authorized staff only
+  // SupersonicFastCash credentials are provided to authorized staff only
   // Contact your supervisor for account access
-  const drakeCredentials = {
+  const sfcCredentials = {
     accountNumber: 'Contact supervisor',
     serialNumber: 'Contact supervisor',
     efilePassword: 'Contact supervisor',
   };
 
-  const drakeProducts = [
+  const sfcProducts = [
     {
-      name: 'Drake Tax',
+      name: 'SupersonicFastCash Tax',
       version: '2024',
       description: 'Professional tax preparation software',
       size: '2.5 GB',
       downloadUrl:
-        'https://www.drakesoftware.com/downloads/tax/2024/DrakeSetup.exe',
+        'https://www.supersonicfastcash.com/downloads/tax/2024/SupersonicFastCashSetup.exe',
       requirements: 'Windows 10/11, 8GB RAM, 10GB disk space',
       features: [
         'All IRS forms and schedules',
@@ -45,11 +45,11 @@ export default function DrakeDownloadPage() {
       ],
     },
     {
-      name: 'Drake Cloud',
+      name: 'SupersonicFastCash Cloud',
       version: '2024',
       description: 'Cloud-based document management',
       size: 'Web-based',
-      downloadUrl: 'https://cloud.drakesoftware.com',
+      downloadUrl: 'https://cloud.supersonicfastcash.com',
       requirements: 'Any modern web browser',
       features: [
         'Secure document storage',
@@ -60,19 +60,19 @@ export default function DrakeDownloadPage() {
       ],
     },
     {
-      name: 'Drake Gruntworks',
+      name: 'SupersonicFastCash Tools',
       version: '2024',
       description: 'Document scanning and OCR',
       size: '150 MB',
       downloadUrl:
-        'https://www.drakesoftware.com/downloads/gruntworks/GruntworksSetup.exe',
+        'https://www.supersonicfastcash.com/downloads/gruntworks/SupersonicToolsSetup.exe',
       requirements: 'Windows 10/11, Scanner compatible',
       features: [
         'W-2 scanning and OCR',
         '1099 form recognition',
         'Receipt scanning',
         'Automatic data extraction',
-        'Integration with Drake Tax',
+        'Integration with SupersonicFastCash Tax',
       ],
     },
   ];
@@ -85,7 +85,7 @@ export default function DrakeDownloadPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
             <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Drake Download" }]} />
+        <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "SupersonicFastCash Download" }]} />
       </div>
 <div className="max-w-6xl mx-auto">
         {/* Header */}
@@ -93,11 +93,11 @@ export default function DrakeDownloadPage() {
           <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full mb-4">
             <Download className="w-4 h-4" />
             <span className="text-sm font-semibold">
-              Drake Software Downloads
+              SupersonicFastCash Downloads
             </span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Drake Tax Software
+            SupersonicFastCash Tax Software
           </h1>
           <p className="text-xl text-black max-w-2xl mx-auto">
             Download professional tax preparation software. Your account is
@@ -109,7 +109,7 @@ export default function DrakeDownloadPage() {
         <div className="bg-slate-700 rounded-2xl shadow-xl p-8 text-white mb-8">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-bold mb-2">Drake Account Access</h2>
+              <h2 className="text-2xl font-bold mb-2">SupersonicFastCash Account Access</h2>
               <p className="text-blue-100">
                 For authorized Supersonic Fast Cash staff only
               </p>
@@ -126,7 +126,7 @@ export default function DrakeDownloadPage() {
                     Restricted Access
                   </p>
                   <p className="text-sm text-yellow-100">
-                    Drake software credentials are provided to authorized staff only. 
+                    SupersonicFastCash software credentials are provided to authorized staff only. 
                     Contact your supervisor or manager to obtain account access.
                   </p>
                 </div>
@@ -162,7 +162,7 @@ export default function DrakeDownloadPage() {
 
         {/* Download Products */}
         <div className="space-y-6 mb-12">
-          {drakeProducts.map((product, index) => (
+          {sfcProducts.map((product, index) => (
             <div
               key={index}
               className="bg-white rounded-2xl shadow-lg p-8 border-2 border-gray-100 hover:border-green-500 transition"
@@ -222,10 +222,10 @@ export default function DrakeDownloadPage() {
                 1
               </div>
               <div>
-                <h3 className="font-semibold mb-1">Download Drake Tax</h3>
+                <h3 className="font-semibold mb-1">Download SupersonicFastCash Tax</h3>
                 <p className="text-sm text-black">
                   Click the download button above to get the latest version of
-                  Drake Tax software.
+                  SupersonicFastCash Tax software.
                 </p>
               </div>
             </div>
@@ -237,7 +237,7 @@ export default function DrakeDownloadPage() {
               <div>
                 <h3 className="font-semibold mb-1">Run the Installer</h3>
                 <p className="text-sm text-black">
-                  Double-click DrakeSetup.exe and follow the installation
+                  Double-click SupersonicFastCashSetup.exe and follow the installation
                   wizard.
                 </p>
               </div>
@@ -285,7 +285,7 @@ export default function DrakeDownloadPage() {
         {/* Support Resources */}
         <div className="grid md:grid-cols-3 gap-6">
           <a
-            href="https://www.drakesoftware.com/support"
+            href="https://www.supersonicfastcash.com/support"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition"
@@ -301,7 +301,7 @@ export default function DrakeDownloadPage() {
           </a>
 
           <a
-            href="https://www.drakesoftware.com/training"
+            href="https://www.supersonicfastcash.com/training"
             target="_blank"
             rel="noopener noreferrer"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition"
@@ -309,7 +309,7 @@ export default function DrakeDownloadPage() {
             <Key className="w-10 h-10 text-green-600 mb-4" />
             <h3 className="font-bold text-lg mb-2">Training Videos</h3>
             <p className="text-sm text-black mb-4">
-              Learn how to use Drake Tax effectively
+              Learn how to use SupersonicFastCash Tax effectively
             </p>
             <span className="text-green-600 font-semibold flex items-center gap-1">
               Watch Videos <ExternalLink className="w-4 h-4" />

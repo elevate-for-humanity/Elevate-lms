@@ -227,7 +227,7 @@ export default function SmartUploadPage() {
           </h1>
           <p className="text-xl text-black max-w-2xl mx-auto">
             Upload your W-2s, 1099s, and receipts. We'll automatically extract
-            all the data for you using Drake Software OCR.
+            all the data for you using SupersonicFastCash OCR.
           </p>
         </div>
 
@@ -285,7 +285,7 @@ export default function SmartUploadPage() {
             <Sparkles className="w-10 h-10 text-blue-600 mb-4" />
             <h3 className="font-bold text-lg mb-2">Auto Data Extraction</h3>
             <p className="text-sm text-black">
-              Drake Software OCR automatically reads and extracts all data from
+              SupersonicFastCash OCR automatically reads and extracts all data from
               your documents
             </p>
           </div>

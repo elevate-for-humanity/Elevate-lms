@@ -171,24 +171,24 @@ const COMPETENCY_QUESTIONS: Question[] = [
     category: 'Deadlines',
   },
 
-  // Drake Software Questions
+  // SupersonicFastCash Questions
   {
     id: 16,
-    question: 'In Drake Software, which key opens the forms view?',
+    question: 'In SupersonicFastCash, which key opens the forms view?',
     options: ['F1', 'F5', 'F9', 'F12'],
     correctAnswer: 1,
-    category: 'Drake Software',
+    category: 'SupersonicFastCash',
   },
   {
     id: 17,
-    question: "Drake's e-file transmission is accessed through:",
+    question: "SupersonicFastCash's e-file transmission is accessed through:",
     options: ['File menu', 'Tools menu', 'Transmit menu', 'E-File menu'],
     correctAnswer: 2,
-    category: 'Drake Software',
+    category: 'SupersonicFastCash',
   },
   {
     id: 18,
-    question: "What does Drake's 'Calculate' function do?",
+    question: "What does SupersonicFastCash's 'Calculate' function do?",
     options: [
       'Only checks for errors',
       'Computes tax liability and generates forms',
@@ -196,7 +196,7 @@ const COMPETENCY_QUESTIONS: Question[] = [
       'Prints the return',
     ],
     correctAnswer: 1,
-    category: 'Drake Software',
+    category: 'SupersonicFastCash',
   },
 
   // Ethics & Compliance
@@ -429,7 +429,7 @@ export default function CompetencyTest() {
                   • <strong>80% passing score</strong> required (24/30 correct)
                 </li>
                 <li>
-                  • Topics: Filing status, income, deductions, credits, Drake
+                  • Topics: Filing status, income, deductions, credits, SupersonicFastCash
                   Software, ethics
                 </li>
                 <li>• Multiple choice format</li>
@@ -519,7 +519,7 @@ export default function CompetencyTest() {
                   <li>
                     Complete onboarding paperwork (W-4, I-9, direct deposit)
                   </li>
-                  <li>Begin Drake Software training</li>
+                  <li>Begin SupersonicFastCash training</li>
                   <li>Start preparing tax returns!</li>
                 </ol>
               </div>
@@ -531,7 +531,7 @@ export default function CompetencyTest() {
                   test after 7 days.
                 </p>
                 <p className="text-sm">
-                  We recommend reviewing tax preparation materials and Drake
+                  We recommend reviewing tax preparation materials and SupersonicFastCash
                   Software documentation before retaking.
                 </p>
               </div>

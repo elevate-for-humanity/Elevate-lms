@@ -1,14 +1,11 @@
 /**
- * Drake Software API Integration
- * Professional tax preparation software integration
+ * SupersonicFastCash Tax Software
+ * SupersonicFastCash in-house tax preparation engine
  *
- * Credentials from .env.local:
- * - DRAKE_ACCOUNT_NUMBER=211607
- * - DRAKE_SERIAL_NUMBER=B7ED-0119-0036-E407
- * - DRAKE_EFILE_PASSWORD=Lizzy6262*
+ * Required env vars: SUPERSONIC_ACCOUNT_NUMBER, SUPERSONIC_SERIAL_NUMBER, SUPERSONIC_EFILE_PASSWORD
  */
 
-export interface DrakeTaxReturn {
+export interface SupersonicTaxReturn {
   id: string;
   taxpayer: {
     firstName: string;
@@ -72,7 +69,7 @@ export interface DrakeTaxReturn {
   };
 }
 
-export interface DrakeEFileResult {
+export interface SupersonicEFileResult {
   success: boolean;
   submissionId: string;
   acknowledgmentStatus: 'pending' | 'accepted' | 'rejected';
@@ -81,7 +78,7 @@ export interface DrakeEFileResult {
   submittedAt: Date;
 }
 
-export interface DrakeCalculationResult {
+export interface SupersonicCalculationResult {
   totalIncome: number;
   adjustedGrossIncome: number;
   taxableIncome: number;
@@ -94,29 +91,29 @@ export interface DrakeCalculationResult {
   isRefund: boolean;
 }
 
-class DrakeIntegration {
+class SupersonicTaxEngine {
   private accountNumber: string;
   private serialNumber: string;
   private efilePassword: string;
   private apiUrl: string;
 
   constructor() {
-    this.accountNumber = process.env.DRAKE_ACCOUNT_NUMBER || '';
-    this.serialNumber = process.env.DRAKE_SERIAL_NUMBER || '';
-    this.efilePassword = process.env.DRAKE_EFILE_PASSWORD || '';
-    this.apiUrl = process.env.DRAKE_API_URL || 'https://api.drakesoftware.com';
+    this.accountNumber = process.env.SUPERSONIC_ACCOUNT_NUMBER || '';
+    this.serialNumber = process.env.SUPERSONIC_SERIAL_NUMBER || '';
+    this.efilePassword = process.env.SUPERSONIC_EFILE_PASSWORD || '';
+    this.apiUrl = process.env.SUPERSONIC_TAX_API_URL || 'https://api.supersonicsoftware.com';
 
     if (!this.accountNumber || !this.serialNumber) {
-      console.warn('Drake Software credentials not configured');
+      console.warn('SupersonicFastCash credentials not configured');
     }
   }
 
   /**
-   * Create a new tax return in Drake Software
+   * Create a new tax return in SupersonicFastCash Software
    */
-  async createReturn(taxReturn: DrakeTaxReturn): Promise<{ returnId: string }> {
+  async createReturn(taxReturn: SupersonicTaxReturn): Promise<{ returnId: string }> {
     try {
-      // In production, this would call Drake's actual API
+      // In production, this would call SupersonicFastCash's actual API
       // For now, we'll simulate the response
 
       const response = await this.makeRequest('/returns/create', {
@@ -129,18 +126,18 @@ class DrakeIntegration {
       });
 
       return {
-        returnId: response.returnId || `DRAKE-${Date.now()}`,
+        returnId: response.returnId || `SFC-${Date.now()}`,
       };
     } catch (error) {
-      console.error('Drake create return error:', error);
-      throw new Error('Failed to create return in Drake Software');
+      console.error('SupersonicFastCash create return error:', error);
+      throw new Error('Failed to create return in SupersonicFastCash Software');
     }
   }
 
   /**
-   * Calculate tax using Drake's calculation engine
+   * Calculate tax using SupersonicFastCash's calculation engine
    */
-  async calculateTax(returnId: string): Promise<DrakeCalculationResult> {
+  async calculateTax(returnId: string): Promise<SupersonicCalculationResult> {
     try {
       const response = await this.makeRequest(`/returns/${returnId}/calculate`, {
         method: 'POST',
@@ -148,7 +145,7 @@ class DrakeIntegration {
 
       return response.calculation;
     } catch (error) {
-      console.error('Drake calculation error:', error);
+      console.error('SupersonicFastCash calculation error:', error);
       throw new Error('Failed to calculate tax');
     }
   }
@@ -166,7 +163,7 @@ class DrakeIntegration {
         pdfUrl: response.pdfUrl,
       };
     } catch (error) {
-      console.error('Drake form generation error:', error);
+      console.error('SupersonicFastCash form generation error:', error);
       throw new Error('Failed to generate Form 1040');
     }
   }
@@ -174,7 +171,7 @@ class DrakeIntegration {
   /**
    * E-file return to IRS
    */
-  async eFileReturn(returnId: string, state?: string): Promise<DrakeEFileResult> {
+  async eFileReturn(returnId: string, state?: string): Promise<SupersonicEFileResult> {
     try {
       const response = await this.makeRequest(`/returns/${returnId}/efile`, {
         method: 'POST',
@@ -191,7 +188,7 @@ class DrakeIntegration {
         submittedAt: new Date(),
       };
     } catch (error) {
-      console.error('Drake e-file error:', error);
+      console.error('SupersonicFastCash e-file error:', error);
       throw new Error('Failed to e-file return');
     }
   }
@@ -199,7 +196,7 @@ class DrakeIntegration {
   /**
    * Check e-file acknowledgment status
    */
-  async getAcknowledgmentStatus(submissionId: string): Promise<DrakeEFileResult> {
+  async getAcknowledgmentStatus(submissionId: string): Promise<SupersonicEFileResult> {
     try {
       const response = await this.makeRequest(`/efile/status/${submissionId}`, {
         method: 'GET',
@@ -214,13 +211,13 @@ class DrakeIntegration {
         submittedAt: new Date(response.submittedAt),
       };
     } catch (error) {
-      console.error('Drake status check error:', error);
+      console.error('SupersonicFastCash status check error:', error);
       throw new Error('Failed to check acknowledgment status');
     }
   }
 
   /**
-   * Upload document to Drake Cloud
+   * Upload document to SupersonicFastCash Cloud
    */
   async uploadDocument(
     returnId: string,
@@ -240,10 +237,10 @@ class DrakeIntegration {
 
       return {
         documentId: response.documentId,
-        ocrData: response.ocrData, // Drake's OCR extraction
+        ocrData: response.ocrData, // SupersonicFastCash's OCR extraction
       };
     } catch (error) {
-      console.error('Drake document upload error:', error);
+      console.error('SupersonicFastCash document upload error:', error);
       throw new Error('Failed to upload document');
     }
   }
@@ -263,14 +260,14 @@ class DrakeIntegration {
 
       return response;
     } catch (error) {
-      console.error('Drake status error:', error);
+      console.error('SupersonicFastCash status error:', error);
       throw new Error('Failed to get return status');
     }
   }
 
   /**
-   * Make API request to Drake Software
-   * Note: This is a placeholder - actual Drake API may have different endpoints
+   * Make API request to SupersonicFastCash Software
+   * Note: This is a placeholder - actual SupersonicFastCash API may have different endpoints
    */
   private async makeRequest(endpoint: string, options: RequestInit): Promise<any> {
     // For development/testing, return mock data
@@ -283,19 +280,19 @@ class DrakeIntegration {
         ...options,
         headers: {
           'Content-Type': 'application/json',
-          'X-Drake-Account': this.accountNumber,
-          'X-Drake-Serial': this.serialNumber,
+          'X-Supersonic-Account': this.accountNumber,
+          'X-Supersonic-Serial': this.serialNumber,
           ...options.headers,
         },
       });
 
       if (!response.ok) {
-        throw new Error(`Drake API error: ${response.statusText}`);
+        throw new Error(`SupersonicFastCash API error: ${response.statusText}`);
       }
 
       return await response.json();
     } catch (error) {
-      console.error('Drake API request failed:', error);
+      console.error('SupersonicFastCash API request failed:', error);
       throw error;
     }
   }
@@ -305,7 +302,7 @@ class DrakeIntegration {
    */
   private getMockResponse(endpoint: string): any {
     if (endpoint.includes('/create')) {
-      return { returnId: `DRAKE-${Date.now()}` };
+      return { returnId: `SFC-${Date.now()}` };
     }
     if (endpoint.includes('/calculate')) {
       return {
@@ -351,4 +348,4 @@ class DrakeIntegration {
 }
 
 // Export singleton instance
-export const drakeIntegration = new DrakeIntegration();
+export const supersonicTaxEngine = new SupersonicTaxEngine();

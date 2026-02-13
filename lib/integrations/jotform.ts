@@ -1,6 +1,6 @@
 /**
  * JotForm API Integration
- * Connects client intake forms to Drake Software
+ * Connects client intake forms to SupersonicFastCash
  */
 
 export interface JotFormSubmission {

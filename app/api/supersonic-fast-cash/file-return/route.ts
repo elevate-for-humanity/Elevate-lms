@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { drakeIntegration } from '@/lib/integrations/drake-software';
+import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { Resend } from 'resend';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 
@@ -107,8 +107,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create Drake tax return
-    const drakeReturn = await drakeIntegration.createReturn({
+    // Create SupersonicFastCash tax return
+    const supersonicReturn = await supersonicTaxEngine.createReturn({
       id: client.id,
       taxpayer: {
         firstName: taxReturn.firstName,
@@ -153,7 +153,7 @@ export async function POST(request: NextRequest) {
     });
 
     // Calculate tax
-    const calculation = await drakeIntegration.calculateTax(drakeReturn.returnId);
+    const calculation = await supersonicTaxEngine.calculateTax(supersonicReturn.returnId);
 
     // Save tax return record
     const { data: taxReturnRecord, error: returnError } = await supabase
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
         user_id: client.id,
         tax_year: 2024,
         filing_status: taxReturn.filingStatus,
-        drake_return_id: drakeReturn.returnId,
+        supersonic_return_id: supersonicReturn.returnId,
         federal_refund: calculation.refundOrOwed,
         status: 'filed',
       })
@@ -174,7 +174,7 @@ export async function POST(request: NextRequest) {
     }
 
     // E-file the return
-    const efileResult = await drakeIntegration.eFileReturn(drakeReturn.returnId);
+    const efileResult = await supersonicTaxEngine.eFileReturn(supersonicReturn.returnId);
 
     // Send confirmation email
     try {
@@ -241,7 +241,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      returnId: drakeReturn.returnId,
+      returnId: supersonicReturn.returnId,
       submissionId: efileResult.submissionId,
       estimatedRefund: calculation.refundOrOwed,
     });

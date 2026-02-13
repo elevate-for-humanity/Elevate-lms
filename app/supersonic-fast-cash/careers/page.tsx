@@ -75,7 +75,7 @@ export default async function TaxCareersPage() {
         'Completion of IRS Annual Filing Season Program OR',
         'EA, CPA, or tax law degree',
         '1+ years tax preparation experience preferred',
-        'Proficient with tax software (Drake, ProSeries, or similar)',
+        'Proficient with tax software (SupersonicFastCash, ProSeries, or similar)',
       ],
     },
     {
@@ -119,7 +119,7 @@ export default async function TaxCareersPage() {
         'IRS PTIN required',
         'Home office setup with reliable internet',
         'Comfortable with video conferencing (Zoom)',
-        'Tax software experience (Drake, ProSeries, or similar)',
+        'Tax software experience (SupersonicFastCash, ProSeries, or similar)',
         'Available during tax season (Jan-April)',
         'Must be authorized to work in the USA',
         'Experience with multi-state returns preferred',
@@ -515,7 +515,7 @@ export default async function TaxCareersPage() {
                 preparation training for new hires. You'll learn:
               </p>
               <ul className="list-disc pl-6 mt-2 text-black">
-                <li>Tax software (Drake, ProSeries)</li>
+                <li>Tax software (SupersonicFastCash, ProSeries)</li>
                 <li>Common tax forms (W-2, 1099, Schedule C)</li>
                 <li>Deductions and credits</li>
                 <li>Client communication</li>

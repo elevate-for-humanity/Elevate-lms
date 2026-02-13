@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jotFormIntegration } from '@/lib/integrations/jotform';
-import { drakeIntegration } from '@/lib/integrations/drake-software';
+import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { Resend } from 'resend';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
@@ -13,7 +13,7 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 
 /**
  * JotForm Webhook Handler
- * Receives form submissions and automatically creates Drake tax returns
+ * Receives form submissions and automatically creates SupersonicFastCash tax returns
  */
 export async function POST(request: NextRequest) {
   try {
@@ -66,8 +66,8 @@ export async function POST(request: NextRequest) {
       throw new Error('Failed to save client data');
     }
 
-    // Step 4: Create tax return in Drake Software
-    const drakeReturn = await drakeIntegration.createReturn({
+    // Step 4: Create tax return in SupersonicFastCash Software
+    const supersonicReturn = await supersonicTaxEngine.createReturn({
       id: '',
       taxpayer: {
         firstName: clientData.firstName,
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
         filing_status: clientData.filingStatus,
         service_type: 'professional',
         status: 'in_progress',
-        drake_return_id: drakeReturn.returnId,
+        supersonic_return_id: supersonicReturn.returnId,
         jotform_submission_id: submissionId,
         has_w2: clientData.hasW2,
         has_1099: clientData.has1099,
@@ -166,7 +166,7 @@ export async function POST(request: NextRequest) {
           </ol>
 
           <p><strong>Your Client ID:</strong> ${client.id}</p>
-          <p><strong>Drake Return ID:</strong> ${drakeReturn.returnId}</p>
+          <p><strong>SupersonicFastCash Return ID:</strong> ${supersonicReturn.returnId}</p>
 
           <p>
             <a href="https://www.elevateforhumanity.org/supersonic-fast-cash/portal"
@@ -220,9 +220,9 @@ export async function POST(request: NextRequest) {
             <li>Rental Income: ${clientData.hasRentalIncome ? 'Yes' : 'No'}</li>
           </ul>
 
-          <h3>Drake Software:</h3>
+          <h3>SupersonicFastCash Software:</h3>
           <ul>
-            <li><strong>Return ID:</strong> ${drakeReturn.returnId}</li>
+            <li><strong>Return ID:</strong> ${supersonicReturn.returnId}</li>
             <li><strong>Status:</strong> Created and ready for data entry</li>
           </ul>
 
@@ -249,7 +249,7 @@ export async function POST(request: NextRequest) {
       message: 'Client intake processed successfully',
       clientId: client.id,
       taxReturnId: taxReturn.id,
-      drakeReturnId: drakeReturn.returnId,
+      supersonicReturnId: supersonicReturn.returnId,
     });
   } catch (error) {
     return NextResponse.json(
@@ -270,6 +270,6 @@ export async function GET(request: NextRequest) {
     message: 'JotForm webhook endpoint is active',
     endpoint: '/api/supersonic-fast-cash/jotform-webhook',
     method: 'POST',
-    description: 'Receives JotForm submissions and creates Drake tax returns',
+    description: 'Receives JotForm submissions and creates SupersonicFastCash tax returns',
   });
 }

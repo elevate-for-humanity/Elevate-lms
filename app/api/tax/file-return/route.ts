@@ -1,6 +1,6 @@
 /**
  * Direct IRS E-File API
- * Replaces Drake Software integration
+ * Replaces SupersonicFastCash integration
  * EFIN: 358459
  */
 

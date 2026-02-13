@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
           tax_year,
           filing_status,
           status,
-          drake_return_id,
+          sfc_return_id,
           federal_refund,
           state_refund,
           created_at
@@ -49,8 +49,8 @@ export async function GET(request: NextRequest) {
     const completed = clients?.filter(c =>
       c.tax_returns?.some((r: any) => r.status === 'completed')
     ).length || 0;
-    const withDrake = clients?.filter(c =>
-      c.tax_returns?.some((r: any) => r.drake_return_id)
+    const withSupersonicFastCash = clients?.filter(c =>
+      c.tax_returns?.some((r: any) => r.sfc_return_id)
     ).length || 0;
 
     return NextResponse.json({
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
         total: totalClients,
         inProgress,
         completed,
-        withDrake,
+        withSupersonicFastCash,
       },
     });
   } catch (error) {

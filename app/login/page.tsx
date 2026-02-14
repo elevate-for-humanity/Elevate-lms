@@ -81,8 +81,8 @@ function LoginForm() {
       {/* Hero Banner */}
       <section className="relative h-[200px] w-full overflow-hidden">
         <Image
-          src="/images/facilities-new/facility-2.jpg"
-          alt="Login"
+          src="/images/heroes-hq/success-hero.jpg"
+          alt="Elevate for Humanity login"
           fill
           className="object-cover"
           priority
@@ -97,7 +97,7 @@ function LoginForm() {
           <div className="bg-white rounded-lg shadow-lg p-8">
             <h1 className="text-3xl font-bold text-center mb-2">Login</h1>
             <p className="text-center text-black mb-8">
-              Access your dashboard
+              Sign in to manage your training, certifications, and career progress.
             </p>
 
             {error && (
@@ -120,7 +120,7 @@ function LoginForm() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="your.email@gmail.com"
                 />
               </div>
@@ -138,7 +138,7 @@ function LoginForm() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="••••••••"
                 />
               </div>

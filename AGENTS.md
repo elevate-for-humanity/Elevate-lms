@@ -64,34 +64,28 @@ Choose replacements based on page context:
 
 ---
 
-# COMPLETED TASK: Stock Image Replacement
+# COMPLETED TASKS
 
-All 34 files with `success-new/` and `students-new/` stock images have been replaced file-by-file with contextually appropriate workforce images. Build verified: 865/865 pages, zero errors.
+## Stock Image Replacement ✅
+All 34 files with `success-new/` and `students-new/` stock images replaced with contextual workforce images.
 
-Verify with: `grep -rl "success-new\|students-new" app/ --include="*.tsx" --include="*.ts"` (should return empty)
+## Template Sludge Elimination ✅
+- All "Access your dashboard" broken copy fixed (12 files)
+- All "Join thousands who have launched" CTAs eliminated (87+ files)
+- All public-facing template pages rewritten with real content (27 pages)
+- Auth pages: signin/signup redirect to real forms, forgot/reset-password have real forms
+- Funding pages: how-it-works, federal-programs, state-programs, grant-programs all rewritten
+- Support, training, grievance, forms, orientation pages all rewritten
+- Admin template CTAs fixed to brand colors (52 files)
 
-# CURRENT TASK: "Access your dashboard" Placeholder Text (12 files)
-
-These need contextual replacement:
-```
-app/auth/signin/page.tsx
-app/auth/signup/page.tsx
-app/login/page.tsx
-app/orientation/schedule/page.tsx
-app/partners/portal/page.tsx
-app/reports/page.tsx
-app/share/page.tsx
-app/solutions/higher-ed/page.tsx
-app/store/checkout/success/page.tsx
-app/student-portal/handbook/page.tsx
-app/workforce-board/eligibility/page.tsx
-app/workforce-board/employment/page.tsx
-```
-(Also `app/api/barber/webhook/route.ts` and `app/data/page-registry.ts` but those may be intentional.)
+## Remaining Lower-Priority Items
+- 8 files still have Learn/Certify/Work inline SVG card sections (complex JSX, admin pages)
+- ~1,233 files use raw Tailwind blue/green/etc instead of brand tokens (gradual migration)
+- 161 console.log statements should use logger utility
+- Missing error.tsx in app/store and app/login
 
 ## Build State
-
-Last verified: 865/865 pages, zero errors
+Last verified: 882/882 pages, zero errors
 
 ---
 

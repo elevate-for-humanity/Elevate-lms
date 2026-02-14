@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ComplianceBadges } from '@/components/ComplianceBadges';
 import HomeHeroVideo from './HomeHeroVideo';
+import PageAvatar from '@/components/PageAvatar';
 
 const programs = [
   { name: 'Healthcare', href: '/programs/healthcare', image: '/images/hero/hero-healthcare.jpg', desc: 'CNA, Medical Assistant, Phlebotomy' },
@@ -29,23 +30,30 @@ export default function HomePage() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent z-20" />
         <div className="absolute inset-0 z-30 flex items-center">
           <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full">
-            <div className="max-w-xl">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 leading-[1.1]">
+            <div className="max-w-2xl">
+              <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-white mb-6 leading-[1.05]">
                 Limitless<br />Opportunities
               </h1>
-              <p className="text-lg sm:text-xl text-white/90 mb-8 leading-relaxed">
-                Free career training through WIOA, WRG, and JRI funding. Get certified and hired in weeks.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/apply/student" className="bg-red-600 hover:bg-red-700 text-white text-lg font-bold px-8 py-4 rounded-lg transition-colors text-center">
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Link href="/apply/student" className="bg-red-600 hover:bg-red-700 text-white text-xl font-bold px-10 py-5 rounded-lg transition-colors text-center">
                   Apply Now
                 </Link>
-                <Link href="/programs" className="bg-white/95 hover:bg-white text-slate-900 text-lg font-bold px-8 py-4 rounded-lg transition-colors text-center">
+                <Link href="/programs" className="bg-white/95 hover:bg-white text-slate-900 text-xl font-bold px-10 py-5 rounded-lg transition-colors text-center">
                   View Programs
                 </Link>
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* ===== AVATAR GUIDE ===== */}
+      <section className="py-8 sm:py-12 bg-white">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <PageAvatar
+            videoSrc="/videos/avatars/home-welcome.mp4"
+            title="Welcome to Elevate for Humanity"
+          />
         </div>
       </section>
 
@@ -59,7 +67,7 @@ export default function HomePage() {
               { title: 'Hire Our Graduates', desc: 'Our candidates come out credentialed and ready to work.', href: '/employer', image: '/images/heroes-hq/employer-hero.jpg' },
             ].map((card) => (
               <Link key={card.title} href={card.href} className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow border border-slate-100">
-                <div className="relative w-full h-48">
+                <div className="relative w-full aspect-[16/10]">
                   <Image
                     src={card.image}
                     alt={card.title}
@@ -69,9 +77,9 @@ export default function HomePage() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2">{card.title}</h3>
-                  <p className="text-slate-700 mb-3">{card.desc}</p>
-                  <span className="text-blue-600 font-semibold group-hover:underline">Learn More →</span>
+                  <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">{card.title}</h3>
+                  <p className="text-base text-slate-700 mb-3">{card.desc}</p>
+                  <span className="text-red-600 font-semibold text-base group-hover:underline">Learn More →</span>
                 </div>
               </Link>
             ))}
@@ -89,21 +97,21 @@ export default function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {programs.map((program) => (
               <Link key={program.name} href={program.href} className="group">
-                <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
+                <div className="relative w-full aspect-[3/2] rounded-xl overflow-hidden">
                   <Image
                     src={program.image}
                     alt={program.name}
                     fill
-                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                  <div className="absolute bottom-0 left-0 right-0 p-4">
-                    <h3 className="text-white font-bold text-base sm:text-lg">{program.name}</h3>
-                    <p className="text-white/80 text-xs sm:text-sm">{program.desc}</p>
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-5">
+                    <h3 className="text-white font-bold text-lg sm:text-xl">{program.name}</h3>
+                    <p className="text-white/85 text-sm sm:text-base mt-1">{program.desc}</p>
                   </div>
                 </div>
               </Link>
@@ -111,7 +119,7 @@ export default function HomePage() {
           </div>
 
           <div className="text-center mt-10">
-            <Link href="/programs" className="inline-block bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors">
+            <Link href="/programs" className="inline-block bg-red-600 hover:bg-red-700 text-white text-lg font-bold px-10 py-4 rounded-lg transition-colors">
               View All Programs
             </Link>
           </div>
@@ -132,8 +140,8 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-red-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold group-hover:bg-red-700 transition-colors">
                   {step.num}
                 </div>
-                <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-slate-700 text-sm">{step.desc}</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-slate-700 text-base">{step.desc}</p>
               </Link>
             ))}
           </div>
@@ -278,10 +286,10 @@ export default function HomePage() {
               { quote: 'Anyone who wants to grow and make more money should try Elevate. You deserve it! The staff is amazing and easy to communicate with.', name: 'Jasmine R.', program: 'CNA Certification' },
             ].map((t) => (
               <div key={t.name} className="bg-slate-50 rounded-xl p-8 border border-slate-100">
-                <p className="text-slate-800 mb-6 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                <p className="text-slate-800 text-lg mb-6 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
                 <div>
-                  <p className="font-bold text-slate-900">{t.name}</p>
-                  <p className="text-slate-600 text-sm">{t.program}</p>
+                  <p className="font-bold text-slate-900 text-base">{t.name}</p>
+                  <p className="text-slate-600 text-base">{t.program}</p>
                 </div>
               </div>
             ))}

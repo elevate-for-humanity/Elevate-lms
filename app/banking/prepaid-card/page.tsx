@@ -298,13 +298,11 @@ export default function PrepaidCardPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-4">Download the App</h3>
                 <p className="text-gray-600 mb-6">Available for iOS and Android</p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <span className="bg-gray-400 text-white px-6 py-3 rounded-lg font-medium cursor-not-allowed" title="App launching soon">
-                    App Store - Soon
-                  </span>
-                  <span className="bg-gray-400 text-white px-6 py-3 rounded-lg font-medium cursor-not-allowed" title="App launching soon">
-                    Google Play - Soon
-                  </span>
+                  <Link href="/contact" className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-medium transition text-center">
+                    Contact Us to Enroll
+                  </Link>
                 </div>
+                <p className="text-gray-500 text-sm mt-3">Mobile app in development — manage your card online today.</p>
               </div>
             </div>
           </div>

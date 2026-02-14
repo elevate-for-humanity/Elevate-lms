@@ -327,7 +327,7 @@ export default async function BadgesPage() {
             <Award className="w-16 h-16 text-slate-300 mx-auto mb-4" />
             <h2 className="text-xl font-bold text-slate-900 mb-2">No Badges Available</h2>
             <p className="text-slate-600 mb-6">
-              Badges will be available soon. Keep learning to be ready!
+              Complete courses and certifications to earn badges. Your achievements will appear here.
             </p>
             <Link
               href="/lms/courses"

@@ -87,29 +87,22 @@ export default function AppHubPage() {
                 Access courses, track progress, and achieve your goals on the go.
               </p>
               <div className="flex flex-wrap gap-4">
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 bg-gray-600 text-white px-6 py-3 rounded-xl cursor-not-allowed opacity-75"
-                  title="iOS app launching soon - join waitlist at elevateforhumanity.org/contact"
+                <Link
+                  href="/programs"
+                  className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-6 py-3 rounded-xl font-semibold hover:bg-brand-blue-50 transition"
                 >
-                  <Apple className="w-6 h-6" />
-                  <div className="text-left">
-                    <div className="text-xs">iOS App</div>
-                    <div className="font-semibold">Launching Soon</div>
-                  </div>
-                </button>
-                <button
-                  type="button"
-                  className="inline-flex items-center gap-2 bg-gray-600 text-white px-6 py-3 rounded-xl cursor-not-allowed opacity-75"
-                  title="Android app launching soon - join waitlist at elevateforhumanity.org/contact"
+                  Browse Programs
+                </Link>
+                <Link
+                  href="/contact"
+                  className="inline-flex items-center gap-2 bg-brand-blue-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-brand-blue-400 transition"
                 >
-                  <Play className="w-6 h-6" />
-                  <div className="text-left">
-                    <div className="text-xs">Android App</div>
-                    <div className="font-semibold">Launching Soon</div>
-                  </div>
-                </button>
+                  Contact Us
+                </Link>
               </div>
+              <p className="text-brand-blue-200 text-sm mt-4">
+                Native iOS and Android apps are in development. Use our mobile-optimized website in the meantime.
+              </p>
             </div>
             <div className="flex justify-center">
               <div className="relative">
@@ -160,16 +153,9 @@ export default function AppHubPage() {
                   <div className="text-gray-500 text-sm">{app.downloads} downloads</div>
                 </div>
                 <div className="flex gap-2">
-                  {app.platforms.includes('ios') && (
-                    <span className="flex-1 flex items-center justify-center gap-2 bg-gray-400 text-white py-2 rounded-lg text-sm cursor-not-allowed" title="Launching soon">
-                      <Apple className="w-4 h-4" /> Soon
-                    </span>
-                  )}
-                  {app.platforms.includes('android') && (
-                    <span className="flex-1 flex items-center justify-center gap-2 bg-gray-400 text-white py-2 rounded-lg text-sm cursor-not-allowed" title="Launching soon">
-                      <Play className="w-4 h-4" /> Soon
-                    </span>
-                  )}
+                  <span className="flex-1 flex items-center justify-center gap-2 bg-brand-blue-600 text-white py-2 rounded-lg text-sm">
+                    <CheckCircle className="w-4 h-4" /> Mobile Web Ready
+                  </span>
                 </div>
               </div>
             ))}
@@ -178,15 +164,15 @@ export default function AppHubPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-slate-900 text-white">
+      <section className="py-16 bg-slate-50 border-t">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold mb-4">Start Learning Today</h2>
-          <p className="text-gray-300 mb-8">
-            Download our app and access free training programs on your mobile device.
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Start Learning Today</h2>
+          <p className="text-slate-600 mb-8">
+            Access free training programs from any device — desktop, tablet, or phone.
           </p>
           <Link
             href="/programs"
-            className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
+            className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
           >
             Browse Programs
           </Link>

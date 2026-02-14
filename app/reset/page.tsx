@@ -16,7 +16,7 @@ export default function ResetPage() {
     try {
       setStatus('Signing out from Supabase...');
       const supabase = createClient();
-      await supabase?.auth.signOut();
+      await supabase.auth.signOut();
     } catch (error) { /* Error handled silently */ }
 
     try {

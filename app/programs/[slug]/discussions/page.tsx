@@ -42,7 +42,7 @@ export default function ProgramDiscussionsPage() {
     const supabase = createClient();
     
     // Check auth
-    const { data: { user: authUser } } = await supabase?.auth.getUser();
+    const { data: { user: authUser } } = await supabase.auth.getUser();
     setUser(authUser);
 
     // Load program by slug

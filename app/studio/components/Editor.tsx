@@ -124,7 +124,9 @@ export function Editor({ file, settings, onChange, onSave, splitFile, showDiff, 
           if (data.completion && data.completion.length < 200) {
             setInlineCompletion(data.completion);
           }
-        } catch {}
+        } catch {
+          // AI completion request failed — silently ignore
+        }
       }, 1000));
     }
   }, [onSave, onAddComment, enableAICompletion, file, inlineCompletion]);

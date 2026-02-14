@@ -28,7 +28,7 @@ export default function ApplicationStatusPage() {
 
   const loadApplication = async () => {
     const supabase = createClient();
-    const { data: { user } } = await supabase?.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
       router.push('/login?redirect=/lms/apply/status');

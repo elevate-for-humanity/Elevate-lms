@@ -23,7 +23,7 @@ export default function SignInForm() {
     try {
       const supabase = createClient();
       const { data, error: signInError } =
-        await supabase?.auth.signInWithPassword({
+        await supabase.auth.signInWithPassword({
           email,
           password,
         });
@@ -37,7 +37,7 @@ export default function SignInForm() {
       if (data.user) {
         // Claim any pre-auth applications
         try {
-          await supabase?.rpc('claim_applications_for_current_user');
+          await supabase.rpc('claim_applications_for_current_user');
         } catch (claimError) {
           // Don't block login if claim fails
         }
@@ -55,7 +55,7 @@ export default function SignInForm() {
   const handleOAuthSignIn = async (provider: 'google' | 'azure') => {
     try {
       const supabase = createClient();
-      const { error } = await supabase?.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/auth/callback`,

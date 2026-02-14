@@ -64,7 +64,7 @@ export default function AdminApprenticeships() {
       .update({
         approved: true,
         approved_at: new Date().toISOString(),
-        approved_by: (await supabase?.auth.getUser()).data.user?.id,
+        approved_by: (await supabase.auth.getUser()).data.user?.id,
       })
       .eq('id', logId);
 

@@ -47,7 +47,7 @@ export default function StudentApplicationPage() {
 
   const loadUserData = async () => {
     const supabase = createClient();
-    const { data: { user: authUser } } = await supabase?.auth.getUser();
+    const { data: { user: authUser } } = await supabase.auth.getUser();
 
     if (!authUser) {
       router.push('/login?redirect=/lms/apply');

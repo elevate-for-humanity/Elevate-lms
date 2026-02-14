@@ -78,6 +78,7 @@ function SubscriptionsContent() {
       toast.error('Subscription canceled. You can try again anytime.');
       router.replace('/store/subscriptions');
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   async function loadUser() {

@@ -253,7 +253,7 @@ export default async function ProgramsPage() {
             </div>
             
             <div className="lg:sticky lg:top-24">
-              <div className="h-80 lg:h-96 rounded-xl overflow-hidden shadow-lg">
+              <div className="aspect-square max-h-[320px] rounded-xl overflow-hidden shadow-lg">
                 <img src="/images/prog-roadmap.jpg" alt="Career roadmap" className="w-full h-full object-cover" />
               </div>
             </div>
@@ -300,7 +300,7 @@ export default async function ProgramsPage() {
               </div>
             </div>
             <div className="order-1 lg:order-2">
-              <div className="h-64 lg:h-80 rounded-xl overflow-hidden shadow-lg">
+              <div className="aspect-square max-h-[320px] rounded-xl overflow-hidden shadow-lg">
                 <img src="/images/prog-why.jpg" alt="Career support" className="w-full h-full object-cover" />
               </div>
             </div>

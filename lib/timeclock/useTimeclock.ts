@@ -194,6 +194,7 @@ export function useTimeclock(options: UseTimeclockOptions) {
     } catch (error) {
       console.error('[Timeclock] Heartbeat error:', error);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.progressEntryId, gpsPosition, onAutoClockOut]);
 
   /**

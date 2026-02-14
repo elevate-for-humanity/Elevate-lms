@@ -50,7 +50,7 @@ export default function EnrollPage({
       // Check authentication
       const {
         data: { user: currentUser },
-      } = await supabase?.auth.getUser();
+      } = await supabase.auth.getUser();
       if (!currentUser) {
         router.push(`/login?next=/courses/partners/${params.courseId}/enroll`);
         return;

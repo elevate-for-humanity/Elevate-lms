@@ -37,7 +37,7 @@ export default function InstructorAnnouncementsPage() {
     const supabase = createClient();
     
     // Check auth
-    const { data: { user } } = await supabase?.auth.getUser();
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
       router.push('/login');
       return;

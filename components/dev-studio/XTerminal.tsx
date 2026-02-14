@@ -24,7 +24,7 @@ const XTerminal = forwardRef<XTerminalHandle, XTerminalProps>(({ onClear }, ref)
     '',
   ]);
 
-  // Simple ANSI to HTML converter
+  /* eslint-disable no-control-regex */
   const ansiToHtml = (text: string): string => {
     return text
       .replace(/\x1b\[0m/g, '</span>')
@@ -37,6 +37,7 @@ const XTerminal = forwardRef<XTerminalHandle, XTerminalProps>(({ onClear }, ref)
       .replace(/\x1b\[2J\x1b\[H/g, '') // Clear screen sequence
       .replace(/\x1b\[\d+m/g, ''); // Remove any other ANSI codes
   };
+  /* eslint-enable no-control-regex */
 
   useImperativeHandle(ref, () => ({
     write: (data: string) => {

@@ -74,7 +74,9 @@ export function AIChat({ messages, setMessages, currentFile, repoId, userId, onA
                 fullContent += parsed.content;
                 setStreamingContent(fullContent);
               }
-            } catch {}
+            } catch {
+              // Partial JSON chunk — skip until complete
+            }
           }
         }
       }

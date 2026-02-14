@@ -128,9 +128,8 @@ export function WebSocketTerminal({ wsUrl = 'http://localhost:3001', cwd, onPort
     setInput(e.target.value);
   };
 
-  // Parse ANSI codes for display
+  /* eslint-disable no-control-regex */
   const parseAnsi = (text: string) => {
-    // Simple ANSI parser - convert to spans with colors
     return text
       .replace(/\x1b\[32m/g, '<span style="color:#7ee787">')
       .replace(/\x1b\[33m/g, '<span style="color:#e2c08d">')
@@ -139,6 +138,7 @@ export function WebSocketTerminal({ wsUrl = 'http://localhost:3001', cwd, onPort
       .replace(/\x1b\[0m/g, '</span>')
       .replace(/\x1b\[\d+m/g, '');
   };
+  /* eslint-enable no-control-regex */
 
   return (
     <div

@@ -85,7 +85,7 @@ export default function HomePage() {
       <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-stone-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="relative h-[280px] sm:h-[340px] rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/5">
+            <div className="relative aspect-square max-h-[360px] rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/5">
               <Image src="/images/trades/program-welding-training.jpg" alt="Hands-on career training" fill className="object-cover object-center" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
             <div>
@@ -169,7 +169,7 @@ export default function HomePage() {
                 href={program.href}
                 className="group hover:-translate-y-1 transition-all duration-300"
               >
-                <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden mb-3">
+                <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-3">
                   <Image src={program.image} alt={program.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover object-center group-hover:scale-105 transition-transform duration-500" />
                 </div>
                 <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1">{program.name}</h3>
@@ -201,7 +201,7 @@ export default function HomePage() {
             <p className="text-xl text-slate-600">Four steps to your new career</p>
           </div>
           
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {[
               { step: '1', title: 'Register at WorkOne', desc: 'Sign up at indianacareerconnect.com and schedule a WorkOne appointment', img: '/images/artlist/office-meeting.jpg', href: '/funding', linkLabel: 'Learn More' },
               { step: '2', title: 'Choose Program', desc: 'Pick the career path that fits your goals and schedule', img: '/images/heroes-hq/programs-hero.jpg', href: '/programs', linkLabel: 'View Programs' },
@@ -209,12 +209,12 @@ export default function HomePage() {
               { step: '4', title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates', img: '/images/heroes/success-story-1.jpg', href: '/career-services', linkLabel: 'Career Services' },
             ].map((step) => (
               <Link key={step.title} href={step.href} className="group hover:-translate-y-1 transition-all duration-300">
-                <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-3">
+                <div className="relative aspect-square rounded-xl overflow-hidden mb-2">
                   <Image src={step.img} alt={step.title} fill className="object-cover object-center group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 50vw, 25vw" />
                   <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-brand-red-600 text-white text-sm font-bold flex items-center justify-center">{step.step}</div>
                 </div>
                 <h3 className="font-bold text-black text-sm sm:text-base mb-1">{step.title}</h3>
-                <p className="text-slate-600 text-xs sm:text-sm mb-2">{step.desc}</p>
+                <p className="text-slate-600 text-xs sm:text-sm mb-1 line-clamp-2">{step.desc}</p>
                 <span className="text-blue-600 font-semibold text-xs sm:text-sm group-hover:underline">{step.linkLabel} →</span>
               </Link>
             ))}
@@ -228,7 +228,7 @@ export default function HomePage() {
       <section className="py-16 sm:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="relative h-[280px] sm:h-[340px] rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/5">
+            <div className="relative aspect-square max-h-[360px] rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/5">
               <Image src="/images/heroes-hq/jri-hero.jpg" alt="JRI Earn While You Learn program" fill className="object-cover object-center" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
             <div>
@@ -276,7 +276,7 @@ export default function HomePage() {
                 </a>
               </div>
             </div>
-            <div className="relative h-[280px] sm:h-[340px] rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/5 order-1 md:order-2">
+            <div className="relative aspect-square max-h-[360px] rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/5 order-1 md:order-2">
               <Image src="/images/heroes-hq/funding-hero.jpg" alt="WIOA and WRG funding for career training" fill className="object-cover object-center" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
           </div>
@@ -295,7 +295,7 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-2 gap-8">
             {/* Employer Card */}
             <div className="group">
-              <div className="relative aspect-[3/2] rounded-2xl overflow-hidden mb-4">
+              <div className="relative aspect-square rounded-2xl overflow-hidden mb-4">
                 <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer partnerships" fill className="object-cover object-center group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Why Hire Our Graduates</h3>
@@ -311,7 +311,7 @@ export default function HomePage() {
             </div>
             {/* Partner Card */}
             <div className="group">
-              <div className="relative aspect-[3/2] rounded-2xl overflow-hidden mb-4">
+              <div className="relative aspect-square rounded-2xl overflow-hidden mb-4">
                 <Image src="/images/heroes-hq/success-hero.jpg" alt="Training partnerships" fill className="object-cover object-center group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, 50vw" />
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Why Partner With Elevate</h3>

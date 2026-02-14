@@ -23,7 +23,7 @@ function LmsAppLayoutInner({ children }: { children: ReactNode }) {
     // NO DEMO MODE BYPASS - All users must authenticate
     const supabase = createClient();
 
-    supabase?.auth.getUser().then(({ data, error }) => {
+    supabase.auth.getUser().then(({ data, error }) => {
       if (error || !data?.user) {
         router.push('/login?next=/lms/dashboard');
         return;

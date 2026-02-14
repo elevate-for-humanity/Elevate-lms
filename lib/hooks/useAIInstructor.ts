@@ -42,6 +42,7 @@ export function useAILessonGuidance(lessonTitle: string) {
     }, 2000);
 
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lessonTitle]);
 
   return { triggerMessage };

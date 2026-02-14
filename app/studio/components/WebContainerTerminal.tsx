@@ -43,6 +43,7 @@ const ANSI_COLORS: Record<string, string> = {
 
 function parseAnsi(text: string): { text: string; color: string }[] {
   const parts: { text: string; color: string }[] = [];
+  // eslint-disable-next-line no-control-regex
   const regex = /\x1b\[(\d+)m/g;
   let lastIndex = 0;
   let currentColor = '#e6edf3';

@@ -1,7 +1,8 @@
 // Stripe Integration for Course Payments and Subscriptions
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
-  : null;
+
+const stripe = getStripe();
 export interface CheckoutSessionParams {
   courseId: string;
   courseName: string;

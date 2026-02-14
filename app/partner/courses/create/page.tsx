@@ -35,10 +35,10 @@ export default function CreateCoursePage() {
 
   const loadLicenses = async () => {
     try {
-      const { data: { user } } = await supabase?.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
-      const { data, error } = await supabase?.rpc('get_partner_license_info', {
+      const { data, error } = await supabase.rpc('get_partner_license_info', {
         p_partner_id: user.id
       });
 
@@ -55,7 +55,7 @@ export default function CreateCoursePage() {
     setMessage('');
 
     try {
-      const { data: { user } } = await supabase?.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Not authenticated');
 
       const license = licenses.find(l => l.license_key === selectedLicense);

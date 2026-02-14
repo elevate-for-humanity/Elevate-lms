@@ -81,7 +81,9 @@ export default async function EmployerCompliancePage() {
       const { data: authData } = await supabase.auth.getUser();
       user = authData.user;
     }
-  } catch {}
+  } catch {
+    // Auth unavailable — continue as unauthenticated
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -90,10 +90,10 @@ export default function EnrollPage() {
     try {
       const {
         data: { user },
-      } = await supabase?.auth.getUser();
+      } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data, error } = await supabase?.rpc('can_user_enroll', {
+      const { data, error } = await supabase.rpc('can_user_enroll', {
         p_user_id: user.id,
         p_program_id: programId,
         p_license_key: licenseKey || null,
@@ -113,7 +113,7 @@ export default function EnrollPage() {
     try {
       const {
         data: { user },
-      } = await supabase?.auth.getUser();
+      } = await supabase.auth.getUser();
       if (!user) {
         setMessage('Please sign in to enroll');
         router.push(`/login?redirect=/enroll/${programId}`);

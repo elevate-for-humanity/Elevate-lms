@@ -36,8 +36,8 @@ export default function LicensingPage() {
     const supabase = createClient();
 
     const [licensesRes, tenantsRes] = await Promise.all([
-      supabase?.from('licenses').select('*').order('created_at', { ascending: false }),
-      supabase?.from('tenants').select('id, name, slug, active').order('name')
+      supabase.from('licenses').select('*').order('created_at', { ascending: false }),
+      supabase.from('tenants').select('id, name, slug, active').order('name')
     ]);
 
     if (licensesRes.data) setLicenses(licensesRes.data);
@@ -47,7 +47,7 @@ export default function LicensingPage() {
 
   async function updateLicenseStatus(licenseId: string, status: string) {
     const supabase = createClient();
-    await supabase?.from('licenses').update({ status }).eq('id', licenseId);
+    await supabase.from('licenses').update({ status }).eq('id', licenseId);
     loadData();
   }
 

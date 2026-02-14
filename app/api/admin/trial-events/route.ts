@@ -52,7 +52,7 @@ export const GET = withAuth(
 
       const eventTypes = eventTypeFilters[type] || eventTypeFilters.all;
 
-      let query = supabase
+      const query = supabase
         .from('license_events')
         .select('id, license_id, organization_id, event_type, event_data, created_at')
         .in('event_type', eventTypes)

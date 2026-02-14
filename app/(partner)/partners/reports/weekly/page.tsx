@@ -46,9 +46,9 @@ export default function PartnerWeeklyReportsPage() {
       return;
     }
 
-    const { data: user } = await supabase?.auth.getUser();
+    const { data: user } = await supabase.auth.getUser();
 
-    const { error } = await supabase?.from('apprentice_weekly_reports').insert({
+    const { error } = await supabase.from('apprentice_weekly_reports').insert({
       placement_id: placementId,
       week_start: weekStart,
       week_end: weekEnd,

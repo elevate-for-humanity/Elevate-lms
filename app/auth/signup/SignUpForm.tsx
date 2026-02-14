@@ -69,7 +69,7 @@ export default function SignUpForm() {
 
     try {
       const supabase = createClient();
-      const { data, error: signUpError } = await supabase?.auth.signUp({
+      const { data, error: signUpError } = await supabase.auth.signUp({
         email: formData.email,
         password: formData.password,
         options: {
@@ -111,7 +111,7 @@ export default function SignUpForm() {
   const handleOAuthSignUp = async (provider: 'google' | 'azure') => {
     try {
       const supabase = createClient();
-      const { error } = await supabase?.auth.signInWithOAuth({
+      const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: {
           redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/auth/callback`,

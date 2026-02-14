@@ -142,10 +142,10 @@ export default function UploadDocumentsPage() {
         // Get public URL
         const {
           data: { publicUrl },
-        } = supabase?.storage.from('documents').getPublicUrl(filePath);
+        } = supabase.storage.from('documents').getPublicUrl(filePath);
 
         // Save to database
-        await supabase?.from('tax_documents').insert({
+        await supabase.from('tax_documents').insert({
           file_name: file.name,
           file_path: filePath,
           file_size: file.size,

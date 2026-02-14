@@ -5,6 +5,7 @@
  * Runs in a full Linux container on Fly.io.
  */
 
+/* eslint-disable @typescript-eslint/no-require-imports */
 const express = require('express');
 const { WebSocketServer } = require('ws');
 const http = require('http');

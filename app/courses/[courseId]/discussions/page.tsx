@@ -65,14 +65,14 @@ export default function CourseDiscussionsPage() {
     const supabase = createClient();
     const {
       data: { user },
-    } = await supabase?.auth.getUser();
+    } = await supabase.auth.getUser();
 
     if (!user) {
       router.push('/login');
       return;
     }
 
-    const { error } = await supabase?.from('course_discussions').insert({
+    const { error } = await supabase.from('course_discussions').insert({
       course_id: courseId,
       user_id: user.id,
       title: newTopic,

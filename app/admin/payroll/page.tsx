@@ -59,7 +59,7 @@ export default function AdminPayroll() {
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - 7);
-    const { data, error }: any = await supabase?.rpc('calculate_payroll', {
+    const { data, error }: any = await supabase.rpc('calculate_payroll', {
       p_apprenticeship_id: apprenticeshipId,
       p_period_start: startDate.toISOString().split('T')[0],
       p_period_end: endDate.toISOString().split('T')[0],

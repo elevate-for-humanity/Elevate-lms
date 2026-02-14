@@ -89,7 +89,7 @@ export default function OnboardingDocumentsPage() {
   useEffect(() => {
     const supabase = createClient();
 
-    supabase?.auth.getUser().then(async ({ data, error }) => {
+    supabase.auth.getUser().then(async ({ data, error }) => {
       if (error || !data?.user) {
         router.push('/login?next=/student-portal/onboarding/documents');
         return;

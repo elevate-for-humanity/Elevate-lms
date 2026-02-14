@@ -41,10 +41,11 @@ export default function StudioPage() {
   const [usePersistentStorage, setUsePersistentStorage] = useState(true);
   const studioBackend = useStudioBackend();
   const studioGitHub = useStudio();
+  const standaloneWebcontainer = useWebContainer();
   
   // Use backend hook if persistent storage enabled, otherwise GitHub-only
   const studio = usePersistentStorage ? studioBackend : studioGitHub;
-  const webcontainer = usePersistentStorage ? studioBackend.webcontainer : useWebContainer();
+  const webcontainer = usePersistentStorage ? studioBackend.webcontainer : standaloneWebcontainer;
   
   const [panel, setPanel] = useState<Panel>('files');
   const [showTerminal, setShowTerminal] = useState(false);

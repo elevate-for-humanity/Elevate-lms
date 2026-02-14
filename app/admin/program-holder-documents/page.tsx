@@ -91,7 +91,7 @@ export default function AdminProgramHolderDocuments() {
     try {
       const {
         data: { user },
-      } = await supabase?.auth.getUser();
+      } = await supabase.auth.getUser();
       if (!user) return;
 
       const { error } = await supabase

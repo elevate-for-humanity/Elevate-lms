@@ -35,21 +35,23 @@ export default async function LicensePage() {
 
   const startingPrice = getStartingPrice();
 
-  // Queries wrapped in try/catch — tables/columns may not exist in production yet
+  // Queries wrapped in try/catch — tables/columns may not exist yet
   let licenseTiers: any[] | null = null;
   let testimonials: any[] | null = null;
   let partners: any[] | null = null;
 
   try {
     const supabase = createPublicClient();
-    const [tiersResult, testimonialsResult, partnersResult] = await Promise.allSettled([
-      supabase.from('license_tiers').select('*').eq('is_active', true).order('price', { ascending: true }),
-      supabase.from('testimonials').select('*').eq('is_featured', true).limit(3),
-      supabase.from('partners').select('id, name').eq('is_active', true).limit(6),
-    ]);
-    if (tiersResult.status === 'fulfilled') licenseTiers = tiersResult.value.data;
-    if (testimonialsResult.status === 'fulfilled') testimonials = testimonialsResult.value.data;
-    if (partnersResult.status === 'fulfilled') partners = partnersResult.value.data;
+    if (supabase) {
+      const [tiersResult, testimonialsResult, partnersResult] = await Promise.allSettled([
+        supabase.from('license_tiers').select('*').eq('is_active', true).order('price', { ascending: true }),
+        supabase.from('testimonials').select('*').eq('is_featured', true).limit(3),
+        supabase.from('partners').select('id, name').eq('is_active', true).limit(6),
+      ]);
+      if (tiersResult.status === 'fulfilled') licenseTiers = tiersResult.value.data;
+      if (testimonialsResult.status === 'fulfilled') testimonials = testimonialsResult.value.data;
+      if (partnersResult.status === 'fulfilled') partners = partnersResult.value.data;
+    }
   } catch {
     // DB unavailable — fall through to static fallbacks
   }

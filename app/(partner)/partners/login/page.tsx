@@ -16,7 +16,7 @@ export default function PartnerLoginPage() {
     e.preventDefault();
     setMsg(null);
 
-    const { error } = await supabase?.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });

@@ -63,9 +63,9 @@ export default function PartnerDocumentsPage() {
       return;
     }
 
-    const { data: u } = await supabase?.auth.getUser();
+    const { data: u } = await supabase.auth.getUser();
 
-    const { error: dbErr } = await supabase?.from('partner_documents').insert({
+    const { error: dbErr } = await supabase.from('partner_documents').insert({
       shop_id: shopId,
       document_type: type,
       file_path: path,

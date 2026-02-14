@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ComplianceBadges } from '@/components/ComplianceBadges';
+import HomeHeroVideo from './HomeHeroVideo';
 
 const programs = [
   { name: 'Healthcare', href: '/programs/healthcare', image: '/images/hero/hero-healthcare.jpg', desc: 'CNA, Medical Assistant, Phlebotomy' },
@@ -24,15 +25,9 @@ export default function HomePage() {
 
       {/* ===== HERO ===== */}
       <section className="relative h-[75vh] min-h-[520px] max-h-[720px]">
-        <Image
-          src="/images/hero-poster.jpg"
-          alt="Career training at Elevate for Humanity"
-          fill
-          priority
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
-        <div className="absolute inset-0 z-10 flex items-center">
+        <HomeHeroVideo />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent z-20" />
+        <div className="absolute inset-0 z-30 flex items-center">
           <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full">
             <div className="max-w-xl">
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 leading-[1.1]">

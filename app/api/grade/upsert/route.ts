@@ -25,7 +25,8 @@ export async function POST(req: Request) {
     .eq('id', user.id)
     .single();
 
-  if (profile?.role !== 'instructor') {
+  const gradingRoles = ['instructor', 'admin', 'super_admin', 'staff'];
+  if (!profile?.role || !gradingRoles.includes(profile.role)) {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
 

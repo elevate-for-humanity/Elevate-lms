@@ -25,7 +25,10 @@ export default async function GradebookPage({ params }: { params: { courseId: st
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/instructor" className="hover:text-primary">Instructor</Link></li><li>/</li><li><Link href="/instructor/courses" className="hover:text-primary">Courses</Link></li><li>/</li><li className="text-gray-900 font-medium">Gradebook</li></ol></nav>
           <div className="flex justify-between items-center">
             <div><h1 className="text-3xl font-bold text-gray-900">{course?.title} - Gradebook</h1><p className="text-gray-600 mt-2">Manage student grades</p></div>
-            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Export Grades</button>
+            <div className="flex gap-3">
+              <Link href={`/instructor/courses/${params.courseId}/assignments`} className="bg-orange-600 text-white px-4 py-2 rounded-lg hover:bg-orange-700 text-sm font-medium">SpeedGrader</Link>
+              <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Export Grades</button>
+            </div>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">

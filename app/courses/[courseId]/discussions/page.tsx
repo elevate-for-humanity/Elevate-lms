@@ -245,20 +245,20 @@ export default function CourseDiscussionsPage() {
                 <h2 className="text-2xl md:text-3xl font-bold mb-6">
                   Ready to Improve Your Career?
                 </h2>
-                <p className="text-base md:text-lg mb-8 text-blue-100">
-                  Join thousands who have launched successful careers through
-                  our free training programs.
+                <p className="text-base md:text-lg mb-8 text-brand-blue-100">
+                  Explore training programs and earn industry certifications through
+                  Elevate for Humanity.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/contact"
-                    className="bg-white text-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
+                    className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
                   >
                     Apply Now - It's Free
                   </Link>
                   <Link
                     href="/programs"
-                    className="bg-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
+                    className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
                   >
                     Browse All Programs
                   </Link>
@@ -372,7 +372,7 @@ export default function CourseDiscussionsPage() {
                 >
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+                      <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center">
                         <span className="text-brand-blue-600 font-semibold text-lg">
                           {discussion.profiles?.full_name?.[0] || '?'}
                         </span>

@@ -244,20 +244,20 @@ export default function CourseLeaderboardPage() {
                 <h2 className="text-2xl md:text-3xl font-bold mb-6">
                   Ready to Improve Your Career?
                 </h2>
-                <p className="text-base md:text-lg mb-8 text-blue-100">
-                  Join thousands who have launched successful careers through
-                  our free training programs.
+                <p className="text-base md:text-lg mb-8 text-brand-blue-100">
+                  Explore training programs and earn industry certifications through
+                  Elevate for Humanity.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link
                     href="/contact"
-                    className="bg-white text-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
+                    className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
                   >
                     Apply Now - It's Free
                   </Link>
                   <Link
                     href="/programs"
-                    className="bg-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
+                    className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
                   >
                     Browse All Programs
                   </Link>
@@ -285,7 +285,7 @@ export default function CourseLeaderboardPage() {
             <h1 className="text-4xl font-bold mb-4 text-2xl md:text-3xl lg:text-4xl">
               {course?.title}
             </h1>
-            <p className="text-base md:text-lg text-blue-100">
+            <p className="text-base md:text-lg text-brand-blue-100">
               Course Leaderboard
             </p>
           </div>
@@ -303,7 +303,7 @@ export default function CourseLeaderboardPage() {
                   onClick={() => setTimeframe('week')}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     timeframe === 'week'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-brand-blue-600 text-white'
                       : 'bg-gray-100 text-black hover:bg-gray-200'
                   }`}
                 >
@@ -313,7 +313,7 @@ export default function CourseLeaderboardPage() {
                   onClick={() => setTimeframe('month')}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     timeframe === 'month'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-brand-blue-600 text-white'
                       : 'bg-gray-100 text-black hover:bg-gray-200'
                   }`}
                 >
@@ -323,7 +323,7 @@ export default function CourseLeaderboardPage() {
                   onClick={() => setTimeframe('all')}
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     timeframe === 'all'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-brand-blue-600 text-white'
                       : 'bg-gray-100 text-black hover:bg-gray-200'
                   }`}
                 >
@@ -459,7 +459,7 @@ export default function CourseLeaderboardPage() {
                           #{enstart.rank}
                         </span>
                       </div>
-                      <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                         {enstart.profiles?.avatar_url ? (
                           <Image
                             src={enstart.profiles.avatar_url}
@@ -470,7 +470,7 @@ export default function CourseLeaderboardPage() {
                             quality={100}
                           />
                         ) : (
-                          <span className="text-blue-600 font-semibold">
+                          <span className="text-brand-blue-600 font-semibold">
                             {enstart.profiles?.full_name?.[0] || '?'}
                           </span>
                         )}
@@ -485,7 +485,7 @@ export default function CourseLeaderboardPage() {
                         </p>
                       </div>
                       <div className="text-right">
-                        <p className="text-lg font-bold text-blue-600">
+                        <p className="text-lg font-bold text-brand-blue-600">
                           {enstart.points}
                         </p>
                         <p className="text-xs text-black">points</p>

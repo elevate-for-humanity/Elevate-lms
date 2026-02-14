@@ -44,7 +44,7 @@ export const NAV_ITEMS = [
       { name: 'About Elevate', href: '/about' },
       { name: 'Our Mission', href: '/mission' },
       { name: 'How It Works', href: '/how-it-works' },
-      { name: 'Success Stories', href: '/success-stories' },
+      { name: 'Success Stories', href: '/testimonials' },
       { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
       { name: 'FAQ', href: '/faq' },
     ]

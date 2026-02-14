@@ -96,7 +96,7 @@ export default function GrantReportingPage() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <span className="inline-block bg-orange-500 text-white text-sm font-bold px-4 py-1 rounded-full mb-4">
+              <span className="inline-block bg-red-600 text-white text-sm font-bold px-4 py-1 rounded-full mb-4">
                 Reporting Tools
               </span>
               <h1 className="text-4xl sm:text-5xl font-black mb-6">Grant Reporting Made Easy</h1>
@@ -108,7 +108,7 @@ export default function GrantReportingPage() {
                   View Pricing
                   <ArrowRight className="w-5 h-5" />
                 </Link>
-                <Link href="/store/demo" className="inline-flex items-center gap-2 bg-orange-500 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-400 transition border border-orange-400">
+                <Link href="/store/demo" className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-400 transition border border-orange-400">
                   Request Demo
                 </Link>
               </div>

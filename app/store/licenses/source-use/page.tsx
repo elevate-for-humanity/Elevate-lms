@@ -277,7 +277,7 @@ export default function SourceUseLicensePage() {
               <thead>
                 <tr className="border-b border-slate-200">
                   <th className="py-4 px-4 text-slate-600 font-medium">Feature</th>
-                  <th className="py-4 px-4 text-orange-400 font-medium">Managed Platform</th>
+                  <th className="py-4 px-4 text-red-600 font-medium">Managed Platform</th>
                   <th className="py-4 px-4 text-slate-600 font-medium">Source-Use</th>
                 </tr>
               </thead>
@@ -307,7 +307,7 @@ export default function SourceUseLicensePage() {
           <div className="text-center mt-8">
             <Link
               href="/store/licenses/managed-platform"
-              className="inline-flex items-center gap-2 text-orange-400 hover:text-orange-300 font-medium"
+              className="inline-flex items-center gap-2 text-red-600 hover:text-red-500 font-medium"
             >
               <Shield className="w-5 h-5" />
               Most organizations should choose Managed Platform →
@@ -328,7 +328,7 @@ export default function SourceUseLicensePage() {
               { week: 'Ongoing', title: 'Annual Maintenance', desc: 'Quarterly security patches, annual compliance review, and email-based technical support.' },
             ].map((step) => (
               <div key={step.week} className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-                <div className="text-orange-400 text-xs font-bold uppercase tracking-wide mb-2">{step.week}</div>
+                <div className="text-red-600 text-xs font-bold uppercase tracking-wide mb-2">{step.week}</div>
                 <h3 className="text-slate-900 font-semibold mb-2">{step.title}</h3>
                 <p className="text-slate-600 text-sm">{step.desc}</p>
               </div>

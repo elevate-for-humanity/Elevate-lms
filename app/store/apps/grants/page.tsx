@@ -158,7 +158,7 @@ export default function GrantsAppPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {pricing.map((plan, i) => (
               <div key={i} className={`rounded-2xl p-8 ${plan.popular ? 'bg-green-600 text-white ring-4 ring-green-300' : 'bg-white border border-gray-200'}`}>
-                {plan.popular && <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">MOST POPULAR</span>}
+                {plan.popular && <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">MOST POPULAR</span>}
                 <h3 className={`text-2xl font-bold mt-4 ${plan.popular ? 'text-slate-900' : 'text-gray-900'}`}>{plan.name}</h3>
                 <div className="mt-4 mb-6">
                   <span className="text-4xl font-bold">${plan.price}</span>

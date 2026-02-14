@@ -36,7 +36,7 @@ export default function SchoolLicensePage() {
             <Link href="/contact?subject=School%20License" className="bg-white text-slate-900 px-6 py-3 rounded-lg font-bold hover:bg-slate-100">
               Schedule Demo
             </Link>
-            <Link href="/store/checkout?license=school" className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700">
+            <Link href="/store/checkout?license=school" className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-red-700">
               Purchase Now
             </Link>
           </div>
@@ -128,7 +128,7 @@ export default function SchoolLicensePage() {
 
           {/* The Turning Point */}
           <div className="mt-12 text-center">
-            <div className="inline-block bg-orange-100 text-orange-800 px-6 py-3 rounded-full font-bold">
+            <div className="inline-block bg-red-50 text-red-800 px-6 py-3 rounded-full font-bold">
               Then Maria found Elevate
             </div>
           </div>
@@ -213,19 +213,19 @@ export default function SchoolLicensePage() {
           
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-5xl font-black text-orange-400">73%</div>
+              <div className="text-5xl font-black text-red-600">73%</div>
               <div className="text-slate-600 mt-2">Less time on admin</div>
             </div>
             <div>
-              <div className="text-5xl font-black text-orange-400">2→5</div>
+              <div className="text-5xl font-black text-red-600">2→5</div>
               <div className="text-slate-600 mt-2">Days to enroll → Hours</div>
             </div>
             <div>
-              <div className="text-5xl font-black text-orange-400">100%</div>
+              <div className="text-5xl font-black text-red-600">100%</div>
               <div className="text-slate-600 mt-2">Compliance accuracy</div>
             </div>
             <div>
-              <div className="text-5xl font-black text-orange-400">+40%</div>
+              <div className="text-5xl font-black text-red-600">+40%</div>
               <div className="text-slate-600 mt-2">More students served</div>
             </div>
           </div>

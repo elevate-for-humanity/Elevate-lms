@@ -215,7 +215,7 @@ export default function EnterpriseCapitalReadinessPage() {
         {/* Implementation Timeline */}
         <section className="mb-16">
           <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
-            <Clock className="w-6 h-6 text-orange-400" />
+            <Clock className="w-6 h-6 text-red-600" />
             Enterprise Implementation Timeline
           </h2>
           

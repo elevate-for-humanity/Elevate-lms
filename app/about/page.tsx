@@ -96,7 +96,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 gap-10 items-start">
             <div className="relative aspect-[4/5] max-w-md mx-auto md:mx-0 rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src={FOUNDER.headshotSrc || '/images/placeholder-avatar.jpg'}
+                src={FOUNDER.headshotSrc || '/images/team/founder/elizabeth-greene-founder-hero-01.jpg'}
                 alt={FOUNDER.name}
                 fill
                 className="object-cover object-top"

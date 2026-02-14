@@ -524,7 +524,7 @@ export default function FundingImpactPage() {
       <section className="relative py-20">
         <div className="absolute inset-0">
           <Image
-            src="/images/stories/success-banner.jpg"
+            src="/images/heroes-hq/success-stories-hero.jpg"
             alt="Success stories"
             fill
             className="object-cover"

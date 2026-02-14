@@ -73,9 +73,9 @@ const apprenticeships = [
 
 const steps = [
   { num: 1, title: 'Apply', desc: 'Submit your application', image: '/images/business/collaboration-1.jpg' },
-  { num: 2, title: 'Interview', desc: 'Meet with employers', image: '/images/business/handshake-1.jpg' },
+  { num: 2, title: 'Interview', desc: 'Meet with employers', image: '/images/heroes-hq/employer-hero.jpg' },
   { num: 3, title: 'Train', desc: 'Learn on the job', image: '/images/business/team-1.jpg' },
-  { num: 4, title: 'Certify', desc: 'Earn your credential', image: '/images/business/success-1.jpg' },
+  { num: 4, title: 'Certify', desc: 'Earn your credential', image: '/images/heroes-hq/success-hero.jpg' },
 ];
 
 export default function ApprenticeshipsPage() {

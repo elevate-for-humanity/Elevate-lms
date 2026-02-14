@@ -46,7 +46,7 @@ export default function EmployerPage() {
               { step: '1', title: 'Tell Us Your Needs', desc: 'Submit your hiring needs — roles, skills, and timeline.', image: '/images/heroes/workforce-partner-3.jpg' },
               { step: '2', title: 'We Train Candidates', desc: 'We recruit and train workers in your specific skill requirements.', image: '/images/homepage/training-program-collage.png' },
               { step: '3', title: 'You Interview', desc: 'Meet pre-screened candidates. Only interview qualified people.', image: '/images/heroes-hq/career-services-hero.jpg' },
-              { step: '4', title: 'Hire & Save', desc: 'Hire with tax credits and wage reimbursements.', image: '/images/homepage/employer-partnership.png' },
+              { step: '4', title: 'Hire & Save', desc: 'Hire with tax credits and wage reimbursements.', image: '/images/heroes-hq/employer-hero.jpg' },
             ].map((item) => (
               <div key={item.step} className="flex sm:flex-col gap-4 sm:gap-0 rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-28 h-28 sm:w-full sm:h-[140px] flex-shrink-0 sm:flex-shrink">

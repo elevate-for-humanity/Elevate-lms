@@ -13,7 +13,7 @@ export default function Pathways() {
           <Link href="/programs" className="flex-1 min-w-[300px] bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group">
             <div className="relative h-48">
               <Image
-                src="/images/artlist/thumbnails/hero-training-1-thumb.jpg"
+                src="/images/artlist/hero-training-1.jpg"
                 alt="Students learning"
                 fill
                 className="object-cover group-hover:scale-105 transition"

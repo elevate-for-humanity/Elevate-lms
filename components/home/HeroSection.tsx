@@ -60,7 +60,7 @@ export default function HeroSection({ user, activeEnrollment, isLoading = false 
         playsInline
         autoPlay
         preload="metadata"
-        poster="/images/heroes-hq/homepage-hero.jpg"
+        poster="/images/heroes-hq/about-hero.jpg"
       >
         <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home-fast.mp4" type="video/mp4" />
       </video>

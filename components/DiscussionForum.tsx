@@ -46,7 +46,7 @@ export function DiscussionForum({
         const formatted: ForumPost[] = data.map(p => ({
           id: p.id,
           author: p.profiles?.full_name || 'Anonymous',
-          avatar: p.profiles?.avatar_url || '/images/default-avatar.png',
+          avatar: p.profiles?.avatar_url || '/images/team/founder/elizabeth-greene-founder-hero-01.jpg',
           content: p.content,
           timestamp: new Date(p.created_at).toLocaleString(),
           likes: p.likes_count || 0,
@@ -85,7 +85,7 @@ export function DiscussionForum({
       const post: ForumPost = {
         id: data.id,
         author: user?.email?.split('@')[0] || 'Current User',
-        avatar: '/images/split/piece-15.webp',
+        avatar: '/images/team/founder/elizabeth-greene-founder-hero-01.jpg',
         content: newPost,
         timestamp: 'Just now',
         likes: 0,

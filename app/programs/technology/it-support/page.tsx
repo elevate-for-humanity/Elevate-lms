@@ -61,7 +61,7 @@ export default function ITSupportPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row gap-5 items-start">
             <div className="relative w-full h-[200px] sm:w-72 sm:h-[280px] rounded-xl overflow-hidden flex-shrink-0">
-              <Image src="/images/pathways/it-support.jpg" alt="IT support training" fill className="object-cover" />
+              <Image src="/images/programs-hq/it-support.jpg" alt="IT support training" fill className="object-cover" />
             </div>
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>

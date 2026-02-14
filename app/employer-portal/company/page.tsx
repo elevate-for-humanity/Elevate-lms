@@ -85,8 +85,8 @@ export default async function CompanyProfilePage() {
   const companyData = {
     name: employer.business_name || 'Company Name',
     dba: employer.dba_name,
-    logo: '/images/defaults/company-logo.png',
-    cover: '/images/defaults/company-cover.jpg',
+    logo: '/images/heroes-hq/employer-hero.jpg',
+    cover: '/images/heroes-hq/employer-hero.jpg',
     industry: employer.industry || 'Not specified',
     size: employer.employee_count ? `${employer.employee_count} employees` : 'Not specified',
     founded: employer.year_established || 'Not specified',
@@ -109,7 +109,7 @@ export default async function CompanyProfilePage() {
     <div className="min-h-screen bg-gray-50">
       {/* Cover Image */}
       <div className="relative h-64 bg-brand-blue-600">
-        {companyData.cover && companyData.cover !== '/images/defaults/company-cover.jpg' && (
+        {companyData.cover && companyData.cover !== '/images/heroes-hq/employer-hero.jpg' && (
           <Image
             src={companyData.cover}
             alt="Company cover"

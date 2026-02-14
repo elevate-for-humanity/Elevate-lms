@@ -10,7 +10,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Grants Discovery & Management App',
     description: 'Find and manage federal, state, and foundation grants with AI-powered matching.',
-    images: ['/images/store/grants-app.jpg'],
+    images: ['/images/heroes-hq/funding-hero.jpg'],
     type: 'website',
   },
   alternates: {

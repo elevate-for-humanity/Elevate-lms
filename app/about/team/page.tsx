@@ -133,7 +133,7 @@ export default async function TeamPage() {
                   <div className="md:col-span-1">
                     <div className="relative w-full aspect-square max-w-[300px] mx-auto rounded-xl overflow-hidden shadow-lg">
                       <Image
-                        src={member.image_url || '/images/placeholder-avatar.jpg'}
+                        src={member.image_url || '/images/heroes-hq/career-services-hero.jpg'}
                         alt={member.name}
                         fill
                         className="object-cover"

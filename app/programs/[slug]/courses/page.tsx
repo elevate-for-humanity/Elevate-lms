@@ -145,7 +145,7 @@ export default function ProgramCoursesPage() {
                 'technology': [
                   '/hero-images/technology-category.jpg',
                   '/hero-images/technology-hero.jpg',
-                  '/images/programs/web-development.jpg'
+                  '/images/programs-hq/technology-hero.jpg'
                 ],
                 'business': [
                   '/images/business/professional-1.jpg',

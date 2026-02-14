@@ -70,7 +70,7 @@ export function LiveStreamingClassroom({ sessionId }: LiveStreamingClassroomProp
       const formatted: Participant[] = attendees.map(a => ({
         id: a.user_id,
         name: a.profiles?.full_name || 'Participant',
-        avatar: a.profiles?.avatar_url || '/images/default-avatar.png',
+        avatar: a.profiles?.avatar_url || '/images/team/founder/elizabeth-greene-founder-hero-01.jpg',
         role: a.profiles?.role === 'instructor' ? 'instructor' : 'student',
         handRaised: a.hand_raised || false,
         muted: true,

@@ -3,7 +3,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import PageAvatar from '@/components/PageAvatar';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
   CheckCircle, Clock, DollarSign, Award, ArrowRight, 
@@ -87,10 +87,7 @@ export default function HVACTechnicianPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/trades-guide.mp4" 
-        title="Trades Program Guide" 
-      />
+      <ProgramHeroBanner videoSrc="/videos/avatars/trades-guide.mp4" />
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">

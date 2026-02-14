@@ -11,7 +11,7 @@ import { Heart, Users, Award, Clock, DollarSign } from 'lucide-react';
 import { CompactHero } from '@/components/heroes/CompactHero';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 
@@ -81,7 +81,7 @@ export default async function Page() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/healthcare-guide.mp4" title="DSP Program Guide" />
+      <ProgramHeroBanner videoSrc="/videos/avatars/healthcare-guide.mp4" />
 
       {/* Program Overview */}
       <section className="max-w-7xl mx-auto px-4 py-16">

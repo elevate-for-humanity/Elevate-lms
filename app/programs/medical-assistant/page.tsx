@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
-import PageAvatar from '@/components/PageAvatar';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import { 
@@ -111,6 +111,7 @@ export default function MedicalAssistantProgramPage() {
 
   return (
     <>
+      <ProgramHeroBanner videoSrc="/videos/healthcare-cna.mp4" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[

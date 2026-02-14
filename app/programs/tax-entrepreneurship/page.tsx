@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import type { Metadata } from 'next';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
-import PageAvatar from '@/components/PageAvatar';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -87,7 +87,7 @@ export default async function TaxEntrepreneurshipPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar videoSrc="/videos/avatars/financial-guide.mp4" title="Tax Entrepreneurship Program Guide" />
+      <ProgramHeroBanner videoSrc="/videos/avatars/financial-guide.mp4" />
 
       {/* Pathway Disclosure */}
       <PathwayDisclosure programName="Tax Entrepreneurship" programSlug="tax-entrepreneurship" />

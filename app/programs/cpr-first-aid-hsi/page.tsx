@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import PageAvatar from '@/components/PageAvatar';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { 
   CheckCircle, Clock, Award, ArrowRight, Heart, 
   Users, Shield, Phone, Calendar, Building, Briefcase
@@ -139,10 +139,7 @@ export default function CPRFirstAidPage() {
       </section>
 
       {/* Avatar Guide */}
-      <PageAvatar 
-        videoSrc="/videos/avatars/healthcare-guide.mp4" 
-        title="CPR & First Aid Guide" 
-      />
+      <ProgramHeroBanner videoSrc="/videos/avatars/healthcare-guide.mp4" />
 
       {/* Quick Stats */}
       <section className="py-8 bg-slate-900">

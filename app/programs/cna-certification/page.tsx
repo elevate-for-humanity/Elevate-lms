@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
+import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
 
@@ -21,6 +22,7 @@ export const metadata: Metadata = {
 export default function CNACertificationPage() {
   return (
     <div className="min-h-screen bg-white">
+      <ProgramHeroBanner videoSrc="/videos/cna-hero.mp4" />
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Programs', href: '/programs' }, { label: 'Healthcare', href: '/programs/healthcare' }, { label: 'CNA Certification' }]} />

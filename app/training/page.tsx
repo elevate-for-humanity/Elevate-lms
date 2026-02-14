@@ -2,191 +2,101 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Stethoscope, Wrench, Monitor, Scissors, Truck, BookOpen } from 'lucide-react';
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/training',
-  },
+  alternates: { canonical: 'https://www.elevateforhumanity.org/training' },
   title: 'Training Programs | Elevate For Humanity',
-  description:
-    'Explore training programs and courses.',
+  description: 'Explore career training programs in healthcare, skilled trades, technology, CDL, barbering, and more. Many programs available at no cost through funding.',
 };
 
-export default async function TrainingPage() {
+const PROGRAM_AREAS = [
+  { title: 'Healthcare', desc: 'CNA, Medical Assistant, Phlebotomy, Home Health Aide', icon: Stethoscope, href: '/programs/healthcare', image: '/images/programs-hq/healthcare-hero.jpg' },
+  { title: 'Skilled Trades', desc: 'Welding, HVAC, Electrical, Plumbing, Construction', icon: Wrench, href: '/programs/skilled-trades', image: '/images/programs-hq/skilled-trades-hero.jpg' },
+  { title: 'Technology', desc: 'IT Support, Cybersecurity, CompTIA Certifications', icon: Monitor, href: '/programs/technology', image: '/images/programs-hq/technology-hero.jpg' },
+  { title: 'CDL & Transportation', desc: 'Class A CDL, Commercial Driving, Logistics', icon: Truck, href: '/programs/cdl', image: '/images/programs-hq/cdl-trucking.jpg' },
+  { title: 'Barbering & Cosmetology', desc: 'Barber Apprenticeship, Cosmetology, Nail Technician', icon: Scissors, href: '/programs/barber-apprenticeship', image: '/images/programs-hq/barber-hero.jpg' },
+  { title: 'Business & Professional', desc: 'Tax Preparation, Office Administration, Entrepreneurship', icon: BookOpen, href: '/programs/business', image: '/images/programs-hq/business-training.jpg' },
+];
+
+export default function TrainingPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Training" }]} />
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: 'Training' }]} />
       </div>
-{/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
-        <Image
-          src="/images/hero/hero-hands-on-training.jpg"
-          alt="Training Programs"
-          fill
-          className="object-cover object-center"
-          quality={100}
-          priority
-          sizes="100vw"
-        />
 
+      {/* Hero */}
+      <section className="relative h-[300px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
+        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career training programs" fill className="object-cover" priority sizes="100vw" />
+        <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Training Programs
-          </h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100">
-            Manage training
-            for career workforce training and career success.
+          <h1 className="text-3xl md:text-5xl font-bold mb-4">Training Programs</h1>
+          <p className="text-lg md:text-xl text-gray-100">
+            Hands-on career training in high-demand fields. Many programs may be available at no cost through WIOA and state funding.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-            >
-              Get Started
-            </Link>
-            <Link
-              href="/programs"
-              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-            >
-              View Programs
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* Training Options */}
+      {/* Program Areas */}
       <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            <h2 className="text-2xl md:text-3xl font-bold mb-8 text-center">
-              Training Options
-            </h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <Link
-                href="/training/certifications"
-                className="bg-white rounded-lg shadow-sm border p-8 hover:shadow-md transition-shadow"
-              >
-                <h3 className="text-xl font-semibold mb-4">Certifications</h3>
-                <p className="text-gray-600">
-                  Earn industry-recognized certifications to advance your
-                  career.
-                </p>
-              </Link>
-              <Link
-                href="/training/learning-center"
-                className="bg-white rounded-lg shadow-sm border p-8 hover:shadow-md transition-shadow"
-              >
-                <h3 className="text-xl font-semibold mb-4">Learning Center</h3>
-                <p className="text-gray-600">
-                  Access our comprehensive learning resources and materials.
-                </p>
-              </Link>
-            </div>
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">Choose Your Career Path</h2>
+          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+            Each program includes industry certification preparation, hands-on training, and career placement support.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {PROGRAM_AREAS.map((p) => {
+              const Icon = p.icon;
+              return (
+                <Link key={p.title} href={p.href} className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all">
+                  <div className="relative h-40">
+                    <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
+                  </div>
+                  <div className="p-5">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon className="w-5 h-5 text-brand-blue-600" />
+                      <h3 className="text-lg font-bold text-gray-900">{p.title}</h3>
+                    </div>
+                    <p className="text-gray-600 text-sm">{p.desc}</p>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* Features */}
-      <section className="py-16 bg-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="text-center p-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-brand-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Expert Instruction</h3>
-                <p className="text-gray-600">
-                  Learn from industry professionals with real-world experience.
-                </p>
+      {/* What's Included */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">What Every Program Includes</h2>
+          <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {[
+              { title: 'Industry Certification', desc: 'Prepare for and earn recognized credentials in your field.' },
+              { title: 'Hands-On Training', desc: 'Learn by doing with real equipment and real-world scenarios.' },
+              { title: 'Career Services', desc: 'Resume help, interview prep, and direct employer connections.' },
+              { title: 'Funding Assistance', desc: 'Help identifying and applying for available funding sources.' },
+            ].map((item) => (
+              <div key={item.title} className="bg-white border border-gray-200 rounded-xl p-5 text-center">
+                <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
+                <p className="text-gray-600 text-sm">{item.desc}</p>
               </div>
-              <div className="text-center p-6">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-brand-green-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">
-                  Industry Certifications
-                </h3>
-                <p className="text-gray-600">
-                  Earn credentials recognized by employers nationwide.
-                </p>
-              </div>
-              <div className="text-center p-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg
-                    className="w-8 h-8 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-2">Job Placement</h3>
-                <p className="text-gray-600">
-                  Get connected with employers looking for trained professionals.
-                </p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* CTA */}
       <section className="py-16 bg-brand-blue-700 text-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Ready to Start Your Training?
-            </h2>
-            <p className="text-base md:text-lg text-blue-100 mb-8">
-              Join thousands who have launched successful careers through our
-              programs.
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link
-                href="/apply"
-                className="bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
-              >
-                Apply Now
-              </Link>
-              <Link
-                href="/programs"
-                className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg"
-              >
-                Browse Programs
-              </Link>
-            </div>
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Start Training?</h2>
+          <p className="text-brand-blue-100 mb-8 text-lg">
+            Attend an orientation to learn about programs and check your eligibility for funded training.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link href="/orientation/schedule" className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg">Orientation Schedule</Link>
+            <Link href="/programs" className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg">All Programs</Link>
           </div>
         </div>
       </section>

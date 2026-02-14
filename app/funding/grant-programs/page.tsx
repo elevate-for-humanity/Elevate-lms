@@ -298,28 +298,21 @@ export default function GrantProgramsPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Ready to Start Your Free Training?
           </h2>
-          <p className="text-base md:text-lg text-blue-100 mb-8">
-            Join thousands who have launched successful careers through our ETPL
-            approved programs.
+          <p className="text-base md:text-lg text-brand-blue-100 mb-8">
+            Explore ETPL-approved programs that may be available at no cost through federal and state funding.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/apply"
-              className="bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+              href="/enroll"
+              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
             >
-              Apply Now
+              Check Eligibility
             </Link>
             <Link
-              href="/funding/wioa"
-              className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg"
+              href="/funding/how-it-works"
+              className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
             >
-              Learn About WIOA
-            </Link>
-            <Link
-              href="/funding/wrg"
-              className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg"
-            >
-              Learn About WRG
+              How Funding Works
             </Link>
           </div>
         </div>

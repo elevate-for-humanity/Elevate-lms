@@ -82,7 +82,7 @@ export default function TrialPage() {
             <p className="text-lg text-slate-800 mb-2">
               Check <strong>{adminEmail}</strong> for login instructions.
             </p>
-            <p className="text-sm text-slate-500 mb-8">
+            <p className="text-sm text-slate-600 mb-8">
               You&apos;re now in your live workspace (14-day trial). Nothing here is public until you launch.
             </p>
 
@@ -125,13 +125,13 @@ export default function TrialPage() {
                     }),
                   }).catch(() => {});
                 }}
-                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors w-full sm:w-auto"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-brand-red-600 text-slate-900 font-bold rounded-lg hover:bg-brand-red-700 transition-colors w-full sm:w-auto"
               >
                 Open Dashboard &amp; Configure <ArrowRight className="w-5 h-5" />
               </a>
             </div>
 
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-600">
               No credit card required. Full platform access for 14 days.
             </p>
           </div>
@@ -156,7 +156,7 @@ export default function TrialPage() {
             <p className="text-lg text-slate-800">
               Full platform access. No credit card. Your environment is provisioned instantly.
             </p>
-            <p className="mt-2 text-sm text-slate-500">
+            <p className="mt-2 text-sm text-slate-600">
               This creates your real workspace with your own subdomain and admin dashboard.
               The demo used sample data — this will be your live environment.
             </p>
@@ -235,7 +235,7 @@ export default function TrialPage() {
                   >
                     Try again
                   </button>
-                  <span className="text-red-300">|</span>
+                  <span className="text-red-600">|</span>
                   <Link
                     href={`/contact?topic=support&reason=trial-create-failed${correlationId ? `&ref=${correlationId}` : ''}`}
                     className="text-sm font-medium text-brand-red-600 hover:underline"
@@ -252,7 +252,7 @@ export default function TrialPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-brand-red-600 text-white font-bold rounded-lg hover:bg-brand-red-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center gap-2 px-8 py-4 bg-brand-red-600 text-slate-900 font-bold rounded-lg hover:bg-brand-red-700 transition-colors disabled:bg-slate-300 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>
@@ -268,13 +268,13 @@ export default function TrialPage() {
           </form>
 
           <div className="mt-8 text-center space-y-3">
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-600">
               Already know what you need?{' '}
               <Link href="/store/licenses" className="text-brand-red-600 font-medium hover:underline">
                 Go directly to licensing
               </Link>
             </p>
-            <p className="text-sm text-slate-500">
+            <p className="text-sm text-slate-600">
               Want to see the platform first?{' '}
               <Link href="/store/demo" className="text-brand-red-600 font-medium hover:underline">
                 View guided tour →

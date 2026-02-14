@@ -43,7 +43,7 @@ export default function StoreHeroVideo() {
 
   return (
     <div className="relative max-w-2xl mx-auto mb-8">
-      <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 bg-slate-800">
+      <div className="relative aspect-video rounded-2xl overflow-hidden shadow-2xl border-4 border-white/20 bg-white">
         <video
           ref={videoRef}
           className="w-full h-full object-cover"
@@ -58,7 +58,7 @@ export default function StoreHeroVideo() {
 
         {/* Loading state */}
         {!isLoaded && (
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-800">
+          <div className="absolute inset-0 flex items-center justify-center bg-white">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
           </div>
         )}
@@ -66,7 +66,7 @@ export default function StoreHeroVideo() {
         {/* Play overlay - show when not playing */}
         {!isPlaying && !hasEnded && isLoaded && (
           <div 
-            className="absolute inset-0 flex items-center justify-center bg-black/40 cursor-pointer"
+            className="absolute inset-0 flex items-center justify-center bg-white/40 cursor-pointer"
             onClick={playVideo}
           >
             <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
@@ -78,14 +78,14 @@ export default function StoreHeroVideo() {
         {/* Replay overlay */}
         {hasEnded && (
           <div 
-            className="absolute inset-0 flex items-center justify-center bg-black/50 cursor-pointer"
+            className="absolute inset-0 flex items-center justify-center bg-white/50 cursor-pointer"
             onClick={replayVideo}
           >
             <div className="text-center">
               <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform mx-auto mb-2">
                 <RotateCcw className="w-8 h-8 text-brand-blue-600" />
               </div>
-              <span className="text-white text-sm font-medium">Watch Again</span>
+              <span className="text-slate-900 text-sm font-medium">Watch Again</span>
             </div>
           </div>
         )}
@@ -95,13 +95,13 @@ export default function StoreHeroVideo() {
           <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between">
             <button
               onClick={toggleMute}
-              className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-full text-white transition-all"
+              className="p-3 bg-slate-100 hover:bg-slate-200 rounded-full text-slate-900 transition-all"
               aria-label={isMuted ? 'Unmute' : 'Mute'}
             >
               {isMuted ? <VolumeX className="w-6 h-6" /> : <Volume2 className="w-6 h-6" />}
             </button>
             
-            <span className="text-white text-sm font-medium bg-black/40 px-4 py-2 rounded-full backdrop-blur-sm">
+            <span className="text-slate-900 text-sm font-medium bg-white/40 px-4 py-2 rounded-full backdrop-blur-sm">
               Store Guide
             </span>
             
@@ -110,7 +110,7 @@ export default function StoreHeroVideo() {
         )}
       </div>
       
-      <p className="text-slate-400 text-sm mt-3">
+      <p className="text-slate-600 text-sm mt-3">
         Watch our guide explain what&apos;s available in the store
       </p>
     </div>

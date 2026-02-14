@@ -82,10 +82,10 @@ export default function CommunityHubPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Community Hub" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 bg-slate-700">
+      <section className="relative py-20 bg-slate-100">
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-white">
+            <div className="text-slate-900">
               <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-sm font-medium mb-6">
                 <Zap className="w-4 h-4" />
                 Platform Add-On
@@ -106,7 +106,7 @@ export default function CommunityHubPage() {
                 </Link>
                 <Link
                   href="#features"
-                  className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition"
+                  className="px-8 py-4 border-2 border-white text-slate-900 font-bold rounded-lg hover:bg-white/10 transition"
                 >
                   See Features
                 </Link>
@@ -115,23 +115,23 @@ export default function CommunityHubPage() {
             <div className="hidden lg:block">
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
                 <div className="space-y-4">
-                  <div className="flex items-center gap-3 text-white">
+                  <div className="flex items-center gap-3 text-slate-900">
                     <CheckCircle className="w-5 h-5 text-green-400" />
                     <span>One-time purchase</span>
                   </div>
-                  <div className="flex items-center gap-3 text-white">
+                  <div className="flex items-center gap-3 text-slate-900">
                     <CheckCircle className="w-5 h-5 text-green-400" />
                     <span>Lifetime access</span>
                   </div>
-                  <div className="flex items-center gap-3 text-white">
+                  <div className="flex items-center gap-3 text-slate-900">
                     <CheckCircle className="w-5 h-5 text-green-400" />
                     <span>Unlimited members</span>
                   </div>
-                  <div className="flex items-center gap-3 text-white">
+                  <div className="flex items-center gap-3 text-slate-900">
                     <CheckCircle className="w-5 h-5 text-green-400" />
                     <span>Full source code access</span>
                   </div>
-                  <div className="flex items-center gap-3 text-white">
+                  <div className="flex items-center gap-3 text-slate-900">
                     <CheckCircle className="w-5 h-5 text-green-400" />
                     <span>Integrates with your LMS</span>
                   </div>
@@ -139,7 +139,7 @@ export default function CommunityHubPage() {
                 <div className="mt-8 pt-6 border-t border-white/20">
                   <div className="text-center">
                     <span className="text-indigo-200 text-sm">One-time payment</span>
-                    <div className="text-4xl font-black text-white">$2,499</div>
+                    <div className="text-4xl font-black text-slate-900">$2,499</div>
                   </div>
                 </div>
               </div>
@@ -237,7 +237,7 @@ export default function CommunityHubPage() {
 
       {/* CTA */}
       <section className="py-20 bg-indigo-600">
-        <div className="max-w-4xl mx-auto px-4 text-center text-white">
+        <div className="max-w-4xl mx-auto px-4 text-center text-slate-900">
           <h2 className="text-3xl font-bold mb-4">Ready to Build Your Community?</h2>
           <p className="text-indigo-100 mb-8">
             One-time purchase. Lifetime access. Unlimited members.
@@ -251,7 +251,7 @@ export default function CommunityHubPage() {
             </Link>
             <Link
               href="/community"
-              className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition"
+              className="px-8 py-4 border-2 border-white text-slate-900 font-bold rounded-lg hover:bg-white/10 transition"
             >
               See Live Demo
             </Link>

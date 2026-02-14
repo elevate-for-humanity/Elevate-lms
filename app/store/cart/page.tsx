@@ -55,7 +55,7 @@ export default async function CartPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/login?redirect=/store/cart"
-                className="inline-flex items-center gap-2 bg-orange-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-700"
+                className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-700"
               >
                 Sign In
               </Link>
@@ -199,7 +199,7 @@ export default async function CartPage() {
                 </div>
                 <Link
                   href="/store/checkout"
-                  className="w-full flex items-center justify-center gap-2 bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700"
+                  className="w-full flex items-center justify-center gap-2 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700"
                 >
                   <CreditCard className="w-5 h-5" />
                   Proceed to Checkout
@@ -218,7 +218,7 @@ export default async function CartPage() {
             <p className="text-gray-600 mb-6">Browse our store to find resources that support your journey.</p>
             <Link
               href="/store"
-              className="inline-flex items-center gap-2 bg-orange-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-700"
+              className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-orange-700"
             >
               Continue Shopping
             </Link>

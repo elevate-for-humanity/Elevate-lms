@@ -174,7 +174,7 @@ function ManagedLicenseContent() {
             <div className="mt-4 flex gap-3">
               <a
                 href="#pricing"
-                className="inline-flex items-center gap-2 bg-amber-600 text-white px-4 py-2 rounded-lg font-bold hover:bg-amber-700 transition-colors"
+                className="inline-flex items-center gap-2 bg-amber-600 text-slate-900 px-4 py-2 rounded-lg font-bold hover:bg-amber-700 transition-colors"
               >
                 Subscribe Now
                 <ArrowRight className="w-4 h-4" />
@@ -191,17 +191,17 @@ function ManagedLicenseContent() {
       )}
 
       {/* Hero */}
-      <section className="bg-slate-700 text-white py-16">
+      <section className="bg-slate-100 text-slate-900 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 bg-brand-blue-600 text-white rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 bg-blue-600 text-white rounded-full text-sm font-bold mb-4">
               <Shield className="w-4 h-4" />
               Managed Platform
             </div>
             <h1 className="text-4xl lg:text-5xl font-black mb-4">
               {MANAGED_LICENSE.name}
             </h1>
-            <p className="text-xl text-slate-300 mb-6">
+            <p className="text-xl text-slate-700 mb-6">
               {MANAGED_LICENSE.description} You manage your organization, users, and programs. 
               We manage the platform, infrastructure, security, and enforcement.
             </p>
@@ -215,7 +215,7 @@ function ManagedLicenseContent() {
               </Link>
               <Link
                 href="#pricing"
-                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors"
               >
                 View Pricing
               </Link>
@@ -249,17 +249,17 @@ function ManagedLicenseContent() {
           </h2>
           <div className="grid md:grid-cols-2 gap-8">
             {/* You Manage */}
-            <div className="bg-brand-blue-50 rounded-2xl p-8">
+            <div className="bg-blue-50 rounded-2xl p-8">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-brand-blue-600 rounded-lg flex items-center justify-center">
-                  <Users className="w-6 h-6 text-white" />
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <Users className="w-6 h-6 text-slate-900" />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900">You Manage</h3>
               </div>
               <ul className="space-y-3">
                 {MANAGED_LICENSE.youManage.map((item, idx) => (
                   <li key={idx} className="flex items-center gap-3">
-                    <Check className="w-5 h-5 text-brand-blue-600" />
+                    <Check className="w-5 h-5 text-blue-600" />
                     <span className="text-slate-700">{item}</span>
                   </li>
                 ))}
@@ -270,7 +270,7 @@ function ManagedLicenseContent() {
             <div className="bg-green-50 rounded-2xl p-8">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
-                  <Server className="w-6 h-6 text-white" />
+                  <Server className="w-6 h-6 text-slate-900" />
                 </div>
                 <h3 className="text-2xl font-bold text-slate-900">We Manage</h3>
               </div>
@@ -288,22 +288,22 @@ function ManagedLicenseContent() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-16 bg-slate-900 text-white">
+      <section id="pricing" className="py-16 bg-white text-slate-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-black mb-4 text-center">Pricing</h2>
-          <p className="text-slate-400 text-center mb-8">
+          <p className="text-slate-600 text-center mb-8">
             Choose the plan that fits your organization. Cancel anytime.
           </p>
           
           {/* Billing Toggle */}
           <div className="flex justify-center mb-8">
-            <div className="bg-slate-800 p-1 rounded-lg inline-flex">
+            <div className="bg-white p-1 rounded-lg inline-flex">
               <button
                 onClick={() => setSelectedPlan('standard')}
                 className={`px-6 py-2 rounded-md font-semibold transition-colors ${
                   selectedPlan === 'standard'
-                    ? 'bg-brand-blue-600 text-white'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Monthly
@@ -312,8 +312,8 @@ function ManagedLicenseContent() {
                 onClick={() => setSelectedPlan('premium')}
                 className={`px-6 py-2 rounded-md font-semibold transition-colors flex items-center gap-2 ${
                   selectedPlan === 'premium'
-                    ? 'bg-brand-blue-600 text-white'
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-blue-600 text-white'
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 Annual
@@ -327,24 +327,24 @@ function ManagedLicenseContent() {
           {/* Pricing Cards */}
           <div className="grid md:grid-cols-2 gap-6 mb-8">
             {/* Schools & Training Providers */}
-            <div className="bg-slate-800 rounded-2xl p-6 border border-slate-700">
-              <div className="text-brand-blue-400 font-semibold text-sm mb-2">FOR SCHOOLS & TRAINING PROVIDERS</div>
-              <h3 className="text-2xl font-bold text-white mb-2">School Plan</h3>
-              <p className="text-slate-400 text-sm mb-4">
+            <div className="bg-white rounded-2xl p-6 border border-slate-200">
+              <div className="text-blue-400 font-semibold text-sm mb-2">FOR SCHOOLS & TRAINING PROVIDERS</div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">School Plan</h3>
+              <p className="text-slate-600 text-sm mb-4">
                 Full LMS for training providers, schools, and educational organizations.
               </p>
               <div className="mb-6">
-                <span className="text-4xl font-black text-white">
+                <span className="text-4xl font-black text-slate-900">
                   ${selectedPlan === 'premium' ? '1,200' : '1,500'}
                 </span>
-                <span className="text-slate-400">/{selectedPlan === 'premium' ? 'month, billed annually' : 'month'}</span>
+                <span className="text-slate-600">/{selectedPlan === 'premium' ? 'month, billed annually' : 'month'}</span>
                 {selectedPlan === 'premium' && (
                   <div className="text-green-400 text-sm mt-1">Save $3,600/year</div>
                 )}
               </div>
               <ul className="space-y-3 mb-6">
                 {['Up to 100 learners', 'Unlimited courses', 'Certificates & credentials', 'Progress tracking', 'Email support'].map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-slate-300">
+                  <li key={feature} className="flex items-center gap-2 text-slate-700">
                     <Check className="w-5 h-5 text-green-400" />
                     {feature}
                   </li>
@@ -352,34 +352,34 @@ function ManagedLicenseContent() {
               </ul>
               <button
                 onClick={() => handleUpgrade(selectedPlan === 'premium' ? 'school_annual' : 'school_monthly')}
-                className="w-full bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700 transition-colors"
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors"
               >
                 Start {selectedPlan === 'premium' ? 'Annual' : 'Monthly'} Plan
               </button>
             </div>
 
             {/* Organizations / Managed */}
-            <div className="bg-slate-800 rounded-2xl p-6 border-2 border-brand-blue-500 relative">
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-brand-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+            <div className="bg-white rounded-2xl p-6 border-2 border-blue-500 relative">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">
                 MOST POPULAR
               </div>
-              <div className="text-brand-blue-400 font-semibold text-sm mb-2">FOR ORGANIZATIONS</div>
-              <h3 className="text-2xl font-bold text-white mb-2">Managed License</h3>
-              <p className="text-slate-400 text-sm mb-4">
+              <div className="text-blue-400 font-semibold text-sm mb-2">FOR ORGANIZATIONS</div>
+              <h3 className="text-2xl font-bold text-slate-900 mb-2">Managed License</h3>
+              <p className="text-slate-600 text-sm mb-4">
                 Full platform with domain isolation, role-based access, and priority support.
               </p>
               <div className="mb-6">
-                <span className="text-4xl font-black text-white">
+                <span className="text-4xl font-black text-slate-900">
                   ${selectedPlan === 'premium' ? '2,000' : '2,500'}
                 </span>
-                <span className="text-slate-400">/{selectedPlan === 'premium' ? 'month, billed annually' : 'month'}</span>
+                <span className="text-slate-600">/{selectedPlan === 'premium' ? 'month, billed annually' : 'month'}</span>
                 {selectedPlan === 'premium' && (
                   <div className="text-green-400 text-sm mt-1">Save $6,000/year</div>
                 )}
               </div>
               <ul className="space-y-3 mb-6">
                 {['Up to 50 users', 'Domain isolation', 'Role-based access control', 'Custom branding', 'Priority support', 'Dedicated onboarding'].map((feature) => (
-                  <li key={feature} className="flex items-center gap-2 text-slate-300">
+                  <li key={feature} className="flex items-center gap-2 text-slate-700">
                     <Check className="w-5 h-5 text-green-400" />
                     {feature}
                   </li>
@@ -387,7 +387,7 @@ function ManagedLicenseContent() {
               </ul>
               <button
                 onClick={() => handleUpgrade(selectedPlan === 'premium' ? 'managed_annual' : 'managed_monthly')}
-                className="w-full bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700 transition-colors"
+                className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition-colors"
               >
                 Start {selectedPlan === 'premium' ? 'Annual' : 'Monthly'} Plan
               </button>
@@ -395,14 +395,14 @@ function ManagedLicenseContent() {
           </div>
 
           {/* Enterprise / Contact Sales */}
-          <div className="bg-slate-800/50 rounded-xl p-6 text-center border border-slate-700">
-            <h3 className="text-xl font-bold text-white mb-2">Need a custom solution?</h3>
-            <p className="text-slate-400 mb-4">
+          <div className="bg-white rounded-xl p-6 text-center border border-slate-200">
+            <h3 className="text-xl font-bold text-slate-900 mb-2">Need a custom solution?</h3>
+            <p className="text-slate-600 mb-4">
               For larger organizations, custom integrations, or special requirements.
             </p>
             <Link
               href="/support/contact?subject=enterprise"
-              className="inline-flex items-center gap-2 bg-slate-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-slate-600 transition-colors"
+              className="inline-flex items-center gap-2 bg-slate-100 text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors"
             >
               Contact Sales
               <ArrowRight className="w-4 h-4" />
@@ -439,7 +439,7 @@ function ManagedLicenseContent() {
               { step: 5, title: 'Go Live', desc: 'Start enrolling students and delivering training.' },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   {item.step}
                 </div>
                 <div>
@@ -462,22 +462,22 @@ function ManagedLicenseContent() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-brand-blue-600 text-white">
+      <section className="py-16 bg-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-black mb-4">Ready to Get Started?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <p className="text-xl text-blue-100 mb-8">
             Launch your managed LMS platform today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/store/demo"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-50 transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors"
             >
               Watch Demo First
             </Link>
             <Link
               href="/store/licenses/checkout/managed"
-              className="inline-flex items-center justify-center gap-2 bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-900 transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-blue-800 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-900 transition-colors"
             >
               Start License Setup
               <ArrowRight className="w-5 h-5" />

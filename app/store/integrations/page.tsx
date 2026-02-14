@@ -38,7 +38,7 @@ export default async function IntegrationsPage() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Integrations" }]} />
       </div>
-<section className="bg-slate-700 text-white py-20">
+<section className="bg-slate-100 text-slate-900 py-20">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Plug className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-5xl font-black mb-6">
@@ -229,12 +229,12 @@ export default async function IntegrationsPage() {
               </div>
             </div>
 
-            <div className="bg-gray-900 text-white rounded-xl p-8">
+            <div className="bg-white text-slate-900 rounded-xl p-8">
               <div className="flex items-center justify-between mb-4">
                 <h4 className="font-bold">Example API Call</h4>
                 <span className="text-xs bg-green-600 px-2 py-2 rounded">POST</span>
               </div>
-              <pre className="bg-black rounded-lg p-4 overflow-x-auto text-sm">
+              <pre className="bg-white rounded-lg p-4 overflow-x-auto text-sm">
                 <code>{`curl -X POST https://your-platform.com/api/students \\
   -H "Authorization: Bearer YOUR_API_KEY" \\
   -H "Content-Type: application/json" \\
@@ -251,7 +251,7 @@ export default async function IntegrationsPage() {
 
       <section className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="bg-slate-700 rounded-2xl p-12 text-center">
+          <div className="bg-slate-100 rounded-2xl p-12 text-center">
             <Plug className="w-16 h-16 text-indigo-600 mx-auto mb-6" />
             <h2 className="text-3xl font-bold mb-4">Need a Custom Integration?</h2>
             <p className="text-xl text-gray-700 mb-8 max-w-2xl mx-auto">
@@ -260,7 +260,7 @@ export default async function IntegrationsPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/contact"
-                className="inline-flex items-center justify-center gap-2 bg-indigo-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-indigo-700 transition"
+                className="inline-flex items-center justify-center gap-2 bg-indigo-600 text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-indigo-700 transition"
               >
                 Request Custom Integration
               </Link>

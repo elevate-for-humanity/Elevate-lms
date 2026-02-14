@@ -440,7 +440,12 @@ section {
    ============================================ */
 
 :root {
-  /* Professional Brand Colors - Blue (Primary) + Orange (Accent) */
+  /* Professional Brand Colors - Red, Blue, Orange, White */
+  --brand-red: #dc2626;
+  --brand-red-dark: #b91c1c;
+  --brand-red-light: #f87171;
+  --brand-red-soft: rgba(220, 38, 38, 0.1);
+
   --brand-blue: #3b82f6; /* professional blue - PRIMARY */
   --brand-blue-dark: #2563eb;
   --brand-blue-darker: #1d4ed8;
@@ -484,9 +489,9 @@ section {
 
   /* Text - Dark on Light */
   --brand-text: #111827;
-  --brand-text-secondary: #4b5563;
-  --brand-text-muted: #6b7280;
-  --brand-text-light: #9ca3af;
+  --brand-text-secondary: #374151;
+  --brand-text-muted: #4b5563;
+  --brand-text-light: #6b7280;
 
   /* Shadows - Softer for light theme */
   --brand-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -852,26 +857,26 @@ html {
 .elevate-select {
   width: 100%;
   border-radius: 0.75rem;
-  border: 1px solid rgba(148, 163, 184, 0.5);
-  background: rgba(15, 23, 42, 0.9);
-  color: var(--brand-text);
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #111827;
   padding: 0.5rem 0.75rem;
-  font-size: 0.82rem;
+  font-size: 0.875rem;
 }
 
 .elevate-input:focus,
 .elevate-textarea:focus,
 .elevate-select:focus {
   outline: none;
-  border-color: var(--brand-secondary);
-  box-shadow: 0 0 0 1px rgba(56, 189, 248, 0.5);
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
 .elevate-label {
   display: block;
   font-size: 0.75rem;
   font-weight: 600;
-  color: var(--brand-text-soft);
+  color: #1f2937;
   margin-bottom: 0.35rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -891,7 +896,7 @@ html {
 .elevate-table th,
 .elevate-table td {
   padding: 0.55rem 0.75rem;
-  border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .elevate-table th {
@@ -899,11 +904,11 @@ html {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: var(--brand-text-muted);
+  color: #1f2937;
 }
 
 .elevate-table tr:hover td {
-  background: rgba(15, 23, 42, 0.9);
+  background: #f8fafc;
 }
 
 /* ============================================
@@ -1757,5 +1762,119 @@ header[role="banner"] a.\!text-white {
 .hover-lift:hover {
   transform: translateY(-8px);
   box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+
+/* ============================================================================
+   BRAND COLOR AUDIT OVERRIDES
+   Enforce brand palette: Red, White, Orange, Blue
+   Fix washed-out grey text on light backgrounds
+   ============================================================================ */
+
+/*
+ * Grey text fix: text-gray-300/400/500 and text-slate-300/400/500 are too
+ * light on white/light backgrounds. Override to darker, readable values.
+ * Only applies on light backgrounds — dark containers (footer, nav, hero)
+ * are excluded via :not() selectors.
+ */
+
+/* --- Fix light-grey body text on light backgrounds --- */
+
+/* gray-300 (#d1d5db) → gray-700 (#374151) on light backgrounds */
+:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50, [class*="bg-white"]) .text-gray-300:not(footer .text-gray-300):not([class*="bg-slate-9"] .text-gray-300):not([class*="bg-gray-9"] .text-gray-300):not([class*="bg-blue-9"] .text-gray-300) {
+  color: #374151;
+}
+
+/* gray-400 (#9ca3af) → gray-700 (#374151) */
+:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50) .text-gray-400:not(footer .text-gray-400):not([class*="bg-slate-9"] .text-gray-400):not([class*="bg-gray-9"] .text-gray-400) {
+  color: #374151;
+}
+
+/* gray-500 (#6b7280) → gray-800 (#1f2937) */
+:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50) .text-gray-500:not(footer .text-gray-500):not([class*="bg-slate-9"] .text-gray-500):not([class*="bg-gray-9"] .text-gray-500) {
+  color: #1f2937;
+}
+
+/* slate-300 (#cbd5e1) → slate-700 (#334155) on light backgrounds */
+:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50) .text-slate-300:not(footer .text-slate-300):not([class*="bg-slate-9"] .text-slate-300):not([class*="bg-gray-9"] .text-slate-300) {
+  color: #334155;
+}
+
+/* slate-400 (#94a3b8) → slate-700 (#334155) */
+:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50) .text-slate-400:not(footer .text-slate-400):not([class*="bg-slate-9"] .text-slate-400):not([class*="bg-gray-9"] .text-slate-400) {
+  color: #334155;
+}
+
+/* slate-500 (#64748b) → slate-800 (#1e293b) */
+:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50) .text-slate-500:not(footer .text-slate-500):not([class*="bg-slate-9"] .text-slate-500):not([class*="bg-gray-9"] .text-slate-500) {
+  color: #1e293b;
+}
+
+/* zinc/neutral grey variants → same treatment */
+:where(main, section) .text-zinc-400,
+:where(main, section) .text-zinc-500,
+:where(main, section) .text-neutral-400,
+:where(main, section) .text-neutral-500 {
+  color: #374151;
+}
+
+/* --- Clean section backgrounds: remove off-brand colored tints --- */
+
+/* Sections with colored backgrounds that should be white or neutral */
+:where(main) section.bg-purple-50,
+:where(main) section.bg-pink-50,
+:where(main) section.bg-violet-50,
+:where(main) section.bg-indigo-50,
+:where(main) section.bg-teal-50,
+:where(main) section.bg-cyan-50,
+:where(main) section.bg-emerald-50,
+:where(main) section.bg-lime-50,
+:where(main) section.bg-amber-50,
+:where(main) section.bg-yellow-50,
+:where(main) section.bg-fuchsia-50,
+:where(main) section.bg-rose-50 {
+  background-color: #f8fafc; /* slate-50 — clean neutral */
+}
+
+/* --- Ensure brand-colored text stays on-brand --- */
+
+/* Links and accents should use brand blue, not random colors */
+:where(main) a.text-purple-600,
+:where(main) a.text-indigo-600,
+:where(main) a.text-teal-600,
+:where(main) a.text-cyan-600,
+:where(main) a.text-violet-600 {
+  color: #2563eb; /* brand blue-600 */
+}
+
+:where(main) a.text-purple-600:hover,
+:where(main) a.text-indigo-600:hover,
+:where(main) a.text-teal-600:hover,
+:where(main) a.text-cyan-600:hover,
+:where(main) a.text-violet-600:hover {
+  color: #1d4ed8; /* brand blue-700 */
+}
+
+/* --- Card subtitle/muted text: ensure readable --- */
+.elevate-card-subtitle,
+.elevate-page-subtitle {
+  color: #374151; /* gray-700 instead of muted gray */
+}
+
+/* --- Form labels: ensure readable on light backgrounds --- */
+.elevate-label {
+  color: #1f2937; /* gray-800 — readable on white */
+}
+
+/* --- Table header text: ensure readable --- */
+.elevate-table th {
+  color: #1f2937; /* gray-800 */
+}
+
+/* --- Trust badges and small labels: darken from slate-500 --- */
+:where(main) .text-xs.text-slate-500,
+:where(main) .text-xs.text-gray-500,
+:where(main) .text-sm.text-slate-500,
+:where(main) .text-sm.text-gray-500 {
+  color: #374151;
 }
 

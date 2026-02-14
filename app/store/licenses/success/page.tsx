@@ -90,7 +90,7 @@ function SuccessContent() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-        <Loader2 className="w-10 h-10 text-brand-blue-600 animate-spin" />
+        <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
       </div>
     );
   }
@@ -98,7 +98,7 @@ function SuccessContent() {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Success Header */}
-      <section className="bg-slate-700 text-white py-16">
+      <section className="bg-slate-100 text-slate-900 py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-12 h-12" />
@@ -116,19 +116,19 @@ function SuccessContent() {
           <h2 className="text-2xl font-bold mb-6">Your Platform Details</h2>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="bg-slate-50 rounded-lg p-4">
-              <div className="text-slate-500 text-sm mb-1">Organization</div>
+              <div className="text-slate-600 text-sm mb-1">Organization</div>
               <div className="font-bold text-slate-900">
                 {tenantData?.organizationName || 'Your Organization'}
               </div>
             </div>
             <div className="bg-slate-50 rounded-lg p-4">
-              <div className="text-slate-500 text-sm mb-1">Platform URL</div>
-              <div className="font-bold text-brand-blue-600">
+              <div className="text-slate-600 text-sm mb-1">Platform URL</div>
+              <div className="font-bold text-blue-600">
                 {tenantData?.subdomain || 'yourorg'}.elevateforhumanity.org
               </div>
             </div>
             <div className="bg-slate-50 rounded-lg p-4">
-              <div className="text-slate-500 text-sm mb-1">Status</div>
+              <div className="text-slate-600 text-sm mb-1">Status</div>
               <div className="font-bold text-green-600 flex items-center gap-2">
                 <span className="w-2 h-2 bg-green-500 rounded-full"></span>
                 Active
@@ -136,8 +136,8 @@ function SuccessContent() {
             </div>
           </div>
 
-          <div className="mt-6 p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
-            <p className="text-brand-blue-800 text-sm">
+          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p className="text-blue-800 text-sm">
               <strong>Provisioning in progress:</strong> Your platform is being set up automatically.
               Admin login credentials will be sent to your email within minutes.
             </p>
@@ -177,7 +177,7 @@ function SuccessContent() {
                   {step.href && (
                     <Link
                       href={step.href}
-                      className="inline-flex items-center gap-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition-colors"
+                      className="inline-flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
                     >
                       {step.cta}
                       <ArrowRight className="w-4 h-4" />
@@ -198,12 +198,12 @@ function SuccessContent() {
             href="/store/guides/licensing"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
           >
-            <BookOpen className="w-10 h-10 text-brand-blue-600 mb-4" />
+            <BookOpen className="w-10 h-10 text-blue-600 mb-4" />
             <h3 className="text-xl font-bold mb-2">Licensing Guide</h3>
             <p className="text-slate-600 mb-4">
               Step-by-step walkthrough of setup, billing, and platform management.
             </p>
-            <span className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold">
+            <span className="inline-flex items-center gap-2 text-blue-600 font-semibold">
               Read Guide <ArrowRight className="w-4 h-4" />
             </span>
           </Link>
@@ -224,15 +224,15 @@ function SuccessContent() {
         </div>
 
         {/* Admin Dashboard CTA */}
-        <div className="bg-brand-blue-600 rounded-2xl p-8 text-white text-center">
+        <div className="bg-blue-600 rounded-2xl p-8 text-white text-center">
           <Settings className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h2 className="text-2xl font-bold mb-2">Ready to Configure?</h2>
-          <p className="text-brand-blue-100 mb-6">
+          <p className="text-blue-100 mb-6">
             Access your admin dashboard to start setting up your platform.
           </p>
           <Link
             href="/admin"
-            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-50 transition-colors"
+            className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors"
           >
             Open Admin Dashboard
             <ArrowRight className="w-5 h-5" />
@@ -241,7 +241,7 @@ function SuccessContent() {
 
         {/* Master Statement */}
         <div className="mt-8 text-center">
-          <p className="text-sm text-slate-500 italic">{MASTER_STATEMENT}</p>
+          <p className="text-sm text-slate-600 italic">{MASTER_STATEMENT}</p>
         </div>
       </div>
     </div>
@@ -251,7 +251,7 @@ function SuccessContent() {
 function LoadingFallback() {
   return (
     <div className="min-h-screen bg-slate-50 flex items-center justify-center">
-      <Loader2 className="w-10 h-10 text-brand-blue-600 animate-spin" />
+      <Loader2 className="w-10 h-10 text-blue-600 animate-spin" />
     </div>
   );
 }

@@ -136,8 +136,8 @@ export default {
         content: {
           primary: '#111827',
           secondary: '#374151',
-          muted: '#6B7280',
-          disabled: '#9CA3AF',
+          muted: '#4B5563',
+          disabled: '#6B7280',
         },
 
         // Primary Brand Colors - Red, Blue, Orange, Green, White, Black

@@ -146,7 +146,7 @@ export default function CapitalReadinessGuidePage() {
       />
     <div className="min-h-screen bg-white">
       {/* Hero Section */}
-      <section className="relative bg-slate-700 text-white py-20 lg:py-28">
+      <section className="relative bg-slate-100 text-slate-900 py-20 lg:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -156,10 +156,10 @@ export default function CapitalReadinessGuidePage() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 The Elevate Capital Readiness Guide
               </h1>
-              <p className="text-xl text-slate-300 mb-4">
+              <p className="text-xl text-slate-700 mb-4">
                 Build trust before you chase capital.
               </p>
-              <p className="text-lg text-slate-400 mb-8">
+              <p className="text-lg text-slate-600 mb-8">
                 A practical, human guide for licensed businesses, workforce-aligned employers, 
                 and nonprofits that want funding, credibility, and sustainable growth—without shortcuts.
               </p>
@@ -168,29 +168,29 @@ export default function CapitalReadinessGuidePage() {
                 <BuyButton productId="capital-readiness-guide" price="$39" />
                 <Link
                   href="#preview"
-                  className="inline-flex items-center gap-2 px-8 py-4 border border-slate-600 text-white font-semibold rounded-lg hover:bg-slate-800 transition"
+                  className="inline-flex items-center gap-2 px-8 py-4 border border-slate-200 text-slate-900 font-semibold rounded-lg hover:bg-white transition"
                 >
                   Preview Contents
                 </Link>
                 <Link
                   href="/store/guides/capital-readiness/slides"
-                  className="inline-flex items-center gap-2 px-8 py-4 border border-slate-600 text-white font-semibold rounded-lg hover:bg-slate-800 transition"
+                  className="inline-flex items-center gap-2 px-8 py-4 border border-slate-200 text-slate-900 font-semibold rounded-lg hover:bg-white transition"
                 >
                   <Presentation className="w-5 h-5" />
                   View Slides
                 </Link>
               </div>
 
-              <p className="text-sm text-slate-500">
+              <p className="text-sm text-slate-600">
                 Free inside Elevate programs • Included with enterprise licenses
               </p>
             </div>
 
             <div className="relative">
-              <div className="bg-slate-700 rounded-2xl p-8 shadow-2xl">
+              <div className="bg-slate-100 rounded-2xl p-8 shadow-2xl">
                 <div className="aspect-[3/4] bg-white rounded-lg flex items-center justify-center">
                   <div className="text-center p-8">
-                    <BookOpen className="w-16 h-16 text-slate-400 mx-auto mb-4" />
+                    <BookOpen className="w-16 h-16 text-slate-600 mx-auto mb-4" />
                     <h3 className="text-xl font-bold text-slate-900 mb-2">Capital Readiness Guide</h3>
                     <p className="text-slate-600 text-sm">Elevate for Humanity</p>
                   </div>
@@ -302,7 +302,7 @@ export default function CapitalReadinessGuidePage() {
                   {step}
                 </div>
                 {index < 3 && (
-                  <ArrowRight className="w-6 h-6 text-slate-400 mx-2 hidden lg:block" />
+                  <ArrowRight className="w-6 h-6 text-slate-600 mx-2 hidden lg:block" />
                 )}
               </div>
             ))}
@@ -311,26 +311,26 @@ export default function CapitalReadinessGuidePage() {
       </section>
 
       {/* Readiness Levels */}
-      <section className="py-16 lg:py-24 bg-slate-900 text-white">
+      <section className="py-16 lg:py-24 bg-white text-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-center mb-4">Capital Readiness Levels</h2>
-          <p className="text-center text-slate-400 mb-12">Where does your organization stand?</p>
+          <p className="text-center text-slate-600 mb-12">Where does your organization stand?</p>
           
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-slate-800 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <div className="w-12 h-12 bg-red-500/20 text-red-400 rounded-full flex items-center justify-center font-bold mb-4">1</div>
               <h3 className="text-xl font-bold mb-2">Informal</h3>
-              <p className="text-slate-400">Founder-led. Reactive. Memory-based.</p>
+              <p className="text-slate-600">Founder-led. Reactive. Memory-based.</p>
             </div>
-            <div className="bg-slate-800 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <div className="w-12 h-12 bg-yellow-500/20 text-yellow-400 rounded-full flex items-center justify-center font-bold mb-4">2</div>
               <h3 className="text-xl font-bold mb-2">Documented</h3>
-              <p className="text-slate-400">Systems exist. Processes written. Time-dependent.</p>
+              <p className="text-slate-600">Systems exist. Processes written. Time-dependent.</p>
             </div>
-            <div className="bg-slate-800 rounded-xl p-6">
+            <div className="bg-white rounded-xl p-6">
               <div className="w-12 h-12 bg-green-500/20 text-green-400 rounded-full flex items-center justify-center font-bold mb-4">3</div>
               <h3 className="text-xl font-bold mb-2">Institutional</h3>
-              <p className="text-slate-400">Systems run without personalities. Trust compounds.</p>
+              <p className="text-slate-600">Systems run without personalities. Trust compounds.</p>
             </div>
           </div>
         </div>
@@ -339,7 +339,7 @@ export default function CapitalReadinessGuidePage() {
       {/* Pricing */}
       <section className="py-16 lg:py-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-slate-700 rounded-2xl p-8 lg:p-12 text-white text-center">
+          <div className="bg-slate-100 rounded-2xl p-8 lg:p-12 text-slate-900 text-center">
             <h2 className="text-3xl font-bold mb-4">Get the Guide</h2>
             <p className="text-brand-blue-100 mb-8 max-w-xl mx-auto">
               Start building institutional trust today. Includes the full ebook, integrated workbook, 
@@ -369,7 +369,7 @@ export default function CapitalReadinessGuidePage() {
           </p>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 px-6 py-3 border-2 border-slate-900 text-slate-900 font-semibold rounded-lg hover:bg-slate-900 hover:text-white transition"
+            className="inline-flex items-center gap-2 px-6 py-3 border-2 border-slate-900 text-slate-900 font-semibold rounded-lg hover:bg-white hover:text-slate-900 transition"
           >
             Contact for Enterprise Pricing
           </Link>
@@ -379,7 +379,7 @@ export default function CapitalReadinessGuidePage() {
       {/* Disclaimer */}
       <section className="py-8 border-t border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <p className="text-sm text-slate-500 text-center">
+          <p className="text-sm text-slate-600 text-center">
             This guide is educational only. It is not legal, tax, or financial advice. 
             Outcomes vary based on execution. References include IRS business compliance standards, 
             general underwriting practices, WIOA/workforce reporting norms, and state audit readiness expectations.

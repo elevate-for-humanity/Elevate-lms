@@ -49,7 +49,7 @@ export default function GrantsAppPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Grants" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-slate-700 text-white py-16 px-4">
+      <section className="bg-slate-100 text-slate-900 py-16 px-4">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -69,12 +69,12 @@ export default function GrantsAppPage() {
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/store/cart?add=grants-org"
-                  className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
+                  className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
                 >
                   <ShoppingCart className="w-5 h-5" />
                   Add to Cart - $199/mo
                 </Link>
-                <button className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors">
+                <button className="inline-flex items-center gap-2 border border-slate-300 hover:bg-slate-50 text-slate-900 px-8 py-4 rounded-lg font-bold text-lg transition-colors">
                   <Play className="w-5 h-5" />
                   Watch Demo
                 </button>
@@ -136,7 +136,7 @@ export default function GrantsAppPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">See How It Works</h2>
           <p className="text-gray-600 mb-8">Watch a complete walkthrough of the grants discovery and management process</p>
-          <div className="aspect-video bg-gray-900 rounded-2xl overflow-hidden">
+          <div className="aspect-video bg-white rounded-2xl overflow-hidden">
             <video
               autoPlay
               muted
@@ -159,7 +159,7 @@ export default function GrantsAppPage() {
             {pricing.map((plan, i) => (
               <div key={i} className={`rounded-2xl p-8 ${plan.popular ? 'bg-green-600 text-white ring-4 ring-green-300' : 'bg-white border border-gray-200'}`}>
                 {plan.popular && <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">MOST POPULAR</span>}
-                <h3 className={`text-2xl font-bold mt-4 ${plan.popular ? 'text-white' : 'text-gray-900'}`}>{plan.name}</h3>
+                <h3 className={`text-2xl font-bold mt-4 ${plan.popular ? 'text-slate-900' : 'text-gray-900'}`}>{plan.name}</h3>
                 <div className="mt-4 mb-6">
                   <span className="text-4xl font-bold">${plan.price}</span>
                   <span className={plan.popular ? 'text-green-100' : 'text-gray-500'}>{plan.period}</span>
@@ -190,15 +190,15 @@ export default function GrantsAppPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-gray-900 text-white">
+      <section className="py-16 px-4 bg-white text-slate-900">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Start Finding Grants Today</h2>
           <p className="text-gray-300 mb-8">14-day free trial. No credit card required.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/store/cart?add=grants-org" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg font-bold">
+            <Link href="/store/cart?add=grants-org" className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-bold">
               Start Free Trial
             </Link>
-            <Link href="/contact" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg font-bold">
+            <Link href="/contact" className="border border-slate-300 hover:bg-slate-50 text-slate-900 px-8 py-4 rounded-lg font-bold">
               Schedule Demo
             </Link>
           </div>

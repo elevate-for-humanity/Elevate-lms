@@ -10,14 +10,14 @@ function CancelContent() {
   const product = searchParams.get("product");
 
   return (
-    <div className="min-h-screen bg-slate-700 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-slate-100 flex items-center justify-center px-4">
       <div className="max-w-lg w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 md:p-12">
         <div className="text-center">
           <div className="w-20 h-20 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-6">
             <XCircle className="w-12 h-12 text-red-400" />
           </div>
 
-          <h1 className="text-3xl font-bold text-white mb-4">
+          <h1 className="text-3xl font-bold text-slate-900 mb-4">
             Checkout Cancelled
           </h1>
 
@@ -29,7 +29,7 @@ function CancelContent() {
             {product && (
               <Link
                 href={`/store/guides/${product}`}
-                className="flex items-center justify-center gap-2 w-full bg-white/10 hover:bg-white/20 text-white py-4 rounded-xl font-semibold transition-colors border border-white/20"
+                className="flex items-center justify-center gap-2 w-full border border-slate-300 hover:bg-slate-50 text-slate-900 py-4 rounded-xl font-semibold transition-colors border border-white/20"
               >
                 <ArrowLeft className="w-5 h-5" />
                 Return to Product
@@ -38,14 +38,14 @@ function CancelContent() {
 
             <Link
               href="/store"
-              className="flex items-center justify-center gap-2 w-full bg-emerald-600 hover:bg-emerald-700 text-white py-4 rounded-xl font-semibold transition-colors"
+              className="flex items-center justify-center gap-2 w-full bg-emerald-600 hover:bg-emerald-700 text-slate-900 py-4 rounded-xl font-semibold transition-colors"
             >
               Browse Store
             </Link>
 
             <Link
               href="/contact"
-              className="flex items-center justify-center gap-2 w-full text-gray-400 hover:text-white py-3 transition-colors"
+              className="flex items-center justify-center gap-2 w-full text-gray-400 hover:text-slate-900 py-3 transition-colors"
             >
               <HelpCircle className="w-4 h-4" />
               Need Help?
@@ -73,8 +73,8 @@ export default function StoreCheckoutCancelPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-          <div className="text-white">Loading...</div>
+        <div className="min-h-screen bg-white flex items-center justify-center">
+          <div className="text-slate-900">Loading...</div>
         </div>
       }
     >

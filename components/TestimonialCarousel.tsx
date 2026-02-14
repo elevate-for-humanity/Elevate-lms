@@ -164,7 +164,7 @@ export function TestimonialCarousel() {
       {/* Au indicator */}
       {isAutoPlaying && (
         <div className="text-center mt-4">
-          <span className="text-xs text-slate-500">Au • Click arrows to pause</span>
+          <span className="text-xs text-slate-700">Auto-playing • Click arrows to pause</span>
         </div>
       )}
     </div>

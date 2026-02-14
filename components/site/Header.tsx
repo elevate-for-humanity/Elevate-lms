@@ -8,19 +8,6 @@ import HeaderDesktopNav from './HeaderDesktopNav';
 
 // Navigation structure
 export const NAV_ITEMS = [
-  {
-    name: 'Platform',
-    href: '/platform',
-    subItems: [
-      { name: 'Overview', href: '/platform' },
-      { name: 'Partners', href: '/platform/partners' },
-      { name: 'Managed Platform', href: '/platform/managed' },
-      { name: 'Enterprise', href: '/platform/enterprise' },
-      { name: 'Workforce Boards', href: '/platform/workforce-boards' },
-      { name: 'Licensing', href: '/platform/licensing' },
-      { name: 'How It Works', href: '/platform/how-it-works' },
-    ]
-  },
   { 
     name: 'Programs', 
     href: '/programs',
@@ -35,6 +22,19 @@ export const NAV_ITEMS = [
       { name: '— Apprenticeships —', href: '/apprenticeships', isHeader: true },
       { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
       { name: 'Cosmetology Apprenticeship', href: '/programs/cosmetology-apprenticeship' },
+      { name: '— All Programs —', href: '/programs', isHeader: true },
+      { name: 'View All Programs', href: '/programs' },
+    ]
+  },
+  { 
+    name: 'Funding', 
+    href: '/funding',
+    subItems: [
+      { name: 'Funding Overview', href: '/funding' },
+      { name: 'WIOA Funding', href: '/wioa-eligibility' },
+      { name: 'Financial Aid', href: '/financial-aid' },
+      { name: 'Tuition & Fees', href: '/tuition-fees' },
+      { name: 'Scholarships', href: '/scholarships' },
     ]
   },
   { 
@@ -46,6 +46,7 @@ export const NAV_ITEMS = [
       { name: 'How It Works', href: '/how-it-works' },
       { name: 'Success Stories', href: '/success-stories' },
       { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
+      { name: 'FAQ', href: '/faq' },
     ]
   },
   { 
@@ -54,8 +55,8 @@ export const NAV_ITEMS = [
     subItems: [
       { name: 'Help Center', href: '/help' },
       { name: 'Contact Us', href: '/contact' },
-      { name: 'Documentation', href: '/docs' },
-      { name: 'System Status', href: '/status' },
+      { name: 'FAQ', href: '/faq' },
+      { name: 'Schedule & Calendar', href: '/academic-calendar' },
     ]
   },
 ];
@@ -91,16 +92,16 @@ export default function Header() {
             Sign In
           </Link>
           <Link
-            href="/inquiry"
-            className="border border-brand-blue-600 text-brand-blue-600 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-50 transition-colors"
-          >
-            Get Info
-          </Link>
-          <Link
             href="/programs"
-            className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors"
+            className="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors"
           >
             View Programs
+          </Link>
+          <Link
+            href="/apply/student"
+            className="bg-brand-red-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-red-700 transition-colors"
+          >
+            Apply Now
           </Link>
         </div>
 

@@ -402,7 +402,7 @@ function RequestLicenseContent() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-slate-900 text-white py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-white text-slate-900 py-4 rounded-lg font-bold text-lg hover:bg-white transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 'Submitting...'
@@ -439,7 +439,7 @@ function LoadingFallback() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Request License" }]} />
       </div>
-<Loader2 className="w-10 h-10 text-slate-500 animate-spin" />
+<Loader2 className="w-10 h-10 text-slate-600 animate-spin" />
     </div>
   );
 }

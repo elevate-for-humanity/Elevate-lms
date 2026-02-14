@@ -89,7 +89,7 @@ export default function GrantReportingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative bg-orange-600 text-white py-20 overflow-hidden">
+      <section className="relative bg-red-600 text-white py-20 overflow-hidden">
         <div className="absolute inset-0">
           <Image src="/images/heroes-hq/funding-hero.jpg" alt="Grant Reporting" fill className="object-cover opacity-30" />
         </div>
@@ -143,7 +143,7 @@ export default function GrantReportingPage() {
               <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-orange-500 hover:shadow-xl transition-all group">
                 <div className="relative h-48">
                   <Image src={feature.image} alt={feature.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
-                  <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white">{feature.title}</h3>
+                  <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{feature.title}</h3>
                 </div>
                 <div className="p-6">
                   <p className="text-gray-600 mb-4">{feature.description}</p>
@@ -197,7 +197,7 @@ export default function GrantReportingPage() {
               { name: 'Enterprise', price: '$2,499', features: ['Everything in Pro', 'Custom integrations', 'API access', 'Dedicated support'] },
             ].map((plan) => (
               <div key={plan.name} className={`bg-white rounded-2xl p-8 border-2 ${plan.popular ? 'border-orange-500 shadow-xl' : 'border-gray-200'}`}>
-                {plan.popular && <span className="bg-orange-600 text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</span>}
+                {plan.popular && <span className="bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</span>}
                 <h3 className="text-xl font-bold text-black mt-4">{plan.name}</h3>
                 <p className="text-4xl font-black text-black my-4">{plan.price}</p>
                 <ul className="space-y-3 mb-8">
@@ -208,7 +208,7 @@ export default function GrantReportingPage() {
                     </li>
                   ))}
                 </ul>
-                <Link href="/store/checkout" className={`block text-center py-3 rounded-lg font-bold ${plan.popular ? 'bg-orange-600 text-white' : 'bg-gray-100 text-black'}`}>
+                <Link href="/store/checkout" className={`block text-center py-3 rounded-lg font-bold ${plan.popular ? 'bg-red-600 text-white' : 'bg-gray-100 text-black'}`}>
                   Get Started
                 </Link>
               </div>
@@ -218,7 +218,7 @@ export default function GrantReportingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-orange-600 text-white">
+      <section className="py-16 bg-red-600 text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Simplify Grant Reporting</h2>
           <p className="text-orange-100 mb-8">Schedule a demo to see how we can save you hours on every report.</p>

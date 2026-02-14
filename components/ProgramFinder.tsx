@@ -287,7 +287,7 @@ export default function ProgramFinder() {
                         <div className="text-3xl font-bold text-brand-blue-600 mb-1">
                           {program.matchScore}%
                         </div>
-                        <div className="text-sm text-gray-500">Match</div>
+                        <div className="text-sm text-slate-700 font-medium">Match</div>
                       </div>
                     </div>
 
@@ -295,21 +295,21 @@ export default function ProgramFinder() {
                       <div className="flex items-center gap-2 text-black">
                         <Clock className="w-5 h-5 text-brand-blue-600" />
                         <div>
-                          <div className="text-xs text-gray-500">Duration</div>
+                          <div className="text-xs text-slate-700 font-medium">Duration</div>
                           <div className="font-semibold">{program.duration}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 text-black">
                         <DollarSign className="w-5 h-5 text-green-600" />
                         <div>
-                          <div className="text-xs text-gray-500">Salary Range</div>
+                          <div className="text-xs text-slate-700 font-medium">Salary Range</div>
                           <div className="font-semibold">{program.salary}</div>
                         </div>
                       </div>
                       <div className="flex items-center gap-2 text-black">
-                        <TrendingUp className="w-5 h-5 text-purple-600" />
+                        <TrendingUp className="w-5 h-5 text-blue-600" />
                         <div>
-                          <div className="text-xs text-gray-500">Job Demand</div>
+                          <div className="text-xs text-slate-700 font-medium">Job Demand</div>
                           <div className="font-semibold">{program.demand}</div>
                         </div>
                       </div>

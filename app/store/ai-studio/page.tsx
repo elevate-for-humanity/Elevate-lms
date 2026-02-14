@@ -106,28 +106,28 @@ export default function AIStudioPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Ai Studio" }]} />
       </div>
 {/* Hero */}
-      <section className="relative min-h-[500px] flex items-center overflow-hidden bg-slate-700">
+      <section className="relative min-h-[500px] flex items-center overflow-hidden bg-slate-100">
         <div className="absolute inset-0 opacity-20">
           <div className="absolute top-20 left-20 w-72 h-72 bg-pink-500 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-20 w-96 h-96 bg-brand-blue-500 rounded-full blur-3xl animate-pulse delay-1000" />
+          <div className="absolute bottom-20 right-20 w-96 h-96 bg-blue-500 rounded-full blur-3xl animate-pulse delay-1000" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-bold mb-6 border border-white/20">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-slate-900 rounded-full text-sm font-bold mb-6 border border-white/20">
                 <Sparkles className="w-4 h-4 text-yellow-400" />
                 Powered by AI
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-6">
                 AI Studio
-                <span className="block text-transparent bg-clip-text bg-slate-700">
+                <span className="block text-transparent bg-clip-text bg-slate-100">
                   Create Content at Scale
                 </span>
               </h1>
 
-              <p className="text-xl text-brand-blue-100 mb-8">
+              <p className="text-xl text-blue-100 mb-8">
                 Generate videos, voiceovers, images, and AI instructors for your courses. 
                 No video editing skills required.
               </p>
@@ -135,14 +135,14 @@ export default function AIStudioPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="#pricing"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-50 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-blue-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg"
                 >
                   View Plans
                   <ArrowRight className="w-5 h-5" />
                 </Link>
                 <Link
                   href="/store/ai-studio/demo"
-                  className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-lg font-bold text-lg border-2 border-white/30 hover:bg-white/20 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 bg-white/10 backdrop-blur-sm text-slate-900 px-8 py-4 rounded-lg font-bold text-lg border-2 border-white/30 hover:bg-white/20 transition-colors"
                 >
                   <Play className="w-5 h-5" />
                   Watch Demo
@@ -153,17 +153,17 @@ export default function AIStudioPage() {
             {/* Demo Preview */}
             <div className="relative">
               <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-6 border border-white/20">
-                <div className="aspect-video bg-black/50 rounded-xl flex items-center justify-center mb-4">
+                <div className="aspect-video bg-white/50 rounded-xl flex items-center justify-center mb-4">
                   <div className="text-center">
-                    <Play className="w-16 h-16 text-white/80 mx-auto mb-2" />
-                    <p className="text-white/60 text-sm">AI-Generated Video Preview</p>
+                    <Play className="w-16 h-16 text-slate-900/80 mx-auto mb-2" />
+                    <p className="text-slate-900/60 text-sm">AI-Generated Video Preview</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-slate-700 rounded-full" />
+                  <div className="w-10 h-10 bg-slate-100 rounded-full" />
                   <div>
-                    <p className="text-white font-semibold">Instructor</p>
-                    <p className="text-brand-blue-300 text-sm">AI Healthcare Instructor</p>
+                    <p className="text-slate-900 font-semibold">Instructor</p>
+                    <p className="text-blue-300 text-sm">AI Healthcare Instructor</p>
                   </div>
                 </div>
               </div>
@@ -189,8 +189,8 @@ export default function AIStudioPage() {
               const Icon = cap.icon;
               return (
                 <div key={cap.title} className="bg-white rounded-xl p-8 shadow-sm hover:shadow-lg transition-all text-center">
-                  <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                    <Icon className="w-8 h-8 text-brand-blue-600" />
+                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <Icon className="w-8 h-8 text-blue-600" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{cap.title}</h3>
                   <p className="text-gray-600">{cap.description}</p>
@@ -219,12 +219,12 @@ export default function AIStudioPage() {
                 key={plan.name}
                 className={`relative bg-white rounded-2xl p-8 ${
                   plan.popular
-                    ? 'border-2 border-brand-blue-600 shadow-2xl scale-105 z-10'
+                    ? 'border-2 border-blue-600 shadow-2xl scale-105 z-10'
                     : 'border border-gray-200 hover:shadow-lg'
                 } transition-all`}
               >
                 {plan.popular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-brand-blue-600 text-white text-sm font-bold rounded-full">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 bg-blue-600 text-white text-sm font-bold rounded-full">
                     Most Popular
                   </div>
                 )}
@@ -246,7 +246,7 @@ export default function AIStudioPage() {
                   href={`/store/ai-studio/checkout?plan=${plan.name.toLowerCase().replace(' ', '-')}`}
                   className={`block w-full text-center py-3 rounded-lg font-bold transition-colors mb-6 ${
                     plan.popular
-                      ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
+                      ? 'bg-blue-600 text-white hover:bg-blue-700'
                       : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
                   }`}
                 >
@@ -268,18 +268,18 @@ export default function AIStudioPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-slate-700">
+      <section className="py-20 bg-slate-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Zap className="w-16 h-16 text-yellow-400 mx-auto mb-6" />
-          <h2 className="text-4xl font-black text-white mb-6">
+          <h2 className="text-4xl font-black text-slate-900 mb-6">
             Ready to Create with AI?
           </h2>
-          <p className="text-xl text-brand-blue-200 mb-10 max-w-2xl mx-auto">
+          <p className="text-xl text-blue-200 mb-10 max-w-2xl mx-auto">
             Start your free trial today. No credit card required.
           </p>
           <Link
             href="/store/ai-studio/checkout?plan=professional"
-            className="inline-flex items-center gap-2 bg-white text-brand-blue-900 px-10 py-5 rounded-lg font-bold text-lg hover:bg-brand-blue-50 transition-colors shadow-lg"
+            className="inline-flex items-center gap-2 bg-white text-blue-900 px-10 py-5 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg"
           >
             Start Free Trial
             <ArrowRight className="w-5 h-5" />

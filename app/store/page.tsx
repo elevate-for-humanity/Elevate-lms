@@ -43,7 +43,7 @@ export default function StorePage() {
         </div>
 
         {/* Hero Section with Search */}
-        <section className="relative bg-slate-900 text-white py-16 overflow-hidden">
+        <section className="relative bg-white text-slate-900 py-16 overflow-hidden">
 
           <div className="absolute inset-0">
             <Image
@@ -59,11 +59,8 @@ export default function StorePage() {
               <h1 className="text-4xl sm:text-5xl font-black mb-4">
                 Workforce Operating System
               </h1>
-              <p className="text-xl text-slate-300 mb-4">
-                Run funded training pathways end-to-end, including compliance and outcomes.
-              </p>
-              <p className="text-sm text-slate-400 mb-8">
-                This is not an LMS. It includes an LMS. The platform automates operations while authority stays with workforce administrators. Individual courses start at $49. Managed platform and enterprise solutions are contract-based.
+              <p className="text-xl text-slate-700 mb-8">
+                Licenses, courses, and tools for workforce development organizations.
               </p>
               
               {/* Universal Search with Quick Filters */}
@@ -77,11 +74,7 @@ export default function StorePage() {
           </div>
         </section>
 
-        {/* Avatar Guide */}
-        <PageAvatar 
-          videoSrc="/videos/avatars/store-assistant.mp4" 
-          title="Store Assistant" 
-        />
+        {/* Avatar removed — enterprise buyers don't need an animated assistant */}
 
 
 
@@ -96,7 +89,7 @@ export default function StorePage() {
                     key={card.id}
                     href={card.href}
                     data-tour={card.tourId}
-                    className="group bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-orange-500 hover:shadow-xl transition-all flex flex-col"
+                    className="group bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-red-600 hover:shadow-xl transition-all flex flex-col"
                   >
                     {/* Card Image */}
                     <div className="relative h-36 overflow-hidden">
@@ -113,7 +106,7 @@ export default function StorePage() {
                       <h3 className="font-bold text-black text-lg mb-1">{card.title}</h3>
                       <p className="text-sm text-gray-700 mb-3">{card.subtitle}</p>
                       <p className="text-sm text-gray-600 mb-4 flex-1 line-clamp-2">{card.description}</p>
-                      <span className="inline-flex items-center gap-1 text-orange-600 font-semibold text-sm group-hover:gap-2 transition-all">
+                      <span className="inline-flex items-center gap-1 text-red-600 font-semibold text-sm group-hover:gap-2 transition-all">
                         Explore
                         <ArrowRight className="w-4 h-4" />
                       </span>
@@ -125,13 +118,9 @@ export default function StorePage() {
           </div>
         </section>
 
-        {/* Divider */}
+        {/* Section break */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="border-t border-gray-200 relative">
-            <span className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-4 text-gray-700 font-medium">
-              More
-            </span>
-          </div>
+          <h2 className="text-xl font-bold text-slate-900 mb-2">Resources & Tools</h2>
         </div>
 
         {/* Secondary Cards - Tier 2 */}
@@ -145,7 +134,7 @@ export default function StorePage() {
                     key={card.id}
                     href={card.href}
                     data-tour={card.tourId}
-                    className="group bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-orange-500 hover:shadow-xl transition-all flex flex-col"
+                    className="group bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-red-600 hover:shadow-xl transition-all flex flex-col"
                   >
                     {/* Card Image */}
                     <div className="relative h-32 overflow-hidden">
@@ -161,7 +150,7 @@ export default function StorePage() {
                     <div className="p-4 flex-1 flex flex-col">
                       <h3 className="font-bold text-black mb-1">{card.title}</h3>
                       <p className="text-sm text-gray-700 mb-3">{card.subtitle}</p>
-                      <span className="inline-flex items-center gap-1 text-orange-600 font-semibold text-sm group-hover:gap-2 transition-all">
+                      <span className="inline-flex items-center gap-1 text-red-600 font-semibold text-sm group-hover:gap-2 transition-all">
                         Explore
                         <ArrowRight className="w-4 h-4" />
                       </span>
@@ -187,9 +176,9 @@ export default function StorePage() {
                 <Link
                   key={link.label}
                   href={link.href}
-                  className="flex items-center gap-3 bg-white p-4 rounded-lg border border-gray-200 hover:border-orange-500 hover:shadow transition"
+                  className="flex items-center gap-3 bg-white p-4 rounded-lg border border-gray-200 hover:border-red-600 hover:shadow transition"
                 >
-                  <link.icon className="w-5 h-5 text-orange-600" />
+                  <link.icon className="w-5 h-5 text-red-600" />
                   <span className="font-medium text-black">{link.label}</span>
                 </Link>
               ))}
@@ -198,16 +187,16 @@ export default function StorePage() {
         </section>
 
         {/* CTA */}
-        <section className="py-12 bg-slate-900 text-white">
+        <section className="py-12 bg-white text-slate-900">
           <div className="max-w-3xl mx-auto px-4 text-center">
             <h2 className="text-3xl font-black mb-4">Need Help Finding Something?</h2>
-            <p className="text-slate-300 mb-6">
+            <p className="text-slate-700 mb-6">
               Our team is here to help you find the right products, courses, or platform solutions.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link 
                 href="/contact" 
-                className="inline-flex items-center justify-center gap-2 bg-orange-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-orange-700 transition"
+                className="inline-flex items-center justify-center gap-2 bg-red-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-red-700 transition"
               >
                 Contact Us
               </Link>

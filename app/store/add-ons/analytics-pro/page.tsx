@@ -98,11 +98,11 @@ export default function AnalyticsProPage() {
         <div className="relative z-10 max-w-6xl mx-auto px-4 w-full">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
-              <BarChart3 className="w-6 h-6 text-white" />
+              <BarChart3 className="w-6 h-6 text-slate-900" />
             </div>
             <span className="text-indigo-200 font-medium">Platform Add-On</span>
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-4">
             Analytics Pro
           </h1>
           <p className="text-xl text-indigo-100 max-w-2xl mb-6">
@@ -119,7 +119,7 @@ export default function AnalyticsProPage() {
             </Link>
             <Link 
               href="#features"
-              className="inline-flex items-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-2 border-2 border-white text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
             >
               View Features
             </Link>
@@ -185,7 +185,7 @@ export default function AnalyticsProPage() {
       {/* Pricing */}
       <section className="py-16">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-slate-700 rounded-2xl p-8 md:p-12 text-white text-center">
+          <div className="bg-slate-100 rounded-2xl p-8 md:p-12 text-slate-900 text-center">
             <h2 className="text-3xl font-bold mb-4">Enterprise Pricing</h2>
             <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
               Analytics Pro is available as an add-on to Enterprise licenses. 
@@ -200,7 +200,7 @@ export default function AnalyticsProPage() {
               </Link>
               <Link
                 href="/store/add-ons"
-                className="inline-flex items-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+                className="inline-flex items-center gap-2 border-2 border-white text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition-colors"
               >
                 View All Add-Ons
               </Link>
@@ -210,15 +210,15 @@ export default function AnalyticsProPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-slate-900">
+      <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Ready to Improve Your Data?</h2>
-          <p className="text-xl text-slate-300 mb-8">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Ready to Improve Your Data?</h2>
+          <p className="text-xl text-slate-700 mb-8">
             Schedule a demo to see Analytics Pro in action with your own data.
           </p>
           <Link
             href="/contact?product=analytics-pro&demo=true"
-            className="inline-flex items-center gap-2 bg-indigo-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
+            className="inline-flex items-center gap-2 bg-indigo-600 text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-indigo-700 transition-colors"
           >
             Schedule Demo
             <ArrowRight className="w-5 h-5" />

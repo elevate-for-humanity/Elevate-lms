@@ -66,7 +66,7 @@ export default function AppsPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Apps" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-slate-700 text-white py-16 px-4">
+      <section className="bg-slate-100 text-slate-900 py-16 px-4">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Apps & Tools</h1>
           <p className="text-xl text-gray-300 max-w-2xl mx-auto">
@@ -88,7 +88,7 @@ export default function AppsPage() {
                       <div className={`w-14 h-14 ${colors.bg} rounded-xl flex items-center justify-center`}>
                         <app.icon className={`w-7 h-7 ${colors.text}`} />
                       </div>
-                      <span className={`${colors.badge} text-white text-xs font-bold px-3 py-1 rounded-full`}>
+                      <span className={`${colors.badge} text-slate-900 text-xs font-bold px-3 py-1 rounded-full`}>
                         {app.category}
                       </span>
                     </div>
@@ -116,7 +116,7 @@ export default function AppsPage() {
                         </Link>
                         <Link
                           href={`/store/cart?add=${app.slug}-pro`}
-                          className={`inline-flex items-center gap-1 ${colors.badge} text-white px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity`}
+                          className={`inline-flex items-center gap-1 ${colors.badge} text-slate-900 px-4 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition-opacity`}
                         >
                           <ShoppingCart className="w-4 h-4" />
                           Add
@@ -136,7 +136,7 @@ export default function AppsPage() {
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Need a Custom Solution?</h2>
           <p className="text-gray-600 mb-8">Contact us for enterprise pricing and custom integrations.</p>
-          <Link href="/contact" className="bg-gray-900 hover:bg-gray-800 text-white px-8 py-4 rounded-lg font-bold">
+          <Link href="/contact" className="bg-white hover:bg-gray-800 text-slate-900 px-8 py-4 rounded-lg font-bold">
             Contact Sales
           </Link>
         </div>

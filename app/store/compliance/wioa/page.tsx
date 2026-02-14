@@ -206,7 +206,7 @@ export default function WIOACompliancePage() {
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
-                  <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white">{feature.title}</h3>
+                  <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{feature.title}</h3>
                 </div>
                 <div className="p-6">
                   <p className="text-gray-600 mb-4">{feature.description}</p>
@@ -240,7 +240,7 @@ export default function WIOACompliancePage() {
                 <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-green-600">
                   <Image src={item.image} alt={item.title} fill className="object-cover" />
                   <div className="absolute inset-0 bg-green-600/60 flex items-center justify-center">
-                    <span className="text-2xl font-black text-white">{item.step}</span>
+                    <span className="text-2xl font-black text-slate-900">{item.step}</span>
                   </div>
                 </div>
                 <h3 className="font-bold text-lg text-black mb-2">{item.title}</h3>

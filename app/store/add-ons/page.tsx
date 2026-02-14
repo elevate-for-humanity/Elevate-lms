@@ -87,28 +87,28 @@ export default function AddOnsPage() {
         <div className="relative z-10 max-w-6xl mx-auto px-4 w-full">
           <div className="flex items-center gap-3 mb-4">
             <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
-              <Puzzle className="w-6 h-6 text-white" />
+              <Puzzle className="w-6 h-6 text-slate-900" />
             </div>
-            <span className="text-brand-blue-200 font-medium">Elevate Store</span>
+            <span className="text-blue-200 font-medium">Elevate Store</span>
           </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-4">
             Platform Add-Ons
           </h1>
-          <p className="text-xl text-brand-blue-100 max-w-2xl mb-6">
+          <p className="text-xl text-blue-100 max-w-2xl mb-6">
             Extend your workforce operating system with powerful features. 
             One-time purchase, lifetime access, no recurring fees.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link 
               href="#add-ons"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
             >
               Browse Add-Ons
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link 
               href="/contact"
-              className="inline-flex items-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-2 border-2 border-white text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
             >
               Request Custom Feature
             </Link>
@@ -144,11 +144,11 @@ export default function AddOnsPage() {
                     className="absolute inset-0 flex items-center justify-center group"
                   >
                     <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
-                      <Play className="w-8 h-8 text-brand-blue-600 ml-1" />
+                      <Play className="w-8 h-8 text-blue-600 ml-1" />
                     </div>
                   </button>
                   <div className="absolute bottom-4 left-4 right-4">
-                    <span className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+                    <span className="inline-block bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">
                       Most Popular
                     </span>
                   </div>
@@ -157,12 +157,12 @@ export default function AddOnsPage() {
                 {/* Content Side */}
                 <div className="p-8 lg:p-10">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-                      <addon.icon className="w-7 h-7 text-brand-blue-600" />
+                    <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
+                      <addon.icon className="w-7 h-7 text-blue-600" />
                     </div>
                     <div className="text-right">
-                      <div className="text-3xl font-black text-brand-blue-600">{addon.price}</div>
-                      <div className="text-sm text-slate-500">One-time payment</div>
+                      <div className="text-3xl font-black text-blue-600">{addon.price}</div>
+                      <div className="text-sm text-slate-600">One-time payment</div>
                     </div>
                   </div>
 
@@ -172,7 +172,7 @@ export default function AddOnsPage() {
                   <div className="grid sm:grid-cols-2 gap-6 mb-8">
                     <div>
                       <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-brand-blue-500" />
+                        <Zap className="w-4 h-4 text-blue-500" />
                         Features Included
                       </h4>
                       <ul className="space-y-2">
@@ -186,7 +186,7 @@ export default function AddOnsPage() {
                     </div>
                     <div>
                       <h4 className="font-semibold text-slate-900 mb-3 flex items-center gap-2">
-                        <Trophy className="w-4 h-4 text-brand-blue-500" />
+                        <Trophy className="w-4 h-4 text-blue-500" />
                         Benefits
                       </h4>
                       <ul className="space-y-2">
@@ -203,14 +203,14 @@ export default function AddOnsPage() {
                   <div className="flex flex-wrap gap-4">
                     <Link
                       href={addon.href}
-                      className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
+                      className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
                     >
                       View Details
                       <ArrowRight className="w-5 h-5" />
                     </Link>
                     <Link
                       href={`${addon.href}/checkout`}
-                      className="inline-flex items-center gap-2 border-2 border-brand-blue-600 text-brand-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
+                      className="inline-flex items-center gap-2 border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
                     >
                       Purchase Now
                     </Link>
@@ -237,12 +237,12 @@ export default function AddOnsPage() {
                 href={item.href}
                 className="group bg-white rounded-xl p-8 border border-slate-200 shadow-sm hover:shadow-lg transition-all"
               >
-                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-brand-blue-200 transition-colors">
-                  <item.icon className="w-6 h-6 text-brand-blue-600" />
+                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-200 transition-colors">
+                  <item.icon className="w-6 h-6 text-blue-600" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-blue-600 transition-colors">{item.title}</h3>
+                <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">{item.title}</h3>
                 <p className="text-slate-600 mb-4">{item.description}</p>
-                <span className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold">
+                <span className="inline-flex items-center gap-2 text-blue-600 font-semibold">
                   Learn More <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
@@ -252,22 +252,22 @@ export default function AddOnsPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-600">
+      <section className="py-16 bg-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-4">Need a Custom Add-On?</h2>
-          <p className="text-xl text-brand-blue-100 mb-8">
+          <h2 className="text-3xl font-bold text-slate-900 mb-4">Need a Custom Add-On?</h2>
+          <p className="text-xl text-blue-100 mb-8">
             We build custom features for enterprise clients. Tell us what you need.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
             >
               Contact Sales
             </Link>
             <Link
               href="/store"
-              className="inline-flex items-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-2 border-2 border-white text-slate-900 px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition-colors"
             >
               Back to Store
             </Link>

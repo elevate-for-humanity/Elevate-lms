@@ -9,7 +9,7 @@
   --brand-white: #ffffff;
   --brand-light: #f8fafc;
   --brand-dark: #0f172a;
-  --brand-gray: #64748b;
+  --brand-gray: #374151;
 }
 
 /* ============================================================================
@@ -210,7 +210,7 @@
 }
 
 .bg-gradient-hero {
-  background: linear-gradient(135deg, #2563eb 0%, #7c3aed 50%, #dc2626 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #dc2626 100%);
 }
 
 .bg-pattern {

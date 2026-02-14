@@ -87,7 +87,7 @@ function CheckoutForm({
       <button
         type="submit"
         disabled={!stripe || processing}
-        className="w-full bg-brand-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {processing ? (
           <>
@@ -355,7 +355,7 @@ export default function LicenseCheckoutPage() {
 
                   <button
                     type="submit"
-                    className="w-full bg-brand-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition"
+                    className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-lg transition"
                   >
                     Continue to Payment
                   </button>

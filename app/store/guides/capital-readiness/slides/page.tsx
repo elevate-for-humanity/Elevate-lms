@@ -102,11 +102,11 @@ const slides = [
 
 export default function CapitalReadinessSlidesPage() {
   return (
-    <div className="min-h-screen bg-slate-900 text-white">
+    <div className="min-h-screen bg-white text-slate-900">
       {/* Header */}
-      <header className="border-b border-slate-800 py-4">
+      <header className="border-b border-slate-200 py-4">
         <div className="max-w-7xl mx-auto px-4 flex items-center justify-between">
-          <Link href="/store/guides/capital-readiness" className="flex items-center gap-2 text-slate-400 hover:text-white">
+          <Link href="/store/guides/capital-readiness" className="flex items-center gap-2 text-slate-600 hover:text-slate-900">
             <ArrowLeft className="w-4 h-4" />
             Back to Guide
           </Link>
@@ -130,12 +130,12 @@ export default function CapitalReadinessSlidesPage() {
           {slides.map((slide, index) => (
             <div 
               key={slide.id}
-              className="bg-slate-700 rounded-2xl overflow-hidden shadow-xl"
+              className="bg-slate-100 rounded-2xl overflow-hidden shadow-xl"
             >
               {/* Slide Number */}
-              <div className="bg-slate-700/50 px-6 py-2 flex items-center justify-between">
-                <span className="text-sm text-slate-400">Slide {slide.id} of {slides.length}</span>
-                <span className="text-xs text-slate-500 uppercase tracking-wide">{slide.type}</span>
+              <div className="bg-slate-100/50 px-6 py-2 flex items-center justify-between">
+                <span className="text-sm text-slate-600">Slide {slide.id} of {slides.length}</span>
+                <span className="text-xs text-slate-600 uppercase tracking-wide">{slide.type}</span>
               </div>
               
               {/* Slide Content */}
@@ -143,7 +143,7 @@ export default function CapitalReadinessSlidesPage() {
                 <h2 className={`font-bold mb-6 ${slide.type === 'title' ? 'text-4xl md:text-5xl' : 'text-3xl md:text-4xl'}`}>
                   {slide.title}
                 </h2>
-                <div className="text-xl md:text-2xl text-slate-300 whitespace-pre-line max-w-3xl">
+                <div className="text-xl md:text-2xl text-slate-700 whitespace-pre-line max-w-3xl">
                   {slide.content}
                 </div>
               </div>
@@ -153,10 +153,10 @@ export default function CapitalReadinessSlidesPage() {
       </main>
 
       {/* Footer CTA */}
-      <footer className="border-t border-slate-800 py-12">
+      <footer className="border-t border-slate-200 py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h3 className="text-2xl font-bold mb-4">Need the Full Presentation?</h3>
-          <p className="text-slate-400 mb-6">
+          <p className="text-slate-600 mb-6">
             Get the PowerPoint/Keynote version with speaker notes for board meetings, 
             state presentations, and enterprise sales.
           </p>
@@ -169,7 +169,7 @@ export default function CapitalReadinessSlidesPage() {
             </Link>
             <Link
               href="/store/guides/capital-readiness/enterprise"
-              className="px-6 py-3 border border-slate-600 rounded-lg font-semibold hover:bg-slate-800"
+              className="px-6 py-3 border border-slate-200 rounded-lg font-semibold hover:bg-white"
             >
               Enterprise Licensing
             </Link>

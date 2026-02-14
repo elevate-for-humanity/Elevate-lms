@@ -5,19 +5,19 @@ import { ArrowLeft, Building2, Shield, Globe, Users, FileCheck, Scale, Briefcase
 
 export default function EnterpriseCapitalReadinessPage() {
   return (
-    <div className="min-h-screen bg-slate-700">
+    <div className="min-h-screen bg-slate-100">
       {/* Header */}
-      <header className="border-b border-white/10 bg-black/20 backdrop-blur-sm">
+      <header className="border-b border-white/10 bg-white/20 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <Link 
               href="/store/guides/capital-readiness"
-              className="flex items-center gap-2 text-brand-blue-300 hover:text-white transition-colors"
+              className="flex items-center gap-2 text-blue-300 hover:text-slate-900 transition-colors"
             >
               <ArrowLeft className="w-4 h-4" />
               Back to Capital Readiness Guide
             </Link>
-            <span className="px-3 py-1 bg-brand-blue-500/20 text-brand-blue-300 rounded-full text-sm font-medium border border-brand-blue-500/30">
+            <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm font-medium border border-blue-500/30">
               Level 4: Enterprise
             </span>
           </div>
@@ -27,11 +27,11 @@ export default function EnterpriseCapitalReadinessPage() {
       {/* Hero Section */}
       <section className="py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-500/20 rounded-full text-brand-blue-300 text-sm font-medium mb-6 border border-brand-blue-500/30">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 rounded-full text-blue-300 text-sm font-medium mb-6 border border-blue-500/30">
             <Building2 className="w-4 h-4" />
             Enterprise & Government Deployment
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
+          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6">
             Advanced Capital Readiness
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl mx-auto">
@@ -48,13 +48,13 @@ export default function EnterpriseCapitalReadinessPage() {
         {/* Enterprise Overview */}
         <section className="mb-16">
           <div className="bg-white/5 backdrop-blur-sm rounded-2xl border border-white/10 p-8">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-3">
-              <Globe className="w-6 h-6 text-brand-blue-400" />
+            <h2 className="text-2xl font-bold text-slate-900 mb-6 flex items-center gap-3">
+              <Globe className="w-6 h-6 text-blue-400" />
               Enterprise Deployment Overview
             </h2>
             <div className="grid md:grid-cols-2 gap-8">
               <div>
-                <h3 className="text-lg font-semibold text-white mb-4">Target Organizations</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Target Organizations</h3>
                 <ul className="space-y-3">
                   {[
                     "State workforce development agencies",
@@ -72,7 +72,7 @@ export default function EnterpriseCapitalReadinessPage() {
                 </ul>
               </div>
               <div>
-                <h3 className="text-lg font-semibold text-white mb-4">Key Differentiators</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">Key Differentiators</h3>
                 <ul className="space-y-3">
                   {[
                     "White-label customization options",
@@ -83,7 +83,7 @@ export default function EnterpriseCapitalReadinessPage() {
                     "Data residency compliance"
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3 text-gray-300">
-                      <Shield className="w-5 h-5 text-brand-blue-400 flex-shrink-0 mt-0.5" />
+                      <Shield className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
                       {item}
                     </li>
                   ))}
@@ -95,8 +95,8 @@ export default function EnterpriseCapitalReadinessPage() {
 
         {/* Government Procurement */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
-            <Scale className="w-6 h-6 text-brand-blue-400" />
+          <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
+            <Scale className="w-6 h-6 text-blue-400" />
             Government Procurement Pathways
           </h2>
           
@@ -140,9 +140,9 @@ export default function EnterpriseCapitalReadinessPage() {
               }
             ].map((pathway, i) => (
               <div key={i} className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-                <h3 className="text-xl font-semibold text-white mb-2">{pathway.title}</h3>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">{pathway.title}</h3>
                 <div className="flex gap-4 mb-4">
-                  <span className="text-sm text-brand-blue-300 flex items-center gap-1">
+                  <span className="text-sm text-blue-300 flex items-center gap-1">
                     <Clock className="w-4 h-4" />
                     {pathway.timeline}
                   </span>
@@ -152,11 +152,11 @@ export default function EnterpriseCapitalReadinessPage() {
                   </span>
                 </div>
                 <p className="text-gray-400 text-sm mb-4">{pathway.description}</p>
-                <h4 className="text-sm font-medium text-white mb-2">Key Steps:</h4>
+                <h4 className="text-sm font-medium text-slate-900 mb-2">Key Steps:</h4>
                 <ul className="space-y-2">
                   {pathway.steps.map((step, j) => (
                     <li key={j} className="text-sm text-gray-300 flex items-start gap-2">
-                      <span className="text-brand-blue-400 font-medium">{j + 1}.</span>
+                      <span className="text-blue-400 font-medium">{j + 1}.</span>
                       {step}
                     </li>
                   ))}
@@ -168,7 +168,7 @@ export default function EnterpriseCapitalReadinessPage() {
 
         {/* Compliance Frameworks */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
             <FileCheck className="w-6 h-6 text-green-400" />
             Compliance & Security Frameworks
           </h2>
@@ -177,9 +177,9 @@ export default function EnterpriseCapitalReadinessPage() {
             <table className="w-full">
               <thead className="bg-white/5">
                 <tr>
-                  <th className="text-left px-6 py-4 text-white font-semibold">Framework</th>
-                  <th className="text-left px-6 py-4 text-white font-semibold">Status</th>
-                  <th className="text-left px-6 py-4 text-white font-semibold">Applicability</th>
+                  <th className="text-left px-6 py-4 text-slate-900 font-semibold">Framework</th>
+                  <th className="text-left px-6 py-4 text-slate-900 font-semibold">Status</th>
+                  <th className="text-left px-6 py-4 text-slate-900 font-semibold">Applicability</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/10">
@@ -192,14 +192,14 @@ export default function EnterpriseCapitalReadinessPage() {
                   { framework: "GDPR", status: "Compliant", applicability: "International deployments" }
                 ].map((item, i) => (
                   <tr key={i}>
-                    <td className="px-6 py-4 text-white font-medium">{item.framework}</td>
+                    <td className="px-6 py-4 text-slate-900 font-medium">{item.framework}</td>
                     <td className="px-6 py-4">
                       <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                         item.status === "Compliant" 
                           ? "bg-green-500/20 text-green-300" 
                           : item.status === "In Progress"
                           ? "bg-yellow-500/20 text-yellow-300"
-                          : "bg-brand-blue-500/20 text-brand-blue-300"
+                          : "bg-blue-500/20 text-blue-300"
                       }`}>
                         {item.status}
                       </span>
@@ -214,13 +214,13 @@ export default function EnterpriseCapitalReadinessPage() {
 
         {/* Implementation Timeline */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
             <Clock className="w-6 h-6 text-orange-400" />
             Enterprise Implementation Timeline
           </h2>
           
           <div className="relative">
-            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-slate-700"></div>
+            <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-slate-100"></div>
             
             <div className="space-y-8">
               {[
@@ -270,11 +270,11 @@ export default function EnterpriseCapitalReadinessPage() {
                 }
               ].map((phase, i) => (
                 <div key={i} className="relative pl-20">
-                  <div className="absolute left-6 w-4 h-4 rounded-full bg-brand-blue-500 border-4 border-slate-900"></div>
+                  <div className="absolute left-6 w-4 h-4 rounded-full bg-blue-500 border-4 border-slate-900"></div>
                   <div className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
                     <div className="flex flex-wrap items-center gap-4 mb-4">
-                      <h3 className="text-lg font-semibold text-white">{phase.phase}</h3>
-                      <span className="px-3 py-1 bg-brand-blue-500/20 text-brand-blue-300 rounded-full text-sm">
+                      <h3 className="text-lg font-semibold text-slate-900">{phase.phase}</h3>
+                      <span className="px-3 py-1 bg-blue-500/20 text-blue-300 rounded-full text-sm">
                         {phase.duration}
                       </span>
                     </div>
@@ -295,7 +295,7 @@ export default function EnterpriseCapitalReadinessPage() {
 
         {/* Stakeholder Management */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
             <Users className="w-6 h-6 text-cyan-400" />
             Multi-Stakeholder Coordination
           </h2>
@@ -344,7 +344,7 @@ export default function EnterpriseCapitalReadinessPage() {
               }
             ].map((stakeholder, i) => (
               <div key={i} className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-                <h3 className="text-lg font-semibold text-white mb-4">{stakeholder.role}</h3>
+                <h3 className="text-lg font-semibold text-slate-900 mb-4">{stakeholder.role}</h3>
                 <ul className="space-y-2 mb-4">
                   {stakeholder.responsibilities.map((resp, j) => (
                     <li key={j} className="flex items-start gap-2 text-gray-300 text-sm">
@@ -365,7 +365,7 @@ export default function EnterpriseCapitalReadinessPage() {
 
         {/* Risk Mitigation */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
             <AlertTriangle className="w-6 h-6 text-yellow-400" />
             Risk Mitigation Strategies
           </h2>
@@ -403,7 +403,7 @@ export default function EnterpriseCapitalReadinessPage() {
                     <AlertTriangle className="w-4 h-4 text-yellow-400" />
                   </div>
                   <div>
-                    <h3 className="text-white font-medium mb-1">{item.risk}</h3>
+                    <h3 className="text-slate-900 font-medium mb-1">{item.risk}</h3>
                     <p className="text-gray-400 text-sm">{item.mitigation}</p>
                   </div>
                 </div>
@@ -414,7 +414,7 @@ export default function EnterpriseCapitalReadinessPage() {
 
         {/* Pricing */}
         <section className="mb-16">
-          <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
+          <h2 className="text-2xl font-bold text-slate-900 mb-8 flex items-center gap-3">
             <Briefcase className="w-6 h-6 text-emerald-400" />
             Enterprise Pricing Models
           </h2>
@@ -456,10 +456,10 @@ export default function EnterpriseCapitalReadinessPage() {
               }
             ].map((pricing, i) => (
               <div key={i} className="bg-white/5 backdrop-blur-sm rounded-xl border border-white/10 p-6">
-                <h3 className="text-xl font-semibold text-white mb-2">{pricing.model}</h3>
+                <h3 className="text-xl font-semibold text-slate-900 mb-2">{pricing.model}</h3>
                 <p className="text-2xl font-bold text-emerald-400 mb-2">{pricing.price}</p>
                 <p className="text-sm text-gray-400 mb-4">Best for: {pricing.best}</p>
-                <h4 className="text-sm font-medium text-white mb-2">Includes:</h4>
+                <h4 className="text-sm font-medium text-slate-900 mb-2">Includes:</h4>
                 <ul className="space-y-2">
                   {pricing.includes.map((item, j) => (
                     <li key={j} className="flex items-center gap-2 text-gray-300 text-sm">
@@ -475,8 +475,8 @@ export default function EnterpriseCapitalReadinessPage() {
 
         {/* CTA */}
         <section className="text-center">
-          <div className="bg-brand-blue-500/20 rounded-2xl border border-brand-blue-500/30 p-12">
-            <h2 className="text-3xl font-bold text-white mb-4">
+          <div className="bg-blue-500/20 rounded-2xl border border-blue-500/30 p-12">
+            <h2 className="text-3xl font-bold text-slate-900 mb-4">
               Ready for Enterprise Deployment?
             </h2>
             <p className="text-gray-300 mb-8 max-w-2xl mx-auto">
@@ -486,13 +486,13 @@ export default function EnterpriseCapitalReadinessPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact?type=enterprise"
-                className="px-8 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition-colors"
+                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors"
               >
                 Schedule Enterprise Consultation
               </Link>
               <Link
                 href="/store/guides/capital-readiness"
-                className="px-8 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg transition-colors border border-white/20"
+                className="px-8 py-3 border border-slate-300 hover:bg-slate-50 text-slate-900 font-semibold rounded-lg transition-colors border border-white/20"
               >
                 Back to Guide Overview
               </Link>

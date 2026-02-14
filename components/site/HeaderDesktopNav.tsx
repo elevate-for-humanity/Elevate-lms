@@ -39,7 +39,7 @@ export default function HeaderDesktopNav({ items }: HeaderDesktopNavProps) {
                   subItem.isHeader ? (
                     <div
                       key={subItem.name}
-                      className="px-4 py-2 text-xs font-bold text-slate-500 uppercase tracking-wide bg-slate-50 mt-1 first:mt-0"
+                      className="px-4 py-2 text-xs font-bold text-slate-700 uppercase tracking-wide bg-slate-50 mt-1 first:mt-0"
                     >
                       {subItem.name.replace(/—/g, '').trim()}
                     </div>

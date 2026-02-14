@@ -1,108 +1,52 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { TEAM_PREVIEW } from '@/data/team';
-import HomeHeroVideo from './HomeHeroVideo';
-import MarqueeBanner from '@/components/MarqueeBanner';
-import { StatStrip } from '@/components/StatStrip';
-import { TestimonialCarousel } from '@/components/TestimonialCarousel';
-import NewsletterSignup from '@/components/NewsletterSignup';
-import { TrustBadges } from '@/components/TrustBadges';
 import { ComplianceBadges } from '@/components/ComplianceBadges';
-import ProgramFinder from '@/components/ProgramFinder';
-import ProgramHighlights from '@/components/ProgramHighlights';
 
 const programs = [
-  { 
-    name: 'Healthcare', 
-    href: '/programs/healthcare', 
-    image: '/images/hero/hero-healthcare.jpg', 
-    description: 'CNA, Medical Assistant, Phlebotomy — get certified and working in weeks',
-  },
-  { 
-    name: 'Skilled Trades', 
-    href: '/programs/skilled-trades', 
-    image: '/images/trades/hero-program-hvac.jpg', 
-    description: 'HVAC, Electrical, Welding, Plumbing — hands-on training, real job placement',
-  },
-  { 
-    name: 'Barber Apprenticeship', 
-    href: '/programs/barber-apprenticeship', 
-    image: '/images/barber-hero-new.jpg', 
-    description: 'Earn while you learn — get paid during your apprenticeship',
-  },
-  { 
-    name: 'CDL Training', 
-    href: '/programs/cdl', 
-    image: '/images/cdl-vibrant.jpg', 
-    description: 'Class A & B commercial driving — start earning $50K+ in weeks',
-  },
-  { 
-    name: 'Technology', 
-    href: '/programs/technology', 
-    image: '/images/programs-hq/it-support.jpg', 
-    description: 'IT Support, Cybersecurity — high-demand tech careers',
-  },
-  { 
-    name: 'CPR & First Aid', 
-    href: '/programs/cpr-first-aid-hsi', 
-    image: '/images/healthcare/healthcare-professional-portrait-1.jpg', 
-    description: 'HSI certified — same-day certification available',
-  },
+  { name: 'Healthcare', href: '/programs/healthcare', image: '/images/hero/hero-healthcare.jpg', desc: 'CNA, Medical Assistant, Phlebotomy' },
+  { name: 'Skilled Trades', href: '/programs/skilled-trades', image: '/images/trades/hero-program-hvac.jpg', desc: 'HVAC, Electrical, Welding, Plumbing' },
+  { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', image: '/images/barber-hero-new.jpg', desc: 'Earn while you learn' },
+  { name: 'CDL Training', href: '/programs/cdl', image: '/images/cdl-vibrant.jpg', desc: 'Class A & B — start earning $50K+' },
+  { name: 'Technology', href: '/programs/technology', image: '/images/programs-hq/it-support.jpg', desc: 'IT Support, Cybersecurity' },
+  { name: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi', image: '/images/healthcare/healthcare-professional-portrait-1.jpg', desc: 'HSI certified — same-day available' },
+];
+
+const steps = [
+  { num: '01', title: 'Register', desc: 'Sign up at indianacareerconnect.com to determine funding eligibility.', href: '/funding' },
+  { num: '02', title: 'Choose a Program', desc: 'Pick the career path that fits your goals and schedule.', href: '/programs' },
+  { num: '03', title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works' },
+  { num: '04', title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services' },
 ];
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-white">
 
-      {/* ===== MARQUEE BANNER ===== */}
-      <MarqueeBanner />
-
-      {/* ===== VIDEO HERO ===== */}
-      <section className="relative h-[70vh] min-h-[500px] max-h-[700px]">
-        <HomeHeroVideo />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent z-20" />
-        <div className="absolute inset-0 z-30 flex flex-col items-end justify-end text-left px-8 pb-12 sm:px-12 sm:pb-16 md:px-20 md:pb-20">
-          <div className="max-w-2xl">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-3 leading-tight drop-shadow-lg">
-              Career Training That Works
-            </h1>
-            <p className="text-xl sm:text-2xl text-white/95 mb-6 drop-shadow-md">
-              WIOA &amp; JRI funded programs available. Earn while you learn. Get certified and hired in weeks.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg sm:text-xl font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center">
-                Apply Now
-              </Link>
-              <Link href="/programs" className="bg-white/95 hover:bg-white text-black text-lg sm:text-xl font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center backdrop-blur-sm">
-                View Programs
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== EARN WHILE YOU LEARN ===== */}
-      <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-stone-50">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="relative aspect-square max-h-[360px] rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/5">
-              <Image src="/images/trades/program-welding-training.jpg" alt="Hands-on career training" fill className="object-cover object-center" sizes="(max-width: 768px) 100vw, 50vw" />
-            </div>
-            <div>
-              <p className="text-brand-red-600 font-bold text-lg mb-2 tracking-wide uppercase">Why Elevate</p>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-6 leading-tight">Earn While You Learn</h2>
-              <p className="text-xl text-slate-700 mb-5 leading-relaxed">
-                Get paid during your apprenticeship. Many of our JRI and WIOA-funded programs cover tuition and supplies. Some programs have tuition with flexible payment options.
-              </p>
-              <p className="text-xl text-green-700 font-bold mb-8">
-                Funding available for qualifying students. Real certifications. Real jobs.
+      {/* ===== HERO ===== */}
+      <section className="relative h-[75vh] min-h-[520px] max-h-[720px]">
+        <Image
+          src="/images/hero-poster.jpg"
+          alt="Career training at Elevate for Humanity"
+          fill
+          priority
+          className="object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent" />
+        <div className="absolute inset-0 z-10 flex items-center">
+          <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full">
+            <div className="max-w-xl">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 leading-[1.1]">
+                Limitless<br />Opportunities
+              </h1>
+              <p className="text-lg sm:text-xl text-white/90 mb-8 leading-relaxed">
+                Free career training through WIOA, WRG, and JRI funding. Get certified and hired in weeks.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
-                <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg">
-                  Register at Indiana Career Connect
-                </a>
-                <Link href="/funding" className="inline-block border-2 border-brand-red-600 text-brand-red-600 text-lg font-bold px-8 py-4 rounded-full transition-all hover:bg-brand-red-50 hover:scale-105">
-                  Learn More About Funding →
+                <Link href="/apply/student" className="bg-red-600 hover:bg-red-700 text-white text-lg font-bold px-8 py-4 rounded-lg transition-colors text-center">
+                  Apply Now
+                </Link>
+                <Link href="/programs" className="bg-white/95 hover:bg-white text-slate-900 text-lg font-bold px-8 py-4 rounded-lg transition-colors text-center">
+                  View Programs
                 </Link>
               </div>
             </div>
@@ -110,142 +54,137 @@ export default function HomePage() {
         </div>
       </section>
 
-
-
-      {/* ===== PARTNERS ===== */}
-      <section className="py-14 sm:py-20 bg-slate-50">
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Approved Training Provider</h2>
-            <p className="text-lg text-slate-700 max-w-2xl mx-auto">Approved and funded through these workforce partners</p>
-          </div>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-slate-100 hover:shadow-md transition">
-              <div className="flex justify-center mb-4">
-                <Image src="/images/partners/usdol.webp" alt="US Department of Labor" width={80} height={80} className="w-20 h-20" />
-              </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-2">US Department of Labor</h3>
-              <p className="text-slate-500 text-xs leading-relaxed">Registered Apprenticeship Sponsor</p>
-            </div>
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-slate-100 hover:shadow-md transition">
-              <div className="flex justify-center mb-4">
-                <Image src="/images/partners/dwd.svg" alt="Indiana DWD" width={80} height={80} className="w-20 h-20 rounded-lg" />
-              </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-2">Indiana DWD</h3>
-              <p className="text-slate-500 text-xs leading-relaxed">WIOA-approved training provider</p>
-            </div>
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-slate-100 hover:shadow-md transition">
-              <div className="flex justify-center mb-4">
-                <Image src="/images/partners/workone.svg" alt="WorkOne" width={80} height={80} className="w-20 h-20 rounded-lg" />
-              </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-2">WorkOne</h3>
-              <p className="text-slate-500 text-xs leading-relaxed">Eligibility and enrollment partner</p>
-            </div>
-            <div className="bg-white rounded-xl p-6 text-center shadow-sm border border-slate-100 hover:shadow-md transition">
-              <div className="flex justify-center mb-4">
-                <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" width={80} height={80} className="w-20 h-20" />
-              </div>
-              <h3 className="font-bold text-slate-900 text-sm mb-2">Next Level Jobs</h3>
-              <p className="text-slate-500 text-xs leading-relaxed">Workforce Ready Grant tuition funding</p>
-            </div>
+      {/* ===== 3-CARD VALUE PROPS ===== */}
+      <section className="py-16 sm:py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { title: 'Career Opportunities', desc: 'See our career pathways and find the best fit for your future.', href: '/programs', image: '/images/hero/hero-hands-on-training.jpg' },
+              { title: 'Funding Available', desc: 'Most programs are 100% free through WIOA, WRG, and JRI funding.', href: '/funding', image: '/images/heroes-hq/funding-hero.jpg' },
+              { title: 'Hire Our Graduates', desc: 'Our candidates come out credentialed and ready to work.', href: '/employer', image: '/images/heroes-hq/employer-hero.jpg' },
+            ].map((card) => (
+              <Link key={card.title} href={card.href} className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow border border-slate-100">
+                <div className="relative w-full h-48">
+                  <Image
+                    src={card.image}
+                    alt={card.title}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover"
+                  />
+                </div>
+                <div className="p-6">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2">{card.title}</h3>
+                  <p className="text-slate-700 mb-3">{card.desc}</p>
+                  <span className="text-blue-600 font-semibold group-hover:underline">Learn More →</span>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
 
       {/* ===== PROGRAMS ===== */}
-      <section className="py-16 sm:py-20 bg-gradient-to-b from-stone-50 to-white">
+      <section className="py-16 sm:py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-4">Training Programs</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Programs & Pathways</h2>
+            <p className="text-lg text-slate-700 max-w-2xl mx-auto">
               Industry-recognized certifications in high-demand fields. Start your new career in weeks.
             </p>
           </div>
-          
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
             {programs.map((program) => (
-              <Link 
-                key={program.name}
-                href={program.href}
-                className="group hover:-translate-y-1 transition-all duration-300"
-              >
-                <div className="relative w-full aspect-square rounded-xl overflow-hidden mb-3">
-                  <Image src={program.image} alt={program.name} fill sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" className="object-cover object-center group-hover:scale-105 transition-transform duration-500" />
+              <Link key={program.name} href={program.href} className="group">
+                <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
+                  <Image
+                    src={program.image}
+                    alt={program.name}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <h3 className="text-white font-bold text-base sm:text-lg">{program.name}</h3>
+                    <p className="text-white/80 text-xs sm:text-sm">{program.desc}</p>
+                  </div>
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1">{program.name}</h3>
-                <p className="text-slate-600 text-sm sm:text-base mb-2">{program.description}</p>
-                <span className="text-brand-blue-600 font-semibold text-sm group-hover:underline">Learn More →</span>
               </Link>
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <Link href="/programs" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-10 py-4 rounded-full transition-all hover:scale-105 shadow-lg">
+          <div className="text-center mt-10">
+            <Link href="/programs" className="inline-block bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors">
               View All Programs
             </Link>
           </div>
         </div>
       </section>
 
-      {/* ===== PROGRAM FINDER ===== */}
-      <ProgramFinder />
-
-      {/* ===== PROGRAM HIGHLIGHTS ===== */}
-      <ProgramHighlights />
-
       {/* ===== HOW IT WORKS ===== */}
-      <section className="py-16 sm:py-20 bg-stone-50">
+      <section className="py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-4">How It Works</h2>
-            <p className="text-xl text-slate-600">Four steps to your new career</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">How It Works</h2>
+            <p className="text-lg text-slate-700">Four steps to your new career</p>
           </div>
-          
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {[
-              { step: '1', title: 'Register at WorkOne', desc: 'Sign up at indianacareerconnect.com and schedule a WorkOne appointment', img: '/images/artlist/office-meeting.jpg', href: '/funding', linkLabel: 'Learn More' },
-              { step: '2', title: 'Choose Program', desc: 'Pick the career path that fits your goals and schedule', img: '/images/heroes-hq/programs-hero.jpg', href: '/programs', linkLabel: 'View Programs' },
-              { step: '3', title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification', img: '/images/hero/hero-certifications.jpg', href: '/how-it-works', linkLabel: 'Learn More' },
-              { step: '4', title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates', img: '/images/heroes/success-story-1.jpg', href: '/career-services', linkLabel: 'Career Services' },
-            ].map((step) => (
-              <Link key={step.title} href={step.href} className="group hover:-translate-y-1 transition-all duration-300">
-                <div className="relative aspect-square rounded-xl overflow-hidden mb-2">
-                  <Image src={step.img} alt={step.title} fill className="object-cover object-center group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 50vw, 25vw" />
-                  <div className="absolute top-2 left-2 w-7 h-7 rounded-full bg-brand-red-600 text-white text-sm font-bold flex items-center justify-center">{step.step}</div>
+
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            {steps.map((step) => (
+              <Link key={step.num} href={step.href} className="group text-center">
+                <div className="w-16 h-16 bg-red-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold group-hover:bg-red-700 transition-colors">
+                  {step.num}
                 </div>
-                <h3 className="font-bold text-black text-sm sm:text-base mb-1">{step.title}</h3>
-                <p className="text-slate-600 text-xs sm:text-sm mb-1 line-clamp-2">{step.desc}</p>
-                <span className="text-brand-blue-600 font-semibold text-xs sm:text-sm group-hover:underline">{step.linkLabel} →</span>
+                <h3 className="text-lg font-bold text-slate-900 mb-2">{step.title}</h3>
+                <p className="text-slate-700 text-sm">{step.desc}</p>
               </Link>
             ))}
           </div>
         </div>
       </section>
 
-
-
-      {/* ===== JRI — EARN WHILE YOU LEARN ===== */}
-      <section className="py-16 sm:py-20 bg-white">
+      {/* ===== FUNDING ===== */}
+      <section className="py-16 sm:py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="relative aspect-square max-h-[360px] rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/5">
-              <Image src="/images/heroes-hq/jri-hero.jpg" alt="JRI Earn While You Learn program" fill className="object-cover object-center" sizes="(max-width: 768px) 100vw, 50vw" />
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
+              <Image
+                src="/images/heroes-hq/jri-hero.jpg"
+                alt="Earn while you learn"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+              />
             </div>
             <div>
-              <p className="text-brand-red-600 font-bold text-lg mb-2 tracking-wide uppercase">Job-Ready Incentive (JRI)</p>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-6 leading-tight">Earn While You Learn</h2>
-              <ul className="text-lg text-slate-700 mb-8 space-y-3">
-                <li className="flex items-start gap-2"><span className="text-brand-red-600 font-bold mt-0.5">•</span> Get paid during your training — no student debt</li>
-                <li className="flex items-start gap-2"><span className="text-brand-red-600 font-bold mt-0.5">•</span> JRI covers tuition, supplies, and certification fees</li>
-                <li className="flex items-start gap-2"><span className="text-brand-red-600 font-bold mt-0.5">•</span> Available for healthcare, skilled trades, CDL, and more</li>
-                <li className="flex items-start gap-2"><span className="text-brand-red-600 font-bold mt-0.5">•</span> Register at indianacareerconnect.com to check eligibility</li>
+              <p className="text-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">100% Tuition-Free Programs</h2>
+              <p className="text-lg text-slate-700 mb-6">
+                Most programs are fully funded through WIOA, WRG, and JRI. No tuition, no fees, no debt.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {[
+                  'WIOA — Federal workforce funding for eligible adults',
+                  'WRG — Workforce Ready Grant covers high-demand certifications',
+                  'JRI — Earn while you learn with paid apprenticeships',
+                  'Register at indianacareerconnect.com to check eligibility',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-slate-800">
+                    <span className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                    </span>
+                    {item}
+                  </li>
+                ))}
               </ul>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/programs/jri" className="inline-block bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center">
-                  Explore JRI Programs
+                <Link href="/wioa-eligibility" className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center">
+                  Check Eligibility
                 </Link>
-                <Link href="/funding" className="inline-block border-2 border-brand-red-600 text-brand-red-600 text-lg font-bold px-8 py-4 rounded-full transition-all hover:bg-brand-red-50 hover:scale-105 text-center">
-                  All Funding Options →
+                <Link href="/funding" className="border-2 border-red-600 text-red-600 font-bold px-6 py-3 rounded-lg hover:bg-red-50 transition-colors text-center">
+                  All Funding Options
                 </Link>
               </div>
             </div>
@@ -253,165 +192,120 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ===== WIOA & WRG FUNDING ===== */}
-      <section className="py-16 sm:py-20 bg-stone-50">
+      {/* ===== PARTNERS ===== */}
+      <section className="py-16 sm:py-20">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Approved Training Provider</h2>
+            <p className="text-lg text-slate-700">Funded and recognized by leading workforce organizations</p>
+          </div>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center justify-items-center">
+            {[
+              { src: '/images/partners/usdol.webp', alt: 'U.S. Department of Labor' },
+              { src: '/images/partners/dwd.webp', alt: 'Indiana DWD' },
+              { src: '/images/partners/workone.webp', alt: 'WorkOne Indiana' },
+              { src: '/images/partners/nextleveljobs.webp', alt: 'Next Level Jobs' },
+            ].map((logo) => (
+              <div key={logo.alt} className="h-20 w-full flex items-center justify-center p-4 bg-white rounded-lg border border-slate-100">
+                <Image
+                  src={logo.src}
+                  alt={logo.alt}
+                  width={160}
+                  height={64}
+                  className="object-contain h-12 w-auto"
+                />
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-center mt-8">
+            <ComplianceBadges />
+          </div>
+        </div>
+      </section>
+
+      {/* ===== EMPLOYERS ===== */}
+      <section className="py-16 sm:py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div className="order-2 md:order-1">
-              <p className="text-brand-blue-600 font-bold text-lg mb-2 tracking-wide uppercase">Funding Programs</p>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-6 leading-tight">WIOA &amp; WRG Funding</h2>
-              <ul className="text-lg text-slate-700 mb-8 space-y-3">
-                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> <strong>WIOA</strong> — Federal workforce funding for eligible adults, dislocated workers, and youth</li>
-                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> <strong>WRG</strong> — Workforce Ready Grant covers tuition for high-demand certifications</li>
-                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Step 1: Register at indianacareerconnect.com</li>
-                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Step 2: Schedule a WorkOne appointment for eligibility</li>
-                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Not all programs are free — some require tuition with flexible payment options</li>
+            <div>
+              <p className="text-blue-600 font-bold text-sm mb-2 uppercase tracking-wide">For Employers</p>
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Hire Our Skilled Graduates</h2>
+              <p className="text-lg text-slate-700 mb-6">
+                Our candidates come out of our programs credentialed and ready to work. Access tax credits and funding.
+              </p>
+              <ul className="space-y-3 mb-8">
+                {[
+                  'Pre-trained, certified candidates ready day one',
+                  'WOTC tax credits — up to $9,600 per hire',
+                  'OJT reimbursement covers 50-75% of wages',
+                  'Post jobs and browse candidates online',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-slate-800">
+                    <span className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                    </span>
+                    {item}
+                  </li>
+                ))}
               </ul>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/wioa-eligibility" className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center">
-                  Check WIOA Eligibility
+                <Link href="/employer" className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center">
+                  Employer Portal
                 </Link>
-                <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-block border-2 border-brand-blue-600 text-brand-blue-600 text-lg font-bold px-8 py-4 rounded-full transition-all hover:bg-brand-blue-50 hover:scale-105 text-center">
-                  Register Now →
-                </a>
+                <Link href="/apply/program-holder" className="border-2 border-blue-600 text-blue-600 font-bold px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors text-center">
+                  Become a Partner
+                </Link>
               </div>
             </div>
-            <div className="relative aspect-square max-h-[360px] rounded-2xl overflow-hidden shadow-xl ring-1 ring-black/5 order-1 md:order-2">
-              <Image src="/images/heroes-hq/funding-hero.jpg" alt="WIOA and WRG funding for career training" fill className="object-cover object-center" sizes="(max-width: 768px) 100vw, 50vw" />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ===== WHY PARTNER / EMPLOYERS ===== */}
-      <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-4">Partner With Us</h2>
-            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Hire trained, certified graduates. Access tax credits and funding. No phone calls needed — everything is self-service.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 gap-8">
-            {/* Employer Card */}
-            <div className="group">
-              <div className="relative aspect-square rounded-2xl overflow-hidden mb-4">
-                <Image src="/images/heroes-hq/employer-hero.jpg" alt="Employer partnerships" fill className="object-cover object-center group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, 50vw" />
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Why Hire Our Graduates</h3>
-              <ul className="text-slate-700 mb-4 space-y-2">
-                <li className="flex items-start gap-2"><span className="text-orange-500 font-bold mt-0.5">•</span> Pre-trained, certified candidates ready to work day one</li>
-                <li className="flex items-start gap-2"><span className="text-orange-500 font-bold mt-0.5">•</span> Access WOTC tax credits — up to $9,600 per hire</li>
-                <li className="flex items-start gap-2"><span className="text-orange-500 font-bold mt-0.5">•</span> OJT reimbursement covers 50-75% of wages during training</li>
-                <li className="flex items-start gap-2"><span className="text-orange-500 font-bold mt-0.5">•</span> Post jobs and browse candidates online</li>
-              </ul>
-              <Link href="/employer" className="inline-block bg-orange-500 hover:bg-orange-600 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg">
-                Employer Portal →
-              </Link>
-            </div>
-            {/* Partner Card */}
-            <div className="group">
-              <div className="relative aspect-square rounded-2xl overflow-hidden mb-4">
-                <Image src="/images/heroes-hq/success-hero.jpg" alt="Training partnerships" fill className="object-cover object-center group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 100vw, 50vw" />
-              </div>
-              <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Why Partner With Elevate</h3>
-              <ul className="text-slate-700 mb-4 space-y-2">
-                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Approved WIOA and JRI training provider</li>
-                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Full support ecosystem — funding, childcare, career placement</li>
-                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Industry-recognized certifications in high-demand fields</li>
-                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Apply to partner or list your programs online</li>
-              </ul>
-              <Link href="/apply/program-holder" className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg">
-                Become a Partner →
-              </Link>
+            <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
+              <Image
+                src="/images/heroes-hq/employer-hero.jpg"
+                alt="Hire our graduates"
+                fill
+                sizes="(max-width: 768px) 100vw, 50vw"
+                className="object-cover"
+              />
             </div>
           </div>
         </div>
       </section>
 
       {/* ===== TESTIMONIALS ===== */}
-      <section className="py-16 sm:py-20 bg-stone-50">
+      <section className="py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-black mb-4">What Our Students Say</h2>
-            <p className="text-xl text-slate-600">Real stories from real graduates</p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">What Our Students Say</h2>
           </div>
-          <TestimonialCarousel />
-        </div>
-      </section>
-
-      {/* ===== MEET THE TEAM ===== */}
-      <section className="py-16 sm:py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Meet the Team</h2>
-            <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              The professionals operating workforce training, apprenticeship programs, and career services.
-            </p>
-          </div>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {TEAM_PREVIEW.map((member) => (
-              <div key={member.id} className="text-center">
-                <div className="relative w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-slate-200">
-                  {member.headshotSrc ? (
-                    <Image
-                      src={member.headshotSrc}
-                      alt={member.name}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-3xl font-bold text-slate-400">
-                      {member.name.split(' ').map(n => n[0]).join('')}
-                    </div>
-                  )}
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              { quote: 'WIOA paid for my Medical Assistant training, and I started working right after graduation. Now I\'m making $42,000 a year with full benefits.', name: 'Sarah M.', program: 'Medical Assistant' },
+              { quote: 'They provided an extremely informative and hospitable environment. I really enjoyed my classes. Thank you so much!', name: 'Timothy S.', program: 'CDL Training' },
+              { quote: 'Anyone who wants to grow and make more money should try Elevate. You deserve it! The staff is amazing and easy to communicate with.', name: 'Jasmine R.', program: 'CNA Certification' },
+            ].map((t) => (
+              <div key={t.name} className="bg-slate-50 rounded-xl p-8 border border-slate-100">
+                <p className="text-slate-800 mb-6 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
+                <div>
+                  <p className="font-bold text-slate-900">{t.name}</p>
+                  <p className="text-slate-600 text-sm">{t.program}</p>
                 </div>
-                <h3 className="font-bold text-slate-900 text-lg">{member.name}</h3>
-                <p className="text-sm text-slate-500 mb-2">{member.title}</p>
               </div>
             ))}
           </div>
-          <div className="text-center mt-10">
-            <Link
-              href="/about/team"
-              className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-3 rounded-lg font-semibold hover:bg-slate-800 transition"
-            >
-              View Full Team
-            </Link>
-          </div>
         </div>
       </section>
-
-      {/* ===== TRUST BADGES & COMPLIANCE ===== */}
-      <section className="py-12 bg-white border-t border-stone-200">
-        <div className="max-w-7xl mx-auto px-6">
-          <div className="flex flex-wrap items-center justify-center gap-8">
-            <TrustBadges />
-          </div>
-          <div className="mt-8 flex justify-center">
-            <ComplianceBadges />
-          </div>
-        </div>
-      </section>
-
-      {/* ===== NEWSLETTER ===== */}
-      <NewsletterSignup />
 
       {/* ===== CTA ===== */}
-      <section className="py-16 sm:py-24 bg-gradient-to-br from-brand-red-600 via-brand-red-600 to-brand-red-700 relative overflow-hidden">
+      <section className="py-20 sm:py-28 bg-red-600 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.1),transparent_50%)]" />
-        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-6">Start Your New Career Today</h2>
-          <p className="text-xl sm:text-2xl text-white/95 mb-10">
+        <div className="max-w-3xl mx-auto px-6 text-center relative z-10">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white mb-4">Ready to Change Your Life?</h2>
+          <p className="text-xl text-white/90 mb-10">
             Apply in minutes. Most students begin training within 2-4 weeks.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/apply" className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition-all hover:scale-105 shadow-lg">
-              Apply Now
+            <Link href="/apply/student" className="bg-white text-red-600 px-10 py-4 rounded-lg font-bold text-lg hover:bg-slate-50 transition-colors">
+              Get Started Today
             </Link>
-            <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition-all backdrop-blur-sm">
-              Register at Indiana Career Connect
-            </a>
           </div>
         </div>
       </section>

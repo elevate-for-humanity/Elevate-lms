@@ -39,7 +39,7 @@ export default function FundingPage() {
       <section className="py-8 sm:py-14 bg-white">
         <div className="max-w-5xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-2">Funding Options</h2>
-          <p className="text-slate-500 text-sm text-center mb-6 sm:mb-8">Eligibility is determined by WorkOne, not Elevate. Register and schedule an appointment to find out what you qualify for. The process typically takes 1-3 weeks from registration to funding approval.</p>
+          <p className="text-slate-800 text-sm text-center mb-6 sm:mb-8">Eligibility is determined by WorkOne, not Elevate. Register and schedule an appointment to find out what you qualify for. The process typically takes 1-3 weeks from registration to funding approval.</p>
 
           <div className="space-y-5 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6">
             {/* WIOA */}
@@ -149,7 +149,7 @@ export default function FundingPage() {
       <section className="py-8 sm:py-14 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-2">Self-Pay Options</h2>
-          <p className="text-slate-500 text-sm text-center mb-6 sm:mb-8">If you don&apos;t qualify for state or federal funding, we offer flexible payment options.</p>
+          <p className="text-slate-800 text-sm text-center mb-6 sm:mb-8">If you don&apos;t qualify for state or federal funding, we offer flexible payment options.</p>
           <div className="space-y-3 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-4">
             {[
               { title: 'Pay in Full', desc: 'One-time payment at enrollment. Some programs offer a discount for full payment.', tag: 'Best Value' },

@@ -26,17 +26,17 @@ export default function SchoolLicensePage() {
       </section>
 
       {/* Price Bar */}
-      <section className="bg-slate-900 text-white py-6 sticky top-0 z-40">
+      <section className="bg-white text-slate-900 py-6 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-4">
           <div>
             <span className="text-3xl font-black">$15,000</span>
-            <span className="text-slate-400 ml-2">one-time</span>
+            <span className="text-slate-600 ml-2">one-time</span>
           </div>
           <div className="flex gap-4">
             <Link href="/contact?subject=School%20License" className="bg-white text-slate-900 px-6 py-3 rounded-lg font-bold hover:bg-slate-100">
               Schedule Demo
             </Link>
-            <Link href="/store/checkout?license=school" className="bg-orange-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700">
+            <Link href="/store/checkout?license=school" className="bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-700">
               Purchase Now
             </Link>
           </div>
@@ -207,26 +207,26 @@ export default function SchoolLicensePage() {
       </section>
 
       {/* The Numbers */}
-      <section className="py-16 bg-slate-900 text-white">
+      <section className="py-16 bg-white text-slate-900">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-black mb-12 text-center">Maria's Results After 6 Months</h2>
           
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-5xl font-black text-orange-400">73%</div>
-              <div className="text-slate-400 mt-2">Less time on admin</div>
+              <div className="text-slate-600 mt-2">Less time on admin</div>
             </div>
             <div>
               <div className="text-5xl font-black text-orange-400">2→5</div>
-              <div className="text-slate-400 mt-2">Days to enroll → Hours</div>
+              <div className="text-slate-600 mt-2">Days to enroll → Hours</div>
             </div>
             <div>
               <div className="text-5xl font-black text-orange-400">100%</div>
-              <div className="text-slate-400 mt-2">Compliance accuracy</div>
+              <div className="text-slate-600 mt-2">Compliance accuracy</div>
             </div>
             <div>
               <div className="text-5xl font-black text-orange-400">+40%</div>
-              <div className="text-slate-400 mt-2">More students served</div>
+              <div className="text-slate-600 mt-2">More students served</div>
             </div>
           </div>
         </div>
@@ -302,7 +302,7 @@ export default function SchoolLicensePage() {
             ].map((step, i) => (
               <div key={i} className="flex gap-6">
                 <div className="w-24 flex-shrink-0">
-                  <span className="inline-block bg-orange-600 text-white px-3 py-1 rounded-full text-sm font-bold">
+                  <span className="inline-block bg-red-600 text-white px-3 py-1 rounded-full text-sm font-bold">
                     {step.day}
                   </span>
                 </div>
@@ -339,7 +339,7 @@ export default function SchoolLicensePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-20 bg-orange-600 text-white">
+      <section className="py-20 bg-red-600 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-black mb-4">Ready to Be Like Maria?</h2>
           <p className="text-xl text-orange-100 mb-8">
@@ -354,13 +354,13 @@ export default function SchoolLicensePage() {
             </Link>
             <Link 
               href="/store/demo"
-              className="bg-orange-700 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-800 border-2 border-orange-500"
+              className="bg-red-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-orange-800 border-2 border-orange-500"
             >
               See Platform Tour
             </Link>
           </div>
           <p className="mt-8 text-orange-200">
-            Questions? <Link href="/contact?topic=licensing" className="underline hover:text-white">Contact us</Link>
+            Questions? <Link href="/contact?topic=licensing" className="underline hover:text-slate-900">Contact us</Link>
           </p>
         </div>
       </section>

@@ -80,7 +80,7 @@ function CheckoutSuccessContent() {
           
           <div className="space-y-4">
             <div className="flex gap-4">
-              <div className="w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+              <div className="w-8 h-8 bg-white text-slate-900 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                 1
               </div>
               <div>
@@ -92,7 +92,7 @@ function CheckoutSuccessContent() {
             </div>
 
             <div className="flex gap-4">
-              <div className="w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+              <div className="w-8 h-8 bg-white text-slate-900 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                 2
               </div>
               <div>
@@ -104,7 +104,7 @@ function CheckoutSuccessContent() {
             </div>
 
             <div className="flex gap-4">
-              <div className="w-8 h-8 bg-slate-900 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
+              <div className="w-8 h-8 bg-white text-slate-900 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">
                 3
               </div>
               <div>
@@ -119,7 +119,7 @@ function CheckoutSuccessContent() {
           <div className="mt-8 pt-6 border-t">
             <Link
               href="/admin"
-              className="block w-full text-center bg-slate-900 text-white py-4 rounded-lg font-bold text-lg hover:bg-slate-800 transition-colors"
+              className="block w-full text-center bg-white text-slate-900 py-4 rounded-lg font-bold text-lg hover:bg-white transition-colors"
             >
               Go to Dashboard
               <ArrowRight className="w-5 h-5 inline ml-2" />

@@ -46,14 +46,14 @@ export default function StoreDigitalPage() {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-bold mb-6 border border-white/20">
+              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-slate-900 rounded-full text-sm font-bold mb-6 border border-white/20">
                 <Sparkles className="w-4 h-4" />
                 AI-Powered Tools & Resources
               </div>
 
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-6">
                 Digital Resources
-                <span className="block text-brand-blue-300">For Training Providers</span>
+                <span className="block text-blue-300">For Training Providers</span>
               </h1>
 
               <p className="text-xl text-indigo-100 mb-8 leading-relaxed">
@@ -71,14 +71,14 @@ export default function StoreDigitalPage() {
                 </Link>
                 <Link
                   href="#demos"
-                  className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-6 py-3 rounded-xl font-bold hover:bg-white/20 transition-all border border-white/20"
+                  className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-slate-900 px-6 py-3 rounded-xl font-bold hover:bg-white/20 transition-all border border-white/20"
                 >
                   <Play className="w-5 h-5" />
                   Watch Demos
                 </Link>
               </div>
 
-              <div className="flex flex-wrap gap-6 text-white/80 text-sm">
+              <div className="flex flex-wrap gap-6 text-slate-900/80 text-sm">
                 <div className="flex items-center gap-2">
                   <Check className="w-5 h-5 text-green-400" />
                   <span>Instant access</span>
@@ -97,25 +97,25 @@ export default function StoreDigitalPage() {
             <div className="hidden lg:grid grid-cols-2 gap-4">
               <div className="space-y-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <Shield className="w-10 h-10 text-brand-blue-400 mb-3" />
-                  <h3 className="font-bold text-white mb-1">SAM.gov Assistant</h3>
+                  <Shield className="w-10 h-10 text-blue-400 mb-3" />
+                  <h3 className="font-bold text-slate-900 mb-1">SAM.gov Assistant</h3>
                   <p className="text-sm text-indigo-200">Federal registration made easy</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <Sparkles className="w-10 h-10 text-brand-blue-400 mb-3" />
-                  <h3 className="font-bold text-white mb-1">AI Studio</h3>
+                  <Sparkles className="w-10 h-10 text-blue-400 mb-3" />
+                  <h3 className="font-bold text-slate-900 mb-1">AI Studio</h3>
                   <p className="text-sm text-indigo-200">Generate videos & content</p>
                 </div>
               </div>
               <div className="space-y-4 mt-8">
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
                   <DollarSign className="w-10 h-10 text-green-400 mb-3" />
-                  <h3 className="font-bold text-white mb-1">Grants Navigator</h3>
+                  <h3 className="font-bold text-slate-900 mb-1">Grants Navigator</h3>
                   <p className="text-sm text-indigo-200">Find & apply for funding</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
                   <Users className="w-10 h-10 text-amber-400 mb-3" />
-                  <h3 className="font-bold text-white mb-1">AI Tutor</h3>
+                  <h3 className="font-bold text-slate-900 mb-1">AI Tutor</h3>
                   <p className="text-sm text-indigo-200">24/7 student support</p>
                 </div>
               </div>
@@ -125,53 +125,53 @@ export default function StoreDigitalPage() {
       </section>
 
       {/* Demo Videos Section */}
-      <section id="demos" className="py-16 bg-slate-900">
+      <section id="demos" className="py-16 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-black text-white mb-4">See Our Tools in Action</h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">Watch quick demos of our most popular digital resources</p>
+            <h2 className="text-3xl font-black text-slate-900 mb-4">See Our Tools in Action</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">Watch quick demos of our most popular digital resources</p>
           </div>
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-slate-800 rounded-2xl overflow-hidden group">
-              <div className="relative aspect-video bg-slate-700">
+            <div className="bg-white rounded-2xl overflow-hidden group">
+              <div className="relative aspect-video bg-slate-100">
                 <Image src="/images/store/ai-studio.jpg" alt="AI Studio Demo" fill className="object-cover" />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-all">
+                <div className="absolute inset-0 bg-white/40 flex items-center justify-center group-hover:bg-white/60 transition-all">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <Play className="w-8 h-8 text-white ml-1" />
+                    <Play className="w-8 h-8 text-slate-900 ml-1" />
                   </div>
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-white">AI Studio Demo</h3>
-                <p className="text-sm text-slate-400">Generate videos, images & voiceovers</p>
+                <h3 className="font-bold text-slate-900">AI Studio Demo</h3>
+                <p className="text-sm text-slate-600">Generate videos, images & voiceovers</p>
               </div>
             </div>
-            <div className="bg-slate-800 rounded-2xl overflow-hidden group">
-              <div className="relative aspect-video bg-slate-700">
+            <div className="bg-white rounded-2xl overflow-hidden group">
+              <div className="relative aspect-video bg-slate-100">
                 <Image src="/images/store/crm-hub.jpg" alt="SAM.gov Assistant Demo" fill className="object-cover" />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-all">
+                <div className="absolute inset-0 bg-white/40 flex items-center justify-center group-hover:bg-white/60 transition-all">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <Play className="w-8 h-8 text-white ml-1" />
+                    <Play className="w-8 h-8 text-slate-900 ml-1" />
                   </div>
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-white">SAM.gov Walkthrough</h3>
-                <p className="text-sm text-slate-400">Step-by-step registration guide</p>
+                <h3 className="font-bold text-slate-900">SAM.gov Walkthrough</h3>
+                <p className="text-sm text-slate-600">Step-by-step registration guide</p>
               </div>
             </div>
-            <div className="bg-slate-800 rounded-2xl overflow-hidden group">
-              <div className="relative aspect-video bg-slate-700">
+            <div className="bg-white rounded-2xl overflow-hidden group">
+              <div className="relative aspect-video bg-slate-100">
                 <Image src="/images/store/ai-tutor.jpg" alt="AI Tutor Demo" fill className="object-cover" />
-                <div className="absolute inset-0 bg-black/40 flex items-center justify-center group-hover:bg-black/60 transition-all">
+                <div className="absolute inset-0 bg-white/40 flex items-center justify-center group-hover:bg-white/60 transition-all">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                    <Play className="w-8 h-8 text-white ml-1" />
+                    <Play className="w-8 h-8 text-slate-900 ml-1" />
                   </div>
                 </div>
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-white">AI Tutor Demo</h3>
-                <p className="text-sm text-slate-400">24/7 student assistance</p>
+                <h3 className="font-bold text-slate-900">AI Tutor Demo</h3>
+                <p className="text-sm text-slate-600">24/7 student assistance</p>
               </div>
             </div>
           </div>
@@ -207,7 +207,7 @@ export default function StoreDigitalPage() {
                     className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute bottom-4 left-4 right-4">
-                    <span className="inline-block px-3 py-1 bg-indigo-600 text-white text-xs font-bold rounded-full">
+                    <span className="inline-block px-3 py-1 bg-indigo-600 text-slate-900 text-xs font-bold rounded-full">
                       {product.priceDisplay}
                     </span>
                   </div>
@@ -275,7 +275,7 @@ export default function StoreDigitalPage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-12">
-            <Building2 className="w-8 h-8 text-brand-blue-600" />
+            <Building2 className="w-8 h-8 text-blue-600" />
             <h2 className="text-3xl font-black text-slate-900">Platform Add-Ons</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -293,17 +293,17 @@ export default function StoreDigitalPage() {
                     className="object-cover"
                   />
                   <div className="absolute bottom-4 left-4">
-                    <span className="px-3 py-1 bg-brand-blue-600 text-white text-xs font-bold rounded-full">
+                    <span className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
                       {product.priceDisplay}
                     </span>
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
                     {product.name}
                   </h3>
                   <p className="text-slate-600 text-sm mb-4">{product.description}</p>
-                  <div className="flex items-center gap-2 text-brand-blue-600 font-semibold">
+                  <div className="flex items-center gap-2 text-blue-600 font-semibold">
                     Learn More <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>
@@ -316,8 +316,8 @@ export default function StoreDigitalPage() {
       {/* CTA */}
       <section className="py-16 bg-indigo-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Zap className="w-12 h-12 text-white mx-auto mb-4" />
-          <h2 className="text-3xl font-black text-white mb-4">Need the Complete Platform?</h2>
+          <Zap className="w-12 h-12 text-slate-900 mx-auto mb-4" />
+          <h2 className="text-3xl font-black text-slate-900 mb-4">Need the Complete Platform?</h2>
           <p className="text-xl text-indigo-100 mb-8">Get the full Elevate LMS with all features included.</p>
           <Link
             href="/store/licenses"

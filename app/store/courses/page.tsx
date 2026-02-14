@@ -45,12 +45,12 @@ export default function StoreCoursesPage() {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-full text-sm font-bold mb-6 border border-white/20">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-slate-900 rounded-full text-sm font-bold mb-6 border border-white/20">
               <Award className="w-4 h-4" />
               Industry-Recognized Certifications
             </div>
 
-            <h1 className="text-4xl sm:text-5xl font-black text-white leading-tight mb-6">
+            <h1 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight mb-6">
               Certification Courses
               <span className="block text-brand-blue-300">With Exam Vouchers</span>
             </h1>
@@ -60,7 +60,7 @@ export default function StoreCoursesPage() {
               Each course includes the certification exam voucher.
             </p>
 
-            <div className="flex flex-wrap gap-6 text-white/80 text-sm">
+            <div className="flex flex-wrap gap-6 text-slate-900/80 text-sm">
               <div className="flex items-center gap-2">
                 <Check className="w-5 h-5 text-green-400" />
                 <span>Exam voucher included</span>
@@ -171,7 +171,7 @@ export default function StoreCoursesPage() {
       {/* CTA */}
       <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-black text-white mb-4">
+          <h2 className="text-3xl font-black text-slate-900 mb-4">
             Need Multiple Certifications?
           </h2>
           <p className="text-xl text-brand-blue-100 mb-8">

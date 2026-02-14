@@ -234,7 +234,7 @@ Come back anytime if you need help!`,
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Sam Gov Assistant" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-slate-700 text-white py-12 sm:py-16">
+      <section className="bg-slate-100 text-slate-900 py-12 sm:py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-sm font-bold mb-4 border border-white/20">

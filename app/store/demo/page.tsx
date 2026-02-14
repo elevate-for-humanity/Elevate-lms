@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   Play,
   Shield,
@@ -26,6 +27,7 @@ const tours = [
     icon: Shield,
     tourId: 'institution_admin',
     license: 'Managed Platform',
+    image: '/images/demos/admin-dashboard-thumb.jpg',
     description: 'Organization management, enrollment oversight, compliance reporting, and user administration.',
     highlights: [
       'Multi-program enrollment dashboard',
@@ -39,6 +41,7 @@ const tours = [
     icon: Briefcase,
     tourId: 'partner_employer',
     license: 'Managed Platform',
+    image: '/images/demos/employer-portal-thumb.jpg',
     description: 'Candidate pipelines, apprenticeship management, and workforce reporting for employer partners.',
     highlights: [
       'Candidate matching and pipelines',
@@ -52,6 +55,7 @@ const tours = [
     icon: BarChart3,
     tourId: 'workforce_program',
     license: 'Enterprise Source-Use',
+    image: '/images/demos/lms-overview-thumb.jpg',
     description: 'WIOA eligibility, funding management, outcome tracking, and federal reporting for workforce boards.',
     highlights: [
       'WIOA eligibility determination',
@@ -65,6 +69,7 @@ const tours = [
     icon: GraduationCap,
     tourId: null,
     license: 'All licenses',
+    image: '/images/demos/course-builder-thumb.jpg',
     description: 'Course delivery, progress tracking, credential issuance, and career services from the student perspective.',
     highlights: [
       'Course modules and assessments',
@@ -88,7 +93,7 @@ export default function StoreDemoPage() {
       </div>
 
       {/* Hero */}
-      <section className="py-14 sm:py-18 bg-slate-900 text-white">
+      <section className="py-14 sm:py-18 bg-white text-slate-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-brand-red-600/20 text-brand-red-400 px-4 py-2 rounded-full text-sm font-bold mb-6">
             <Play className="w-4 h-4" /> Guided Platform Tour
@@ -96,13 +101,13 @@ export default function StoreDemoPage() {
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight">
             See the Platform in Action
           </h1>
-          <p className="mt-6 text-lg text-white/90 max-w-2xl mx-auto">
+          <p className="mt-6 text-lg text-slate-900/90 max-w-2xl mx-auto">
             Walk through each role in the Workforce OS — admin, employer, and workforce program.
             This is a guided walkthrough. You won&apos;t create an account or enter any data here.
           </p>
           <div className="mt-8 flex flex-col items-center gap-3">
             <TrackedTrialCta source="demo_hero" />
-            <Link href="/store/licenses" className="text-sm text-white/60 hover:text-white/90 underline">
+            <Link href="/store/licenses" className="text-sm text-slate-900/60 hover:text-slate-900/90 underline">
               View licensing options
             </Link>
           </div>
@@ -118,22 +123,25 @@ export default function StoreDemoPage() {
                 key={tour.title}
                 className={`flex flex-col ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'} gap-8 items-center`}
               >
-                {/* Screenshot placeholder */}
-                <div className="w-full md:w-1/2 bg-slate-100 rounded-2xl overflow-hidden border border-slate-200 aspect-video flex items-center justify-center">
-                  <div className="text-center p-8">
-                    <tour.icon className="w-16 h-16 text-slate-400 mx-auto mb-4" />
-                    <p className="text-slate-500 font-medium">{tour.title}</p>
-                    {tour.tourId ? (
-                      <Link
-                        href={`/demo/tour/${tour.tourId}?step=1`}
-                        className="inline-flex items-center gap-2 mt-3 px-5 py-2 bg-brand-red-600 text-white text-sm font-bold rounded-lg hover:bg-brand-red-700 transition-colors"
-                      >
-                        <Play className="w-4 h-4" /> Start Tour
-                      </Link>
-                    ) : (
-                      <p className="text-slate-400 text-sm mt-2">Included in all licenses</p>
-                    )}
-                  </div>
+                {/* Screenshot */}
+                <div className="w-full md:w-1/2 relative rounded-2xl overflow-hidden border border-slate-200 shadow-lg aspect-video">
+                  <Image
+                    src={tour.image}
+                    alt={`${tour.title} screenshot`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 50vw"
+                  />
+                  {tour.tourId && (
+                    <Link
+                      href={`/demo/tour/${tour.tourId}?step=1`}
+                      className="absolute inset-0 flex items-center justify-center bg-white/30 hover:bg-white/40 transition-colors"
+                    >
+                      <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center">
+                        <Play className="w-7 h-7 text-red-600 ml-1" />
+                      </div>
+                    </Link>
+                  )}
                 </div>
 
                 {/* Content */}
@@ -142,7 +150,7 @@ export default function StoreDemoPage() {
                     <tour.icon className="w-6 h-6 text-brand-red-600" />
                     <h2 className="text-2xl font-bold text-slate-900">{tour.title}</h2>
                   </div>
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
+                  <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3">
                     {tour.license}
                   </p>
                   <p className="text-slate-800 mb-4">{tour.description}</p>
@@ -180,11 +188,11 @@ export default function StoreDemoPage() {
           </p>
           <div className="flex flex-col items-center gap-3">
             <TrackedTrialCta source="demo_bottom" />
-            <Link href="/store/licenses" className="text-sm text-slate-500 hover:underline">
+            <Link href="/store/licenses" className="text-sm text-slate-600 hover:underline">
               View licensing options
             </Link>
           </div>
-          <p className="mt-6 text-sm text-slate-400">
+          <p className="mt-6 text-sm text-slate-600">
             <Link href="/contact?topic=enterprise-review" className="hover:underline">Enterprise / Government review</Link>
             {' · '}
             <Link href="/contact" className="hover:underline">Compliance or procurement questions</Link>

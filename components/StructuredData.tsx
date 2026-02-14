@@ -5,7 +5,7 @@ export default function StructuredData() {
     '@type': ['EducationalOrganization', 'LocalBusiness'],
     '@id': 'https://www.elevateforhumanity.org/#organization',
     name: 'Elevate for Humanity',
-    legalName: '2EXCLUSIVE LLC-S',
+    legalName: 'Elevate for Humanity, Inc.',
     alternateName: 'Elevate 4 Humanity',
     url: 'https://www.elevateforhumanity.org',
     logo: {
@@ -19,7 +19,7 @@ export default function StructuredData() {
       '100% FREE career training in Indianapolis. WIOA-funded programs in HVAC, healthcare, barbering, and trades. No tuition, no debt. Job placement assistance.',
     slogan: 'This Is Not Graduation. This Is Elevation.',
     telephone: '+1-317-314-3757',
-    email: 'Elevate4humanityedu@gmail.com',
+    email: 'info@elevateforhumanity.org',
     founder: {
       '@type': 'Person',
       name: 'Elizabeth Lene Greene',
@@ -46,7 +46,7 @@ export default function StructuredData() {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
       telephone: '+1-317-314-3757',
-      email: 'Elevate4humanityedu@gmail.com',
+      email: 'info@elevateforhumanity.org',
       availableLanguage: ['English', 'Spanish'],
     },
     sameAs: [
@@ -55,7 +55,7 @@ export default function StructuredData() {
       'https://www.instagram.com/elevateforhumanity',
       'https://www.youtube.com/@elevateforhumanity',
     ],
-    priceRange: 'Free',
+    priceRange: 'Free - $75,000',
     openingHoursSpecification: [
       {
         '@type': 'OpeningHoursSpecification',

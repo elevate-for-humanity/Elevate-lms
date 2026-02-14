@@ -215,19 +215,19 @@ export default function GuidedTour({ tourId, onComplete, onSkip, autoStart = fal
         aria-label={`Tour step ${currentStep + 1} of ${steps.length}`}
       >
         {/* Header */}
-        <div className="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+        <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">{tour.name}</span>
-            <span className="text-xs text-slate-400">
+            <span className="text-sm font-medium text-slate-900">{tour.name}</span>
+            <span className="text-xs text-slate-500">
               {currentStep + 1} / {steps.length}
             </span>
           </div>
           <button
             onClick={() => endTour(false)}
-            className="p-1 hover:bg-white/10 rounded transition"
+            className="p-1 hover:bg-slate-100 rounded transition"
             aria-label="Close tour"
           >
-            <X className="w-4 h-4" />
+            <X className="w-4 h-4 text-slate-600" />
           </button>
         </div>
 

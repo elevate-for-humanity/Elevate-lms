@@ -127,7 +127,7 @@ export async function POST(req: NextRequest) {
               </p>
               <p style="color: #6b7280; font-size: 12px; margin: 0 0 15px 0;">
                 <a href="tel:+13173143757" style="color: #2563eb; text-decoration: none;">(317) 314-3757</a> •
-                <a href="mailto:Elevate4humanityedu@gmail.com" style="color: #2563eb; text-decoration: none;">Elevate4humanityedu@gmail.com</a>
+                <a href="mailto:info@elevateforhumanity.org" style="color: #2563eb; text-decoration: none;">info@elevateforhumanity.org</a>
               </p>
               <p style="color: #9ca3af; font-size: 11px; margin: 0;">
                 © ${new Date().getFullYear()} Elevate For Humanity. All rights reserved.

@@ -200,10 +200,10 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
       >
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
           {/* Header with Avatar */}
-          <div className="bg-slate-800 text-white p-4">
+          <div className="bg-white border-b border-slate-200 p-4">
             <div className="flex items-center gap-3">
               {/* Avatar Image */}
-              <div className={`w-14 h-14 rounded-full overflow-hidden border-2 flex-shrink-0 ${isSpeaking ? 'border-orange-500 animate-pulse' : 'border-white'}`}>
+              <div className={`w-14 h-14 rounded-full overflow-hidden border-2 flex-shrink-0 ${isSpeaking ? 'border-red-500 animate-pulse' : 'border-slate-200'}`}>
                 <Image
                   src="/images/team-hq/instructor-1.jpg"
                   alt="Store Guide"
@@ -214,8 +214,8 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
               </div>
               
               <div className="flex-1">
-                <h2 className="text-lg font-bold">Store Guide</h2>
-                <p className="text-slate-300 text-sm">
+                <h2 className="text-lg font-bold text-slate-900">Store Guide</h2>
+                <p className="text-slate-500 text-sm">
                   {isSpeaking ? 'Speaking...' : storeGuideFlow.welcomeMessage}
                 </p>
               </div>
@@ -223,16 +223,16 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
               {/* Mute & Close buttons */}
               <button
                 onClick={toggleMute}
-                className="p-2 hover:bg-white/10 rounded-full"
+                className="p-2 hover:bg-slate-100 rounded-full"
                 title={isMuted ? 'Unmute' : 'Mute'}
               >
-                {isMuted ? <VolumeX className="w-5 h-5 text-slate-400" /> : <Volume2 className="w-5 h-5 text-orange-400" />}
+                {isMuted ? <VolumeX className="w-5 h-5 text-slate-400" /> : <Volume2 className="w-5 h-5 text-red-500" />}
               </button>
               <button
                 onClick={handleClose}
-                className="p-2 hover:bg-white/10 rounded-full"
+                className="p-2 hover:bg-slate-100 rounded-full"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 text-slate-600" />
               </button>
             </div>
           </div>

@@ -10,9 +10,9 @@ export const CONTACT_INFO = {
 
   // Email - Hidden behind contact form (not displayed publicly)
   email: {
-    general: "Elevate4humanityedu@gmail.com", // Used by contact form only
-    support: "Elevate4humanityedu@gmail.com", // Used by contact form only
-    partnerships: "Elevate4humanityedu@gmail.com", // Used by contact form only
+    general: "info@elevateforhumanity.org", // Used by contact form only
+    support: "info@elevateforhumanity.org", // Used by contact form only
+    partnerships: "info@elevateforhumanity.org", // Used by contact form only
   },
 
   // Address

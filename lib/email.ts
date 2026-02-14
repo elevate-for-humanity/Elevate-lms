@@ -115,7 +115,7 @@ export const emailTemplates = {
                   </div>
 
                   <p style="margin: 20px 0 0 0; color: #6b7280; font-size: 14px; line-height: 1.6;">
-                    Need help? Contact us at <a href="mailto:Elevate4humanityedu@gmail.com" style="color: #dc2626;">Elevate4humanityedu@gmail.com</a>
+                    Need help? Contact us at <a href="mailto:info@elevateforhumanity.org" style="color: #dc2626;">info@elevateforhumanity.org</a>
                   </p>
                 </td>
               </tr>
@@ -204,7 +204,7 @@ export const emailTemplates = {
                     Elevate for Humanity Career & Technical Institute
                   </p>
                   <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-                    <a href="mailto:Elevate4humanityedu@gmail.com" style="color: #dc2626; text-decoration: none;">Elevate4humanityedu@gmail.com</a>
+                    <a href="mailto:info@elevateforhumanity.org" style="color: #dc2626; text-decoration: none;">info@elevateforhumanity.org</a>
                   </p>
                 </td>
               </tr>
@@ -375,7 +375,7 @@ export const emailTemplates = {
                     Elevate for Humanity Career & Technical Institute
                   </p>
                   <p style="margin: 0; color: #9ca3af; font-size: 12px;">
-                    <a href="mailto:Elevate4humanityedu@gmail.com" style="color: #2563eb; text-decoration: none;">Elevate4humanityedu@gmail.com</a>
+                    <a href="mailto:info@elevateforhumanity.org" style="color: #2563eb; text-decoration: none;">info@elevateforhumanity.org</a>
                   </p>
                 </td>
               </tr>

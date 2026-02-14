@@ -74,7 +74,7 @@ export function LoadingTimeout({
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-sm text-gray-500">
             Still having issues?{' '}
-            <a href="mailto:Elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">
+            <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">
               Contact Support
             </a>
           </p>

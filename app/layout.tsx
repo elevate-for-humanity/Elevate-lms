@@ -218,7 +218,48 @@ export default function RootLayout({
       >
         <SkipToContent />
         <GoogleAnalytics />
-        {/* Sezzle loaded per-page on course/product pages only — not globally */}
+        {/* Sezzle Price Widget Configuration */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              document.sezzleConfig = {
+                configGroups: [
+                  {
+                    targetXPath: ".sezzle-hero-price",
+                    renderToPath: ".sezzle-hero-widget",
+                    theme: "dark",
+                    alignment: "left"
+                  },
+                  {
+                    targetXPath: ".sezzle-price-target",
+                    renderToPath: ".sezzle-widget-container", 
+                    theme: "light",
+                    alignment: "left"
+                  },
+                  {
+                    targetXPath: ".product-price",
+                    theme: "light",
+                    alignment: "left"
+                  },
+                  {
+                    targetXPath: ".cart-total",
+                    renderToPath: ".sezzle-cart-widget",
+                    theme: "light",
+                    alignment: "right"
+                  }
+                ],
+                language: "en",
+                minPrice: 35,
+                maxPrice: 2500
+              };
+            `,
+          }}
+        />
+        {/* Sezzle Price Widget Script */}
+        <script
+          src="https://widget.sezzle.com/v1/javascript/price-widget?uuid=8ac76455-16d3-44f4-9b11-64b85a80184c"
+          async
+        />
         <PublicLayout>{children}</PublicLayout>
         <CookieConsent />
 

@@ -1,249 +1,115 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-
 import Link from 'next/link';
-
 import Image from 'next/image';
-
-export const dynamic = 'force-dynamic';
+import { Briefcase, TrendingUp, Users, MapPin, FileCheck, Handshake } from 'lucide-react';
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/workforce-board/employment',
-  },
-  title: 'Employment | Elevate For Humanity',
-  description:
-    'Resources and tools for your success.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/workforce-board/employment' },
+  title: 'Employment Services | Workforce Board | Elevate For Humanity',
+  description: 'Employment services for workforce board participants including job placement, employer connections, and career support.',
 };
 
-export default async function EmploymentPage() {
-  const supabase = await createClient();
+const SERVICES = [
+  { title: 'Job Placement Assistance', desc: 'Our career services team connects program graduates with employer partners actively hiring in their field.', icon: Briefcase },
+  { title: 'Resume & Interview Prep', desc: 'One-on-one coaching for resume writing, interview skills, and professional presentation.', icon: FileCheck },
+  { title: 'Employer Partnerships', desc: 'Direct hiring pipelines with local and regional employers across healthcare, trades, technology, and business.', icon: Handshake },
+  { title: 'Labor Market Data', desc: 'Access current wage data, job demand forecasts, and industry trends for informed career decisions.', icon: TrendingUp },
+  { title: 'Job Fairs & Hiring Events', desc: 'Regular employer meet-and-greet events, career fairs, and on-site hiring opportunities.', icon: Users },
+  { title: 'Local Job Boards', desc: 'Curated job listings from verified employers in the Indianapolis metro area and across Indiana.', icon: MapPin },
+];
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch employment data
-  const { data: employment } = await supabase
-    .from('employment_records')
-    .select('*')
-    .order('created_at', { ascending: false });
-
+export default function EmploymentPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Workforce Board", href: "/workforce-board" }, { label: "Employment" }]} />
+    <div className="min-h-screen bg-white">
+      <div className="max-w-7xl mx-auto px-4 py-4">
+        <Breadcrumbs items={[{ label: 'Workforce Board', href: '/workforce-board' }, { label: 'Employment Services' }]} />
       </div>
-{/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
+
+      {/* Hero */}
+      <section className="relative h-[300px] md:h-[350px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/healthcare/hero-healthcare-professionals.jpg"
-          alt="Employment"
+          src="/images/heroes-hq/employer-hero.jpg"
+          alt="Employment services"
           fill
+          className="object-cover"
           priority
           sizes="100vw"
-          className="object-cover"
-          quality={85}
         />
+        <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">Employment</h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100">
-            Access your dashboard and
-            development.
+          <h1 className="text-3xl md:text-5xl font-bold mb-4">Employment Services</h1>
+          <p className="text-lg md:text-xl text-gray-100">
+            From training completion to career placement — we support you every step of the way.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/support"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-            >
-              Get Started
-            </Link>
-            <Link
-              href="/workforce-board/dashboard"
-              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-            >
-              View Programs
-            </Link>
-          </div>
         </div>
       </section>
 
-      {/* Content Section */}
+      {/* Services Grid */}
       <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            {/* Feature Grid */}
-            <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-6">Employment</h2>
-                <p className="text-black mb-6">
-                  Your hub for training and career growth.
-                  workforce training and career success.
-                </p>
-                <ul className="space-y-3">
-                  <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span>100% free training programs</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span>Industry-standard certifications</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span>Career support and job placement</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
-                <Image
-                  src="/images/programs-hq/healthcare-hero.jpg"
-                  alt="Employment"
-                  fill
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                  className="object-cover"
-                  quality={85}
-                />
-              </div>
-            </div>
-
-            {/* Feature Cards */}
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <svg
-                    className="w-6 h-6 text-brand-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
-                  </svg>
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2 text-center">How We Help You Get Hired</h2>
+          <p className="text-gray-600 text-center mb-12 max-w-2xl mx-auto">
+            Employment support is included with every training program at no additional cost.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {SERVICES.map((s) => {
+              const Icon = s.icon;
+              return (
+                <div key={s.title} className="bg-white border border-gray-200 rounded-xl p-6">
+                  <Icon className="w-8 h-8 text-brand-blue-600 mb-4" />
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{s.title}</h3>
+                  <p className="text-gray-600 text-sm">{s.desc}</p>
                 </div>
-                <h3 className="text-lg font-semibold mb-3">Learn</h3>
-                <p className="text-black">
-                  Access quality training programs
-                </p>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
-                  <svg
-                    className="w-6 h-6 text-brand-green-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-3">Certify</h3>
-                <p className="text-black">Earn industry certifications</p>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <svg
-                    className="w-6 h-6 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-3">Work</h3>
-                <p className="text-black">Get hired in your field</p>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
+      {/* Process */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-5xl mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">Your Path to Employment</h2>
+          <div className="grid md:grid-cols-4 gap-6">
+            {[
+              { step: '1', title: 'Complete Training', desc: 'Finish your program and earn your certification.' },
+              { step: '2', title: 'Career Coaching', desc: 'Work with an advisor on resume, interview prep, and job search strategy.' },
+              { step: '3', title: 'Employer Match', desc: 'Get connected with employers hiring in your field.' },
+              { step: '4', title: 'Get Hired', desc: 'Start your new career with ongoing support for the first 90 days.' },
+            ].map((item) => (
+              <div key={item.step} className="text-center">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mx-auto mb-4">
+                  {item.step}
+                </div>
+                <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
+                <p className="text-gray-600 text-sm">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
       <section className="py-16 bg-brand-blue-700 text-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Need Help?
-            </h2>
-            <p className="text-base md:text-lg text-blue-100 mb-8">
-              Contact support if you have questions about workforce
-              services or need assistance.
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link
-                href="/support"
-                className="bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
-              >
-                Apply Now
-              </Link>
-              <Link
-                href="/workforce-board/dashboard"
-                className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg"
-              >
-                Browse Programs
-              </Link>
-            </div>
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Start Your Career?</h2>
+          <p className="text-brand-blue-100 mb-8 text-lg">
+            Enroll in a training program and get access to all employment services at no cost.
+          </p>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link
+              href="/programs"
+              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+            >
+              Browse Programs
+            </Link>
+            <Link
+              href="/employer"
+              className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
+            >
+              Employer Partners
+            </Link>
           </div>
         </div>
       </section>

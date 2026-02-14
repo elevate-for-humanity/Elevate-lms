@@ -335,7 +335,7 @@ export default function SupersonicFastCashPage() {
 
             <div className="relative h-[400px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/pexels/office-work.jpg"
+                src="/images/programs-hq/tax-preparation.jpg"
                 alt="Supersonic Fast Cash Office"
                 fill
                 className="object-cover"

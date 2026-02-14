@@ -451,7 +451,7 @@ export function GitPanel({
                     {c.author.avatar_url ? (
                       <img
                         src={c.author.avatar_url}
-                        alt=""
+                        alt={c.author.name || 'Commit author'}
                         style={{ 
                           width: 32, 
                           height: 32, 

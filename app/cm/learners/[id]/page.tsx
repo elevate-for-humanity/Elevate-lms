@@ -124,7 +124,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
               {learner.avatar_url ? (
-                <img src={learner.avatar_url} alt="" className="w-16 h-16 rounded-full object-cover" />
+                <img src={learner.avatar_url} alt={`${learner.first_name} ${learner.last_name}`} className="w-16 h-16 rounded-full object-cover" />
               ) : (
                 <User className="w-8 h-8 text-blue-600" />
               )}

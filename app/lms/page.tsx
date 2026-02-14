@@ -149,7 +149,7 @@ export default async function LMSPage() {
             <div className="flex flex-col sm:flex-row sm:items-center gap-6">
               <div className="w-full sm:w-48 h-32 bg-slate-100 rounded-2xl overflow-hidden flex-shrink-0 relative">
                 {continueCourse.course?.thumbnail_url ? (
-                  <Image src={continueCourse.course.thumbnail_url} alt="" fill className="object-cover" sizes="192px" />
+                  <Image src={continueCourse.course.thumbnail_url} alt={continueCourse.course.title || 'Course thumbnail'} fill className="object-cover" sizes="192px" />
                 ) : (
                   <div className="w-full h-full flex items-center justify-center"><BookOpen className="w-10 h-10 text-slate-300" /></div>
                 )}
@@ -185,7 +185,7 @@ export default async function LMSPage() {
                     <Link key={enrollment.id} href={`/lms/courses/${enrollment.course?.id}`} className="flex items-center gap-4 p-4 bg-slate-50 rounded-2xl hover:bg-slate-100 transition group">
                       <div className="w-16 h-12 bg-slate-200 rounded-xl overflow-hidden flex-shrink-0 relative">
                         {enrollment.course?.thumbnail_url ? (
-                          <Image src={enrollment.course.thumbnail_url} alt="" fill className="object-cover" sizes="64px" />
+                          <Image src={enrollment.course.thumbnail_url} alt={enrollment.course.title || 'Course thumbnail'} fill className="object-cover" sizes="64px" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center"><BookOpen className="w-5 h-5 text-slate-400" /></div>
                         )}

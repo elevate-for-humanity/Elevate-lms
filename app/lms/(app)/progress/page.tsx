@@ -281,7 +281,7 @@ export default async function ProgressPage() {
                             {enrollment.courses?.thumbnail_url ? (
                               <Image 
                                 src={enrollment.courses.thumbnail_url} 
-                                alt="" 
+                                alt={enrollment.courses.title || 'Course thumbnail'} 
                                 fill
                                 className="object-cover rounded-xl"
                                 sizes="64px"

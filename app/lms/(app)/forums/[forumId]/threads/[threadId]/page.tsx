@@ -121,7 +121,7 @@ export default async function ThreadPage({ params }: Props) {
                 {author?.avatar_url ? (
                   <img
                     src={author.avatar_url}
-                    alt=""
+                    alt={author?.full_name || 'Thread author'}
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
@@ -188,7 +188,7 @@ export default async function ThreadPage({ params }: Props) {
                         {replyAuthor?.avatar_url ? (
                           <img
                             src={replyAuthor.avatar_url}
-                            alt=""
+                            alt={replyAuthor?.full_name || 'Reply author'}
                             className="w-10 h-10 rounded-full object-cover"
                           />
                         ) : (

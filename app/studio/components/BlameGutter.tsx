@@ -132,7 +132,7 @@ export function BlameGutter({ repo, path, branch, token, lineCount, visible }: B
                   {group.info.avatar && (
                     <img 
                       src={group.info.avatar} 
-                      alt="" 
+                      alt={group.info.author || 'Author'} 
                       style={{ 
                         width: 14, 
                         height: 14, 

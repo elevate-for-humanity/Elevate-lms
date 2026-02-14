@@ -270,7 +270,7 @@ export default function BarberPartnerPage() {
                   <div className="flex items-center gap-4 mb-4">
                     <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                       {apprentice.avatar_url ? (
-                        <img src={apprentice.avatar_url} alt="" className="w-12 h-12 rounded-full object-cover" />
+                        <img src={apprentice.avatar_url} alt={apprentice.full_name || 'Apprentice'} className="w-12 h-12 rounded-full object-cover" />
                       ) : (
                         <span className="text-lg font-bold text-blue-600">
                           {apprentice.full_name.charAt(0)}

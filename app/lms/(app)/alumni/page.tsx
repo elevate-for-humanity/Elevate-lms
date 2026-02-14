@@ -137,7 +137,7 @@ export default async function AlumniPage() {
                   <div key={member.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
                     <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 relative overflow-hidden">
                       {member.avatar_url ? (
-                        <Image src={member.avatar_url} alt="" fill className="rounded-full object-cover" sizes="48px" />
+                        <Image src={member.avatar_url} alt={member.full_name || 'Alumni member'} fill className="rounded-full object-cover" sizes="48px" />
                       ) : (
                         <GraduationCap className="w-6 h-6 text-amber-600" />
                       )}

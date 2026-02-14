@@ -159,7 +159,7 @@ export default function MessagesClient({ userId, initialConversations, participa
                     >
                       <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
                         {other.avatar_url ? (
-                          <img src={other.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                          <img src={other.avatar_url} alt={other.full_name || 'Contact'} className="w-full h-full rounded-full object-cover" />
                         ) : (
                           <User className="w-6 h-6 text-gray-400" />
                         )}
@@ -197,7 +197,7 @@ export default function MessagesClient({ userId, initialConversations, participa
                       <>
                         <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
                           {other.avatar_url ? (
-                            <img src={other.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                            <img src={other.avatar_url} alt={other.full_name || 'Contact'} className="w-full h-full rounded-full object-cover" />
                           ) : (
                             <User className="w-5 h-5 text-gray-400" />
                           )}

@@ -113,7 +113,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
           <div className="flex items-center gap-4">
             <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
               {provider.logo_url ? (
-                <img src={provider.logo_url} alt="" className="w-12 h-12 object-contain" />
+                <img src={provider.logo_url} alt={`${provider.provider_name} logo`} className="w-12 h-12 object-contain" />
               ) : (
                 <Globe className="w-8 h-8 text-blue-600" />
               )}

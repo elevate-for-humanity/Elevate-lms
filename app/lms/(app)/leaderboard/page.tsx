@@ -185,7 +185,7 @@ export default async function LeaderboardPage() {
                   {currentUserEntry.avatarUrl ? (
                     <img
                       src={currentUserEntry.avatarUrl}
-                      alt=""
+                      alt={currentUserEntry.name || 'Your avatar'}
                       className="w-14 h-14 rounded-full object-cover"
                     />
                   ) : (
@@ -252,7 +252,7 @@ export default async function LeaderboardPage() {
                       {entry.avatarUrl ? (
                         <img
                           src={entry.avatarUrl}
-                          alt=""
+                          alt={entry.name || 'Learner avatar'}
                           className="w-full h-full object-cover"
                         />
                       ) : (

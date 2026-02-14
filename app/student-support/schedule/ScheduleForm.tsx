@@ -130,7 +130,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
                 }`}>
                 <div className="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center mb-3">
                   {advisor.avatar_url ? (
-                    <img src={advisor.avatar_url} alt="" className="w-full h-full rounded-full object-cover" />
+                    <img src={advisor.avatar_url} alt={advisor.full_name || 'Advisor'} className="w-full h-full rounded-full object-cover" />
                   ) : (
                     <User className="w-6 h-6 text-gray-500" />
                   )}

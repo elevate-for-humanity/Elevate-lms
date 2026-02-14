@@ -47,7 +47,7 @@ export default function TransparencyPage() {
       {/* Hero */}
       <section className="relative h-72 overflow-hidden">
         <Image
-          src="/images/pexels/office-work.jpg"
+          src="/images/heroes-hq/team-hero.jpg"
           alt="Transparency"
           fill
           className="object-cover"

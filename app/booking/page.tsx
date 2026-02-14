@@ -104,7 +104,7 @@ export default async function BookingPage() {
       <section className="relative min-h-[350px] flex items-center">
         <div 
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(https://images.pexels.com/photos/3184465/pexels-photo-3184465.jpeg?auto=compress&cs=tinysrgb&w=1920)' }}
+          style={{ backgroundImage: 'url(/images/programs-hq/training-classroom.jpg)' }}
         />
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 text-white">

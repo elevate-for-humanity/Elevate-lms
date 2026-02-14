@@ -106,8 +106,8 @@ export default async function ThankyouPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {displayNextSteps.map((step: any, index: number) => (
               <div key={index} className="bg-white rounded-xl p-6 shadow-sm border">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                  <span className="text-blue-600 font-bold">{index + 1}</span>
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center mb-4">
+                  <span className="text-brand-blue-600 font-bold">{index + 1}</span>
                 </div>
                 <h3 className="font-semibold mb-2">{step.title}</h3>
                 <p className="text-gray-600 text-sm">{step.description}</p>
@@ -126,7 +126,7 @@ export default async function ThankyouPage() {
               href="/support" 
               className="flex items-center gap-4 bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition"
             >
-              <Phone className="w-8 h-8 text-blue-600" />
+              <Phone className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <div className="font-semibold">Contact Us</div>
                 <div className="text-gray-600">Get Help Online</div>
@@ -136,7 +136,7 @@ export default async function ThankyouPage() {
               href="mailto:elevate4humanityedu@gmail.com" 
               className="flex items-center gap-4 bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition"
             >
-              <Mail className="w-8 h-8 text-blue-600" />
+              <Mail className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <div className="font-semibold">Email Us</div>
                 <div className="text-gray-600 text-sm">elevate4humanityedu@gmail.com</div>
@@ -146,7 +146,7 @@ export default async function ThankyouPage() {
               href="/booking" 
               className="flex items-center gap-4 bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition"
             >
-              <Calendar className="w-8 h-8 text-blue-600" />
+              <Calendar className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <div className="font-semibold">Schedule a Call</div>
                 <div className="text-gray-600">Book an appointment</div>
@@ -168,13 +168,13 @@ export default async function ThankyouPage() {
                   href={`/programs/${program.slug || program.id}`}
                   className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition group"
                 >
-                  <h3 className="font-semibold mb-2 group-hover:text-blue-600 transition">
+                  <h3 className="font-semibold mb-2 group-hover:text-brand-blue-600 transition">
                     {program.name}
                   </h3>
                   {program.description && (
                     <p className="text-gray-600 text-sm line-clamp-2">{program.description}</p>
                   )}
-                  <div className="flex items-center gap-1 text-blue-600 text-sm mt-4 font-medium">
+                  <div className="flex items-center gap-1 text-brand-blue-600 text-sm mt-4 font-medium">
                     Learn more <ArrowRight className="w-4 h-4" />
                   </div>
                 </Link>
@@ -185,24 +185,24 @@ export default async function ThankyouPage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold text-white mb-4">
             Ready to Learn More?
           </h2>
-          <p className="text-blue-100 mb-8">
+          <p className="text-brand-blue-100 mb-8">
             Browse all our programs or return to the homepage.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/programs"
-              className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition"
+              className="bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-gray-100 transition"
             >
               View All Programs
             </Link>
             <Link
               href="/"
-              className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               Return Home
             </Link>

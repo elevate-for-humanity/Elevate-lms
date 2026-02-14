@@ -122,11 +122,11 @@ export default async function CMLearnerDetailPage({ params }: Props) {
 
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center">
               {learner.avatar_url ? (
                 <img src={learner.avatar_url} alt={`${learner.first_name} ${learner.last_name}`} className="w-16 h-16 rounded-full object-cover" />
               ) : (
-                <User className="w-8 h-8 text-blue-600" />
+                <User className="w-8 h-8 text-brand-blue-600" />
               )}
             </div>
             <div>
@@ -153,7 +153,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
             </Link>
             <Link
               href={`/cm/learners/${id}/edit`}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Edit className="w-4 h-4" />
               Edit Profile
@@ -166,8 +166,8 @@ export default async function CMLearnerDetailPage({ params }: Props) {
       <div className="grid grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-900">{activeEnrollments}</p>
@@ -188,8 +188,8 @@ export default async function CMLearnerDetailPage({ params }: Props) {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <FileText className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+              <FileText className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-900">{caseNotes?.length || 0}</p>
@@ -217,7 +217,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-slate-900">Goals & Milestones</h2>
-              <Link href={`/cm/learners/${id}/goals`} className="text-sm text-blue-600 hover:underline">
+              <Link href={`/cm/learners/${id}/goals`} className="text-sm text-brand-blue-600 hover:underline">
                 Manage Goals
               </Link>
             </div>
@@ -244,7 +244,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                       goal.status === 'completed' ? 'bg-green-100 text-green-800' :
-                      goal.status === 'in_progress' ? 'bg-blue-100 text-blue-800' :
+                      goal.status === 'in_progress' ? 'bg-brand-blue-100 text-brand-blue-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>
                       {goal.status?.replace('_', ' ')}
@@ -261,7 +261,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-slate-900">Recent Case Notes</h2>
-              <Link href={`/cm/learners/${id}/notes`} className="text-sm text-blue-600 hover:underline">
+              <Link href={`/cm/learners/${id}/notes`} className="text-sm text-brand-blue-600 hover:underline">
                 View All
               </Link>
             </div>
@@ -316,7 +316,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
                       <p className="font-medium text-slate-900">{enrollment.progress || 0}%</p>
                       <span className={`text-xs ${
                         enrollment.status === 'completed' ? 'text-green-600' :
-                        enrollment.status === 'active' ? 'text-blue-600' : 'text-slate-500'
+                        enrollment.status === 'active' ? 'text-brand-blue-600' : 'text-slate-500'
                       }`}>
                         {enrollment.status}
                       </span>
@@ -379,7 +379,7 @@ export default async function CMLearnerDetailPage({ params }: Props) {
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-slate-900">Documents</h2>
-              <Link href={`/cm/learners/${id}/documents`} className="text-sm text-blue-600 hover:underline">
+              <Link href={`/cm/learners/${id}/documents`} className="text-sm text-brand-blue-600 hover:underline">
                 View All
               </Link>
             </div>

@@ -55,7 +55,7 @@ const REQUEST_TYPE_LABELS: Record<string, string> = {
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; icon: typeof Clock }> = {
   pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800', icon: Clock },
-  under_review: { label: 'Under Review', color: 'bg-blue-100 text-blue-800', icon: AlertCircle },
+  under_review: { label: 'Under Review', color: 'bg-brand-blue-100 text-brand-blue-800', icon: AlertCircle },
   approved: { label: 'Approved', color: 'bg-green-100 text-green-800', icon: CheckCircle },
   partially_approved: { label: 'Partially Approved', color: 'bg-orange-100 text-orange-800', icon: AlertCircle },
   denied: { label: 'Denied', color: 'bg-red-100 text-red-800', icon: XCircle },
@@ -146,7 +146,7 @@ export default async function FerpaRequestsPage() {
             </div>
             <Link
               href="/ferpa/requests/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               <Plus className="w-4 h-4" />
               New Request
@@ -171,8 +171,8 @@ export default async function FerpaRequestsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <AlertCircle className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <AlertCircle className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{reviewCount}</p>
@@ -267,7 +267,7 @@ export default async function FerpaRequestsPage() {
                         </span>
                         <Link
                           href={`/ferpa/requests/${request.id}`}
-                          className="text-sm text-blue-600 hover:text-blue-700"
+                          className="text-sm text-brand-blue-600 hover:text-brand-blue-700"
                         >
                           View
                         </Link>
@@ -283,7 +283,7 @@ export default async function FerpaRequestsPage() {
               <p className="text-gray-500">No access requests found</p>
               <Link
                 href="/ferpa/requests/new"
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium mt-2 inline-block"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium mt-2 inline-block"
               >
                 Create the first request
               </Link>
@@ -292,12 +292,12 @@ export default async function FerpaRequestsPage() {
         </div>
 
         {/* FERPA Timeline Notice */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
           <div className="flex items-start gap-3">
-            <Calendar className="w-5 h-5 text-blue-600 mt-0.5" />
+            <Calendar className="w-5 h-5 text-brand-blue-600 mt-0.5" />
             <div>
-              <h3 className="font-medium text-blue-800">FERPA Response Timeline</h3>
-              <p className="text-sm text-blue-700 mt-1">
+              <h3 className="font-medium text-brand-blue-800">FERPA Response Timeline</h3>
+              <p className="text-sm text-brand-blue-700 mt-1">
                 Under FERPA, institutions must respond to records access requests within 45 days.
                 Requests approaching or past their due date are highlighted for priority handling.
               </p>

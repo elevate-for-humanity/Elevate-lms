@@ -105,7 +105,7 @@ export default function VideoHeroSection() {
           >
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white text-lg font-bold rounded-lg hover:bg-blue-700 hover:scale-105 transition-all shadow-lg"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 text-white text-lg font-bold rounded-lg hover:bg-brand-blue-700 hover:scale-105 transition-all shadow-lg"
             >
               Apply Now
             </Link>

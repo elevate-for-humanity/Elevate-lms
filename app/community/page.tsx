@@ -108,7 +108,7 @@ export default async function CommunityPage() {
       <section className="py-16 bg-white">
         <div className="max-w-5xl mx-auto px-4 text-center">
           {/* Badge */}
-          <span className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full mb-6">
+          <span className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold rounded-full mb-6">
             <Users className="w-4 h-4" />
             {memberCount.toLocaleString()}+ Members
           </span>
@@ -125,7 +125,7 @@ export default async function CommunityPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/community/join"
-              className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
             >
               <Users className="w-5 h-5" />
               Join the Community
@@ -174,10 +174,10 @@ export default async function CommunityPage() {
                 href={feature.href}
                 className="bg-gray-50 rounded-xl p-6 hover:shadow-md transition-shadow"
               >
-                <feature.icon className="w-10 h-10 text-blue-600 mb-4" />
+                <feature.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
                 <p className="text-gray-600 mb-4">{feature.description}</p>
-                <span className="inline-flex items-center gap-2 text-blue-600 font-medium">
+                <span className="inline-flex items-center gap-2 text-brand-blue-600 font-medium">
                   Explore <ArrowRight className="w-4 h-4" />
                 </span>
               </Link>
@@ -193,7 +193,7 @@ export default async function CommunityPage() {
             <h2 className="text-3xl font-bold text-gray-900">Popular Discussions</h2>
             <Link
               href="/community/discussions"
-              className="text-blue-600 font-medium hover:underline flex items-center gap-1"
+              className="text-brand-blue-600 font-medium hover:underline flex items-center gap-1"
             >
               View All <ArrowRight className="w-4 h-4" />
             </Link>
@@ -224,7 +224,7 @@ export default async function CommunityPage() {
             <h2 className="text-3xl font-bold text-gray-900">Upcoming Events</h2>
             <Link
               href="/community/events"
-              className="text-blue-600 font-medium hover:underline flex items-center gap-1"
+              className="text-brand-blue-600 font-medium hover:underline flex items-center gap-1"
             >
               View Calendar <ArrowRight className="w-4 h-4" />
             </Link>
@@ -246,7 +246,7 @@ export default async function CommunityPage() {
                   />
                 </div>
                 <div className="p-4">
-                  <div className="flex items-center gap-2 text-sm text-blue-600 mb-2">
+                  <div className="flex items-center gap-2 text-sm text-brand-blue-600 mb-2">
                     <Calendar className="w-4 h-4" />
                     {event.frequency}
                   </div>
@@ -274,7 +274,7 @@ export default async function CommunityPage() {
                 'Celebrate wins and share success stories'
               ].map((benefit, index) => (
                 <div key={index} className="flex items-center gap-3">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0" />
                   <span className="text-gray-700">{benefit}</span>
                 </div>
               ))}
@@ -301,22 +301,22 @@ export default async function CommunityPage() {
             {/* Join Form */}
             <div className="bg-gray-50 rounded-xl p-6">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center">
                   <GraduationCap className="w-5 h-5 text-white" />
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900">Join Community</h3>
               </div>
               <form className="space-y-4" action="/api/community/join" method="POST">
-                <input type="text" name="name" placeholder="Full Name *" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                <input type="email" name="email" placeholder="Email *" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500" />
-                <select name="status" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <input type="text" name="name" placeholder="Full Name *" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" />
+                <input type="email" name="email" placeholder="Email *" required className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" />
+                <select name="status" className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500">
                   <option value="">Your Status?</option>
                   <option value="current-student">Current Student</option>
                   <option value="alumni">Alumni</option>
                   <option value="prospective">Prospective Student</option>
                   <option value="professional">Industry Professional</option>
                 </select>
-                <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                <button type="submit" className="w-full bg-brand-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors">
                   Join Now - Free
                 </button>
               </form>
@@ -344,22 +344,22 @@ export default async function CommunityPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Connect?</h2>
-          <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-brand-blue-100 mb-8 max-w-2xl mx-auto">
             Join thousands of learners and professionals who are supporting each other on their career journeys.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/community/join"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 font-semibold rounded-lg hover:bg-brand-blue-50 transition-colors"
             >
               Join Free <ArrowRight className="w-5 h-5 ml-2" />
             </Link>
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center px-8 py-4 bg-blue-700 text-white font-semibold rounded-lg hover:bg-blue-800 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-700 text-white font-semibold rounded-lg hover:bg-brand-blue-800 transition-colors"
             >
               Start Training
             </Link>

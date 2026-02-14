@@ -83,7 +83,7 @@ export default function VideoUploader({
 
         <div className="space-y-4">
           {/* Upload Area */}
-          <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+          <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-brand-blue-500 transition-colors">
             <input
               type="file"
               accept={acceptedFormats}
@@ -97,7 +97,7 @@ export default function VideoUploader({
               className="cursor-pointer flex flex-col items-center gap-3"
             >
               {uploading ? (
-                <Loader2 className="h-12 w-12 text-blue-600 animate-spin" />
+                <Loader2 className="h-12 w-12 text-brand-blue-600 animate-spin" />
               ) : (
                 <Upload className="h-12 w-12 text-slate-400" />
               )}
@@ -119,11 +119,11 @@ export default function VideoUploader({
                 <span className="text-black">
                   {enhancing ? 'Enhancing video quality...' : 'Uploading...'}
                 </span>
-                <span className="text-blue-600 font-semibold">{progress}%</span>
+                <span className="text-brand-blue-600 font-semibold">{progress}%</span>
               </div>
               <div className="w-full bg-slate-200 rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                  className="bg-brand-blue-600 h-2 rounded-full transition-all duration-300"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -153,7 +153,7 @@ export default function VideoUploader({
                         href={result.originalUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline"
+                        className="text-brand-blue-600 hover:underline"
                       >
                         View Original
                       </a>
@@ -166,7 +166,7 @@ export default function VideoUploader({
                         href={result.enhancedUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline font-semibold"
+                        className="text-brand-blue-600 hover:underline font-semibold"
                       >
                         View Enhanced
                       </a>
@@ -198,11 +198,11 @@ export default function VideoUploader({
           )}
 
           {/* Enhancement Info */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <h4 className="font-semibold text-blue-900 mb-2">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+            <h4 className="font-semibold text-brand-blue-900 mb-2">
               ✨ AI Enhancement Features:
             </h4>
-            <ul className="text-sm text-blue-700 space-y-1">
+            <ul className="text-sm text-brand-blue-700 space-y-1">
               <li>• Upscale to 1080p HD quality</li>
               <li>• Remove noise and grain</li>
               <li>• Enhance colors and contrast</li>

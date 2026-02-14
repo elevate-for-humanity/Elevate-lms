@@ -75,7 +75,7 @@ export function ShowMore({
           aria-expanded={isExpanded}
           className={cn(
             'mt-4 inline-flex items-center gap-2',
-            'text-blue-600 hover:text-blue-700 font-semibold',
+            'text-brand-blue-600 hover:text-brand-blue-700 font-semibold',
             'transition-colors',
             alwaysExpandedOnDesktop && 'md:hidden'
           )}

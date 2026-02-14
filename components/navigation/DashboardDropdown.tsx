@@ -49,7 +49,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 const DEFAULT_DASHBOARDS: Dashboard[] = [
   { id: '1', name: 'Admin', href: '/admin/dashboard', icon: 'Shield', description: 'System management', color: 'text-red-600', roles: ['admin', 'super_admin'], order_index: 1 },
-  { id: '2', name: 'Student', href: '/lms/dashboard', icon: 'GraduationCap', description: 'Learning portal', color: 'text-blue-600', roles: ['student', 'user'], order_index: 2 },
+  { id: '2', name: 'Student', href: '/lms/dashboard', icon: 'GraduationCap', description: 'Learning portal', color: 'text-brand-blue-600', roles: ['student', 'user'], order_index: 2 },
   { id: '3', name: 'Staff', href: '/staff-portal/dashboard', icon: 'Users', description: 'Support operations', color: 'text-green-600', roles: ['staff', 'admin'], order_index: 3 },
   { id: '4', name: 'Program Holder', href: '/program-holder/dashboard', icon: 'Building2', description: 'Training providers', color: 'text-purple-600', roles: ['program_holder', 'admin'], order_index: 4 },
   { id: '5', name: 'Employer', href: '/employer/dashboard', icon: 'Briefcase', description: 'Hiring portal', color: 'text-orange-600', roles: ['employer'], order_index: 5 },
@@ -190,7 +190,7 @@ export function DashboardDropdown({ className }: Props) {
               </div>
 
               {recentDashboards.length > 0 && (
-                <div className="px-3 py-1 text-xs text-blue-600 font-medium">
+                <div className="px-3 py-1 text-xs text-brand-blue-600 font-medium">
                   Recently visited
                 </div>
               )}
@@ -206,17 +206,17 @@ export function DashboardDropdown({ className }: Props) {
                       href={dashboard.href}
                       onClick={() => trackVisit(dashboard)}
                       className={`flex items-start gap-3 px-3 py-2 rounded-lg hover:bg-slate-50 transition group ${
-                        isRecent ? 'bg-blue-50/50' : ''
+                        isRecent ? 'bg-brand-blue-50/50' : ''
                       }`}
                     >
                       <Icon
                         className={`w-5 h-5 mt-0.5 ${dashboard.color} group-hover:scale-110 transition`}
                       />
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-gray-900 group-hover:text-blue-600 flex items-center gap-2">
+                        <div className="text-sm font-medium text-gray-900 group-hover:text-brand-blue-600 flex items-center gap-2">
                           {dashboard.name}
                           {isRecent && (
-                            <span className="text-xs bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded">
+                            <span className="text-xs bg-brand-blue-100 text-brand-blue-600 px-1.5 py-0.5 rounded">
                               Recent
                             </span>
                           )}
@@ -235,7 +235,7 @@ export function DashboardDropdown({ className }: Props) {
               <Link
                 href="/dashboards"
                 onClick={() => setIsOpen(false)}
-                className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-white rounded-lg transition"
+                className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-brand-blue-600 hover:bg-white rounded-lg transition"
               >
                 <LayoutDashboard className="w-4 h-4" />
                 View All Dashboards

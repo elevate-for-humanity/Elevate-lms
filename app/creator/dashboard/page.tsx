@@ -117,9 +117,9 @@ export default function CreatorDashboardPage() {
                   </td>
                   <td className="py-4">
                     <div className="flex items-center justify-center gap-2">
-                      <button className="p-2 text-gray-600 hover:text-blue-600"><Eye className="w-4 h-4" /></button>
+                      <button className="p-2 text-gray-600 hover:text-brand-blue-600"><Eye className="w-4 h-4" /></button>
                       <button className="p-2 text-gray-600 hover:text-orange-600"><Edit className="w-4 h-4" /></button>
-                      <button className="p-2 text-gray-600 hover:text-blue-600"><BarChart3 className="w-4 h-4" /></button>
+                      <button className="p-2 text-gray-600 hover:text-brand-blue-600"><BarChart3 className="w-4 h-4" /></button>
                     </div>
                   </td>
                 </tr>

@@ -22,20 +22,20 @@ export default async function DiscussionPage({ params }: { params: { courseId: s
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href={`/courses/${params.courseId}`} className="text-blue-600 hover:text-blue-800 text-sm">← Back to Course</Link>
+          <Link href={`/courses/${params.courseId}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">← Back to Course</Link>
           <h1 className="text-2xl font-bold text-gray-900 mt-2">{course?.title} - Discussion</h1>
           <p className="text-gray-600 mt-1">Connect with fellow learners and instructors</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-4 mb-6">
           <h2 className="font-semibold mb-3">Start a Discussion</h2>
           <textarea className="w-full border rounded-lg px-3 py-2 mb-3" rows={3} placeholder="Share your thoughts or ask a question..." />
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Post</button>
+          <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Post</button>
         </div>
         <div className="space-y-4">
           {discussions && discussions.length > 0 ? discussions.map((post: any) => (
             <div key={post.id} className="bg-white rounded-lg shadow-sm border p-4">
               <div className="flex items-start gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><span className="text-blue-600 font-medium">{(post.profiles?.full_name || 'U')[0]}</span></div>
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center"><span className="text-brand-blue-600 font-medium">{(post.profiles?.full_name || 'U')[0]}</span></div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="font-medium">{post.profiles?.full_name || 'User'}</span>
@@ -43,8 +43,8 @@ export default async function DiscussionPage({ params }: { params: { courseId: s
                   </div>
                   <p className="text-gray-700">{post.content}</p>
                   <div className="flex gap-4 mt-2">
-                    <button className="text-sm text-gray-500 hover:text-blue-600">Reply</button>
-                    <button className="text-sm text-gray-500 hover:text-blue-600">Like</button>
+                    <button className="text-sm text-gray-500 hover:text-brand-blue-600">Reply</button>
+                    <button className="text-sm text-gray-500 hover:text-brand-blue-600">Like</button>
                   </div>
                 </div>
               </div>

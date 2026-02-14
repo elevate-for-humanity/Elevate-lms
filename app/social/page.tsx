@@ -48,7 +48,7 @@ const socialPlatforms = [
   {
     name: 'Facebook',
     icon: Facebook,
-    color: 'bg-blue-600 hover:bg-blue-700',
+    color: 'bg-brand-blue-600 hover:bg-brand-blue-700',
     href: 'https://www.facebook.com/profile.php?id=61571046346179',
     followers: '2.8K',
     description: 'Join our community for updates, success stories, and live events',
@@ -66,7 +66,7 @@ const socialPlatforms = [
   {
     name: 'LinkedIn',
     icon: Linkedin,
-    color: 'bg-blue-700 hover:bg-blue-800',
+    color: 'bg-brand-blue-700 hover:bg-brand-blue-800',
     href: 'https://www.linkedin.com/company/elevate-for-humanity',
     followers: '856',
     description: 'Connect with us for professional updates and job opportunities',
@@ -263,8 +263,8 @@ export default function SocialMediaPage() {
         <div className={`relative z-10 max-w-7xl mx-auto px-4 py-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
           <div className="max-w-2xl">
             <div className="flex items-center gap-2 mb-6">
-              <Share2 className="w-6 h-6 text-blue-400" />
-              <span className="text-blue-400 font-medium">Connect With Us</span>
+              <Share2 className="w-6 h-6 text-brand-blue-400" />
+              <span className="text-brand-blue-400 font-medium">Connect With Us</span>
             </div>
             
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
@@ -345,7 +345,7 @@ export default function SocialMediaPage() {
                 <p className="text-2xl font-bold text-slate-900 mb-2">{platform.followers} followers</p>
                 <p className="text-slate-600 text-sm mb-4">{platform.description}</p>
                 
-                <span className="inline-flex items-center gap-2 text-blue-600 font-medium group-hover:gap-3 transition-all">
+                <span className="inline-flex items-center gap-2 text-brand-blue-600 font-medium group-hover:gap-3 transition-all">
                   {platform.cta} <ArrowRight className="w-4 h-4" />
                 </span>
               </a>
@@ -410,7 +410,7 @@ export default function SocialMediaPage() {
                 </div>
                 
                 <div className="p-5">
-                  <h3 className="font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-bold text-slate-900 mb-2 line-clamp-2 group-hover:text-brand-blue-600 transition-colors">
                     {video.title}
                   </h3>
                   <p className="text-sm text-slate-500">{video.views} views</p>
@@ -534,7 +534,7 @@ export default function SocialMediaPage() {
       {/* Newsletter Section */}
       <section className="py-20">
         <div className="max-w-3xl mx-auto px-4 text-center">
-          <Calendar className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+          <Calendar className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
           <h2 className="text-3xl font-bold text-slate-900 mb-4">
             Never Miss an Update
           </h2>
@@ -546,11 +546,11 @@ export default function SocialMediaPage() {
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-5 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="flex-1 px-5 py-3 border border-slate-300 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
             <button
               type="submit"
-              className="px-8 py-3 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition-colors"
+              className="px-8 py-3 bg-brand-blue-600 text-white rounded-full font-medium hover:bg-brand-blue-700 transition-colors"
             >
               Subscribe
             </button>

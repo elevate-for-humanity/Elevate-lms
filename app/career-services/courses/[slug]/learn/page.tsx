@@ -95,7 +95,7 @@ export default async function CourseLearnPage({
           <div className="space-y-3">
             <Link
               href={`/career-services/courses/${slug}`}
-              className="block w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700"
+              className="block w-full bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700"
             >
               View Course Details
             </Link>

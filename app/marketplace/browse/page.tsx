@@ -54,11 +54,11 @@ export default async function MarketplaceBrowsePage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-blue-900/60" />
+        <div className="absolute inset-0 bg-brand-blue-900/60" />
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 w-full">
             <h1 className="text-4xl font-bold text-white mb-2">Marketplace</h1>
-            <p className="text-xl text-blue-100">Digital products, courses, and resources from creators</p>
+            <p className="text-xl text-brand-blue-100">Digital products, courses, and resources from creators</p>
           </div>
         </div>
       </section>
@@ -73,7 +73,7 @@ export default async function MarketplaceBrowsePage() {
                 key={category}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   category === 'All'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -113,7 +113,7 @@ export default async function MarketplaceBrowsePage() {
                     <span className="text-lg font-bold text-gray-900">${item.price || 0}</span>
                     <Link
                       href={`/marketplace/items/${item.id}`}
-                      className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                      className="p-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
                     >
                       <ShoppingCart className="w-4 h-4" />
                     </Link>
@@ -130,7 +130,7 @@ export default async function MarketplaceBrowsePage() {
             <div className="p-8 text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">No Items Available</h2>
               <p className="text-gray-600 mb-6">Check back soon for digital products and resources.</p>
-              <Link href="/store" className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <Link href="/store" className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
                 Visit Store
               </Link>
             </div>

@@ -20,7 +20,7 @@ interface HeroSectionProps {
 
 const badgeColors = {
   green: 'bg-green-500',
-  blue: 'bg-blue-500',
+  blue: 'bg-brand-blue-500',
   orange: 'bg-orange-500',
   purple: 'bg-purple-500',
 };
@@ -41,7 +41,7 @@ export function HeroSection({
             {badges.map((badge, index) => (
               <span
                 key={index}
-                className={`px-4 py-2 ${badgeColors[badge.color as keyof typeof badgeColors] || 'bg-blue-500'} text-white text-sm font-bold rounded-full`}
+                className={`px-4 py-2 ${badgeColors[badge.color as keyof typeof badgeColors] || 'bg-brand-blue-500'} text-white text-sm font-bold rounded-full`}
               >
                 {badge.text}
               </span>
@@ -65,7 +65,7 @@ export function HeroSection({
           </Link>
           <Link
             href={secondaryCTA.href}
-            className="px-8 py-4 bg-white hover:bg-gray-100 text-blue-900 font-bold rounded-lg transition-all text-center"
+            className="px-8 py-4 bg-white hover:bg-gray-100 text-brand-blue-900 font-bold rounded-lg transition-all text-center"
           >
             {secondaryCTA.text}
           </Link>

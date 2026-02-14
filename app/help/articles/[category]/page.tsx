@@ -37,8 +37,8 @@ export default async function HelpCategoryPage({ params }: Props) {
           {articles.map((article) => (
             <Link key={article.id} href={`/help/articles/article/${article.id}`} className="flex items-center justify-between p-6 hover:bg-gray-50">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <FileText className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                  <FileText className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900">{article.title}</h3>

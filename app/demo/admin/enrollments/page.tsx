@@ -10,7 +10,7 @@ export default function DemoEnrollmentsPage() {
             <h3 className="font-bold text-gray-900">{p.name}</h3>
             <p className="text-sm text-gray-500">{p.type} — {p.duration}</p>
             <div className="mt-2 flex gap-4 text-sm">
-              <span className="text-blue-600 font-medium">{p.enrolled} enrolled</span>
+              <span className="text-brand-blue-600 font-medium">{p.enrolled} enrolled</span>
               <span className="text-gray-400">/ {p.capacity} capacity</span>
             </div>
           </div>

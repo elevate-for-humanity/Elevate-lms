@@ -163,7 +163,7 @@ export default function AIStudioPage() {
   };
 
   return (
-    <div className="min-h-screen bg-blue-50">
+    <div className="min-h-screen bg-brand-blue-50">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Ai Studio" }]} />
       </div>
@@ -171,8 +171,8 @@ export default function AIStudioPage() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Sparkles className="w-8 h-8 text-blue-600" />
-            <h1 className="text-4xl font-bold text-blue-600">
+            <Sparkles className="w-8 h-8 text-brand-blue-600" />
+            <h1 className="text-4xl font-bold text-brand-blue-600">
               AI Studio
             </h1>
           </div>
@@ -192,7 +192,7 @@ export default function AIStudioPage() {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-all whitespace-nowrap ${
                   activeTab === tab.id
-                    ? 'bg-blue-600 text-white shadow-lg'
+                    ? 'bg-brand-blue-600 text-white shadow-lg'
                     : 'bg-white text-black hover:bg-gray-50 border border-gray-200'
                 }`}
               >
@@ -208,7 +208,7 @@ export default function AIStudioPage() {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-2xl font-bold text-black mb-6 flex items-center gap-2">
-                <Wand2 className="w-6 h-6 text-blue-600" />
+                <Wand2 className="w-6 h-6 text-brand-blue-600" />
                 Generate {tabs.find((t) => t.id === activeTab)?.label}
               </h2>
 
@@ -234,7 +234,7 @@ export default function AIStudioPage() {
                             : 'e.g., Upbeat background music for training video'
                   }
                   rows={4}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -248,7 +248,7 @@ export default function AIStudioPage() {
                   <select
                     value={selectedStyle}
                     onChange={(e) => setSelectedStyle(e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   >
                     {getStyleOptions().map((style) => (
                       <option key={style} value={style}>
@@ -272,7 +272,7 @@ export default function AIStudioPage() {
                       onChange={(e) => setDuration(parseInt(e.target.value))}
                       min="5"
                       max="300"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     />
                   </div>
                 )}
@@ -286,7 +286,7 @@ export default function AIStudioPage() {
                     <select
                       value={aspectRatio}
                       onChange={(e) => setAspectRatio(e.target.value)}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     >
                       <option value="16:9">16:9 (Landscape)</option>
                       <option value="9:16">9:16 (Portrait)</option>
@@ -301,7 +301,7 @@ export default function AIStudioPage() {
               <button
                 onClick={generateAsset}
                 disabled={loading || !prompt.trim()}
-                className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+                className="w-full bg-brand-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>
@@ -317,12 +317,12 @@ export default function AIStudioPage() {
               </button>
 
               {/* Feature Info */}
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <h3 className="font-semibold text-blue-900 mb-2">
+              <div className="mt-6 p-4 bg-brand-blue-50 rounded-lg">
+                <h3 className="font-semibold text-brand-blue-900 mb-2">
                   <Sparkles className="w-5 h-5 inline-block" /> What you can
                   create:
                 </h3>
-                <ul className="text-sm text-blue-800 space-y-1">
+                <ul className="text-sm text-brand-blue-800 space-y-1">
                   {activeTab === 'video' && (
                     <>
                       <li>• Professional training videos</li>
@@ -390,10 +390,10 @@ export default function AIStudioPage() {
                       className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow"
                     >
                       <div className="flex items-start justify-between mb-2">
-                        <span className="text-xs font-medium text-blue-600 uppercase">
+                        <span className="text-xs font-medium text-brand-blue-600 uppercase">
                           {asset.type}
                         </span>
-                        <button className="text-black hover:text-blue-600" aria-label="Download">
+                        <button className="text-black hover:text-brand-blue-600" aria-label="Download">
                           <Download className="w-4 h-4" />
                         </button>
                       </div>
@@ -419,11 +419,11 @@ export default function AIStudioPage() {
                       {(asset.type === 'voiceover' ||
                         asset.type === 'music') && (
                         <div className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg mb-2">
-                          <button className="text-blue-600 hover:text-blue-700" aria-label="Action button">
+                          <button className="text-brand-blue-600 hover:text-brand-blue-700" aria-label="Action button">
                             <Play className="w-5 h-5" />
                           </button>
                           <div className="flex-1 h-1 bg-gray-200 rounded-full">
-                            <div className="h-full w-0 bg-blue-600 rounded-full" />
+                            <div className="h-full w-0 bg-brand-blue-600 rounded-full" />
                           </div>
                         </div>
                       )}

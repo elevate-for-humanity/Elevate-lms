@@ -104,7 +104,7 @@ export default async function HubPage() {
             {isAdmin && (
               <div>
                 <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                  <Users className="w-5 h-5 text-blue-500" />
+                  <Users className="w-5 h-5 text-brand-blue-500" />
                   Cohort Overview
                 </h2>
                 <CohortView />

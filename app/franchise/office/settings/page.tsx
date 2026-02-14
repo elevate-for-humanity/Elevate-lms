@@ -425,7 +425,7 @@ export default function OfficeSettingsPage() {
                 />
               </div>
 
-              <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 rounded-lg p-4">
+              <div className="bg-brand-blue-50 dark:bg-blue-950 border border-brand-blue-200 rounded-lg p-4">
                 <p className="text-sm">
                   <strong>Note:</strong> The ERO is responsible for signing all returns filed through this office.
                   Make sure the EFIN and signature PIN match your IRS e-file application.

@@ -67,7 +67,7 @@ export default function FeatureTour() {
         <div className="flex gap-3 mb-6">
           <Link
             href={feature.link}
-            className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition text-center"
+            className="flex-1 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition text-center"
             onClick={handleComplete}
           >
             {feature.cta}
@@ -91,7 +91,7 @@ export default function FeatureTour() {
             <div
               key={index}
               className={`w-2 h-2 rounded-full transition ${
-                index === currentStep ? 'bg-blue-600 w-6' : 'bg-gray-300'
+                index === currentStep ? 'bg-brand-blue-600 w-6' : 'bg-gray-300'
               }`}
             />
           ))}

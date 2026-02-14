@@ -310,7 +310,7 @@ export default function ApprovalsPage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex items-center gap-4 mb-12">
-            <Users className="w-12 h-12 text-blue-600" />
+            <Users className="w-12 h-12 text-brand-blue-600" />
             <h2 className="text-2xl md:text-2xl md:text-3xl font-bold text-2xl md:text-3xl lg:text-2xl md:text-3xl">
               Nonprofit & Diversity Certifications
             </h2>
@@ -318,7 +318,7 @@ export default function ApprovalsPage() {
 
           <div className="space-y-8">
             {/* 501(c)(3) */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-blue-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
               <div className="flex items-start gap-4">
                 <CheckCircle className="w-8 h-8 text-brand-green-600 flex-shrink-0 mt-1" />
                 <div>
@@ -333,7 +333,7 @@ export default function ApprovalsPage() {
             </div>
 
             {/* Candid */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-blue-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
               <div className="flex items-start gap-4">
                 <CheckCircle className="w-8 h-8 text-brand-green-600 flex-shrink-0 mt-1" />
                 <div>
@@ -349,7 +349,7 @@ export default function ApprovalsPage() {
             </div>
 
             {/* ByBlack */}
-            <div className="bg-white rounded-2xl p-8 border-l-4 border-blue-600">
+            <div className="bg-white rounded-2xl p-8 border-l-4 border-brand-blue-600">
               <div className="flex items-start gap-4">
                 <CheckCircle className="w-8 h-8 text-brand-green-600 flex-shrink-0 mt-1" />
                 <div>

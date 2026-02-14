@@ -56,10 +56,10 @@ export function NextActionBanner() {
   }
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+    <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-4 mb-6">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+          <div className="flex-shrink-0 w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center text-brand-blue-600">
             {ACTION_ICONS[nextAction.action] || <ArrowRight className="w-5 h-5" />}
           </div>
           <div>
@@ -69,7 +69,7 @@ export function NextActionBanner() {
         </div>
         <Link
           href={nextAction.route}
-          className="flex-shrink-0 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
+          className="flex-shrink-0 inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
         >
           {nextAction.cta}
           <ArrowRight className="w-4 h-4" />

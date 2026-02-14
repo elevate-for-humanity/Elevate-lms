@@ -172,7 +172,7 @@ export default function SideAvatarGuide({
       {/* Toggle Button */}
       <button
         onClick={() => setIsExpanded(!isExpanded)}
-        className={`absolute ${toggleClasses} top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white p-3 shadow-lg transition-colors`}
+        className={`absolute ${toggleClasses} top-1/2 -translate-y-1/2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white p-3 shadow-lg transition-colors`}
         title={isExpanded ? 'Hide Guide' : 'Show Guide'}
       >
         {isExpanded ? (
@@ -186,7 +186,7 @@ export default function SideAvatarGuide({
       {!isExpanded && (
         <button
           onClick={() => setIsExpanded(true)}
-          className={`absolute ${side === 'right' ? '-left-20' : '-right-20'} top-1/2 -translate-y-1/2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 transition-colors`}
+          className={`absolute ${side === 'right' ? '-left-20' : '-right-20'} top-1/2 -translate-y-1/2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-3 rounded-xl shadow-lg flex items-center gap-2 transition-colors`}
         >
           <MessageCircle className="w-6 h-6" />
           <span className="font-medium whitespace-nowrap">Ask {avatarName}</span>
@@ -235,7 +235,7 @@ export default function SideAvatarGuide({
             </div>
             <div className="mt-3 text-center">
               <div className="text-white font-semibold text-lg">{avatarName}</div>
-              <div className="text-blue-300">{avatarRole}</div>
+              <div className="text-brand-blue-300">{avatarRole}</div>
             </div>
           </div>
 
@@ -249,7 +249,7 @@ export default function SideAvatarGuide({
                 <div
                   className={`max-w-[85%] px-4 py-2 rounded-2xl ${
                     msg.role === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-md'
+                      ? 'bg-brand-blue-600 text-white rounded-br-md'
                       : 'bg-white text-gray-800 border border-gray-200 shadow-sm rounded-bl-md'
                   }`}
                 >
@@ -285,13 +285,13 @@ export default function SideAvatarGuide({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Ask a question..."
-                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className="px-4 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                className="px-4 py-3 bg-brand-blue-600 text-white rounded-xl hover:bg-brand-blue-700 disabled:opacity-50 transition-colors"
               >
                 <Send className="w-5 h-5" />
               </button>

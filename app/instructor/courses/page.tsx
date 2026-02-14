@@ -73,13 +73,13 @@ export default async function InstructorCoursesPage() {
       </div>
 
       {!user ? (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <p className="text-blue-900 mb-4">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+          <p className="text-brand-blue-900 mb-4">
             Please log in to view your courses.
           </p>
           <a
             href="/login"
-            className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-block bg-brand-blue-600 text-white px-6 py-2 rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             Log In
           </a>

@@ -155,7 +155,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
             Apprentice *
           </label>
           <select
-            className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             value={placementId}
             onChange={(e) => setPlacementId(e.target.value)}
             required
@@ -176,7 +176,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
             </label>
             <input
               type="date"
-              className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               value={weekStart}
               onChange={(e) => setWeekStart(e.target.value)}
               required
@@ -188,7 +188,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
             </label>
             <input
               type="date"
-              className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               value={weekEnd}
               onChange={(e) => setWeekEnd(e.target.value)}
               required
@@ -207,7 +207,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
               step="0.5"
               min="0"
               max="168"
-              className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               value={hoursOjt}
               onChange={(e) => setHoursOjt(e.target.value)}
               required
@@ -225,7 +225,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
               step="0.5"
               min="0"
               max="168"
-              className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               value={hoursRelated}
               onChange={(e) => setHoursRelated(e.target.value)}
             />
@@ -236,11 +236,11 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
         </div>
 
         {/* Total Hours Display */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
           <div className="text-sm font-semibold text-black">
             Total Hours This Week
           </div>
-          <div className="text-2xl font-bold text-blue-600">
+          <div className="text-2xl font-bold text-brand-blue-600">
             {(Number(hoursOjt) || 0) + (Number(hoursRelated) || 0)} hours
           </div>
         </div>
@@ -251,7 +251,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
             Attendance / Progress Notes
           </label>
           <textarea
-            className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             rows={4}
             value={attendanceNotes}
             onChange={(e) => setAttendanceNotes(e.target.value)}
@@ -265,7 +265,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
             Skills / Competencies Progress
           </label>
           <textarea
-            className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             rows={4}
             value={competenciesNotes}
             onChange={(e) => setCompetenciesNotes(e.target.value)}
@@ -302,7 +302,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {saving ? 'Submitting...' : 'Submit Report'}
           </button>

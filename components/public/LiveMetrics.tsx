@@ -71,7 +71,7 @@ export function LiveMetrics() {
     return (
       <div className="bg-white rounded-lg border border-slate-200 p-8">
         <div className="flex items-center justify-center">
-          <div className="animate-spin rounded-full h-11 w-11 border-b-2 border-blue-600" />
+          <div className="animate-spin rounded-full h-11 w-11 border-b-2 border-brand-blue-600" />
           <span className="ml-3 text-black">Loading live metrics...</span>
         </div>
       </div>
@@ -146,7 +146,7 @@ export function LiveMetrics() {
   ];
 
   const colorClasses: Record<string, string> = {
-    blue: 'bg-blue-50 text-blue-600',
+    blue: 'bg-brand-blue-50 text-brand-blue-600',
     green: 'bg-green-50 text-green-600',
     purple: 'bg-purple-50 text-purple-600',
     orange: 'bg-orange-50 text-orange-600',

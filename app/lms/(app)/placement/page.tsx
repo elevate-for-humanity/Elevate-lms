@@ -73,7 +73,7 @@ export default async function PlacementPage() {
             <div className="grid sm:grid-cols-2 gap-4">
               {services.map((service) => (
                 <div key={service.title} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                  <service.icon className="w-5 h-5 text-blue-600 mt-0.5" />
+                  <service.icon className="w-5 h-5 text-brand-blue-600 mt-0.5" />
                   <div>
                     <h3 className="font-medium">{service.title}</h3>
                     <p className="text-sm text-gray-600">{service.desc}</p>
@@ -88,14 +88,14 @@ export default async function PlacementPage() {
             {jobListings && jobListings.length > 0 ? (
               <div className="space-y-4">
                 {jobListings.map((job: any) => (
-                  <div key={job.id} className="border rounded-lg p-4 hover:border-blue-300 transition">
+                  <div key={job.id} className="border rounded-lg p-4 hover:border-brand-blue-300 transition">
                     <div className="flex items-start justify-between">
                       <div>
                         <h3 className="font-semibold">{job.title}</h3>
                         <p className="text-sm text-gray-600">{job.company}</p>
                         <p className="text-sm text-gray-500 mt-1">{job.location}</p>
                       </div>
-                      <Link href={`/lms/jobs/${job.id}`} className="text-blue-600 text-sm font-medium hover:underline">
+                      <Link href={`/lms/jobs/${job.id}`} className="text-brand-blue-600 text-sm font-medium hover:underline">
                         View
                       </Link>
                     </div>
@@ -113,10 +113,10 @@ export default async function PlacementPage() {
         </div>
 
         <div className="space-y-6">
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <Building2 className="w-8 h-8 text-blue-600 mb-3" />
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+            <Building2 className="w-8 h-8 text-brand-blue-600 mb-3" />
             <h3 className="font-semibold text-lg mb-2">Employer Partners</h3>
-            <p className="text-2xl font-bold text-blue-600">{partnerCount || 50}+</p>
+            <p className="text-2xl font-bold text-brand-blue-600">{partnerCount || 50}+</p>
             <p className="text-sm text-gray-600">Companies actively hiring our graduates</p>
           </div>
 
@@ -140,7 +140,7 @@ export default async function PlacementPage() {
             <p className="text-sm text-gray-600 mb-4">
               Contact your program coordinator to schedule a placement consultation.
             </p>
-            <Link href="/lms/messages" className="text-blue-600 font-medium text-sm hover:underline">
+            <Link href="/lms/messages" className="text-brand-blue-600 font-medium text-sm hover:underline">
               Message Career Services
             </Link>
           </div>

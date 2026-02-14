@@ -90,7 +90,7 @@ export default function GenerateSitePage() {
       <header className="border-b border-white/10">
         <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-white">
-            <Sparkles className="w-6 h-6 text-blue-400" />
+            <Sparkles className="w-6 h-6 text-brand-blue-400" />
             <span className="font-bold text-lg">Elevate LMS Generator</span>
           </div>
           <div className="text-sm text-slate-400">
@@ -125,7 +125,7 @@ export default function GenerateSitePage() {
                   value={formData.organizationName}
                   onChange={(e) => setFormData({ ...formData, organizationName: e.target.value })}
                   placeholder="e.g., Midwest Career Academy"
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
 
@@ -140,7 +140,7 @@ export default function GenerateSitePage() {
                       onClick={() => setFormData({ ...formData, organizationType: type.value })}
                       className={`p-4 rounded-lg border-2 text-left transition-all ${
                         formData.organizationType === type.value
-                          ? 'border-blue-500 bg-blue-500/20'
+                          ? 'border-brand-blue-500 bg-brand-blue-500/20'
                           : 'border-white/20 hover:border-white/40'
                       }`}
                     >
@@ -154,7 +154,7 @@ export default function GenerateSitePage() {
               <button
                 onClick={() => setStep('details')}
                 disabled={!formData.organizationName || !formData.organizationType}
-                className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
+                className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-slate-600 disabled:cursor-not-allowed text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-colors"
               >
                 Continue
                 <ArrowRight className="w-5 h-5" />
@@ -183,7 +183,7 @@ export default function GenerateSitePage() {
                 <select
                   value={formData.industry}
                   onChange={(e) => setFormData({ ...formData, industry: e.target.value })}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 >
                   <option value="" className="bg-slate-800">Select industry...</option>
                   {INDUSTRIES.map((ind) => (
@@ -201,7 +201,7 @@ export default function GenerateSitePage() {
                   value={formData.targetAudience}
                   onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })}
                   placeholder="e.g., Career changers, high school graduates, veterans"
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
 
@@ -214,7 +214,7 @@ export default function GenerateSitePage() {
                   value={formData.trainingTypes}
                   onChange={(e) => setFormData({ ...formData, trainingTypes: e.target.value })}
                   placeholder="e.g., HVAC certification, medical assistant, CDL training"
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
 
@@ -227,7 +227,7 @@ export default function GenerateSitePage() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="Tell us about your organization's mission and goals..."
                   rows={3}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 resize-none"
                 />
               </div>
 
@@ -246,7 +246,7 @@ export default function GenerateSitePage() {
                 </button>
                 <button
                   onClick={handleGenerate}
-                  className="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all"
+                  className="flex-1 py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold rounded-lg flex items-center justify-center gap-2 transition-all"
                 >
                   <Sparkles className="w-5 h-5" />
                   Generate My Site
@@ -259,8 +259,8 @@ export default function GenerateSitePage() {
         {/* Step 3: Generating */}
         {step === 'generating' && (
           <div className="text-center py-20">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-500/20 rounded-full mb-6">
-              <Loader2 className="w-10 h-10 text-blue-400 animate-spin" />
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-blue-500/20 rounded-full mb-6">
+              <Loader2 className="w-10 h-10 text-brand-blue-400 animate-spin" />
             </div>
             <h2 className="text-3xl font-black text-white mb-4">
               Creating Your Platform...
@@ -360,11 +360,11 @@ export default function GenerateSitePage() {
                 
                 <a
                   href={`/store/checkout?plan=professional_monthly&preview=${siteConfig.meta.previewId}`}
-                  className="p-6 bg-blue-600 hover:bg-blue-700 rounded-xl text-center transition-colors ring-2 ring-blue-400"
+                  className="p-6 bg-brand-blue-600 hover:bg-brand-blue-700 rounded-xl text-center transition-colors ring-2 ring-blue-400"
                 >
                   <p className="text-white font-bold text-lg">Professional</p>
                   <p className="text-3xl font-black text-white my-2">$299<span className="text-lg">/mo</span></p>
-                  <p className="text-blue-200 text-sm">500 students</p>
+                  <p className="text-brand-blue-200 text-sm">500 students</p>
                 </a>
                 
                 <a

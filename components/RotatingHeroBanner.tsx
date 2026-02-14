@@ -123,7 +123,7 @@ export default function RotatingHeroBanner() {
               </Link>
               <Link
                 href="/funding"
-                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-blue-600 rounded-full hover:bg-blue-700 transition-all hover:scale-105 shadow-2xl border-2 border-white/20"
+                className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-brand-blue-600 rounded-full hover:bg-brand-blue-700 transition-all hover:scale-105 shadow-2xl border-2 border-white/20"
               >
                 {slide.cta2}
               </Link>

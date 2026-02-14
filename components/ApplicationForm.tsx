@@ -240,7 +240,7 @@ export function ApplicationForm() {
                 Which program are you interested in? *
               </label>
               <select
-                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 value={formData.program}
                 onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setFormData({...formData, program: e.target.value})}
               >
@@ -271,7 +271,7 @@ export function ApplicationForm() {
                 Current Employment Status *
               </label>
               <select
-                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 value={formData.employmentStatus}
                 onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setFormData({...formData, employmentStatus: e.target.value})}
               >
@@ -286,7 +286,7 @@ export function ApplicationForm() {
                 Annual Household Income *
               </label>
               <select
-                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 value={formData.householdIncome}
                 onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setFormData({...formData, householdIncome: e.target.value})}
               >

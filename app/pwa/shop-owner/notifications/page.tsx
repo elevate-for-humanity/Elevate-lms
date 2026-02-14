@@ -23,16 +23,16 @@ interface Notification {
 const NOTIFICATION_ICONS: Record<NotificationType, React.ReactNode> = {
   hours_submitted: <Clock className="w-5 h-5 text-amber-400" />,
   apprentice_joined: <Users className="w-5 h-5 text-green-400" />,
-  report_ready: <FileText className="w-5 h-5 text-blue-400" />,
-  reminder: <AlertCircle className="w-5 h-5 text-blue-400" />,
+  report_ready: <FileText className="w-5 h-5 text-brand-blue-400" />,
+  reminder: <AlertCircle className="w-5 h-5 text-brand-blue-400" />,
   system: <Bell className="w-5 h-5 text-slate-400" />,
 };
 
 const NOTIFICATION_COLORS: Record<NotificationType, string> = {
   hours_submitted: 'bg-amber-500/20',
   apprentice_joined: 'bg-green-500/20',
-  report_ready: 'bg-blue-500/20',
-  reminder: 'bg-blue-500/20',
+  report_ready: 'bg-brand-blue-500/20',
+  reminder: 'bg-brand-blue-500/20',
   system: 'bg-slate-700',
 };
 
@@ -136,7 +136,7 @@ export default function ShopOwnerNotificationsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
   }
@@ -152,7 +152,7 @@ export default function ShopOwnerNotificationsPage() {
             <div>
               <h1 className="text-xl font-bold text-white">Notifications</h1>
               {unreadCount > 0 && (
-                <p className="text-blue-400 text-sm">{unreadCount} unread</p>
+                <p className="text-brand-blue-400 text-sm">{unreadCount} unread</p>
               )}
             </div>
           </div>
@@ -160,7 +160,7 @@ export default function ShopOwnerNotificationsPage() {
             <button
               onClick={markAllAsRead}
               disabled={markingRead === 'all'}
-              className="text-blue-400 text-sm font-medium hover:text-blue-300 disabled:opacity-50"
+              className="text-brand-blue-400 text-sm font-medium hover:text-brand-blue-300 disabled:opacity-50"
             >
               {markingRead === 'all' ? 'Marking...' : 'Mark all read'}
             </button>
@@ -183,7 +183,7 @@ export default function ShopOwnerNotificationsPage() {
               <div
                 key={notification.id}
                 className={`relative bg-slate-800 rounded-xl overflow-hidden ${
-                  !notification.read ? 'border-l-4 border-blue-500' : ''
+                  !notification.read ? 'border-l-4 border-brand-blue-500' : ''
                 }`}
               >
                 {notification.actionUrl ? (

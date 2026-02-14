@@ -91,7 +91,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
       : 'Student');
 
   return (
-    <nav role="navigation" aria-label="LMS navigation" className="bg-blue-900 sticky top-0 z-50 shadow-lg">
+    <nav role="navigation" aria-label="LMS navigation" className="bg-brand-blue-900 sticky top-0 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
@@ -124,7 +124,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                   href={item.href}
                   className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-all ${
                     isActive(item.href)
-                      ? 'bg-white text-blue-900'
+                      ? 'bg-white text-brand-blue-900'
                       : 'text-white/90 hover:bg-white/10'
                   }`}
                 >
@@ -222,7 +222,7 @@ export function LMSNavigation({ user, profile }: LMSNavigationProps) {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg font-medium transition ${
                       isActive(item.href)
-                        ? 'bg-white text-blue-900'
+                        ? 'bg-white text-brand-blue-900'
                         : 'text-white hover:bg-white/10'
                     }`}
                   >

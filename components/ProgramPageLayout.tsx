@@ -120,8 +120,8 @@ export default function ProgramPageLayout({
               <div className="text-5xl font-black text-green-600 mb-3 text-3xl md:text-4xl lg:text-5xl">{cost}</div>
               <div className="text-black font-semibold text-lg">100% Funded</div>
             </div>
-            <div className="bg-white rounded-2xl shadow-lg border-2 border-blue-100 p-8 text-center transform hover:scale-105 transition-all">
-              <div className="text-5xl font-black text-blue-600 mb-3 text-3xl md:text-4xl lg:text-5xl">{placement}</div>
+            <div className="bg-white rounded-2xl shadow-lg border-2 border-brand-blue-100 p-8 text-center transform hover:scale-105 transition-all">
+              <div className="text-5xl font-black text-brand-blue-600 mb-3 text-3xl md:text-4xl lg:text-5xl">{placement}</div>
               <div className="text-black font-semibold text-lg">Job Placement</div>
             </div>
             <div className="bg-white rounded-2xl shadow-lg border-2 border-orange-100 p-8 text-center transform hover:scale-105 transition-all">
@@ -231,7 +231,7 @@ d="M5 13l4 4L19 7" />
                 <h3 className="text-3xl font-bold mb-6 text-black">Career Opportunities</h3>
                 <div className="grid grid-cols-1 gap-4">
                   {jobTitles.map((job, index) => (
-                    <div key={index} className="   rounded-xl p-5 shadow-sm border-l-4 border-blue-500">
+                    <div key={index} className="   rounded-xl p-5 shadow-sm border-l-4 border-brand-blue-500">
                       <span className="text-lg font-semibold text-black">{job}</span>
                     </div>
                   ))}

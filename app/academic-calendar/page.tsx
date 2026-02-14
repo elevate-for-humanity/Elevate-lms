@@ -62,10 +62,10 @@ export default function AcademicCalendarPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-blue-600 text-white py-16">
+      <section className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl font-bold mb-4">Academic Calendar</h1>
-          <p className="text-xl text-blue-100">
+          <p className="text-xl text-brand-blue-100">
             Important dates and schedules for {currentYear}
           </p>
         </div>
@@ -75,7 +75,7 @@ export default function AcademicCalendarPage() {
         {/* Terms */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Calendar className="w-6 h-6 text-blue-600" />
+            <Calendar className="w-6 h-6 text-brand-blue-600" />
             {currentYear} Terms
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -104,7 +104,7 @@ export default function AcademicCalendarPage() {
         {/* Holidays */}
         <section className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <GraduationCap className="w-6 h-6 text-blue-600" />
+            <GraduationCap className="w-6 h-6 text-brand-blue-600" />
             Holidays & Breaks
           </h2>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
@@ -128,14 +128,14 @@ export default function AcademicCalendarPage() {
         </section>
 
         {/* CTA */}
-        <section className="bg-blue-50 rounded-xl p-8 text-center">
+        <section className="bg-brand-blue-50 rounded-xl p-8 text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">Ready to Enroll?</h2>
           <p className="text-gray-600 mb-6">
             Start your career training journey today. Most programs are FREE through WIOA funding.
           </p>
           <Link
             href="/apply"
-            className="inline-block px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-block px-8 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             Apply Now
           </Link>

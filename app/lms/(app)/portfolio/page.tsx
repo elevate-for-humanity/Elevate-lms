@@ -76,7 +76,7 @@ export default async function PortfolioPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-              <Briefcase className="w-8 h-8 text-blue-600" />
+              <Briefcase className="w-8 h-8 text-brand-blue-600" />
               My Portfolio
             </h1>
             <p className="text-gray-600 mt-1">
@@ -88,7 +88,7 @@ export default async function PortfolioPage() {
               <Share2 className="w-4 h-4" />
               Share Portfolio
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
               <Download className="w-4 h-4" />
               Export PDF
             </button>
@@ -112,8 +112,8 @@ export default async function PortfolioPage() {
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">
@@ -125,8 +125,8 @@ export default async function PortfolioPage() {
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <FileText className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                <FileText className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">0</div>
@@ -188,7 +188,7 @@ export default async function PortfolioPage() {
                   </p>
                   <Link
                     href="/lms/courses"
-                    className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                    className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
                   >
                     Browse Courses →
                   </Link>
@@ -219,7 +219,7 @@ export default async function PortfolioPage() {
                         </div>
                         <Link
                           href={`/lms/courses/${enrollment.course_id}`}
-                          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                          className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
                         >
                           View Course
                         </Link>
@@ -247,7 +247,7 @@ export default async function PortfolioPage() {
               <p className="text-gray-600 text-sm mb-4">
                 Showcase your work by adding projects, case studies, or work samples.
               </p>
-              <button className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-400 hover:text-blue-600 transition-colors">
+              <button className="w-full flex items-center justify-center gap-2 px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-brand-blue-400 hover:text-brand-blue-600 transition-colors">
                 <Plus className="w-5 h-5" />
                 Add Project
               </button>
@@ -264,23 +264,23 @@ export default async function PortfolioPage() {
             </div>
 
             {/* Portfolio Tips */}
-            <div className="bg-blue-50 rounded-xl p-6">
+            <div className="bg-brand-blue-50 rounded-xl p-6">
               <h2 className="font-semibold text-gray-900 mb-4">Portfolio Tips</h2>
               <ul className="space-y-3 text-sm text-gray-700">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="w-4 h-4 text-brand-blue-600 mt-0.5 flex-shrink-0" />
                   <span>Add descriptions to your certificates explaining what you learned</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="w-4 h-4 text-brand-blue-600 mt-0.5 flex-shrink-0" />
                   <span>Include projects that demonstrate your skills</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="w-4 h-4 text-brand-blue-600 mt-0.5 flex-shrink-0" />
                   <span>Share your portfolio link on LinkedIn and resumes</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                  <CheckCircle className="w-4 h-4 text-brand-blue-600 mt-0.5 flex-shrink-0" />
                   <span>Keep your portfolio updated as you complete new courses</span>
                 </li>
               </ul>
@@ -293,14 +293,14 @@ export default async function PortfolioPage() {
                   <Trophy className="w-5 h-5 text-yellow-600" />
                   Recent Badges
                 </h2>
-                <Link href="/lms/badges" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                <Link href="/lms/badges" className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium">
                   View All
                 </Link>
               </div>
               <div className="grid grid-cols-3 gap-3">
                 <div className="text-center p-3 bg-gray-50 rounded-lg">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
-                    <Star className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-2">
+                    <Star className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <p className="text-xs text-gray-600">First Steps</p>
                 </div>

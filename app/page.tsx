@@ -174,7 +174,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-1">{program.name}</h3>
                 <p className="text-slate-600 text-sm sm:text-base mb-2">{program.description}</p>
-                <span className="text-blue-600 font-semibold text-sm group-hover:underline">Learn More →</span>
+                <span className="text-brand-blue-600 font-semibold text-sm group-hover:underline">Learn More →</span>
               </Link>
             ))}
           </div>
@@ -215,7 +215,7 @@ export default function HomePage() {
                 </div>
                 <h3 className="font-bold text-black text-sm sm:text-base mb-1">{step.title}</h3>
                 <p className="text-slate-600 text-xs sm:text-sm mb-1 line-clamp-2">{step.desc}</p>
-                <span className="text-blue-600 font-semibold text-xs sm:text-sm group-hover:underline">{step.linkLabel} →</span>
+                <span className="text-brand-blue-600 font-semibold text-xs sm:text-sm group-hover:underline">{step.linkLabel} →</span>
               </Link>
             ))}
           </div>
@@ -258,20 +258,20 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="order-2 md:order-1">
-              <p className="text-blue-600 font-bold text-lg mb-2 tracking-wide uppercase">Funding Programs</p>
+              <p className="text-brand-blue-600 font-bold text-lg mb-2 tracking-wide uppercase">Funding Programs</p>
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-black mb-6 leading-tight">WIOA &amp; WRG Funding</h2>
               <ul className="text-lg text-slate-700 mb-8 space-y-3">
-                <li className="flex items-start gap-2"><span className="text-blue-600 font-bold mt-0.5">•</span> <strong>WIOA</strong> — Federal workforce funding for eligible adults, dislocated workers, and youth</li>
-                <li className="flex items-start gap-2"><span className="text-blue-600 font-bold mt-0.5">•</span> <strong>WRG</strong> — Workforce Ready Grant covers tuition for high-demand certifications</li>
-                <li className="flex items-start gap-2"><span className="text-blue-600 font-bold mt-0.5">•</span> Step 1: Register at indianacareerconnect.com</li>
-                <li className="flex items-start gap-2"><span className="text-blue-600 font-bold mt-0.5">•</span> Step 2: Schedule a WorkOne appointment for eligibility</li>
-                <li className="flex items-start gap-2"><span className="text-blue-600 font-bold mt-0.5">•</span> Not all programs are free — some require tuition with flexible payment options</li>
+                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> <strong>WIOA</strong> — Federal workforce funding for eligible adults, dislocated workers, and youth</li>
+                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> <strong>WRG</strong> — Workforce Ready Grant covers tuition for high-demand certifications</li>
+                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Step 1: Register at indianacareerconnect.com</li>
+                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Step 2: Schedule a WorkOne appointment for eligibility</li>
+                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Not all programs are free — some require tuition with flexible payment options</li>
               </ul>
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/wioa-eligibility" className="inline-block bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center">
+                <Link href="/wioa-eligibility" className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center">
                   Check WIOA Eligibility
                 </Link>
-                <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-block border-2 border-blue-600 text-blue-600 text-lg font-bold px-8 py-4 rounded-full transition-all hover:bg-blue-50 hover:scale-105 text-center">
+                <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-block border-2 border-brand-blue-600 text-brand-blue-600 text-lg font-bold px-8 py-4 rounded-full transition-all hover:bg-brand-blue-50 hover:scale-105 text-center">
                   Register Now →
                 </a>
               </div>
@@ -316,12 +316,12 @@ export default function HomePage() {
               </div>
               <h3 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">Why Partner With Elevate</h3>
               <ul className="text-slate-700 mb-4 space-y-2">
-                <li className="flex items-start gap-2"><span className="text-blue-600 font-bold mt-0.5">•</span> Approved WIOA and JRI training provider</li>
-                <li className="flex items-start gap-2"><span className="text-blue-600 font-bold mt-0.5">•</span> Full support ecosystem — funding, childcare, career placement</li>
-                <li className="flex items-start gap-2"><span className="text-blue-600 font-bold mt-0.5">•</span> Industry-recognized certifications in high-demand fields</li>
-                <li className="flex items-start gap-2"><span className="text-blue-600 font-bold mt-0.5">•</span> Apply to partner or list your programs online</li>
+                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Approved WIOA and JRI training provider</li>
+                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Full support ecosystem — funding, childcare, career placement</li>
+                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Industry-recognized certifications in high-demand fields</li>
+                <li className="flex items-start gap-2"><span className="text-brand-blue-600 font-bold mt-0.5">•</span> Apply to partner or list your programs online</li>
               </ul>
-              <Link href="/apply/program-holder" className="inline-block bg-blue-600 hover:bg-blue-700 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg">
+              <Link href="/apply/program-holder" className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-lg font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg">
                 Become a Partner →
               </Link>
             </div>

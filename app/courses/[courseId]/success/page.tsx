@@ -71,8 +71,8 @@ export default async function EnrollmentSuccessPage({
             </Link>
           </div>
 
-          <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-blue-900">
+          <div className="p-4 bg-brand-blue-50 rounded-lg border border-brand-blue-200">
+            <p className="text-sm text-brand-blue-900">
               📧 <strong>Check your email</strong> - We've sent you a confirmation with course access details and next steps.
             </p>
           </div>
@@ -86,8 +86,8 @@ export default async function EnrollmentSuccessPage({
           
           <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-bold">1</span>
+              <div className="flex-shrink-0 w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-brand-blue-600 font-bold">1</span>
               </div>
               <div>
                 <h3 className="font-bold text-black mb-1">
@@ -100,8 +100,8 @@ export default async function EnrollmentSuccessPage({
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-bold">2</span>
+              <div className="flex-shrink-0 w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-brand-blue-600 font-bold">2</span>
               </div>
               <div>
                 <h3 className="font-bold text-black mb-1">
@@ -114,8 +114,8 @@ export default async function EnrollmentSuccessPage({
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                <span className="text-blue-600 font-bold">3</span>
+              <div className="flex-shrink-0 w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                <span className="text-brand-blue-600 font-bold">3</span>
               </div>
               <div>
                 <h3 className="font-bold text-black mb-1">
@@ -140,7 +140,7 @@ export default async function EnrollmentSuccessPage({
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/support"
-              className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-colors"
+              className="inline-flex items-center justify-center bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-bold transition-colors"
             >
               Call support center
             </a>

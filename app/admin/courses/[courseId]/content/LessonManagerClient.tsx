@@ -158,7 +158,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
         </div>
         <div className="flex gap-3">
           <Link href="/admin/course-builder" className="px-4 py-2 border rounded-lg hover:bg-gray-50">Back to Courses</Link>
-          <button onClick={openCreateModal} className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2">
+          <button onClick={openCreateModal} className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 flex items-center gap-2">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
             Add Lesson
           </button>
@@ -216,7 +216,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
                 </span>
                 <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-gray-100">
                   {lesson.video_url ? (
-                    <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <svg className="w-5 h-5 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   ) : (
                     <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                   )}
@@ -236,7 +236,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
           ) : (
             <div className="p-8 text-center text-gray-500">
               <p>No lessons yet</p>
-              <button onClick={openCreateModal} className="mt-2 text-blue-600 hover:text-blue-800">Add your first lesson</button>
+              <button onClick={openCreateModal} className="mt-2 text-brand-blue-600 hover:text-brand-blue-800">Add your first lesson</button>
             </div>
           )}
         </div>
@@ -260,7 +260,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="e.g., Introduction to Hair Cutting Techniques"
                 />
               </div>
@@ -270,7 +270,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
                   type="url"
                   value={formData.video_url}
                   onChange={(e) => setFormData({ ...formData, video_url: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="https://youtube.com/watch?v=... or Vimeo URL"
                 />
                 <p className="text-xs text-gray-500 mt-1">Leave empty for text-only lesson</p>
@@ -281,7 +281,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
                   rows={6}
                   value={formData.content}
                   onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="Lesson content, instructions, or notes..."
                 />
               </div>
@@ -292,7 +292,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
                   min="0"
                   value={formData.duration_minutes}
                   onChange={(e) => setFormData({ ...formData, duration_minutes: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="e.g., 15"
                 />
               </div>
@@ -300,7 +300,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
                 <button type="button" onClick={() => { setShowModal(false); resetForm(); }} className="flex-1 px-4 py-2 border rounded-lg hover:bg-gray-50">
                   Cancel
                 </button>
-                <button type="submit" disabled={loading} className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50">
+                <button type="submit" disabled={loading} className="flex-1 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50">
                   {loading ? 'Saving...' : (editingLesson ? 'Update Lesson' : 'Add Lesson')}
                 </button>
               </div>

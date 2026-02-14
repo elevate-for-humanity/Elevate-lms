@@ -280,7 +280,7 @@ export function LessonSidebar({
                 <button
                   type="button"
                   onClick={() => seekTo(b.position_seconds)}
-                  className="text-left text-[11px] text-blue-700 hover:underline"
+                  className="text-left text-[11px] text-brand-blue-700 hover:underline"
                 >
                   {b.label || "Bookmark"} • {formatTime(b.position_seconds)}
                 </button>
@@ -318,7 +318,7 @@ export function LessonSidebar({
           <button
             type="button"
             onClick={handleAddNote}
-            className="rounded-full bg-blue-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-blue-700"
+            className="rounded-full bg-brand-blue-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-brand-blue-700"
           >
             Save note
           </button>
@@ -336,7 +336,7 @@ export function LessonSidebar({
                     <button
                       type="button"
                       onClick={() => seekTo(n.position_seconds!)}
-                      className="text-blue-700 hover:underline"
+                      className="text-brand-blue-700 hover:underline"
                     >
                       {formatTime(n.position_seconds!)}
                     </button>
@@ -450,7 +450,7 @@ export function LessonSidebar({
                         answerForQuestion === q.id ? null : q.id
                       )
                     }
-                    className="mt-1 text-[10px] font-semibold text-blue-700 hover:underline"
+                    className="mt-1 text-[10px] font-semibold text-brand-blue-700 hover:underline"
                   >
                     {answerForQuestion === q.id
                       ? "Cancel"
@@ -468,7 +468,7 @@ export function LessonSidebar({
                       <button
                         type="button"
                         onClick={() => handleAnswerQuestion(q.id)}
-                        className="rounded-full bg-blue-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-blue-700"
+                        className="rounded-full bg-brand-blue-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-brand-blue-700"
                       >
                         Post answer
                       </button>

@@ -252,11 +252,11 @@ export default function ComplianceAuditPage() {
                       </p>
                       <p className="text-sm text-green-600">Workforce-Funded</p>
                     </div>
-                    <div className="p-4 bg-blue-50 rounded-lg">
-                      <p className="text-2xl font-bold text-blue-700">
+                    <div className="p-4 bg-brand-blue-50 rounded-lg">
+                      <p className="text-2xl font-bold text-brand-blue-700">
                         {selectedAudit.employer_sponsored_count}
                       </p>
-                      <p className="text-sm text-blue-600">Employer-Sponsored</p>
+                      <p className="text-sm text-brand-blue-600">Employer-Sponsored</p>
                     </div>
                     <div className="p-4 bg-slate-50 rounded-lg">
                       <p className="text-2xl font-bold text-slate-700">

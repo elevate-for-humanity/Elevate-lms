@@ -302,7 +302,7 @@ export default function AdminApprenticeships() {
                             apprenticeship.status === 'active'
                               ? 'bg-brand-green-100 text-green-800'
                               : apprenticeship.status === 'completed'
-                                ? 'bg-blue-100 text-blue-800'
+                                ? 'bg-brand-blue-100 text-brand-blue-800'
                                 : 'bg-gray-100 text-black'
                           }`}
                         >
@@ -312,7 +312,7 @@ export default function AdminApprenticeships() {
                       <td className="px-6 py-4">
                         <Link
                           href={`/admin/apprenticeships/${apprenticeship.id}`}
-                          className="text-brand-blue-600 hover:text-blue-800 font-medium"
+                          className="text-brand-blue-600 hover:text-brand-blue-800 font-medium"
                         >
                           View Details
                         </Link>

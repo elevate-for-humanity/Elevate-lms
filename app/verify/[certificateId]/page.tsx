@@ -247,9 +247,9 @@ export default async function VerifyCertificatePage({
             </div>
 
             {/* Issuer Information */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-              <h3 className="font-bold text-blue-900 mb-3">About the Issuer</h3>
-              <div className="space-y-2 text-blue-800 text-sm">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-6">
+              <h3 className="font-bold text-brand-blue-900 mb-3">About the Issuer</h3>
+              <div className="space-y-2 text-brand-blue-800 text-sm">
                 <p>
                   <strong>Organization:</strong> Elevate For Humanity
                 </p>
@@ -268,7 +268,7 @@ export default async function VerifyCertificatePage({
                       process.env.NEXT_PUBLIC_SITE_URL ||
                       'https://elevateforhumanity.com'
                     }
-                    className="underline hover:text-blue-900"
+                    className="underline hover:text-brand-blue-900"
                     target="_blank"
                     rel="noopener noreferrer"
                   >

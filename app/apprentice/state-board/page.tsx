@@ -81,7 +81,7 @@ export default async function StateBoardExamPage() {
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold text-black flex items-center gap-3">
-            <Award className="w-8 h-8 text-blue-600" />
+            <Award className="w-8 h-8 text-brand-blue-600" />
             Indiana State Board Exam
           </h1>
           <p className="text-slate-600 mt-1">
@@ -174,7 +174,7 @@ export default async function StateBoardExamPage() {
               ) : (
                 <Link
                   href="/lms/progress"
-                  className="px-3 py-2 bg-blue-100 text-blue-700 text-sm font-semibold rounded-full hover:bg-blue-200"
+                  className="px-3 py-2 bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold rounded-full hover:bg-brand-blue-200"
                 >
                   Access Milady →
                 </Link>
@@ -238,16 +238,16 @@ export default async function StateBoardExamPage() {
                   href={examInfo.examProviderUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block p-6 bg-blue-50 border-2 border-blue-200 rounded-xl hover:border-blue-400 transition-all group"
+                  className="block p-6 bg-brand-blue-50 border-2 border-brand-blue-200 rounded-xl hover:border-brand-blue-400 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-bold text-blue-900">Schedule Exam</h4>
-                    <ExternalLink className="w-5 h-5 text-blue-600 group-hover:translate-x-1 transition-transform" />
+                    <h4 className="font-bold text-brand-blue-900">Schedule Exam</h4>
+                    <ExternalLink className="w-5 h-5 text-brand-blue-600 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <p className="text-sm text-blue-700 mb-3">
+                  <p className="text-sm text-brand-blue-700 mb-3">
                     Register and schedule your written and practical exams through {examInfo.examProvider}.
                   </p>
-                  <div className="text-blue-600 font-semibold text-sm flex items-center gap-1">
+                  <div className="text-brand-blue-600 font-semibold text-sm flex items-center gap-1">
                     Go to {examInfo.examProvider} <ArrowRight className="w-4 h-4" />
                   </div>
                 </a>
@@ -257,16 +257,16 @@ export default async function StateBoardExamPage() {
                   href={examInfo.applicationUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block p-6 bg-blue-50 border-2 border-blue-200 rounded-xl hover:border-blue-400 transition-all group"
+                  className="block p-6 bg-brand-blue-50 border-2 border-brand-blue-200 rounded-xl hover:border-brand-blue-400 transition-all group"
                 >
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="font-bold text-blue-900">License Application</h4>
-                    <ExternalLink className="w-5 h-5 text-blue-600 group-hover:translate-x-1 transition-transform" />
+                    <h4 className="font-bold text-brand-blue-900">License Application</h4>
+                    <ExternalLink className="w-5 h-5 text-brand-blue-600 group-hover:translate-x-1 transition-transform" />
                   </div>
-                  <p className="text-sm text-blue-700 mb-3">
+                  <p className="text-sm text-brand-blue-700 mb-3">
                     Apply for your Indiana license through the IPLA MyLicense portal.
                   </p>
-                  <div className="text-blue-600 font-semibold text-sm flex items-center gap-1">
+                  <div className="text-brand-blue-600 font-semibold text-sm flex items-center gap-1">
                     Go to MyLicense.IN.gov <ArrowRight className="w-4 h-4" />
                   </div>
                 </a>
@@ -327,7 +327,7 @@ export default async function StateBoardExamPage() {
             </p>
             <Link
               href="/lms/progress"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700"
             >
               View My Progress <ArrowRight className="w-4 h-4" />
             </Link>
@@ -360,13 +360,13 @@ export default async function StateBoardExamPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href="/support"
-              className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium hover:bg-blue-200"
+              className="px-4 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-lg font-medium hover:bg-brand-blue-200"
             >
               Call: 317-314-3757
             </a>
             <a
               href="mailto:elevate4humanityedu@gmail.com"
-              className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg font-medium hover:bg-blue-200"
+              className="px-4 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-lg font-medium hover:bg-brand-blue-200"
             >
               Email Support
             </a>

@@ -31,7 +31,7 @@ const TYPE_ICONS = {
 };
 
 const TYPE_COLORS = {
-  program: 'text-blue-600 bg-blue-100',
+  program: 'text-brand-blue-600 bg-brand-blue-100',
   course: 'text-green-600 bg-green-100',
   article: 'text-purple-600 bg-purple-100',
   user: 'text-orange-600 bg-orange-100',
@@ -240,7 +240,7 @@ export function SearchBar({ placeholder = "Search programs, courses...", classNa
           onFocus={() => setIsOpen(true)}
           onBlur={() => setTimeout(() => setIsOpen(false), 200)}
           onKeyDown={handleKeyDown}
-          className="pl-10 pr-10 py-2 w-full md:w-72 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          className="pl-10 pr-10 py-2 w-full md:w-72 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent text-sm"
           aria-label="Search"
           aria-expanded={isOpen}
           aria-controls="search-results"
@@ -256,7 +256,7 @@ export function SearchBar({ placeholder = "Search programs, courses...", classNa
           </button>
         )}
         {loading && (
-          <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-blue-500 animate-spin" />
+          <Loader2 className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-brand-blue-500 animate-spin" />
         )}
       </div>
 
@@ -284,7 +284,7 @@ export function SearchBar({ placeholder = "Search programs, courses...", classNa
                     href={result.href}
                     onClick={() => handleResultClick(result)}
                     className={`flex items-start gap-3 px-4 py-3 hover:bg-gray-50 transition ${
-                      isSelected ? 'bg-blue-50' : ''
+                      isSelected ? 'bg-brand-blue-50' : ''
                     }`}
                     role="option"
                     aria-selected={isSelected}
@@ -320,7 +320,7 @@ export function SearchBar({ placeholder = "Search programs, courses...", classNa
               <p className="text-gray-500">No results found for "{query}"</p>
               <Link
                 href={`/search?q=${encodeURIComponent(query)}`}
-                className="text-sm text-blue-600 hover:underline mt-2 inline-block"
+                className="text-sm text-brand-blue-600 hover:underline mt-2 inline-block"
               >
                 View all search results
               </Link>
@@ -336,7 +336,7 @@ export function SearchBar({ placeholder = "Search programs, courses...", classNa
                 </span>
                 <button
                   onClick={clearRecentSearches}
-                  className="text-blue-600 hover:text-blue-800 normal-case font-normal"
+                  className="text-brand-blue-600 hover:text-brand-blue-800 normal-case font-normal"
                 >
                   Clear
                 </button>
@@ -348,7 +348,7 @@ export function SearchBar({ placeholder = "Search programs, courses...", classNa
                     key={search}
                     onClick={() => setQuery(search)}
                     className={`w-full text-left px-4 py-2 hover:bg-gray-50 flex items-center gap-2 ${
-                      isSelected ? 'bg-blue-50' : ''
+                      isSelected ? 'bg-brand-blue-50' : ''
                     }`}
                     role="option"
                     aria-selected={isSelected}
@@ -384,7 +384,7 @@ export function SearchBar({ placeholder = "Search programs, courses...", classNa
             <div className="border-t border-gray-100 p-2 bg-gray-50">
               <Link
                 href={`/search?q=${encodeURIComponent(query)}`}
-                className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 hover:bg-white rounded-lg transition"
+                className="flex items-center justify-center gap-2 px-3 py-2 text-sm font-medium text-brand-blue-600 hover:bg-white rounded-lg transition"
               >
                 <Search className="w-4 h-4" />
                 Search all for "{query}"

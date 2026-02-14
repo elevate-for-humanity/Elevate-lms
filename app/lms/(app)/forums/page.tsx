@@ -127,7 +127,7 @@ export default async function ForumsPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-              <MessageSquare className="w-8 h-8 text-blue-600" />
+              <MessageSquare className="w-8 h-8 text-brand-blue-600" />
               Discussion Forums
             </h1>
             <p className="text-gray-600 mt-1">
@@ -140,10 +140,10 @@ export default async function ForumsPage() {
               <input
                 type="text"
                 placeholder="Search forums..."
-                className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
               <Plus className="w-5 h-5" />
               New Topic
             </button>
@@ -159,18 +159,18 @@ export default async function ForumsPage() {
                 <Link
                   key={index}
                   href={`/lms/forums/${category.name.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="block bg-white rounded-xl p-6 shadow-sm border hover:border-blue-300 hover:shadow-md transition-all"
+                  className="block bg-white rounded-xl p-6 shadow-sm border hover:border-brand-blue-300 hover:shadow-md transition-all"
                 >
                   <div className="flex items-start gap-4">
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                      category.color === 'blue' ? 'bg-blue-100' :
+                      category.color === 'blue' ? 'bg-brand-blue-100' :
                       category.color === 'green' ? 'bg-green-100' :
-                      category.color === 'blue' ? 'bg-blue-100' : 'bg-orange-100'
+                      category.color === 'blue' ? 'bg-brand-blue-100' : 'bg-orange-100'
                     }`}>
                       <category.icon className={`w-6 h-6 ${
-                        category.color === 'blue' ? 'text-blue-600' :
+                        category.color === 'blue' ? 'text-brand-blue-600' :
                         category.color === 'green' ? 'text-green-600' :
-                        category.color === 'blue' ? 'text-blue-600' : 'text-orange-600'
+                        category.color === 'blue' ? 'text-brand-blue-600' : 'text-orange-600'
                       }`} />
                     </div>
                     <div className="flex-1">
@@ -200,7 +200,7 @@ export default async function ForumsPage() {
                 >
                   <div className="flex items-start gap-2">
                     {topic.pinned && (
-                      <Pin className="w-4 h-4 text-blue-600 flex-shrink-0 mt-1" />
+                      <Pin className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-1" />
                     )}
                     <div className="flex-1 min-w-0">
                       <h4 className="font-medium text-gray-900 text-sm truncate">

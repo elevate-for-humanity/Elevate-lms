@@ -156,7 +156,7 @@ export default function AdminProgramHolderDocuments() {
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Program Holder Documents" }]} />
         </div>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4" />
           <p className="text-black">Loading documents...</p>
         </div>
       </div>
@@ -207,7 +207,7 @@ export default function AdminProgramHolderDocuments() {
                 onClick={() => setFilter(tab.key as any)}
                 className={`px-6 py-4 font-medium transition ${
                   filter === tab.key
-                    ? 'border-b-2 border-blue-600 text-blue-600'
+                    ? 'border-b-2 border-brand-blue-600 text-brand-blue-600'
                     : 'text-black hover:text-black'
                 }`}
               >
@@ -236,7 +236,7 @@ export default function AdminProgramHolderDocuments() {
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-start gap-4 flex-1">
                     <FileText
-                      className="text-blue-600 flex-shrink-0 mt-1"
+                      className="text-brand-blue-600 flex-shrink-0 mt-1"
                       size={32}
                     />
                     <div className="flex-1">
@@ -275,7 +275,7 @@ export default function AdminProgramHolderDocuments() {
                       href={doc.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                      className="text-brand-blue-600 hover:text-brand-blue-700 font-medium flex items-center gap-1"
                     >
                       <Download size={16} />
                       View
@@ -305,7 +305,7 @@ export default function AdminProgramHolderDocuments() {
                             setApprovalNotes(e.target.value);
                           }}
                           rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                           placeholder="Add notes about your decision..."
                         />
                       </div>

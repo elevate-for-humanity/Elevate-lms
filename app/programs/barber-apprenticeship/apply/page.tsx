@@ -310,7 +310,7 @@ export default function BarberApprenticeshipApplyPage() {
           
           {/* Left Column - Payment Calculator */}
           <div className="lg:col-span-2">
-            <div className="bg-blue-600 rounded-2xl p-6 text-white sticky top-8">
+            <div className="bg-brand-blue-600 rounded-2xl p-6 text-white sticky top-8">
               <div className="flex items-center gap-3 mb-4">
                 <Calculator className="w-6 h-6" />
                 <h2 className="text-lg font-bold">Payment Calculator</h2>
@@ -318,7 +318,7 @@ export default function BarberApprenticeshipApplyPage() {
 
               <div className="space-y-4 mb-6">
                 <div>
-                  <label className="block text-sm font-medium text-blue-200 mb-2">
+                  <label className="block text-sm font-medium text-brand-blue-200 mb-2">
                     Transfer Hours (if any)
                   </label>
                   <input
@@ -334,13 +334,13 @@ export default function BarberApprenticeshipApplyPage() {
                     className="w-full px-4 py-3 bg-white/20 border border-white/30 rounded-lg text-white placeholder-white/50"
                     placeholder="0"
                   />
-                  <p className="text-xs text-blue-200 mt-1">
+                  <p className="text-xs text-brand-blue-200 mt-1">
                     Have documented hours from another program?
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-blue-200 mb-2">
+                  <label className="block text-sm font-medium text-brand-blue-200 mb-2">
                     Hours Per Week
                   </label>
                   <select
@@ -361,11 +361,11 @@ export default function BarberApprenticeshipApplyPage() {
               <div className="bg-white/10 rounded-xl p-4 mb-4">
                 <div className="grid grid-cols-2 gap-4 text-center">
                   <div>
-                    <div className="text-blue-200 text-xs uppercase mb-1">Remaining Hours</div>
+                    <div className="text-brand-blue-200 text-xs uppercase mb-1">Remaining Hours</div>
                     <div className="text-2xl font-black">{remainingHours.toLocaleString()}</div>
                   </div>
                   <div>
-                    <div className="text-blue-200 text-xs uppercase mb-1">Est. Duration</div>
+                    <div className="text-brand-blue-200 text-xs uppercase mb-1">Est. Duration</div>
                     <div className="text-2xl font-black">~{weeks} weeks</div>
                   </div>
                 </div>
@@ -374,7 +374,7 @@ export default function BarberApprenticeshipApplyPage() {
               {/* Pricing */}
               <div className="bg-white/10 rounded-xl p-4">
                 <div className="text-center">
-                  <div className="text-blue-200 text-xs uppercase mb-1">Program Tuition</div>
+                  <div className="text-brand-blue-200 text-xs uppercase mb-1">Program Tuition</div>
                   <div className="text-3xl font-black">${PRICING.fullPrice.toLocaleString()}</div>
                 </div>
               </div>
@@ -392,14 +392,14 @@ export default function BarberApprenticeshipApplyPage() {
 
               {/* If not approved for full BNPL */}
               <div className="bg-white/10 rounded-xl p-3 mt-4">
-                <p className="text-xs text-blue-200 text-center">
+                <p className="text-xs text-brand-blue-200 text-center">
                   If BNPL partially approved, remaining balance split into ~{weeks} weekly payments of ${weeklyDollars.toFixed(2)}
                 </p>
               </div>
 
               <div className="mt-4 flex items-start gap-2">
-                <Info className="w-4 h-4 text-blue-200 flex-shrink-0 mt-0.5" />
-                <p className="text-xs text-blue-200">
+                <Info className="w-4 h-4 text-brand-blue-200 flex-shrink-0 mt-0.5" />
+                <p className="text-xs text-brand-blue-200">
                   Transfer hours reduce program duration, not tuition cost.
                 </p>
               </div>
@@ -443,7 +443,7 @@ export default function BarberApprenticeshipApplyPage() {
                       required
                       value={formData.firstName}
                       onChange={(e) => updateField('firstName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="First name"
                     />
                   </div>
@@ -456,7 +456,7 @@ export default function BarberApprenticeshipApplyPage() {
                       required
                       value={formData.lastName}
                       onChange={(e) => updateField('lastName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="Last name"
                     />
                   </div>
@@ -472,7 +472,7 @@ export default function BarberApprenticeshipApplyPage() {
                     required
                     value={formData.email}
                     onChange={(e) => updateField('email', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="your@email.com"
                   />
                 </div>
@@ -486,7 +486,7 @@ export default function BarberApprenticeshipApplyPage() {
                     required
                     value={formData.phone}
                     onChange={(e) => updateField('phone', e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="(317) 555-0123"
                   />
                 </div>
@@ -538,7 +538,7 @@ export default function BarberApprenticeshipApplyPage() {
                         value="yes"
                         checked={formData.hasHostShop === 'yes'}
                         onChange={(e) => updateField('hasHostShop', e.target.value)}
-                        className="w-4 h-4 text-blue-600"
+                        className="w-4 h-4 text-brand-blue-600"
                       />
                       <span className="text-black">Yes, I have a shop</span>
                     </label>
@@ -549,7 +549,7 @@ export default function BarberApprenticeshipApplyPage() {
                         value="no"
                         checked={formData.hasHostShop === 'no'}
                         onChange={(e) => updateField('hasHostShop', e.target.value)}
-                        className="w-4 h-4 text-blue-600"
+                        className="w-4 h-4 text-brand-blue-600"
                       />
                       <span className="text-black">No, I need help finding one</span>
                     </label>
@@ -565,7 +565,7 @@ export default function BarberApprenticeshipApplyPage() {
                       type="text"
                       value={formData.hostShopName}
                       onChange={(e) => updateField('hostShopName', e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="Name of the barbershop"
                     />
                   </div>
@@ -625,7 +625,7 @@ export default function BarberApprenticeshipApplyPage() {
                     onClick={() => setPaymentOption('custom')}
                     className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
                       paymentOption === 'custom' 
-                        ? 'border-blue-600 bg-blue-50' 
+                        ? 'border-brand-blue-600 bg-brand-blue-50' 
                         : 'border-gray-300 bg-white hover:border-gray-400'
                     }`}
                   >
@@ -635,14 +635,14 @@ export default function BarberApprenticeshipApplyPage() {
                         <p className="text-black text-sm">Pay what you can today (min ${Math.round(PRICING.fullPrice * 0.35).toLocaleString()})</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-blue-600 text-lg">You Choose</p>
+                        <p className="font-bold text-brand-blue-600 text-lg">You Choose</p>
                       </div>
                     </div>
                   </button>
 
                   {/* Custom Amount Input */}
                   {paymentOption === 'custom' && (
-                    <div className="bg-blue-50 rounded-xl p-4 mb-3 border-2 border-blue-200">
+                    <div className="bg-brand-blue-50 rounded-xl p-4 mb-3 border-2 border-brand-blue-200">
                       <label className="block text-sm font-medium text-black mb-2">
                         Enter your payment amount (min ${Math.round(PRICING.fullPrice * 0.35).toLocaleString()})
                       </label>
@@ -662,7 +662,7 @@ export default function BarberApprenticeshipApplyPage() {
                             if (customAmount < min) setCustomAmount(min);
                             if (customAmount > PRICING.fullPrice) setCustomAmount(PRICING.fullPrice);
                           }}
-                          className="w-full px-4 py-3 text-2xl font-bold border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-4 py-3 text-2xl font-bold border-2 border-brand-blue-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                         />
                       </div>
                       <p className="text-sm text-black mt-2">
@@ -677,7 +677,7 @@ export default function BarberApprenticeshipApplyPage() {
                     onClick={() => setPaymentOption('affirm')}
                     className={`w-full p-4 rounded-xl border-2 mb-3 text-left transition ${
                       paymentOption === 'affirm' 
-                        ? 'border-blue-600 bg-blue-50' 
+                        ? 'border-brand-blue-600 bg-brand-blue-50' 
                         : 'border-gray-300 bg-white hover:border-gray-400'
                     }`}
                   >
@@ -687,7 +687,7 @@ export default function BarberApprenticeshipApplyPage() {
                         <p className="text-black text-sm">Pay over time</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold text-blue-600 text-lg">You Choose</p>
+                        <p className="font-bold text-brand-blue-600 text-lg">You Choose</p>
                         <p className="text-xs text-black">min ${PRICING.setupFee.toLocaleString()}</p>
                       </div>
                     </div>
@@ -695,7 +695,7 @@ export default function BarberApprenticeshipApplyPage() {
 
                   {/* Affirm Amount Input */}
                   {paymentOption === 'affirm' && (
-                    <div className="bg-blue-50 rounded-xl p-4 mb-3 border-2 border-blue-200">
+                    <div className="bg-brand-blue-50 rounded-xl p-4 mb-3 border-2 border-brand-blue-200">
                       <label className="block text-sm font-medium text-black mb-2">
                         How much do you want to finance with Affirm? (min ${PRICING.setupFee.toLocaleString()})
                       </label>
@@ -714,7 +714,7 @@ export default function BarberApprenticeshipApplyPage() {
                             if (customAmount < PRICING.setupFee) setCustomAmount(PRICING.setupFee);
                             if (customAmount > PRICING.fullPrice) setCustomAmount(PRICING.fullPrice);
                           }}
-                          className="w-full px-4 py-3 text-2xl font-bold border-2 border-blue-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                          className="w-full px-4 py-3 text-2xl font-bold border-2 border-brand-blue-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                         />
                       </div>
                       <p className="text-sm text-black mt-2">
@@ -782,18 +782,18 @@ export default function BarberApprenticeshipApplyPage() {
                       <span className="px-3 py-1 bg-black text-white rounded-full text-xs font-bold">Card</span>
                       <span className="px-3 py-1 bg-black text-white rounded-full text-xs font-bold">Apple Pay</span>
                       <span className="px-3 py-1 bg-white text-black border border-black rounded-full text-xs font-bold">Google Pay</span>
-                      <span className="px-3 py-1 bg-blue-900 text-white rounded-full text-xs font-bold">Samsung Pay</span>
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">Link</span>
+                      <span className="px-3 py-1 bg-brand-blue-900 text-white rounded-full text-xs font-bold">Samsung Pay</span>
+                      <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 rounded-full text-xs font-bold">Link</span>
                     </div>
                     <div className="flex flex-wrap gap-2 justify-center mb-2">
                       <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-full text-xs font-bold">Klarna</span>
                       <span className="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-bold">Afterpay</span>
-                      <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-bold">Zip</span>
+                      <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 rounded-full text-xs font-bold">Zip</span>
                     </div>
                     <div className="flex flex-wrap gap-2 justify-center">
                       <span className="px-3 py-1 bg-green-500 text-white rounded-full text-xs font-bold">Cash App</span>
                       <span className="px-3 py-1 bg-orange-400 text-white rounded-full text-xs font-bold">Amazon Pay</span>
-                      <span className="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-bold">Bank (ACH)</span>
+                      <span className="px-3 py-1 bg-brand-blue-600 text-white rounded-full text-xs font-bold">Bank (ACH)</span>
                     </div>
                     <p className="text-xs text-gray-600 mt-3 text-center">
                       Payment options subject to eligibility. Terms and availability vary by provider.
@@ -805,7 +805,7 @@ export default function BarberApprenticeshipApplyPage() {
                 <button
                   onClick={handlePayNow}
                   disabled={loading || !formData.email || !formData.firstName || !formData.lastName || !formData.phone}
-                  className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
+                  className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-gray-300 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 text-lg"
                 >
                   {loading ? (
                     <>
@@ -827,10 +827,10 @@ export default function BarberApprenticeshipApplyPage() {
             </div>
 
             {/* Payment Options Notice */}
-            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-4">
-              <p className="text-blue-800 text-sm">
+            <div className="mt-6 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-4">
+              <p className="text-brand-blue-800 text-sm">
                 <strong>Have questions?</strong> Contact us for payment plan options or employer-sponsored funding.{' '}
-                <Link href="/inquiry?program=barber-apprenticeship" className="text-blue-700 font-medium hover:underline">
+                <Link href="/inquiry?program=barber-apprenticeship" className="text-brand-blue-700 font-medium hover:underline">
                   Request information →
                 </Link>
               </p>

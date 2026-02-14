@@ -51,7 +51,7 @@ export function CompactHero({
         {badge && (
           <Link
             href={badge.href}
-            className="inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700 mb-3"
+            className="inline-flex items-center gap-2 text-sm font-medium text-brand-blue-600 hover:text-brand-blue-700 mb-3"
           >
             <badge.icon className="w-4 h-4" />
             {badge.text}
@@ -71,7 +71,7 @@ export function CompactHero({
             {primaryCTA && (
               <Link
                 href={primaryCTA.href}
-                className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center justify-center rounded-lg bg-brand-blue-600 px-6 py-3 text-base font-semibold text-white hover:bg-brand-blue-700 transition-colors"
               >
                 {primaryCTA.text}
               </Link>

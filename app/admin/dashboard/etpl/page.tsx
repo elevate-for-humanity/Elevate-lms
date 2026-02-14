@@ -47,7 +47,7 @@ export default async function EtplDashboard() {
           </div>
           <Link
             href="/api/audit/export"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
           >
             <Download className="w-5 h-5" />
             Export Audit CSV
@@ -60,10 +60,10 @@ export default async function EtplDashboard() {
             Apprentice Enrollment & Outcomes
           </h2>
           <div className="grid md:grid-cols-4 gap-6">
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-blue-200">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-brand-blue-200">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                  <Users className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-black">
@@ -90,10 +90,10 @@ export default async function EtplDashboard() {
               </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-blue-200">
+            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-brand-blue-200">
               <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Circle className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                  <Circle className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
                   <div className="text-3xl font-bold text-black">
@@ -179,7 +179,7 @@ export default async function EtplDashboard() {
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white rounded-2xl p-6 shadow-lg">
             <div className="flex items-center gap-3 mb-4">
-              <Briefcase className="w-6 h-6 text-blue-600" />
+              <Briefcase className="w-6 h-6 text-brand-blue-600" />
               <h2 className="text-xl font-bold text-black">
                 Employer Onboarding
               </h2>
@@ -208,7 +208,7 @@ export default async function EtplDashboard() {
 
           <div className="bg-white rounded-2xl p-6 shadow-lg">
             <div className="flex items-center gap-3 mb-4">
-              <Award className="w-6 h-6 text-blue-600" />
+              <Award className="w-6 h-6 text-brand-blue-600" />
               <h2 className="text-xl font-bold text-black">
                 RAPIDS Tracking
               </h2>
@@ -220,7 +220,7 @@ export default async function EtplDashboard() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-black">Registered</span>
-                <span className="font-bold text-blue-600">
+                <span className="font-bold text-brand-blue-600">
                   {rapids.registered}
                 </span>
               </div>
@@ -232,7 +232,7 @@ export default async function EtplDashboard() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-black">Completed</span>
-                <span className="font-bold text-blue-600">
+                <span className="font-bold text-brand-blue-600">
                   {rapids.completed}
                 </span>
               </div>

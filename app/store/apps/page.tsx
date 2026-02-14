@@ -54,9 +54,9 @@ const apps = [
 ];
 
 const colorClasses = {
-  blue: { bg: 'bg-blue-100', text: 'text-blue-600', badge: 'bg-blue-600' },
+  blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600', badge: 'bg-brand-blue-600' },
   green: { bg: 'bg-green-100', text: 'text-green-600', badge: 'bg-green-600' },
-  blue: { bg: 'bg-blue-100', text: 'text-blue-600', badge: 'bg-blue-600' },
+  blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600', badge: 'bg-brand-blue-600' },
 };
 
 export default function AppsPage() {

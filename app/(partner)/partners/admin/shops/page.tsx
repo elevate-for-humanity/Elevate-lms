@@ -78,7 +78,7 @@ export default async function AdminShopsPage() {
                     {new Date(s.created_at).toLocaleDateString()}
                   </td>
                   <td className="py-2">
-                    <button className="text-blue-600 hover:underline text-sm">View</button>
+                    <button className="text-brand-blue-600 hover:underline text-sm">View</button>
                   </td>
                 </tr>
               ))

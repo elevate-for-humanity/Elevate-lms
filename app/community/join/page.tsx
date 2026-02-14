@@ -43,13 +43,13 @@ export default async function JoinCommunityPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative py-20 bg-blue-800 text-white overflow-hidden">
+      <section className="relative py-20 bg-brand-blue-800 text-white overflow-hidden">
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Join the Elevate Community</h1>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
             Connect with fellow learners, access exclusive resources, and accelerate your career growth.
           </p>
-          <Link href="/apply" className="inline-flex items-center gap-2 bg-white text-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition">
+          <Link href="/apply" className="inline-flex items-center gap-2 bg-white text-brand-blue-900 px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-50 transition">
             Get Started <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
@@ -62,8 +62,8 @@ export default async function JoinCommunityPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit, idx) => (
               <div key={idx} className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <benefit.icon className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <benefit.icon className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
                 <p className="text-slate-600">{benefit.description}</p>
@@ -88,8 +88,8 @@ export default async function JoinCommunityPage() {
                   </div>
                   <p className="text-slate-700 mb-4 italic">&ldquo;{testimonial.quote}&rdquo;</p>
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 font-semibold">
+                    <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-brand-blue-600 font-semibold">
                         {testimonial.name.split(' ').map((n: string) => n[0]).join('')}
                       </span>
                     </div>
@@ -113,7 +113,7 @@ export default async function JoinCommunityPage() {
             Start your journey with Elevate for Humanity today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/apply" className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition">
+            <Link href="/apply" className="bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition">
               Apply Now
             </Link>
             <Link href="/programs" className="border border-slate-300 px-8 py-4 rounded-lg font-semibold hover:bg-slate-50 transition">

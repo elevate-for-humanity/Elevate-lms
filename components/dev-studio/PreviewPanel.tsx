@@ -49,21 +49,21 @@ export default function PreviewPanel({ url = 'http://localhost:3000', filePath }
           <div className="flex gap-1 bg-white border rounded p-1">
             <button
               onClick={() => setDevice('desktop')}
-              className={`p-1 rounded ${device === 'desktop' ? 'bg-blue-100 text-blue-600' : 'text-black hover:bg-gray-100'}`}
+              className={`p-1 rounded ${device === 'desktop' ? 'bg-brand-blue-100 text-brand-blue-600' : 'text-black hover:bg-gray-100'}`}
               title="Desktop view"
             >
               <Monitor className="w-4 h-4" />
             </button>
             <button
               onClick={() => setDevice('tablet')}
-              className={`p-1 rounded ${device === 'tablet' ? 'bg-blue-100 text-blue-600' : 'text-black hover:bg-gray-100'}`}
+              className={`p-1 rounded ${device === 'tablet' ? 'bg-brand-blue-100 text-brand-blue-600' : 'text-black hover:bg-gray-100'}`}
               title="Tablet view"
             >
               <Tablet className="w-4 h-4" />
             </button>
             <button
               onClick={() => setDevice('mobile')}
-              className={`p-1 rounded ${device === 'mobile' ? 'bg-blue-100 text-blue-600' : 'text-black hover:bg-gray-100'}`}
+              className={`p-1 rounded ${device === 'mobile' ? 'bg-brand-blue-100 text-brand-blue-600' : 'text-black hover:bg-gray-100'}`}
               title="Mobile view"
             >
               <Smartphone className="w-4 h-4" />

@@ -45,7 +45,7 @@ export default async function GrantIntakePage() {
         <div className="mb-8">
           <Link
             href="/admin/grants"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Grants
           </Link>
@@ -72,7 +72,7 @@ export default async function GrantIntakePage() {
               <input
                 type="text"
                 placeholder="e.g., WIOA Youth Program Grant 2024"
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
               />
             </div>
 
@@ -83,7 +83,7 @@ export default async function GrantIntakePage() {
               <input
                 type="text"
                 placeholder="e.g., Indiana Department of Workforce Development"
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
               />
             </div>
 
@@ -97,7 +97,7 @@ export default async function GrantIntakePage() {
                   <input
                     type="number"
                     placeholder="0.00"
-                    className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>
@@ -106,7 +106,7 @@ export default async function GrantIntakePage() {
                 <label className="block text-sm font-medium text-black mb-2">
                   Grant Type
                 </label>
-                <select className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500">
                   <option value="">Select type</option>
                   <option value="wioa">WIOA</option>
                   <option value="wrg">WRG</option>
@@ -125,7 +125,7 @@ export default async function GrantIntakePage() {
                 </label>
                 <input
                   type="date"
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                 />
               </div>
 
@@ -133,7 +133,7 @@ export default async function GrantIntakePage() {
                 <label className="block text-sm font-medium text-black mb-2">
                   Grant Period
                 </label>
-                <select className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+                <select className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500">
                   <option value="">Select period</option>
                   <option value="1year">1 Year</option>
                   <option value="2year">2 Years</option>
@@ -150,7 +150,7 @@ export default async function GrantIntakePage() {
               <textarea
                 rows={4}
                 placeholder="Describe the grant purpose, requirements, and goals..."
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
               />
             </div>
 
@@ -161,7 +161,7 @@ export default async function GrantIntakePage() {
               <textarea
                 rows={3}
                 placeholder="Who will this grant serve? (e.g., Youth ages 16-24, Justice-involved individuals)"
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
               />
             </div>
 

@@ -57,7 +57,7 @@ export default function CertificatesPage() {
       <section className="py-20 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl shadow-xl p-8 md:p-12 text-center">
-            <Shield className="h-16 w-16 text-blue-600 mx-auto mb-6" />
+            <Shield className="h-16 w-16 text-brand-blue-600 mx-auto mb-6" />
             <h2 className="text-3xl font-black text-black mb-4">
               Verify a Certificate
             </h2>
@@ -69,9 +69,9 @@ export default function CertificatesPage() {
               <input
                 type="text"
                 placeholder="Enter Certificate ID (e.g., EFH-2024-12345)"
-                className="flex-1 px-6 py-4 border-2 border-gray-300 rounded-xl text-black focus:border-blue-600 focus:outline-none"
+                className="flex-1 px-6 py-4 border-2 border-gray-300 rounded-xl text-black focus:border-brand-blue-600 focus:outline-none"
               />
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-xl font-bold transition-colors flex items-center justify-center gap-2" aria-label="Action button">
+              <button className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-xl font-bold transition-colors flex items-center justify-center gap-2" aria-label="Action button">
                 <Search className="h-5 w-5" />
                 Verify
               </button>
@@ -85,7 +85,7 @@ export default function CertificatesPage() {
                   href="https://www.ssa.gov"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 font-semibold"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                 >
                   SSA.gov
                 </a>
@@ -94,7 +94,7 @@ export default function CertificatesPage() {
                   href="https://www.irs.gov/tax-professionals"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 font-semibold"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                 >
                   IRS.gov
                 </a>
@@ -103,7 +103,7 @@ export default function CertificatesPage() {
                   href="https://www.dol.gov"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 font-semibold"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                 >
                   DOL.gov
                 </a>
@@ -112,7 +112,7 @@ export default function CertificatesPage() {
                   href="https://www.in.gov/pla"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-600 hover:text-blue-700 font-semibold"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                 >
                   Indiana PLA
                 </a>
@@ -228,7 +228,7 @@ export default function CertificatesPage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
-              <Building2 className="h-12 w-12 text-blue-600 mb-4" />
+              <Building2 className="h-12 w-12 text-brand-blue-600 mb-4" />
               <h3 className="text-lg font-bold text-black mb-2">SSA</h3>
               <p className="text-sm text-black mb-3">
                 Social Security Administration
@@ -237,7 +237,7 @@ export default function CertificatesPage() {
                 href="https://www.ssa.gov"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 ssa.gov →
               </a>
@@ -253,14 +253,14 @@ export default function CertificatesPage() {
                 href="https://www.irs.gov/tax-professionals/enrolled-agents"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 irs.gov →
               </a>
             </div>
 
             <div className="bg-white border-2 border-gray-200 rounded-xl p-6">
-              <GraduationCap className="h-12 w-12 text-blue-600 mb-4" />
+              <GraduationCap className="h-12 w-12 text-brand-blue-600 mb-4" />
               <h3 className="text-lg font-bold text-black mb-2">DOL</h3>
               <p className="text-sm text-black mb-3">
                 Department of Labor - Apprenticeship Programs
@@ -269,7 +269,7 @@ export default function CertificatesPage() {
                 href="https://www.dol.gov/apprenticeship"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 dol.gov →
               </a>
@@ -285,7 +285,7 @@ export default function CertificatesPage() {
                 href="https://www.fmcsa.dot.gov"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 fmcsa.dot.gov →
               </a>
@@ -301,7 +301,7 @@ export default function CertificatesPage() {
                 href="https://www.hhs.gov"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 hhs.gov →
               </a>
@@ -317,7 +317,7 @@ export default function CertificatesPage() {
                 href="https://www.dol.gov/agencies/eta/wioa"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 WIOA Programs →
               </a>
@@ -333,7 +333,7 @@ export default function CertificatesPage() {
                 href="https://www.credentialingexcellence.org/ncca"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 Accreditation →
               </a>
@@ -351,7 +351,7 @@ export default function CertificatesPage() {
                 href="https://www.in.gov/pla"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 Indiana PLA →
               </a>
@@ -371,8 +371,8 @@ export default function CertificatesPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-11 w-11 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-11 w-11 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
                 Industry Recognized
@@ -396,8 +396,8 @@ export default function CertificatesPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="h-11 w-11 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award className="h-11 w-11 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
                 Career Advancement

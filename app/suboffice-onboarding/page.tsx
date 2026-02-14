@@ -56,7 +56,7 @@ export default function SubofficeOnboardingPage() {
       </section>
 
       {/* How You Get Paid - CRITICAL */}
-      <section className="py-16 bg-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4">
           <div className="text-center mb-12">
             <DollarSign className="w-16 h-16 mx-auto mb-4" />
@@ -109,25 +109,25 @@ export default function SubofficeOnboardingPage() {
             </h4>
             <div className="space-y-3">
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-white text-blue-900 rounded-full flex items-center justify-center font-bold mr-3">
+                <div className="w-8 h-8 bg-white text-brand-blue-900 rounded-full flex items-center justify-center font-bold mr-3">
                   1
                 </div>
                 <span>Client files tax return</span>
               </div>
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-white text-blue-900 rounded-full flex items-center justify-center font-bold mr-3">
+                <div className="w-8 h-8 bg-white text-brand-blue-900 rounded-full flex items-center justify-center font-bold mr-3">
                   2
                 </div>
                 <span>IRS reviews and processes return</span>
               </div>
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-white text-blue-900 rounded-full flex items-center justify-center font-bold mr-3">
+                <div className="w-8 h-8 bg-white text-brand-blue-900 rounded-full flex items-center justify-center font-bold mr-3">
                   3
                 </div>
                 <span>IRS releases refund to client</span>
               </div>
               <div className="flex items-center">
-                <div className="w-8 h-8 bg-white text-blue-900 rounded-full flex items-center justify-center font-bold mr-3">
+                <div className="w-8 h-8 bg-white text-brand-blue-900 rounded-full flex items-center justify-center font-bold mr-3">
                   4
                 </div>
                 <span>Payment released to main office</span>
@@ -165,8 +165,8 @@ export default function SubofficeOnboardingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Step 1 */}
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Building2 className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Building2 className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3 text-center">
                 Step 1: Business Info
@@ -203,8 +203,8 @@ export default function SubofficeOnboardingPage() {
 
             {/* Step 3 */}
             <div className="bg-white p-8 rounded-lg shadow-md">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Users className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3 text-center">
                 Step 3: Staff & Payroll
@@ -341,7 +341,7 @@ export default function SubofficeOnboardingPage() {
           <div className="mt-8 text-center">
             <Link
               href="/suboffice-onboarding/payout-policy.pdf"
-              className="text-blue-600 hover:text-blue-800 font-semibold underline"
+              className="text-brand-blue-600 hover:text-brand-blue-800 font-semibold underline"
               target="_blank"
             >
               Download Complete Payout Policy (PDF)
@@ -351,7 +351,7 @@ export default function SubofficeOnboardingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Get Started?

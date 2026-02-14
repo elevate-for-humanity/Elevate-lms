@@ -39,7 +39,7 @@ export default function FileTree({ files, onFileSelect, selectedFile }: FileTree
       <div key={node.path}>
         <div
           className={`flex items-center gap-2 px-2 py-2 cursor-pointer hover:bg-gray-100 ${
-            isSelected ? 'bg-blue-50 text-blue-700' : ''
+            isSelected ? 'bg-brand-blue-50 text-brand-blue-700' : ''
           }`}
           style={{ paddingLeft: `${level * 16 + 8}px` }}
           onClick={() => {
@@ -57,7 +57,7 @@ export default function FileTree({ files, onFileSelect, selectedFile }: FileTree
               ) : (
                 <ChevronRight className="w-4 h-4" />
               )}
-              <Folder className="w-4 h-4 text-blue-500" />
+              <Folder className="w-4 h-4 text-brand-blue-500" />
             </>
           ) : (
             <>

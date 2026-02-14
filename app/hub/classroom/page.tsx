@@ -61,7 +61,7 @@ export default async function ClassroomPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {enrollments.map((enrollment: any) => (
                 <div key={enrollment.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition">
-                  <div className="h-40 bg-blue-500 flex items-center justify-center">
+                  <div className="h-40 bg-brand-blue-500 flex items-center justify-center">
                     <BookOpen className="w-16 h-16 text-white/50" />
                   </div>
                   <div className="p-6">

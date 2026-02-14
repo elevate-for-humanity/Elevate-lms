@@ -35,7 +35,7 @@ export const Input = React.forwardRef<HTMLInputElement, InputProps>(
       ? 'border-red-500 focus:border-red-500 focus:ring-red-500'
       : success
       ? 'border-green-500 focus:border-green-500 focus:ring-green-500'
-      : 'border-slate-300 focus:border-orange-500 focus:ring-blue-500';
+      : 'border-slate-300 focus:border-orange-500 focus:ring-brand-blue-500';
 
     const disabledStyles = props.disabled
       ? 'bg-slate-100 cursor-not-allowed opacity-60'

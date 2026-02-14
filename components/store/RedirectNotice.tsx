@@ -44,7 +44,7 @@ function NoticeContent() {
 
   return (
     <div className="max-w-3xl mx-auto px-4 mt-4">
-      <div className="flex items-center justify-between gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+      <div className="flex items-center justify-between gap-3 p-3 bg-brand-blue-50 border border-brand-blue-200 rounded-lg text-sm text-brand-blue-800">
         <div className="flex items-center gap-2">
           <Info className="w-4 h-4 flex-shrink-0" />
           <span>{displayMessage}</span>

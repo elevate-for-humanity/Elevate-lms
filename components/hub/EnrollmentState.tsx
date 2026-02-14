@@ -36,8 +36,8 @@ const statusConfig: Record<EnrollmentStatus, {
 }> = {
   applied: { 
     label: 'Application Pending', 
-    color: 'text-blue-700', 
-    bgColor: 'bg-blue-100',
+    color: 'text-brand-blue-700', 
+    bgColor: 'bg-brand-blue-100',
     icon: Clock 
   },
   enrolled: { 

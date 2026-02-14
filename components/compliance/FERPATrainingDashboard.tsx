@@ -161,8 +161,8 @@ export default function FERPATrainingDashboard({
         <div className="grid md:grid-cols-5 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Users className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-brand-blue-100 rounded-lg">
+                <Users className="w-6 h-6 text-brand-blue-600" />
               </div>
             </div>
             <div className="text-3xl font-bold text-black">{totalStaff}</div>
@@ -219,7 +219,7 @@ export default function FERPATrainingDashboard({
                 placeholder="Search by name or email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               />
             </div>
             <div className="flex gap-2">
@@ -227,7 +227,7 @@ export default function FERPATrainingDashboard({
                 onClick={() => setFilter('all')}
                 className={`px-4 py-2 rounded-lg font-medium transition ${
                   filter === 'all'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-slate-100 text-black hover:bg-slate-200'
                 }`}
               >
@@ -314,14 +314,14 @@ export default function FERPATrainingDashboard({
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 py-2 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                          <span className="px-2 py-2 text-xs font-medium rounded-full bg-brand-blue-100 text-brand-blue-800">
                             {record.profiles.role}
                           </span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <span className={`text-sm font-medium ${
                             record.quiz_score >= 90 ? 'text-green-600' :
-                            record.quiz_score >= 80 ? 'text-blue-600' :
+                            record.quiz_score >= 80 ? 'text-brand-blue-600' :
                             'text-brand-orange-600'
                           }`}>
                             {record.quiz_score}%
@@ -348,7 +348,7 @@ export default function FERPATrainingDashboard({
                           <div className="flex gap-2">
                             <Link
                               href={`/ferpa/training/certificate/${record.id}`}
-                              className="text-blue-600 hover:text-blue-800"
+                              className="text-brand-blue-600 hover:text-brand-blue-800"
                               title="View Certificate"
                             >
                               <FileText className="w-4 h-4" />
@@ -419,7 +419,7 @@ export default function FERPATrainingDashboard({
                           </div>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 py-2 text-xs font-medium rounded-full bg-blue-100 text-blue-800">
+                          <span className="px-2 py-2 text-xs font-medium rounded-full bg-brand-blue-100 text-brand-blue-800">
                             {user.role}
                           </span>
                         </td>
@@ -438,7 +438,7 @@ export default function FERPATrainingDashboard({
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <button
                             onClick={() => sendReminder(user.id, user.email)}
-                            className="text-blue-600 hover:text-blue-800 flex items-center gap-1"
+                            className="text-brand-blue-600 hover:text-brand-blue-800 flex items-center gap-1"
                           >
                             <Mail className="w-4 h-4" />
                             Send Reminder

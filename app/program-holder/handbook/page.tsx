@@ -250,7 +250,7 @@ export default async function ProgramHolderHandbookPage() {
             <li>All expenditures must be allowable under WIOA guidelines</li>
             <li>Financial records must be maintained for audit purposes</li>
           </ul>
-          <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400">
+          <div className="mt-4 p-4 bg-brand-blue-50 border-l-4 border-brand-blue-400">
             <p className="font-semibold">Payment Example (Per Student):</p>
             <p className="text-sm mt-2">
               Student in Barber Program with $6,000 WIOA funding:

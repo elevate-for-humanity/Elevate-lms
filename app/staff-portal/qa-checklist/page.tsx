@@ -76,7 +76,7 @@ export default async function QAChecklistPage() {
             </div>
             <Link
               href="/staff-portal/dashboard"
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               ← Back
             </Link>
@@ -87,7 +87,7 @@ export default async function QAChecklistPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <Calendar className="h-11 w-11 text-blue-600 mb-2" />
+            <Calendar className="h-11 w-11 text-brand-blue-600 mb-2" />
             <p className="text-3xl font-bold text-black">
               {checklistsWithStatus?.length || 0}
             </p>
@@ -101,7 +101,7 @@ export default async function QAChecklistPage() {
             <p className="text-black text-sm">Completed Today</p>
           </div>
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <User className="h-11 w-11 text-blue-600 mb-2" />
+            <User className="h-11 w-11 text-brand-blue-600 mb-2" />
             <p className="text-3xl font-bold text-black">{profile.role}</p>
             <p className="text-black text-sm">Your Role</p>
           </div>
@@ -171,7 +171,7 @@ export default async function QAChecklistPage() {
 
                       {!checklist.completed && (
                         <button
-                          className="w-full px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                          className="w-full px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
                           onClick={() =>
                             alert(
                               'Mark complete functionality - will integrate with API'

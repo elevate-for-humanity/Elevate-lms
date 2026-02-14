@@ -65,7 +65,7 @@ d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.
               {program.funding_tags && program.funding_tags.length > 0 && (
                 <div className="mt-2 flex flex-wrap gap-1">
                   {program.funding_tags.slice(0, 2).map((tag) => (
-                    <span key={tag} className="text-[10px] px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">
+                    <span key={tag} className="text-[10px] px-2 py-0.5 bg-brand-blue-100 text-brand-blue-700 rounded-full">
                       {tag}
                     </span>
                   ))}

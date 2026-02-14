@@ -118,11 +118,11 @@ export default async function ProductPage({
                 productTitle={product.title}
               />
 
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                <h3 className="font-semibold text-blue-900 mb-2">
+              <div className="mt-6 p-4 bg-brand-blue-50 rounded-lg">
+                <h3 className="font-semibold text-brand-blue-900 mb-2">
                   What you'll get:
                 </h3>
-                <ul className="text-sm text-blue-800 space-y-1">
+                <ul className="text-sm text-brand-blue-800 space-y-1">
                   <li>• Instant digital download</li>
                   <li>• Lifetime access</li>
                   <li>• Support from creator</li>

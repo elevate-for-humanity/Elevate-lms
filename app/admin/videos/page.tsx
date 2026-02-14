@@ -142,12 +142,12 @@ export default async function VideosPage() {
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <Eye className="h-11 w-11 text-blue-600" />
+                  <Eye className="h-11 w-11 text-brand-blue-600" />
                   <h3 className="text-sm font-medium text-black">
                     Total Views
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-blue-600">
+                <p className="text-3xl font-bold text-brand-blue-600">
                   {videos?.reduce((acc, v) => acc + (v.view_count || 0), 0) ||
                     0}
                 </p>
@@ -202,7 +202,7 @@ export default async function VideosPage() {
                         <div className="mt-3 flex gap-2">
                           <Link
                             href={`/admin/videos/${video.id}`}
-                            className="flex-1 text-center bg-blue-100 text-brand-blue-700 px-3 py-2 rounded text-sm font-medium hover:bg-blue-200"
+                            className="flex-1 text-center bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded text-sm font-medium hover:bg-brand-blue-200"
                           >
                             Edit
                           </Link>

@@ -109,13 +109,13 @@ export default async function SecurityPage() {
       <div className="py-16">
       <div className="max-w-4xl mx-auto px-4">
         <div className="flex items-center gap-3 mb-8">
-          <Shield className="w-10 h-10 text-blue-600" />
+          <Shield className="w-10 h-10 text-brand-blue-600" />
           <h1 className="text-4xl font-bold text-black">
             Security & Data Protection
           </h1>
         </div>
 
-        <div className="bg-blue-50 border-l-4 border-blue-600 p-6 mb-8">
+        <div className="bg-brand-blue-50 border-l-4 border-brand-blue-600 p-6 mb-8">
           <p className="text-xl font-semibold text-black">
             Your information is protected. Your trust matters.
           </p>
@@ -143,7 +143,7 @@ export default async function SecurityPage() {
               const Icon = measure.icon;
               return (
                 <div key={index} className="bg-white rounded-lg shadow-sm p-6">
-                  <Icon className="w-8 h-8 text-blue-600 mb-3" />
+                  <Icon className="w-8 h-8 text-brand-blue-600 mb-3" />
                   <h3 className="font-bold text-lg mb-2">{measure.title}</h3>
                   <p className="text-gray-600">{measure.description}</p>
                 </div>
@@ -175,11 +175,11 @@ export default async function SecurityPage() {
               {certifications.map((cert: any) => (
                 <div key={cert.id} className="bg-white rounded-lg shadow-sm p-6 border-2 border-gray-100">
                   <div className="flex items-center justify-between mb-3">
-                    <Shield className="w-8 h-8 text-blue-600" />
+                    <Shield className="w-8 h-8 text-brand-blue-600" />
                     <span className={`px-2 py-1 rounded text-xs font-medium ${
                       cert.status === 'active' || cert.is_active
                         ? 'bg-green-100 text-green-700' 
-                        : 'bg-blue-100 text-blue-700'
+                        : 'bg-brand-blue-100 text-brand-blue-700'
                     }`}>
                       {cert.status === 'active' || cert.is_active ? 'Compliant' : cert.status || 'Pending'}
                     </span>
@@ -212,7 +212,7 @@ export default async function SecurityPage() {
             </p>
             <a
               href="mailto:elevate4humanityedu@gmail.com"
-              className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
+              className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
             >
               <Mail className="w-5 h-5" />
               elevate4humanityedu@gmail.com
@@ -255,20 +255,20 @@ export default async function SecurityPage() {
         </div>
       </div>
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-blue-100 mb-6">Apply today for free career training programs.</p>
+          <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
               Visit Support Center

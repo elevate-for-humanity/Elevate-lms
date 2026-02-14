@@ -141,12 +141,12 @@ export default function HoursTracker() {
               </div>
 
               {enrollment.required_hours && (
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <div className="flex items-center gap-2 text-blue-700 mb-1">
+                <div className="bg-brand-blue-50 rounded-lg p-4">
+                  <div className="flex items-center gap-2 text-brand-blue-700 mb-1">
                     <FileText className="w-5 h-5" />
                     <span className="text-sm font-medium">Progress</span>
                   </div>
-                  <p className="text-3xl font-bold text-blue-800">
+                  <p className="text-3xl font-bold text-brand-blue-800">
                     {progress.toFixed(0)}%
                   </p>
                 </div>

@@ -74,7 +74,7 @@ export default function LogHoursPage() {
                   type="date"
                   value={date}
                   onChange={(e) => setDate(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-12 pr-4 py-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-12 pr-4 py-4 text-white focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -93,7 +93,7 @@ export default function LogHoursPage() {
                   value={hours}
                   onChange={(e) => setHours(e.target.value)}
                   placeholder="e.g., 8"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-12 pr-4 py-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-12 pr-4 py-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -109,7 +109,7 @@ export default function LogHoursPage() {
                   onClick={() => setHours(h.toString())}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     hours === h.toString()
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-brand-blue-600 text-white'
                       : 'bg-slate-800 text-slate-400 border border-slate-700'
                   }`}
                 >
@@ -126,7 +126,7 @@ export default function LogHoursPage() {
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="What did you work on today?"
                 rows={3}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent resize-none"
               />
             </div>
 
@@ -134,7 +134,7 @@ export default function LogHoursPage() {
             <button
               type="submit"
               disabled={submitting || !hours}
-              className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -159,7 +159,7 @@ export default function LogHoursPage() {
             <Scissors className="w-6 h-6" />
             <span className="text-xs">Home</span>
           </Link>
-          <Link href="/pwa/barber/log-hours" className="flex flex-col items-center gap-1 text-blue-400">
+          <Link href="/pwa/barber/log-hours" className="flex flex-col items-center gap-1 text-brand-blue-400">
             <Clock className="w-6 h-6" />
             <span className="text-xs">Log</span>
           </Link>

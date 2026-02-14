@@ -99,14 +99,14 @@ export default function CNAEnrollPage() {
         <Breadcrumbs items={[{ label: "Programs", href: "/programs" }, { label: "Enroll" }]} />
       </div>
 {/* Header */}
-      <div className="bg-blue-600 text-white py-8">
+      <div className="bg-brand-blue-600 text-white py-8">
         <div className="max-w-4xl mx-auto px-4">
-          <Link href="/programs/cna" className="inline-flex items-center gap-2 text-blue-100 hover:text-white mb-4">
+          <Link href="/programs/cna" className="inline-flex items-center gap-2 text-brand-blue-100 hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to CNA Program
           </Link>
           <h1 className="text-3xl font-bold">Enroll in CNA Certification</h1>
-          <p className="text-blue-100 mt-2">Start your healthcare career in just 4-8 weeks</p>
+          <p className="text-brand-blue-100 mt-2">Start your healthcare career in just 4-8 weeks</p>
         </div>
       </div>
 
@@ -119,11 +119,11 @@ export default function CNAEnrollPage() {
               {[1, 2, 3].map((s) => (
                 <div key={s} className="flex items-center">
                   <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                    step >= s ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+                    step >= s ? 'bg-brand-blue-600 text-white' : 'bg-gray-200 text-gray-500'
                   }`}>
                     {step > s ? <Check className="w-5 h-5" /> : s}
                   </div>
-                  {s < 3 && <div className={`w-12 h-1 ${step > s ? 'bg-blue-600' : 'bg-gray-200'}`} />}
+                  {s < 3 && <div className={`w-12 h-1 ${step > s ? 'bg-brand-blue-600' : 'bg-gray-200'}`} />}
                 </div>
               ))}
             </div>
@@ -142,7 +142,7 @@ export default function CNAEnrollPage() {
                         value={formData.firstName}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       />
                     </div>
                     <div>
@@ -153,7 +153,7 @@ export default function CNAEnrollPage() {
                         value={formData.lastName}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       />
                     </div>
                   </div>
@@ -167,7 +167,7 @@ export default function CNAEnrollPage() {
                         value={formData.email}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       />
                     </div>
                     <div>
@@ -178,7 +178,7 @@ export default function CNAEnrollPage() {
                         value={formData.phone}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       />
                     </div>
                   </div>
@@ -191,7 +191,7 @@ export default function CNAEnrollPage() {
                       value={formData.dateOfBirth}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     />
                   </div>
 
@@ -203,7 +203,7 @@ export default function CNAEnrollPage() {
                       value={formData.address}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     />
                   </div>
 
@@ -216,7 +216,7 @@ export default function CNAEnrollPage() {
                         value={formData.city}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       />
                     </div>
                     <div>
@@ -226,7 +226,7 @@ export default function CNAEnrollPage() {
                         value={formData.state}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       >
                         <option value="IN">Indiana</option>
                         <option value="IL">Illinois</option>
@@ -243,7 +243,7 @@ export default function CNAEnrollPage() {
                         value={formData.zip}
                         onChange={handleInputChange}
                         required
-                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                        className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       />
                     </div>
                   </div>
@@ -251,7 +251,7 @@ export default function CNAEnrollPage() {
                   <button
                     type="button"
                     onClick={() => setStep(2)}
-                    className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700"
+                    className="w-full bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700"
                   >
                     Continue to Emergency Contact
                   </button>
@@ -270,7 +270,7 @@ export default function CNAEnrollPage() {
                       value={formData.emergencyContact}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     />
                   </div>
 
@@ -282,7 +282,7 @@ export default function CNAEnrollPage() {
                       value={formData.emergencyPhone}
                       onChange={handleInputChange}
                       required
-                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     />
                   </div>
 
@@ -297,7 +297,7 @@ export default function CNAEnrollPage() {
                     <button
                       type="button"
                       onClick={() => setStep(3)}
-                      className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700"
+                      className="flex-1 bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700"
                     >
                       Continue to Payment
                     </button>
@@ -312,7 +312,7 @@ export default function CNAEnrollPage() {
                   <div className="space-y-4">
                     <label className={`block p-4 border-2 rounded-xl cursor-pointer transition ${
                       formData.paymentOption === 'payment-plan' 
-                        ? 'border-blue-600 bg-blue-50' 
+                        ? 'border-brand-blue-600 bg-brand-blue-50' 
                         : 'border-gray-200 hover:border-gray-300'
                     }`}>
                       <input
@@ -325,10 +325,10 @@ export default function CNAEnrollPage() {
                       />
                       <div className="flex items-start gap-4">
                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-1 ${
-                          formData.paymentOption === 'payment-plan' ? 'border-blue-600' : 'border-gray-300'
+                          formData.paymentOption === 'payment-plan' ? 'border-brand-blue-600' : 'border-gray-300'
                         }`}>
                           {formData.paymentOption === 'payment-plan' && (
-                            <div className="w-3 h-3 bg-blue-600 rounded-full" />
+                            <div className="w-3 h-3 bg-brand-blue-600 rounded-full" />
                           )}
                         </div>
                         <div className="flex-1">
@@ -349,7 +349,7 @@ export default function CNAEnrollPage() {
 
                     <label className={`block p-4 border-2 rounded-xl cursor-pointer transition ${
                       formData.paymentOption === 'full-payment' 
-                        ? 'border-blue-600 bg-blue-50' 
+                        ? 'border-brand-blue-600 bg-brand-blue-50' 
                         : 'border-gray-200 hover:border-gray-300'
                     }`}>
                       <input
@@ -362,10 +362,10 @@ export default function CNAEnrollPage() {
                       />
                       <div className="flex items-start gap-4">
                         <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center mt-1 ${
-                          formData.paymentOption === 'full-payment' ? 'border-blue-600' : 'border-gray-300'
+                          formData.paymentOption === 'full-payment' ? 'border-brand-blue-600' : 'border-gray-300'
                         }`}>
                           {formData.paymentOption === 'full-payment' && (
-                            <div className="w-3 h-3 bg-blue-600 rounded-full" />
+                            <div className="w-3 h-3 bg-brand-blue-600 rounded-full" />
                           )}
                         </div>
                         <div className="flex-1">
@@ -386,10 +386,10 @@ export default function CNAEnrollPage() {
                         checked={formData.agreeToTerms}
                         onChange={handleInputChange}
                         required
-                        className="mt-1 w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                        className="mt-1 w-5 h-5 rounded border-gray-300 text-brand-blue-600 focus:ring-brand-blue-500"
                       />
                       <span className="text-sm text-gray-600">
-                        I agree to the <Link href="/terms-of-service" className="text-blue-600 hover:underline">Terms of Service</Link> and <Link href="/refund-policy" className="text-blue-600 hover:underline">Refund Policy</Link>. I understand that the down payment is non-refundable and weekly payments are due every Monday.
+                        I agree to the <Link href="/terms-of-service" className="text-brand-blue-600 hover:underline">Terms of Service</Link> and <Link href="/refund-policy" className="text-brand-blue-600 hover:underline">Refund Policy</Link>. I understand that the down payment is non-refundable and weekly payments are due every Monday.
                       </span>
                     </label>
                   </div>
@@ -411,7 +411,7 @@ export default function CNAEnrollPage() {
                     <button
                       type="submit"
                       disabled={!formData.agreeToTerms || isSubmitting}
-                      className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="flex-1 bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                     >
                       {isSubmitting ? (
                         <>Processing...</>
@@ -438,26 +438,26 @@ export default function CNAEnrollPage() {
               <h3 className="font-bold text-lg mb-4">Program Summary</h3>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <GraduationCap className="w-5 h-5 text-blue-600" />
+                  <GraduationCap className="w-5 h-5 text-brand-blue-600" />
                   <span>{PROGRAM_DETAILS.name}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Clock className="w-5 h-5 text-blue-600" />
+                  <Clock className="w-5 h-5 text-brand-blue-600" />
                   <span>{PROGRAM_DETAILS.duration}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Calendar className="w-5 h-5 text-blue-600" />
+                  <Calendar className="w-5 h-5 text-brand-blue-600" />
                   <span>{PROGRAM_DETAILS.schedule}</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <DollarSign className="w-5 h-5 text-blue-600" />
+                  <DollarSign className="w-5 h-5 text-brand-blue-600" />
                   <span className="font-bold">${PROGRAM_DETAILS.price} total</span>
                 </div>
               </div>
             </div>
 
             {/* Payment Plan Details */}
-            <div className="bg-blue-50 rounded-xl p-6">
+            <div className="bg-brand-blue-50 rounded-xl p-6">
               <h3 className="font-bold text-lg mb-4">Payment Plan</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">

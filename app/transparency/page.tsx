@@ -55,7 +55,7 @@ export default function TransparencyPage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Transparency</h1>
-          <p className="text-xl text-blue-100 max-w-2xl">
+          <p className="text-xl text-brand-blue-100 max-w-2xl">
             We believe in complete transparency. Here's how we measure our impact and use our resources.
           </p>
         </div>
@@ -91,11 +91,11 @@ export default function TransparencyPage() {
                 <div key={item.category}>
                   <div className="flex items-center justify-between mb-2">
                     <span className="font-semibold">{item.category}</span>
-                    <span className="text-blue-600 font-bold">{item.percentage}%</span>
+                    <span className="text-brand-blue-600 font-bold">{item.percentage}%</span>
                   </div>
                   <div className="w-full h-4 bg-gray-200 rounded-full overflow-hidden mb-2">
                     <div 
-                      className="h-full bg-blue-600 rounded-full"
+                      className="h-full bg-brand-blue-600 rounded-full"
                       style={{ width: `${item.percentage}%` }}
                     />
                   </div>
@@ -116,22 +116,22 @@ export default function TransparencyPage() {
           <h2 className="text-3xl font-bold mb-8">Annual Reports</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl shadow-sm border p-6">
-              <FileText className="w-10 h-10 text-blue-600 mb-4" />
+              <FileText className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="font-semibold text-lg mb-2">2023 Annual Report</h3>
               <p className="text-gray-600 text-sm mb-4">Complete overview of our programs, outcomes, and financials.</p>
-              <span className="text-blue-600 font-medium">Available on Request</span>
+              <span className="text-brand-blue-600 font-medium">Available on Request</span>
             </div>
             <div className="bg-white rounded-xl shadow-sm border p-6">
-              <FileText className="w-10 h-10 text-blue-600 mb-4" />
+              <FileText className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="font-semibold text-lg mb-2">2022 Annual Report</h3>
               <p className="text-gray-600 text-sm mb-4">Our growth and impact in the second year of operations.</p>
-              <span className="text-blue-600 font-medium">Available on Request</span>
+              <span className="text-brand-blue-600 font-medium">Available on Request</span>
             </div>
             <div className="bg-white rounded-xl shadow-sm border p-6">
-              <FileText className="w-10 h-10 text-blue-600 mb-4" />
+              <FileText className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="font-semibold text-lg mb-2">Form 990</h3>
               <p className="text-gray-600 text-sm mb-4">IRS Form 990 nonprofit tax return.</p>
-              <span className="text-blue-600 font-medium">Available on Request</span>
+              <span className="text-brand-blue-600 font-medium">Available on Request</span>
             </div>
           </div>
         </section>
@@ -154,7 +154,7 @@ export default function TransparencyPage() {
         {/* Methodology */}
         <section>
           <h2 className="text-3xl font-bold mb-8">How We Measure Success</h2>
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-8">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8">
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <h3 className="font-semibold text-lg mb-4">Outcome Tracking</h3>
@@ -180,15 +180,15 @@ export default function TransparencyPage() {
       </div>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Questions About Our Data?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             We're happy to provide additional information about our outcomes and operations.
           </p>
           <Link
             href="/contact"
-            className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100"
+            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100"
           >
             Contact Us
           </Link>

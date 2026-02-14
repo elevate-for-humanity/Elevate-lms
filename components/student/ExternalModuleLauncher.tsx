@@ -152,7 +152,7 @@ export default function ExternalModuleLauncher({
           ) : (
             <div className="max-w-md mx-auto">
               <label className="block">
-                <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors cursor-pointer">
+                <div className="border-2 border-dashed border-slate-600 rounded-lg p-8 text-center hover:border-brand-blue-500 transition-colors cursor-pointer">
                   <input
                     type="file"
                     accept=".pdf,.jpg,.jpeg,.png"
@@ -162,7 +162,7 @@ export default function ExternalModuleLauncher({
                   />
                   {uploading ? (
                     <div>
-                      <div className="animate-spin rounded-full h-11 w-11 border-b-2 border-blue-500 mx-auto mb-2" />
+                      <div className="animate-spin rounded-full h-11 w-11 border-b-2 border-brand-blue-500 mx-auto mb-2" />
                       <p className="text-slate-400 text-sm">Uploading...</p>
                     </div>
                   ) : (

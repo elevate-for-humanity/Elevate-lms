@@ -241,7 +241,7 @@ export function QuizBuilder() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-2">
                             <span className="font-bold">Q{index + 1}.</span>
-                            <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">
+                            <span className="px-2 py-0.5 bg-brand-blue-100 text-brand-blue-700 text-xs rounded">
                               {q.type.replace('-', ' ')}
                             </span>
                             <span className="px-2 py-0.5 bg-green-100 text-green-700 text-xs rounded">

@@ -32,9 +32,9 @@ export default function RefundAdvancePage() {
       <div className="bg-gray-50 border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
-            <Link href="/" className="hover:text-blue-600">Home</Link>
+            <Link href="/" className="hover:text-brand-blue-600">Home</Link>
             <span className="mx-2">/</span>
-            <Link href="/banking" className="hover:text-blue-600">Banking</Link>
+            <Link href="/banking" className="hover:text-brand-blue-600">Banking</Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900 font-medium">Refund Advance</span>
           </nav>
@@ -63,33 +63,33 @@ export default function RefundAdvancePage() {
           <p className="text-xl md:text-2xl mb-4">
             Get up to $6,000 today - No credit check required
           </p>
-          <p className="text-lg text-blue-100">
+          <p className="text-lg text-brand-blue-100">
             Repaid automatically from your IRS refund
           </p>
         </div>
       </section>
 
       {/* Key Benefits */}
-      <section className="py-12 bg-blue-50">
+      <section className="py-12 bg-brand-blue-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-6">
             <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-              <DollarSign className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+              <DollarSign className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-bold text-gray-900 mb-2">Up to $6,000</h3>
               <p className="text-sm text-gray-600">Based on your expected refund amount</p>
             </div>
             <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-              <Shield className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+              <Shield className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-bold text-gray-900 mb-2">No Credit Check</h3>
               <p className="text-sm text-gray-600">Approval based on your tax refund</p>
             </div>
             <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-              <Zap className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+              <Zap className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-bold text-gray-900 mb-2">Same-Day Funding</h3>
               <p className="text-sm text-gray-600">Get your money within hours</p>
             </div>
             <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-              <CheckCircle className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+              <CheckCircle className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-bold text-gray-900 mb-2">Auto Repayment</h3>
               <p className="text-sm text-gray-600">Repaid from your IRS refund</p>
             </div>
@@ -105,29 +105,29 @@ export default function RefundAdvancePage() {
           </h2>
 
           <div className="grid md:grid-cols-4 gap-6">
-            <div className="bg-gray-50 rounded-xl p-6 text-center border-2 border-gray-200 hover:border-blue-400 transition">
-              <p className="text-4xl font-bold text-blue-600 mb-2">$500</p>
+            <div className="bg-gray-50 rounded-xl p-6 text-center border-2 border-gray-200 hover:border-brand-blue-400 transition">
+              <p className="text-4xl font-bold text-brand-blue-600 mb-2">$500</p>
               <p className="text-gray-600 mb-4">Minimum refund: $1,000</p>
               <p className="text-sm text-gray-500">Quick cash for immediate needs</p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 text-center border-2 border-gray-200 hover:border-blue-400 transition">
-              <p className="text-4xl font-bold text-blue-600 mb-2">$1,500</p>
+            <div className="bg-gray-50 rounded-xl p-6 text-center border-2 border-gray-200 hover:border-brand-blue-400 transition">
+              <p className="text-4xl font-bold text-brand-blue-600 mb-2">$1,500</p>
               <p className="text-gray-600 mb-4">Minimum refund: $3,000</p>
               <p className="text-sm text-gray-500">Cover bills and expenses</p>
             </div>
 
-            <div className="bg-blue-600 rounded-xl p-6 text-center text-white transform scale-105 shadow-lg">
-              <div className="bg-yellow-400 text-blue-900 text-xs font-bold px-3 py-1 rounded-full inline-block mb-2">
+            <div className="bg-brand-blue-600 rounded-xl p-6 text-center text-white transform scale-105 shadow-lg">
+              <div className="bg-yellow-400 text-brand-blue-900 text-xs font-bold px-3 py-1 rounded-full inline-block mb-2">
                 MOST POPULAR
               </div>
               <p className="text-4xl font-bold mb-2">$3,000</p>
-              <p className="text-blue-100 mb-4">Minimum refund: $5,000</p>
-              <p className="text-sm text-blue-100">Best value for most filers</p>
+              <p className="text-brand-blue-100 mb-4">Minimum refund: $5,000</p>
+              <p className="text-sm text-brand-blue-100">Best value for most filers</p>
             </div>
 
-            <div className="bg-gray-50 rounded-xl p-6 text-center border-2 border-gray-200 hover:border-blue-400 transition">
-              <p className="text-4xl font-bold text-blue-600 mb-2">$6,000</p>
+            <div className="bg-gray-50 rounded-xl p-6 text-center border-2 border-gray-200 hover:border-brand-blue-400 transition">
+              <p className="text-4xl font-bold text-brand-blue-600 mb-2">$6,000</p>
               <p className="text-gray-600 mb-4">Minimum refund: $10,000</p>
               <p className="text-sm text-gray-500">Maximum advance available</p>
             </div>
@@ -149,7 +149,7 @@ export default function RefundAdvancePage() {
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   1
                 </div>
                 <div className="ml-4">
@@ -162,7 +162,7 @@ export default function RefundAdvancePage() {
               </div>
 
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   2
                 </div>
                 <div className="ml-4">
@@ -175,7 +175,7 @@ export default function RefundAdvancePage() {
               </div>
 
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   3
                 </div>
                 <div className="ml-4">
@@ -188,7 +188,7 @@ export default function RefundAdvancePage() {
               </div>
 
               <div className="flex items-start">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg flex-shrink-0">
                   4
                 </div>
                 <div className="ml-4">
@@ -211,7 +211,7 @@ export default function RefundAdvancePage() {
                 </div>
                 <div className="flex justify-between items-center py-3 border-b">
                   <span className="text-gray-600">Refund Advance Received</span>
-                  <span className="font-bold text-blue-600">$3,000</span>
+                  <span className="font-bold text-brand-blue-600">$3,000</span>
                 </div>
                 <div className="flex justify-between items-center py-3 border-b">
                   <span className="text-gray-600">Advance Fee</span>
@@ -304,7 +304,7 @@ export default function RefundAdvancePage() {
             <div className="space-y-6">
               <div>
                 <h3 className="font-bold text-gray-900 mb-2 flex items-center">
-                  <FileText className="w-5 h-5 text-blue-600 mr-2" />
+                  <FileText className="w-5 h-5 text-brand-blue-600 mr-2" />
                   This is a Loan
                 </h3>
                 <p className="text-gray-600">
@@ -315,7 +315,7 @@ export default function RefundAdvancePage() {
 
               <div>
                 <h3 className="font-bold text-gray-900 mb-2 flex items-center">
-                  <Clock className="w-5 h-5 text-blue-600 mr-2" />
+                  <Clock className="w-5 h-5 text-brand-blue-600 mr-2" />
                   Timing
                 </h3>
                 <p className="text-gray-600">
@@ -326,7 +326,7 @@ export default function RefundAdvancePage() {
 
               <div>
                 <h3 className="font-bold text-gray-900 mb-2 flex items-center">
-                  <DollarSign className="w-5 h-5 text-blue-600 mr-2" />
+                  <DollarSign className="w-5 h-5 text-brand-blue-600 mr-2" />
                   Fees and APR
                 </h3>
                 <p className="text-gray-600">
@@ -391,24 +391,24 @@ export default function RefundAdvancePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-700 text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Need Cash Now?
           </h2>
-          <p className="text-xl mb-8 text-blue-100">
+          <p className="text-xl mb-8 text-brand-blue-100">
             Get up to $6,000 today with a refund advance. No credit check required.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/tax"
-              className="bg-white hover:bg-gray-100 text-blue-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
+              className="bg-white hover:bg-gray-100 text-brand-blue-700 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               Apply Now <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
             <Link
               href="/banking"
-              className="bg-blue-600 hover:bg-blue-500 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all border-2 border-white"
+              className="bg-brand-blue-600 hover:bg-brand-blue-500 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all border-2 border-white"
             >
               View All Banking Options
             </Link>

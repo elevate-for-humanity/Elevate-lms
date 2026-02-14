@@ -183,7 +183,7 @@ export default function DeviceCompatibility() {
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="text-center">
-        <div className="w-16 h-16 mx-auto mb-4 bg-blue-100 rounded-full flex items-center justify-center">
+        <div className="w-16 h-16 mx-auto mb-4 bg-brand-blue-100 rounded-full flex items-center justify-center">
           <Smartphone size={32} className="text-brand-orange-600" />
         </div>
         <h1 className="text-2xl font-bold text-black mb-2">

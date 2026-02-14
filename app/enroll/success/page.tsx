@@ -114,7 +114,7 @@ export default async function EnrollSuccessPage() {
           <div className="space-y-6">
             {displayNextSteps.map((item: any, index: number) => (
               <div key={index} className="flex gap-4">
-                <div className="flex-shrink-0 w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                <div className="flex-shrink-0 w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
                   {item.step || index + 1}
                 </div>
                 <div>
@@ -127,18 +127,18 @@ export default async function EnrollSuccessPage() {
         </div>
 
         {/* Contact Info */}
-        <div className="bg-blue-50 rounded-xl p-6 mb-6">
+        <div className="bg-brand-blue-50 rounded-xl p-6 mb-6">
           <h3 className="font-bold text-lg mb-4">Need Help?</h3>
           <div className="space-y-3">
             <a 
               href="/support" 
-              className="flex items-center gap-3 text-gray-700 hover:text-blue-600"
+              className="flex items-center gap-3 text-gray-700 hover:text-brand-blue-600"
             >
               <span>Visit our Help Center →</span>
             </a>
             <a 
               href="mailto:elevate4humanityedu@gmail.com" 
-              className="flex items-center gap-3 text-gray-700 hover:text-blue-600"
+              className="flex items-center gap-3 text-gray-700 hover:text-brand-blue-600"
             >
               <Mail className="w-5 h-5" />
               <span>elevate4humanityedu@gmail.com</span>
@@ -175,13 +175,13 @@ export default async function EnrollSuccessPage() {
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/student/dashboard"
-            className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-blue-700 transition"
+            className="flex-1 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-brand-blue-700 transition"
           >
             Student Dashboard
           </Link>
           <Link
             href="/student/billing"
-            className="flex-1 border border-blue-600 text-blue-600 px-6 py-3 rounded-lg font-semibold text-center hover:bg-blue-50 transition"
+            className="flex-1 border border-brand-blue-600 text-brand-blue-600 px-6 py-3 rounded-lg font-semibold text-center hover:bg-brand-blue-50 transition"
           >
             View Payment Plan
           </Link>
@@ -191,7 +191,7 @@ export default async function EnrollSuccessPage() {
         <div className="mt-8 text-center">
           <Link
             href="/booking"
-            className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
+            className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
           >
             <Calendar className="w-5 h-5" />
             Schedule Your Orientation

@@ -221,7 +221,7 @@ export function NotificationPermissionBanner({ onDismiss }: NotificationPermissi
   };
 
   return (
-    <div className="bg-blue-600 text-white px-4 py-3">
+    <div className="bg-brand-blue-600 text-white px-4 py-3">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <Bell className="w-5 h-5 flex-shrink-0" />
@@ -233,13 +233,13 @@ export function NotificationPermissionBanner({ onDismiss }: NotificationPermissi
           <button
             onClick={handleEnable}
             disabled={loading}
-            className="px-3 py-1 bg-white text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50"
+            className="px-3 py-1 bg-white text-brand-blue-600 rounded-lg text-sm font-medium hover:bg-brand-blue-50"
           >
             Enable
           </button>
           <button
             onClick={handleDismiss}
-            className="p-1 hover:bg-blue-500 rounded"
+            className="p-1 hover:bg-brand-blue-500 rounded"
           >
             <X className="w-4 h-4" />
           </button>

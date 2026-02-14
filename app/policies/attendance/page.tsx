@@ -32,7 +32,7 @@ export default function AttendancePage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Attendance Requirements</h2>
             
-            <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+            <div className="bg-brand-blue-50 rounded-xl p-6 border-2 border-brand-blue-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Minimum Attendance</h3>
               <p className="text-black mb-4">
                 Students must maintain:
@@ -110,7 +110,7 @@ export default function AttendancePage() {
               <h3 className="text-xl font-bold text-black mb-4">Notification Procedure</h3>
               <div className="space-y-6">
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     1
                   </div>
                   <div>
@@ -139,7 +139,7 @@ export default function AttendancePage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>
@@ -276,14 +276,14 @@ export default function AttendancePage() {
               <li><strong>Emergency Line:</strong> (317) 314-3757 ext. 911 (after hours)</li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/progress" className="text-blue-600 hover:underline">Progress Policy</a></li>
-                <li><a href="/policies/student-code" className="text-blue-600 hover:underline">Student Code of Conduct</a></li>
-                <li><a href="/policies/academic-integrity" className="text-blue-600 hover:underline">Academic Integrity Policy</a></li>
+                <li><a href="/policies/progress" className="text-brand-blue-600 hover:underline">Progress Policy</a></li>
+                <li><a href="/policies/student-code" className="text-brand-blue-600 hover:underline">Student Code of Conduct</a></li>
+                <li><a href="/policies/academic-integrity" className="text-brand-blue-600 hover:underline">Academic Integrity Policy</a></li>
               </ul>
             </div>
           </div>

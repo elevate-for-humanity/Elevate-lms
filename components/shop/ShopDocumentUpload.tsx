@@ -121,7 +121,7 @@ export function ShopDocumentUpload({
           {/* Upload Form */}
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
             <div className="flex items-center gap-3 mb-6">
-              <Upload className="w-6 h-6 text-blue-600" />
+              <Upload className="w-6 h-6 text-brand-blue-600" />
               <h2 className="text-xl font-bold text-black">Upload Document</h2>
             </div>
 
@@ -131,7 +131,7 @@ export function ShopDocumentUpload({
                   Document Type *
                 </label>
                 <select
-                  className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   value={selectedType}
                   onChange={(e) => setSelectedType(e.target.value)}
                   required
@@ -158,7 +158,7 @@ export function ShopDocumentUpload({
                   type="file"
                   accept=".pdf"
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
-                  className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full rounded-lg border border-slate-300 p-3 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   required
                 />
                 <p className="mt-2 text-xs text-black">
@@ -192,7 +192,7 @@ export function ShopDocumentUpload({
               <button
                 type="submit"
                 disabled={uploading || !file}
-                className="w-full px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {uploading ? 'Uploading...' : 'Upload Document'}
               </button>
@@ -202,7 +202,7 @@ export function ShopDocumentUpload({
           {/* Document Templates */}
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
             <div className="flex items-center gap-3 mb-6">
-              <FileText className="w-6 h-6 text-blue-600" />
+              <FileText className="w-6 h-6 text-brand-blue-600" />
               <h2 className="text-xl font-bold text-black">Document Templates</h2>
             </div>
 
@@ -217,7 +217,7 @@ export function ShopDocumentUpload({
                 <a
                   href="/docs/templates/EFH_Shop_MOU_Indiana.pdf"
                   download
-                  className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                  className="inline-flex items-center gap-2 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                 >
                   <FileText className="w-4 h-4" />
                   Download Template
@@ -234,7 +234,7 @@ export function ShopDocumentUpload({
                 <a
                   href="/docs/templates/EFH_NDA_IP_Acknowledgment.pdf"
                   download
-                  className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                  className="inline-flex items-center gap-2 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                 >
                   <FileText className="w-4 h-4" />
                   Download Template
@@ -251,7 +251,7 @@ export function ShopDocumentUpload({
                 <a
                   href="/docs/templates/EFH_Non_Compete_Indiana.pdf"
                   download
-                  className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                  className="inline-flex items-center gap-2 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                 >
                   <FileText className="w-4 h-4" />
                   Download Template
@@ -267,7 +267,7 @@ export function ShopDocumentUpload({
                   href="https://www.irs.gov/pub/irs-pdf/fw9.pdf"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                  className="inline-flex items-center gap-2 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                 >
                   <FileText className="w-4 h-4" />
                   Download from IRS
@@ -288,7 +288,7 @@ export function ShopDocumentUpload({
         <div className="mt-6 text-center">
           <a
             href="/shop/onboarding"
-            className="text-blue-600 hover:text-blue-700 font-semibold"
+            className="text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
           >
             ← Back to Onboarding
           </a>

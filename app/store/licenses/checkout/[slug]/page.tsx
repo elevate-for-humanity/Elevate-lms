@@ -243,12 +243,12 @@ export default function LicenseCheckoutPage() {
               </div>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
               <div className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                <div className="text-sm text-blue-900">
+                <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="text-sm text-brand-blue-900">
                   <p className="font-semibold mb-1">What happens next:</p>
-                  <ul className="space-y-1 text-blue-800">
+                  <ul className="space-y-1 text-brand-blue-800">
                     <li>1. Complete payment</li>
                     <li>2. Receive license key via email</li>
                     <li>3. Access setup instructions</li>

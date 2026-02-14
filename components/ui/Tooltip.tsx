@@ -31,7 +31,7 @@ export function Tooltip({ content, type = 'help', children }: TooltipProps) {
     <div className="relative inline-block">
       <button
         type="button"
-        className="inline-flex items-center justify-center w-5 h-5 text-gray-500 hover:text-black focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-full"
+        className="inline-flex items-center justify-center w-5 h-5 text-gray-500 hover:text-black focus:outline-none focus:ring-2 focus:ring-brand-blue-500 rounded-full"
         onMouseEnter={() => setIsVisible(true)}
         onMouseLeave={() => setIsVisible(false)}
         onFocus={() => setIsVisible(true)}
@@ -191,7 +191,7 @@ export function EmptyState({
       {action && (
         <a
           href={action.href}
-          className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-4 py-2 text-sm font-medium text-white bg-brand-blue-600 rounded-md hover:bg-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
         >
           {action.label}
         </a>
@@ -240,7 +240,7 @@ export function FormField({
         name={name}
         required={required}
         placeholder={placeholder}
-        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue-500 ${
           error ? 'border-red-500' : 'border-gray-300'
         }`}
         aria-describedby={error ? `${name}-error` : undefined}

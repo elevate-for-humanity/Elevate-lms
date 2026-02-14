@@ -31,12 +31,12 @@ export default function EnrollLoading() {
           </div>
         </div>
 
-        <div className="bg-blue-50 rounded-xl p-6">
-          <div className="h-5 w-24 bg-blue-200 rounded mb-3" />
-          <div className="h-4 w-full max-w-sm bg-blue-100 rounded mb-4" />
+        <div className="bg-brand-blue-50 rounded-xl p-6">
+          <div className="h-5 w-24 bg-brand-blue-200 rounded mb-3" />
+          <div className="h-4 w-full max-w-sm bg-brand-blue-100 rounded mb-4" />
           <div className="flex gap-4">
-            <div className="h-10 w-36 bg-blue-200 rounded-lg" />
-            <div className="h-10 w-28 bg-blue-100 rounded-lg" />
+            <div className="h-10 w-36 bg-brand-blue-200 rounded-lg" />
+            <div className="h-10 w-28 bg-brand-blue-100 rounded-lg" />
           </div>
         </div>
       </div>

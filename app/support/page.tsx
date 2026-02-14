@@ -57,7 +57,7 @@ export default async function SupportPage() {
       <div className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Student Support Center</h1>
-          <p className="text-xl text-blue-100 max-w-2xl">
+          <p className="text-xl text-brand-blue-100 max-w-2xl">
             Need help with enrollment, training programs, or your student account? 
             Our team is here to support your career journey.
           </p>
@@ -206,11 +206,11 @@ export default async function SupportPage() {
           <div className="flex flex-wrap gap-6 justify-center">
             <div className="text-white">
               <p className="text-sm text-slate-400">Phone</p>
-              <a href="/support" className="text-lg font-semibold hover:text-blue-400">Get Help Online</a>
+              <a href="/support" className="text-lg font-semibold hover:text-brand-blue-400">Get Help Online</a>
             </div>
             <div className="text-white">
               <p className="text-sm text-slate-400">Email</p>
-              <a href="mailto:elevate4humanityedu@gmail.com" className="text-lg font-semibold hover:text-blue-400">elevate4humanityedu@gmail.com</a>
+              <a href="mailto:elevate4humanityedu@gmail.com" className="text-lg font-semibold hover:text-brand-blue-400">elevate4humanityedu@gmail.com</a>
             </div>
           </div>
         </div>

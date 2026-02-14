@@ -104,7 +104,7 @@ export default function AboutPage() {
               />
             </div>
             <div>
-              <p className="text-blue-600 font-semibold text-sm mb-2 uppercase tracking-wide">Founder</p>
+              <p className="text-brand-blue-600 font-semibold text-sm mb-2 uppercase tracking-wide">Founder</p>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-1">{FOUNDER.name}</h2>
               <p className="text-slate-500 mb-6">{FOUNDER.title}</p>
               <div className="text-slate-700 space-y-4 leading-relaxed">
@@ -127,7 +127,7 @@ export default function AboutPage() {
               </div>
               <Link
                 href="/about/team"
-                className="inline-flex items-center gap-2 mt-8 text-blue-600 font-semibold hover:gap-3 transition-all"
+                className="inline-flex items-center gap-2 mt-8 text-brand-blue-600 font-semibold hover:gap-3 transition-all"
               >
                 Meet the Full Team <ArrowRight className="w-5 h-5" />
               </Link>
@@ -202,7 +202,7 @@ export default function AboutPage() {
                     />
                   </div>
                   <div className="p-4">
-                    <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{prog.name}</h3>
+                    <h3 className="font-bold text-slate-900 group-hover:text-brand-blue-600 transition-colors">{prog.name}</h3>
                   </div>
                 </div>
               </Link>

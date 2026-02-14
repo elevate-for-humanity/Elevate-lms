@@ -82,7 +82,7 @@ export default async function ProgramHolderLicensePage() {
           </div>
           <Link
             href="/apply/program-holder"
-            className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
+            className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
           >
             Apply to Join Network →
           </Link>
@@ -119,7 +119,7 @@ export default async function ProgramHolderLicensePage() {
                       href="https://www.apprenticeship.gov"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline text-xs"
+                      className="text-brand-blue-600 hover:underline text-xs"
                     >
                       Verify on apprenticeship.gov →
                     </a>
@@ -229,7 +229,7 @@ export default async function ProgramHolderLicensePage() {
 
           <div className="space-y-6">
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600">
+              <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center font-bold text-brand-blue-600">
                 1
               </div>
               <div>
@@ -244,7 +244,7 @@ export default async function ProgramHolderLicensePage() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600">
+              <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center font-bold text-brand-blue-600">
                 2
               </div>
               <div>
@@ -259,7 +259,7 @@ export default async function ProgramHolderLicensePage() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600">
+              <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center font-bold text-brand-blue-600">
                 3
               </div>
               <div>
@@ -274,7 +274,7 @@ export default async function ProgramHolderLicensePage() {
             </div>
 
             <div className="flex gap-4">
-              <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-600">
+              <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center font-bold text-brand-blue-600">
                 4
               </div>
               <div>
@@ -329,8 +329,8 @@ export default async function ProgramHolderLicensePage() {
               <div className="text-xs text-slate-500">Setup: $15,000</div>
             </div>
 
-            <div className="bg-white rounded-xl p-6 shadow-lg border-2 border-blue-500">
-              <div className="text-sm font-bold text-blue-600 mb-2">MEDIUM</div>
+            <div className="bg-white rounded-xl p-6 shadow-lg border-2 border-brand-blue-500">
+              <div className="text-sm font-bold text-brand-blue-600 mb-2">MEDIUM</div>
               <div className="text-3xl font-bold text-black mb-1">
                 $8,000
               </div>
@@ -462,7 +462,7 @@ export default async function ProgramHolderLicensePage() {
           </p>
           <Link
             href="/apply/program-holder"
-            className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
+            className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition"
           >
             Apply Now →
           </Link>

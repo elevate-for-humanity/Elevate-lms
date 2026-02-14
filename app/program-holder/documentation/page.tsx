@@ -145,7 +145,7 @@ export default async function DocumentationPage() {
                     <BookOpen className="h-11 w-11 text-brand-green-600" />
                   )}
                   {category.category === 'Policies' && (
-                    <FileCheck className="h-11 w-11 text-blue-600" />
+                    <FileCheck className="h-11 w-11 text-brand-blue-600" />
                   )}
                   <h2 className="text-2xl font-bold text-black">
                     {category.category}
@@ -178,26 +178,26 @@ export default async function DocumentationPage() {
             ))}
 
             {/* Quick Links */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-4">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-brand-blue-900 mb-4">
                 Quick Links
               </h3>
               <div className="grid md:grid-cols-3 gap-4">
                 <Link
                   href="/program-holder/documents"
-                  className="text-blue-900 hover:text-blue-700 font-medium"
+                  className="text-brand-blue-900 hover:text-brand-blue-700 font-medium"
                 >
                   Upload Documents →
                 </Link>
                 <Link
                   href="/program-holder/reports"
-                  className="text-blue-900 hover:text-blue-700 font-medium"
+                  className="text-brand-blue-900 hover:text-brand-blue-700 font-medium"
                 >
                   Submit Reports →
                 </Link>
                 <Link
                   href="/program-holder/support"
-                  className="text-blue-900 hover:text-blue-700 font-medium"
+                  className="text-brand-blue-900 hover:text-brand-blue-700 font-medium"
                 >
                   Get Support →
                 </Link>

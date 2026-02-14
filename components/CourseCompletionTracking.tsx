@@ -95,7 +95,7 @@ export function CourseCompletionTracking() {
               <div className="flex items-start gap-4">
                 <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold flex-shrink-0 ${
                   milestone.completed ? 'bg-green-500 text-white' :
-                  milestone.progress > 0 ? 'bg-blue-500 text-white' :
+                  milestone.progress > 0 ? 'bg-brand-blue-500 text-white' :
                   'bg-gray-300 text-black'
                 }`}>
                   {milestone.completed ? '✓' : index + 1}

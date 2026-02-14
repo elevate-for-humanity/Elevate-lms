@@ -28,9 +28,9 @@ export default function PathwayDisclosure({
   
   if (variant === 'compact') {
     return (
-      <div className={`bg-blue-50 border border-blue-100 rounded-lg p-4 ${className}`}>
+      <div className={`bg-brand-blue-50 border border-brand-blue-100 rounded-lg p-4 ${className}`}>
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center">
+          <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -43,7 +43,7 @@ export default function PathwayDisclosure({
             </p>
             <Link 
               href={applyUrl}
-              className="inline-flex items-center justify-center bg-blue-600 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-blue-700 transition-colors text-sm"
+              className="inline-flex items-center justify-center bg-brand-blue-600 text-white px-5 py-2.5 rounded-full font-semibold hover:bg-brand-blue-700 transition-colors text-sm"
             >
               Start Eligibility & Choose a Career Path
             </Link>
@@ -64,7 +64,7 @@ export default function PathwayDisclosure({
         <div className="grid md:grid-cols-3 gap-4 mb-6">
           {/* Stage 1 */}
           <div className="bg-white rounded-xl p-5 shadow-sm border border-slate-200">
-            <div className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold text-sm mb-3">1</div>
+            <div className="w-8 h-8 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center font-bold text-sm mb-3">1</div>
             <h3 className="font-semibold text-slate-900 text-sm mb-1">Eligibility & Career Alignment</h3>
             <p className="text-xs text-slate-600">
               Determine funding eligibility and select your career pathway.
@@ -91,7 +91,7 @@ export default function PathwayDisclosure({
         </div>
         
         {/* Disclosure Text */}
-        <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 text-xs text-slate-600 mb-5">
+        <div className="bg-brand-blue-50 border border-brand-blue-100 rounded-lg p-4 text-xs text-slate-600 mb-5">
           <p>
             Elevate for Humanity delivers all training through a structured career pathway. 
             Participants begin with an eligibility and career alignment phase, where funding eligibility is determined and program selection occurs. 
@@ -105,7 +105,7 @@ export default function PathwayDisclosure({
         <div className="text-center">
           <Link 
             href={applyUrl}
-            className="inline-flex items-center justify-center bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center justify-center bg-brand-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-brand-blue-700 transition-colors"
           >
             Start Eligibility & Choose a Career Path
           </Link>

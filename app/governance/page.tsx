@@ -85,8 +85,8 @@ export default function GovernancePage() {
       <div className="bg-slate-900 text-white py-16">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
-            <Building2 className="w-8 h-8 text-blue-400" />
-            <span className="text-blue-400 font-medium">Platform Governance</span>
+            <Building2 className="w-8 h-8 text-brand-blue-400" />
+            <span className="text-brand-blue-400 font-medium">Platform Governance</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Governance
@@ -103,7 +103,7 @@ export default function GovernancePage() {
 
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* For Reviewers */}
-        <section className="mb-12 bg-blue-50 rounded-xl p-6 border border-blue-100">
+        <section className="mb-12 bg-brand-blue-50 rounded-xl p-6 border border-brand-blue-100">
           <h2 className="text-xl font-bold text-slate-900 mb-4">For Partners, Buyers & Reviewers</h2>
           <p className="text-slate-700 leading-relaxed mb-4">
             If you are a partner, buyer, reviewer, or agency representative, this is the best 
@@ -136,19 +136,19 @@ export default function GovernancePage() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="group p-5 bg-white border border-slate-200 rounded-xl hover:border-blue-300 hover:shadow-md transition-all"
+                className="group p-5 bg-white border border-slate-200 rounded-xl hover:border-brand-blue-300 hover:shadow-md transition-all"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
-                    <link.icon className="w-5 h-5 text-slate-600 group-hover:text-blue-600" />
+                  <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center group-hover:bg-brand-blue-100 transition-colors">
+                    <link.icon className="w-5 h-5 text-slate-600 group-hover:text-brand-blue-600" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
+                    <h3 className="font-semibold text-slate-900 group-hover:text-brand-blue-600 transition-colors">
                       {link.title}
                     </h3>
                     <p className="text-sm text-slate-600 mt-1">{link.description}</p>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-blue-500 transition-colors" />
+                  <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-brand-blue-500 transition-colors" />
                 </div>
               </Link>
             ))}
@@ -161,25 +161,25 @@ export default function GovernancePage() {
           <div className="flex flex-wrap gap-3">
             <Link
               href="/resources"
-              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-blue-300 hover:text-blue-600 transition-colors"
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-brand-blue-300 hover:text-brand-blue-600 transition-colors"
             >
               Resource Library
             </Link>
             <Link
               href="/privacy-policy"
-              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-blue-300 hover:text-blue-600 transition-colors"
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-brand-blue-300 hover:text-brand-blue-600 transition-colors"
             >
               Privacy Policy
             </Link>
             <Link
               href="/terms-of-service"
-              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-blue-300 hover:text-blue-600 transition-colors"
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-brand-blue-300 hover:text-brand-blue-600 transition-colors"
             >
               Terms of Service
             </Link>
             <Link
               href="/accessibility"
-              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-blue-300 hover:text-blue-600 transition-colors"
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-brand-blue-300 hover:text-brand-blue-600 transition-colors"
             >
               Accessibility
             </Link>
@@ -201,20 +201,20 @@ export default function GovernancePage() {
           </Link>
         </section>
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-blue-100 mb-6">Apply today for free career training programs.</p>
+          <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
               Get Help Online

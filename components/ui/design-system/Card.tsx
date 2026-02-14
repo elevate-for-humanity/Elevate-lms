@@ -51,7 +51,7 @@ export function Card({
         'rounded-card transition-all duration-200',
         variantClasses[variant],
         paddingClasses[padding],
-        onClick && 'cursor-pointer hover:border-blue-600',
+        onClick && 'cursor-pointer hover:border-brand-blue-600',
         className
       )}
     >

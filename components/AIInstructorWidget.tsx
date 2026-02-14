@@ -120,8 +120,8 @@ export function AIInstructorWidget({
 
           {/* Message */}
           <div className="p-6 max-h-96 overflow-y-auto">
-            <div className="bg-blue-50 rounded-2xl p-4 relative">
-              <div className="absolute -top-2 left-6 w-4 h-4 bg-blue-50 transform rotate-45" />
+            <div className="bg-brand-blue-50 rounded-2xl p-4 relative">
+              <div className="absolute -top-2 left-6 w-4 h-4 bg-brand-blue-50 transform rotate-45" />
               <p className="text-black leading-relaxed">
                 {message || contextMessages[context]}
               </p>

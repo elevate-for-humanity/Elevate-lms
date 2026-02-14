@@ -211,9 +211,9 @@ export function StudentOnboarding({ onComplete }: { onComplete: () => void }) {
             Explore our programs in:
           </p>
           <div className="grid grid-cols-2 gap-3">
-            <div className="bg-blue-50 rounded-lg p-4">
-              <div className="font-semibold text-blue-900">Healthcare</div>
-              <div className="text-sm text-blue-700">Medical Assistant, CNA, Home Health Aide</div>
+            <div className="bg-brand-blue-50 rounded-lg p-4">
+              <div className="font-semibold text-brand-blue-900">Healthcare</div>
+              <div className="text-sm text-brand-blue-700">Medical Assistant, CNA, Home Health Aide</div>
             </div>
             <div className="bg-purple-50 rounded-lg p-4">
               <div className="font-semibold text-purple-900">Skilled Trades</div>
@@ -271,11 +271,11 @@ export function InstructorOnboarding({ onComplete }: { onComplete: () => void })
       description: 'Let\'s set up your teaching environment',
       content: (
         <div className="space-y-4">
-          <div className="bg-blue-50 rounded-lg p-6 text-center">
-            <h4 className="text-lg font-semibold text-blue-900 mb-2">
+          <div className="bg-brand-blue-50 rounded-lg p-6 text-center">
+            <h4 className="text-lg font-semibold text-brand-blue-900 mb-2">
               👨‍🏫 Welcome to Your Instructor Portal
             </h4>
-            <p className="text-blue-700">
+            <p className="text-brand-blue-700">
               Manage courses, grade assignments, and engage with students.
             </p>
           </div>
@@ -291,15 +291,15 @@ export function InstructorOnboarding({ onComplete }: { onComplete: () => void })
           <p className="text-black">As an instructor, you can:</p>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
-              <Check className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <Check className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Create and manage course content</span>
             </li>
             <li className="flex items-start gap-3">
-              <Check className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <Check className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Upload videos, documents, and assignments</span>
             </li>
             <li className="flex items-start gap-3">
-              <Check className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <Check className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Track student progress and engagement</span>
             </li>
           </ul>

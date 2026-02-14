@@ -197,7 +197,7 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
     switch (status) {
       case 'placed': return 'bg-green-100 text-green-700';
       case 'offer_pending': return 'bg-yellow-100 text-yellow-700';
-      case 'interviewing': return 'bg-blue-100 text-blue-700';
+      case 'interviewing': return 'bg-brand-blue-100 text-brand-blue-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -205,7 +205,7 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     );
   }
@@ -220,7 +220,7 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`py-4 px-2 border-b-2 font-medium capitalize ${
-                activeTab === tab ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500'
+                activeTab === tab ? 'border-brand-blue-600 text-brand-blue-600' : 'border-transparent text-gray-500'
               }`}
             >
               {tab}
@@ -236,8 +236,8 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="p-6">
               <div className="flex items-center gap-3 mb-2">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <Users className="w-5 h-5 text-blue-600" />
+                <div className="p-2 bg-brand-blue-100 rounded-lg">
+                  <Users className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <h3 className="text-sm text-gray-500">Total Placements</h3>
               </div>
@@ -292,7 +292,7 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full"
+                        className="bg-brand-blue-600 h-2 rounded-full"
                         style={{ width: `${item.percentage}%` }}
                       />
                     </div>
@@ -310,7 +310,7 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
                       <Building2 className="w-5 h-5 text-gray-400" />
                       <span className="font-medium">{partner.name}</span>
                     </div>
-                    <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
+                    <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 text-sm rounded-full">
                       {partner.hires} hires
                     </span>
                   </div>
@@ -377,7 +377,7 @@ export function JobPlacementTracking({ programId, showPipeline = true }: Props) 
                   </div>
                   {placement.match_score && (
                     <div className="text-right ml-6">
-                      <div className="text-3xl font-bold text-blue-600">{placement.match_score}%</div>
+                      <div className="text-3xl font-bold text-brand-blue-600">{placement.match_score}%</div>
                       <p className="text-sm text-gray-500">Match Score</p>
                     </div>
                   )}

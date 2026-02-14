@@ -57,7 +57,7 @@ export default function AIChatPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-blue-600 text-white py-20">
+      <section className="bg-brand-blue-600 text-white py-20">
         <div className="max-w-5xl mx-auto px-4 text-center">
           <div className="inline-flex items-center gap-2 bg-white/20 px-4 py-2 rounded-full mb-6">
             <Sparkles className="w-5 h-5" />
@@ -66,13 +66,13 @@ export default function AIChatPage() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
             Your Personal Learning Assistant
           </h1>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
             Get instant help with courses, career questions, and your learning journey. 
             Available 24/7 to support your success.
           </p>
           <Link
             href="/ai-tutor"
-            className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-colors"
+            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-brand-blue-50 transition-colors"
           >
             <MessageSquare className="w-5 h-5" />
             Start Chatting
@@ -85,13 +85,13 @@ export default function AIChatPage() {
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl shadow-xl border overflow-hidden">
             {/* Chat Header */}
-            <div className="bg-blue-600 p-4 flex items-center gap-3">
+            <div className="bg-brand-blue-600 p-4 flex items-center gap-3">
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                 <Bot className="w-6 h-6 text-white" />
               </div>
               <div>
                 <h3 className="font-semibold text-white">Elevate AI Assistant</h3>
-                <p className="text-blue-200 text-sm">Always here to help</p>
+                <p className="text-brand-blue-200 text-sm">Always here to help</p>
               </div>
             </div>
 
@@ -99,8 +99,8 @@ export default function AIChatPage() {
             <div className="p-6 space-y-4 bg-gray-50">
               {/* AI Message */}
               <div className="flex gap-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-5 h-5 text-blue-600" />
+                <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <div className="bg-white rounded-2xl rounded-tl-none p-4 shadow-sm max-w-md">
                   <p className="text-gray-700">
@@ -118,15 +118,15 @@ export default function AIChatPage() {
 
               {/* User Message */}
               <div className="flex gap-3 justify-end">
-                <div className="bg-blue-600 text-white rounded-2xl rounded-tr-none p-4 max-w-md">
+                <div className="bg-brand-blue-600 text-white rounded-2xl rounded-tr-none p-4 max-w-md">
                   <p>What certifications should I get for a healthcare career?</p>
                 </div>
               </div>
 
               {/* AI Response */}
               <div className="flex gap-3">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Bot className="w-5 h-5 text-blue-600" />
+                <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <Bot className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <div className="bg-white rounded-2xl rounded-tl-none p-4 shadow-sm max-w-md">
                   <p className="text-gray-700">
@@ -159,12 +159,12 @@ export default function AIChatPage() {
                 <input
                   type="text"
                   placeholder="Type your question..."
-                  className="flex-1 px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="flex-1 px-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                   disabled
                 />
                 <Link
                   href="/ai-tutor"
-                  className="px-6 py-3 bg-blue-600 text-white rounded-full font-semibold hover:bg-blue-700 transition-colors"
+                  className="px-6 py-3 bg-brand-blue-600 text-white rounded-full font-semibold hover:bg-brand-blue-700 transition-colors"
                 >
                   Start Chat
                 </Link>
@@ -181,8 +181,8 @@ export default function AIChatPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
               <div key={index} className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                  <feature.icon className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <feature.icon className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">{feature.title}</h3>
                 <p className="text-gray-600 text-sm">{feature.description}</p>
@@ -201,9 +201,9 @@ export default function AIChatPage() {
               <Link
                 key={index}
                 href="/ai-tutor"
-                className="flex items-center gap-3 p-4 bg-white rounded-xl border hover:border-blue-300 hover:shadow-md transition-all"
+                className="flex items-center gap-3 p-4 bg-white rounded-xl border hover:border-brand-blue-300 hover:shadow-md transition-all"
               >
-                <MessageSquare className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                <MessageSquare className="w-5 h-5 text-brand-blue-600 flex-shrink-0" />
                 <span className="text-gray-700">{question}</span>
                 <ArrowRight className="w-4 h-4 text-gray-400 ml-auto" />
               </Link>
@@ -213,15 +213,15 @@ export default function AIChatPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-blue-100 mb-8">
+          <p className="text-brand-blue-100 mb-8">
             Your AI learning assistant is ready to help you succeed.
           </p>
           <Link
             href="/ai-tutor"
-            className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition-colors"
+            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-brand-blue-50 transition-colors"
           >
             <MessageSquare className="w-5 h-5" />
             Start Chatting Now
@@ -229,20 +229,20 @@ export default function AIChatPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-blue-100 mb-6">Apply today for free career training programs.</p>
+          <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
               Get Help Online

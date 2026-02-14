@@ -155,7 +155,7 @@ export function LiveOutcomesDashboard({ initialData }: { initialData?: Partial<O
   ];
 
   const colorClasses: Record<string, { bg: string; icon: string; text: string }> = {
-    blue: { bg: 'bg-blue-50', icon: 'text-blue-600', text: 'text-blue-900' },
+    blue: { bg: 'bg-brand-blue-50', icon: 'text-brand-blue-600', text: 'text-brand-blue-900' },
     green: { bg: 'bg-green-50', icon: 'text-green-600', text: 'text-green-900' },
     purple: { bg: 'bg-purple-50', icon: 'text-purple-600', text: 'text-purple-900' },
     emerald: { bg: 'bg-emerald-50', icon: 'text-emerald-600', text: 'text-emerald-900' },

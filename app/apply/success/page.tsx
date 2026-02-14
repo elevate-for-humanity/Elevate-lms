@@ -141,7 +141,7 @@ export default async function ApplicationSuccessPage({
           <ol className="space-y-4">
             {currentRole.nextSteps.map((step: string, index: number) => (
               <li key={index} className="flex items-start gap-4">
-                <span className="flex-shrink-0 w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+                <span className="flex-shrink-0 w-8 h-8 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center font-bold">
                   {index + 1}
                 </span>
                 <span className="text-gray-700 pt-1">{step}</span>
@@ -151,19 +151,19 @@ export default async function ApplicationSuccessPage({
         </div>
 
         {/* Contact Info */}
-        <div className="bg-blue-50 rounded-xl p-6 mb-6">
+        <div className="bg-brand-blue-50 rounded-xl p-6 mb-6">
           <h3 className="font-semibold mb-4">Questions? Contact Us</h3>
           <div className="flex flex-col sm:flex-row gap-4">
             <a
               href="/support"
-              className="flex items-center gap-2 text-blue-600 hover:underline"
+              className="flex items-center gap-2 text-brand-blue-600 hover:underline"
             >
               <Phone className="w-5 h-5" />
               Get Help Online
             </a>
             <a
               href="mailto:elevate4humanityedu@gmail.com"
-              className="flex items-center gap-2 text-blue-600 hover:underline"
+              className="flex items-center gap-2 text-brand-blue-600 hover:underline"
             >
               <Mail className="w-5 h-5" />
               elevate4humanityedu@gmail.com
@@ -175,7 +175,7 @@ export default async function ApplicationSuccessPage({
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href={currentRole.dashboardLink}
-            className="flex-1 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-blue-700 transition inline-flex items-center justify-center gap-2"
+            className="flex-1 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-brand-blue-700 transition inline-flex items-center justify-center gap-2"
           >
             {currentRole.dashboardText}
             <ArrowRight className="w-5 h-5" />
@@ -192,7 +192,7 @@ export default async function ApplicationSuccessPage({
         <div className="mt-8 text-center">
           <Link
             href="/booking"
-            className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
+            className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
           >
             <Calendar className="w-5 h-5" />
             Schedule a call with our team

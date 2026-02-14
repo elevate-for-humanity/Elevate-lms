@@ -144,10 +144,10 @@ export default function FundingImpactPage() {
                 />
               </div>
               <div className="p-6 text-center">
-                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
-                  <Briefcase className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
+                  <Briefcase className="w-7 h-7 text-brand-blue-600" />
                 </div>
-                <div className="text-4xl font-bold text-blue-600 mb-2">78%</div>
+                <div className="text-4xl font-bold text-brand-blue-600 mb-2">78%</div>
                 <div className="text-gray-700 font-medium">Employment Rate</div>
                 <div className="text-sm text-gray-500 mt-1">Within 90 days of completion</div>
               </div>
@@ -204,8 +204,8 @@ export default function FundingImpactPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <Users className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Users className="w-6 h-6 text-brand-blue-600" />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 mb-2">Local Delivery</h3>
@@ -336,7 +336,7 @@ export default function FundingImpactPage() {
               </div>
               <div className="p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                  <div className="w-12 h-12 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold">
                     ST
                   </div>
                   <div>
@@ -447,7 +447,7 @@ export default function FundingImpactPage() {
               </div>
             </div>
 
-            <div className="bg-blue-50 rounded-xl overflow-hidden border border-blue-200">
+            <div className="bg-brand-blue-50 rounded-xl overflow-hidden border border-brand-blue-200">
               <div className="relative h-48">
                 <Image
                   src="/images/employers/partnership-office-meeting.jpg"
@@ -457,7 +457,7 @@ export default function FundingImpactPage() {
                 />
               </div>
               <div className="p-8">
-                <div className="w-14 h-14 bg-blue-600 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-blue-50">
+                <div className="w-14 h-14 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-brand-blue-50">
                   <Building2 className="w-7 h-7 text-white" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Employer Benefits</h3>

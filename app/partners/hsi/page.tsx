@@ -124,7 +124,7 @@ export default function HSIPage() {
             Available Courses
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   CPR & AED Training
@@ -142,7 +142,7 @@ export default function HSIPage() {
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   First Aid Training
@@ -160,7 +160,7 @@ export default function HSIPage() {
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   Emergency Medical Responder
@@ -178,7 +178,7 @@ export default function HSIPage() {
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   RSV Training

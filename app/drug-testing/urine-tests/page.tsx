@@ -112,14 +112,14 @@ export default function UrineTestsPage() {
         <Breadcrumbs items={[{ label: "Drug Testing", href: "/drug-testing" }, { label: "Urine Tests" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 bg-blue-900 text-white">
+      <section className="relative py-20 bg-brand-blue-900 text-white">
         <div className="max-w-6xl mx-auto px-6">
-          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-blue-200 hover:text-white mb-6 transition">
+          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-brand-blue-200 hover:text-white mb-6 transition">
             <ArrowLeft className="w-4 h-4" />
             Back to Drug Testing
           </Link>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Urine Drug Tests</h1>
-          <p className="text-xl text-blue-100 max-w-2xl">
+          <p className="text-xl text-brand-blue-100 max-w-2xl">
             Lab-based urine testing is the most common and cost-effective method for workplace drug screening. 
             Results typically in 24-48 hours.
           </p>
@@ -142,7 +142,7 @@ export default function UrineTestsPage() {
             {urineTests.map((test) => (
               <div
                 key={test.name}
-                className={`bg-white rounded-2xl overflow-hidden shadow-sm border-2 ${test.popular ? 'border-blue-500' : 'border-gray-200'}`}
+                className={`bg-white rounded-2xl overflow-hidden shadow-sm border-2 ${test.popular ? 'border-brand-blue-500' : 'border-gray-200'}`}
               >
                 <div className="grid lg:grid-cols-3">
                   {/* Image */}
@@ -154,7 +154,7 @@ export default function UrineTestsPage() {
                       className="object-cover"
                     />
                     {test.popular && (
-                      <div className="absolute top-4 left-4 bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold">
+                      <div className="absolute top-4 left-4 bg-brand-blue-500 text-white px-3 py-1 rounded-full text-sm font-bold">
                         MOST POPULAR
                       </div>
                     )}
@@ -168,7 +168,7 @@ export default function UrineTestsPage() {
                         <p className="text-gray-600 mt-1">{test.description}</p>
                       </div>
                       <div className="text-right">
-                        <div className="text-3xl font-bold text-blue-600">${test.price}</div>
+                        <div className="text-3xl font-bold text-brand-blue-600">${test.price}</div>
                         <div className="text-sm text-gray-500">per person</div>
                       </div>
                     </div>
@@ -199,7 +199,7 @@ export default function UrineTestsPage() {
                     <div className="mt-6 flex flex-wrap gap-4">
                       <a
                         href="/support"
-                        className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
+                        className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-700 transition"
                       >
                         <Phone className="w-4 h-4" />
                         Order Now
@@ -214,15 +214,15 @@ export default function UrineTestsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Need Help Choosing?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Contact us and we'll recommend the right test for your situation.
           </p>
           <a
             href="/support"
-            className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
+            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
           >
             <Phone className="w-5 h-5" />
             Get Help Online

@@ -93,7 +93,7 @@ export default function ShopDetailsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
   }
@@ -114,7 +114,7 @@ export default function ShopDetailsPage() {
           <button
             onClick={handleSave}
             disabled={saving}
-            className="bg-blue-600 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 disabled:opacity-50"
+            className="bg-brand-blue-600 text-white px-4 py-2 rounded-xl font-medium flex items-center gap-2 disabled:opacity-50"
           >
             {saving ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -154,7 +154,7 @@ export default function ShopDetailsPage() {
               type="text"
               value={shop.name}
               onChange={(e) => setShop(prev => ({ ...prev, name: e.target.value }))}
-              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
 
@@ -164,7 +164,7 @@ export default function ShopDetailsPage() {
               type="text"
               value={shop.ownerName}
               onChange={(e) => setShop(prev => ({ ...prev, ownerName: e.target.value }))}
-              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
 
@@ -174,7 +174,7 @@ export default function ShopDetailsPage() {
               type="text"
               value={shop.licenseNumber}
               onChange={(e) => setShop(prev => ({ ...prev, licenseNumber: e.target.value }))}
-              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
         </div>
@@ -192,7 +192,7 @@ export default function ShopDetailsPage() {
               type="text"
               value={shop.address}
               onChange={(e) => setShop(prev => ({ ...prev, address: e.target.value }))}
-              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
 
@@ -203,7 +203,7 @@ export default function ShopDetailsPage() {
                 type="text"
                 value={shop.city}
                 onChange={(e) => setShop(prev => ({ ...prev, city: e.target.value }))}
-                className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
             <div>
@@ -211,7 +211,7 @@ export default function ShopDetailsPage() {
               <select
                 value={shop.state}
                 onChange={(e) => setShop(prev => ({ ...prev, state: e.target.value }))}
-                className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               >
                 <option value="">Select</option>
                 {US_STATES.map(state => (
@@ -228,7 +228,7 @@ export default function ShopDetailsPage() {
               value={shop.zip}
               onChange={(e) => setShop(prev => ({ ...prev, zip: e.target.value }))}
               maxLength={10}
-              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
         </div>
@@ -247,7 +247,7 @@ export default function ShopDetailsPage() {
               value={shop.phone}
               onChange={(e) => setShop(prev => ({ ...prev, phone: e.target.value }))}
               placeholder="(555) 555-5555"
-              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
 
@@ -257,7 +257,7 @@ export default function ShopDetailsPage() {
               type="email"
               value={shop.email}
               onChange={(e) => setShop(prev => ({ ...prev, email: e.target.value }))}
-              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
         </div>
@@ -265,14 +265,14 @@ export default function ShopDetailsPage() {
         {/* QR Code Link */}
         <Link
           href="/pwa/shop-owner/checkin"
-          className="flex items-center gap-4 bg-blue-600/20 border border-blue-500/30 rounded-xl p-4"
+          className="flex items-center gap-4 bg-brand-blue-600/20 border border-brand-blue-500/30 rounded-xl p-4"
         >
-          <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+          <div className="w-12 h-12 bg-brand-blue-500 rounded-xl flex items-center justify-center">
             <FileText className="w-6 h-6 text-white" />
           </div>
           <div className="flex-1">
             <p className="text-white font-medium">Check-In QR Code</p>
-            <p className="text-blue-300 text-sm">View and share your shop's check-in code</p>
+            <p className="text-brand-blue-300 text-sm">View and share your shop's check-in code</p>
           </div>
         </Link>
       </main>

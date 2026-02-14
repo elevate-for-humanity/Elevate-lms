@@ -32,7 +32,7 @@ export default function AIUsagePage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">AI Tools Available</h2>
             
-            <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+            <div className="bg-brand-blue-50 rounded-xl p-6 border-2 border-brand-blue-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Elevate AI Tutor</h3>
               <p className="text-black mb-4">
                 Our AI tutor is available 24/7 to support your learning:
@@ -217,15 +217,15 @@ export default function AIUsagePage() {
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/academic-integrity" className="text-blue-600 hover:underline">Academic Integrity Policy</a></li>
-                <li><a href="/policies/acceptable-use" className="text-blue-600 hover:underline">Acceptable Use Policy</a></li>
-                <li><a href="/policies/student-code" className="text-blue-600 hover:underline">Student Code of Conduct</a></li>
-                <li><a href="/policies/copyright" className="text-blue-600 hover:underline">Copyright Policy</a></li>
+                <li><a href="/policies/academic-integrity" className="text-brand-blue-600 hover:underline">Academic Integrity Policy</a></li>
+                <li><a href="/policies/acceptable-use" className="text-brand-blue-600 hover:underline">Acceptable Use Policy</a></li>
+                <li><a href="/policies/student-code" className="text-brand-blue-600 hover:underline">Student Code of Conduct</a></li>
+                <li><a href="/policies/copyright" className="text-brand-blue-600 hover:underline">Copyright Policy</a></li>
               </ul>
             </div>
           </div>

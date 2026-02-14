@@ -121,7 +121,7 @@ export default function MonitoringDashboard() {
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Monitoring" }]} />
         </div>
         <div className="text-center">
-          <Activity className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <Activity className="h-12 w-12 animate-spin text-brand-blue-600 mx-auto mb-4" />
           <p className="text-black">Loading monitoring data...</p>
         </div>
       </div>
@@ -139,7 +139,7 @@ export default function MonitoringDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-black flex items-center gap-3">
-                <Activity className="h-11 w-11 text-blue-600" />
+                <Activity className="h-11 w-11 text-brand-blue-600" />
                 System Monitoring
               </h1>
               <p className="text-black mt-2">Real-time platform health and performance metrics</p>
@@ -159,7 +159,7 @@ export default function MonitoringDashboard() {
                   fetchStatus();
                   fetchErrors();
                 }}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 Refresh Now
               </button>
@@ -202,7 +202,7 @@ export default function MonitoringDashboard() {
             {/* Database */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <Database className="h-11 w-11 text-blue-600" />
+                <Database className="h-11 w-11 text-brand-blue-600" />
                 <span className={`px-3 py-2 rounded-full text-sm font-medium ${getStatusColor(status.checks.database.status)}`}>
                   {status.checks.database.status}
                 </span>
@@ -236,7 +236,7 @@ export default function MonitoringDashboard() {
             {/* Stripe */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
-                <Server className="h-11 w-11 text-blue-600" />
+                <Server className="h-11 w-11 text-brand-blue-600" />
                 <span className={`px-3 py-2 rounded-full text-sm font-medium ${getStatusColor(status.checks.stripe.status)}`}>
                   {status.checks.stripe.status}
                 </span>
@@ -269,7 +269,7 @@ export default function MonitoringDashboard() {
             {/* Request Metrics */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center gap-3 mb-4">
-                <TrendingUp className="h-10 w-10 text-blue-600" />
+                <TrendingUp className="h-10 w-10 text-brand-blue-600" />
                 <h3 className="text-lg font-bold text-black">Requests</h3>
               </div>
               <div className="space-y-3">
@@ -317,7 +317,7 @@ export default function MonitoringDashboard() {
             {/* Memory Usage */}
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <div className="flex items-center gap-3 mb-4">
-                <Server className="h-10 w-10 text-blue-600" />
+                <Server className="h-10 w-10 text-brand-blue-600" />
                 <h3 className="text-lg font-bold text-black">Memory</h3>
               </div>
               <div className="space-y-3">
@@ -331,7 +331,7 @@ export default function MonitoringDashboard() {
                 </div>
                 <div>
                   <div className="text-sm text-black">Usage</div>
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-brand-blue-600">
                     {((status.metrics.memory.used / status.metrics.memory.total) * 100).toFixed(1)}%
                   </div>
                 </div>

@@ -159,11 +159,11 @@ export default function PayrollSetupForm({
           className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 space-y-8"
         >
           {/* Role & Rate Info */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <h3 className="text-lg font-semibold text-blue-900 mb-2">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+            <h3 className="text-lg font-semibold text-brand-blue-900 mb-2">
               Your Role: {profile.role.replace(/_/g, ' ')}
             </h3>
-            <p className="text-blue-800 mb-4">
+            <p className="text-brand-blue-800 mb-4">
               {getRoleDescription(profile.role)}
             </p>
             {rateConfig && (
@@ -214,7 +214,7 @@ export default function PayrollSetupForm({
               value={rate}
               onChange={(e) => setRate(e.target.value)}
               Content={rateConfig?.default_rate?.toString() || '0'}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               required
             />
             {rateConfig && (
@@ -237,7 +237,7 @@ export default function PayrollSetupForm({
                 onClick={() => setPayoutMethod('STRIPE')}
                 className={`flex items-start gap-4 p-4 rounded-lg border-2 transition-colors text-left ${
                   payoutMethod === 'STRIPE'
-                    ? 'border-brand-blue-600 bg-blue-50'
+                    ? 'border-brand-blue-600 bg-brand-blue-50'
                     : 'border-slate-300 bg-white hover:border-slate-400'
                 }`}
               >
@@ -252,7 +252,7 @@ export default function PayrollSetupForm({
                   <div
                     className={`font-semibold ${
                       payoutMethod === 'STRIPE'
-                        ? 'text-blue-900'
+                        ? 'text-brand-blue-900'
                         : 'text-black'
                     }`}
                   >
@@ -269,7 +269,7 @@ export default function PayrollSetupForm({
                 onClick={() => setPayoutMethod('ACH')}
                 className={`flex items-start gap-4 p-4 rounded-lg border-2 transition-colors text-left ${
                   payoutMethod === 'ACH'
-                    ? 'border-brand-blue-600 bg-blue-50'
+                    ? 'border-brand-blue-600 bg-brand-blue-50'
                     : 'border-slate-300 bg-white hover:border-slate-400'
                 }`}
               >
@@ -284,7 +284,7 @@ export default function PayrollSetupForm({
                   <div
                     className={`font-semibold ${
                       payoutMethod === 'ACH'
-                        ? 'text-blue-900'
+                        ? 'text-brand-blue-900'
                         : 'text-black'
                     }`}
                   >

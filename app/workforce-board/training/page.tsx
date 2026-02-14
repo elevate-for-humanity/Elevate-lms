@@ -26,14 +26,14 @@ export default async function TrainingPage() {
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/workforce-board" className="hover:text-primary">Workforce Board</Link></li><li>/</li><li className="text-gray-900 font-medium">Training</li></ol></nav>
           <div className="flex justify-between items-center">
             <div><h1 className="text-3xl font-bold text-gray-900">Training Programs</h1><p className="text-gray-600 mt-2">Manage training programs and providers</p></div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Program</button>
+            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Add Program</button>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Programs</h3><p className="text-3xl font-bold text-gray-900 mt-2">{count || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active</h3><p className="text-3xl font-bold text-green-600 mt-2">{activeCount || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Participants</h3><p className="text-3xl font-bold text-blue-600 mt-2">847</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Completion Rate</h3><p className="text-3xl font-bold text-blue-600 mt-2">76%</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Participants</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">847</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Completion Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">76%</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-4 border-b"><h2 className="font-semibold">Training Programs</h2></div>

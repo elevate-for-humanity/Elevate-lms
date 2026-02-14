@@ -742,7 +742,7 @@ export default function AdminPortalMapPage() {
                   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                 >
               ) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -791,7 +791,7 @@ export default function AdminPortalMapPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-4 flex-1">
                       <div className="flex-shrink-0">
-                        <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                        <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                           <Icon className="w-6 h-6 text-brand-blue-600" />
                         </div>
                       </div>
@@ -866,7 +866,7 @@ export default function AdminPortalMapPage() {
         </div>
 
         {/* Footer Info */}
-        <div className="mt-12 bg-blue-50 rounded-lg p-6">
+        <div className="mt-12 bg-brand-blue-50 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-black mb-2">
             About This Portal
           </h3>

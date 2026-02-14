@@ -230,42 +230,42 @@ export default async function TaxCareersPage() {
               </ol>
             </div>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-6">
               <h3 className="font-bold text-lg mb-3">
                 Stipulations & Requirements:
               </h3>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>Referral must be hired and complete onboarding</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>
                     Bonus paid only for <strong>completed and accepted</strong>{' '}
                     tax returns
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>Return must be e-filed and accepted by IRS/state</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>Referral must remain employed for minimum 30 days</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>Bonuses paid monthly via direct deposit or check</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>
                     No bonus for rejected, amended, or incomplete returns
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>
                     Referrer must be current employee or approved partner
                   </span>
@@ -312,7 +312,7 @@ export default async function TaxCareersPage() {
       </section>
 
       {/* How to Get PTIN & EFIN */}
-      <section className="py-20 bg-blue-50">
+      <section className="py-20 bg-brand-blue-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold mb-4">
@@ -326,7 +326,7 @@ export default async function TaxCareersPage() {
           <div className="grid md:grid-cols-2 gap-8">
             {/* PTIN */}
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <h3 className="text-2xl font-bold mb-6 text-blue-900">
+              <h3 className="text-2xl font-bold mb-6 text-brand-blue-900">
                 Step 1: Get Your PTIN (Preparer Tax Identification Number)
               </h3>
 
@@ -355,7 +355,7 @@ export default async function TaxCareersPage() {
                         href="https://www.irs.gov/tax-professionals/ptin-requirements-for-tax-return-preparers"
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 underline font-semibold"
+                        className="text-brand-blue-600 underline font-semibold"
                       >
                         IRS.gov/PTIN
                       </a>
@@ -382,7 +382,7 @@ export default async function TaxCareersPage() {
                 href="https://www.irs.gov/tax-professionals/ptin-requirements-for-tax-return-preparers"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block w-full text-center px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
+                className="inline-block w-full text-center px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Apply for PTIN on IRS.gov →
               </a>
@@ -390,7 +390,7 @@ export default async function TaxCareersPage() {
 
             {/* EFIN */}
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <h3 className="text-2xl font-bold mb-6 text-blue-900">
+              <h3 className="text-2xl font-bold mb-6 text-brand-blue-900">
                 Step 2: EFIN (Electronic Filing Identification Number)
               </h3>
 
@@ -449,7 +449,7 @@ export default async function TaxCareersPage() {
                 href="https://www.irs.gov/e-file-providers/become-an-authorized-e-file-provider"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block w-full text-center px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
+                className="inline-block w-full text-center px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Learn More About EFIN →
               </a>
@@ -582,7 +582,7 @@ export default async function TaxCareersPage() {
                       <span className="px-3 py-2 bg-green-100 text-green-700 rounded-full font-semibold">
                         {position.type}
                       </span>
-                      <span className="px-3 py-2 bg-blue-100 text-blue-700 rounded-full font-semibold">
+                      <span className="px-3 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-full font-semibold">
                         {position.location}
                       </span>
                     </div>

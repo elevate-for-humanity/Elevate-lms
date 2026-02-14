@@ -139,7 +139,7 @@ export default function WorkOneLocator() {
         </div>
 
         {/* Additional Resources */}
-        <div className="mt-12 bg-blue-50 rounded-lg p-8">
+        <div className="mt-12 bg-brand-blue-50 rounded-lg p-8">
           <div className="max-w-3xl mx-auto text-center">
             <h3 className="text-2xl font-bold text-black mb-4">
               Can't Visit in Person?

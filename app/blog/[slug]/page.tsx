@@ -166,7 +166,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         </div>
         
         <div 
-          className="prose prose-lg max-w-none prose-headings:text-black prose-p:text-gray-700 prose-a:text-blue-600 prose-strong:text-black"
+          className="prose prose-lg max-w-none prose-headings:text-black prose-p:text-gray-700 prose-a:text-brand-blue-600 prose-strong:text-black"
           dangerouslySetInnerHTML={{ __html: formatContent(post.content) }}
         />
         
@@ -212,7 +212,7 @@ export default async function BlogPostPage({ params }: { params: Params }) {
                     />
                   </div>
                   <div className="p-6">
-                    <h3 className="font-bold text-black group-hover:text-blue-600 transition line-clamp-2">
+                    <h3 className="font-bold text-black group-hover:text-brand-blue-600 transition line-clamp-2">
                       {related.title}
                     </h3>
                     <p className="text-gray-600 text-sm mt-2 line-clamp-2">
@@ -226,22 +226,22 @@ export default async function BlogPostPage({ params }: { params: Params }) {
         </section>
       )}
 
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your Career Journey?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Join hundreds of students who have transformed their careers through our free training programs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="px-8 py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-gray-100 transition"
+              className="px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-100 transition"
             >
               Apply Now - It's Free
             </Link>
             <Link
               href="/programs"
-              className="px-8 py-4 bg-blue-700 text-white font-bold rounded-lg hover:bg-blue-800 transition border-2 border-white"
+              className="px-8 py-4 bg-brand-blue-700 text-white font-bold rounded-lg hover:bg-brand-blue-800 transition border-2 border-white"
             >
               Browse Programs
             </Link>
@@ -261,7 +261,7 @@ function formatContent(content: string): string {
     .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold mt-12 mb-6">$1</h1>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:underline">$1</a>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-brand-blue-600 hover:underline">$1</a>')
     .replace(/^- (.*$)/gim, '<li class="ml-4">$1</li>')
     .replace(/\n\n/g, '</p><p class="mb-4">');
 }

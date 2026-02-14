@@ -74,19 +74,19 @@ export default async function StartTrialPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-blue-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-brand-blue-800 flex items-center justify-center p-4">
       <div className="max-w-lg w-full">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Layout className="w-10 h-10 text-blue-900" />
+            <Layout className="w-10 h-10 text-brand-blue-900" />
           </div>
           <h1 className="text-3xl font-black text-white mb-2">Website Builder</h1>
-          <p className="text-blue-200">Professional Websites in Minutes</p>
+          <p className="text-brand-blue-200">Professional Websites in Minutes</p>
         </div>
 
         <div className="bg-white rounded-2xl p-8 shadow-2xl">
           <div className="text-center mb-6">
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-brand-blue-100 text-brand-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
               <Clock className="w-4 h-4" />
               14-Day Free Trial
             </div>
@@ -97,20 +97,20 @@ export default async function StartTrialPage() {
           <ul className="space-y-3 mb-8">
             {features.map((feature, i) => (
               <li key={i} className="flex items-center gap-3">
-                <Check className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                <Check className="w-5 h-5 text-brand-blue-500 flex-shrink-0" />
                 <span className="text-gray-700">{feature}</span>
               </li>
             ))}
           </ul>
 
           <form action={startTrial}>
-            <button type="submit" className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition">
+            <button type="submit" className="w-full bg-brand-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-blue-700 transition">
               Start Free Trial
             </button>
           </form>
 
           <p className="text-center text-sm text-gray-500 mt-4">
-            By starting a trial, you agree to our <Link href="/terms" className="text-blue-600 hover:underline">Terms</Link>
+            By starting a trial, you agree to our <Link href="/terms" className="text-brand-blue-600 hover:underline">Terms</Link>
           </p>
         </div>
       </div>

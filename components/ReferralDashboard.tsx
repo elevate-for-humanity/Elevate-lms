@@ -83,7 +83,7 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
       </div>
     );
   }
@@ -108,7 +108,7 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
                 {stats?.totalReferrals || 0}
               </p>
             </div>
-            <Users className="w-12 h-12 text-blue-600 opacity-20" />
+            <Users className="w-12 h-12 text-brand-blue-600 opacity-20" />
           </div>
         </div>
 
@@ -154,20 +154,20 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
         <div className="flex items-start justify-between">
           <div className="flex-1">
             <h2 className="text-2xl font-bold mb-2">Your Referral Code</h2>
-            <p className="text-blue-100 mb-6">
+            <p className="text-brand-blue-100 mb-6">
               Share this code with friends and earn $50 for each completed referral!
             </p>
 
             <div className="flex items-center gap-4">
               <div className="flex-1 bg-white/20 backdrop-blur-sm rounded-lg p-4">
-                <p className="text-sm text-blue-100 mb-1">Referral Code</p>
+                <p className="text-sm text-brand-blue-100 mb-1">Referral Code</p>
                 <p className="text-3xl font-bold tracking-wider">{referralCode || 'Loading...'}</p>
               </div>
 
               <div className="flex gap-2">
                 <button
                   onClick={handleCopyCode}
-                  className="flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
+                  className="flex items-center gap-2 px-6 py-3 bg-white text-brand-blue-600 rounded-lg hover:bg-gray-50 transition-colors font-semibold"
                 >
                   {copied ? (
                     <>
@@ -200,8 +200,8 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
         <h3 className="text-xl font-bold text-black mb-6">How It Works</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Share2 className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Share2 className="w-8 h-8 text-brand-blue-600" />
             </div>
             <h4 className="font-semibold text-black mb-2">1. Share Your Code</h4>
             <p className="text-sm text-black">
@@ -257,7 +257,7 @@ export default function ReferralDashboard({ userId }: ReferralDashboardProps) {
             </div>
 
             {stats.pendingEarnings > 50 && (
-              <button className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+              <button className="w-full py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors font-semibold">
                 Request Payout
               </button>
             )}

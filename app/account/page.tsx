@@ -93,7 +93,7 @@ export default async function AccountPage() {
         {/* Header */}
         <div className="bg-white rounded-xl p-6 shadow-sm border mb-8">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center">
               {profile?.avatar_url ? (
                 <img 
                   src={profile.avatar_url} 
@@ -101,7 +101,7 @@ export default async function AccountPage() {
                   className="w-16 h-16 rounded-full object-cover"
                 />
               ) : (
-                <User className="w-8 h-8 text-blue-600" />
+                <User className="w-8 h-8 text-brand-blue-600" />
               )}
             </div>
             <div>
@@ -119,7 +119,7 @@ export default async function AccountPage() {
             <Link
               key={section.href}
               href={section.href}
-              className="bg-white rounded-xl p-6 shadow-sm border hover:border-blue-300 hover:shadow-md transition-all flex items-center gap-4"
+              className="bg-white rounded-xl p-6 shadow-sm border hover:border-brand-blue-300 hover:shadow-md transition-all flex items-center gap-4"
             >
               <div className="w-12 h-12 bg-gray-100 rounded-xl flex items-center justify-center flex-shrink-0">
                 <section.icon className="w-6 h-6 text-gray-600" />

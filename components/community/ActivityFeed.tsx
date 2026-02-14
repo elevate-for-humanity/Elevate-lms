@@ -53,7 +53,7 @@ export default function ActivityFeed() {
     switch (type) {
       case 'comment':
       case 'discussion':
-        return <MessageSquare className="w-5 h-5 text-blue-500" />;
+        return <MessageSquare className="w-5 h-5 text-brand-blue-500" />;
       case 'like':
         return <Heart className="w-5 h-5 text-red-500" />;
       case 'achievement':
@@ -139,7 +139,7 @@ export default function ActivityFeed() {
                 {activity.link && (
                   <Link
                     href={activity.link}
-                    className="text-blue-600 text-sm hover:underline flex-shrink-0"
+                    className="text-brand-blue-600 text-sm hover:underline flex-shrink-0"
                   >
                     View
                   </Link>
@@ -153,7 +153,7 @@ export default function ActivityFeed() {
       <div className="p-4 border-t">
         <Link
           href="/community/activity"
-          className="text-blue-600 text-sm font-medium hover:underline"
+          className="text-brand-blue-600 text-sm font-medium hover:underline"
         >
           View all activity →
         </Link>

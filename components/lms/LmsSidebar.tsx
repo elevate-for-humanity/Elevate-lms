@@ -81,8 +81,8 @@ export function LmsSidebar() {
               className={clsx(
                 'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
                 active
-                  ? 'bg-blue-600 text-white shadow-sm'
-                  : 'text-black hover:bg-gray-50 hover:text-blue-700'
+                  ? 'bg-brand-blue-600 text-white shadow-sm'
+                  : 'text-black hover:bg-gray-50 hover:text-brand-blue-700'
               )}
             >
               <Icon className="w-4 h-4" />
@@ -104,7 +104,7 @@ export function LmsSidebar() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-black hover:bg-gray-50 hover:text-blue-700 transition-all"
+                className="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-black hover:bg-gray-50 hover:text-brand-blue-700 transition-all"
               >
                 <Icon className="w-4 h-4" />
                 <span>{item.label}</span>

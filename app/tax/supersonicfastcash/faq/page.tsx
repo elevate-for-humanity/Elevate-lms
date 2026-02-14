@@ -170,7 +170,7 @@ export default function FAQPage() {
         ))}
       </div>
 
-      <section className="mt-8 rounded-2xl bg-blue-50 border-l-4 border-brand-blue-600 p-6">
+      <section className="mt-8 rounded-2xl bg-brand-blue-50 border-l-4 border-brand-blue-600 p-6">
         <h2 className="text-xl font-bold mb-3">Still Have Questions?</h2>
         <p className="text-black mb-6">
           Can't find the answer you're looking for? We're here to help.

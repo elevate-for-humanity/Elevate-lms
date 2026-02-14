@@ -146,7 +146,7 @@ export default async function ProgramsPage() {
           <img src="/images/programs-hero-vibrant.jpg" alt="Career training programs" className="w-full h-full object-cover" />
         </div>
         <div className="absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-8 sm:right-8">
-          <span className="inline-block bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">
+          <span className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">
             Career Training Programs
           </span>
         </div>
@@ -156,20 +156,20 @@ export default async function ProgramsPage() {
       <section className="py-10 sm:py-12 lg:py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 leading-tight mb-4">
-            Find Your <span className="text-blue-600">Career Path.</span><br />
+            Find Your <span className="text-brand-blue-600">Career Path.</span><br />
             <span className="text-red-600">Start Free.</span>
           </h1>
           <p className="text-base sm:text-lg text-slate-600 max-w-2xl mx-auto mb-6">
             If you're here, you're in the right place. This program is designed to take you from interested to enrolled, then into class with a clear next step at every stage.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition-all shadow-lg">
+            <Link href="/apply" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-brand-blue-700 transition-all shadow-lg">
               Start Eligibility &amp; Apply
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
               </svg>
             </Link>
-            <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-full font-semibold hover:border-blue-600 hover:text-blue-600 transition-all">
+            <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-6 py-3 rounded-full font-semibold hover:border-brand-blue-600 hover:text-brand-blue-600 transition-all">
               Learn About Funding
             </Link>
           </div>
@@ -195,17 +195,17 @@ export default async function ProgramsPage() {
       <section className="py-16 lg:py-24 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <p className="text-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Training Categories</p>
+            <p className="text-brand-blue-600 font-semibold text-sm uppercase tracking-widest mb-3">Training Categories</p>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Choose Your Career Path</h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">Each program is designed to take you from beginner to job-ready.</p>
           </div>
           
           <div className="space-y-4">
             {categories.map((cat) => (
-              <Link key={cat.title} href={cat.href} className="group block bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 hover:border-blue-300">
+              <Link key={cat.title} href={cat.href} className="group block bg-white rounded-xl p-6 shadow-sm hover:shadow-lg transition-all duration-300 border border-slate-200 hover:border-brand-blue-300">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">{cat.title}</h3>
+                    <h3 className="text-xl font-bold text-slate-900 mb-1 group-hover:text-brand-blue-600 transition-colors">{cat.title}</h3>
                     <p className="text-slate-600 text-sm mb-3">{cat.description}</p>
                     <div className="flex flex-wrap gap-2">
                       {cat.programs.map((p, i) => (
@@ -214,7 +214,7 @@ export default async function ProgramsPage() {
                     </div>
                   </div>
                   <div className="flex-shrink-0 ml-4">
-                    <span className="text-blue-600 font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
+                    <span className="text-brand-blue-600 font-semibold text-sm inline-flex items-center gap-1 group-hover:gap-2 transition-all">
                       View →
                     </span>
                   </div>
@@ -230,7 +230,7 @@ export default async function ProgramsPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-10 items-start">
             <div>
-              <p className="text-blue-600 font-semibold text-sm uppercase tracking-widest mb-4">How It Works</p>
+              <p className="text-brand-blue-600 font-semibold text-sm uppercase tracking-widest mb-4">How It Works</p>
               <h2 className="text-3xl font-bold text-slate-900 mb-4">Roadmap to Your New Career</h2>
               <p className="text-base text-slate-600 mb-6">Our structured process is designed to get you job-ready fast.</p>
               
@@ -238,7 +238,7 @@ export default async function ProgramsPage() {
                 {roadmap.map((item, i) => (
                   <details key={i} className="group bg-slate-50 rounded-xl overflow-hidden" open={i === 0}>
                     <summary className="flex items-center gap-3 p-4 cursor-pointer list-none">
-                      <span className="text-xl font-bold text-blue-600">{item.step}</span>
+                      <span className="text-xl font-bold text-brand-blue-600">{item.step}</span>
                       <span className="font-semibold text-slate-900 flex-1 text-sm">{item.title}</span>
                       <svg className="w-4 h-4 text-slate-400 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -262,7 +262,7 @@ export default async function ProgramsPage() {
       </section>
 
       {/* SCROLLING TEXT */}
-      <section className="py-6 bg-blue-600 overflow-hidden">
+      <section className="py-6 bg-brand-blue-600 overflow-hidden">
         <div className="flex animate-marquee-reverse whitespace-nowrap">
           {[...Array(4)].map((_, i) => (
             <span key={i} className="text-4xl md:text-5xl font-black text-white/20 mx-6">
@@ -277,9 +277,9 @@ export default async function ProgramsPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-10 items-center">
             <div className="order-2 lg:order-1">
-              <p className="text-blue-600 font-semibold text-sm uppercase tracking-widest mb-4">Why Elevate?</p>
+              <p className="text-brand-blue-600 font-semibold text-sm uppercase tracking-widest mb-4">Why Elevate?</p>
               <h2 className="text-3xl font-bold text-slate-900 leading-tight mb-4">
-                We don&apos;t just train you. <span className="text-blue-600">We launch your career.</span>
+                We don&apos;t just train you. <span className="text-brand-blue-600">We launch your career.</span>
               </h2>
               <p className="text-base text-slate-600 mb-5">From enrollment to employment, we support you every step of the way.</p>
               <div className="space-y-2">
@@ -364,12 +364,12 @@ export default async function ProgramsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-blue-600">
+      <section className="py-16 lg:py-24 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Begin Your Journey Today</h2>
-          <p className="text-lg text-blue-100 mb-8">Whether you&apos;re starting fresh or changing careers, we&apos;re here to help.</p>
+          <p className="text-lg text-brand-blue-100 mb-8">Whether you&apos;re starting fresh or changing careers, we&apos;re here to help.</p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-blue-50 transition-all">
+            <Link href="/apply" className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-brand-blue-50 transition-all">
               Check Eligibility
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
@@ -379,7 +379,7 @@ export default async function ProgramsPage() {
               Get Help Online
             </Link>
           </div>
-          <p className="text-blue-200 text-sm mt-4">
+          <p className="text-brand-blue-200 text-sm mt-4">
             Enrollment is availability- and eligibility-based. A workforce advisor will confirm your placement and start date.
           </p>
         </div>

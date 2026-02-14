@@ -52,14 +52,14 @@ export default async function MarketplaceSellersPage() {
             {sellerList.map((seller: any) => (
               <div key={seller.id} className="bg-white rounded-xl border p-6 hover:shadow-lg transition">
                 <div className="flex items-center gap-4 mb-4">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
-                    <User className="w-8 h-8 text-blue-600" />
+                  <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                    <User className="w-8 h-8 text-brand-blue-600" />
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
                       <h3 className="font-semibold text-gray-900">{seller.store_name || seller.profile?.full_name || 'Seller'}</h3>
                       {seller.is_verified && (
-                        <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs rounded-full">Verified</span>
+                        <span className="px-2 py-0.5 bg-brand-blue-100 text-brand-blue-700 text-xs rounded-full">Verified</span>
                       )}
                     </div>
                     {seller.rating > 0 && (
@@ -97,7 +97,7 @@ export default async function MarketplaceSellersPage() {
             <p className="text-gray-600 mb-6">Be the first to sell on our marketplace.</p>
             <Link 
               href="/marketplace/sell"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               Become a Seller
             </Link>

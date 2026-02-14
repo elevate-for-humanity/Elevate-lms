@@ -97,12 +97,12 @@ export default function ShopOwnerRegisterPage() {
         </header>
 
         <main className="px-4 py-6 space-y-6">
-          <div className="bg-blue-600/20 border border-blue-500/30 rounded-xl p-6">
-            <div className="w-16 h-16 bg-blue-500 rounded-xl flex items-center justify-center mb-4">
+          <div className="bg-brand-blue-600/20 border border-brand-blue-500/30 rounded-xl p-6">
+            <div className="w-16 h-16 bg-brand-blue-500 rounded-xl flex items-center justify-center mb-4">
               <Building2 className="w-8 h-8 text-white" />
             </div>
             <h2 className="text-xl font-bold text-white mb-2">Partner Shop Program</h2>
-            <p className="text-blue-200 mb-4">
+            <p className="text-brand-blue-200 mb-4">
               Join our network of licensed barbershops training the next generation of barbers.
             </p>
             <ul className="space-y-2 text-sm text-slate-300">
@@ -137,7 +137,7 @@ export default function ShopOwnerRegisterPage() {
 
           <button
             onClick={() => setStep('details')}
-            className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 flex items-center justify-center gap-2"
+            className="w-full bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700 flex items-center justify-center gap-2"
           >
             Start Application
             <ChevronRight className="w-5 h-5" />
@@ -175,7 +175,7 @@ export default function ShopOwnerRegisterPage() {
                 value={shopData.name}
                 onChange={(e) => updateField('name', e.target.value)}
                 placeholder="Your Barbershop Name"
-                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
 
@@ -186,7 +186,7 @@ export default function ShopOwnerRegisterPage() {
                 value={shopData.ownerName}
                 onChange={(e) => updateField('ownerName', e.target.value)}
                 placeholder="Full Name"
-                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
 
@@ -197,7 +197,7 @@ export default function ShopOwnerRegisterPage() {
                 value={shopData.address}
                 onChange={(e) => updateField('address', e.target.value)}
                 placeholder="123 Main Street"
-                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
 
@@ -209,7 +209,7 @@ export default function ShopOwnerRegisterPage() {
                   value={shopData.city}
                   onChange={(e) => updateField('city', e.target.value)}
                   placeholder="City"
-                  className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
               <div>
@@ -217,7 +217,7 @@ export default function ShopOwnerRegisterPage() {
                 <select
                   value={shopData.state}
                   onChange={(e) => updateField('state', e.target.value)}
-                  className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 >
                   <option value="">Select</option>
                   {US_STATES.map(state => (
@@ -235,7 +235,7 @@ export default function ShopOwnerRegisterPage() {
                 onChange={(e) => updateField('zip', e.target.value)}
                 placeholder="12345"
                 maxLength={5}
-                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
 
@@ -246,7 +246,7 @@ export default function ShopOwnerRegisterPage() {
                 value={shopData.phone}
                 onChange={(e) => updateField('phone', e.target.value)}
                 placeholder="(555) 123-4567"
-                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
 
@@ -257,7 +257,7 @@ export default function ShopOwnerRegisterPage() {
                 value={shopData.email}
                 onChange={(e) => updateField('email', e.target.value)}
                 placeholder="shop@example.com"
-                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
 
@@ -268,7 +268,7 @@ export default function ShopOwnerRegisterPage() {
                 value={shopData.licenseNumber}
                 onChange={(e) => updateField('licenseNumber', e.target.value)}
                 placeholder="License Number"
-                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full bg-slate-800 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
           </div>
@@ -276,7 +276,7 @@ export default function ShopOwnerRegisterPage() {
           <button
             onClick={() => setStep('confirm')}
             disabled={!shopData.name || !shopData.address || !shopData.city || !shopData.state || !shopData.phone || !shopData.email || !shopData.licenseNumber}
-            className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             Continue
             <ChevronRight className="w-5 h-5" />
@@ -351,7 +351,7 @@ export default function ShopOwnerRegisterPage() {
               type="checkbox"
               checked={agreedToTerms}
               onChange={(e) => setAgreedToTerms(e.target.checked)}
-              className="w-5 h-5 mt-0.5 rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
+              className="w-5 h-5 mt-0.5 rounded border-slate-600 bg-slate-700 text-brand-blue-600 focus:ring-brand-blue-500"
             />
             <span className="text-slate-300 text-sm">
               I certify that the information provided is accurate and I agree to the partner program terms and conditions.
@@ -361,7 +361,7 @@ export default function ShopOwnerRegisterPage() {
           <button
             onClick={handleSubmit}
             disabled={loading || !agreedToTerms}
-            className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="w-full bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
@@ -393,7 +393,7 @@ export default function ShopOwnerRegisterPage() {
         </p>
         <Link
           href="/pwa/shop-owner"
-          className="inline-block w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700"
+          className="inline-block w-full bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700"
         >
           Return to Home
         </Link>

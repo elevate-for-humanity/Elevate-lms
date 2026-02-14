@@ -69,7 +69,7 @@ export default async function CreateShopPage() {
                 id="name"
                 name="name"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 placeholder="e.g., Main Street Barbershop"
               />
             </div>
@@ -82,7 +82,7 @@ export default async function CreateShopPage() {
                 type="text"
                 id="ein"
                 name="ein"
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 placeholder="XX-XXXXXXX"
               />
             </div>
@@ -96,7 +96,7 @@ export default async function CreateShopPage() {
                 id="address1"
                 name="address1"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
 
@@ -108,7 +108,7 @@ export default async function CreateShopPage() {
                 type="text"
                 id="address2"
                 name="address2"
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 placeholder="Suite, Unit, etc."
               />
             </div>
@@ -123,7 +123,7 @@ export default async function CreateShopPage() {
                   id="city"
                   name="city"
                   required
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
 
@@ -136,7 +136,7 @@ export default async function CreateShopPage() {
                   name="state"
                   required
                   defaultValue="IN"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="IN">IN</option>
                   <option value="IL">IL</option>
@@ -156,7 +156,7 @@ export default async function CreateShopPage() {
                 id="zip"
                 name="zip"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 placeholder="XXXXX"
               />
             </div>
@@ -170,7 +170,7 @@ export default async function CreateShopPage() {
                 id="phone"
                 name="phone"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 placeholder="(XXX) XXX-XXXX"
               />
             </div>
@@ -184,14 +184,14 @@ export default async function CreateShopPage() {
                 id="email"
                 name="email"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
 
             <div className="pt-4">
               <button
                 type="submit"
-                className="w-full px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                className="w-full px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Create Shop
               </button>

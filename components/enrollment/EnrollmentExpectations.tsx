@@ -38,7 +38,7 @@ export function EnrollmentExpectations({
   if (variant === 'inline') {
     return (
       <div className={`flex items-start gap-2 text-sm text-slate-600 ${className}`}>
-        <Clock className="w-4 h-4 text-blue-500 flex-shrink-0 mt-0.5" />
+        <Clock className="w-4 h-4 text-brand-blue-500 flex-shrink-0 mt-0.5" />
         <span>
           After applying, a workforce advisor will confirm your eligibility and start date within 2-3 business days.
         </span>
@@ -48,9 +48,9 @@ export function EnrollmentExpectations({
 
   if (variant === 'card') {
     return (
-      <div className={`bg-blue-50 border border-blue-200 rounded-xl p-6 ${className}`}>
-        <h3 className="font-semibold text-blue-900 mb-3">What Happens After You Apply</h3>
-        <p className="text-blue-800 mb-4">
+      <div className={`bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 ${className}`}>
+        <h3 className="font-semibold text-brand-blue-900 mb-3">What Happens After You Apply</h3>
+        <p className="text-brand-blue-800 mb-4">
           Enrollment is availability- and eligibility-based. After applying, a workforce advisor will confirm your placement and start date.
         </p>
         {showTimeline && (
@@ -87,7 +87,7 @@ export function EnrollmentExpectations({
 
   // Default: banner
   return (
-    <div className={`bg-slate-100 border-l-4 border-blue-500 px-4 py-3 ${className}`}>
+    <div className={`bg-slate-100 border-l-4 border-brand-blue-500 px-4 py-3 ${className}`}>
       <p className="text-slate-700 text-sm">
         <strong>Note:</strong> Enrollment is availability- and eligibility-based. After applying, a workforce advisor will confirm your placement and start date.
       </p>
@@ -105,7 +105,7 @@ interface TimelineStepProps {
 function TimelineStep({ icon, title, description, status }: TimelineStepProps) {
   const statusColors = {
     complete: 'bg-green-100 text-green-600 border-green-200',
-    current: 'bg-blue-100 text-blue-600 border-blue-200',
+    current: 'bg-brand-blue-100 text-brand-blue-600 border-brand-blue-200',
     pending: 'bg-slate-100 text-slate-400 border-slate-200',
   };
 

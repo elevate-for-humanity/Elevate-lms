@@ -116,7 +116,7 @@ export default function EmailMarketingPage() {
 
           <div className="rounded-xl bg-white p-6 shadow-sm border border-slate-200">
             <div className="flex items-center justify-between mb-2">
-              <Users className="h-11 w-11 text-blue-600" />
+              <Users className="h-11 w-11 text-brand-blue-600" />
               <span className="text-xs font-semibold text-slate-500">
                 CONTACTS
               </span>
@@ -230,7 +230,7 @@ export default function EmailMarketingPage() {
                             campaign.status === 'Sent'
                               ? 'bg-brand-green-100 text-green-800'
                               : campaign.status === 'Scheduled'
-                                ? 'bg-blue-100 text-blue-800'
+                                ? 'bg-brand-blue-100 text-brand-blue-800'
                                 : 'bg-slate-100 text-black'
                           }`}
                         >

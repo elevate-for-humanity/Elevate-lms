@@ -56,19 +56,19 @@ export default function AlumniPage() {
       </div>
 
       {/* Hero */}
-      <section className="pt-24 pb-16 lg:pt-32 lg:pb-24 bg-blue-700 text-white">
+      <section className="pt-24 pb-16 lg:pt-32 lg:pb-24 bg-brand-blue-700 text-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl">
             <h1 className="text-4xl sm:text-5xl font-bold mb-6">
               Elevate Alumni Network
             </h1>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-brand-blue-100 mb-8">
               Join thousands of graduates who have transformed their careers. Access exclusive job opportunities, networking events, and continued learning resources.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 bg-white text-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                className="inline-flex items-center gap-2 bg-white text-brand-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
               >
                 Sign In to Alumni Portal
                 <ArrowRight className="w-4 h-4" />
@@ -90,7 +90,7 @@ export default function AlumniPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-2">{stat.value}</div>
+                <div className="text-3xl md:text-4xl font-bold text-brand-blue-600 mb-2">{stat.value}</div>
                 <div className="text-gray-600">{stat.label}</div>
               </div>
             ))}
@@ -105,7 +105,7 @@ export default function AlumniPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {benefits.map((benefit) => (
               <div key={benefit.title} className="bg-white border rounded-xl p-6 hover:shadow-lg transition-shadow">
-                <benefit.icon className="w-10 h-10 text-blue-600 mb-4" />
+                <benefit.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">{benefit.title}</h3>
                 <p className="text-gray-600 text-sm">{benefit.description}</p>
               </div>
@@ -132,7 +132,7 @@ export default function AlumniPage() {
                   </div>
                   <div className="p-6">
                     <h3 className="font-semibold text-lg">{alumni.name}</h3>
-                    <p className="text-blue-600 text-sm mb-2">{alumni.program}</p>
+                    <p className="text-brand-blue-600 text-sm mb-2">{alumni.program}</p>
                     <p className="text-gray-500 text-sm flex items-center gap-1 mb-4">
                       <MapPin className="w-3 h-3" /> {alumni.company}
                     </p>
@@ -151,7 +151,7 @@ export default function AlumniPage() {
               </p>
               <Link
                 href="/apply"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
               >
                 Start Your Journey
                 <ArrowRight className="w-4 h-4" />
@@ -162,15 +162,15 @@ export default function AlumniPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-blue-600 text-white">
+      <section className="py-16 lg:py-24 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Join Our Network?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             All Elevate graduates automatically become part of our alumni network. Sign in to access your benefits.
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
           >
             Access Alumni Portal
             <ArrowRight className="w-4 h-4" />

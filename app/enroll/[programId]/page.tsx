@@ -208,7 +208,7 @@ export default function EnrollPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center" role="status" aria-live="polite">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" aria-hidden="true"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4" aria-hidden="true"></div>
           <p className="text-gray-600">Loading program details...</p>
           <span className="sr-only">Loading program information, please wait</span>
         </div>
@@ -266,16 +266,16 @@ export default function EnrollPage() {
                     </span>
                   ) : null}
                 </div>
-                <p className="text-blue-100 mt-1 text-sm sm:text-base">
+                <p className="text-brand-blue-100 mt-1 text-sm sm:text-base">
                   Duration: {program.duration_weeks} weeks
                 </p>
               </div>
             </div>
-            <p className="text-base sm:text-lg text-blue-50">
+            <p className="text-base sm:text-lg text-brand-blue-50">
               {program.description}
             </p>
             {program.funding_eligible && (program.price || program.total_cost) && (
-              <p className="text-sm text-blue-200 mt-2">
+              <p className="text-sm text-brand-blue-200 mt-2">
                 Self-pay option: ${(program.price || program.total_cost || 0).toLocaleString()}
               </p>
             )}
@@ -289,7 +289,7 @@ export default function EnrollPage() {
                     ? 'bg-red-50 text-red-800 border border-red-200'
                     : message.includes('successful')
                       ? 'bg-green-50 text-green-800 border border-green-200'
-                      : 'bg-blue-50 text-blue-800 border border-blue-200'
+                      : 'bg-brand-blue-50 text-brand-blue-800 border border-brand-blue-200'
                 }`}
               >
                 {message.includes('Error') ? (
@@ -332,7 +332,7 @@ export default function EnrollPage() {
                       if (e.target.value) checkEligibility();
                     }}
                     placeholder="Enter your license key"
-                    className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="block w-full pl-9 sm:pl-10 pr-3 py-2 sm:py-3 text-sm sm:text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
                 <p className="mt-2 text-xs sm:text-sm text-gray-500">
@@ -377,7 +377,7 @@ export default function EnrollPage() {
               <button
                 onClick={handleEnroll}
                 disabled={enrolling || (eligibility && !eligibility.can_enroll)}
-                className="flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="flex-1 flex items-center justify-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 text-sm sm:text-base bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {enrolling ? (
                   <>

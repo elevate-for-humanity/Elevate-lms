@@ -643,7 +643,7 @@ export default function TrainingPage() {
                   {isEnrolled ? (
                     <button
                       onClick={() => setSelectedModule(module.id)}
-                      className="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 flex items-center justify-center gap-2"
+                      className="w-full bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700 flex items-center justify-center gap-2"
                     >
                       <Play className="w-5 h-5" />
                       Continue Learning
@@ -666,7 +666,7 @@ export default function TrainingPage() {
 
                   <button
                     onClick={() => setSelectedModule(module.id)}
-                    className="w-full mt-2 text-blue-600 py-2 text-sm font-semibold hover:underline"
+                    className="w-full mt-2 text-brand-blue-600 py-2 text-sm font-semibold hover:underline"
                   >
                     View Details
                   </button>
@@ -718,7 +718,7 @@ export default function TrainingPage() {
                 </div>
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6 text-sm">
+              <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6 text-sm">
                 <strong>Don't have an access key?</strong>
                 <p className="mt-1">
                   Access keys are sent to new employees after they pass the
@@ -773,14 +773,14 @@ export default function TrainingPage() {
                     <div className="text-sm text-black">Duration</div>
                   </div>
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <BookOpen className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+                    <BookOpen className="w-8 h-8 mx-auto mb-2 text-brand-blue-600" />
                     <div className="font-bold">
                       {selectedModuleData.lessons} Lessons
                     </div>
                     <div className="text-sm text-black">Content</div>
                   </div>
                   <div className="text-center p-4 bg-gray-50 rounded-lg">
-                    <Award className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+                    <Award className="w-8 h-8 mx-auto mb-2 text-brand-blue-600" />
                     <div className="font-bold">Certificate</div>
                     <div className="text-sm text-black">Upon Completion</div>
                   </div>

@@ -64,7 +64,7 @@ export default async function CashAdvanceReportsPage() {
         <div className="mb-8">
           <Link
             href="/admin/cash-advances"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Cash Advances
           </Link>
@@ -100,7 +100,7 @@ export default async function CashAdvanceReportsPage() {
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-blue-600">
+            <div className="text-3xl font-bold text-brand-blue-600">
               ${totalAmount.toFixed(2)}
             </div>
             <div className="text-black text-sm">Total Amount</div>
@@ -153,7 +153,7 @@ export default async function CashAdvanceReportsPage() {
             <button className="px-4 py-2 bg-brand-green-600 text-white rounded hover:bg-green-700" aria-label="Action button">
               Export to PDF
             </button>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" aria-label="Action button">
+            <button className="px-4 py-2 bg-brand-blue-600 text-white rounded hover:bg-brand-blue-700" aria-label="Action button">
               Export to Excel
             </button>
           </div>

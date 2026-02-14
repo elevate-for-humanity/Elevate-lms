@@ -59,13 +59,13 @@ export default function MissionPage() {
       </div>
 
       {/* Hero */}
-      <div className="bg-blue-600 text-white py-16">
+      <div className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <Heart className="w-12 h-12 mx-auto mb-6 text-blue-200" />
+          <Heart className="w-12 h-12 mx-auto mb-6 text-brand-blue-200" />
           <h1 className="text-3xl md:text-4xl font-bold mb-6">
             Our Mission
           </h1>
-          <p className="text-xl md:text-2xl text-blue-100 leading-relaxed max-w-3xl mx-auto">
+          <p className="text-xl md:text-2xl text-brand-blue-100 leading-relaxed max-w-3xl mx-auto">
             To create pathways out of poverty and into prosperity by providing free, 
             high-quality career training to those who need it most.
           </p>
@@ -94,11 +94,11 @@ export default function MissionPage() {
         {/* Who We Serve */}
         <section className="mb-16">
           <h2 className="text-2xl font-bold text-slate-900 mb-6">Who We Serve</h2>
-          <div className="bg-blue-50 rounded-xl p-6 border border-blue-100">
+          <div className="bg-brand-blue-50 rounded-xl p-6 border border-brand-blue-100">
             <ul className="space-y-3">
               {populations.map((pop, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-slate-700">{pop}</span>
                 </li>
               ))}
@@ -112,8 +112,8 @@ export default function MissionPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {coreValues.map((value) => (
               <div key={value.title} className="bg-white border border-slate-200 rounded-xl p-6">
-                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center mb-4">
-                  <value.icon className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-50 rounded-lg flex items-center justify-center mb-4">
+                  <value.icon className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <h3 className="text-lg font-semibold text-slate-900 mb-2">{value.title}</h3>
                 <p className="text-slate-600">{value.description}</p>
@@ -127,21 +127,21 @@ export default function MissionPage() {
           <h2 className="text-2xl font-bold text-slate-900 mb-6">How It Works</h2>
           <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
+              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">1</div>
               <div>
                 <h3 className="font-semibold text-slate-900 mb-1">Enroll in a Training Program</h3>
                 <p className="text-slate-600">Choose from healthcare, skilled trades, technology, or business programs. Most are fully funded through WIOA, WRG, or employer sponsorship.</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
+              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">2</div>
               <div>
                 <h3 className="font-semibold text-slate-900 mb-1">Complete Training and Earn Credentials</h3>
                 <p className="text-slate-600">Finish your program, pass certification exams, and earn industry-recognized credentials that employers value.</p>
               </div>
             </div>
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
+              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">3</div>
               <div>
                 <h3 className="font-semibold text-slate-900 mb-1">Get Placed in Employment</h3>
                 <p className="text-slate-600">Our employer partners hire directly from our programs. Career services support you through placement and beyond.</p>
@@ -159,7 +159,7 @@ export default function MissionPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/programs"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition-colors"
             >
               <GraduationCap className="w-5 h-5" />
               View Programs

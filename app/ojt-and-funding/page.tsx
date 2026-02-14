@@ -53,12 +53,12 @@ export default function OJTAndFundingPage() {
                 <div className="space-y-2 mb-4">
                   {['Paid hourly wage from day one', 'Hands-on training at a real workplace', '2,000+ hours of supervised experience', 'Industry certification upon completion', 'Job waiting for you when you finish'].map((item) => (
                     <div key={item} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0" />
+                      <span className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full flex-shrink-0" />
                       <span className="text-slate-700 text-sm">{item}</span>
                     </div>
                   ))}
                 </div>
-                <Link href="/programs/barber-apprenticeship" className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                <Link href="/programs/barber-apprenticeship" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-brand-blue-700 transition-colors">
                   View Barber Apprenticeship <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -77,12 +77,12 @@ export default function OJTAndFundingPage() {
                 <div className="space-y-2 mb-4">
                   {['Full employment from day one', 'Employer receives wage reimbursement', 'Training customized to the job', 'Leads to permanent employment', 'Available across many industries'].map((item) => (
                     <div key={item} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0" />
+                      <span className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full flex-shrink-0" />
                       <span className="text-slate-700 text-sm">{item}</span>
                     </div>
                   ))}
                 </div>
-                <Link href="/employer" className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                <Link href="/employer" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-brand-blue-700 transition-colors">
                   Employer Partnership <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -104,7 +104,7 @@ export default function OJTAndFundingPage() {
               { step: '5', title: 'Start Earning', desc: 'Begin working and training on day one. Earn a paycheck while you learn.' },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
+                <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
                   <p className="text-slate-600 text-sm">{item.desc}</p>
@@ -116,12 +116,12 @@ export default function OJTAndFundingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14 bg-blue-600">
+      <section className="py-8 sm:py-14 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Earning While You Learn</h2>
           <p className="text-white/90 mb-6 text-sm">Apply today and tell us you want an earn-while-you-learn program.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply" className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
+            <Link href="/apply" className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">
               Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
             <Link href="/programs/apprenticeships" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

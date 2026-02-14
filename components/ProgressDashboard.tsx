@@ -78,8 +78,8 @@ export function ProgressDashboard({ userId }: { userId: string }) {
       label: 'Courses Completed',
       value: `${data.courses_completed}/${data.total_courses}`,
       icon: BookOpen,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: 'text-brand-blue-600',
+      bgColor: 'bg-brand-blue-50',
     },
     {
       label: 'Hours Studied',

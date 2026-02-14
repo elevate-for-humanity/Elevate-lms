@@ -322,7 +322,7 @@ export default function CourseDiscussionsPage() {
                       >
                     ) => setNewTopic(e.target.value)}
                     placeholder="What would you like to discuss?"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -340,7 +340,7 @@ export default function CourseDiscussionsPage() {
                     ) => setNewMessage(e.target.value)}
                     placeholder="Share your thoughts..."
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div className="flex gap-3">

@@ -88,7 +88,7 @@ export default function TestEnrollmentPage() {
           <button
             onClick={handleCheckout}
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded font-medium hover:bg-blue-700 disabled:opacity-50"
+            className="w-full bg-brand-blue-600 text-white py-3 rounded font-medium hover:bg-brand-blue-700 disabled:opacity-50"
           >
             {loading ? 'Creating checkout...' : 'Start Checkout'}
           </button>

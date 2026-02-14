@@ -102,7 +102,7 @@ export default async function MessagesPage() {
             </p>
           </div>
           <div className="mt-4 md:mt-0">
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition">
               <Plus className="w-4 h-4" />
               New Message
             </button>
@@ -118,7 +118,7 @@ export default async function MessagesPage() {
                 <input
                   type="text"
                   placeholder="Search messages..."
-                  className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
               <div className="flex gap-2">
@@ -139,10 +139,10 @@ export default async function MessagesPage() {
                 <Link
                   key={conv.id}
                   href={`/lms/messages/${conv.id}`}
-                  className={`block p-4 hover:bg-slate-50 transition ${conv.unread > 0 ? 'bg-blue-50' : ''}`}
+                  className={`block p-4 hover:bg-slate-50 transition ${conv.unread > 0 ? 'bg-brand-blue-50' : ''}`}
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                    <div className="w-12 h-12 bg-brand-blue-500 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                       {conv.participant?.full_name?.[0]?.toUpperCase() || 'U'}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -162,10 +162,10 @@ export default async function MessagesPage() {
                       </p>
                       <div className="flex items-center gap-2 mt-1">
                         {conv.lastMessage.sender_id === user.id && conv.lastMessage.read_at && (
-                          <CheckCheck className="w-4 h-4 text-blue-500" />
+                          <CheckCheck className="w-4 h-4 text-brand-blue-500" />
                         )}
                         {conv.unread > 0 && (
-                          <span className="px-2 py-0.5 bg-blue-600 text-white text-xs font-bold rounded-full">
+                          <span className="px-2 py-0.5 bg-brand-blue-600 text-white text-xs font-bold rounded-full">
                             {conv.unread}
                           </span>
                         )}
@@ -182,7 +182,7 @@ export default async function MessagesPage() {
               <p className="text-slate-600 mb-6">
                 Start a conversation with your instructors or classmates.
               </p>
-              <button className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition">
+              <button className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition">
                 <Plus className="w-5 h-5" />
                 Start a Conversation
               </button>
@@ -194,7 +194,7 @@ export default async function MessagesPage() {
         <div className="mt-8">
           <h2 className="text-lg font-bold text-slate-900 mb-4">Quick Contacts</h2>
           <div className="grid md:grid-cols-3 gap-4">
-            <Link href="/lms/messages/support" className="bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 hover:shadow-md transition">
+            <Link href="/lms/messages/support" className="bg-white rounded-xl border border-slate-200 p-4 hover:border-brand-blue-300 hover:shadow-md transition">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
                   <User className="w-5 h-5 text-green-600" />
@@ -205,10 +205,10 @@ export default async function MessagesPage() {
                 </div>
               </div>
             </Link>
-            <Link href="/lms/messages/instructor" className="bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 hover:shadow-md transition">
+            <Link href="/lms/messages/instructor" className="bg-white rounded-xl border border-slate-200 p-4 hover:border-brand-blue-300 hover:shadow-md transition">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900">My Instructor</h3>
@@ -216,10 +216,10 @@ export default async function MessagesPage() {
                 </div>
               </div>
             </Link>
-            <Link href="/lms/messages/career" className="bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 hover:shadow-md transition">
+            <Link href="/lms/messages/career" className="bg-white rounded-xl border border-slate-200 p-4 hover:border-brand-blue-300 hover:shadow-md transition">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                  <User className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                  <User className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-semibold text-slate-900">Career Services</h3>

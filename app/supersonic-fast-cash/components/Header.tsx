@@ -23,14 +23,14 @@ export function SupersonicHeader() {
   return (
     <>
       {/* Top Bar - Trust indicators */}
-      <div className="bg-blue-900 text-white py-2">
+      <div className="bg-brand-blue-900 text-white py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center text-sm">
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4" />
               <span className="hidden sm:inline">Secure Tax Preparation</span>
             </div>
-            <a href="/support" className="flex items-center gap-2 hover:text-blue-200">
+            <a href="/support" className="flex items-center gap-2 hover:text-brand-blue-200">
               <Phone className="w-4 h-4" />
               <span>Get Help Online</span>
             </a>
@@ -45,9 +45,9 @@ export function SupersonicHeader() {
             {/* Logo */}
             <Link href="/supersonic-fast-cash" className="flex items-center">
               <div className="text-xl font-bold">
-                <span className="text-blue-900">Supersonic</span>
+                <span className="text-brand-blue-900">Supersonic</span>
                 <span className="text-red-600"> Fast Cash</span>
-                <span className="text-blue-900 text-sm font-normal ml-1">LLC</span>
+                <span className="text-brand-blue-900 text-sm font-normal ml-1">LLC</span>
               </div>
             </Link>
 
@@ -57,7 +57,7 @@ export function SupersonicHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-gray-700 hover:text-blue-900 font-medium text-sm"
+                  className="text-gray-700 hover:text-brand-blue-900 font-medium text-sm"
                 >
                   {link.label}
                 </Link>
@@ -73,7 +73,7 @@ export function SupersonicHeader() {
             {/* Mobile Menu Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-gray-700 hover:text-blue-900"
+              className="lg:hidden p-2 text-gray-700 hover:text-brand-blue-900"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -89,7 +89,7 @@ export function SupersonicHeader() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="block py-2 text-gray-700 hover:text-blue-900 font-medium"
+                  className="block py-2 text-gray-700 hover:text-brand-blue-900 font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {link.label}

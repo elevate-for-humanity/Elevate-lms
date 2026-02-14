@@ -103,7 +103,7 @@ export default function ApproveHoursPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
+          <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-white">Loading pending hours...</p>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function ApproveHoursPage() {
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/shop-owner/approve-hours"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
+            className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
           >
             Sign In
           </Link>
@@ -153,8 +153,8 @@ export default function ApproveHoursPage() {
           entries.map((entry) => (
             <div key={entry.id} className="bg-slate-800 rounded-xl p-4">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
-                  <User className="w-6 h-6 text-blue-400" />
+                <div className="w-12 h-12 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                  <User className="w-6 h-6 text-brand-blue-400" />
                 </div>
                 <div className="flex-1">
                   <p className="text-white font-medium">{entry.apprenticeName}</p>

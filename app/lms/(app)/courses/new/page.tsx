@@ -37,7 +37,7 @@ export default async function NewCoursePage() {
             </div>
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Thumbnail</label><div className="border-2 border-dashed rounded-lg p-6 text-center"><p className="text-gray-500">Drag and drop or click to upload</p></div></div>
             <div className="flex gap-4 pt-4 border-t">
-              <button type="submit" className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Create Course</button>
+              <button type="submit" className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Create Course</button>
               <Link href="/lms/courses" className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</Link>
             </div>
           </form>

@@ -95,9 +95,9 @@ export default function RoleDashboard({ role, userName }: RoleDashboardProps) {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">{config.title}</h1>
-            <p className="text-xl text-blue-100 mb-8">{config.description}</p>
+            <p className="text-xl text-brand-blue-100 mb-8">{config.description}</p>
             {userName && (
-              <p className="text-lg text-blue-200">Welcome back, {userName}!</p>
+              <p className="text-lg text-brand-blue-200">Welcome back, {userName}!</p>
             )}
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function RoleDashboard({ role, userName }: RoleDashboardProps) {
               {config.stats.map((stat, index) => (
                 <div key={index} className="bg-white rounded-lg shadow-sm border p-6">
                   <div className="text-sm text-black mb-1">{stat.label}</div>
-                  <div className="text-3xl font-bold text-blue-600">{stat.value}</div>
+                  <div className="text-3xl font-bold text-brand-blue-600">{stat.value}</div>
                 </div>
               ))}
             </div>
@@ -122,7 +122,7 @@ export default function RoleDashboard({ role, userName }: RoleDashboardProps) {
               <div className="flex flex-wrap gap-4">
                 <Link
                   href={config.primaryAction.href}
-                  className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                  className="px-8 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
                 >
                   {config.primaryAction.label}
                 </Link>

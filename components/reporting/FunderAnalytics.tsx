@@ -37,7 +37,7 @@ const funderDescriptions: Record<string, string> = {
 };
 
 const funderColors: Record<string, string> = {
-  WIOA: 'bg-blue-100 text-blue-800 border-blue-300',
+  WIOA: 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-300',
   WRG: 'bg-green-100 text-green-800 border-green-300',
   JRI: 'bg-purple-100 text-purple-800 border-purple-300',
   SEAL: 'bg-orange-100 text-orange-800 border-orange-300',
@@ -381,7 +381,7 @@ export default function FunderAnalytics() {
 
             {/* Compliance Notes */}
             {funder.funderType === 'WIOA' && (
-              <Card className="border-blue-300 bg-blue-50">
+              <Card className="border-brand-blue-300 bg-brand-blue-50">
                 <CardHeader>
                   <CardTitle>WIOA Compliance Notes</CardTitle>
                 </CardHeader>

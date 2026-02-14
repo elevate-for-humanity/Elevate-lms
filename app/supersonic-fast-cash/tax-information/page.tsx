@@ -53,28 +53,28 @@ export default async function TaxInformationPage() {
       <section id="tax-tips" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-12">
-            <FileText className="w-12 h-12 text-blue-600" />
+            <FileText className="w-12 h-12 text-brand-blue-600" />
             <h2 className="text-4xl font-black text-black">Tax Tips</h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-blue-50 rounded-lg p-8 border border-blue-200">
+            <div className="bg-brand-blue-50 rounded-lg p-8 border border-brand-blue-200">
               <h3 className="text-2xl font-bold text-black mb-4">Maximize Your Deductions</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Keep detailed records of all business expenses</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Track mileage for business travel</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Save receipts for charitable donations</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Consider home office deduction if eligible</span>
                 </li>
               </ul>
@@ -124,23 +124,23 @@ export default async function TaxInformationPage() {
               </ul>
             </div>
 
-            <div className="bg-blue-50 rounded-lg p-8 border border-blue-200">
+            <div className="bg-brand-blue-50 rounded-lg p-8 border border-brand-blue-200">
               <h3 className="text-2xl font-bold text-black mb-4">Year-Round Planning</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Adjust withholding if needed</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Make quarterly estimated payments</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Contribute to retirement accounts</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Review tax situation after major life changes</span>
                 </li>
               </ul>
@@ -170,37 +170,37 @@ export default async function TaxInformationPage() {
                 </thead>
                 <tbody>
                   <tr className="border-b border-gray-200">
-                    <td className="py-4 px-4 font-bold text-blue-600">10%</td>
+                    <td className="py-4 px-4 font-bold text-brand-blue-600">10%</td>
                     <td className="py-4 px-4">$0 - $11,600</td>
                     <td className="py-4 px-4">$0 - $23,200</td>
                   </tr>
                   <tr className="border-b border-gray-200">
-                    <td className="py-4 px-4 font-bold text-blue-600">12%</td>
+                    <td className="py-4 px-4 font-bold text-brand-blue-600">12%</td>
                     <td className="py-4 px-4">$11,601 - $47,150</td>
                     <td className="py-4 px-4">$23,201 - $94,300</td>
                   </tr>
                   <tr className="border-b border-gray-200">
-                    <td className="py-4 px-4 font-bold text-blue-600">22%</td>
+                    <td className="py-4 px-4 font-bold text-brand-blue-600">22%</td>
                     <td className="py-4 px-4">$47,151 - $100,525</td>
                     <td className="py-4 px-4">$94,301 - $201,050</td>
                   </tr>
                   <tr className="border-b border-gray-200">
-                    <td className="py-4 px-4 font-bold text-blue-600">24%</td>
+                    <td className="py-4 px-4 font-bold text-brand-blue-600">24%</td>
                     <td className="py-4 px-4">$100,526 - $191,950</td>
                     <td className="py-4 px-4">$201,051 - $383,900</td>
                   </tr>
                   <tr className="border-b border-gray-200">
-                    <td className="py-4 px-4 font-bold text-blue-600">32%</td>
+                    <td className="py-4 px-4 font-bold text-brand-blue-600">32%</td>
                     <td className="py-4 px-4">$191,951 - $243,725</td>
                     <td className="py-4 px-4">$383,901 - $487,450</td>
                   </tr>
                   <tr className="border-b border-gray-200">
-                    <td className="py-4 px-4 font-bold text-blue-600">35%</td>
+                    <td className="py-4 px-4 font-bold text-brand-blue-600">35%</td>
                     <td className="py-4 px-4">$243,726 - $609,350</td>
                     <td className="py-4 px-4">$487,451 - $731,200</td>
                   </tr>
                   <tr>
-                    <td className="py-4 px-4 font-bold text-blue-600">37%</td>
+                    <td className="py-4 px-4 font-bold text-brand-blue-600">37%</td>
                     <td className="py-4 px-4">$609,351+</td>
                     <td className="py-4 px-4">$731,201+</td>
                   </tr>
@@ -257,23 +257,23 @@ export default async function TaxInformationPage() {
             </div>
           </div>
 
-          <div className="mt-12 bg-blue-50 rounded-2xl p-8 border-2 border-blue-200">
+          <div className="mt-12 bg-brand-blue-50 rounded-2xl p-8 border-2 border-brand-blue-200">
             <h3 className="text-2xl font-black text-black mb-4">Important Notes</h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-2">
-                <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <span>The IRS generally has 3 years to audit your return</span>
               </li>
               <li className="flex items-start gap-2">
-                <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <span>If you underreport income by 25%+, the IRS has 6 years</span>
               </li>
               <li className="flex items-start gap-2">
-                <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <span>No statute of limitations if you don't file or file fraudulently</span>
               </li>
               <li className="flex items-start gap-2">
-                <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <span>Keep records longer if you have ongoing tax issues</span>
               </li>
             </ul>
@@ -293,13 +293,13 @@ export default async function TaxInformationPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/book-appointment"
-              className="px-10 py-5 bg-white text-blue-600 font-black rounded-xl hover:bg-gray-100 transition-all transform hover:scale-105 uppercase shadow-lg"
+              className="px-10 py-5 bg-white text-brand-blue-600 font-black rounded-xl hover:bg-gray-100 transition-all transform hover:scale-105 uppercase shadow-lg"
             >
               Get Started
             </Link>
             <Link
               href="/supersonic-fast-cash/book-appointment"
-              className="px-10 py-5 bg-transparent border-3 border-white text-white font-black rounded-xl hover:bg-white hover:text-blue-600 transition-all transform hover:scale-105 uppercase"
+              className="px-10 py-5 bg-transparent border-3 border-white text-white font-black rounded-xl hover:bg-white hover:text-brand-blue-600 transition-all transform hover:scale-105 uppercase"
             >
               Book Appointment
             </Link>

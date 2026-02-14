@@ -41,7 +41,7 @@ export default function GrantsPage() {
           </p>
           <Link
             href="/wioa-eligibility"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
           >
             See If You Qualify <ArrowRight className="w-5 h-5" />
           </Link>
@@ -62,7 +62,7 @@ export default function GrantsPage() {
               { icon: Shield, title: 'No Risk', desc: 'Unlike loans, grants never need to be paid back. Ever.' },
             ].map((item, i) => (
               <div key={i} className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                <item.icon className="w-10 h-10 text-blue-600 mb-4" />
+                <item.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <h3 className="font-bold text-slate-900 mb-2">{item.title}</h3>
                 <p className="text-slate-600 text-sm">{item.desc}</p>
               </div>
@@ -85,8 +85,8 @@ export default function GrantsPage() {
             {/* WIOA */}
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-start gap-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <Users className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <Users className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">WIOA (Workforce Innovation and Opportunity Act)</h3>
@@ -110,7 +110,7 @@ export default function GrantsPage() {
                       ))}
                     </ul>
                   </div>
-                  <Link href="/wioa-eligibility" className="text-blue-600 font-semibold hover:underline inline-flex items-center gap-1">
+                  <Link href="/wioa-eligibility" className="text-brand-blue-600 font-semibold hover:underline inline-flex items-center gap-1">
                     Check WIOA Eligibility <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -171,7 +171,7 @@ export default function GrantsPage() {
                       ))}
                     </ul>
                   </div>
-                  <Link href="/snap-et-partner" className="text-blue-600 font-semibold hover:underline inline-flex items-center gap-1">
+                  <Link href="/snap-et-partner" className="text-brand-blue-600 font-semibold hover:underline inline-flex items-center gap-1">
                     Learn About SNAP E&T <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -181,8 +181,8 @@ export default function GrantsPage() {
             {/* JRI */}
             <div className="bg-white border border-slate-200 rounded-2xl p-8 shadow-sm">
               <div className="flex flex-col md:flex-row md:items-start gap-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <GraduationCap className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <GraduationCap className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <div className="flex-1">
                   <h3 className="text-2xl font-bold text-slate-900 mb-2">JRI (Justice Reinvestment Initiative)</h3>
@@ -203,7 +203,7 @@ export default function GrantsPage() {
                       ))}
                     </ul>
                   </div>
-                  <Link href="/jri" className="text-blue-600 font-semibold hover:underline inline-flex items-center gap-1">
+                  <Link href="/jri" className="text-brand-blue-600 font-semibold hover:underline inline-flex items-center gap-1">
                     Learn About JRI Programs <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -214,12 +214,12 @@ export default function GrantsPage() {
       </section>
 
       {/* How to Apply */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-3xl font-bold text-white mb-4 text-center">
             How to Get Started
           </h2>
-          <p className="text-xl text-blue-100 text-center mb-12">
+          <p className="text-xl text-brand-blue-100 text-center mb-12">
             We make the process simple. Here&apos;s what happens:
           </p>
           <div className="grid md:grid-cols-4 gap-8">
@@ -230,18 +230,18 @@ export default function GrantsPage() {
               { num: '4', title: 'Start Training', desc: 'Begin your program with everything paid for.' },
             ].map((step, i) => (
               <div key={i} className="text-center">
-                <div className="w-14 h-14 bg-white text-blue-600 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                <div className="w-14 h-14 bg-white text-brand-blue-600 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                   {step.num}
                 </div>
                 <h3 className="text-lg font-bold text-white mb-2">{step.title}</h3>
-                <p className="text-blue-100 text-sm">{step.desc}</p>
+                <p className="text-brand-blue-100 text-sm">{step.desc}</p>
               </div>
             ))}
           </div>
           <div className="text-center mt-12">
             <Link
               href="/wioa-eligibility"
-              className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition-colors"
             >
               Check Your Eligibility Now <ArrowRight className="w-5 h-5" />
             </Link>
@@ -258,11 +258,11 @@ export default function GrantsPage() {
           </p>
           <p className="text-slate-700">
             Contact us at{' '}
-            <a href="/support" className="font-semibold text-blue-600 hover:underline">
+            <a href="/support" className="font-semibold text-brand-blue-600 hover:underline">
               Get Help Online
             </a>{' '}
             or email{' '}
-            <a href="mailto:elevate4humanityedu@gmail.com" className="font-semibold text-blue-600 hover:underline">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="font-semibold text-brand-blue-600 hover:underline">
               elevate4humanityedu@gmail.com
             </a>
           </p>

@@ -45,16 +45,16 @@ export default function SNAPETPartnerPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-blue-900 text-white py-20">
+      <section className="bg-brand-blue-900 text-white py-20">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-4xl">
-            <div className="inline-block bg-yellow-400 text-blue-900 px-6 py-3 rounded-full font-bold text-sm mb-6">
+            <div className="inline-block bg-yellow-400 text-brand-blue-900 px-6 py-3 rounded-full font-bold text-sm mb-6">
               DOL-USDA ALIGNED PROVIDER
             </div>
             <h1 className="text-5xl md:text-6xl font-bold mb-6">
               SNAP E&T Career Pathway Execution Partner
             </h1>
-            <p className="text-2xl text-blue-100 mb-8">
+            <p className="text-2xl text-brand-blue-100 mb-8">
               ETPL-approved, WIOA-aligned training provider ready to serve SNAP
               E&T participants with credentialed pathways, 80-hour compliance
               tracking, and verified outcomes.
@@ -62,7 +62,7 @@ export default function SNAPETPartnerPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="#capabilities"
-                className="inline-block px-8 py-4 bg-yellow-400 text-blue-900 font-bold rounded-lg hover:bg-yellow-300 transition text-lg text-center"
+                className="inline-block px-8 py-4 bg-yellow-400 text-brand-blue-900 font-bold rounded-lg hover:bg-yellow-300 transition text-lg text-center"
               >
                 View Capabilities
               </Link>
@@ -121,60 +121,60 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Clock className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mb-4">
+                <Clock className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">
                 80-Hour Compliance Ready
               </h3>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Real-time attendance tracking</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Hour verification system</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Monthly compliance reports</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>SNAP E&T hour code tagging</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Automated export for FSSA</span>
                 </li>
               </ul>
             </div>
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                <Image src="/images/icons/trending-up.png" alt="Icon" width={32} height={32} className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mb-4">
+                <Image src="/images/icons/trending-up.png" alt="Icon" width={32} height={32} className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold mb-3">Verified Outcomes</h3>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Credential tracking system</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Job placement verification</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Wage gain documentation</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Employer partnerships</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Performance reporting dashboard</span>
                 </li>
               </ul>
@@ -197,7 +197,7 @@ export default function SNAPETPartnerPage() {
 
           <div className="overflow-x-auto">
             <table className="w-full bg-white rounded-xl shadow-lg">
-              <thead className="bg-blue-600 text-white">
+              <thead className="bg-brand-blue-600 text-white">
                 <tr>
                   <th className="px-6 py-4 text-left">SNAP E&T Category</th>
                   <th className="px-6 py-4 text-left">Our Programs</th>
@@ -355,7 +355,7 @@ export default function SNAPETPartnerPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">15+</div>
+              <div className="text-4xl font-bold text-brand-blue-600 mb-2">15+</div>
               <p className="font-bold mb-2">Training Programs</p>
               <p className="text-sm text-black">
                 All ETPL-approved and credentialed
@@ -371,7 +371,7 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">85%</div>
+              <div className="text-4xl font-bold text-brand-blue-600 mb-2">85%</div>
               <p className="font-bold mb-2">Job Placement Rate</p>
               <p className="text-sm text-black">
                 Verified employer connections
@@ -403,7 +403,7 @@ export default function SNAPETPartnerPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 1
               </div>
               <h3 className="text-xl font-bold mb-3">Intro Meeting</h3>
@@ -414,7 +414,7 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
               <h3 className="text-xl font-bold mb-3">Program Mapping</h3>
@@ -425,7 +425,7 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 3
               </div>
               <h3 className="text-xl font-bold mb-3">Contract/MOU</h3>
@@ -436,7 +436,7 @@ export default function SNAPETPartnerPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 4
               </div>
               <h3 className="text-xl font-bold mb-3">First Referrals</h3>
@@ -450,27 +450,27 @@ export default function SNAPETPartnerPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-blue-900 text-white">
+      <section className="py-20 bg-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Partner?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Contact us to discuss SNAP E&T partnership opportunities
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-yellow-400 text-blue-900 font-bold rounded-lg hover:bg-yellow-300 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-yellow-400 text-brand-blue-900 font-bold rounded-lg hover:bg-yellow-300 transition text-lg"
             >
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-white text-blue-600 font-bold rounded-lg hover:bg-gray-50 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 px-10 py-5 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-50 transition text-lg"
             >
               <Phone className="w-5 h-5" /> Get Help Online
             </a>
           </div>
-          <p className="mt-6 text-blue-200">Elizabeth Greene, Founder & CEO</p>
+          <p className="mt-6 text-brand-blue-200">Elizabeth Greene, Founder & CEO</p>
           <div className="mt-8 flex flex-wrap gap-4 justify-center">
             <Link href="/fssa-partnership-request" className="text-yellow-400 hover:underline font-semibold">
               FSSA Partnership Request →

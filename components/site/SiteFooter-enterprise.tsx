@@ -39,13 +39,13 @@ export default function SiteFooterEnterprise() {
           </p>
 
           {/* ONE CTA */}
-          <div className="bg-blue-50 border-2 border-blue-600 rounded-lg p-6 max-w-md mx-auto">
+          <div className="bg-brand-blue-50 border-2 border-brand-blue-600 rounded-lg p-6 max-w-md mx-auto">
             <h3 className="text-xl font-bold text-black mb-3">
               Need Help? Talk to an Advisor
             </h3>
             <a
               href="/support"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-700 transition"
             >
               <Phone className="h-5 w-5" />
               Call Get Help

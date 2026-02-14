@@ -186,26 +186,26 @@ export default async function SupportPage() {
             </div>
 
             {/* Additional Resources */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-              <h3 className="text-lg font-semibold text-blue-900 mb-4">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-8">
+              <h3 className="text-lg font-semibold text-brand-blue-900 mb-4">
                 Additional Resources
               </h3>
               <div className="grid md:grid-cols-3 gap-4">
                 <Link
                   href="/program-holder/documentation"
-                  className="text-blue-900 hover:text-blue-700 font-medium"
+                  className="text-brand-blue-900 hover:text-brand-blue-700 font-medium"
                 >
                   Documentation →
                 </Link>
                 <Link
                   href="/program-holder/handbook"
-                  className="text-blue-900 hover:text-blue-700 font-medium"
+                  className="text-brand-blue-900 hover:text-brand-blue-700 font-medium"
                 >
                   Program Handbook →
                 </Link>
                 <Link
                   href="/program-holder/training"
-                  className="text-blue-900 hover:text-blue-700 font-medium"
+                  className="text-brand-blue-900 hover:text-brand-blue-700 font-medium"
                 >
                   Training Resources →
                 </Link>

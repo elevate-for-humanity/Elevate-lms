@@ -22,18 +22,18 @@ export function Header() {
 
         {/* Navigation */}
         <nav className="flex items-center gap-4">
-          <Link href="/programs" className="text-gray-700 hover:text-blue-600 text-sm font-medium">
+          <Link href="/programs" className="text-gray-700 hover:text-brand-blue-600 text-sm font-medium">
             Programs
           </Link>
-          <Link href="/how-it-works" className="text-gray-700 hover:text-blue-600 text-sm font-medium hidden sm:block">
+          <Link href="/how-it-works" className="text-gray-700 hover:text-brand-blue-600 text-sm font-medium hidden sm:block">
             How It Works
           </Link>
-          <Link href="/contact" className="text-gray-700 hover:text-blue-600 text-sm font-medium hidden sm:block">
+          <Link href="/contact" className="text-gray-700 hover:text-brand-blue-600 text-sm font-medium hidden sm:block">
             Contact
           </Link>
           <Link
             href="/apply"
-            className="bg-blue-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-blue-700"
+            className="bg-brand-blue-600 text-white px-5 py-2 rounded-full text-sm font-semibold hover:bg-brand-blue-700"
           >
             Apply Now
           </Link>

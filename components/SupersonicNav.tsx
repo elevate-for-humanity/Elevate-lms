@@ -8,7 +8,7 @@ export function SupersonicNav() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="bg-blue-900 text-white sticky top-0 z-50 shadow-lg">
+    <header className="bg-brand-blue-900 text-white sticky top-0 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
@@ -67,31 +67,31 @@ export function SupersonicNav() {
               <div className="absolute top-full left-0 bg-white text-black shadow-xl rounded-lg p-4 hidden group-hover:block w-64 mt-2">
                 <Link
                   href="/supersonic-fast-cash/calculator"
-                  className="block py-2 px-3 hover:bg-gray-50 hover:text-blue-900 rounded transition-colors"
+                  className="block py-2 px-3 hover:bg-gray-50 hover:text-brand-blue-900 rounded transition-colors"
                 >
                   🧮 Refund Calculator
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/tools/refund-tracker"
-                  className="block py-2 px-3 hover:bg-gray-50 hover:text-blue-900 rounded transition-colors"
+                  className="block py-2 px-3 hover:bg-gray-50 hover:text-brand-blue-900 rounded transition-colors"
                 >
                   📍 Track Refund
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/upload-documents"
-                  className="block py-2 px-3 hover:bg-gray-50 hover:text-blue-900 rounded transition-colors"
+                  className="block py-2 px-3 hover:bg-gray-50 hover:text-brand-blue-900 rounded transition-colors"
                 >
                   📄 Upload Documents
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/portal"
-                  className="block py-2 px-3 hover:bg-gray-50 hover:text-blue-900 rounded transition-colors"
+                  className="block py-2 px-3 hover:bg-gray-50 hover:text-brand-blue-900 rounded transition-colors"
                 >
                   👤 Customer Portal
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/tools/smart-upload"
-                  className="block py-2 px-3 hover:bg-gray-50 hover:text-blue-900 rounded transition-colors"
+                  className="block py-2 px-3 hover:bg-gray-50 hover:text-brand-blue-900 rounded transition-colors"
                 >
                   📤 Smart Upload
                 </Link>
@@ -133,19 +133,19 @@ export function SupersonicNav() {
               <div className="absolute top-full left-0 bg-white text-black shadow-xl rounded-lg p-4 hidden group-hover:block w-64 mt-2">
                 <Link
                   href="/supersonic-fast-cash/careers"
-                  className="block py-2 px-3 hover:bg-gray-50 hover:text-blue-900 rounded transition-colors"
+                  className="block py-2 px-3 hover:bg-gray-50 hover:text-brand-blue-900 rounded transition-colors"
                 >
                   💼 Careers
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/careers/training"
-                  className="block py-2 px-3 hover:bg-gray-50 hover:text-blue-900 rounded transition-colors"
+                  className="block py-2 px-3 hover:bg-gray-50 hover:text-brand-blue-900 rounded transition-colors"
                 >
                   📚 Training
                 </Link>
                 <a
                   href="/support"
-                  className="block py-2 px-3 hover:bg-gray-50 hover:text-blue-900 rounded transition-colors"
+                  className="block py-2 px-3 hover:bg-gray-50 hover:text-brand-blue-900 rounded transition-colors"
                 >
                   📞 Contact Us
                 </a>
@@ -184,30 +184,30 @@ export function SupersonicNav() {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="lg:hidden py-4 border-t border-blue-800">
+          <div className="lg:hidden py-4 border-t border-brand-blue-800">
             <div className="space-y-2">
               <div className="font-bold text-red-500 mb-2">Services</div>
               <Link
                 href="/supersonic-fast-cash/apply"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 Tax Refund Advance
               </Link>
               <Link
                 href="/supersonic-fast-cash/services"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 Professional Tax Prep
               </Link>
               <Link
                 href="/supersonic-fast-cash/diy-taxes"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 DIY Self-Prep
               </Link>
               <Link
                 href="/supersonic-fast-cash/book-appointment"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 Book Appointment
               </Link>
@@ -215,25 +215,25 @@ export function SupersonicNav() {
               <div className="font-bold text-red-500 mb-2 mt-4">Tools</div>
               <Link
                 href="/supersonic-fast-cash/calculator"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 Refund Calculator
               </Link>
               <Link
                 href="/supersonic-fast-cash/tools/refund-tracker"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 Track Refund
               </Link>
               <Link
                 href="/supersonic-fast-cash/upload-documents"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 Upload Documents
               </Link>
               <Link
                 href="/supersonic-fast-cash/portal"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 Customer Portal
               </Link>
@@ -241,19 +241,19 @@ export function SupersonicNav() {
               <div className="font-bold text-red-500 mb-2 mt-4">Resources</div>
               <Link
                 href="/supersonic-fast-cash/how-it-works"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 How It Works
               </Link>
               <Link
                 href="/supersonic-fast-cash/pricing"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 Pricing
               </Link>
               <Link
                 href="/supersonic-fast-cash/locations"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 Locations
               </Link>
@@ -261,13 +261,13 @@ export function SupersonicNav() {
               <div className="font-bold text-red-500 mb-2 mt-4">About</div>
               <Link
                 href="/supersonic-fast-cash/careers"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 Careers
               </Link>
               <a
                 href="/support"
-                className="block py-2 pl-4 hover:bg-blue-800 rounded"
+                className="block py-2 pl-4 hover:bg-brand-blue-800 rounded"
               >
                 Contact Us
               </a>

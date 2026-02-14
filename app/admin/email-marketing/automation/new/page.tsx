@@ -226,7 +226,7 @@ export default function NewWorkflowPage() {
                       >
                     ) => setWorkflow({ ...workflow, name: e.target.value })}
                     placeholder="e.g., Welcome Series"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -252,7 +252,7 @@ export default function NewWorkflowPage() {
                           | 'abandoned',
                       })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   >
                     <option value="enrollment">New Student Enrollment</option>
                     <option value="application">
@@ -283,7 +283,7 @@ export default function NewWorkflowPage() {
                         targetAudience: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   >
                     <option value="all-students">All Students</option>
                     <option value="barber">Barber Program</option>
@@ -402,7 +402,7 @@ export default function NewWorkflowPage() {
                                 }
                                 className={`p-3 border-2 rounded-lg text-left text-sm transition-colors ${
                                   step.template === key
-                                    ? 'border-brand-blue-600 bg-blue-50'
+                                    ? 'border-brand-blue-600 bg-brand-blue-50'
                                     : 'border-gray-200 hover:border-gray-300'
                                 }`}
                               >
@@ -429,7 +429,7 @@ export default function NewWorkflowPage() {
                             >
                           ) => updateStep(step.id, { subject: e.target.value })}
                           placeholder="Email subject"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                         />
                       </div>
 

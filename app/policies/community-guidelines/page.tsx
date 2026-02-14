@@ -33,7 +33,7 @@ export default function CommunityGuidelinesPage() {
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Our Community Values</h2>
             
             <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+              <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200">
                 <h3 className="text-xl font-bold text-black mb-3">Respect</h3>
                 <p className="text-black">
                   Treat all community members with dignity and respect, regardless of background, identity, 
@@ -49,7 +49,7 @@ export default function CommunityGuidelinesPage() {
                 </p>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+              <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200">
                 <h3 className="text-xl font-bold text-black mb-3">Support</h3>
                 <p className="text-black">
                   Help and encourage fellow community members. Share knowledge, offer assistance, 
@@ -161,7 +161,7 @@ export default function CommunityGuidelinesPage() {
               <h3 className="text-xl font-bold text-black mb-4">If You Experience or Witness Violations</h3>
               <div className="space-y-6">
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     1
                   </div>
                   <div>
@@ -187,7 +187,7 @@ export default function CommunityGuidelinesPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>
@@ -308,15 +308,15 @@ export default function CommunityGuidelinesPage() {
               <li><strong>Emergency:</strong> Call 911, then (317) 314-3757 ext. 911</li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/student-code" className="text-blue-600 hover:underline">Student Code of Conduct</a></li>
-                <li><a href="/policies/acceptable-use" className="text-blue-600 hover:underline">Acceptable Use Policy</a></li>
-                <li><a href="/policies/moderation" className="text-blue-600 hover:underline">Content Moderation Policy</a></li>
-                <li><a href="/policies/privacy" className="text-blue-600 hover:underline">Privacy Policy</a></li>
+                <li><a href="/policies/student-code" className="text-brand-blue-600 hover:underline">Student Code of Conduct</a></li>
+                <li><a href="/policies/acceptable-use" className="text-brand-blue-600 hover:underline">Acceptable Use Policy</a></li>
+                <li><a href="/policies/moderation" className="text-brand-blue-600 hover:underline">Content Moderation Policy</a></li>
+                <li><a href="/policies/privacy" className="text-brand-blue-600 hover:underline">Privacy Policy</a></li>
               </ul>
             </div>
           </div>

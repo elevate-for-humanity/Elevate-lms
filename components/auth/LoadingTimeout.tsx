@@ -27,7 +27,7 @@ export function LoadingTimeout({
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4"></div>
           <p className="text-black">Loading...</p>
         </div>
       </div>
@@ -50,7 +50,7 @@ export function LoadingTimeout({
         <div className="flex flex-col gap-3">
           <button
             onClick={() => window.location.reload()}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold"
           >
             <RefreshCw className="h-5 w-5" />
             Reload Page
@@ -65,7 +65,7 @@ export function LoadingTimeout({
 
           <Link
             href="/"
-            className="text-blue-600 hover:underline text-sm"
+            className="text-brand-blue-600 hover:underline text-sm"
           >
             Go to Homepage
           </Link>
@@ -74,7 +74,7 @@ export function LoadingTimeout({
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-sm text-gray-500">
             Still having issues?{' '}
-            <a href="mailto:Elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">
+            <a href="mailto:Elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">
               Contact Support
             </a>
           </p>

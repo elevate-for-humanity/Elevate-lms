@@ -32,7 +32,7 @@ export default function CopyrightPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Our Copyrighted Materials</h2>
             
-            <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+            <div className="bg-brand-blue-50 rounded-xl p-6 border-2 border-brand-blue-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">What We Own</h3>
               <p className="text-black mb-4">
                 Unless otherwise noted, all content on Elevate for Humanity platforms is owned by or licensed to us:
@@ -200,7 +200,7 @@ export default function CopyrightPage() {
               <li><strong>Authorization:</strong> Physical or electronic signature of copyright owner or agent</li>
             </ol>
 
-            <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200 mb-6">
+            <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200 mb-6">
               <h4 className="text-lg font-bold text-black mb-3">DMCA Agent Contact</h4>
               <ul className="list-none text-black space-y-2">
                 <li><strong>Email:</strong> elevate4humanityedu@gmail.com</li>
@@ -290,15 +290,15 @@ export default function CopyrightPage() {
               <li><strong>Phone:</strong> (317) 314-3757</li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/content" className="text-blue-600 hover:underline">Content Policy</a></li>
-                <li><a href="/policies/academic-integrity" className="text-blue-600 hover:underline">Academic Integrity Policy</a></li>
-                <li><a href="/policies/acceptable-use" className="text-blue-600 hover:underline">Acceptable Use Policy</a></li>
-                <li><a href="/policies/terms" className="text-blue-600 hover:underline">Terms of Service</a></li>
+                <li><a href="/policies/content" className="text-brand-blue-600 hover:underline">Content Policy</a></li>
+                <li><a href="/policies/academic-integrity" className="text-brand-blue-600 hover:underline">Academic Integrity Policy</a></li>
+                <li><a href="/policies/acceptable-use" className="text-brand-blue-600 hover:underline">Acceptable Use Policy</a></li>
+                <li><a href="/policies/terms" className="text-brand-blue-600 hover:underline">Terms of Service</a></li>
               </ul>
             </div>
           </div>

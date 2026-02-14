@@ -235,7 +235,7 @@ export default function AdminNav() {
                           href={child.href}
                           className={`block px-3 py-2 text-sm rounded-lg transition-colors ${
                             isActive(child.href)
-                              ? 'bg-blue-600 text-white font-medium'
+                              ? 'bg-brand-blue-600 text-white font-medium'
                               : 'text-slate-400 hover:bg-slate-800 hover:text-white'
                           }`}
                         >
@@ -254,7 +254,7 @@ export default function AdminNav() {
                 href={item.href!}
                 className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
                   isActive(item.href!)
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'text-slate-300 hover:bg-slate-800 hover:text-white'
                 }`}
               >
@@ -272,7 +272,7 @@ export default function AdminNav() {
           href="/admin/settings"
           className={`flex items-center gap-3 px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
             isActive('/admin/settings')
-              ? 'bg-blue-600 text-white'
+              ? 'bg-brand-blue-600 text-white'
               : 'text-slate-300 hover:bg-slate-800 hover:text-white'
           }`}
         >

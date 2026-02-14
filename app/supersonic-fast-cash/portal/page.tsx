@@ -72,8 +72,8 @@ export default async function ClientPortalPage() {
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <FileText className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <FileText className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-black">
@@ -100,8 +100,8 @@ export default async function ClientPortalPage() {
 
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-3xl font-bold text-black">$0</div>
@@ -119,7 +119,7 @@ export default async function ClientPortalPage() {
             </h2>
             <Link
               href="/supersonic-fast-cash/book-appointment"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Book New Appointment
             </Link>
@@ -135,7 +135,7 @@ export default async function ClientPortalPage() {
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <Calendar className="w-5 h-5 text-blue-600" />
+                        <Calendar className="w-5 h-5 text-brand-blue-600" />
                         <h3 className="font-semibold text-black">
                           {appointment.service_type}
                         </h3>
@@ -146,7 +146,7 @@ export default async function ClientPortalPage() {
                               : appointment.status === 'pending'
                                 ? 'bg-yellow-100 text-yellow-700'
                                 : appointment.status === 'completed'
-                                  ? 'bg-blue-100 text-blue-700'
+                                  ? 'bg-brand-blue-100 text-brand-blue-700'
                                   : 'bg-gray-100 text-black'
                           }`}
                         >
@@ -183,7 +183,7 @@ export default async function ClientPortalPage() {
               <p className="text-black mb-4">No appointments scheduled</p>
               <Link
                 href="/supersonic-fast-cash/book-appointment"
-                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 Book Your First Appointment
               </Link>
@@ -197,7 +197,7 @@ export default async function ClientPortalPage() {
             <h2 className="text-2xl font-bold text-black">Your Documents</h2>
             <Link
               href="/supersonic-fast-cash/upload-documents"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Upload Documents
             </Link>
@@ -211,7 +211,7 @@ export default async function ClientPortalPage() {
                   className="border border-gray-200 rounded-lg p-6 flex items-center justify-between"
                 >
                   <div className="flex items-center gap-4">
-                    <FileText className="w-8 h-8 text-blue-600" />
+                    <FileText className="w-8 h-8 text-brand-blue-600" />
                     <div>
                       <h3 className="font-semibold text-black">
                         {doc.file_name}
@@ -251,7 +251,7 @@ export default async function ClientPortalPage() {
               <p className="text-black mb-4">No documents uploaded yet</p>
               <Link
                 href="/supersonic-fast-cash/upload-documents"
-                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 Upload Your First Document
               </Link>

@@ -3,7 +3,7 @@
 export function ProgressChart() {
   const courses = [
     { name: 'Barber', progress: 100, color: 'bg-green-500' },
-    { name: 'CNA', progress: 65, color: 'bg-blue-500' },
+    { name: 'CNA', progress: 65, color: 'bg-brand-blue-500' },
     { name: 'HVAC', progress: 23, color: 'bg-orange-500' },
   ];
 

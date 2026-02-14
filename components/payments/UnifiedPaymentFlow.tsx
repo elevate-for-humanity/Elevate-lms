@@ -159,16 +159,16 @@ export default function UnifiedPaymentFlow({
             onClick={() => setPaymentType('full')}
             className={`p-6 rounded-lg border-2 transition-all text-left ${
               paymentType === 'full'
-                ? 'border-blue-600 bg-blue-50'
+                ? 'border-brand-blue-600 bg-brand-blue-50'
                 : 'border-slate-200 hover:border-slate-300'
             }`}
           >
             <div className="flex items-start justify-between mb-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <DollarSign className="w-6 h-6 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <DollarSign className="w-6 h-6 text-brand-blue-600" />
               </div>
               {paymentType === 'full' && (
-                <CheckCircle className="w-6 h-6 text-blue-600" />
+                <CheckCircle className="w-6 h-6 text-brand-blue-600" />
               )}
             </div>
             <h3 className="text-lg font-bold text-black mb-2">
@@ -214,10 +214,10 @@ export default function UnifiedPaymentFlow({
         </div>
 
         {paymentType === 'plan' && (
-          <div className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mt-4 p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
             <div className="flex items-start gap-2">
-              <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-              <div className="text-sm text-blue-900">
+              <Info className="w-5 h-5 text-brand-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-brand-blue-900">
                 <p className="font-semibold mb-1">Payment Plan Details:</p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>4 monthly payments of ${monthlyPayment.toLocaleString()}</li>
@@ -245,7 +245,7 @@ export default function UnifiedPaymentFlow({
               disabled={!method.available}
               className={`p-4 rounded-lg border-2 transition-all text-left ${
                 selectedMethod === method.id
-                  ? 'border-blue-600 bg-blue-50'
+                  ? 'border-brand-blue-600 bg-brand-blue-50'
                   : method.available
                   ? 'border-slate-200 hover:border-slate-300'
                   : 'border-slate-100 bg-slate-50 opacity-50 cursor-not-allowed'
@@ -257,7 +257,7 @@ export default function UnifiedPaymentFlow({
                   <div className="flex items-center justify-between mb-1">
                     <h3 className="font-bold text-black">{method.name}</h3>
                     {selectedMethod === method.id && (
-                      <CheckCircle className="w-5 h-5 text-blue-600" />
+                      <CheckCircle className="w-5 h-5 text-brand-blue-600" />
                     )}
                   </div>
                   <p className="text-sm text-black">{method.description}</p>
@@ -309,7 +309,7 @@ export default function UnifiedPaymentFlow({
               <span className="text-lg font-bold text-black">
                 {paymentType === 'full' ? 'Total Due Today' : 'First Payment'}
               </span>
-              <span className="text-2xl font-bold text-blue-600">
+              <span className="text-2xl font-bold text-brand-blue-600">
                 ${(paymentType === 'full' ? price : monthlyPayment).toLocaleString()}
               </span>
             </div>
@@ -348,7 +348,7 @@ export default function UnifiedPaymentFlow({
       <button
         onClick={handleCheckout}
         disabled={loading}
-        className="w-full px-8 py-4 bg-blue-600 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-blue-700 hover:shadow-xl transition-all disabled:bg-slate-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        className="w-full px-8 py-4 bg-brand-blue-600 text-white font-bold text-lg rounded-lg shadow-lg hover:bg-brand-blue-700 hover:shadow-xl transition-all disabled:bg-slate-300 disabled:cursor-not-allowed flex items-center justify-center gap-2"
       >
         {loading ? (
           <>
@@ -367,17 +367,17 @@ export default function UnifiedPaymentFlow({
       <div className="mt-6 text-center text-sm text-black">
         <p>
           By proceeding, you agree to our{' '}
-          <a href="/terms" className="text-blue-600 hover:underline">
+          <a href="/terms" className="text-brand-blue-600 hover:underline">
             Terms of Service
           </a>{' '}
           and{' '}
-          <a href="/privacy" className="text-blue-600 hover:underline">
+          <a href="/privacy" className="text-brand-blue-600 hover:underline">
             Privacy Policy
           </a>
         </p>
         <p className="mt-2">
           Need help? Call us at{' '}
-          <a href="/support" className="text-blue-600 hover:underline font-semibold">
+          <a href="/support" className="text-brand-blue-600 hover:underline font-semibold">
             support center
           </a>
         </p>

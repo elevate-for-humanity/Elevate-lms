@@ -90,7 +90,7 @@ export default function SupersonicFastCashDownloadPage() {
 <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-brand-blue-100 text-brand-blue-700 px-4 py-2 rounded-full mb-4">
             <Download className="w-4 h-4" />
             <span className="text-sm font-semibold">
               SupersonicFastCash Downloads
@@ -110,11 +110,11 @@ export default function SupersonicFastCashDownloadPage() {
           <div className="flex items-start justify-between mb-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">SupersonicFastCash Account Access</h2>
-              <p className="text-blue-100">
+              <p className="text-brand-blue-100">
                 For authorized Supersonic Fast Cash staff only
               </p>
             </div>
-            <Key className="w-8 h-8 text-blue-200" />
+            <Key className="w-8 h-8 text-brand-blue-200" />
           </div>
 
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-6">
@@ -149,7 +149,7 @@ export default function SupersonicFastCashDownloadPage() {
             </div>
 
             <div className="mt-6 pt-6 border-t border-white/20">
-              <p className="text-sm text-blue-100 mb-3">
+              <p className="text-sm text-brand-blue-100 mb-3">
                 <strong>Need Access?</strong> Contact:
               </p>
               <div className="space-y-2 text-sm">
@@ -213,12 +213,12 @@ export default function SupersonicFastCashDownloadPage() {
         </div>
 
         {/* Installation Instructions */}
-        <div className="bg-blue-50 rounded-2xl p-8 mb-8">
+        <div className="bg-brand-blue-50 rounded-2xl p-8 mb-8">
           <h2 className="text-2xl font-bold mb-6">Installation Instructions</h2>
 
           <div className="space-y-4">
             <div className="flex gap-4">
-              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                 1
               </div>
               <div>
@@ -231,7 +231,7 @@ export default function SupersonicFastCashDownloadPage() {
             </div>
 
             <div className="flex gap-4">
-              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                 2
               </div>
               <div>
@@ -244,7 +244,7 @@ export default function SupersonicFastCashDownloadPage() {
             </div>
 
             <div className="flex gap-4">
-              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                 3
               </div>
               <div>
@@ -257,7 +257,7 @@ export default function SupersonicFastCashDownloadPage() {
             </div>
 
             <div className="flex gap-4">
-              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                 4
               </div>
               <div>
@@ -269,7 +269,7 @@ export default function SupersonicFastCashDownloadPage() {
             </div>
 
             <div className="flex gap-4">
-              <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                 5
               </div>
               <div>
@@ -290,12 +290,12 @@ export default function SupersonicFastCashDownloadPage() {
             rel="noopener noreferrer"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition"
           >
-            <FileText className="w-10 h-10 text-blue-600 mb-4" />
+            <FileText className="w-10 h-10 text-brand-blue-600 mb-4" />
             <h3 className="font-bold text-lg mb-2">Documentation</h3>
             <p className="text-sm text-black mb-4">
               User guides, tutorials, and help articles
             </p>
-            <span className="text-blue-600 font-semibold flex items-center gap-1">
+            <span className="text-brand-blue-600 font-semibold flex items-center gap-1">
               View Docs <ExternalLink className="w-4 h-4" />
             </span>
           </a>
@@ -320,12 +320,12 @@ export default function SupersonicFastCashDownloadPage() {
             href="/supersonic-fast-cash/training"
             className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition"
           >
-            <Circle className="w-10 h-10 text-blue-600 mb-4" />
+            <Circle className="w-10 h-10 text-brand-blue-600 mb-4" />
             <h3 className="font-bold text-lg mb-2">Our Training</h3>
             <p className="text-sm text-black mb-4">
               SupersonicFastCash tax preparation courses
             </p>
-            <span className="text-blue-600 font-semibold flex items-center gap-1">
+            <span className="text-brand-blue-600 font-semibold flex items-center gap-1">
               Start Learning →
             </span>
           </Link>

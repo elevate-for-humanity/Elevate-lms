@@ -135,7 +135,7 @@ export default function StudentsPage() {
                 href={program.href}
                 className="bg-white border border-slate-200 rounded-lg p-6 hover:shadow-lg transition group"
               >
-                <h3 className="text-xl font-bold text-black mb-4 group-hover:text-blue-600">
+                <h3 className="text-xl font-bold text-black mb-4 group-hover:text-brand-blue-600">
                   {program.title}
                 </h3>
                 <div className="space-y-2 text-sm text-black mb-4">
@@ -148,7 +148,7 @@ export default function StudentsPage() {
                     <span>{program.pay}</span>
                   </div>
                 </div>
-                <div className="inline-flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-3 transition-all">
+                <div className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold group-hover:gap-3 transition-all">
                   Learn More
                   <ArrowRight className="h-4 w-4" />
                 </div>
@@ -158,7 +158,7 @@ export default function StudentsPage() {
           <div className="text-center mt-8">
             <Link
               href="/programs"
-              className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold"
+              className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
             >
               View All 20 Programs
               <ArrowRight className="h-5 w-5" />
@@ -197,7 +197,7 @@ export default function StudentsPage() {
               },
             ].map((item: any) => (
               <div key={item.step} className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-600 text-white text-2xl font-bold rounded-full mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-blue-600 text-white text-2xl font-bold rounded-full mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold text-black mb-2">
@@ -219,7 +219,7 @@ export default function StudentsPage() {
           </p>
           <Link
             href="/apply"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-gray-50 transition text-lg"
+            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-50 transition text-lg"
           >
             Apply Now
             <ArrowRight className="h-5 w-5" />

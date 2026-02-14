@@ -35,7 +35,7 @@ export default async function NewSignaturePage() {
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Signer Email *</label><input type="email" className="w-full border rounded-lg px-3 py-2" placeholder="signer@email.com" required /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Message (optional)</label><textarea className="w-full border rounded-lg px-3 py-2" rows={3} placeholder="Add a message for the signer" /></div>
             <div className="flex gap-4 pt-4 border-t">
-              <button type="submit" className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Send for Signature</button>
+              <button type="submit" className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Send for Signature</button>
               <Link href="/admin/signatures" className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</Link>
             </div>
           </form>

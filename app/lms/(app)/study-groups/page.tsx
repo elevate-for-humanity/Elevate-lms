@@ -169,7 +169,7 @@ export default async function StudyGroupsPage() {
             </p>
           </div>
           <div className="mt-4 md:mt-0">
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition">
               <Plus className="w-4 h-4" />
               Create Group
             </button>
@@ -184,10 +184,10 @@ export default async function StudyGroupsPage() {
               <input
                 type="text"
                 placeholder="Search study groups..."
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
-            <select className="px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <select className="px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500">
               <option value="">All Courses</option>
               {typedEnrollments.map(e => (
                 <option key={e.courses?.id} value={e.courses?.id}>
@@ -207,12 +207,12 @@ export default async function StudyGroupsPage() {
                 <Link
                   key={group.id}
                   href={`/lms/study-groups/${group.id}`}
-                  className="bg-white rounded-xl border border-slate-200 p-6 hover:border-blue-300 hover:shadow-md transition"
+                  className="bg-white rounded-xl border border-slate-200 p-6 hover:border-brand-blue-300 hover:shadow-md transition"
                 >
                   <div className="flex items-start justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <Users className="w-6 h-6 text-blue-600" />
+                      <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                        <Users className="w-6 h-6 text-brand-blue-600" />
                       </div>
                       <div>
                         <h3 className="font-bold text-slate-900">{group.name}</h3>
@@ -220,7 +220,7 @@ export default async function StudyGroupsPage() {
                       </div>
                     </div>
                     {group.role === 'admin' && (
-                      <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+                      <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-700 text-xs font-medium rounded-full">
                         Admin
                       </span>
                     )}
@@ -321,7 +321,7 @@ export default async function StudyGroupsPage() {
                       className={`w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg font-medium transition ${
                         isFull
                           ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                          : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
                       }`}
                     >
                       {isFull ? (
@@ -344,7 +344,7 @@ export default async function StudyGroupsPage() {
               <p className="text-slate-600 mb-6 max-w-md mx-auto">
                 Be the first to create a study group for your course! Collaborate with classmates to learn together.
               </p>
-              <button className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition">
+              <button className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition">
                 <Plus className="w-5 h-5" />
                 Create Study Group
               </button>
@@ -353,7 +353,7 @@ export default async function StudyGroupsPage() {
         </div>
 
         {/* Benefits Section */}
-        <div className="mt-12 bg-blue-600 rounded-2xl p-8 text-white">
+        <div className="mt-12 bg-brand-blue-600 rounded-2xl p-8 text-white">
           <h2 className="text-2xl font-bold mb-6 text-center">Why Join a Study Group?</h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="text-center">
@@ -361,7 +361,7 @@ export default async function StudyGroupsPage() {
                 <BookOpen className="w-6 h-6" />
               </div>
               <h3 className="font-semibold mb-2">Learn Together</h3>
-              <p className="text-sm text-blue-100">
+              <p className="text-sm text-brand-blue-100">
                 Discuss concepts and help each other understand difficult topics
               </p>
             </div>
@@ -370,7 +370,7 @@ export default async function StudyGroupsPage() {
                 <MessageSquare className="w-6 h-6" />
               </div>
               <h3 className="font-semibold mb-2">Stay Motivated</h3>
-              <p className="text-sm text-blue-100">
+              <p className="text-sm text-brand-blue-100">
                 Regular meetings keep you accountable and on track
               </p>
             </div>
@@ -379,7 +379,7 @@ export default async function StudyGroupsPage() {
                 <Users className="w-6 h-6" />
               </div>
               <h3 className="font-semibold mb-2">Build Connections</h3>
-              <p className="text-sm text-blue-100">
+              <p className="text-sm text-brand-blue-100">
                 Network with peers who share your learning goals
               </p>
             </div>
@@ -388,7 +388,7 @@ export default async function StudyGroupsPage() {
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href="/lms/community" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="/lms/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
             ← Back to Community
           </Link>
         </div>

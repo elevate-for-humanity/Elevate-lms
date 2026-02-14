@@ -144,22 +144,22 @@ export default function MultiSitePage() {
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6">
               Own Your Own
-              <span className="block text-blue-300">Tax Preparation Office</span>
+              <span className="block text-brand-blue-300">Tax Preparation Office</span>
             </h1>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-brand-blue-100 mb-8">
               Join the Supersonic Fast Cash network and build a profitable tax business with our proven systems, training, and support.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/supersonic-fast-cash/multi-site/apply"
-                className="inline-flex items-center justify-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition-colors"
+                className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-blue-50 transition-colors"
               >
                 Apply Now
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <Link
                 href="/supersonic-fast-cash/contact"
-                className="inline-flex items-center justify-center gap-2 bg-blue-500/30 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-500/40 transition-colors border border-white/30"
+                className="inline-flex items-center justify-center gap-2 bg-brand-blue-500/30 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-blue-500/40 transition-colors border border-white/30"
               >
                 Get Started
               </Link>
@@ -173,19 +173,19 @@ export default function MultiSitePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             <div>
-              <div className="text-4xl font-black text-blue-400">15+</div>
+              <div className="text-4xl font-black text-brand-blue-400">15+</div>
               <div className="text-gray-400">Active Locations</div>
             </div>
             <div>
-              <div className="text-4xl font-black text-blue-400">50K+</div>
+              <div className="text-4xl font-black text-brand-blue-400">50K+</div>
               <div className="text-gray-400">Returns Filed</div>
             </div>
             <div>
-              <div className="text-4xl font-black text-blue-400">98%</div>
+              <div className="text-4xl font-black text-brand-blue-400">98%</div>
               <div className="text-gray-400">Partner Retention</div>
             </div>
             <div>
-              <div className="text-4xl font-black text-blue-400">$75K+</div>
+              <div className="text-4xl font-black text-brand-blue-400">$75K+</div>
               <div className="text-gray-400">Avg. Partner Revenue</div>
             </div>
           </div>
@@ -207,8 +207,8 @@ export default function MultiSitePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {benefits.map((benefit, idx) => (
               <div key={idx} className="bg-gray-50 rounded-2xl p-6">
-                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <benefit.icon className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+                  <benefit.icon className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{benefit.title}</h3>
                 <p className="text-gray-600">{benefit.description}</p>
@@ -240,7 +240,7 @@ export default function MultiSitePage() {
             </div>
             <div className="bg-white rounded-2xl p-8 shadow-lg">
               <div className="text-center mb-8">
-                <Zap className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+                <Zap className="w-16 h-16 text-brand-blue-600 mx-auto mb-4" />
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">
                   Ready to Get Started?
                 </h3>
@@ -250,7 +250,7 @@ export default function MultiSitePage() {
               </div>
               <Link
                 href="/supersonic-fast-cash/multi-site/apply"
-                className="block w-full bg-blue-600 text-white text-center py-4 rounded-xl font-bold hover:bg-blue-700 transition-colors"
+                className="block w-full bg-brand-blue-600 text-white text-center py-4 rounded-xl font-bold hover:bg-brand-blue-700 transition-colors"
               >
                 Apply for Partnership
               </Link>
@@ -274,7 +274,7 @@ export default function MultiSitePage() {
           <div className="grid md:grid-cols-4 gap-8">
             {steps.map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center font-black text-2xl mx-auto mb-4">
+                <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-black text-2xl mx-auto mb-4">
                   {item.step}
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -347,20 +347,20 @@ export default function MultiSitePage() {
           <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
             Ready to Build Your Tax Business?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Apply today and join our growing network of successful partners.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/multi-site/apply"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-700 px-10 py-5 rounded-xl font-bold text-xl hover:bg-blue-50 transition-colors shadow-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 px-10 py-5 rounded-xl font-bold text-xl hover:bg-brand-blue-50 transition-colors shadow-lg"
             >
               🚀 Apply Now
               <ArrowRight className="w-6 h-6" />
             </Link>
             <Link
               href="/supersonic-fast-cash/contact"
-              className="inline-flex items-center justify-center gap-2 bg-blue-500/30 text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-blue-500/40 transition-colors border border-white/30"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-500/30 text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-brand-blue-500/40 transition-colors border border-white/30"
             >
               Questions? Contact Us
             </Link>

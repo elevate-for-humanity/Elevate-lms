@@ -58,11 +58,11 @@ export function ModulesTable({
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'scorm':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-brand-blue-100 text-brand-blue-800';
       case 'lesson':
         return 'bg-brand-green-100 text-green-800';
       case 'assessment':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-brand-blue-100 text-brand-blue-800';
       case 'external':
         return 'bg-yellow-100 text-yellow-800';
       default:
@@ -84,7 +84,7 @@ export function ModulesTable({
                 HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
               >
             ) => setSearchTerm(e.target.value)}
-            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           />
           <select
             value={filterProgram}
@@ -93,7 +93,7 @@ export function ModulesTable({
                 HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
               >
             ) => setFilterProgram(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           >
             <option value="all">All Programs</option>
             {programs.map((program: any) => (
@@ -109,7 +109,7 @@ export function ModulesTable({
                 HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
               >
             ) => setFilterType(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           >
             <option value="all">All Types</option>
             <option value="lesson">Lessons</option>
@@ -208,7 +208,7 @@ export function ModulesTable({
                     <div className="flex items-center justify-end gap-2">
                       <Link
                         href={`/admin/modules/${module.id}`}
-                        className="text-brand-blue-600 hover:text-blue-900"
+                        className="text-brand-blue-600 hover:text-brand-blue-900"
                       >
                         Edit
                       </Link>

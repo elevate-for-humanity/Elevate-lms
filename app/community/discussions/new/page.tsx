@@ -80,7 +80,7 @@ export default function NewDiscussionPage() {
         {/* Back Link */}
         <Link
           href="/community/discussions"
-          className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-6"
+          className="inline-flex items-center text-gray-600 hover:text-brand-blue-600 mb-6"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Discussions
@@ -109,7 +109,7 @@ export default function NewDiscussionPage() {
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Enter a clear, descriptive title"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 maxLength={200}
               />
               <p className="mt-1 text-sm text-gray-500">{title.length}/200 characters</p>
@@ -124,7 +124,7 @@ export default function NewDiscussionPage() {
                 id="category"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select a category</option>
                 {categories.map((cat) => (
@@ -144,7 +144,7 @@ export default function NewDiscussionPage() {
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Share your thoughts, questions, or experiences..."
                 rows={8}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 resize-none"
               />
               <p className="mt-1 text-sm text-gray-500">
                 Be specific and provide context to get better responses
@@ -152,7 +152,7 @@ export default function NewDiscussionPage() {
             </div>
 
             {/* Guidelines */}
-            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+            <div className="bg-brand-blue-50 rounded-lg p-4 border border-brand-blue-200">
               <h3 className="font-semibold text-gray-900 mb-2">Posting Guidelines</h3>
               <ul className="text-sm text-gray-700 space-y-1">
                 <li>• Be respectful and constructive in your posts</li>
@@ -173,7 +173,7 @@ export default function NewDiscussionPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
+                className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-3 rounded-lg font-bold transition inline-flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
                   'Posting...'

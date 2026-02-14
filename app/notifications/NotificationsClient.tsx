@@ -41,13 +41,13 @@ export default function NotificationsClient({ userId, initialNotifications, unre
   const getIcon = (type: string) => {
     switch (type) {
       case 'message':
-        return <MessageSquare className="w-5 h-5 text-blue-500" />;
+        return <MessageSquare className="w-5 h-5 text-brand-blue-500" />;
       case 'like':
         return <Heart className="w-5 h-5 text-red-500" />;
       case 'achievement':
         return <Award className="w-5 h-5 text-yellow-500" />;
       case 'event':
-        return <Calendar className="w-5 h-5 text-blue-500" />;
+        return <Calendar className="w-5 h-5 text-brand-blue-500" />;
       case 'group':
         return <Users className="w-5 h-5 text-green-500" />;
       case 'course':
@@ -130,7 +130,7 @@ export default function NotificationsClient({ userId, initialNotifications, unre
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-lg"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-blue-600 hover:bg-brand-blue-50 rounded-lg"
               >
                 <CheckCheck className="w-4 h-4" />
                 Mark all read
@@ -184,7 +184,7 @@ export default function NotificationsClient({ userId, initialNotifications, unre
                 <div
                   key={notification.id}
                   className={`p-4 hover:bg-gray-50 transition ${
-                    !notification.is_read ? 'bg-blue-50/50' : ''
+                    !notification.is_read ? 'bg-brand-blue-50/50' : ''
                   }`}
                 >
                   <div className="flex gap-4">
@@ -208,7 +208,7 @@ export default function NotificationsClient({ userId, initialNotifications, unre
                           {!notification.is_read && (
                             <button
                               onClick={() => markAsRead(notification.id)}
-                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                              className="p-2 text-gray-400 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded-lg"
                               title="Mark as read"
                             >
                               <Check className="w-4 h-4" />
@@ -227,7 +227,7 @@ export default function NotificationsClient({ userId, initialNotifications, unre
                         <Link
                           href={notification.link}
                           onClick={() => !notification.is_read && markAsRead(notification.id)}
-                          className="inline-block mt-2 text-sm text-blue-600 hover:underline"
+                          className="inline-block mt-2 text-sm text-brand-blue-600 hover:underline"
                         >
                           View details →
                         </Link>

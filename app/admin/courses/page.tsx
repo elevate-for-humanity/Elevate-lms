@@ -125,7 +125,7 @@ export default async function AdminCoursesPage() {
             <h1 className="text-4xl font-bold mb-4 text-2xl md:text-3xl lg:text-4xl">
               Course Management
             </h1>
-            <p className="text-base md:text-lg text-blue-100">
+            <p className="text-base md:text-lg text-brand-blue-100">
               Manage all courses and curriculum
             </p>
           </div>
@@ -180,7 +180,7 @@ export default async function AdminCoursesPage() {
               <h3 className="text-sm font-medium text-black mb-2">
                 Total Enrollments
               </h3>
-              <p className="text-3xl font-bold text-blue-600">
+              <p className="text-3xl font-bold text-brand-blue-600">
                 {enrollmentCounts?.length || 0}
               </p>
             </div>
@@ -248,9 +248,9 @@ export default async function AdminCoursesPage() {
                                 className="rounded object-cover"
                               />
                             ) : (
-                              <div className="w-12 h-12 rounded bg-blue-100 flex items-center justify-center">
+                              <div className="w-12 h-12 rounded bg-brand-blue-100 flex items-center justify-center">
                                 <svg
-                                  className="w-6 h-6 text-blue-600"
+                                  className="w-6 h-6 text-brand-blue-600"
                                   fill="none"
                                   stroke="currentColor"
                                   viewBox="0 0 24 24"
@@ -278,7 +278,7 @@ export default async function AdminCoursesPage() {
                           <span
                             className={`px-2 py-2 rounded-full text-xs font-medium ${
                               course.is_published
-                                ? 'bg-blue-100 text-green-700'
+                                ? 'bg-brand-blue-100 text-green-700'
                                 : 'bg-gray-100 text-black'
                             }`}
                           >
@@ -298,7 +298,7 @@ export default async function AdminCoursesPage() {
                             <span
                               className={`px-2 py-2 rounded-full text-xs ${
                                 course.difficulty_level === 'beginner'
-                                  ? 'bg-blue-100 text-green-700'
+                                  ? 'bg-brand-blue-100 text-green-700'
                                   : course.difficulty_level === 'intermediate'
                                     ? 'bg-yellow-100 text-yellow-700'
                                     : 'bg-red-100 text-red-700'

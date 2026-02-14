@@ -72,13 +72,13 @@ export default async function TransferHoursPage() {
         </div>
 
         {/* Info Box */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-          <h3 className="font-semibold text-blue-800 mb-2">About Hour Transfers</h3>
-          <p className="text-blue-700 text-sm mb-4">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-8">
+          <h3 className="font-semibold text-brand-blue-800 mb-2">About Hour Transfers</h3>
+          <p className="text-brand-blue-700 text-sm mb-4">
             You may be eligible to transfer hours from previous related work experience or training. 
             Transfers are subject to approval and verification of documentation.
           </p>
-          <ul className="text-sm text-blue-700 space-y-1">
+          <ul className="text-sm text-brand-blue-700 space-y-1">
             <li>• Maximum transfer: Up to 50% of required hours</li>
             <li>• Documentation required: Employment records, training certificates</li>
             <li>• Processing time: 5-10 business days</li>
@@ -94,7 +94,7 @@ export default async function TransferHoursPage() {
           </p>
           <Link
             href="/apprentice/transfer-hours/request"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-blue-700 transition"
           >
             Start Transfer Request
             <ArrowRight className="w-5 h-5" />
@@ -111,7 +111,7 @@ export default async function TransferHoursPage() {
               {transferRequests.map((request: any) => (
                 <div key={request.id} className="p-6 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <FileText className="w-10 h-10 text-blue-500" />
+                    <FileText className="w-10 h-10 text-brand-blue-500" />
                     <div>
                       <h3 className="font-medium">
                         {request.hours_requested} hours from {request.source}

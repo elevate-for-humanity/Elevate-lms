@@ -56,7 +56,7 @@ export default function PeerReviewSystem() {
           onClick={() => setActiveTab('pending')}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === 'pending'
-              ? 'text-blue-600 border-b-2 border-blue-600'
+              ? 'text-brand-blue-600 border-b-2 border-brand-blue-600'
               : 'text-black hover:text-black'
           }`}
         >
@@ -66,7 +66,7 @@ export default function PeerReviewSystem() {
           onClick={() => setActiveTab('completed')}
           className={`px-4 py-2 font-medium transition-colors ${
             activeTab === 'completed'
-              ? 'text-blue-600 border-b-2 border-blue-600'
+              ? 'text-brand-blue-600 border-b-2 border-brand-blue-600'
               : 'text-black hover:text-black'
           }`}
         >
@@ -103,7 +103,7 @@ export default function PeerReviewSystem() {
               </div>
               <div>
                 {review.status === 'pending' ? (
-                  <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                  <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors">
                     Start Review
                   </button>
                 ) : (
@@ -128,7 +128,7 @@ export default function PeerReviewSystem() {
       )}
 
       {/* Instructions */}
-      <Card className="p-6 bg-blue-50 border-blue-200">
+      <Card className="p-6 bg-brand-blue-50 border-brand-blue-200">
         <h4 className="font-semibold text-black mb-2">Peer Review Guidelines</h4>
         <ul className="text-sm text-black space-y-1">
           <li>• Provide constructive and respectful feedback</li>

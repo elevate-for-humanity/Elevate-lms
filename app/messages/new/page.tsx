@@ -48,7 +48,7 @@ export default function NewMessagePage() {
       </div>
 
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <Link href="/messages" className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/messages" className="inline-flex items-center text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Messages
         </Link>
@@ -69,7 +69,7 @@ export default function NewMessagePage() {
               <select
                 value={formData.to}
                 onChange={(e) => setFormData({ ...formData, to: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select recipient</option>
                 {recipients.map((r) => (
@@ -85,7 +85,7 @@ export default function NewMessagePage() {
                 value={formData.subject}
                 onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                 placeholder="Enter subject"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
 
@@ -96,12 +96,12 @@ export default function NewMessagePage() {
                 onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                 rows={8}
                 placeholder="Type your message..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 resize-none"
               />
             </div>
 
             <div className="flex items-center justify-between pt-4 border-t">
-              <button type="button" className="flex items-center text-gray-600 hover:text-blue-600">
+              <button type="button" className="flex items-center text-gray-600 hover:text-brand-blue-600">
                 <Paperclip className="w-5 h-5 mr-2" />
                 Attach File
               </button>
@@ -112,7 +112,7 @@ export default function NewMessagePage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition inline-flex items-center disabled:opacity-50"
+                  className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-3 rounded-lg font-bold transition inline-flex items-center disabled:opacity-50"
                 >
                   {isSubmitting ? 'Sending...' : (
                     <>

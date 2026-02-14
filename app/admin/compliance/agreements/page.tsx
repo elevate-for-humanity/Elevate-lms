@@ -125,7 +125,7 @@ export default function AdminAgreementsPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 text-brand-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Loading agreement data...</p>
         </div>
       </div>
@@ -165,7 +165,7 @@ export default function AdminAgreementsPage() {
             </button>
             <button
               onClick={() => handleExport('csv')}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Download className="w-4 h-4" />
               Export CSV
@@ -177,8 +177,8 @@ export default function AdminAgreementsPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <FileText className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <FileText className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-slate-500">Total Acceptances</p>
@@ -201,8 +201,8 @@ export default function AdminAgreementsPage() {
 
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-slate-500">Today's Signings</p>
@@ -301,9 +301,9 @@ export default function AdminAgreementsPage() {
                       <td className="px-6 py-4">
                         <span className={`inline-flex px-2 py-1 text-xs font-medium rounded-full ${
                           acc.signature_method === 'drawn'
-                            ? 'bg-blue-100 text-blue-700'
+                            ? 'bg-brand-blue-100 text-brand-blue-700'
                             : acc.signature_method === 'typed'
-                            ? 'bg-blue-100 text-blue-700'
+                            ? 'bg-brand-blue-100 text-brand-blue-700'
                             : 'bg-slate-100 text-slate-700'
                         }`}>
                           {acc.signature_method}

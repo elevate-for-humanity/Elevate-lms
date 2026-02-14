@@ -302,7 +302,7 @@ export default function CertificateDownload({
   if (loading) {
     return (
       <div className="bg-white rounded-xl p-8 shadow-sm border flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     );
   }
@@ -328,7 +328,7 @@ export default function CertificateDownload({
             <button
               onClick={downloadSVG}
               disabled={downloading}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 text-sm font-medium"
             >
               {downloading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Download className="w-4 h-4" />}
               SVG
@@ -361,22 +361,22 @@ export default function CertificateDownload({
 
       {/* Certificate Preview */}
       <div className="p-8">
-        <div className="border-4 border-blue-600 rounded-2xl p-8 md:p-12 text-center bg-white relative overflow-hidden">
+        <div className="border-4 border-brand-blue-600 rounded-2xl p-8 md:p-12 text-center bg-white relative overflow-hidden">
           {/* Watermark */}
           <div className="absolute inset-0 opacity-5 pointer-events-none">
             <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-8xl font-bold text-blue-600 transform -rotate-45">ELEVATE</span>
+              <span className="text-8xl font-bold text-brand-blue-600 transform -rotate-45">ELEVATE</span>
             </div>
           </div>
 
           <div className="relative z-10">
             <p className="text-sm tracking-[0.3em] text-gray-500 mb-4">ELEVATE FOR HUMANITY</p>
-            <h3 className="text-3xl md:text-4xl font-bold text-blue-700 mb-8">
+            <h3 className="text-3xl md:text-4xl font-bold text-brand-blue-700 mb-8">
               {certificate.credential_type}
             </h3>
             
             <p className="text-lg text-gray-600 mb-2">This certifies that</p>
-            <p className="text-3xl md:text-4xl font-bold text-blue-900 mb-4">
+            <p className="text-3xl md:text-4xl font-bold text-brand-blue-900 mb-4">
               {certificate.student_name}
             </p>
             
@@ -423,7 +423,7 @@ export default function CertificateDownload({
           <div className="flex items-center gap-2">
             <button
               onClick={copyVerificationLink}
-              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+              className="flex items-center gap-1 text-sm text-brand-blue-600 hover:text-brand-blue-800"
             >
               {copied ? <CheckCircle className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               {copied ? 'Copied!' : 'Copy Link'}
@@ -432,7 +432,7 @@ export default function CertificateDownload({
               href={`/verify/${certificate.verification_code}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800"
+              className="flex items-center gap-1 text-sm text-brand-blue-600 hover:text-brand-blue-800"
             >
               <ExternalLink className="w-4 h-4" />
               Verify

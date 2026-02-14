@@ -308,10 +308,10 @@ export default async function TutorialsPage() {
             {featuredTutorials.map((tutorial) => (
               <div
                 key={tutorial.id}
-                className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden hover:border-blue-500 hover:shadow-lg transition-all group"
+                className="bg-white rounded-xl border-2 border-gray-200 overflow-hidden hover:border-brand-blue-500 hover:shadow-lg transition-all group"
               >
                 {/* Video Thumbnail Placeholder */}
-                <div className="relative h-48 bg-blue-600 flex items-center justify-center">
+                <div className="relative h-48 bg-brand-blue-600 flex items-center justify-center">
                   
                   <div className="relative z-10 w-16 h-16 bg-white/20 backdrop-blur rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
                     <Play className="w-8 h-8 text-white ml-1" />
@@ -323,7 +323,7 @@ export default async function TutorialsPage() {
 
                 <div className="p-6">
                   <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded">
+                    <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-700 text-xs font-medium rounded">
                       {tutorial.category.replace('-', ' ')}
                     </span>
                     <span className="flex items-center gap-1 text-gray-500 text-sm">
@@ -331,11 +331,11 @@ export default async function TutorialsPage() {
                       {tutorial.duration}
                     </span>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
                     {tutorial.title}
                   </h3>
                   <p className="text-gray-600 mb-4">{tutorial.description}</p>
-                  <button className="flex items-center gap-2 text-blue-600 font-semibold hover:gap-3 transition-all">
+                  <button className="flex items-center gap-2 text-brand-blue-600 font-semibold hover:gap-3 transition-all">
                     Watch Tutorial
                     <ArrowRight className="w-4 h-4" />
                   </button>
@@ -352,7 +352,7 @@ export default async function TutorialsPage() {
               key={cat.id}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                 cat.id === 'all'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-brand-blue-600 text-white'
                   : 'bg-white text-gray-600 hover:bg-gray-100 border border-gray-200'
               }`}
             >
@@ -367,16 +367,16 @@ export default async function TutorialsPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {tutorials.map((tutorial) => {
               const colorClasses: Record<string, string> = {
-                blue: 'bg-blue-100 text-blue-600',
+                blue: 'bg-brand-blue-100 text-brand-blue-600',
                 green: 'bg-green-100 text-green-600',
-                blue: 'bg-blue-100 text-blue-600',
+                blue: 'bg-brand-blue-100 text-brand-blue-600',
                 orange: 'bg-orange-100 text-orange-600',
               };
 
               return (
                 <div
                   key={tutorial.id}
-                  className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all group"
+                  className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-brand-blue-300 transition-all group"
                 >
                   <div className="flex items-start gap-4 mb-4">
                     <div
@@ -385,7 +385,7 @@ export default async function TutorialsPage() {
                       <tutorial.icon className="w-6 h-6" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                      <h3 className="font-bold text-gray-900 group-hover:text-brand-blue-600 transition-colors">
                         {tutorial.title}
                       </h3>
                       <div className="flex items-center gap-2 mt-1">
@@ -412,7 +412,7 @@ export default async function TutorialsPage() {
                     )}
                   </div>
 
-                  <button className="flex items-center gap-2 text-blue-600 font-medium text-sm hover:gap-3 transition-all">
+                  <button className="flex items-center gap-2 text-brand-blue-600 font-medium text-sm hover:gap-3 transition-all">
                     <Play className="w-4 h-4" />
                     Watch Now
                   </button>
@@ -424,23 +424,23 @@ export default async function TutorialsPage() {
 
         {/* Help CTA */}
         <section className="mt-12">
-          <div className="bg-blue-600 rounded-xl p-8 text-white">
+          <div className="bg-brand-blue-600 rounded-xl p-8 text-white">
             <div className="max-w-2xl">
               <h2 className="text-2xl font-bold mb-2">Can't Find What You Need?</h2>
-              <p className="text-blue-100 mb-6">
+              <p className="text-brand-blue-100 mb-6">
                 Our support team is available to help you with any questions not covered
                 in these tutorials.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-blue-600 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
                 >
                   Contact Support
                 </Link>
                 <Link
                   href="/faq"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-400 transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-500 text-white rounded-lg font-semibold hover:bg-brand-blue-400 transition-colors"
                 >
                   Browse FAQs
                 </Link>

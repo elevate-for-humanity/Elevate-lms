@@ -109,7 +109,7 @@ export default function ClientIntakeDashboard() {
               <span className="text-sm font-medium text-black">
                 Total Clients
               </span>
-              <Users className="w-5 h-5 text-blue-600" />
+              <Users className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div className="text-3xl font-bold">{clients.length}</div>
           </div>
@@ -143,7 +143,7 @@ export default function ClientIntakeDashboard() {
               <span className="text-sm font-medium text-black">
                 SupersonicFastCash Returns
               </span>
-              <FileText className="w-5 h-5 text-blue-600" />
+              <FileText className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div className="text-3xl font-bold">
               {clients.filter((c) => c.sfc_return_id).length}
@@ -182,7 +182,7 @@ export default function ClientIntakeDashboard() {
               <button
                 onClick={syncJotForm}
                 disabled={loading}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition disabled:opacity-50"
               >
                 <RefreshCw
                   className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`}
@@ -274,7 +274,7 @@ export default function ClientIntakeDashboard() {
                             ? 'bg-green-100 text-green-700'
                             : client.status === 'review'
                               ? 'bg-yellow-100 text-yellow-700'
-                              : 'bg-blue-100 text-blue-700'
+                              : 'bg-brand-blue-100 text-brand-blue-700'
                         }`}
                       >
                         {client.status === 'completed' && (
@@ -293,7 +293,7 @@ export default function ClientIntakeDashboard() {
                       {client.sfc_return_id ? (
                         <button
                           onClick={() => openInSupersonicFastCash(client.sfc_return_id!)}
-                          className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                          className="flex items-center gap-1 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                         >
                           <FileText className="w-4 h-4" />
                           Open
@@ -308,7 +308,7 @@ export default function ClientIntakeDashboard() {
                       <div className="flex gap-2">
                         <a
                           href={`/supersonic-fast-cash/admin/clients/${client.id}`}
-                          className="text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                          className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                         >
                           View
                         </a>
@@ -331,7 +331,7 @@ export default function ClientIntakeDashboard() {
         </div>
 
         {/* Setup Instructions */}
-        <div className="mt-8 bg-blue-50 rounded-xl p-6">
+        <div className="mt-8 bg-brand-blue-50 rounded-xl p-6">
           <h3 className="font-bold text-lg mb-4">Setup Instructions</h3>
 
           <div className="space-y-4 text-sm">

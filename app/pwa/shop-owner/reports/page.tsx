@@ -121,7 +121,7 @@ export default function ShopOwnerReportsPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
+          <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-white">Loading reports...</p>
         </div>
       </div>
@@ -137,7 +137,7 @@ export default function ShopOwnerReportsPage() {
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/shop-owner/reports"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
+            className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
           >
             Sign In
           </Link>
@@ -154,7 +154,7 @@ export default function ShopOwnerReportsPage() {
     <div className="min-h-screen bg-slate-900 pb-20">
       <header className="bg-slate-700 px-4 pt-12 pb-6 safe-area-inset-top">
         <h1 className="text-2xl font-bold text-white mb-2">Reports</h1>
-        <p className="text-blue-200">Hours tracking and compliance reports</p>
+        <p className="text-brand-blue-200">Hours tracking and compliance reports</p>
       </header>
 
       <div className="px-4 py-4">
@@ -165,7 +165,7 @@ export default function ShopOwnerReportsPage() {
               onClick={() => setPeriod(p)}
               className={`flex-1 py-2 rounded-lg text-sm font-medium capitalize transition-colors ${
                 period === p 
-                  ? 'bg-blue-600 text-white' 
+                  ? 'bg-brand-blue-600 text-white' 
                   : 'text-slate-400 hover:text-white'
               }`}
             >
@@ -180,13 +180,13 @@ export default function ShopOwnerReportsPage() {
           label="Total Hours" 
           value={summary.totalHours.toLocaleString()} 
           icon={Clock}
-          color="bg-blue-500"
+          color="bg-brand-blue-500"
         />
         <StatCard 
           label="Avg per Apprentice" 
           value={summary.avgHoursPerApprentice} 
           icon={TrendingUp}
-          color="bg-blue-500"
+          color="bg-brand-blue-500"
         />
         <StatCard 
           label="Apprentices" 
@@ -214,7 +214,7 @@ export default function ShopOwnerReportsPage() {
               onClick={() => setReportType(type)}
               className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                 reportType === type 
-                  ? 'bg-blue-600 text-white' 
+                  ? 'bg-brand-blue-600 text-white' 
                   : 'bg-slate-800 text-slate-400 hover:text-white'
               }`}
             >
@@ -230,7 +230,7 @@ export default function ShopOwnerReportsPage() {
           <h2 className="text-white font-bold">Apprentice Details</h2>
           <button 
             onClick={() => handleExport(reportType === 'compliance' ? 'compliance' : 'hours')}
-            className="flex items-center gap-2 text-blue-400 text-sm"
+            className="flex items-center gap-2 text-brand-blue-400 text-sm"
           >
             <Download className="w-4 h-4" />
             Export
@@ -251,8 +251,8 @@ export default function ShopOwnerReportsPage() {
                 )}
                 className="w-full flex items-center gap-4 p-4"
               >
-                <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
-                  <span className="text-blue-400 font-bold text-lg">
+                <div className="w-12 h-12 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                  <span className="text-brand-blue-400 font-bold text-lg">
                     {apprentice.name.charAt(0)}
                   </span>
                 </div>
@@ -340,7 +340,7 @@ export default function ShopOwnerReportsPage() {
                       </div>
                       <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                         <div 
-                          className="h-full bg-blue-500 rounded-full"
+                          className="h-full bg-brand-blue-500 rounded-full"
                           style={{ width: `${Math.min(apprentice.progress, 100)}%` }}
                         />
                       </div>
@@ -408,8 +408,8 @@ export default function ShopOwnerReportsPage() {
             onClick={() => handleExport('compliance')}
             className="w-full flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700"
           >
-            <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center">
-              <FileText className="w-5 h-5 text-blue-400" />
+            <div className="w-10 h-10 bg-brand-blue-500/20 rounded-lg flex items-center justify-center">
+              <FileText className="w-5 h-5 text-brand-blue-400" />
             </div>
             <div className="flex-1 text-left">
               <p className="text-white font-medium">Compliance Summary</p>
@@ -434,7 +434,7 @@ export default function ShopOwnerReportsPage() {
             <Users className="w-6 h-6" />
             <span className="text-xs">Team</span>
           </Link>
-          <Link href="/pwa/shop-owner/reports" className="flex flex-col items-center gap-1 text-blue-400">
+          <Link href="/pwa/shop-owner/reports" className="flex flex-col items-center gap-1 text-brand-blue-400">
             <FileText className="w-6 h-6" />
             <span className="text-xs">Reports</span>
           </Link>

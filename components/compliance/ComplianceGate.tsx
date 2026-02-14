@@ -91,7 +91,7 @@ export function ComplianceGate({
       fallback || (
         <div className="min-h-[400px] flex items-center justify-center">
           <div className="text-center">
-            <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+            <div className="w-8 h-8 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
             <p className="text-slate-600">Verifying compliance status...</p>
           </div>
         </div>
@@ -145,7 +145,7 @@ export function ComplianceGate({
 
           <button
             onClick={() => router.push(status?.redirectTo || '/student-portal/onboarding')}
-            className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-blue-700 transition-colors"
+            className="w-full bg-brand-blue-600 text-white py-3 px-4 rounded-lg font-medium hover:bg-brand-blue-700 transition-colors"
           >
             Complete Requirements
           </button>

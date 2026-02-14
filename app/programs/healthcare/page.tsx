@@ -33,7 +33,7 @@ export default function HealthcareProgramsPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
-            <span className="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
+            <span className="inline-block bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Healthcare Programs</h1>
             <p className="text-sm sm:text-lg text-white/90 max-w-xl">
               CNA, Medical Assistant, Phlebotomy, and more. Get certified and working in healthcare in weeks.
@@ -97,7 +97,7 @@ export default function HealthcareProgramsPage() {
               <div className="space-y-2">
                 {['Patient care fundamentals and safety protocols', 'Vital signs monitoring and documentation', 'Infection control and hygiene procedures', 'Medical terminology and healthcare systems', 'Clinical rotations at healthcare facilities', 'State certification exam preparation'].map((item) => (
                   <div key={item} className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0" />
+                    <span className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full flex-shrink-0" />
                     <span className="text-slate-700 text-sm">{item}</span>
                   </div>
                 ))}
@@ -122,7 +122,7 @@ export default function HealthcareProgramsPage() {
             ].map((c) => (
               <div key={c.title} className="bg-slate-50 rounded-xl border border-slate-200 p-4">
                 <h3 className="font-bold text-slate-900 text-sm">{c.title}</h3>
-                <div className="text-blue-600 font-bold text-sm">{c.salary}</div>
+                <div className="text-brand-blue-600 font-bold text-sm">{c.salary}</div>
               </div>
             ))}
           </div>
@@ -141,7 +141,7 @@ export default function HealthcareProgramsPage() {
               { step: '4', title: 'Get Certified', desc: 'Pass your state certification exam and start working.' },
             ].map((s) => (
               <div key={s.step} className="flex items-start gap-4 bg-white rounded-lg p-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
+                <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
                   <p className="text-slate-600 text-sm">{s.desc}</p>
@@ -153,12 +153,12 @@ export default function HealthcareProgramsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14 bg-blue-600">
+      <section className="py-8 sm:py-14 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Healthcare Career</h2>
           <p className="text-white/90 mb-6 text-sm">Classes starting soon. Funding available for qualifying students.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=healthcare" className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
+            <Link href="/apply?program=healthcare" className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">
               Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
             <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

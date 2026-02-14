@@ -167,7 +167,7 @@ export function CourseReviewsSection({ courseId }: { courseId: string }) {
         <button
           type="submit"
           disabled={submitting}
-          className="rounded-full bg-blue-600 px-4 py-2 text-xs font-semibold text-white disabled:opacity-60 hover:bg-blue-700 transition"
+          className="rounded-full bg-brand-blue-600 px-4 py-2 text-xs font-semibold text-white disabled:opacity-60 hover:bg-brand-blue-700 transition"
         >
           {submitting ? "Submitting…" : "Submit review"}
         </button>

@@ -139,15 +139,15 @@ export function ApprenticeProgressWidget({
         {/* Hour Breakdown */}
         <div className="grid grid-cols-2 gap-3">
           {/* RTI Hours (Theory/Milady) */}
-          <div className="bg-blue-50 rounded-lg p-3">
+          <div className="bg-brand-blue-50 rounded-lg p-3">
             <div className="flex items-center gap-2 mb-1">
-              <BookOpen className="w-4 h-4 text-blue-600" />
-              <span className="text-xs font-semibold text-blue-800">RTI (Theory)</span>
+              <BookOpen className="w-4 h-4 text-brand-blue-600" />
+              <span className="text-xs font-semibold text-brand-blue-800">RTI (Theory)</span>
             </div>
-            <div className="text-xl font-bold text-blue-600">
+            <div className="text-xl font-bold text-brand-blue-600">
               {summary.total_rti_hours.toFixed(1)}
             </div>
-            <div className="text-xs text-blue-600">Milady coursework</div>
+            <div className="text-xs text-brand-blue-600">Milady coursework</div>
           </div>
 
           {/* OJT Hours (Hands-on) */}
@@ -206,7 +206,7 @@ export function ApprenticeProgressWidget({
             href="https://www.miladytraining.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-1 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+            className="flex-1 flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
           >
             <BookOpen className="w-4 h-4" />
             Milady
@@ -232,7 +232,7 @@ export function ApprenticeProgressWidget({
               summary.milady_completed 
                 ? 'text-green-600' 
                 : summary.milady_enrolled 
-                  ? 'text-blue-600' 
+                  ? 'text-brand-blue-600' 
                   : 'text-amber-600'
             }`}>
               Milady: {summary.milady_completed ? 'COMPLETE' : summary.milady_enrolled ? 'IN PROGRESS' : 'NOT STARTED'}

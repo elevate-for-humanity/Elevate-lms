@@ -31,7 +31,7 @@ export function ComplianceNotice({
             <span key={policy.url}>
               <Link
                 href={policy.url}
-                className="text-blue-600 hover:text-blue-800 underline"
+                className="text-brand-blue-600 hover:text-brand-blue-800 underline"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -91,7 +91,7 @@ export function ComplianceNotice({
               <Link
                 key={policy.url}
                 href={policy.url}
-                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 underline"
+                className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:text-brand-blue-800 underline"
                 target="_blank"
                 rel="noopener noreferrer"
               >

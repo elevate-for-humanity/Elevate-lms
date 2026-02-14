@@ -231,7 +231,7 @@ export default function JobPlacementPage() {
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Building2 className="w-6 h-6 text-blue-600" />
+                <Building2 className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Technology</h3>
               <ul className="space-y-2 text-gray-600 text-sm">
@@ -257,7 +257,7 @@ export default function JobPlacementPage() {
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Users className="w-6 h-6 text-blue-600" />
+                <Users className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-3">Healthcare</h3>
               <ul className="space-y-2 text-gray-600 text-sm">

@@ -49,19 +49,19 @@ export function ConfirmDialog({
   };
 
   const Icon = variant === 'danger' ? Trash2 : variant === 'warning' ? AlertTriangle : CheckCircle;
-  const iconColor = variant === 'danger' ? 'text-red-600' : variant === 'warning' ? 'text-yellow-600' : 'text-blue-600';
+  const iconColor = variant === 'danger' ? 'text-red-600' : variant === 'warning' ? 'text-yellow-600' : 'text-brand-blue-600';
   const confirmButtonClass = variant === 'danger' 
     ? 'bg-red-600 hover:bg-red-700 text-white' 
     : variant === 'warning'
     ? 'bg-yellow-600 hover:bg-yellow-700 text-white'
-    : 'bg-blue-600 hover:bg-blue-700 text-white';
+    : 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${variant === 'danger' ? 'bg-red-100' : variant === 'warning' ? 'bg-yellow-100' : 'bg-blue-100'}`}>
+            <div className={`p-2 rounded-full ${variant === 'danger' ? 'bg-red-100' : variant === 'warning' ? 'bg-yellow-100' : 'bg-brand-blue-100'}`}>
               <Icon className={`w-5 h-5 ${iconColor}`} />
             </div>
             <DialogTitle>{title}</DialogTitle>
@@ -75,7 +75,7 @@ export function ConfirmDialog({
             type="button"
             onClick={handleCancel}
             disabled={loading}
-            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-blue-500 disabled:opacity-50"
           >
             {cancelText}
           </button>

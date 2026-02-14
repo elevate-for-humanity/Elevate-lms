@@ -103,7 +103,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
+          <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-white">Loading apprentice details...</p>
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
             href="/pwa/shop-owner/apprentices"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
+            className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
           >
             Back to Apprentices
           </Link>
@@ -142,7 +142,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
           </Link>
           <div className="flex-1">
             <h1 className="text-xl font-bold text-white">{apprentice.name}</h1>
-            <p className="text-blue-200 text-sm">Apprentice Details</p>
+            <p className="text-brand-blue-200 text-sm">Apprentice Details</p>
           </div>
           <ComplianceStatusBadge status={apprentice.complianceStatus} />
         </div>
@@ -151,7 +151,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
           <div className="text-center mb-3">
             <p className="text-4xl font-black text-white">{apprentice.totalHours.toLocaleString()}</p>
-            <p className="text-blue-200">of {apprentice.targetHours.toLocaleString()} hours</p>
+            <p className="text-brand-blue-200">of {apprentice.targetHours.toLocaleString()} hours</p>
           </div>
           
           <div className="h-3 bg-white/20 rounded-full overflow-hidden mb-3">
@@ -164,15 +164,15 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
           <div className="grid grid-cols-3 gap-2 text-center text-sm">
             <div>
               <p className="text-white font-bold">{apprentice.progress.toFixed(1)}%</p>
-              <p className="text-blue-200 text-xs">Complete</p>
+              <p className="text-brand-blue-200 text-xs">Complete</p>
             </div>
             <div>
               <p className="text-white font-bold">{apprentice.weeklyAvg}</p>
-              <p className="text-blue-200 text-xs">Hrs/Week Avg</p>
+              <p className="text-brand-blue-200 text-xs">Hrs/Week Avg</p>
             </div>
             <div>
               <p className="text-white font-bold">{apprentice.weeklyHours}</p>
-              <p className="text-blue-200 text-xs">This Week</p>
+              <p className="text-brand-blue-200 text-xs">This Week</p>
             </div>
           </div>
         </div>
@@ -186,7 +186,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
           {apprentice.email && (
             <div className="flex items-center gap-3">
               <Mail className="w-5 h-5 text-slate-500" />
-              <a href={`mailto:${apprentice.email}`} className="text-blue-400">
+              <a href={`mailto:${apprentice.email}`} className="text-brand-blue-400">
                 {apprentice.email}
               </a>
             </div>
@@ -195,7 +195,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
           {apprentice.phone && (
             <div className="flex items-center gap-3">
               <Phone className="w-5 h-5 text-slate-500" />
-              <a href={`tel:${apprentice.phone}`} className="text-blue-400">
+              <a href={`tel:${apprentice.phone}`} className="text-brand-blue-400">
                 {apprentice.phone}
               </a>
             </div>
@@ -296,7 +296,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
         <div className="space-y-3">
           <Link 
             href={`/pwa/shop-owner/log-hours?apprentice=${id}`}
-            className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white py-4 rounded-xl font-medium"
+            className="flex items-center justify-center gap-2 w-full bg-brand-blue-600 text-white py-4 rounded-xl font-medium"
           >
             <Clock className="w-5 h-5" />
             Log Hours for {apprentice.name.split(' ')[0]}
@@ -315,7 +315,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
             <Clock className="w-6 h-6" />
             <span className="text-xs">Log</span>
           </Link>
-          <Link href="/pwa/shop-owner/apprentices" className="flex flex-col items-center gap-1 text-blue-400">
+          <Link href="/pwa/shop-owner/apprentices" className="flex flex-col items-center gap-1 text-brand-blue-400">
             <Users className="w-6 h-6" />
             <span className="text-xs">Team</span>
           </Link>

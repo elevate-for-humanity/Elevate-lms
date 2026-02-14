@@ -34,7 +34,7 @@ export default function EnrollmentError({
         <div className="space-y-3">
           <button
             onClick={reset}
-            className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Try Again
@@ -50,7 +50,7 @@ export default function EnrollmentError({
           
           <a
             href="/support"
-            className="w-full flex items-center justify-center gap-2 text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+            className="w-full flex items-center justify-center gap-2 text-brand-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
           >
             Get Help →
           </a>

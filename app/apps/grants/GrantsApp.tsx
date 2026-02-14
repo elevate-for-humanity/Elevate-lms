@@ -111,11 +111,11 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
               </div>
               <div className="bg-white rounded-lg p-4 border">
                 <p className="text-gray-500 text-sm">Saved</p>
-                <p className="text-2xl font-bold text-blue-600">{savedGrants.length}</p>
+                <p className="text-2xl font-bold text-brand-blue-600">{savedGrants.length}</p>
               </div>
               <div className="bg-white rounded-lg p-4 border">
                 <p className="text-gray-500 text-sm">Applications</p>
-                <p className="text-2xl font-bold text-blue-600">{applications.length}</p>
+                <p className="text-2xl font-bold text-brand-blue-600">{applications.length}</p>
               </div>
               <div className="bg-white rounded-lg p-4 border">
                 <p className="text-gray-500 text-sm">Closing Soon</p>
@@ -222,7 +222,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
                       <div className="flex items-center gap-3">
                         <span className={`px-3 py-1 rounded-full text-xs font-bold ${
                           app.status === 'awarded' ? 'bg-green-100 text-green-800' :
-                          app.status === 'submitted' ? 'bg-blue-100 text-blue-800' :
+                          app.status === 'submitted' ? 'bg-brand-blue-100 text-brand-blue-800' :
                           app.status === 'draft' ? 'bg-gray-100 text-gray-800' :
                           'bg-yellow-100 text-yellow-800'
                         }`}>
@@ -234,7 +234,7 @@ export function GrantsApp({ user, subscription, opportunities, savedGrants, appl
                     {app.status === 'draft' && (
                       <div className="mt-2">
                         <div className="h-2 bg-gray-200 rounded-full">
-                          <div className="h-2 bg-blue-600 rounded-full" style={{ width: `${app.progress || 0}%` }} />
+                          <div className="h-2 bg-brand-blue-600 rounded-full" style={{ width: `${app.progress || 0}%` }} />
                         </div>
                         <p className="text-xs text-gray-500 mt-1">{app.progress || 0}% complete</p>
                       </div>

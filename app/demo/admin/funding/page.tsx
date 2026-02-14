@@ -13,10 +13,10 @@ export default function DemoFundingPage() {
             </div>
             <div className="flex justify-between text-sm mb-2">
               <span className="text-gray-500">Spent</span>
-              <span className="font-medium text-blue-600">$98,500</span>
+              <span className="font-medium text-brand-blue-600">$98,500</span>
             </div>
             <div className="w-full h-2 bg-gray-100 rounded-full">
-              <div className="h-full bg-blue-500 rounded-full" style={{ width: '66%' }} />
+              <div className="h-full bg-brand-blue-500 rounded-full" style={{ width: '66%' }} />
             </div>
           </div>
           <div className="bg-white rounded-lg border p-4">
@@ -27,10 +27,10 @@ export default function DemoFundingPage() {
             </div>
             <div className="flex justify-between text-sm mb-2">
               <span className="text-gray-500">Spent</span>
-              <span className="font-medium text-blue-600">$189,000</span>
+              <span className="font-medium text-brand-blue-600">$189,000</span>
             </div>
             <div className="w-full h-2 bg-gray-100 rounded-full">
-              <div className="h-full bg-blue-500 rounded-full" style={{ width: '95%' }} />
+              <div className="h-full bg-brand-blue-500 rounded-full" style={{ width: '95%' }} />
             </div>
           </div>
         </div>

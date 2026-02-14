@@ -89,7 +89,7 @@ export default async function TrainingCoursesPage() {
                 <div className="bg-slate-700 p-6 text-white">
                   <div className="flex justify-between items-start mb-2">
                     <BookOpen className="w-8 h-8" />
-                    <span className="bg-white text-blue-600 px-3 py-1 rounded-full text-sm font-bold">
+                    <span className="bg-white text-brand-blue-600 px-3 py-1 rounded-full text-sm font-bold">
                       ${course.price}
                     </span>
                   </div>
@@ -136,15 +136,15 @@ export default async function TrainingCoursesPage() {
       </section>
 
       {/* Bundle CTA */}
-      <section className="py-16 bg-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Complete Training Bundle</h2>
-          <p className="text-xl text-blue-200 mb-6">
+          <p className="text-xl text-brand-blue-200 mb-6">
             Get all {displayCourses.length} courses and {totalLessons} lessons for one low price
           </p>
           <div className="bg-white/10 rounded-xl p-8 mb-8">
             <div className="text-5xl font-bold mb-2">$799</div>
-            <div className="text-blue-200">Save over $200 vs individual courses</div>
+            <div className="text-brand-blue-200">Save over $200 vs individual courses</div>
           </div>
           <Link
             href="/supersonic-fast-cash/careers"
@@ -152,7 +152,7 @@ export default async function TrainingCoursesPage() {
           >
             Apply to Join Our Team
           </Link>
-          <p className="text-sm text-blue-300 mt-4">
+          <p className="text-sm text-brand-blue-300 mt-4">
             Training is provided free to hired tax preparers
           </p>
         </div>

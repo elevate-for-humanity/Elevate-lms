@@ -131,7 +131,7 @@ export default async function GrantWorkflowPage() {
               </div>
               <div className="flex-shrink-0 w-16 h-1 bg-slate-200" />
               <div className="flex-1 text-center">
-                <div className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 font-bold">
+                <div className="w-12 h-12 bg-brand-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 font-bold">
                   {statusCounts.review}
                 </div>
                 <p className="text-sm font-medium text-black">🔵 Review</p>
@@ -139,7 +139,7 @@ export default async function GrantWorkflowPage() {
               </div>
               <div className="flex-shrink-0 w-16 h-1 bg-slate-200" />
               <div className="flex-1 text-center">
-                <div className="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 font-bold">
+                <div className="w-12 h-12 bg-brand-blue-500 text-white rounded-full flex items-center justify-center mx-auto mb-2 font-bold">
                   {statusCounts.ready}
                 </div>
                 <p className="text-sm font-medium text-black">🟣 Ready</p>
@@ -176,7 +176,7 @@ export default async function GrantWorkflowPage() {
                 {grants.slice(0, 5).map((grant: Record<string, any>) => (
                   <div
                     key={grant.id}
-                    className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition"
+                    className="border border-slate-200 rounded-lg p-4 hover:border-brand-blue-300 transition"
                   >
                     <h3 className="font-semibold text-black mb-1">
                       {grant.title}

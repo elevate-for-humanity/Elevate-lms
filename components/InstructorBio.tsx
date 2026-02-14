@@ -76,7 +76,7 @@ export function InstructorBio({
                 href={linkedin}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2 px-3 py-2.5 text-sm bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition"
+                className="flex items-center gap-2 px-3 py-2.5 text-sm bg-brand-blue-100 hover:bg-brand-blue-200 text-brand-blue-700 rounded-lg transition"
               >
                 <Linkedin className="w-4 h-4" />
                 LinkedIn

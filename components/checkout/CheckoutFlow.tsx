@@ -94,26 +94,26 @@ function CheckoutForm({ courseId, courseName, price, userId, onSuccess }: Checko
       {/* Progress Steps */}
       <div className="mb-8">
         <div className="flex items-center justify-between">
-          <div className={`flex items-center ${step >= 1 ? 'text-blue-600' : 'text-gray-400'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
+          <div className={`flex items-center ${step >= 1 ? 'text-brand-blue-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 1 ? 'bg-brand-blue-600 text-white' : 'bg-gray-300'}`}>
               1
             </div>
             <span className="ml-2 font-medium">Review</span>
           </div>
           <div className="flex-1 h-1 mx-4 bg-gray-300">
-            <div className={`h-full ${step >= 2 ? 'bg-blue-600' : 'bg-gray-300'}`} style={{ width: step >= 2 ? '100%' : '0%' }} />
+            <div className={`h-full ${step >= 2 ? 'bg-brand-blue-600' : 'bg-gray-300'}`} style={{ width: step >= 2 ? '100%' : '0%' }} />
           </div>
-          <div className={`flex items-center ${step >= 2 ? 'text-blue-600' : 'text-gray-400'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
+          <div className={`flex items-center ${step >= 2 ? 'text-brand-blue-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 2 ? 'bg-brand-blue-600 text-white' : 'bg-gray-300'}`}>
               2
             </div>
             <span className="ml-2 font-medium">Payment</span>
           </div>
           <div className="flex-1 h-1 mx-4 bg-gray-300">
-            <div className={`h-full ${step >= 3 ? 'bg-blue-600' : 'bg-gray-300'}`} style={{ width: step >= 3 ? '100%' : '0%' }} />
+            <div className={`h-full ${step >= 3 ? 'bg-brand-blue-600' : 'bg-gray-300'}`} style={{ width: step >= 3 ? '100%' : '0%' }} />
           </div>
-          <div className={`flex items-center ${step >= 3 ? 'text-blue-600' : 'text-gray-400'}`}>
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-300'}`}>
+          <div className={`flex items-center ${step >= 3 ? 'text-brand-blue-600' : 'text-gray-400'}`}>
+            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${step >= 3 ? 'bg-brand-blue-600 text-white' : 'bg-gray-300'}`}>
               3
             </div>
             <span className="ml-2 font-medium">Complete</span>
@@ -167,7 +167,7 @@ function CheckoutForm({ courseId, courseName, price, userId, onSuccess }: Checko
 
           <button
             onClick={() => setStep(2)}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+            className="w-full bg-brand-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
           >
             Continue to Payment
           </button>
@@ -231,7 +231,7 @@ function CheckoutForm({ courseId, courseName, price, userId, onSuccess }: Checko
               <button
                 type="submit"
                 disabled={!stripe || loading}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                className="flex-1 bg-brand-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
                 {loading ? 'Processing...' : `Pay $${price}`}
               </button>
@@ -272,8 +272,8 @@ fill="#0066B2"/>
             You're now enrolled in {courseName}
           </p>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-900">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-brand-blue-900">
               A confirmation email has been sent to your inbox with course access details.
             </p>
           </div>
@@ -281,7 +281,7 @@ fill="#0066B2"/>
           <div className="space-y-3">
             <button
               onClick={() => window.location.href = `/student/courses/${courseId}`}
-              className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="w-full bg-brand-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               Start Learning Now
             </button>

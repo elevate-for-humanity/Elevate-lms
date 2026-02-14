@@ -161,7 +161,7 @@ export default async function CareerSafePage() {
               href="https://www.careersafeonline.com/login"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white hover:bg-gray-100 text-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl flex items-center gap-2 justify-center"
+              className="bg-white hover:bg-gray-100 text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl flex items-center gap-2 justify-center"
             >
               Login to CareerSafe
               <ExternalLink className="w-5 h-5" />
@@ -178,7 +178,7 @@ export default async function CareerSafePage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-2">OSHA-Authorized</h3>
@@ -198,8 +198,8 @@ export default async function CareerSafePage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Self-Paced</h3>
               <p className="text-black">
@@ -219,7 +219,7 @@ export default async function CareerSafePage() {
 
           {courseCategories.map((category) => (
             <div key={category.name} className="mb-12">
-              <h3 className="text-lg md:text-lg font-bold mb-6 text-blue-900">
+              <h3 className="text-lg md:text-lg font-bold mb-6 text-brand-blue-900">
                 {category.name}
               </h3>
               <div className="grid md:grid-cols-2 gap-6">
@@ -317,7 +317,7 @@ export default async function CareerSafePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             Ready to Get Started?
@@ -335,7 +335,7 @@ export default async function CareerSafePage() {
             </Link>
             <Link
               href="/contact"
-              className="bg-white hover:bg-gray-100 text-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
+              className="bg-white hover:bg-gray-100 text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
             >
               Contact Us
             </Link>

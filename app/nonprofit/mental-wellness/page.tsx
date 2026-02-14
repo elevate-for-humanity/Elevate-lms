@@ -56,18 +56,18 @@ export default async function MentalWellnessPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-blue-600 text-white py-20">
+      <section className="bg-brand-blue-600 text-white py-20">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Brain className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Mental Wellness</h1>
-          <p className="text-xl text-blue-100">
+          <p className="text-xl text-brand-blue-100">
             Holistic programs for mind, body, and spirit
           </p>
         </div>
       </section>
 
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <Link href="/nonprofit" className="text-blue-600 hover:text-blue-700 mb-8 inline-block">
+        <Link href="/nonprofit" className="text-brand-blue-600 hover:text-brand-blue-700 mb-8 inline-block">
           ← Back to Selfish Inc.
         </Link>
 
@@ -76,8 +76,8 @@ export default async function MentalWellnessPage() {
           <h2 className="text-3xl font-bold mb-8">Our Programs</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {displayServices.map((service: any, index: number) => (
-              <div key={index} className="bg-blue-50 rounded-xl p-6">
-                <Circle className="w-6 h-6 text-blue-600 mb-3" />
+              <div key={index} className="bg-brand-blue-50 rounded-xl p-6">
+                <Circle className="w-6 h-6 text-brand-blue-600 mb-3" />
                 <h3 className="font-bold text-lg mb-2">{service.title}</h3>
                 <p className="text-gray-600">{service.description}</p>
               </div>
@@ -92,7 +92,7 @@ export default async function MentalWellnessPage() {
             <div className="space-y-4">
               {workshops.map((workshop: any) => (
                 <div key={workshop.id} className="bg-white border rounded-xl p-6 hover:shadow-md transition">
-                  <div className="flex items-center gap-2 text-blue-600 mb-2">
+                  <div className="flex items-center gap-2 text-brand-blue-600 mb-2">
                     <Calendar className="w-5 h-5" />
                     <span className="font-medium">
                       {new Date(workshop.date).toLocaleDateString()}
@@ -122,8 +122,8 @@ export default async function MentalWellnessPage() {
         )}
 
         {/* CTA */}
-        <section className="bg-blue-50 border border-blue-200 rounded-xl p-8 text-center">
-          <Heart className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+        <section className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8 text-center">
+          <Heart className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
           <h3 className="text-2xl font-bold mb-4">Start Your Wellness Journey</h3>
           <p className="text-gray-600 mb-6">
             Explore our workshops and programs designed to support your mental wellness.
@@ -131,13 +131,13 @@ export default async function MentalWellnessPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/nonprofit/workshops" 
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               View Workshops
             </Link>
             <Link 
               href="/contact" 
-              className="border border-blue-600 text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"
+              className="border border-brand-blue-600 text-brand-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition"
             >
               Contact Us
             </Link>

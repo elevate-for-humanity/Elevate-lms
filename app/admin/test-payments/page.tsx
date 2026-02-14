@@ -42,7 +42,7 @@ export default function TestPaymentsPage() {
         <div className="mb-8">
           <Link
             href="/admin/dashboard"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Dashboard
           </Link>
@@ -155,48 +155,48 @@ export default function TestPaymentsPage() {
             WIOA Funding Integration
           </h2>
           <div className="space-y-3">
-            <div className="flex items-start gap-3 p-3 bg-blue-50 rounded border border-blue-200">
+            <div className="flex items-start gap-3 p-3 bg-brand-blue-50 rounded border border-brand-blue-200">
               <DollarSign className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
-                <div className="font-medium text-blue-900">
+                <div className="font-medium text-brand-blue-900">
                   Free Enrollment via WIOA
                 </div>
-                <div className="text-sm text-blue-700">
+                <div className="text-sm text-brand-blue-700">
                   Students can enroll with WIOA funding (no payment required)
                 </div>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-3 bg-blue-50 rounded border border-blue-200">
+            <div className="flex items-start gap-3 p-3 bg-brand-blue-50 rounded border border-brand-blue-200">
               <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
-                <div className="font-medium text-blue-900">
+                <div className="font-medium text-brand-blue-900">
                   Funding Source Tracking
                 </div>
-                <div className="text-sm text-blue-700">
+                <div className="text-sm text-brand-blue-700">
                   All enrollments track funding_source (WIOA, WRG, JRI, DOL,
                   etc.)
                 </div>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-3 bg-blue-50 rounded border border-blue-200">
+            <div className="flex items-start gap-3 p-3 bg-brand-blue-50 rounded border border-brand-blue-200">
               <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
-                <div className="font-medium text-blue-900">
+                <div className="font-medium text-brand-blue-900">
                   Tuition Amount Tracking
                 </div>
-                <div className="text-sm text-blue-700">
+                <div className="text-sm text-brand-blue-700">
                   Tuition and payment amounts are tracked for all funding
                   sources
                 </div>
               </div>
             </div>
-            <div className="flex items-start gap-3 p-3 bg-blue-50 rounded border border-blue-200">
+            <div className="flex items-start gap-3 p-3 bg-brand-blue-50 rounded border border-brand-blue-200">
               <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
-                <div className="font-medium text-blue-900">
+                <div className="font-medium text-brand-blue-900">
                   RAPIDS Integration
                 </div>
-                <div className="text-sm text-blue-700">
+                <div className="text-sm text-brand-blue-700">
                   WIOA-funded apprenticeships are registered with Indiana RAPIDS
                 </div>
               </div>

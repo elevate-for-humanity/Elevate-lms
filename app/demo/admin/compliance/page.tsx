@@ -21,7 +21,7 @@ export default function DemoCompliancePage() {
             <span className={`text-xs font-medium px-2 py-1 rounded-full ${
               item.severity === 'ok' ? 'bg-green-100 text-green-700' :
               item.severity === 'warning' ? 'bg-amber-100 text-amber-700' :
-              'bg-blue-100 text-blue-700'
+              'bg-brand-blue-100 text-brand-blue-700'
             }`}>
               {item.severity === 'ok' ? 'Current' : item.severity === 'warning' ? 'Action Needed' : 'Scheduled'}
             </span>

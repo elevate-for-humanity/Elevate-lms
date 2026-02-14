@@ -282,7 +282,7 @@ export default function SiteSearch() {
   const getCategoryColor = (category: string) => {
     switch (category) {
       case 'page':
-        return 'text-blue-600 bg-blue-50';
+        return 'text-brand-blue-600 bg-brand-blue-50';
       case 'program':
         return 'text-teal-600 bg-teal-50';
       case 'event':

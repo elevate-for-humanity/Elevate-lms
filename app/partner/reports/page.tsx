@@ -115,7 +115,7 @@ export default async function PartnerReportsPage() {
         {/* Key Metrics */}
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 border">
-            <Users className="w-8 h-8 text-blue-500 mb-2" />
+            <Users className="w-8 h-8 text-brand-blue-500 mb-2" />
             <p className="text-2xl font-bold">{totalEnrollments || 0}</p>
             <p className="text-gray-600 text-sm">Total Referrals</p>
           </div>
@@ -125,7 +125,7 @@ export default async function PartnerReportsPage() {
             <p className="text-gray-600 text-sm">This Quarter</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <Calendar className="w-8 h-8 text-blue-500 mb-2" />
+            <Calendar className="w-8 h-8 text-brand-blue-500 mb-2" />
             <p className="text-2xl font-bold">{completedEnrollments || 0}</p>
             <p className="text-gray-600 text-sm">Completions</p>
           </div>

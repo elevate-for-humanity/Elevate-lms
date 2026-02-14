@@ -38,7 +38,7 @@ export default async function HRPage() {
             <Link key={module.href} href={module.href} className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md">
               <div className="flex justify-between items-start mb-4">
                 <h3 className="font-semibold">{module.name}</h3>
-                <span className="text-2xl font-bold text-blue-600">{module.count}</span>
+                <span className="text-2xl font-bold text-brand-blue-600">{module.count}</span>
               </div>
               <p className="text-sm text-gray-500">{module.description}</p>
             </Link>

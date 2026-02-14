@@ -59,8 +59,8 @@ const STATUS_CONFIG: Record<AvailabilityStatus, {
   },
   funding_pending: {
     label: 'Funding Cycle',
-    color: 'text-blue-700',
-    bgColor: 'bg-blue-100',
+    color: 'text-brand-blue-700',
+    bgColor: 'bg-brand-blue-100',
     icon: AlertCircle,
     description: 'Opens when funding confirmed',
   },
@@ -165,7 +165,7 @@ export function ProgramAvailability({
         )}
 
         {status === 'funding_pending' && (
-          <p className="text-xs text-blue-600 mt-2">
+          <p className="text-xs text-brand-blue-600 mt-2">
             This program opens based on grant funding cycles. Submit an inquiry to be notified.
           </p>
         )}

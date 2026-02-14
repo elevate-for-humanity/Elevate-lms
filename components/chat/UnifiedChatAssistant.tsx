@@ -230,7 +230,7 @@ export default function UnifiedChatAssistant({
       {!isOpen && position !== 'inline' && (
         <button
           onClick={() => setIsOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg transition-all hover:scale-105"
+          className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white rounded-full p-4 shadow-lg transition-all hover:scale-105"
           aria-label="Open chat"
         >
           <MessageCircle className="w-6 h-6" />
@@ -245,14 +245,14 @@ export default function UnifiedChatAssistant({
           } ${position === 'inline' ? 'w-full' : 'w-[380px]'}`}
         >
           {/* Header */}
-          <div className="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
+          <div className="bg-brand-blue-600 text-white px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                 <Bot className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="font-semibold text-sm">{script.name}</h3>
-                <p className="text-xs text-blue-100">{script.role}</p>
+                <p className="text-xs text-brand-blue-100">{script.role}</p>
               </div>
             </div>
             <div className="flex items-center gap-1">
@@ -293,7 +293,7 @@ export default function UnifiedChatAssistant({
                   >
                     <div
                       className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                        message.role === 'user' ? 'bg-blue-600' : 'bg-gray-200'
+                        message.role === 'user' ? 'bg-brand-blue-600' : 'bg-gray-200'
                       }`}
                     >
                       {message.role === 'user' ? (
@@ -305,14 +305,14 @@ export default function UnifiedChatAssistant({
                     <div
                       className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                         message.role === 'user'
-                          ? 'bg-blue-600 text-white rounded-br-md'
+                          ? 'bg-brand-blue-600 text-white rounded-br-md'
                           : 'bg-white text-gray-800 shadow-sm rounded-bl-md'
                       }`}
                     >
                       <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                       <p
                         className={`text-xs mt-1 ${
-                          message.role === 'user' ? 'text-blue-100' : 'text-gray-400'
+                          message.role === 'user' ? 'text-brand-blue-100' : 'text-gray-400'
                         }`}
                       >
                         {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -327,7 +327,7 @@ export default function UnifiedChatAssistant({
                       <Bot className="w-4 h-4 text-gray-600" />
                     </div>
                     <div className="bg-white rounded-2xl rounded-bl-md px-4 py-3 shadow-sm">
-                      <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+                      <Loader2 className="w-5 h-5 animate-spin text-brand-blue-600" />
                     </div>
                   </div>
                 )}
@@ -362,13 +362,13 @@ export default function UnifiedChatAssistant({
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
                     placeholder="Type your message..."
-                    className="flex-1 px-4 py-2.5 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 px-4 py-2.5 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     disabled={isLoading}
                   />
                   <button
                     type="submit"
                     disabled={!input.trim() || isLoading}
-                    className="bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-full p-2.5 transition-colors"
+                    className="bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-gray-300 text-white rounded-full p-2.5 transition-colors"
                     aria-label="Send message"
                   >
                     <Send className="w-5 h-5" />

@@ -52,7 +52,7 @@ export default function StartPage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Start" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-blue-50 py-16">
+      <section className="bg-brand-blue-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-semibold text-gray-900 mb-4">
             Let's Get Your Taxes Filed
@@ -72,8 +72,8 @@ export default function StartPage() {
                 key={option.title}
                 className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow"
               >
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mb-4">
-                  <option.icon className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mb-4">
+                  <option.icon className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 
                 <h2 className="text-xl font-semibold text-gray-900 mb-2">
@@ -94,7 +94,7 @@ export default function StartPage() {
 
                 <Link
                   href={option.href}
-                  className="block w-full text-center py-3 px-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="block w-full text-center py-3 px-4 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
                 >
                   {option.cta}
                 </Link>
@@ -108,7 +108,7 @@ export default function StartPage() {
       <section className="py-16 bg-gray-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white border border-gray-200 rounded-xl p-8 text-center">
-            <Phone className="w-10 h-10 text-blue-600 mx-auto mb-4" />
+            <Phone className="w-10 h-10 text-brand-blue-600 mx-auto mb-4" />
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">
               Prefer to Talk?
             </h2>
@@ -117,7 +117,7 @@ export default function StartPage() {
             </p>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
               <Phone className="w-5 h-5" />
               Get Help Online
@@ -156,17 +156,17 @@ export default function StartPage() {
       </section>
 
       {/* Pricing Link */}
-      <section className="py-16 bg-blue-900">
+      <section className="py-16 bg-brand-blue-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-semibold text-white mb-4">
             Questions about pricing?
           </h2>
-          <p className="text-blue-200 mb-8">
+          <p className="text-brand-blue-200 mb-8">
             See our transparent pricing before you start.
           </p>
           <Link
             href="/supersonic-fast-cash/pricing"
-            className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+            className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-900 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
           >
             View Pricing
             <ArrowRight className="ml-2 w-5 h-5" />

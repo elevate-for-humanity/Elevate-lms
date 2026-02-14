@@ -88,7 +88,7 @@ export default function EnrollmentDashboard() {
       case 'active':
       case 'enrolled':
       case 'in_progress':
-        return <Clock className="w-5 h-5 text-blue-500" />;
+        return <Clock className="w-5 h-5 text-brand-blue-500" />;
       default:
         return <Clock className="w-5 h-5 text-gray-400" />;
     }
@@ -97,18 +97,18 @@ export default function EnrollmentDashboard() {
   const getDeliveryModeLabel = (mode: string) => {
     switch (mode) {
       case 'partner':
-        return { label: 'Partner Course', icon: Building2, color: 'text-blue-600 bg-blue-50' };
+        return { label: 'Partner Course', icon: Building2, color: 'text-brand-blue-600 bg-brand-blue-50' };
       case 'hybrid':
         return { label: 'Apprenticeship', icon: GraduationCap, color: 'text-orange-600 bg-orange-50' };
       default:
-        return { label: 'Online Course', icon: BookOpen, color: 'text-blue-600 bg-blue-50' };
+        return { label: 'Online Course', icon: BookOpen, color: 'text-brand-blue-600 bg-brand-blue-50' };
     }
   };
 
   return (
     <section className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
       <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-        <GraduationCap className="w-6 h-6 text-blue-600" />
+        <GraduationCap className="w-6 h-6 text-brand-blue-600" />
         My Enrollments
       </h2>
 
@@ -120,7 +120,7 @@ export default function EnrollmentDashboard() {
           return (
             <div
               key={enrollment.enrollment_id}
-              className="border border-gray-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+              className="border border-gray-200 rounded-lg p-4 hover:border-brand-blue-300 transition-colors"
             >
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
@@ -163,7 +163,7 @@ export default function EnrollmentDashboard() {
                       </div>
                       <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-blue-500 rounded-full transition-all"
+                          className="h-full bg-brand-blue-500 rounded-full transition-all"
                           style={{ width: `${enrollment.progress}%` }}
                         />
                       </div>
@@ -173,7 +173,7 @@ export default function EnrollmentDashboard() {
 
                 <Link
                   href={enrollment.continue_url}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white text-sm font-medium rounded-lg hover:bg-brand-blue-700 transition-colors whitespace-nowrap"
                 >
                   {enrollment.delivery_mode === 'partner' ? (
                     <>

@@ -88,7 +88,7 @@ export default async function IssueCertificatePage() {
                   </label>
                   <input 
                     type="text" 
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="Full name as it appears on certificate"
                     required
                   />
@@ -99,7 +99,7 @@ export default async function IssueCertificatePage() {
                   </label>
                   <input 
                     type="email" 
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="recipient@email.com"
                     required
                   />
@@ -116,7 +116,7 @@ export default async function IssueCertificatePage() {
                     Certificate Template *
                   </label>
                   <select 
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     required
                   >
                     <option value="">Select a template</option>
@@ -135,7 +135,7 @@ export default async function IssueCertificatePage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Course / Program
                   </label>
-                  <select className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <select className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500">
                     <option value="">Select a course (optional)</option>
                     {courses?.map((course: any) => (
                       <option key={course.id} value={course.id}>
@@ -152,7 +152,7 @@ export default async function IssueCertificatePage() {
                     </label>
                     <input 
                       type="date" 
-                      className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       defaultValue={new Date().toISOString().split('T')[0]}
                       required
                     />
@@ -163,7 +163,7 @@ export default async function IssueCertificatePage() {
                     </label>
                     <input 
                       type="date" 
-                      className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     />
                   </div>
                 </div>
@@ -174,7 +174,7 @@ export default async function IssueCertificatePage() {
                   </label>
                   <input 
                     type="text" 
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="Director or authorized signer name"
                   />
                 </div>
@@ -184,7 +184,7 @@ export default async function IssueCertificatePage() {
                     Additional Notes
                   </label>
                   <textarea 
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     rows={3}
                     placeholder="Any additional information to include"
                   />
@@ -197,11 +197,11 @@ export default async function IssueCertificatePage() {
               <h2 className="text-lg font-semibold mb-4">Notification</h2>
               <div className="space-y-2">
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" defaultChecked />
+                  <input type="checkbox" className="w-4 h-4 text-brand-blue-600 rounded" defaultChecked />
                   <span className="text-sm text-gray-700">Send email notification to recipient</span>
                 </label>
                 <label className="flex items-center gap-2">
-                  <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
+                  <input type="checkbox" className="w-4 h-4 text-brand-blue-600 rounded" />
                   <span className="text-sm text-gray-700">Include PDF attachment</span>
                 </label>
               </div>
@@ -211,7 +211,7 @@ export default async function IssueCertificatePage() {
             <div className="flex gap-4 pt-4 border-t">
               <button 
                 type="submit"
-                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700"
               >
                 Issue Certificate
               </button>

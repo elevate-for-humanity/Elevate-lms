@@ -90,7 +90,7 @@ export default async function GetInvolvedPage() {
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Get Involved</h1>
-          <p className="text-xl text-blue-100 max-w-2xl">
+          <p className="text-xl text-brand-blue-100 max-w-2xl">
             Join our community of compassionate individuals making a difference in people's lives.
           </p>
         </div>
@@ -101,15 +101,15 @@ export default async function GetInvolvedPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-3 gap-6 text-center">
             <div>
-              <div className="text-3xl font-bold text-blue-600">{volunteerCount || 50}+</div>
+              <div className="text-3xl font-bold text-brand-blue-600">{volunteerCount || 50}+</div>
               <div className="text-gray-600">Active Volunteers</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-blue-600">Growing</div>
+              <div className="text-3xl font-bold text-brand-blue-600">Growing</div>
               <div className="text-gray-600">Community</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-blue-600">10+</div>
+              <div className="text-3xl font-bold text-brand-blue-600">10+</div>
               <div className="text-gray-600">Partner Organizations</div>
             </div>
           </div>
@@ -141,7 +141,7 @@ export default async function GetInvolvedPage() {
                 </div>
                 <div className="p-6">
                   <p className="text-gray-600 mb-4">{way.description}</p>
-                  <span className="inline-flex items-center gap-1 text-blue-600 font-medium group-hover:underline">
+                  <span className="inline-flex items-center gap-1 text-brand-blue-600 font-medium group-hover:underline">
                     Learn More <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
@@ -153,7 +153,7 @@ export default async function GetInvolvedPage() {
 
       {/* Volunteer Opportunities */}
       {opportunities && opportunities.length > 0 && (
-        <section className="py-16 bg-blue-50">
+        <section className="py-16 bg-brand-blue-50">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-3xl font-bold mb-8">Current Volunteer Opportunities</h2>
             <div className="grid md:grid-cols-2 gap-6">
@@ -177,19 +177,19 @@ export default async function GetInvolvedPage() {
       <section className="py-16 bg-slate-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Make a Difference?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Contact us to learn more about how you can get involved.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100"
             >
               <Phone className="w-5 h-5" /> Contact Us
             </a>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-400 border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-400 border-2 border-white"
             >
               <Mail className="w-5 h-5" /> Email Us
             </Link>

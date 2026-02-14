@@ -218,7 +218,7 @@ export function AgreementSignature({
   if (loading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin"></div>
       </div>
     );
   }
@@ -267,7 +267,7 @@ export function AgreementSignature({
             type="text"
             value={signerName}
             onChange={(e) => setSignerName(e.target.value)}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             placeholder="Enter your full legal name"
             required
           />
@@ -281,7 +281,7 @@ export function AgreementSignature({
             type="email"
             value={signerEmail}
             onChange={(e) => setSignerEmail(e.target.value)}
-            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${
+            className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 ${
               emailMismatch ? 'border-red-500 bg-red-50' : 'border-slate-300'
             }`}
             placeholder="Enter your email address"
@@ -306,15 +306,15 @@ export function AgreementSignature({
             onClick={() => setSignatureMethod('checkbox')}
             className={`p-4 border-2 rounded-lg text-center transition-colors ${
               signatureMethod === 'checkbox'
-                ? 'border-blue-600 bg-blue-50'
+                ? 'border-brand-blue-600 bg-brand-blue-50'
                 : 'border-slate-200 hover:border-slate-300'
             }`}
           >
             <CheckSquare className={`w-6 h-6 mx-auto mb-2 ${
-              signatureMethod === 'checkbox' ? 'text-blue-600' : 'text-slate-400'
+              signatureMethod === 'checkbox' ? 'text-brand-blue-600' : 'text-slate-400'
             }`} />
             <span className={`text-sm font-medium ${
-              signatureMethod === 'checkbox' ? 'text-blue-900' : 'text-slate-600'
+              signatureMethod === 'checkbox' ? 'text-brand-blue-900' : 'text-slate-600'
             }`}>
               Checkbox
             </span>
@@ -325,15 +325,15 @@ export function AgreementSignature({
             onClick={() => setSignatureMethod('typed')}
             className={`p-4 border-2 rounded-lg text-center transition-colors ${
               signatureMethod === 'typed'
-                ? 'border-blue-600 bg-blue-50'
+                ? 'border-brand-blue-600 bg-brand-blue-50'
                 : 'border-slate-200 hover:border-slate-300'
             }`}
           >
             <Type className={`w-6 h-6 mx-auto mb-2 ${
-              signatureMethod === 'typed' ? 'text-blue-600' : 'text-slate-400'
+              signatureMethod === 'typed' ? 'text-brand-blue-600' : 'text-slate-400'
             }`} />
             <span className={`text-sm font-medium ${
-              signatureMethod === 'typed' ? 'text-blue-900' : 'text-slate-600'
+              signatureMethod === 'typed' ? 'text-brand-blue-900' : 'text-slate-600'
             }`}>
               Type Name
             </span>
@@ -344,15 +344,15 @@ export function AgreementSignature({
             onClick={() => setSignatureMethod('drawn')}
             className={`p-4 border-2 rounded-lg text-center transition-colors ${
               signatureMethod === 'drawn'
-                ? 'border-blue-600 bg-blue-50'
+                ? 'border-brand-blue-600 bg-brand-blue-50'
                 : 'border-slate-200 hover:border-slate-300'
             }`}
           >
             <Pen className={`w-6 h-6 mx-auto mb-2 ${
-              signatureMethod === 'drawn' ? 'text-blue-600' : 'text-slate-400'
+              signatureMethod === 'drawn' ? 'text-brand-blue-600' : 'text-slate-400'
             }`} />
             <span className={`text-sm font-medium ${
-              signatureMethod === 'drawn' ? 'text-blue-900' : 'text-slate-600'
+              signatureMethod === 'drawn' ? 'text-brand-blue-900' : 'text-slate-600'
             }`}>
               Draw
             </span>
@@ -369,7 +369,7 @@ export function AgreementSignature({
               type="text"
               value={typedSignature}
               onChange={(e) => setTypedSignature(e.target.value)}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-signature text-xl"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 font-signature text-xl"
               placeholder="Type your full name"
               style={{ fontFamily: "'Brush Script MT', cursive" }}
             />
@@ -395,7 +395,7 @@ export function AgreementSignature({
               <button
                 type="button"
                 onClick={clearDrawnSignature}
-                className="text-sm text-blue-600 hover:text-blue-800"
+                className="text-sm text-brand-blue-600 hover:text-brand-blue-800"
               >
                 Clear
               </button>
@@ -414,7 +414,7 @@ export function AgreementSignature({
             type="checkbox"
             checked={intentAcknowledged}
             onChange={(e) => setIntentAcknowledged(e.target.checked)}
-            className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+            className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
           />
           <span className="text-sm text-slate-700">
             I understand and agree to the above statement <span className="text-red-500">*</span>
@@ -428,12 +428,12 @@ export function AgreementSignature({
           type="checkbox"
           checked={acknowledged}
           onChange={(e) => setAcknowledged(e.target.checked)}
-          className="mt-1 w-4 h-4 text-blue-600 border-slate-300 rounded focus:ring-blue-500"
+          className="mt-1 w-4 h-4 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
         />
         <span className="text-sm text-slate-700">
           I have read and agree to the terms of this {agreementType.replace(/_/g, ' ')} agreement{' '}
           {documentUrl && (
-            <a href={documentUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
+            <a href={documentUrl} target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 hover:underline">
               (view document)
             </a>
           )}
@@ -447,7 +447,7 @@ export function AgreementSignature({
         disabled={!isFormValid() || submitting}
         className={`w-full py-3 px-4 rounded-lg font-medium transition-colors ${
           isFormValid() && !submitting
-            ? 'bg-blue-600 text-white hover:bg-blue-700'
+            ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
             : 'bg-slate-300 text-slate-500 cursor-not-allowed'
         }`}
       >

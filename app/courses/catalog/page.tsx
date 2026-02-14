@@ -409,7 +409,7 @@ export default function CoursesCatalogPage() {
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Partner Course Catalog
           </h1>
-          <p className="text-base md:text-lg text-blue-100 mb-6">
+          <p className="text-base md:text-lg text-brand-blue-100 mb-6">
             130+ industry certifications from leading training providers
           </p>
           <div className="flex flex-wrap gap-4 text-sm">
@@ -442,7 +442,7 @@ export default function CoursesCatalogPage() {
                   placeholder="Search courses..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -452,7 +452,7 @@ export default function CoursesCatalogPage() {
               <select
                 value={selectedProvider}
                 onChange={(e) => setSelectedProvider(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="all">All Providers</option>
                 {Object.entries(PARTNER_COURSES).map(([id, provider]: any) => (
@@ -468,7 +468,7 @@ export default function CoursesCatalogPage() {
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="all">All Categories</option>
                 {categories.map((cat) => (
@@ -555,7 +555,7 @@ export default function CoursesCatalogPage() {
             >
               {/* Provider Badge */}
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-semibold text-brand-blue-600 bg-blue-50 px-3 py-2 rounded-full">
+                <span className="text-xs font-semibold text-brand-blue-600 bg-brand-blue-50 px-3 py-2 rounded-full">
                   {course.providerName}
                 </span>
                 <span className="text-xs text-slate-500">
@@ -633,7 +633,7 @@ export default function CoursesCatalogPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-bold mb-2">Industry Recognized</h3>

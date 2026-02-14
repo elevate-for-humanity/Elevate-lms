@@ -41,7 +41,7 @@ export default async function DelegatesPage() {
               <h1 className="text-3xl font-bold text-gray-900">Delegates</h1>
               <p className="text-gray-600 mt-2">Manage users with delegated access</p>
             </div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Delegate</button>
+            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Add Delegate</button>
           </div>
         </div>
 
@@ -51,8 +51,8 @@ export default async function DelegatesPage() {
               delegates.map((delegate: any) => (
                 <div key={delegate.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 font-medium">{(delegate.profiles?.full_name || 'U')[0]}</span>
+                    <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-brand-blue-600 font-medium">{(delegate.profiles?.full_name || 'U')[0]}</span>
                     </div>
                     <div>
                       <p className="font-medium">{delegate.profiles?.full_name || 'Unknown'}</p>
@@ -60,7 +60,7 @@ export default async function DelegatesPage() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs">{delegate.role || 'delegate'}</span>
+                    <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-800 rounded-full text-xs">{delegate.role || 'delegate'}</span>
                     <button className="text-red-600 hover:text-red-800 text-sm">Remove</button>
                   </div>
                 </div>

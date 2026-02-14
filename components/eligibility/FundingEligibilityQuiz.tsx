@@ -158,7 +158,7 @@ export function FundingEligibilityQuiz() {
   if (isCalculating) {
     return (
       <div className="max-w-2xl mx-auto p-8 text-center">
-        <Loader2 className="w-16 h-16 text-blue-600 animate-spin mx-auto mb-6" />
+        <Loader2 className="w-16 h-16 text-brand-blue-600 animate-spin mx-auto mb-6" />
         <h2 className="text-2xl font-bold text-slate-900 mb-2">Checking Your Eligibility...</h2>
         <p className="text-slate-600">We're matching you with available funding programs</p>
       </div>
@@ -210,19 +210,19 @@ export function FundingEligibilityQuiz() {
         )}
 
         {/* Next Steps */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-          <h3 className="text-lg font-bold text-blue-900 mb-3">Next Steps</h3>
-          <ol className="space-y-2 text-blue-800">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-8">
+          <h3 className="text-lg font-bold text-brand-blue-900 mb-3">Next Steps</h3>
+          <ol className="space-y-2 text-brand-blue-800">
             <li className="flex items-start gap-2">
-              <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm flex-shrink-0">1</span>
+              <span className="bg-brand-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm flex-shrink-0">1</span>
               <span>Complete a full application (takes 5-10 minutes)</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm flex-shrink-0">2</span>
+              <span className="bg-brand-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm flex-shrink-0">2</span>
               <span>Our team will verify your eligibility with funding agencies</span>
             </li>
             <li className="flex items-start gap-2">
-              <span className="bg-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm flex-shrink-0">3</span>
+              <span className="bg-brand-blue-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-sm flex-shrink-0">3</span>
               <span>Get enrolled in your chosen program - often at no cost to you</span>
             </li>
           </ol>
@@ -232,7 +232,7 @@ export function FundingEligibilityQuiz() {
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/apply"
-            className="flex-1 bg-blue-600 text-white text-center py-4 px-6 rounded-xl font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+            className="flex-1 bg-brand-blue-600 text-white text-center py-4 px-6 rounded-xl font-semibold hover:bg-brand-blue-700 transition-colors flex items-center justify-center gap-2"
           >
             Start Full Application
             <ArrowRight className="w-5 h-5" />
@@ -247,7 +247,7 @@ export function FundingEligibilityQuiz() {
 
         {/* Contact */}
         <p className="text-center text-slate-600 mt-6">
-          Questions? Call us at <a href="/support" className="text-blue-600 font-semibold">Get Help Online</a>
+          Questions? Call us at <a href="/support" className="text-brand-blue-600 font-semibold">Get Help Online</a>
         </p>
       </div>
     );
@@ -263,7 +263,7 @@ export function FundingEligibilityQuiz() {
         </div>
         <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-blue-600 transition-all duration-300"
+            className="h-full bg-brand-blue-600 transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -283,14 +283,14 @@ export function FundingEligibilityQuiz() {
               onClick={() => handleAnswer(option.value)}
               className={`w-full text-left p-4 rounded-xl border-2 transition-all ${
                 answers[currentQuestion.id] === option.value
-                  ? 'border-blue-600 bg-blue-50 text-blue-900'
+                  ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-900'
                   : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
               }`}
             >
               <div className="flex items-center gap-3">
                 <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
                   answers[currentQuestion.id] === option.value
-                    ? 'border-blue-600 bg-blue-600'
+                    ? 'border-brand-blue-600 bg-brand-blue-600'
                     : 'border-slate-300'
                 }`}>
                   {answers[currentQuestion.id] === option.value && (
@@ -320,7 +320,7 @@ export function FundingEligibilityQuiz() {
           disabled={!answers[currentQuestion.id]}
           className={`flex-1 py-4 px-6 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors ${
             answers[currentQuestion.id]
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
+              ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
               : 'bg-slate-200 text-slate-400 cursor-not-allowed'
           }`}
         >

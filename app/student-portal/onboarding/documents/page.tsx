@@ -243,7 +243,7 @@ export default function OnboardingDocumentsPage() {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 text-brand-blue-600 animate-spin mx-auto mb-4" />
           <p className="text-slate-600">Loading documents...</p>
         </div>
       </div>
@@ -265,8 +265,8 @@ export default function OnboardingDocumentsPage() {
         {/* Header */}
         <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Upload className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Upload className="w-6 h-6 text-brand-blue-600" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-slate-900">
@@ -351,14 +351,14 @@ export default function OnboardingDocumentsPage() {
                         <div
                           className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
                             isUploading
-                              ? 'border-blue-300 bg-blue-50'
-                              : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'
+                              ? 'border-brand-blue-300 bg-brand-blue-50'
+                              : 'border-slate-300 hover:border-brand-blue-400 hover:bg-slate-50'
                           }`}
                         >
                           {isUploading ? (
                             <div className="flex items-center justify-center gap-2">
-                              <Loader2 className="w-5 h-5 text-blue-600 animate-spin" />
-                              <span className="text-blue-600">Uploading...</span>
+                              <Loader2 className="w-5 h-5 text-brand-blue-600 animate-spin" />
+                              <span className="text-brand-blue-600">Uploading...</span>
                             </div>
                           ) : (
                             <>
@@ -404,7 +404,7 @@ export default function OnboardingDocumentsPage() {
             disabled={!requiredComplete}
             className={`flex-1 py-3 px-6 rounded-lg font-medium transition-colors ${
               requiredComplete
-                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                ? 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
                 : 'bg-slate-300 text-slate-500 cursor-not-allowed'
             }`}
           >

@@ -115,25 +115,25 @@ export default async function Page() {
             </h3>
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">Duration:</span>
+                <span className="text-brand-blue-600 font-bold">Duration:</span>
                 <span className="text-black">4-6 weeks</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">Cost:</span>
+                <span className="text-brand-blue-600 font-bold">Cost:</span>
                 <span className="text-black">Funded for qualifying students</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">Format:</span>
+                <span className="text-brand-blue-600 font-bold">Format:</span>
                 <span className="text-black">
                   Hybrid (online + in-person)
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">Starting Pay:</span>
+                <span className="text-brand-blue-600 font-bold">Starting Pay:</span>
                 <span className="text-black">$14-$18/hour</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">Job Placement:</span>
+                <span className="text-brand-blue-600 font-bold">Job Placement:</span>
                 <span className="text-black">Included</span>
               </li>
             </ul>
@@ -280,13 +280,13 @@ export default async function Page() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply?program=direct-support-professional"
-              className="px-8 py-4 bg-white text-blue-600 hover:bg-gray-100 font-bold rounded-lg transition-all text-center"
+              className="px-8 py-4 bg-white text-brand-blue-600 hover:bg-gray-100 font-bold rounded-lg transition-all text-center"
             >
               Start Eligibility & Choose This Program
             </Link>
             <Link
               href="/support"
-              className="px-8 py-4 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-lg transition-all text-center border-2 border-white"
+              className="px-8 py-4 bg-brand-blue-700 hover:bg-brand-blue-800 text-white font-bold rounded-lg transition-all text-center border-2 border-white"
             >
               Questions? Contact Us
             </Link>

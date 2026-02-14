@@ -76,7 +76,7 @@ export function CourseContentAccordion({
                         <span className="h-2 w-2 rounded-full bg-slate-300" />
                         <Link
                           href={`/lms/courses/${courseSlug}/lessons/${lesson.id}`}
-                          className="text-xs text-black hover:text-blue-600 hover:underline"
+                          className="text-xs text-black hover:text-brand-blue-600 hover:underline"
                         >
                           {lesson.title}
                         </Link>

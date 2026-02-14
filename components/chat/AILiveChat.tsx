@@ -251,11 +251,11 @@ export default function AILiveChat({
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
               <Bot className="w-6 h-6 text-white" />
             </div>
-            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-blue-600" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-400 rounded-full border-2 border-brand-blue-600" />
           </div>
           <div>
             <h3 className="font-bold text-sm">AI Assistant</h3>
-            <p className="text-xs text-blue-100">
+            <p className="text-xs text-brand-blue-100">
               {agentConnected ? 'Connected to agent' : 'Online • Instant replies'}
             </p>
           </div>
@@ -293,7 +293,7 @@ export default function AILiveChat({
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
                       message.sender === 'user'
-                        ? 'bg-blue-600'
+                        ? 'bg-brand-blue-600'
                         : message.sender === 'agent'
                           ? 'bg-green-600'
                           : 'bg-gray-600'
@@ -309,7 +309,7 @@ export default function AILiveChat({
                     <div
                       className={`rounded-2xl px-4 py-2 ${
                         message.sender === 'user'
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-brand-blue-600 text-white'
                           : 'bg-white text-black shadow-sm'
                       }`}
                     >
@@ -353,7 +353,7 @@ export default function AILiveChat({
               <button
                 onClick={requestHumanAgent}
                 disabled={isLoading}
-                className="text-sm text-blue-600 hover:text-blue-700 font-medium disabled:opacity-50"
+                className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium disabled:opacity-50"
               >
                 Talk to a human agent →
               </button>
@@ -369,13 +369,13 @@ export default function AILiveChat({
                 onKeyPress={handleKeyPress}
                 placeholder="Type your message..."
                 rows={1}
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 disabled={isLoading}
               />
               <button
                 onClick={sendMessage}
                 disabled={isLoading || !inputValue.trim()}
-                className="bg-blue-600 text-white p-3 rounded-xl hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+                className="bg-brand-blue-600 text-white p-3 rounded-xl hover:bg-brand-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

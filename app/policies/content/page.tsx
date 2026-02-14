@@ -186,7 +186,7 @@ export default function ContentPage() {
             </ul>
 
             <h3 className="text-xl font-bold text-black mt-6 mb-3">Moderation Process</h3>
-            <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200 mb-6">
+            <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200 mb-6">
               <p className="text-black mb-4">
                 Content may be moderated through:
               </p>
@@ -292,15 +292,15 @@ export default function ContentPage() {
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/copyright" className="text-blue-600 hover:underline">Copyright Policy</a></li>
-                <li><a href="/policies/community-guidelines" className="text-blue-600 hover:underline">Community Guidelines</a></li>
-                <li><a href="/policies/moderation" className="text-blue-600 hover:underline">Moderation Policy</a></li>
-                <li><a href="/policies/acceptable-use" className="text-blue-600 hover:underline">Acceptable Use Policy</a></li>
+                <li><a href="/policies/copyright" className="text-brand-blue-600 hover:underline">Copyright Policy</a></li>
+                <li><a href="/policies/community-guidelines" className="text-brand-blue-600 hover:underline">Community Guidelines</a></li>
+                <li><a href="/policies/moderation" className="text-brand-blue-600 hover:underline">Moderation Policy</a></li>
+                <li><a href="/policies/acceptable-use" className="text-brand-blue-600 hover:underline">Acceptable Use Policy</a></li>
               </ul>
             </div>
           </div>

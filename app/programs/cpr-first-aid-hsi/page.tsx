@@ -159,7 +159,7 @@ export default function CPRFirstAidPage() {
               <div className="text-slate-400 text-sm">Certification Valid</div>
             </div>
             <div>
-              <Shield className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+              <Shield className="w-8 h-8 text-brand-blue-400 mx-auto mb-2" />
               <div className="text-2xl font-bold text-white">HSI</div>
               <div className="text-slate-400 text-sm">Certified Provider</div>
             </div>
@@ -286,12 +286,12 @@ export default function CPRFirstAidPage() {
       </section>
 
       {/* Group Training */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-white">
               <h2 className="text-3xl md:text-4xl font-black mb-6">Group & On-Site Training</h2>
-              <p className="text-blue-100 mb-6">
+              <p className="text-brand-blue-100 mb-6">
                 We come to your location. Perfect for businesses, schools, churches, and organizations 
                 needing to train multiple people.
               </p>
@@ -304,12 +304,12 @@ export default function CPRFirstAidPage() {
                   'Certificates issued same day',
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-200" />
+                    <CheckCircle className="w-5 h-5 text-brand-blue-200" />
                     <span>{item}</span>
                   </li>
                 ))}
               </ul>
-              <Link href="/employers" className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-white transition-all">
+              <Link href="/employers" className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-white transition-all">
                 Request Group Training <ArrowRight className="w-5 h-5" />
               </Link>
             </div>

@@ -295,7 +295,7 @@ export function GuidedDemoChat() {
         {showStartPrompt ? (
           <div className="text-center py-8">
             <div className="w-16 h-16 bg-gradient-to-r from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Play className="w-8 h-8 text-blue-600" />
+              <Play className="w-8 h-8 text-brand-blue-600" />
             </div>
             <h3 className="text-lg font-semibold text-gray-900 mb-2">
               Welcome to the Platform Demo
@@ -325,7 +325,7 @@ export function GuidedDemoChat() {
                 <div
                   className={`max-w-[80%] p-3 rounded-2xl ${
                     msg.role === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-md'
+                      ? 'bg-brand-blue-600 text-white rounded-br-md'
                       : 'bg-gray-100 text-gray-800 rounded-bl-md'
                   }`}
                 >
@@ -351,7 +351,7 @@ export function GuidedDemoChat() {
             />
             <button
               type="submit"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -360,14 +360,14 @@ export function GuidedDemoChat() {
             <button
               type="button"
               onClick={() => router.push('/schedule')}
-              className="flex-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
+              className="flex-1 text-xs text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               Schedule a Call
             </button>
             <button
               type="button"
               onClick={() => router.push('/store/licenses')}
-              className="flex-1 text-xs text-blue-600 hover:text-blue-700 font-medium"
+              className="flex-1 text-xs text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               View Pricing
             </button>

@@ -43,7 +43,7 @@ export default async function NewCampaignPage() {
               type="text"
               name="name"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               placeholder="Spring 2025 Enrollment Drive"
             />
           </div>
@@ -61,8 +61,8 @@ export default async function NewCampaignPage() {
               ].map((type) => (
                 <label key={type.id} className="relative cursor-pointer">
                   <input type="radio" name="campaign_type" value={type.id} className="peer sr-only" defaultChecked={type.id === 'email'} />
-                  <div className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg peer-checked:border-blue-500 peer-checked:bg-blue-50">
-                    <type.icon className="w-6 h-6 text-gray-600 peer-checked:text-blue-600" />
+                  <div className="flex flex-col items-center gap-2 p-4 border border-gray-200 rounded-lg peer-checked:border-brand-blue-500 peer-checked:bg-brand-blue-50">
+                    <type.icon className="w-6 h-6 text-gray-600 peer-checked:text-brand-blue-600" />
                     <span className="text-sm font-medium">{type.label}</span>
                   </div>
                 </label>
@@ -78,7 +78,7 @@ export default async function NewCampaignPage() {
               type="text"
               name="subject"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               placeholder="Start Your New Career Today!"
             />
           </div>
@@ -90,7 +90,7 @@ export default async function NewCampaignPage() {
             <textarea
               name="content"
               rows={6}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               placeholder="Write your campaign message..."
             />
           </div>
@@ -102,7 +102,7 @@ export default async function NewCampaignPage() {
             <input
               type="datetime-local"
               name="scheduled_at"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             />
             <p className="text-sm text-gray-500 mt-1">Leave empty to save as draft</p>
           </div>
@@ -113,7 +113,7 @@ export default async function NewCampaignPage() {
             </Link>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Create Campaign
             </button>

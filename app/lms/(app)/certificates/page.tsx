@@ -86,7 +86,7 @@ export default async function CertificatesPage() {
           </div>
         ) : (
           <div className="text-center py-16 bg-white rounded-lg">
-            <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-24 h-24 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
               <svg
                 className="w-12 h-12 text-brand-blue-600"
                 fill="none"

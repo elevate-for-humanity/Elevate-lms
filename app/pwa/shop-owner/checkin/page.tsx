@@ -73,7 +73,7 @@ export default function ShopCheckInPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
   }
@@ -147,7 +147,7 @@ export default function ShopCheckInPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-slate-800 rounded-xl p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <Users className="w-5 h-5 text-blue-400" />
+                  <Users className="w-5 h-5 text-brand-blue-400" />
                   <span className="text-slate-400 text-sm">Today's Check-Ins</span>
                 </div>
                 <p className="text-2xl font-bold text-white">{data.todayCheckIns}</p>
@@ -177,7 +177,7 @@ export default function ShopCheckInPage() {
               {'share' in navigator && (
                 <button
                   onClick={handleShare}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-medium py-4 rounded-xl hover:bg-blue-700"
+                  className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 text-white font-medium py-4 rounded-xl hover:bg-brand-blue-700"
                 >
                   <Share2 className="w-5 h-5" />
                   Share Check-In Link
@@ -190,19 +190,19 @@ export default function ShopCheckInPage() {
               <h3 className="text-white font-medium mb-2">How it works</h3>
               <ol className="text-slate-400 text-sm space-y-2">
                 <li className="flex gap-2">
-                  <span className="text-blue-400">1.</span>
+                  <span className="text-brand-blue-400">1.</span>
                   Display this QR code at your shop entrance
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-blue-400">2.</span>
+                  <span className="text-brand-blue-400">2.</span>
                   Apprentices scan the code when they arrive
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-blue-400">3.</span>
+                  <span className="text-brand-blue-400">3.</span>
                   Check-in time is automatically recorded
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-blue-400">4.</span>
+                  <span className="text-brand-blue-400">4.</span>
                   Hours are calculated when they check out
                 </li>
               </ol>

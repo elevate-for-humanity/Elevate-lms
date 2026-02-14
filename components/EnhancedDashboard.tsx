@@ -97,7 +97,7 @@ export default function EnhancedDashboard({ role, userId }: DashboardProps) {
 
         <div className="bg-white border border-slate-200 rounded-lg p-6">
           <div className="flex items-center justify-between mb-2">
-            <MessageSquare className="w-8 h-8 text-blue-600" />
+            <MessageSquare className="w-8 h-8 text-brand-blue-600" />
             <span className="text-2xl font-bold text-black">
               {stats.messages}
             </span>

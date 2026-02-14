@@ -102,7 +102,7 @@ export default async function BulkCertificationsPage() {
               <button className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
                 Approve Selected
               </button>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+              <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-blue-700">
                 Export CSV
               </button>
               <button className="border px-4 py-2 rounded-lg text-sm hover:bg-gray-50">
@@ -126,9 +126,9 @@ export default async function BulkCertificationsPage() {
             <p className="text-sm text-red-800">Expiring Soon</p>
             <p className="text-2xl font-bold text-red-900">0</p>
           </div>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-sm text-blue-800">Total Active</p>
-            <p className="text-2xl font-bold text-blue-900">0</p>
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+            <p className="text-sm text-brand-blue-800">Total Active</p>
+            <p className="text-2xl font-bold text-brand-blue-900">0</p>
           </div>
         </div>
 
@@ -140,7 +140,7 @@ export default async function BulkCertificationsPage() {
               <p className="text-sm text-gray-500">Review and approve certification records</p>
             </div>
             <div className="flex gap-2">
-              <button className="text-sm text-blue-600 hover:text-blue-800">Select All</button>
+              <button className="text-sm text-brand-blue-600 hover:text-brand-blue-800">Select All</button>
               <span className="text-gray-300">|</span>
               <button className="text-sm text-gray-600 hover:text-gray-800">Clear</button>
             </div>

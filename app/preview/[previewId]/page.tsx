@@ -219,7 +219,7 @@ export default function PreviewPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold text-slate-900 mb-2">Preview Not Found</h1>
           <p className="text-slate-600 mb-4">This preview may have expired.</p>
-          <Link href="/builder" className="text-blue-600 hover:underline">
+          <Link href="/builder" className="text-brand-blue-600 hover:underline">
             Generate a new site →
           </Link>
         </div>

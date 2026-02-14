@@ -58,8 +58,8 @@ export function AnalyticsDashboard({ data, timeframe = 'month' }: AnalyticsDashb
       value: data.studyHours.toLocaleString(),
       change: '+15%',
       icon: Clock,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
+      color: 'text-brand-blue-600',
+      bgColor: 'bg-brand-blue-100',
     },
     {
       title: 'Courses Completed',

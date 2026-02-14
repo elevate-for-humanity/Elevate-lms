@@ -20,15 +20,15 @@ export default function LMSPortalPublicPage() {
       {/* Hero */}
       <section className="bg-gradient-to-br from-blue-900 to-blue-700 text-white py-16 md:py-24">
         <div className="max-w-6xl mx-auto px-4 text-center">
-          <BookOpen className="w-16 h-16 mx-auto mb-6 text-blue-300" />
+          <BookOpen className="w-16 h-16 mx-auto mb-6 text-brand-blue-300" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Learning Management System</h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto mb-8">
+          <p className="text-xl text-brand-blue-100 max-w-2xl mx-auto mb-8">
             Access your courses, track your progress, and earn industry-recognized certifications.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/login?redirect=/lms"
-              className="inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-50 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-50 transition-colors"
             >
               Sign In to LMS
               <ArrowRight className="w-5 h-5" />
@@ -52,7 +52,7 @@ export default function LMSPortalPublicPage() {
           </p>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="bg-slate-50 rounded-xl p-6">
-              <Play className="w-10 h-10 text-blue-600 mb-4" />
+              <Play className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Video Courses</h3>
               <p className="text-slate-600">Learn at your own pace with professional video lessons and interactive content.</p>
             </div>
@@ -67,7 +67,7 @@ export default function LMSPortalPublicPage() {
               <p className="text-slate-600">Earn industry-recognized certificates upon completing your training programs.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
-              <Users className="w-10 h-10 text-blue-600 mb-4" />
+              <Users className="w-10 h-10 text-brand-blue-600 mb-4" />
               <h3 className="text-xl font-bold mb-2">Community</h3>
               <p className="text-slate-600">Connect with fellow students, join study groups, and participate in forums.</p>
             </div>
@@ -81,14 +81,14 @@ export default function LMSPortalPublicPage() {
       </section>
 
       {/* CTA */}
-      <section className="bg-blue-600 text-white py-12">
+      <section className="bg-brand-blue-600 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Start Learning?</h2>
-          <p className="text-blue-100 mb-6">Enroll in a program today and begin your career transformation.</p>
+          <p className="text-brand-blue-100 mb-6">Enroll in a program today and begin your career transformation.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-slate-100 transition-colors"
             >
               Apply Now
             </Link>

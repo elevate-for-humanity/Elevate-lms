@@ -93,7 +93,7 @@ export function AutoFlowCharts() {
               </div>
               <div className="w-full bg-brand-border rounded-full h-3">
                 <div
-                  className="bg-blue-500 h-3 rounded-full transition-all duration-500"
+                  className="bg-brand-blue-500 h-3 rounded-full transition-all duration-500"
                   style={{ width: `${step.percentage}%` }}
                 />
               </div>
@@ -241,7 +241,7 @@ export function AutoFlowCharts() {
       </div>
       {isGenerating ? (
         <div className="text-center py-12">
-          <div className="inline-block animate-spin rounded-full h-11 w-11 border-b-2 border-blue-600" />
+          <div className="inline-block animate-spin rounded-full h-11 w-11 border-b-2 border-brand-blue-600" />
           <p className="mt-4 text-brand-text-muted">
             🤖 Copilot is generating your flow charts...
           </p>
@@ -283,8 +283,8 @@ export function AutoFlowCharts() {
         </div>
       )}
       {/* Au Insights */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-4">
+      <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-brand-blue-900 mb-4">
           🤖 Copilot Insights
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

@@ -227,7 +227,7 @@ export function SignatureInput({
           onClick={() => setSignatureType('TYPED')}
           className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
             signatureType === 'TYPED'
-              ? 'border-blue-600 bg-blue-50 text-blue-900'
+              ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-900'
               : 'border-slate-300 bg-white text-gray-700 hover:border-slate-400'
           }`}
         >
@@ -239,7 +239,7 @@ export function SignatureInput({
           onClick={() => setSignatureType('DRAWN')}
           className={`flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border-2 transition-colors ${
             signatureType === 'DRAWN'
-              ? 'border-blue-600 bg-blue-50 text-blue-900'
+              ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-900'
               : 'border-slate-300 bg-white text-gray-700 hover:border-slate-400'
           }`}
         >
@@ -259,7 +259,7 @@ export function SignatureInput({
             value={typedSignature}
             onChange={(e) => handleTypedChange(e.target.value)}
             placeholder="Type your full name exactly as shown"
-            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-xl ${
+            className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 text-xl ${
               typedSignature && !isValid 
                 ? 'border-red-300 bg-red-50' 
                 : 'border-slate-300'
@@ -297,7 +297,7 @@ export function SignatureInput({
             <button
               type="button"
               onClick={clearCanvas}
-              className="text-sm text-blue-600 hover:text-blue-800 flex items-center gap-1"
+              className="text-sm text-brand-blue-600 hover:text-brand-blue-800 flex items-center gap-1"
             >
               <RotateCcw className="w-4 h-4" />
               Clear
@@ -331,7 +331,7 @@ export function SignatureInput({
       )}
 
       {saving && (
-        <div className="flex items-center gap-2 p-3 bg-blue-50 border border-blue-200 rounded-lg text-blue-700 text-sm">
+        <div className="flex items-center gap-2 p-3 bg-brand-blue-50 border border-brand-blue-200 rounded-lg text-brand-blue-700 text-sm">
           <Loader2 className="w-4 h-4 animate-spin" />
           Saving signature...
         </div>
@@ -345,8 +345,8 @@ export function SignatureInput({
       )}
 
       {/* Legal Notice */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-sm text-blue-900">
+      <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+        <p className="text-sm text-brand-blue-900">
           <strong>Legal Notice:</strong> This digital signature has the same
           legal effect as a handwritten signature under the Electronic Signatures 
           in Global and National Commerce Act (E-SIGN Act). By signing, you agree 
@@ -360,7 +360,7 @@ export function SignatureInput({
           type="button"
           onClick={saveSignature}
           disabled={!isValid || saving}
-          className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {saving ? (
             <>

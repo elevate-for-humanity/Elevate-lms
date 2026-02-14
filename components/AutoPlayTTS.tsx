@@ -155,7 +155,7 @@ export default function AutoPlayTTS({ text, delay = 1500 }: AutoPlayTTSProps) {
     return (
       <button
         onClick={playTTS}
-        className="fixed bottom-24 right-6 z-50 bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 transition-all animate-pulse"
+        className="fixed bottom-24 right-6 z-50 bg-brand-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-brand-blue-700 transition-all animate-pulse"
         aria-label="Play welcome message"
       >
         <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">

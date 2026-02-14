@@ -165,7 +165,7 @@ export default function ScholarshipsPage() {
               <div className="text-slate-400 text-sm">Students Pay $0</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-blue-400">$5M+</div>
+              <div className="text-3xl font-bold text-brand-blue-400">$5M+</div>
               <div className="text-slate-400 text-sm">Funding Awarded</div>
             </div>
             <div>
@@ -173,7 +173,7 @@ export default function ScholarshipsPage() {
               <div className="text-slate-400 text-sm">Students Funded</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-blue-400">10+</div>
+              <div className="text-3xl font-bold text-brand-blue-400">10+</div>
               <div className="text-slate-400 text-sm">Funding Sources</div>
             </div>
           </div>
@@ -214,7 +214,7 @@ export default function ScholarshipsPage() {
                     ))}
                   </ul>
                 </div>
-                <Link href={option.link} className="mt-4 inline-flex items-center gap-2 text-blue-600 font-semibold hover:text-blue-700">
+                <Link href={option.link} className="mt-4 inline-flex items-center gap-2 text-brand-blue-600 font-semibold hover:text-brand-blue-700">
                   Learn More <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>

@@ -31,7 +31,7 @@ const SETTINGS_SECTIONS = [
     description: 'Update your personal information and profile picture',
     icon: User,
     href: '/lms/settings/profile',
-    color: 'bg-blue-100 text-blue-600',
+    color: 'bg-brand-blue-100 text-brand-blue-600',
   },
   {
     title: 'Notifications',
@@ -59,7 +59,7 @@ const SETTINGS_SECTIONS = [
     description: 'Set your preferred language and timezone',
     icon: Globe,
     href: '/lms/settings/language',
-    color: 'bg-blue-100 text-blue-600',
+    color: 'bg-brand-blue-100 text-brand-blue-600',
   },
   {
     title: 'Appearance',
@@ -124,10 +124,10 @@ export default async function SettingsPage() {
         <div className="bg-white rounded-2xl border border-slate-200 p-6 mb-8">
           <div className="flex items-center gap-6">
             <div className="relative">
-              <div className="w-20 h-20 bg-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+              <div className="w-20 h-20 bg-brand-blue-500 rounded-full flex items-center justify-center text-white text-2xl font-bold">
                 {profile?.full_name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || 'U'}
               </div>
-              <button className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition">
+              <button className="absolute bottom-0 right-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center hover:bg-brand-blue-700 transition">
                 <Camera className="w-4 h-4" />
               </button>
             </div>
@@ -150,7 +150,7 @@ export default async function SettingsPage() {
             </div>
             <Link
               href="/lms/settings/profile"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+              className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition"
             >
               Edit Profile
             </Link>
@@ -165,19 +165,19 @@ export default async function SettingsPage() {
               <Link
                 key={section.title}
                 href={section.href}
-                className="bg-white rounded-xl border border-slate-200 p-6 hover:border-blue-300 hover:shadow-md transition group"
+                className="bg-white rounded-xl border border-slate-200 p-6 hover:border-brand-blue-300 hover:shadow-md transition group"
               >
                 <div className="flex items-start gap-4">
                   <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${section.color}`}>
                     <IconComponent className="w-6 h-6" />
                   </div>
                   <div className="flex-1">
-                    <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition">
+                    <h3 className="font-bold text-slate-900 group-hover:text-brand-blue-600 transition">
                       {section.title}
                     </h3>
                     <p className="text-sm text-slate-600 mt-1">{section.description}</p>
                   </div>
-                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+                  <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-brand-blue-600 group-hover:translate-x-1 transition-all" />
                 </div>
               </Link>
             );
@@ -243,11 +243,11 @@ export default async function SettingsPage() {
         <div className="mt-8 text-center">
           <p className="text-slate-600">
             Need help? Visit our{' '}
-            <Link href="/lms/support" className="text-blue-600 font-medium hover:text-blue-700">
+            <Link href="/lms/support" className="text-brand-blue-600 font-medium hover:text-brand-blue-700">
               Support Center
             </Link>
             {' '}or{' '}
-            <Link href="/contact" className="text-blue-600 font-medium hover:text-blue-700">
+            <Link href="/contact" className="text-brand-blue-600 font-medium hover:text-brand-blue-700">
               Contact Us
             </Link>
           </p>

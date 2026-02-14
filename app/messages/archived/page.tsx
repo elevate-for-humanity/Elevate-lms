@@ -21,7 +21,7 @@ export default function ArchivedMessagesPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link href="/messages" className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/messages" className="inline-flex items-center text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Messages
         </Link>
@@ -51,7 +51,7 @@ export default function ArchivedMessagesPage() {
                     <p className="text-sm text-gray-500 truncate">{message.preview}</p>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
-                    <button className="p-2 text-gray-400 hover:text-blue-600 transition" title="Restore">
+                    <button className="p-2 text-gray-400 hover:text-brand-blue-600 transition" title="Restore">
                       <RotateCcw className="w-5 h-5" />
                     </button>
                     <button className="p-2 text-gray-400 hover:text-red-600 transition" title="Delete">

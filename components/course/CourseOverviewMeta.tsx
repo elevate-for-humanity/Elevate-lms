@@ -40,7 +40,7 @@ export function CourseOverviewMeta({
           </span>
         )}
         {course.category && (
-          <span className="rounded-full bg-blue-50 px-3 py-2 font-semibold text-blue-700">
+          <span className="rounded-full bg-brand-blue-50 px-3 py-2 font-semibold text-brand-blue-700">
             {course.category}
           </span>
         )}

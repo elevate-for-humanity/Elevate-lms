@@ -67,8 +67,8 @@ function CheckoutContent() {
 
         <div className="bg-white rounded-2xl shadow-lg border p-8">
           <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CreditCard className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CreditCard className="w-8 h-8 text-brand-blue-600" />
             </div>
             <h1 className="text-2xl font-bold">Complete Payment</h1>
             <p className="text-gray-600 mt-2">
@@ -76,10 +76,10 @@ function CheckoutContent() {
             </p>
           </div>
 
-          <div className="bg-blue-50 rounded-xl p-4 mb-6">
+          <div className="bg-brand-blue-50 rounded-xl p-4 mb-6">
             <div className="flex justify-between items-center">
               <span className="text-gray-700">Amount Due Today</span>
-              <span className="text-2xl font-bold text-blue-600">${amount}</span>
+              <span className="text-2xl font-bold text-brand-blue-600">${amount}</span>
             </div>
             {type === 'down-payment' && (
               <p className="text-sm text-gray-600 mt-2">
@@ -99,7 +99,7 @@ function CheckoutContent() {
                 onChange={(e) => setName(e.target.value)}
                 placeholder="John Smith"
                 required
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
 
@@ -113,7 +113,7 @@ function CheckoutContent() {
                 onChange={(e) => setCardNumber(e.target.value.replace(/\D/g, '').slice(0, 16))}
                 placeholder="4242 4242 4242 4242"
                 required
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
 
@@ -128,7 +128,7 @@ function CheckoutContent() {
                   onChange={(e) => setExpiry(e.target.value)}
                   placeholder="MM/YY"
                   required
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
               <div>
@@ -141,7 +141,7 @@ function CheckoutContent() {
                   onChange={(e) => setCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
                   placeholder="123"
                   required
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -155,7 +155,7 @@ function CheckoutContent() {
             <button
               type="submit"
               disabled={isProcessing}
-              className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-brand-blue-600 text-white py-4 rounded-lg font-bold hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {isProcessing ? (
                 'Processing...'
@@ -188,7 +188,7 @@ export default function LMSPaymentCheckoutPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading checkout...</p>
         </div>
       </div>

@@ -117,7 +117,7 @@ export default async function AdminVerificationReviewPage() {
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-2">
-              <Shield className="w-8 h-8 text-blue-600" />
+              <Shield className="w-8 h-8 text-brand-blue-600" />
               <span className="text-3xl font-bold text-black">
                 {verifications?.length || 0}
               </span>
@@ -190,7 +190,7 @@ export default async function AdminVerificationReviewPage() {
                   <div className="flex items-center gap-3">
                     <Link
                       href={`/admin/verifications/review/${verification.id}`}
-                      className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                      className="px-4 py-2 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
                     >
                       <Eye className="w-4 h-4" />
                       Review

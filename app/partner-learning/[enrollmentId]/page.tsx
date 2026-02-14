@@ -65,7 +65,7 @@ export default async function PartnerLearningPage({ params }: Props) {
       case 'active':
       case 'enrolled':
       case 'in_progress':
-        return { icon: Clock, color: 'text-blue-600 bg-blue-50', label: 'In Progress' };
+        return { icon: Clock, color: 'text-brand-blue-600 bg-brand-blue-50', label: 'In Progress' };
       case 'pending':
         return { icon: AlertCircle, color: 'text-amber-600 bg-amber-50', label: 'Pending Setup' };
       default:
@@ -91,7 +91,7 @@ export default async function PartnerLearningPage({ params }: Props) {
           
           <div className="flex items-start justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-blue-600 text-sm font-medium mb-2">
+              <div className="flex items-center gap-2 text-brand-blue-600 text-sm font-medium mb-2">
                 <Building2 className="w-4 h-4" />
                 Partner Course
               </div>
@@ -116,8 +116,8 @@ export default async function PartnerLearningPage({ params }: Props) {
         {/* Instructions Card */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-blue-50 rounded-lg">
-              <Mail className="w-6 h-6 text-blue-600" />
+            <div className="p-3 bg-brand-blue-50 rounded-lg">
+              <Mail className="w-6 h-6 text-brand-blue-600" />
             </div>
             <div>
               <h2 className="text-lg font-semibold text-gray-900 mb-2">
@@ -145,7 +145,7 @@ export default async function PartnerLearningPage({ params }: Props) {
               href={provider.portal_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-medium rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Open Partner Portal
               <ExternalLink className="w-4 h-4" />
@@ -172,7 +172,7 @@ export default async function PartnerLearningPage({ params }: Props) {
               {provider.support_email && (
                 <a 
                   href={`mailto:${provider.support_email}`}
-                  className="flex items-center gap-3 text-gray-600 hover:text-blue-600"
+                  className="flex items-center gap-3 text-gray-600 hover:text-brand-blue-600"
                 >
                   <Mail className="w-5 h-5" />
                   {provider.support_email}
@@ -181,7 +181,7 @@ export default async function PartnerLearningPage({ params }: Props) {
               {provider.support_phone && (
                 <a 
                   href={`tel:${provider.support_phone}`}
-                  className="flex items-center gap-3 text-gray-600 hover:text-blue-600"
+                  className="flex items-center gap-3 text-gray-600 hover:text-brand-blue-600"
                 >
                   <BookOpen className="w-5 h-5" />
                   {provider.support_phone}
@@ -195,7 +195,7 @@ export default async function PartnerLearningPage({ params }: Props) {
         <div className="mt-8 text-center text-gray-500 text-sm">
           <p>
             Having trouble? Contact Elevate for Humanity support at{' '}
-            <a href="/support" className="text-blue-600 hover:underline">
+            <a href="/support" className="text-brand-blue-600 hover:underline">
               support center
             </a>
           </p>

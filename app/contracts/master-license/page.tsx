@@ -15,7 +15,7 @@ export default function MasterLicensePage() {
         <div className="bg-white rounded-xl shadow-sm border">
           <div className="p-6 border-b flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Key className="w-8 h-8 text-blue-600" />
+              <Key className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Master License Agreement</h1>
                 <p className="text-gray-600">Platform and curriculum licensing terms</p>
@@ -23,7 +23,7 @@ export default function MasterLicensePage() {
             </div>
             <div className="flex gap-2">
               <button className="flex items-center gap-2 px-4 py-2 border rounded-lg hover:bg-gray-50"><Printer className="w-4 h-4" /> Print</button>
-              <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"><Download className="w-4 h-4" /> Download PDF</button>
+              <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"><Download className="w-4 h-4" /> Download PDF</button>
             </div>
           </div>
           <div className="p-8 prose max-w-none">

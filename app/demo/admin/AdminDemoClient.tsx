@@ -48,7 +48,7 @@ export default function AdminDemoClient({ stats, students, programs, activity }:
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-blue-600 text-white text-center py-3 px-2 text-xs">
+      <div className="bg-brand-blue-600 text-white text-center py-3 px-2 text-xs">
         <Info className="w-3 h-3 inline mr-1" />
         Live Demo - Admin Dashboard (Connected to Database)
       </div>
@@ -102,9 +102,9 @@ export default function AdminDemoClient({ stats, students, programs, activity }:
           <div className="space-y-4">
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
               {[
-                { label: 'Students', value: stats.students, icon: Users, color: 'text-blue-600' },
+                { label: 'Students', value: stats.students, icon: Users, color: 'text-brand-blue-600' },
                 { label: 'Programs', value: stats.programs, icon: GraduationCap, color: 'text-green-600' },
-                { label: 'Active', value: stats.activeEnrollments, icon: CheckCircle, color: 'text-blue-600' },
+                { label: 'Active', value: stats.activeEnrollments, icon: CheckCircle, color: 'text-brand-blue-600' },
                 { label: 'Partners', value: stats.partners, icon: Building2, color: 'text-orange-600' },
               ].map((s, i) => (
                 <div key={i} className="bg-white rounded-xl p-3 border">
@@ -123,9 +123,9 @@ export default function AdminDemoClient({ stats, students, programs, activity }:
                 {[
                   { stage: 'Intake', count: 45, color: 'bg-gray-500' },
                   { stage: 'Review', count: 32, color: 'bg-yellow-500' },
-                  { stage: 'Enrolled', count: 28, color: 'bg-blue-500' },
+                  { stage: 'Enrolled', count: 28, color: 'bg-brand-blue-500' },
                   { stage: 'Active', count: stats.activeEnrollments, color: 'bg-green-500' },
-                  { stage: 'Done', count: 214, color: 'bg-blue-500' },
+                  { stage: 'Done', count: 214, color: 'bg-brand-blue-500' },
                 ].map((p, i) => (
                   <div key={i} className={`${p.color} text-white px-3 py-2 rounded-lg text-center min-w-[60px]`}>
                     <div className="font-bold">{p.count}</div>
@@ -239,9 +239,9 @@ export default function AdminDemoClient({ stats, students, programs, activity }:
                 {programs.map((p, i) => (
                   <div key={i} className="bg-white rounded-xl p-4 border hover:shadow-md transition">
                     <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                      p.category === 'Healthcare' ? 'bg-blue-100 text-blue-700' : 
+                      p.category === 'Healthcare' ? 'bg-brand-blue-100 text-brand-blue-700' : 
                       p.category === 'Trades' ? 'bg-orange-100 text-orange-700' : 
-                      'bg-blue-100 text-blue-700'
+                      'bg-brand-blue-100 text-brand-blue-700'
                     }`}>{p.category}</span>
                     <h3 className="font-bold text-gray-900 mt-2 mb-3">{p.name}</h3>
                     <div className="flex justify-between">

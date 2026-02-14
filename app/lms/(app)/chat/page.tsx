@@ -76,10 +76,10 @@ export default async function ChatPage() {
             <div className="divide-y">
               {conversationList.length > 0 ? (
                 conversationList.map((conv, idx) => (
-                  <div key={conv.partnerId} className={`p-4 hover:bg-gray-50 cursor-pointer ${idx === 0 ? 'bg-blue-50' : ''}`}>
+                  <div key={conv.partnerId} className={`p-4 hover:bg-gray-50 cursor-pointer ${idx === 0 ? 'bg-brand-blue-50' : ''}`}>
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-blue-600 font-medium">{conv.initials}</span>
+                      <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-brand-blue-600 font-medium">{conv.initials}</span>
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium truncate">{conv.name}</p>
@@ -108,7 +108,7 @@ export default async function ChatPage() {
                       m.recipient_id === conversationList[0]?.partnerId
                     ).slice(0, 20).reverse().map((msg: any) => (
                       <div key={msg.id} className={`flex ${msg.sender_id === user.id ? 'justify-end' : 'justify-start'}`}>
-                        <div className={`rounded-lg p-3 max-w-xs ${msg.sender_id === user.id ? 'bg-blue-600 text-white' : 'bg-gray-100'}`}>
+                        <div className={`rounded-lg p-3 max-w-xs ${msg.sender_id === user.id ? 'bg-brand-blue-600 text-white' : 'bg-gray-100'}`}>
                           <p className="text-sm">{msg.content}</p>
                         </div>
                       </div>
@@ -118,7 +118,7 @@ export default async function ChatPage() {
                 <div className="p-4 border-t">
                   <div className="flex gap-2">
                     <input type="text" placeholder="Type a message..." className="flex-1 border rounded-lg px-3 py-2" />
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Send</button>
+                    <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Send</button>
                   </div>
                 </div>
               </>

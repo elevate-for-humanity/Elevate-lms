@@ -29,12 +29,12 @@ function LandingPage() {
   return (
     <div className="min-h-screen bg-slate-900">
       {/* Hero */}
-      <div className="bg-blue-700 px-6 pt-16 pb-12 text-center">
+      <div className="bg-brand-blue-700 px-6 pt-16 pb-12 text-center">
         <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
           <Scissors className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-3xl font-black text-white mb-3">Barber Apprentice</h1>
-        <p className="text-blue-200 text-lg max-w-xs mx-auto">
+        <p className="text-brand-blue-200 text-lg max-w-xs mx-auto">
           Track your hours, access training, and progress toward your barber license.
         </p>
       </div>
@@ -52,8 +52,8 @@ function LandingPage() {
         </div>
 
         <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
-          <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-            <BookOpen className="w-5 h-5 text-blue-400" />
+          <div className="w-10 h-10 bg-brand-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+            <BookOpen className="w-5 h-5 text-brand-blue-400" />
           </div>
           <div>
             <h3 className="text-white font-semibold">Training Materials</h3>
@@ -76,7 +76,7 @@ function LandingPage() {
       <div className="px-6 pb-8 space-y-3">
         <Link
           href="/login?redirect=/pwa/barber/dashboard"
-          className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700"
+          className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700"
         >
           <LogIn className="w-5 h-5" />
           Sign In
@@ -96,7 +96,7 @@ function LandingPage() {
         <p className="text-slate-500 text-sm">
           Part of the USDOL Registered Barber Apprenticeship
         </p>
-        <Link href="/" className="text-blue-400 text-sm hover:underline">
+        <Link href="/" className="text-brand-blue-400 text-sm hover:underline">
           elevateforhumanity.org
         </Link>
       </div>
@@ -113,14 +113,14 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
   return (
     <div className="min-h-screen bg-slate-900 pb-20">
       {/* Header */}
-      <header className="bg-blue-600 px-4 pt-12 pb-6 safe-area-inset-top">
+      <header className="bg-brand-blue-600 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
               <User className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-blue-200 text-sm">Welcome back,</p>
+              <p className="text-brand-blue-200 text-sm">Welcome back,</p>
               <h1 className="text-white font-bold text-lg">{apprentice.name}</h1>
             </div>
           </div>
@@ -137,7 +137,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
         {/* Progress Card */}
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-4">
           <div className="flex items-center justify-between mb-3">
-            <span className="text-blue-200 text-sm">Progress to Licensure</span>
+            <span className="text-brand-blue-200 text-sm">Progress to Licensure</span>
             <span className="text-white font-bold">{progressPercent.toFixed(1)}%</span>
           </div>
           <div className="h-3 bg-white/20 rounded-full overflow-hidden mb-3">
@@ -148,7 +148,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-white font-bold">{formatHours(totalHours)} hrs</span>
-            <span className="text-blue-200">{formatHours(TARGET_HOURS)} hrs goal</span>
+            <span className="text-brand-blue-200">{formatHours(TARGET_HOURS)} hrs goal</span>
           </div>
         </div>
       </header>
@@ -159,7 +159,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-slate-800 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-5 h-5 text-blue-400" />
+              <Clock className="w-5 h-5 text-brand-blue-400" />
               <span className="text-slate-400 text-sm">This Week</span>
             </div>
             <p className="text-2xl font-bold text-white">{apprentice.weeklyHours || 0} hrs</p>
@@ -209,8 +209,8 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
           </Link>
 
           <Link href="/pwa/barber/hours/submit" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <Plus className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center">
+              <Plus className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Submit Hours</p>
@@ -231,8 +231,8 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
           </Link>
 
           <Link href="/pwa/barber/progress" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center">
+              <TrendingUp className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">View Progress</p>
@@ -242,8 +242,8 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
           </Link>
 
           <Link href="/pwa/barber/training" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <BookOpen className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center">
+              <BookOpen className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Training Materials</p>
@@ -300,7 +300,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
         {/* Shop Info */}
         <div className="bg-slate-800 rounded-xl p-4">
           <div className="flex items-center gap-3 mb-3">
-            <Scissors className="w-5 h-5 text-blue-400" />
+            <Scissors className="w-5 h-5 text-brand-blue-400" />
             <span className="text-slate-400 text-sm">Training Location</span>
           </div>
           <p className="text-white font-medium">{apprentice.shopName}</p>
@@ -315,7 +315,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-6 py-3 safe-area-inset-bottom">
         <div className="flex justify-around">
-          <Link href="/pwa/barber" className="flex flex-col items-center gap-1 text-blue-400">
+          <Link href="/pwa/barber" className="flex flex-col items-center gap-1 text-brand-blue-400">
             <Scissors className="w-6 h-6" />
             <span className="text-xs">Home</span>
           </Link>
@@ -390,7 +390,7 @@ export default function BarberPWAHome() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
+          <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-white">Loading...</p>
         </div>
       </div>
@@ -414,7 +414,7 @@ export default function BarberPWAHome() {
           </p>
           <Link
             href="/programs/barber-apprenticeship"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-medium"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-medium"
           >
             Enroll Now
             <ChevronRight className="w-5 h-5" />

@@ -78,25 +78,25 @@ function SamGovScreenshot({ variant }: { variant: string }) {
       </div>
       
       {/* App Header */}
-      <div className="bg-blue-900 text-white px-6 py-4">
+      <div className="bg-brand-blue-900 text-white px-6 py-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-blue-900" />
+              <Building2 className="w-6 h-6 text-brand-blue-900" />
             </div>
             <div>
               <h1 className="font-bold">SAM.gov Assistant</h1>
-              <p className="text-blue-200 text-xs">Registration & Compliance</p>
+              <p className="text-brand-blue-200 text-xs">Registration & Compliance</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="p-2 hover:bg-blue-800 rounded-lg">
+            <button className="p-2 hover:bg-brand-blue-800 rounded-lg">
               <Bell className="w-5 h-5" />
             </button>
-            <button className="p-2 hover:bg-blue-800 rounded-lg">
+            <button className="p-2 hover:bg-brand-blue-800 rounded-lg">
               <Settings className="w-5 h-5" />
             </button>
-            <div className="w-8 h-8 bg-blue-700 rounded-full flex items-center justify-center text-sm font-bold">
+            <div className="w-8 h-8 bg-brand-blue-700 rounded-full flex items-center justify-center text-sm font-bold">
               JD
             </div>
           </div>
@@ -108,7 +108,7 @@ function SamGovScreenshot({ variant }: { variant: string }) {
             <button 
               key={tab}
               className={`px-4 py-2 text-sm font-medium rounded-t-lg ${
-                i === 0 ? 'bg-gray-50 text-blue-900' : 'text-blue-200 hover:bg-blue-800'
+                i === 0 ? 'bg-gray-50 text-brand-blue-900' : 'text-brand-blue-200 hover:bg-brand-blue-800'
               }`}
             >
               {tab}
@@ -181,12 +181,12 @@ function SamGovScreenshot({ variant }: { variant: string }) {
                 </div>
                 <p className="text-xs text-green-700">No action required</p>
               </div>
-              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="p-3 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
-                  <Calendar className="w-4 h-4 text-blue-600" />
-                  <span className="text-xs font-medium text-blue-800">Renewal</span>
+                  <Calendar className="w-4 h-4 text-brand-blue-600" />
+                  <span className="text-xs font-medium text-brand-blue-800">Renewal</span>
                 </div>
-                <p className="text-xs text-blue-700">Due in 287 days</p>
+                <p className="text-xs text-brand-blue-700">Due in 287 days</p>
               </div>
             </div>
           </div>
@@ -296,7 +296,7 @@ function GrantsScreenshot({ variant }: { variant: string }) {
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-1">
                   <span className={`px-2 py-0.5 text-xs font-bold rounded ${
-                    grant.match >= 90 ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
+                    grant.match >= 90 ? 'bg-green-100 text-green-800' : 'bg-brand-blue-100 text-brand-blue-800'
                   }`}>
                     {grant.match}% Match
                   </span>
@@ -380,7 +380,7 @@ function WebsiteBuilderScreenshot({ variant }: { variant: string }) {
             {/* Hero Block */}
             <div className="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-8 rounded-t-lg">
               <h2 className="text-xl font-bold mb-2">Transform Your Career</h2>
-              <p className="text-blue-100 text-sm mb-4">Industry-recognized certifications in healthcare, technology, and skilled trades.</p>
+              <p className="text-brand-blue-100 text-sm mb-4">Industry-recognized certifications in healthcare, technology, and skilled trades.</p>
               <button className="bg-orange-500 text-white px-4 py-2 rounded text-sm font-medium">Apply Now</button>
             </div>
             
@@ -390,8 +390,8 @@ function WebsiteBuilderScreenshot({ variant }: { variant: string }) {
               <div className="grid grid-cols-3 gap-4">
                 {['No Cost Training', 'Job Placement', 'Flexible Schedule'].map((f, i) => (
                   <div key={i} className="text-center">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full mx-auto mb-2 flex items-center justify-center">
-                      <CheckCircle className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-brand-blue-100 rounded-full mx-auto mb-2 flex items-center justify-center">
+                      <CheckCircle className="w-5 h-5 text-brand-blue-600" />
                     </div>
                     <p className="text-xs font-medium">{f}</p>
                   </div>
@@ -442,7 +442,7 @@ function WebsiteBuilderScreenshot({ variant }: { variant: string }) {
 
 export function AppScreenshotMobile({ app }: { app: 'sam-gov' | 'grants' | 'website-builder' }) {
   const colors = {
-    'sam-gov': { bg: 'bg-blue-900', accent: 'blue' },
+    'sam-gov': { bg: 'bg-brand-blue-900', accent: 'blue' },
     'grants': { bg: 'bg-green-800', accent: 'green' },
     'website-builder': { bg: 'bg-purple-900', accent: 'purple' },
   };

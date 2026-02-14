@@ -273,12 +273,12 @@ export default function CapitalReadinessCoursePage() {
             <h2 className="text-2xl font-bold mb-8">Related Resources</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <Link href="/store/guides/capital-readiness" className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition">
-                <FileText className="w-8 h-8 text-blue-600 mb-4" />
+                <FileText className="w-8 h-8 text-brand-blue-600 mb-4" />
                 <h3 className="font-semibold mb-2">Capital Readiness Guide</h3>
                 <p className="text-slate-600 text-sm">The complete ebook with integrated workbook and readiness scoring.</p>
               </Link>
               <Link href="/programs" className="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition">
-                <Users className="w-8 h-8 text-blue-600 mb-4" />
+                <Users className="w-8 h-8 text-brand-blue-600 mb-4" />
                 <h3 className="font-semibold mb-2">Workforce Programs</h3>
                 <p className="text-slate-600 text-sm">Explore our workforce development and training programs.</p>
               </Link>

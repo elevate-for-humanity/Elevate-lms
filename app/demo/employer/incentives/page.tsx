@@ -11,7 +11,7 @@ export default function DemoIncentivesPage() {
         </div>
         <div className="bg-white rounded-lg border p-4">
           <h3 className="font-bold text-gray-900 mb-1">Apprenticeship Grant</h3>
-          <p className="text-2xl font-bold text-blue-600">$8,000</p>
+          <p className="text-2xl font-bold text-brand-blue-600">$8,000</p>
           <p className="text-sm text-gray-500">Per apprentice reimbursement</p>
         </div>
       </div>

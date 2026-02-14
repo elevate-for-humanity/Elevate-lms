@@ -157,7 +157,7 @@ export default async function LeaderboardPage() {
                   <div className="w-10 flex justify-center">
                     {getRankIcon(index + 1)}
                   </div>
-                  <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium flex-shrink-0">
+                  <div className="w-12 h-12 rounded-full bg-brand-blue-500 flex items-center justify-center text-white font-medium flex-shrink-0">
                     {getInitial(learner.full_name)}
                   </div>
                   <div className="flex-1 min-w-0">

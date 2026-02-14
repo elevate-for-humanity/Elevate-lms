@@ -91,7 +91,7 @@ export default async function LmsPublicPage() {
           />
         </section>
 
-        <section className="mt-14 rounded-3xl border border-blue-200 bg-blue-50 p-8 sm:p-10">
+        <section className="mt-14 rounded-3xl border border-brand-blue-200 bg-brand-blue-50 p-8 sm:p-10">
           <h2 className="text-2xl sm:text-2xl md:text-3xl font-bold text-zinc-900">
             Ready to Start Learning?
           </h2>

@@ -34,7 +34,7 @@ function SuccessContent({
             is being activated.
           </p>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8 text-left">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-8 text-left">
             <h2 className="text-xl font-semibold text-black mb-4">
               What happens next?
             </h2>
@@ -79,7 +79,7 @@ function SuccessContent({
           <div className="space-y-3">
             <Link
               href="/contact?topic=onboarding"
-              className="block w-full bg-blue-600 text-white text-center py-3 rounded-lg hover:bg-blue-700 transition"
+              className="block w-full bg-brand-blue-600 text-white text-center py-3 rounded-lg hover:bg-brand-blue-700 transition"
             >
               Schedule Onboarding Call
             </Link>
@@ -97,14 +97,14 @@ function SuccessContent({
               Questions? Contact us at{' '}
               <a
                 href="mailto:elevate4humanityedu@gmail.com"
-                className="text-blue-600 hover:underline"
+                className="text-brand-blue-600 hover:underline"
               >
                 elevate4humanityedu@gmail.com
               </a>{' '}
               or call{' '}
               <a
                 href="/support"
-                className="text-blue-600 hover:underline"
+                className="text-brand-blue-600 hover:underline"
               >
                 Get Help Online
               </a>

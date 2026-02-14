@@ -69,7 +69,7 @@ export default async function NewPlacementPage() {
                 id="shop_id"
                 name="shop_id"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select a shop</option>
                 {shopAccess.map((access) => (
@@ -89,7 +89,7 @@ export default async function NewPlacementPage() {
                 id="student_email"
                 name="student_email"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 placeholder="student.email@gmail.com"
               />
               <p className="text-sm text-slate-500 mt-1">
@@ -105,7 +105,7 @@ export default async function NewPlacementPage() {
                 id="program_slug"
                 name="program_slug"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select a program</option>
                 <option value="barbering">Barbering</option>
@@ -124,7 +124,7 @@ export default async function NewPlacementPage() {
                 id="start_date"
                 name="start_date"
                 required
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
 
@@ -136,7 +136,7 @@ export default async function NewPlacementPage() {
                 type="date"
                 id="end_date"
                 name="end_date"
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
 
@@ -149,7 +149,7 @@ export default async function NewPlacementPage() {
               </a>
               <button
                 type="submit"
-                className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                className="flex-1 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Create Placement
               </button>

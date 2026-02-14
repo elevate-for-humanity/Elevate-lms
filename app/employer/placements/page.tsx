@@ -25,13 +25,13 @@ export default async function PlacementsPage() {
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/employer" className="hover:text-primary">Employer</Link></li><li>/</li><li className="text-gray-900 font-medium">Placements</li></ol></nav>
           <div className="flex justify-between items-center">
             <div><h1 className="text-3xl font-bold text-gray-900">Job Placements</h1><p className="text-gray-600 mt-2">{count || 0} total placements</p></div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Record Placement</button>
+            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Record Placement</button>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Hires</h3><p className="text-3xl font-bold text-green-600 mt-2">{count || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">This Month</h3><p className="text-3xl font-bold text-blue-600 mt-2">5</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Retention Rate</h3><p className="text-3xl font-bold text-blue-600 mt-2">92%</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">This Month</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">5</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Retention Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">92%</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-4 border-b"><h2 className="font-semibold">Recent Placements</h2></div>

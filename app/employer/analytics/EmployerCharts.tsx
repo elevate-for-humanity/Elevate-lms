@@ -37,7 +37,7 @@ export function HiringTrendsChart() {
   if (loading) {
     return (
       <div className="h-48 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-blue-600"></div>
       </div>
     );
   }
@@ -52,7 +52,7 @@ export function HiringTrendsChart() {
           <span>Hires</span>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-blue-500 rounded"></div>
+          <div className="w-3 h-3 bg-brand-blue-500 rounded"></div>
           <span>Applications</span>
         </div>
       </div>
@@ -66,7 +66,7 @@ export function HiringTrendsChart() {
                 title={`${item.hires} hires`}
               ></div>
               <div
-                className="flex-1 bg-blue-500 rounded-t"
+                className="flex-1 bg-brand-blue-500 rounded-t"
                 style={{ height: `${(item.applications / maxApps) * 100}%` }}
                 title={`${item.applications} applications`}
               ></div>
@@ -102,14 +102,14 @@ export function RetentionByRoleChart() {
   if (loading) {
     return (
       <div className="h-48 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-blue-600"></div>
       </div>
     );
   }
 
   const getRetentionColor = (pct: number) => {
     if (pct >= 90) return 'bg-green-500';
-    if (pct >= 75) return 'bg-blue-500';
+    if (pct >= 75) return 'bg-brand-blue-500';
     if (pct >= 60) return 'bg-yellow-500';
     return 'bg-red-500';
   };

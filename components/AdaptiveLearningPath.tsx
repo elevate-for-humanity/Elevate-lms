@@ -236,7 +236,7 @@ export function AdaptiveLearningPath() {
                     {course.recommended && <span className="text-green-500">✓</span>}
                     <span className="text-black">{course.title}</span>
                     <span className={`px-2 py-0.5 rounded text-xs ${
-                      course.difficulty === 'beginner' ? 'bg-blue-100 text-blue-700' :
+                      course.difficulty === 'beginner' ? 'bg-brand-blue-100 text-brand-blue-700' :
                       course.difficulty === 'intermediate' ? 'bg-purple-100 text-purple-700' :
                       'bg-red-100 text-red-700'
                     }`}>

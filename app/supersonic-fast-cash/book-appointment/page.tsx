@@ -217,7 +217,7 @@ export default function BookAppointment() {
           <div className="flex justify-center gap-4">
             <button
               onClick={openCalendly}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors flex items-center gap-2"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors flex items-center gap-2"
             >
               <Calendar className="w-5 h-5" />
               Schedule with Calendly (Recommended)
@@ -321,12 +321,12 @@ export default function BookAppointment() {
                     }}
                     className={`w-full text-left p-6 rounded-lg border-2 transition ${
                       appointmentData.appointmentType === type.id
-                        ? 'border-blue-600 bg-blue-50'
-                        : 'border-gray-300 hover:border-blue-400'
+                        ? 'border-brand-blue-600 bg-brand-blue-50'
+                        : 'border-gray-300 hover:border-brand-blue-400'
                     }`}
                   >
                     <div className="flex items-start gap-4">
-                      <Icon className="w-8 h-8 text-blue-600 flex-shrink-0" />
+                      <Icon className="w-8 h-8 text-brand-blue-600 flex-shrink-0" />
                       <div>
                         <h3 className="text-xl font-bold mb-2">{type.name}</h3>
                         <p className="text-black">{type.description}</p>
@@ -338,7 +338,7 @@ export default function BookAppointment() {
             </div>
 
             {appointmentData.appointmentType === 'video' && (
-              <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <div className="mt-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
                 <h4 className="font-bold mb-2">Video Call Requirements:</h4>
                 <ul className="text-sm text-black space-y-1">
                   <li>• Computer, tablet, or smartphone with camera</li>
@@ -422,8 +422,8 @@ export default function BookAppointment() {
                       }
                       className={`w-full text-left px-4 py-3 rounded-lg border-2 font-semibold ${
                         appointmentData.date === date
-                          ? 'border-blue-600 bg-blue-50'
-                          : 'border-gray-300 hover:border-blue-400'
+                          ? 'border-brand-blue-600 bg-brand-blue-50'
+                          : 'border-gray-300 hover:border-brand-blue-400'
                       }`}
                     >
                       {new Date(date).toLocaleDateString('en-US', {

@@ -106,7 +106,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-white rounded-lg p-4 border">
-          <Users className="w-6 h-6 text-blue-500 mb-1" />
+          <Users className="w-6 h-6 text-brand-blue-500 mb-1" />
           <p className="text-2xl font-bold">{students.length}</p>
           <p className="text-sm text-gray-500">Total Students</p>
         </div>
@@ -210,8 +210,8 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
                       <button onClick={() => setStatus(student.id, 'excused')}
                         className={`px-3 py-1.5 rounded text-sm ${
                           attendance[student.id] === 'excused' 
-                            ? 'bg-blue-500 text-white' 
-                            : 'bg-gray-100 hover:bg-blue-100'
+                            ? 'bg-brand-blue-500 text-white' 
+                            : 'bg-gray-100 hover:bg-brand-blue-100'
                         }`}>
                         Excused
                       </button>

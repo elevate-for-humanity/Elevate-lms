@@ -67,11 +67,11 @@ export default async function DrugTestingTrainingPage() {
         />
         <div className="absolute inset-0 flex items-center">
           <div className="max-w-6xl mx-auto px-4 text-white">
-            <Link href="/drug-testing" className="inline-flex items-center gap-2 text-blue-200 hover:text-white mb-4">
+            <Link href="/drug-testing" className="inline-flex items-center gap-2 text-brand-blue-200 hover:text-white mb-4">
               <ArrowLeft className="w-4 h-4" /> Back to Drug Testing Services
             </Link>
             <h1 className="text-4xl md:text-5xl font-bold mb-4">Drug Testing Training Courses</h1>
-            <p className="text-xl text-blue-100 max-w-2xl">
+            <p className="text-xl text-brand-blue-100 max-w-2xl">
               DOT and non-DOT certified training. Online courses with immediate certification.
             </p>
           </div>
@@ -83,7 +83,7 @@ export default async function DrugTestingTrainingPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center justify-center gap-4 text-gray-600">
             <span className="text-sm">Training provided in partnership with</span>
-            <Link href="https://mydrugtesttraining.com" target="_blank" rel="noopener noreferrer" className="font-semibold text-blue-600 hover:underline flex items-center gap-1">
+            <Link href="https://mydrugtesttraining.com" target="_blank" rel="noopener noreferrer" className="font-semibold text-brand-blue-600 hover:underline flex items-center gap-1">
               National Drug Screening <ExternalLink className="w-4 h-4" />
             </Link>
           </div>
@@ -141,7 +141,7 @@ export default async function DrugTestingTrainingPage() {
                           href={course.link || '/contact'} 
                           target={course.link ? '_blank' : undefined}
                           rel={course.link ? 'noopener noreferrer' : undefined}
-                          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                          className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors flex items-center gap-2"
                         >
                           Enroll Now {course.link && <ExternalLink className="w-4 h-4" />}
                         </Link>
@@ -161,8 +161,8 @@ export default async function DrugTestingTrainingPage() {
           <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">Why Train With Us?</h2>
           <div className="grid md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <GraduationCap className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <GraduationCap className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="font-semibold mb-2">DOT Compliant</h3>
               <p className="text-sm text-gray-600">All courses meet DOT regulatory requirements</p>
@@ -175,8 +175,8 @@ export default async function DrugTestingTrainingPage() {
               <p className="text-sm text-gray-600">Download your certificate immediately upon completion</p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Clock className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                <Clock className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="font-semibold mb-2">Self-Paced</h3>
               <p className="text-sm text-gray-600">Complete training on your schedule, 24/7 access</p>
@@ -193,12 +193,12 @@ export default async function DrugTestingTrainingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-12 bg-blue-600 text-white">
+      <section className="py-12 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Need Help Choosing a Course?</h2>
-          <p className="text-blue-100 mb-6">Our team can help you determine which training is right for your needs.</p>
+          <p className="text-brand-blue-100 mb-6">Our team can help you determine which training is right for your needs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/contact" className="px-8 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors">
+            <Link href="/contact" className="px-8 py-3 bg-white text-brand-blue-600 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors">
               Contact Us
             </Link>
             <a href="/support" className="px-8 py-3 border-2 border-white text-white rounded-lg font-semibold hover:bg-white/10 transition-colors flex items-center justify-center gap-2">

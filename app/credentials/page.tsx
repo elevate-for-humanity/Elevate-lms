@@ -53,10 +53,10 @@ export default function CredentialsPage() {
             {credentials.map((cred) => (
               <div key={cred.name} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-md transition">
                 <div className="flex items-start gap-4">
-                  <Award className="w-8 h-8 text-blue-600 flex-shrink-0 mt-1" />
+                  <Award className="w-8 h-8 text-brand-blue-600 flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-bold text-slate-900 text-lg">{cred.name}</h3>
-                    <p className="text-sm text-blue-600 font-medium mb-2">{cred.field} — Issued by {cred.issuer}</p>
+                    <p className="text-sm text-brand-blue-600 font-medium mb-2">{cred.field} — Issued by {cred.issuer}</p>
                     <p className="text-slate-600 text-sm">{cred.desc}</p>
                   </div>
                 </div>

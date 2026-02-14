@@ -46,7 +46,7 @@ export default function TimeOffPage() {
             <h1 className="text-3xl font-bold text-gray-900">Time Off</h1>
             <p className="text-gray-600">Manage your leave requests and balances</p>
           </div>
-          <Link href="/employee/time-off/request" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
+          <Link href="/employee/time-off/request" className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
             <Plus className="w-4 h-4 mr-2" />
             Request Time Off
           </Link>
@@ -75,7 +75,7 @@ export default function TimeOffPage() {
                 <div className="pt-3 border-t">
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div
-                      className="bg-blue-600 h-2 rounded-full"
+                      className="bg-brand-blue-600 h-2 rounded-full"
                       style={{ width: `${((balance.used + balance.pending) / balance.total) * 100}%` }}
                     />
                   </div>
@@ -95,8 +95,8 @@ export default function TimeOffPage() {
             {requests.map((request) => (
               <div key={request.id} className="p-6 flex items-center justify-between hover:bg-gray-50">
                 <div className="flex items-center">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                    <Calendar className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mr-4">
+                    <Calendar className="w-6 h-6 text-brand-blue-600" />
                   </div>
                   <div>
                     <p className="font-semibold text-gray-900">{request.type}</p>
@@ -115,8 +115,8 @@ export default function TimeOffPage() {
         {/* Calendar Preview */}
         <div className="mt-8 bg-white rounded-xl shadow-sm p-6">
           <h2 className="text-lg font-bold text-gray-900 mb-4">Upcoming Time Off</h2>
-          <div className="bg-blue-50 rounded-lg p-4 flex items-center">
-            <Calendar className="w-8 h-8 text-blue-600 mr-4" />
+          <div className="bg-brand-blue-50 rounded-lg p-4 flex items-center">
+            <Calendar className="w-8 h-8 text-brand-blue-600 mr-4" />
             <div>
               <p className="font-medium text-gray-900">Vacation: Feb 15-19, 2026</p>
               <p className="text-sm text-gray-600">32 hours • Pending approval</p>

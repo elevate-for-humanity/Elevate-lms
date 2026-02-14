@@ -44,9 +44,9 @@ const apps = [
 ];
 
 const colorClasses = {
-  blue: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' },
+  blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600', border: 'border-brand-blue-200' },
   green: { bg: 'bg-green-100', text: 'text-green-600', border: 'border-green-200' },
-  blue: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' },
+  blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600', border: 'border-brand-blue-200' },
 };
 
 export default function AppsPage() {
@@ -87,11 +87,11 @@ export default function AppsPage() {
                       </span>
                     )}
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-brand-blue-600 transition">
                     {app.name}
                   </h3>
                   <p className="text-gray-600 text-sm mb-4">{app.description}</p>
-                  <div className="flex items-center text-blue-600 text-sm font-medium">
+                  <div className="flex items-center text-brand-blue-600 text-sm font-medium">
                     Open App <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition" />
                   </div>
                 </Link>
@@ -109,27 +109,27 @@ export default function AppsPage() {
             </div>
             <Link
               href="/store/apps"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2"
+              className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 flex items-center gap-2"
             >
               Visit Store <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-blue-100 mb-6">Apply today for free career training programs.</p>
+          <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
               Visit Support Center

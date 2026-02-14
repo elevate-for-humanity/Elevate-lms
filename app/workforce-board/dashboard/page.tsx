@@ -132,7 +132,7 @@ export default async function WorkforceBoardDashboard() {
               <Link href="/workforce-board/reports" className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50">
                 <FileText className="w-4 h-4 mr-2" />Reports
               </Link>
-              <Link href="/workforce-board/participants" className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">
+              <Link href="/workforce-board/participants" className="inline-flex items-center px-4 py-2 bg-brand-blue-600 text-white rounded-lg text-sm font-medium hover:bg-brand-blue-700">
                 <Users className="w-4 h-4 mr-2" />View Participants
               </Link>
             </div>
@@ -144,7 +144,7 @@ export default async function WorkforceBoardDashboard() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center justify-between mb-2">
-              <Users className="w-8 h-8 text-blue-600" />
+              <Users className="w-8 h-8 text-brand-blue-600" />
               <span className="text-xs font-medium text-green-600 flex items-center"><ArrowUpRight className="w-3 h-3 mr-1" />12%</span>
             </div>
             <p className="text-2xl md:text-3xl font-bold text-gray-900">{totalEnrollments}</p>
@@ -159,7 +159,7 @@ export default async function WorkforceBoardDashboard() {
             <p className="text-sm text-gray-600">Completions</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-2"><Target className="w-8 h-8 text-blue-600" /></div>
+            <div className="flex items-center justify-between mb-2"><Target className="w-8 h-8 text-brand-blue-600" /></div>
             <p className="text-2xl md:text-3xl font-bold text-gray-900">{completionRate}%</p>
             <p className="text-sm text-gray-600">Completion Rate</p>
           </div>
@@ -175,7 +175,7 @@ export default async function WorkforceBoardDashboard() {
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
           <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-            <BarChart3 className="w-5 h-5 mr-2 text-blue-600" />WIOA Performance Indicators
+            <BarChart3 className="w-5 h-5 mr-2 text-brand-blue-600" />WIOA Performance Indicators
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div>
@@ -237,7 +237,7 @@ export default async function WorkforceBoardDashboard() {
                       <p className="font-medium text-gray-900">{p.profiles?.full_name || 'Unknown'}</p>
                       <p className="text-sm text-gray-600">{p.profiles?.email || 'No email'}</p>
                     </div>
-                    <Link href={`/workforce-board/participants/${p.id}`} className="text-sm text-blue-600 hover:text-blue-700 font-medium">View</Link>
+                    <Link href={`/workforce-board/participants/${p.id}`} className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium">View</Link>
                   </div>
                 ))}
               </div>
@@ -247,12 +247,12 @@ export default async function WorkforceBoardDashboard() {
                 <p>No at-risk participants</p>
               </div>
             )}
-            <Link href="/workforce-board/participants?filter=at-risk" className="block mt-4 text-center text-sm text-blue-600 hover:text-blue-700 font-medium">View All At-Risk Participants →</Link>
+            <Link href="/workforce-board/participants?filter=at-risk" className="block mt-4 text-center text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium">View All At-Risk Participants →</Link>
           </div>
 
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-              <Clock className="w-5 h-5 mr-2 text-blue-600" />Recent Activity
+              <Clock className="w-5 h-5 mr-2 text-brand-blue-600" />Recent Activity
             </h2>
             {recentEnrollments && recentEnrollments.length > 0 ? (
               <div className="space-y-3">
@@ -263,7 +263,7 @@ export default async function WorkforceBoardDashboard() {
                       <p className="text-sm text-gray-600">{e.programs?.name || e.programs?.title || 'Unknown Program'}</p>
                     </div>
                     <div className="text-right">
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${e.status === 'active' ? 'bg-green-100 text-green-800' : e.status === 'completed' ? 'bg-blue-100 text-blue-800' : e.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>{e.status}</span>
+                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${e.status === 'active' ? 'bg-green-100 text-green-800' : e.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-800' : e.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800'}`}>{e.status}</span>
                       <p className="text-xs text-gray-500 mt-1">{new Date(e.created_at).toLocaleDateString()}</p>
                     </div>
                   </div>
@@ -272,28 +272,28 @@ export default async function WorkforceBoardDashboard() {
             ) : (
               <div className="text-center py-8 text-gray-500"><p>No recent activity</p></div>
             )}
-            <Link href="/workforce-board/participants" className="block mt-4 text-center text-sm text-blue-600 hover:text-blue-700 font-medium">View All Participants →</Link>
+            <Link href="/workforce-board/participants" className="block mt-4 text-center text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium">View All Participants →</Link>
           </div>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-              <Building2 className="w-5 h-5 mr-2 text-blue-600" />Program Overview
+              <Building2 className="w-5 h-5 mr-2 text-brand-blue-600" />Program Overview
             </h2>
-            <Link href="/workforce-board/training" className="text-sm text-blue-600 hover:text-blue-700 font-medium">View All Programs →</Link>
+            <Link href="/workforce-board/training" className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium">View All Programs →</Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">{activePrograms}</p>
+            <div className="text-center p-4 bg-brand-blue-50 rounded-lg">
+              <p className="text-2xl font-bold text-brand-blue-600">{activePrograms}</p>
               <p className="text-sm text-gray-600">Active Programs</p>
             </div>
             <div className="text-center p-4 bg-green-50 rounded-lg">
               <p className="text-2xl font-bold text-green-600">{trainingProviders}</p>
               <p className="text-sm text-gray-600">Training Providers</p>
             </div>
-            <div className="text-center p-4 bg-blue-50 rounded-lg">
-              <p className="text-2xl font-bold text-blue-600">{activeEnrollments}</p>
+            <div className="text-center p-4 bg-brand-blue-50 rounded-lg">
+              <p className="text-2xl font-bold text-brand-blue-600">{activeEnrollments}</p>
               <p className="text-sm text-gray-600">Active Participants</p>
             </div>
             <div className="text-center p-4 bg-orange-50 rounded-lg">
@@ -304,22 +304,22 @@ export default async function WorkforceBoardDashboard() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Link href="/workforce-board/reports" className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
-            <FileText className="w-8 h-8 text-blue-600 mb-2" />
+          <Link href="/workforce-board/reports" className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-brand-blue-300 hover:shadow-md transition">
+            <FileText className="w-8 h-8 text-brand-blue-600 mb-2" />
             <span className="font-medium text-gray-900">Generate Reports</span>
             <span className="text-sm text-gray-500">WIOA, DOL, State</span>
           </Link>
-          <Link href="/workforce-board/eligibility" className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
+          <Link href="/workforce-board/eligibility" className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-brand-blue-300 hover:shadow-md transition">
             <Shield className="w-8 h-8 text-green-600 mb-2" />
             <span className="font-medium text-gray-900">Eligibility Review</span>
             <span className="text-sm text-gray-500">Verify participants</span>
           </Link>
-          <Link href="/workforce-board/employment" className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
-            <Briefcase className="w-8 h-8 text-blue-600 mb-2" />
+          <Link href="/workforce-board/employment" className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-brand-blue-300 hover:shadow-md transition">
+            <Briefcase className="w-8 h-8 text-brand-blue-600 mb-2" />
             <span className="font-medium text-gray-900">Employment Outcomes</span>
             <span className="text-sm text-gray-500">Track placements</span>
           </Link>
-          <Link href="/workforce-board/supportive-services" className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-blue-300 hover:shadow-md transition">
+          <Link href="/workforce-board/supportive-services" className="flex flex-col items-center p-6 bg-white rounded-xl shadow-sm border border-gray-200 hover:border-brand-blue-300 hover:shadow-md transition">
             <DollarSign className="w-8 h-8 text-orange-600 mb-2" />
             <span className="font-medium text-gray-900">Supportive Services</span>
             <span className="text-sm text-gray-500">Manage assistance</span>

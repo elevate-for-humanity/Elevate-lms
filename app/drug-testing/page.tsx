@@ -118,7 +118,7 @@ export default function DrugTestingLandingPage() {
             <div className="flex flex-col sm:flex-row gap-4">
               <a
                 href="/support"
-                className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition text-lg"
+                className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition text-lg"
               >
                 <Phone className="w-5 h-5" />
                 Get Help Online
@@ -136,7 +136,7 @@ export default function DrugTestingLandingPage() {
       </section>
 
       {/* Features Bar */}
-      <section className="py-8 bg-blue-900 text-white">
+      <section className="py-8 bg-brand-blue-900 text-white">
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-6">
             {features.map((feature) => (
@@ -146,7 +146,7 @@ export default function DrugTestingLandingPage() {
                 </div>
                 <div>
                   <h3 className="font-bold">{feature.title}</h3>
-                  <p className="text-sm text-blue-200">{feature.description}</p>
+                  <p className="text-sm text-brand-blue-200">{feature.description}</p>
                 </div>
               </div>
             ))}
@@ -197,7 +197,7 @@ export default function DrugTestingLandingPage() {
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
                     {category.title}
                   </h3>
                   <p className="text-gray-600 mb-4">{category.description}</p>
@@ -208,7 +208,7 @@ export default function DrugTestingLandingPage() {
                       </span>
                     ))}
                   </div>
-                  <div className="flex items-center text-blue-600 font-bold">
+                  <div className="flex items-center text-brand-blue-600 font-bold">
                     View Tests & Pricing
                     <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -232,7 +232,7 @@ export default function DrugTestingLandingPage() {
               />
             </div>
             <div>
-              <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
+              <div className="inline-flex items-center gap-2 bg-brand-blue-100 text-brand-blue-800 px-4 py-2 rounded-full text-sm font-bold mb-4">
                 <Building2 className="w-4 h-4" />
                 For Employers
               </div>
@@ -259,7 +259,7 @@ export default function DrugTestingLandingPage() {
               </ul>
               <Link
                 href="/drug-testing/employer-programs"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition"
               >
                 <Users className="w-5 h-5" />
                 Set Up Employer Account
@@ -336,7 +336,7 @@ export default function DrugTestingLandingPage() {
               { step: 6, title: 'Results Delivered', desc: 'Receive results via secure portal and email. Most results in 24-48 hours.' },
             ].map((item) => (
               <div key={item.step} className="flex gap-6">
-                <div className="w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
+                <div className="w-14 h-14 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
                   {item.step}
                 </div>
                 <div className="pt-2">
@@ -350,25 +350,25 @@ export default function DrugTestingLandingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Schedule a Drug Test?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Schedule online for same-day appointments at locations near you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
             >
               <Phone className="w-5 h-5" />
               Get Help Online
             </a>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 bg-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-800 transition text-lg border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-800 transition text-lg border-2 border-white"
             >
               Request Quote
             </Link>

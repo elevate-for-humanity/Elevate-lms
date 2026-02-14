@@ -82,7 +82,7 @@ export default function FundingVerificationPage() {
               { step: '4', title: 'Enrollment Confirmation', desc: 'Once funding is verified, you will receive your enrollment agreement and program start date.' },
             ].map((item, i) => (
               <div key={i} className="flex items-start gap-4 bg-white rounded-xl p-5 border">
-                <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   {item.step}
                 </div>
                 <div>
@@ -126,7 +126,7 @@ export default function FundingVerificationPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Need Help With Funding?</h2>
             <p className="text-gray-600 mb-6">Our financial aid team can help you identify funding options and complete the verification process.</p>
             <div className="flex flex-wrap gap-4">
-              <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
+              <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition">
                 <Mail className="w-4 h-4" /> Email Us
               </a>
               <a href="/support" className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">

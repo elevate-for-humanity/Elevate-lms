@@ -94,12 +94,12 @@ export default function ContactPage() {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-10 md:mb-12">
           {contactInfo.map((info, index) => (
             <div key={index} className="bg-white rounded-xl shadow-sm p-6 text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <info.icon className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <info.icon className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h2 className="font-semibold text-gray-900">{info.title}</h2>
               {info.href ? (
-                <a href={info.href} className="text-blue-600 hover:underline mt-1 block">{info.value}</a>
+                <a href={info.href} className="text-brand-blue-600 hover:underline mt-1 block">{info.value}</a>
               ) : (
                 <p className="text-gray-900 mt-1">{info.value}</p>
               )}
@@ -121,7 +121,7 @@ export default function ContactPage() {
                 </p>
                 <button
                   onClick={() => setFormState('idle')}
-                  className="text-blue-600 font-medium hover:underline"
+                  className="text-brand-blue-600 font-medium hover:underline"
                 >
                   Send another message
                 </button>
@@ -144,7 +144,7 @@ export default function ContactPage() {
                       type="text"
                       id="firstName"
                       name="firstName"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       required
                       disabled={formState === 'submitting'}
                     />
@@ -157,7 +157,7 @@ export default function ContactPage() {
                       type="text"
                       id="lastName"
                       name="lastName"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       required
                       disabled={formState === 'submitting'}
                     />
@@ -173,7 +173,7 @@ export default function ContactPage() {
                       type="email"
                       id="email"
                       name="email"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       required
                       disabled={formState === 'submitting'}
                     />
@@ -186,7 +186,7 @@ export default function ContactPage() {
                       type="tel"
                       id="phone"
                       name="phone"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                       disabled={formState === 'submitting'}
                     />
                   </div>
@@ -199,7 +199,7 @@ export default function ContactPage() {
                   <select
                     id="subject"
                     name="subject"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     required
                     disabled={formState === 'submitting'}
                   >
@@ -223,7 +223,7 @@ export default function ContactPage() {
                     id="message"
                     name="message"
                     rows={5}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="How can we help you?"
                     required
                     minLength={10}
@@ -237,7 +237,7 @@ export default function ContactPage() {
                 <button
                   type="submit"
                   disabled={formState === 'submitting' || !turnstileToken}
-                  className="flex items-center justify-center gap-2 w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-blue-400 disabled:cursor-not-allowed transition-colors"
+                  className="flex items-center justify-center gap-2 w-full bg-brand-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-brand-blue-700 disabled:bg-brand-blue-400 disabled:cursor-not-allowed transition-colors"
                 >
                   {formState === 'submitting' ? (
                     <>
@@ -273,7 +273,7 @@ export default function ContactPage() {
               <div className="mt-4 pt-4 border-t">
                 <a
                   href="/support"
-                  className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
+                  className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
                 >
                   <Phone className="w-4 h-4" />
                   Call Get Help Online

@@ -161,7 +161,7 @@ export default function IntegrationsPage() {
                   </button>
                   <Link
                     href={`/admin/integrations/${integration.slug}`}
-                    className="px-4 py-2 rounded-lg text-sm font-medium bg-blue-100 text-brand-blue-700 hover:bg-blue-200 flex items-center gap-1"
+                    className="px-4 py-2 rounded-lg text-sm font-medium bg-brand-blue-100 text-brand-blue-700 hover:bg-brand-blue-200 flex items-center gap-1"
                   >
                     <Settings className="h-4 w-4" />
                     Configure

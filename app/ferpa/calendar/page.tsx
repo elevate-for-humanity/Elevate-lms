@@ -31,8 +31,8 @@ interface CalendarEvent {
 }
 
 const EVENT_TYPE_CONFIG: Record<string, { label: string; color: string }> = {
-  training: { label: 'Training', color: 'bg-blue-100 text-blue-700' },
-  audit: { label: 'Audit', color: 'bg-blue-100 text-blue-700' },
+  training: { label: 'Training', color: 'bg-brand-blue-100 text-brand-blue-700' },
+  audit: { label: 'Audit', color: 'bg-brand-blue-100 text-brand-blue-700' },
   deadline: { label: 'Deadline', color: 'bg-red-100 text-red-700' },
   review: { label: 'Review', color: 'bg-orange-100 text-orange-700' },
   notification: { label: 'Notification', color: 'bg-green-100 text-green-700' },
@@ -141,7 +141,7 @@ export default async function FerpaCalendarPage() {
               <h1 className="text-2xl font-bold text-gray-900">Compliance Calendar</h1>
               <p className="text-gray-600 mt-1">Important dates and deadlines</p>
             </div>
-            <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
               <Plus className="w-4 h-4" />
               Add Event
             </button>
@@ -164,7 +164,7 @@ export default async function FerpaCalendarPage() {
                     <p className="font-medium text-gray-900">{event.title}</p>
                     <p className="text-sm text-red-600">Due: {formatDate(event.start_date)}</p>
                   </div>
-                  <button className="text-sm text-blue-600 hover:text-blue-700">Mark Complete</button>
+                  <button className="text-sm text-brand-blue-600 hover:text-brand-blue-700">Mark Complete</button>
                 </div>
               ))}
             </div>
@@ -240,7 +240,7 @@ export default async function FerpaCalendarPage() {
                   <div key={index} className="px-6 py-4">
                     <h3 className="font-medium text-gray-900">{deadline.title}</h3>
                     <p className="text-sm text-gray-500 mt-1">{deadline.description}</p>
-                    <p className="text-xs text-blue-600 mt-2 flex items-center gap-1">
+                    <p className="text-xs text-brand-blue-600 mt-2 flex items-center gap-1">
                       <Clock className="w-3 h-3" />
                       {deadline.date}
                     </p>

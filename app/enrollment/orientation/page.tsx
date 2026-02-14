@@ -14,22 +14,22 @@ interface OrientationSection {
 
 const ORIENTATION_SECTIONS: OrientationSection[] = [
   {
-    icon: <BookOpen className="w-6 h-6 text-blue-600" />,
+    icon: <BookOpen className="w-6 h-6 text-brand-blue-600" />,
     title: 'What you\'re enrolling in',
     description: 'This is a program-based enrollment that leads to your credential or licensure pathway.',
   },
   {
-    icon: <Clock className="w-6 h-6 text-blue-600" />,
+    icon: <Clock className="w-6 h-6 text-brand-blue-600" />,
     title: 'How it works',
     description: 'You\'ll complete required learning, tracked progress, and required activities as part of your program.',
   },
   {
-    icon: <CheckSquare className="w-6 h-6 text-blue-600" />,
+    icon: <CheckSquare className="w-6 h-6 text-brand-blue-600" />,
     title: 'Your responsibilities',
     description: 'Attend consistently. Complete required tasks. Keep your documents current.',
   },
   {
-    icon: <Users className="w-6 h-6 text-blue-600" />,
+    icon: <Users className="w-6 h-6 text-brand-blue-600" />,
     title: 'What we handle',
     description: 'We manage enrollment tracking, compliance steps, and program access.',
   },
@@ -116,7 +116,7 @@ export default function OrientationPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue-600"></div>
       </div>
     );
   }
@@ -140,7 +140,7 @@ export default function OrientationPage() {
               className="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
             >
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center">
+                <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-50 rounded-lg flex items-center justify-center">
                   {section.icon}
                 </div>
                 <div>
@@ -159,7 +159,7 @@ export default function OrientationPage() {
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-1 h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              className="mt-1 h-5 w-5 rounded border-gray-300 text-brand-blue-600 focus:ring-brand-blue-500"
             />
             <span className="text-gray-700">
               I understand my responsibilities and agree to continue.
@@ -180,7 +180,7 @@ export default function OrientationPage() {
           disabled={!agreed || submitting}
           className={`w-full flex items-center justify-center gap-2 py-4 px-6 rounded-lg font-semibold transition-colors ${
             agreed && !submitting
-              ? 'bg-blue-600 hover:bg-blue-700 text-white'
+              ? 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white'
               : 'bg-gray-200 text-gray-500 cursor-not-allowed'
           }`}
         >

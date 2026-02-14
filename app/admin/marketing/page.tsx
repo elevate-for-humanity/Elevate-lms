@@ -88,7 +88,7 @@ export default async function AdminMarketingPage() {
           </div>
           <Link 
             href="/admin/campaigns"
-            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             <Megaphone className="w-5 h-5" />
             View Campaigns
@@ -104,8 +104,8 @@ export default async function AdminMarketingPage() {
                 <p className="text-3xl font-bold text-gray-900 mt-1">{totalLeads || 0}</p>
                 <p className="text-sm text-green-600 mt-1">+{newLeadsThisMonth || 0} this month</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-brand-blue-600" />
               </div>
             </div>
           </div>
@@ -128,8 +128,8 @@ export default async function AdminMarketingPage() {
                 <p className="text-3xl font-bold text-gray-900 mt-1">{newLeadsThisMonth || 0}</p>
                 <p className="text-sm text-gray-500 mt-1">leads</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Target className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Target className="w-6 h-6 text-brand-blue-600" />
               </div>
             </div>
           </div>
@@ -153,7 +153,7 @@ export default async function AdminMarketingPage() {
           <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200">
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
               <h2 className="text-lg font-semibold text-gray-900">Recent Campaigns</h2>
-              <Link href="/admin/campaigns" className="text-sm text-blue-600 hover:text-blue-700">
+              <Link href="/admin/campaigns" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
                 View all
               </Link>
             </div>
@@ -200,8 +200,8 @@ export default async function AdminMarketingPage() {
                   href="/admin/campaigns/new"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Send className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <Send className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Create Campaign</p>
@@ -224,8 +224,8 @@ export default async function AdminMarketingPage() {
                   href="/admin/analytics"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <BarChart3 className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <BarChart3 className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div>
                     <p className="font-medium text-gray-900">Analytics</p>
@@ -248,7 +248,7 @@ export default async function AdminMarketingPage() {
                 <div key={index} className="text-center">
                   <div className="w-full bg-gray-200 rounded-full h-2 mb-2">
                     <div 
-                      className="bg-blue-600 h-2 rounded-full" 
+                      className="bg-brand-blue-600 h-2 rounded-full" 
                       style={{ width: `${item.percent}%` }}
                     />
                   </div>

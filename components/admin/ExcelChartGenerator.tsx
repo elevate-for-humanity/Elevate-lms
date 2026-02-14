@@ -594,7 +594,7 @@ fill="white" />
               onClick={() =>
                 setSelectedCharts(availableCharts.map((c) => c.title))
               }
-              className="text-sm bg-brand-surface text-brand-info px-3 py-2 rounded hover:bg-blue-200"
+              className="text-sm bg-brand-surface text-brand-info px-3 py-2 rounded hover:bg-brand-blue-200"
             >
               Select All
             </button>
@@ -633,13 +633,13 @@ fill="white" />
         </div>
       </div>
       {/* Excel Features */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-4">
+      <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-brand-blue-900 mb-4">
           📈 Excel Export Features
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div className="bg-white rounded p-4">
-            <h4 className="font-medium text-blue-900 mb-2">
+            <h4 className="font-medium text-brand-blue-900 mb-2">
               🎨 Professional Charts
             </h4>
             <ul className="text-sm text-brand-info space-y-1">
@@ -650,7 +650,7 @@ fill="white" />
             </ul>
           </div>
           <div className="bg-white rounded p-4">
-            <h4 className="font-medium text-blue-900 mb-2">
+            <h4 className="font-medium text-brand-blue-900 mb-2">
               📊 Data Integration
             </h4>
             <ul className="text-sm text-brand-info space-y-1">
@@ -661,7 +661,7 @@ fill="white" />
             </ul>
           </div>
           <div className="bg-white rounded p-4">
-            <h4 className="font-medium text-blue-900 mb-2">🎯 Customization</h4>
+            <h4 className="font-medium text-brand-blue-900 mb-2">🎯 Customization</h4>
             <ul className="text-sm text-brand-info space-y-1">
               <li>• Adjustable chart sizes</li>
               <li>• Custom file naming</li>

@@ -42,7 +42,7 @@ const TYPE_ICONS = {
 
 const TYPE_COLORS = {
   video: 'bg-red-100 text-red-700',
-  document: 'bg-blue-100 text-blue-700',
+  document: 'bg-brand-blue-100 text-brand-blue-700',
   course: 'bg-green-100 text-green-700',
   quiz: 'bg-purple-100 text-purple-700',
   module: 'bg-orange-100 text-orange-700',
@@ -168,7 +168,7 @@ export default function ContentLibrary({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     );
   }
@@ -186,7 +186,7 @@ export default function ContentLibrary({
                 placeholder="Search content..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               />
             </div>
             <div className="flex items-center gap-2">
@@ -194,7 +194,7 @@ export default function ContentLibrary({
               <select
                 value={selectedType}
                 onChange={(e) => setSelectedType(e.target.value)}
-                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               >
                 <option value="all">All Types</option>
                 <option value="video">Videos</option>
@@ -213,7 +213,7 @@ export default function ContentLibrary({
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-4 py-2 rounded-full font-medium text-sm transition-colors ${
                   selectedCategory === cat
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -255,7 +255,7 @@ export default function ContentLibrary({
                     {item.type === 'video' && (
                       <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                         <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
-                          <Play className="w-6 h-6 text-blue-600 ml-1" />
+                          <Play className="w-6 h-6 text-brand-blue-600 ml-1" />
                         </div>
                       </div>
                     )}
@@ -298,7 +298,7 @@ export default function ContentLibrary({
                     <span className="text-xs text-gray-400">
                       {item.view_count?.toLocaleString() || 0} views
                     </span>
-                    <button className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1">
+                    <button className="text-brand-blue-600 hover:text-brand-blue-800 text-sm font-medium flex items-center gap-1">
                       {item.type === 'document' ? (
                         <>
                           <Download className="w-4 h-4" />
@@ -327,7 +327,7 @@ export default function ContentLibrary({
           <p className="text-gray-500 mb-2">No content found matching your search.</p>
           <button
             onClick={() => { setSearchTerm(''); setSelectedCategory('all'); setSelectedType('all'); }}
-            className="text-blue-600 hover:underline text-sm"
+            className="text-brand-blue-600 hover:underline text-sm"
           >
             Clear filters
           </button>

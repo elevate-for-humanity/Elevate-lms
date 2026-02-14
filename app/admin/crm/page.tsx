@@ -111,8 +111,8 @@ export default async function CRMHubPage() {
             className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-brand-blue-600" />
               </div>
               <span className="text-2xl font-bold text-black">
                 {totalContacts || 0}
@@ -165,8 +165,8 @@ export default async function CRMHubPage() {
             className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
           >
             <div className="flex items-center justify-between mb-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-brand-blue-600" />
               </div>
               <span className="text-2xl font-bold text-black">
                 {scheduledMeetings || 0}
@@ -186,7 +186,7 @@ export default async function CRMHubPage() {
           >
             <Mail className="w-8 h-8 mb-4" />
             <h3 className="text-xl font-bold mb-2">Send Campaign</h3>
-            <p className="text-blue-100 text-sm">Email your contacts in bulk</p>
+            <p className="text-brand-blue-100 text-sm">Email your contacts in bulk</p>
           </Link>
 
           <Link
@@ -206,7 +206,7 @@ export default async function CRMHubPage() {
           >
             <Calendar className="w-8 h-8 mb-4" />
             <h3 className="text-xl font-bold mb-2">Schedule Meeting</h3>
-            <p className="text-blue-100 text-sm">
+            <p className="text-brand-blue-100 text-sm">
               Book appointment with Zoom
             </p>
           </Link>
@@ -223,7 +223,7 @@ export default async function CRMHubPage() {
               <Link
                 href="/admin/crm/campaigns"
                 aria-label="Link"
-                className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 View All →
               </Link>
@@ -235,8 +235,8 @@ export default async function CRMHubPage() {
                     key={campaign.id}
                     className="flex items-start gap-4 p-4 border border-gray-200 rounded-lg"
                   >
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <Mail className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Mail className="w-5 h-5 text-brand-blue-600" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="font-semibold text-black truncate">
@@ -261,7 +261,7 @@ export default async function CRMHubPage() {
                 <Link
                   href="/admin/crm/campaigns/new"
                   aria-label="Link"
-                  className="text-blue-600 hover:text-blue-700 text-sm font-semibold mt-2 inline-block"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold mt-2 inline-block"
                 >
                   Create your first campaign
                 </Link>
@@ -284,7 +284,7 @@ export default async function CRMHubPage() {
               <Link
                 href="/admin/crm/deals"
                 aria-label="Link"
-                className="text-blue-600 hover:text-blue-700 text-sm font-semibold"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
               >
                 View All →
               </Link>
@@ -307,7 +307,7 @@ export default async function CRMHubPage() {
                         <span className="text-lg font-bold text-black">
                           ${Number(deal.amount).toLocaleString()}
                         </span>
-                        <span className="px-2 py-2 bg-blue-100 text-blue-700 text-xs font-semibold rounded capitalize">
+                        <span className="px-2 py-2 bg-brand-blue-100 text-brand-blue-700 text-xs font-semibold rounded capitalize">
                           {deal.stage}
                         </span>
                       </div>
@@ -330,7 +330,7 @@ export default async function CRMHubPage() {
                 <Link
                   href="/admin/crm/deals/new"
                   aria-label="Link"
-                  className="text-blue-600 hover:text-blue-700 text-sm font-semibold mt-2 inline-block"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold mt-2 inline-block"
                 >
                   Create your first deal
                 </Link>

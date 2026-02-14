@@ -57,19 +57,19 @@ export function StateAwareDashboard({
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between">
             <div className="flex-1">
-              <div className="text-sm font-semibold text-blue-100 mb-1">
+              <div className="text-sm font-semibold text-brand-blue-100 mb-1">
                 NEXT STEP
               </div>
               <h2 className="text-2xl md:text-3xl font-bold mb-2">
                 {dominantAction.label}
               </h2>
-              <p className="text-blue-100 text-lg">
+              <p className="text-brand-blue-100 text-lg">
                 {dominantAction.description}
               </p>
             </div>
             <Link
               href={dominantAction.href}
-              className="flex-shrink-0 ml-6 px-8 py-4 bg-white text-blue-600 rounded-lg font-bold text-lg hover:bg-gray-50 transition shadow-xl flex items-center gap-2"
+              className="flex-shrink-0 ml-6 px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold text-lg hover:bg-gray-50 transition shadow-xl flex items-center gap-2"
             >
               <span>{dominantAction.label}</span>
               <ArrowRight className="h-5 w-5" />
@@ -79,11 +79,11 @@ export function StateAwareDashboard({
           {/* Progress Bar */}
           {progressPercentage !== undefined && (
             <div className="mt-6">
-              <div className="flex items-center justify-between text-sm text-blue-100 mb-2">
+              <div className="flex items-center justify-between text-sm text-brand-blue-100 mb-2">
                 <span>Your Progress</span>
                 <span className="font-bold">{progressPercentage}%</span>
               </div>
-              <div className="w-full bg-blue-800 rounded-full h-3 overflow-hidden">
+              <div className="w-full bg-brand-blue-800 rounded-full h-3 overflow-hidden">
                 <div
                   className="bg-white h-full rounded-full transition-all duration-500"
                   style={{ width: `${progressPercentage}%` }}
@@ -106,7 +106,7 @@ export function StateAwareDashboard({
                     ? 'bg-red-50 border-2 border-red-600'
                     : alert.type === 'warning'
                       ? 'bg-yellow-50 border-2 border-yellow-600'
-                      : 'bg-blue-50 border-2 border-blue-600'
+                      : 'bg-brand-blue-50 border-2 border-brand-blue-600'
                 }`}
               >
                 <AlertCircle
@@ -115,7 +115,7 @@ export function StateAwareDashboard({
                       ? 'text-red-600'
                       : alert.type === 'warning'
                         ? 'text-yellow-600'
-                        : 'text-blue-600'
+                        : 'text-brand-blue-600'
                   }`}
                 />
                 <div className="flex-1">
@@ -125,7 +125,7 @@ export function StateAwareDashboard({
                         ? 'text-red-900'
                         : alert.type === 'warning'
                           ? 'text-yellow-900'
-                          : 'text-blue-900'
+                          : 'text-brand-blue-900'
                     }`}
                   >
                     {alert.message}
@@ -139,7 +139,7 @@ export function StateAwareDashboard({
                         ? 'bg-red-600 text-white hover:bg-red-700'
                         : alert.type === 'warning'
                           ? 'bg-yellow-600 text-white hover:bg-yellow-700'
-                          : 'bg-blue-600 text-white hover:bg-blue-700'
+                          : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
                     }`}
                   >
                     {alert.actionLabel}
@@ -201,23 +201,23 @@ export function SectionCard({
   return (
     <Link
       href={href}
-      className="group bg-white border-2 border-slate-200 rounded-lg p-6 hover:border-blue-600 hover:shadow-lg transition"
+      className="group bg-white border-2 border-slate-200 rounded-lg p-6 hover:border-brand-blue-600 hover:shadow-lg transition"
     >
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
-          {icon && <div className="text-blue-600">{icon}</div>}
-          <h4 className="font-bold text-black group-hover:text-blue-600 transition">
+          {icon && <div className="text-brand-blue-600">{icon}</div>}
+          <h4 className="font-bold text-black group-hover:text-brand-blue-600 transition">
             {title}
           </h4>
         </div>
         {badge && (
-          <span className="px-3 py-2 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+          <span className="px-3 py-2 bg-brand-blue-100 text-brand-blue-700 text-xs font-bold rounded-full">
             {badge}
           </span>
         )}
       </div>
       <p className="text-black text-sm mb-4">{description}</p>
-      <div className="flex items-center gap-2 text-blue-600 font-semibold text-sm group-hover:gap-3 transition-all">
+      <div className="flex items-center gap-2 text-brand-blue-600 font-semibold text-sm group-hover:gap-3 transition-all">
         <span>View</span>
         <ArrowRight className="h-4 w-4" />
       </div>
@@ -247,7 +247,7 @@ export function ProgressIndicator({ steps }: ProgressIndicatorProps) {
                 step.status === 'completed'
                   ? 'bg-green-600 text-white'
                   : step.status === 'current'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-slate-200 text-slate-500'
               }`}
             >
@@ -265,14 +265,14 @@ export function ProgressIndicator({ steps }: ProgressIndicatorProps) {
                   step.status === 'completed'
                     ? 'text-green-900'
                     : step.status === 'current'
-                      ? 'text-blue-900'
+                      ? 'text-brand-blue-900'
                       : 'text-slate-500'
                 }`}
               >
                 {step.label}
               </div>
               {step.status === 'current' && (
-                <div className="text-sm text-blue-600 font-semibold">
+                <div className="text-sm text-brand-blue-600 font-semibold">
                   Current Step
                 </div>
               )}

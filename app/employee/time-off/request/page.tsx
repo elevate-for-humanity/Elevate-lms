@@ -45,15 +45,15 @@ export default function TimeOffRequestPage() {
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
-        <Link href="/employee/time-off" className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/employee/time-off" className="inline-flex items-center text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Time Off
         </Link>
 
         <div className="bg-white rounded-xl shadow-sm p-8">
           <div className="flex items-center mb-6">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-              <Calendar className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mr-4">
+              <Calendar className="w-6 h-6 text-brand-blue-600" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Request Time Off</h1>
@@ -76,7 +76,7 @@ export default function TimeOffRequestPage() {
               <select
                 value={formData.type}
                 onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select leave type</option>
                 <option value="vacation">Vacation</option>
@@ -96,7 +96,7 @@ export default function TimeOffRequestPage() {
                   type="date"
                   value={formData.startDate}
                   onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
               <div>
@@ -107,7 +107,7 @@ export default function TimeOffRequestPage() {
                   type="date"
                   value={formData.endDate}
                   onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -121,7 +121,7 @@ export default function TimeOffRequestPage() {
                 value={formData.hours}
                 onChange={(e) => setFormData({ ...formData, hours: e.target.value })}
                 placeholder="Auto-calculated or enter manually"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
 
@@ -134,11 +134,11 @@ export default function TimeOffRequestPage() {
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                 rows={4}
                 placeholder="Optional: Add any notes for your manager"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 resize-none"
               />
             </div>
 
-            <div className="bg-blue-50 rounded-lg p-4">
+            <div className="bg-brand-blue-50 rounded-lg p-4">
               <h3 className="font-semibold text-gray-900 mb-2">Your Balances</h3>
               <div className="grid grid-cols-3 gap-4 text-sm">
                 <div>
@@ -163,7 +163,7 @@ export default function TimeOffRequestPage() {
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-bold transition inline-flex items-center disabled:opacity-50"
+                className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-3 rounded-lg font-bold transition inline-flex items-center disabled:opacity-50"
               >
                 {isSubmitting ? 'Submitting...' : (
                   <>

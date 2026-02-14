@@ -19,7 +19,7 @@ const statusColors: Record<string, string> = {
   scheduled: 'bg-yellow-100 text-yellow-800',
   active: 'bg-green-100 text-green-800',
   paused: 'bg-orange-100 text-orange-800',
-  completed: 'bg-blue-100 text-blue-800',
+  completed: 'bg-brand-blue-100 text-brand-blue-800',
 };
 
 const typeIcons: Record<string, typeof Mail> = {
@@ -103,7 +103,7 @@ export default async function AdminCampaignsPage() {
           </div>
           <Link
             href="/admin/campaigns/new"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
             New Campaign
@@ -114,8 +114,8 @@ export default async function AdminCampaignsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Mail className="w-6 h-6 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <Mail className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{totalCampaigns || 0}</p>
@@ -136,8 +136,8 @@ export default async function AdminCampaignsPage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Eye className="w-6 h-6 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <Eye className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{openRate}%</p>
@@ -177,7 +177,7 @@ export default async function AdminCampaignsPage() {
               <p className="text-gray-500 mb-4">Create your first marketing campaign</p>
               <Link
                 href="/admin/campaigns/new"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
               >
                 <Plus className="w-5 h-5" />
                 New Campaign
@@ -203,7 +203,7 @@ export default async function AdminCampaignsPage() {
                   return (
                     <tr key={campaign.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
-                        <Link href={`/admin/campaigns/${campaign.id}`} className="font-medium text-gray-900 hover:text-blue-600">
+                        <Link href={`/admin/campaigns/${campaign.id}`} className="font-medium text-gray-900 hover:text-brand-blue-600">
                           {campaign.name}
                         </Link>
                         {campaign.subject && (

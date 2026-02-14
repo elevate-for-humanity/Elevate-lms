@@ -95,7 +95,7 @@ export function AssignmentSubmission({
   };
 
   const getFileIcon = (type: string) => {
-    if (type.startsWith('image/')) return <ImageIcon size={20} className="text-blue-600" />;
+    if (type.startsWith('image/')) return <ImageIcon size={20} className="text-brand-blue-600" />;
     if (type.startsWith('video/')) return <Video size={20} className="text-purple-600" />;
     return <FileText size={20} className="text-black" />;
   };

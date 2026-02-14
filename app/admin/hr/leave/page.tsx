@@ -31,7 +31,7 @@ export default async function LeavePage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Pending Requests</h3><p className="text-3xl font-bold text-yellow-600 mt-2">{requests?.length || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Approved This Month</h3><p className="text-3xl font-bold text-green-600 mt-2">12</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">On Leave Today</h3><p className="text-3xl font-bold text-blue-600 mt-2">3</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">On Leave Today</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">3</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-4 border-b"><h2 className="font-semibold">Pending Requests</h2></div>

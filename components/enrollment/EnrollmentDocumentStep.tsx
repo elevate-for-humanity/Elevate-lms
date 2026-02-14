@@ -162,7 +162,7 @@ export default function EnrollmentDocumentStep({
                 uploaded
                   ? 'border-green-200 bg-green-50'
                   : isDragOver
-                    ? 'border-blue-500 bg-blue-50'
+                    ? 'border-brand-blue-500 bg-brand-blue-50'
                     : 'border-gray-200 bg-white'
               }`}
               onDrop={(e) => handleDrop(req.type, e)}

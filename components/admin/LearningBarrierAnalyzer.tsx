@@ -277,8 +277,8 @@ export function LearningBarrierAnalyzer() {
         </div>
       </div>
       {isAnalyzing && (
-        <div className="text-center py-8 bg-blue-50 rounded-lg mb-6">
-          <div className="inline-block animate-spin rounded-full h-11 w-11 border-b-2 border-blue-600 mb-4" />
+        <div className="text-center py-8 bg-brand-blue-50 rounded-lg mb-6">
+          <div className="inline-block animate-spin rounded-full h-11 w-11 border-b-2 border-brand-blue-600 mb-4" />
           <p className="text-brand-info font-medium">
             🤖 AI is analyzing learning patterns and identifying barriers...
           </p>
@@ -469,8 +469,8 @@ export function LearningBarrierAnalyzer() {
         </div>
       </div>
       {/* Real-time Monitoring Status */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h4 className="font-semibold text-blue-900 mb-2">
+      <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+        <h4 className="font-semibold text-brand-blue-900 mb-2">
           🔄 Real-time Monitoring Active
         </h4>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">

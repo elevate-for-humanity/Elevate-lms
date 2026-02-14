@@ -83,7 +83,7 @@ export function OnboardingChecklist({ onboarding }: OnboardingChecklistProps) {
             </p>
           </div>
           <div className="text-right">
-            <div className="text-3xl font-bold text-blue-600">
+            <div className="text-3xl font-bold text-brand-blue-600">
               {completedCount}/4
             </div>
             <div className="text-xs text-black">Steps Complete</div>

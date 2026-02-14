@@ -53,7 +53,7 @@ export default async function PeerReviewPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <Users className="w-8 h-8 text-blue-600" />
+            <Users className="w-8 h-8 text-brand-blue-600" />
             Peer Review
           </h1>
           <p className="text-gray-600 mt-1">
@@ -87,8 +87,8 @@ export default async function PeerReviewPage() {
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <FileText className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                <FileText className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">0</div>
@@ -98,8 +98,8 @@ export default async function PeerReviewPage() {
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Star className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                <Star className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">--</div>
@@ -114,7 +114,7 @@ export default async function PeerReviewPage() {
           <div className="bg-white rounded-xl shadow-sm border">
             <div className="p-6 border-b">
               <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                <Eye className="w-5 h-5 text-blue-600" />
+                <Eye className="w-5 h-5 text-brand-blue-600" />
                 Assignments to Review
               </h2>
             </div>
@@ -146,7 +146,7 @@ export default async function PeerReviewPage() {
                 </p>
                 <Link
                   href="/lms/courses"
-                  className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
                 >
                   Go to My Courses →
                 </Link>
@@ -160,8 +160,8 @@ export default async function PeerReviewPage() {
           <h2 className="font-semibold text-gray-900 mb-6">How Peer Review Works</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-xl font-bold text-blue-600">1</span>
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-xl font-bold text-brand-blue-600">1</span>
               </div>
               <h3 className="font-medium text-gray-900 mb-2">Submit Your Work</h3>
               <p className="text-gray-600 text-sm">
@@ -169,8 +169,8 @@ export default async function PeerReviewPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-xl font-bold text-blue-600">2</span>
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-xl font-bold text-brand-blue-600">2</span>
               </div>
               <h3 className="font-medium text-gray-900 mb-2">Review Others</h3>
               <p className="text-gray-600 text-sm">
@@ -178,8 +178,8 @@ export default async function PeerReviewPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-xl font-bold text-blue-600">3</span>
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-xl font-bold text-brand-blue-600">3</span>
               </div>
               <h3 className="font-medium text-gray-900 mb-2">Receive Feedback</h3>
               <p className="text-gray-600 text-sm">

@@ -315,41 +315,41 @@ export default async function SAPMonitoringPage() {
         </div>
 
         {/* SAP Requirements */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-          <h2 className="text-xl font-bold text-blue-900 mb-4">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-8">
+          <h2 className="text-xl font-bold text-brand-blue-900 mb-4">
             SAP Requirements
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div>
-              <h3 className="font-semibold text-blue-900 mb-2">
+              <h3 className="font-semibold text-brand-blue-900 mb-2">
                 GPA Requirement
               </h3>
-              <p className="text-blue-800 text-sm mb-1">
+              <p className="text-brand-blue-800 text-sm mb-1">
                 Minimum: 2.0 (C average)
               </p>
-              <p className="text-blue-700 text-xs">
+              <p className="text-brand-blue-700 text-xs">
                 Students below 2.0 GPA are placed on warning
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-blue-900 mb-2">
+              <h3 className="font-semibold text-brand-blue-900 mb-2">
                 Attendance Requirement
               </h3>
-              <p className="text-blue-800 text-sm mb-1">
+              <p className="text-brand-blue-800 text-sm mb-1">
                 Minimum: 80% attendance
               </p>
-              <p className="text-blue-700 text-xs">
+              <p className="text-brand-blue-700 text-xs">
                 Excessive absences may result in dismissal
               </p>
             </div>
             <div>
-              <h3 className="font-semibold text-blue-900 mb-2">
+              <h3 className="font-semibold text-brand-blue-900 mb-2">
                 Completion Rate
               </h3>
-              <p className="text-blue-800 text-sm mb-1">
+              <p className="text-brand-blue-800 text-sm mb-1">
                 Minimum: 67% of coursework
               </p>
-              <p className="text-blue-700 text-xs">
+              <p className="text-brand-blue-700 text-xs">
                 Must complete within 150% of program length
               </p>
             </div>
@@ -369,7 +369,7 @@ export default async function SAPMonitoringPage() {
                   <input
                     type="text"
                     placeholder="Search students..."
-                    className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="pl-10 pr-4 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
                 <button className="flex items-center gap-2 px-4 py-2 text-black hover:text-black border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors text-sm" aria-label="Action button">

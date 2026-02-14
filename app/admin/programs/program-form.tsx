@@ -78,7 +78,7 @@ export function ProgramForm({ program }: ProgramFormProps) {
             name="name"
             required
             defaultValue={program?.name}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             placeholder="e.g., Barber Apprenticeship Program"
           />
         </div>
@@ -96,7 +96,7 @@ export function ProgramForm({ program }: ProgramFormProps) {
             name="slug"
             required
             defaultValue={program?.slug}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             placeholder="e.g., barber-apprenticeship"
           />
           <p className="text-sm text-black mt-1">
@@ -116,7 +116,7 @@ export function ProgramForm({ program }: ProgramFormProps) {
             name="description"
             rows={4}
             defaultValue={program?.description}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             placeholder="Brief description of the program..."
           />
         </div>
@@ -132,7 +132,7 @@ export function ProgramForm({ program }: ProgramFormProps) {
             id="category"
             name="category"
             defaultValue={program?.category || 'workforce'}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           >
             <option value="workforce">Workforce Development</option>
             <option value="apprenticeship">Apprenticeship</option>
@@ -164,7 +164,7 @@ export function ProgramForm({ program }: ProgramFormProps) {
               min="0"
               step="1"
               defaultValue={program?.duration_hours}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               placeholder="e.g., 1500"
             />
           </div>
@@ -183,7 +183,7 @@ export function ProgramForm({ program }: ProgramFormProps) {
               min="0"
               step="0.01"
               defaultValue={program?.price}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               placeholder="e.g., 2500.00"
             />
             <p className="text-sm text-black mt-1">
@@ -204,7 +204,7 @@ export function ProgramForm({ program }: ProgramFormProps) {
             name="requirements"
             rows={3}
             defaultValue={program?.requirements}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             placeholder="List program requirements (one per line)..."
           />
         </div>
@@ -221,7 +221,7 @@ export function ProgramForm({ program }: ProgramFormProps) {
             name="outcomes"
             rows={3}
             defaultValue={program?.outcomes}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             placeholder="List expected outcomes (one per line)..."
           />
         </div>
@@ -237,7 +237,7 @@ export function ProgramForm({ program }: ProgramFormProps) {
               type="checkbox"
               name="is_active"
               defaultChecked={program?.is_active ?? true}
-              className="w-4 h-4 text-brand-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-brand-blue-600 border-gray-300 rounded focus:ring-brand-blue-500"
             />
             <span className="text-sm font-medium text-black">Active</span>
           </label>
@@ -247,7 +247,7 @@ export function ProgramForm({ program }: ProgramFormProps) {
               type="checkbox"
               name="featured"
               defaultChecked={program?.featured ?? false}
-              className="w-4 h-4 text-brand-blue-600 border-gray-300 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-brand-blue-600 border-gray-300 rounded focus:ring-brand-blue-500"
             />
             <span className="text-sm font-medium text-black">Featured</span>
           </label>

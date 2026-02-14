@@ -164,7 +164,7 @@ export default function VideoHeroBanner({
           textPosition === 'center' ? 'mx-auto' : textPosition === 'right' ? 'ml-auto' : ''
         }`}>
           {/* Subtitle/Badge */}
-          <span className="inline-block px-4 py-2 bg-blue-600/90 text-white text-sm font-semibold rounded-full mb-6 backdrop-blur-sm">
+          <span className="inline-block px-4 py-2 bg-brand-blue-600/90 text-white text-sm font-semibold rounded-full mb-6 backdrop-blur-sm">
             {subtitle}
           </span>
 
@@ -187,7 +187,7 @@ export default function VideoHeroBanner({
             {ctaText && ctaLink && (
               <Link
                 href={ctaLink}
-                className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg"
+                className="px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition-all transform hover:scale-105 shadow-lg"
               >
                 {ctaText}
               </Link>

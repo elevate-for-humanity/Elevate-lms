@@ -267,14 +267,14 @@ export default function DIYTaxesPage() {
         </div>
 
         {/* Security Notice */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-8">
           <div className="flex items-start gap-3">
-            <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-5 h-5 text-brand-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
             </svg>
             <div>
-              <p className="text-sm font-medium text-blue-900">Secure Session</p>
-              <p className="text-sm text-blue-700">
+              <p className="text-sm font-medium text-brand-blue-900">Secure Session</p>
+              <p className="text-sm text-brand-blue-700">
                 Your information is protected with industry-standard encryption. Sensitive data such as Social Security Numbers is collected only within this secure, authenticated session and is never stored unencrypted.
               </p>
             </div>
@@ -558,7 +558,7 @@ export default function DIYTaxesPage() {
               {/* Spouse Info if Married */}
               {(taxReturn.filingStatus === 'married_joint' ||
                 taxReturn.filingStatus === 'married_separate') && (
-                <div className="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="mt-8 p-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
                   <h3 className="font-bold text-lg mb-4">Spouse Information</h3>
                   <div className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4">
@@ -832,7 +832,7 @@ export default function DIYTaxesPage() {
               </div>
 
               {/* Upload W-2 Button */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+              <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 text-center">
                 <p className="mb-4">
                   Have a W-2? Upload it and we'll extract the data
                   automatically!
@@ -842,7 +842,7 @@ export default function DIYTaxesPage() {
                     (window.location.href =
                       '/supersonic-fast-cash/tools/smart-upload')
                   }
-                  className="bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-700"
+                  className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-700"
                 >
                   Upload W-2 with OCR
                 </button>
@@ -930,7 +930,7 @@ export default function DIYTaxesPage() {
 
               {/* Itemized Deductions Form */}
               {taxReturn.deductionType === 'itemized' && (
-                <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="p-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
                   <h3 className="font-bold text-lg mb-4">
                     Itemized Deductions
                   </h3>
@@ -1290,7 +1290,7 @@ export default function DIYTaxesPage() {
                 </div>
 
                 {/* Bank Info for Direct Deposit */}
-                <div className="p-6 bg-blue-50 border border-blue-200 rounded-lg">
+                <div className="p-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
                   <h3 className="font-bold text-lg mb-4">
                     Direct Deposit Information
                   </h3>
@@ -1440,7 +1440,7 @@ export default function DIYTaxesPage() {
 
           <button
             onClick={saveProgress}
-            className="bg-blue-600 text-white px-6 py-4 rounded-lg font-bold hover:bg-blue-700 flex items-center gap-2"
+            className="bg-brand-blue-600 text-white px-6 py-4 rounded-lg font-bold hover:bg-brand-blue-700 flex items-center gap-2"
           >
             <Save className="w-5 h-5" />
             Save Progress

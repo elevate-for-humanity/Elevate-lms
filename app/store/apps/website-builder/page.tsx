@@ -56,7 +56,7 @@ export default function WebsiteBuilderAppPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <div className="flex items-center gap-2 mb-4">
-                <span className="bg-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">WEBSITE</span>
+                <span className="bg-brand-blue-500 text-white text-xs font-bold px-3 py-1 rounded-full">WEBSITE</span>
                 <div className="flex items-center gap-1">
                   {[1,2,3,4,5].map(i => <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />)}
                   <span className="text-sm ml-1">4.9 (156 reviews)</span>
@@ -65,7 +65,7 @@ export default function WebsiteBuilderAppPage() {
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 Website Builder for Training Providers
               </h1>
-              <p className="text-xl text-blue-100 mb-8">
+              <p className="text-xl text-brand-blue-100 mb-8">
                 Launch a professional training website in minutes. Pre-built templates, LMS integration, enrollment forms, and SEO tools included.
               </p>
               <div className="flex flex-wrap gap-4">
@@ -122,8 +122,8 @@ export default function WebsiteBuilderAppPage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((f, i) => (
               <div key={i} className="p-6 rounded-xl border border-gray-200 hover:shadow-lg transition-shadow">
-                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <f.icon className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+                  <f.icon className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-lg mb-2">{f.title}</h3>
                 <p className="text-gray-600">{f.desc}</p>
@@ -134,7 +134,7 @@ export default function WebsiteBuilderAppPage() {
       </section>
 
       {/* Demo Video Section */}
-      <section className="py-16 px-4 bg-blue-50">
+      <section className="py-16 px-4 bg-brand-blue-50">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-6">Build Your Site in Minutes</h2>
           <p className="text-gray-600 mb-8">Watch how easy it is to create a professional training provider website</p>
@@ -159,18 +159,18 @@ export default function WebsiteBuilderAppPage() {
           <p className="text-gray-600 text-center mb-12">Start free, upgrade as you grow</p>
           <div className="grid md:grid-cols-3 gap-8">
             {pricing.map((plan, i) => (
-              <div key={i} className={`rounded-2xl p-8 ${plan.popular ? 'bg-blue-600 text-white ring-4 ring-blue-300' : 'bg-white border border-gray-200'}`}>
+              <div key={i} className={`rounded-2xl p-8 ${plan.popular ? 'bg-brand-blue-600 text-white ring-4 ring-blue-300' : 'bg-white border border-gray-200'}`}>
                 {plan.popular && <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">MOST POPULAR</span>}
                 <h3 className={`text-2xl font-bold mt-4 ${plan.popular ? 'text-white' : 'text-gray-900'}`}>{plan.name}</h3>
                 <div className="mt-4 mb-6">
                   <span className="text-4xl font-bold">${plan.price}</span>
-                  <span className={plan.popular ? 'text-blue-100' : 'text-gray-500'}>{plan.period}</span>
+                  <span className={plan.popular ? 'text-brand-blue-100' : 'text-gray-500'}>{plan.period}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((f, j) => (
                     <li key={j} className="flex items-center gap-2">
-                      <Check className={`w-5 h-5 ${plan.popular ? 'text-blue-200' : 'text-green-500'}`} />
-                      <span className={plan.popular ? 'text-blue-100' : 'text-gray-600'}>{f}</span>
+                      <Check className={`w-5 h-5 ${plan.popular ? 'text-brand-blue-200' : 'text-green-500'}`} />
+                      <span className={plan.popular ? 'text-brand-blue-100' : 'text-gray-600'}>{f}</span>
                     </li>
                   ))}
                 </ul>
@@ -178,8 +178,8 @@ export default function WebsiteBuilderAppPage() {
                   href={`/store/cart?add=website-${plan.name.toLowerCase()}`}
                   className={`block w-full text-center py-3 rounded-lg font-bold transition-colors ${
                     plan.popular 
-                      ? 'bg-white text-blue-600 hover:bg-gray-100' 
-                      : 'bg-blue-600 text-white hover:bg-blue-700'
+                      ? 'bg-white text-brand-blue-600 hover:bg-gray-100' 
+                      : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
                   }`}
                 >
                   <ShoppingCart className="w-4 h-4 inline mr-2" />

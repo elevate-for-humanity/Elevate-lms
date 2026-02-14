@@ -32,8 +32,8 @@ export default function ModernLandingHero({
   const contentSection = (
     <div className="flex flex-col justify-center">
       {badge && (
-        <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 w-fit">
-          <span className="w-2 h-2 bg-blue-500 rounded-full"></span>
+        <div className="inline-flex items-center gap-2 bg-brand-blue-50 text-brand-blue-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 w-fit">
+          <span className="w-2 h-2 bg-brand-blue-500 rounded-full"></span>
           {badge}
         </div>
       )}
@@ -41,7 +41,7 @@ export default function ModernLandingHero({
       <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-black mb-4 leading-tight">
         {headline}
         {accentText && (
-          <span className="block text-blue-600">{accentText}</span>
+          <span className="block text-brand-blue-600">{accentText}</span>
         )}
       </h1>
       
@@ -67,7 +67,7 @@ export default function ModernLandingHero({
       <div className="flex flex-col sm:flex-row gap-4">
         <Link
           href={primaryCTA.href}
-          className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors shadow-lg hover:shadow-xl"
+          className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors shadow-lg hover:shadow-xl"
         >
           {primaryCTA.text}
           <ArrowRight className="w-5 h-5" />

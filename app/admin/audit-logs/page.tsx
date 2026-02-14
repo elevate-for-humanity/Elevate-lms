@@ -116,7 +116,7 @@ export default function AuditLogsPage() {
         <div className="mb-8">
           <Link
             href="/admin/dashboard"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Dashboard
           </Link>
@@ -166,7 +166,7 @@ export default function AuditLogsPage() {
             <h3 className="text-sm font-medium text-black mb-2">
               Unique Users
             </h3>
-            <p className="text-3xl font-bold text-blue-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {new Set(logs.map((l) => l.user_id)).size}
             </p>
           </div>
@@ -279,7 +279,7 @@ export default function AuditLogsPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-2 text-xs rounded bg-blue-100 text-blue-800">
+                        <span className="px-2 py-2 text-xs rounded bg-brand-blue-100 text-brand-blue-800">
                           {log.action}
                         </span>
                       </td>
@@ -297,7 +297,7 @@ export default function AuditLogsPage() {
                         {log.metadata &&
                           Object.keys(log.metadata).length > 0 && (
                             <details className="cursor-pointer">
-                              <summary className="text-brand-blue-600 hover:text-blue-800">
+                              <summary className="text-brand-blue-600 hover:text-brand-blue-800">
                                 View metadata
                               </summary>
                               <pre className="mt-2 text-xs bg-gray-50 p-2 rounded overflow-auto max-w-xs">

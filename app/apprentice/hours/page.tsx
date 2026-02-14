@@ -65,7 +65,7 @@ export default async function ApprenticeHoursPage() {
           </div>
           <Link
             href="/apprentice/hours/log"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
           >
             <Plus className="w-4 h-4" />
             Log Hours
@@ -80,7 +80,7 @@ export default async function ApprenticeHoursPage() {
           </div>
           <div className="w-full bg-gray-200 rounded-full h-4 mb-2">
             <div 
-              className="bg-blue-600 h-4 rounded-full transition-all"
+              className="bg-brand-blue-600 h-4 rounded-full transition-all"
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -91,8 +91,8 @@ export default async function ApprenticeHoursPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Clock className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Clock className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{totalHours}</p>
@@ -124,8 +124,8 @@ export default async function ApprenticeHoursPage() {
           </div>
           <div className="bg-white rounded-xl p-6 border">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Target className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{requiredHours - approvedHours}</p>
@@ -170,7 +170,7 @@ export default async function ApprenticeHoursPage() {
               ))}
             </div>
             <div className="px-6 py-4 border-t bg-gray-50">
-              <Link href="/apprentice/hours/history" className="text-blue-600 hover:underline text-sm">
+              <Link href="/apprentice/hours/history" className="text-brand-blue-600 hover:underline text-sm">
                 View all entries →
               </Link>
             </div>
@@ -182,7 +182,7 @@ export default async function ApprenticeHoursPage() {
             <p className="text-gray-600 mb-6">Start tracking your apprenticeship hours.</p>
             <Link 
               href="/apprentice/hours/log"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Plus className="w-4 h-4" />
               Log Your First Hours

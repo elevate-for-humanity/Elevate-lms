@@ -226,7 +226,7 @@ export default async function ProgramHolderVerificationPage() {
                             <a
                               href={`/api/admin/documents/${doc.id}/view`}
                               target="_blank"
-                              className="p-2 text-blue-600 hover:bg-gray-50 rounded"
+                              className="p-2 text-brand-blue-600 hover:bg-gray-50 rounded"
                               rel="noreferrer"
                             >
                               <Eye className="w-4 h-4" />
@@ -284,7 +284,7 @@ export default async function ProgramHolderVerificationPage() {
                   <div className="flex gap-3">
                     <Link
                       href={`/admin/program-holders/verification/${holder.id}/review`}
-                      className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-center font-medium"
+                      className="flex-1 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 text-center font-medium"
                     >
                       Review & Verify
                     </Link>
@@ -338,7 +338,7 @@ export default async function ProgramHolderVerificationPage() {
                     </span>
                     <Link
                       href={`/admin/program-holders/${holder.id}`}
-                      className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                      className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
                     >
                       View
                     </Link>

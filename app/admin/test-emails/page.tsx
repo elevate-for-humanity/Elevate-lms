@@ -56,7 +56,7 @@ export default function TestEmailsPage() {
         <div className="mb-8">
           <Link
             href="/admin/dashboard"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Dashboard
           </Link>
@@ -134,7 +134,7 @@ export default function TestEmailsPage() {
             <button
               onClick={() => sendTestEmail('welcome')}
               disabled={loading}
-              className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-lg hover:border-blue-500 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex flex-col items-center gap-3 p-6 border-2 border-gray-200 rounded-lg hover:border-brand-blue-500 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Send className="w-8 h-8 text-brand-blue-600" />
               <div className="text-center">

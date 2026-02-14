@@ -16,7 +16,7 @@ export default function DemoApprenticeshipsPage() {
             <div className="flex items-center gap-2">
               <div className="flex-1 h-2 bg-gray-100 rounded-full">
                 <div
-                  className="h-full bg-blue-500 rounded-full"
+                  className="h-full bg-brand-blue-500 rounded-full"
                   style={{ width: `${Math.round((s.hours_completed / s.hours_required) * 100)}%` }}
                 />
               </div>

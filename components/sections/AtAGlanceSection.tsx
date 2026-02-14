@@ -31,7 +31,7 @@ export function AtAGlanceSection({
             const Icon = item.icon;
             return (
               <div key={index} className="flex items-start gap-4">
-                <Icon className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                <Icon className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
                 <div>
                   <h3 className="font-bold text-black mb-1">{item.label}</h3>
                   <p className="text-black">{item.value}</p>

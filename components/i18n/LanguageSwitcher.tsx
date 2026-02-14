@@ -51,7 +51,7 @@ export function LanguageSwitcher() {
               key={loc}
               onClick={() => handleLocaleChange(loc)}
               className={`w-full flex items-center justify-between px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                loc === locale ? 'text-blue-600 bg-blue-50' : 'text-gray-700'
+                loc === locale ? 'text-brand-blue-600 bg-brand-blue-50' : 'text-gray-700'
               }`}
               role="option"
               aria-selected={loc === locale}

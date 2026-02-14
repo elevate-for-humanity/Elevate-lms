@@ -101,7 +101,7 @@ export const SelectTrigger = React.forwardRef<
       onClick={() => setOpen(!open)}
       aria-haspopup="listbox"
       aria-expanded={open}
-      className={`flex items-center justify-between w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${className}`}
+      className={`flex items-center justify-between w-full px-3 py-2 text-sm bg-white border border-slate-300 rounded-md hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 ${className}`}
     >
       {children}
       <ChevronDown
@@ -172,7 +172,7 @@ export const SelectItem: React.FC<SelectItemProps> = ({
         disabled
           ? 'text-slate-400 cursor-not-allowed'
           : 'text-black hover:bg-slate-100 cursor-pointer'
-      } ${isSelected ? 'bg-blue-50 text-brand-orange-600 font-medium' : ''}`}
+      } ${isSelected ? 'bg-brand-blue-50 text-brand-orange-600 font-medium' : ''}`}
     >
       {children}
     </button>

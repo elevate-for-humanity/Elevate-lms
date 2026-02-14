@@ -15,11 +15,11 @@ export function StatStrip({ stats, background = "slate" }: StatStripProps) {
 
   const getColorClass = (color?: string) => {
     switch (color) {
-      case "blue": return "text-blue-600";
+      case "blue": return "text-brand-blue-600";
       case "green": return "text-green-600";
       case "orange": return "text-orange-600";
       case "purple": return "text-purple-600";
-      default: return background === "dark" ? "text-orange-400" : "text-blue-600";
+      default: return background === "dark" ? "text-orange-400" : "text-brand-blue-600";
     }
   };
 

@@ -155,8 +155,8 @@ export default async function AnalyticsPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.totalCourses}</div>
@@ -179,8 +179,8 @@ export default async function AnalyticsPage() {
 
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Target className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.avgQuizScore}%</div>
@@ -208,14 +208,14 @@ export default async function AnalyticsPage() {
             {/* Weekly Activity */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h2 className="text-lg font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <Activity className="w-5 h-5 text-blue-600" />
+                <Activity className="w-5 h-5 text-brand-blue-600" />
                 Weekly Activity
               </h2>
               <div className="flex items-end justify-between h-32 gap-2">
                 {weeklyActivity.map((count, index) => (
                   <div key={index} className="flex-1 flex flex-col items-center gap-2">
                     <div
-                      className="w-full bg-blue-500 rounded-t-lg transition-all"
+                      className="w-full bg-brand-blue-500 rounded-t-lg transition-all"
                       style={{
                         height: `${(count / maxActivity) * 100}%`,
                         minHeight: count > 0 ? '8px' : '4px',
@@ -250,7 +250,7 @@ export default async function AnalyticsPage() {
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
                           course.status === 'completed'
                             ? 'bg-green-100 text-green-700'
-                            : 'bg-blue-100 text-blue-700'
+                            : 'bg-brand-blue-100 text-brand-blue-700'
                         }`}>
                           {course.status === 'completed' ? 'Completed' : 'In Progress'}
                         </span>
@@ -260,7 +260,7 @@ export default async function AnalyticsPage() {
                           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
                             <div
                               className={`h-full rounded-full ${
-                                course.progress === 100 ? 'bg-green-500' : 'bg-blue-500'
+                                course.progress === 100 ? 'bg-green-500' : 'bg-brand-blue-500'
                               }`}
                               style={{ width: `${course.progress}%` }}
                             />
@@ -289,7 +289,7 @@ export default async function AnalyticsPage() {
             {/* Performance Summary */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <BarChart3 className="w-5 h-5 text-blue-600" />
+                <BarChart3 className="w-5 h-5 text-brand-blue-600" />
                 Performance
               </h3>
               <div className="space-y-4">
@@ -313,7 +313,7 @@ export default async function AnalyticsPage() {
             </div>
 
             {/* Completion Stats */}
-            <div className="bg-blue-600 rounded-2xl p-6 text-white">
+            <div className="bg-brand-blue-600 rounded-2xl p-6 text-white">
               <h3 className="font-bold mb-4 flex items-center gap-2">
                 <Award className="w-5 h-5" />
                 Completion Stats
@@ -321,7 +321,7 @@ export default async function AnalyticsPage() {
               <div className="space-y-4">
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-blue-100">Courses</span>
+                    <span className="text-brand-blue-100">Courses</span>
                     <span className="font-bold">{stats.completedCourses}/{stats.totalCourses}</span>
                   </div>
                   <div className="h-2 bg-white/20 rounded-full overflow-hidden">
@@ -335,7 +335,7 @@ export default async function AnalyticsPage() {
                 </div>
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-blue-100">Lessons</span>
+                    <span className="text-brand-blue-100">Lessons</span>
                     <span className="font-bold">{stats.completedLessons}/{stats.totalLessons}</span>
                   </div>
                   <div className="h-2 bg-white/20 rounded-full overflow-hidden">
@@ -358,7 +358,7 @@ export default async function AnalyticsPage() {
                   href="/lms/progress"
                   className="flex items-center gap-2 p-3 bg-slate-50 rounded-lg hover:bg-slate-100 transition"
                 >
-                  <TrendingUp className="w-4 h-4 text-blue-600" />
+                  <TrendingUp className="w-4 h-4 text-brand-blue-600" />
                   <span className="text-slate-700">View Progress</span>
                 </Link>
                 <Link

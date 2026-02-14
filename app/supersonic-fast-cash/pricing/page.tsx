@@ -65,7 +65,7 @@ export default function PricingPage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Pricing" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-blue-50 py-16">
+      <section className="bg-brand-blue-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-semibold text-gray-900 mb-4">
             Simple, Transparent Pricing
@@ -88,13 +88,13 @@ export default function PricingPage() {
                 key={plan.name}
                 className={`relative bg-white border rounded-xl p-6 shadow-sm ${
                   plan.popular
-                    ? 'border-blue-600 ring-2 ring-blue-600'
+                    ? 'border-brand-blue-600 ring-2 ring-brand-blue-600'
                     : 'border-gray-200'
                 }`}
               >
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-blue-600 text-white text-sm font-medium px-3 py-1 rounded-full">
+                    <span className="bg-brand-blue-600 text-white text-sm font-medium px-3 py-1 rounded-full">
                       Most Popular
                     </span>
                   </div>
@@ -197,7 +197,7 @@ export default function PricingPage() {
 
             <div className="bg-white rounded-xl p-6 border border-gray-200">
               <div className="text-center mb-4">
-                <span className="inline-block bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium mb-3">
+                <span className="inline-block bg-brand-blue-100 text-brand-blue-800 px-3 py-1 rounded-full text-sm font-medium mb-3">
                   Larger Advance
                 </span>
                 <h3 className="text-xl font-semibold text-gray-900">$1,250 – $7,500</h3>
@@ -205,11 +205,11 @@ export default function PricingPage() {
               </div>
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-blue-600" />
+                  <CheckCircle className="w-4 h-4 text-brand-blue-600" />
                   Terms disclosed before funding
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-blue-600" />
+                  <CheckCircle className="w-4 h-4 text-brand-blue-600" />
                   Deducted from refund
                 </li>
               </ul>
@@ -230,7 +230,7 @@ export default function PricingPage() {
           <div className="text-center mt-8">
             <Link
               href="/supersonic-fast-cash/cash-advance"
-              className="inline-flex items-center text-blue-600 font-medium hover:text-blue-700"
+              className="inline-flex items-center text-brand-blue-600 font-medium hover:text-brand-blue-700"
             >
               Learn more about refund advances
               <ArrowRight className="ml-1 w-4 h-4" />
@@ -249,7 +249,7 @@ export default function PricingPage() {
           <div className="space-y-6">
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
               <div className="flex items-start gap-3">
-                <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">When do I pay?</h3>
                   <p className="text-gray-600 text-sm">
@@ -263,7 +263,7 @@ export default function PricingPage() {
 
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
               <div className="flex items-start gap-3">
-                <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">What if I'm not sure which plan I need?</h3>
                   <p className="text-gray-600 text-sm">
@@ -276,7 +276,7 @@ export default function PricingPage() {
 
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
               <div className="flex items-start gap-3">
-                <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">Are there any hidden fees?</h3>
                   <p className="text-gray-600 text-sm">
@@ -303,7 +303,7 @@ export default function PricingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
             >
               <Phone className="w-5 h-5" />
               Get Help Online
@@ -319,12 +319,12 @@ export default function PricingPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 bg-blue-900">
+      <section className="py-16 bg-brand-blue-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-semibold text-white mb-4">
             Ready to file?
           </h2>
-          <p className="text-blue-200 mb-8">
+          <p className="text-brand-blue-200 mb-8">
             Start your return for free. Pay only when you file.
           </p>
           <Link

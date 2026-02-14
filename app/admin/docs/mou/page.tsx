@@ -31,7 +31,7 @@ export default async function MOUDocsPage() {
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/admin" className="hover:text-primary">Admin</Link></li><li>/</li><li><Link href="/admin/docs" className="hover:text-primary">Docs</Link></li><li>/</li><li className="text-gray-900 font-medium">MOU</li></ol></nav>
           <div className="flex justify-between items-center">
             <div><h1 className="text-3xl font-bold text-gray-900">MOU Documentation</h1><p className="text-gray-600 mt-2">Templates and agreements</p></div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Upload Template</button>
+            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Upload Template</button>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
@@ -39,10 +39,10 @@ export default async function MOUDocsPage() {
             {templates.map((t, i) => (
               <div key={i} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded flex items-center justify-center"><svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded flex items-center justify-center"><svg className="w-5 h-5 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg></div>
                   <div><p className="font-medium">{t.name}</p><p className="text-sm text-gray-500">{t.type} • Updated {t.lastUpdated}</p></div>
                 </div>
-                <button className="text-blue-600 hover:text-blue-800 text-sm">Download</button>
+                <button className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">Download</button>
               </div>
             ))}
           </div>

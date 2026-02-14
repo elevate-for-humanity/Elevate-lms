@@ -52,7 +52,7 @@ export default function AccessPausedPage() {
           <div className="space-y-3">
             <Link
               href="/contact?topic=support"
-              className="w-full inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="w-full inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
             >
               <Mail className="w-5 h-5" />
               Contact Support
@@ -71,7 +71,7 @@ export default function AccessPausedPage() {
         {/* Footer */}
         <p className="text-center text-sm text-slate-400 mt-6">
           If you believe this is an error, please{' '}
-          <Link href="/support/contact" className="text-blue-600 hover:underline">
+          <Link href="/support/contact" className="text-brand-blue-600 hover:underline">
             contact support
           </Link>
           .

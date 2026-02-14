@@ -75,14 +75,14 @@ export default function TestimonialsSection() {
         
         <div className="relative">
           <div className="bg-slate-50 rounded-3xl p-8 md:p-12">
-            <svg className="w-12 h-12 text-blue-600/20 mb-6" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-12 h-12 text-brand-blue-600/20 mb-6" fill="currentColor" viewBox="0 0 24 24">
               <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
             </svg>
             <p className="text-2xl md:text-3xl font-medium text-slate-800 mb-8 leading-relaxed">
               {current.quote}
             </p>
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
+              <div className="w-14 h-14 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-xl">
                 {current.name[0]}
               </div>
               <div>
@@ -99,7 +99,7 @@ export default function TestimonialsSection() {
                   key={i}
                   onClick={() => setCurrentIndex(i)}
                   className={`w-3 h-3 rounded-full transition-all ${
-                    currentIndex === i ? 'bg-blue-600 w-8' : 'bg-slate-300 hover:bg-slate-400'
+                    currentIndex === i ? 'bg-brand-blue-600 w-8' : 'bg-slate-300 hover:bg-slate-400'
                   }`}
                 />
               ))}

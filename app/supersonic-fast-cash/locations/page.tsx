@@ -60,7 +60,7 @@ export default async function LocationsPage() {
 
               <div className="space-y-6 mb-8">
                 <div className="flex items-start gap-4">
-                  <MapPin className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                  <MapPin className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
                   <div>
                     <div className="font-semibold text-black mb-1">
                       Address
@@ -74,14 +74,14 @@ export default async function LocationsPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <Phone className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                  <Phone className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
                   <div>
                     <div className="font-semibold text-black mb-1">
                       Phone
                     </div>
                     <a
                       href="/support"
-                      className="text-blue-600 hover:text-blue-700"
+                      className="text-brand-blue-600 hover:text-brand-blue-700"
                     >
                       Get Help Online
                     </a>
@@ -89,14 +89,14 @@ export default async function LocationsPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <Mail className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                  <Mail className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
                   <div>
                     <div className="font-semibold text-black mb-1">
                       Email
                     </div>
                     <a
                       href="mailto:supersonicfastcashllc@gmail.com"
-                      className="text-blue-600 hover:text-blue-700"
+                      className="text-brand-blue-600 hover:text-brand-blue-700"
                     >
                       supersonicfastcashllc@gmail.com
                     </a>
@@ -104,7 +104,7 @@ export default async function LocationsPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <Clock className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                  <Clock className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
                   <div>
                     <div className="font-semibold text-black mb-2">
                       Hours
@@ -127,7 +127,7 @@ export default async function LocationsPage() {
                 </div>
 
                 <div className="flex items-start gap-4">
-                  <Car className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                  <Car className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
                   <div>
                     <div className="font-semibold text-black mb-1">
                       Parking
@@ -142,7 +142,7 @@ export default async function LocationsPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/supersonic-fast-cash/book-appointment"
-                  className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
                 >
                   Book In-Person Visit
                 </Link>
@@ -177,7 +177,7 @@ export default async function LocationsPage() {
       <section className="py-20 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <Video className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+            <Video className="w-16 h-16 text-brand-blue-600 mx-auto mb-4" />
             <h2 className="text-3xl font-bold text-black mb-4">
               Virtual Appointments Available
             </h2>
@@ -189,8 +189,8 @@ export default async function LocationsPage() {
 
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Video className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Video className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="font-bold text-black mb-2">
                 Video Consultation
@@ -213,8 +213,8 @@ export default async function LocationsPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="font-bold text-black mb-2">Document Upload</h3>
               <p className="text-sm text-black">
@@ -226,7 +226,7 @@ export default async function LocationsPage() {
           <div className="text-center mt-12">
             <Link
               href="/supersonic-fast-cash/book-appointment"
-              className="inline-block px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-block px-8 py-4 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Schedule Virtual Appointment
             </Link>
@@ -309,22 +309,22 @@ export default async function LocationsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-blue-900 text-white">
+      <section className="py-20 bg-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-4xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Visit us in Indianapolis or schedule a virtual appointment today
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/supersonic-fast-cash/book-appointment"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-900 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-900 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
             >
               Book Appointment
             </Link>
             <Link
               href="/support"
-              className="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-semibold rounded-lg hover:bg-blue-800 transition-colors border-2 border-white"
+              className="inline-flex items-center justify-center px-8 py-4 bg-transparent text-white font-semibold rounded-lg hover:bg-brand-blue-800 transition-colors border-2 border-white"
             >
               Call Get Help Online
             </Link>

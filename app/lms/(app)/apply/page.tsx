@@ -143,7 +143,7 @@ export default function StudentApplicationPage() {
             ) : existingApplication.status === 'rejected' ? (
               <AlertCircle className="w-16 h-16 text-red-500" />
             ) : (
-              <FileText className="w-16 h-16 text-blue-500" />
+              <FileText className="w-16 h-16 text-brand-blue-500" />
             )}
           </div>
           <h1 className="text-2xl font-bold mb-2">Application Already Submitted</h1>

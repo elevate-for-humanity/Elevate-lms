@@ -79,7 +79,7 @@ export default function GenerateReportPage() {
               Your {REPORT_TYPES.find(t => t.value === formData.reportType)?.label} is ready for download.
             </p>
             <div className="flex items-center justify-center gap-4">
-              <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <button className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
                 <Download className="w-4 h-4" />
                 Download Report
               </button>
@@ -105,7 +105,7 @@ export default function GenerateReportPage() {
                     key={type.value}
                     className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
                       formData.reportType === type.value
-                        ? 'border-blue-500 bg-blue-50'
+                        ? 'border-brand-blue-500 bg-brand-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -138,7 +138,7 @@ export default function GenerateReportPage() {
                     id="startDate"
                     value={formData.startDate}
                     onChange={(e) => setFormData({ ...formData, startDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
                 <div>
@@ -150,7 +150,7 @@ export default function GenerateReportPage() {
                     id="endDate"
                     value={formData.endDate}
                     onChange={(e) => setFormData({ ...formData, endDate: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>
@@ -168,7 +168,7 @@ export default function GenerateReportPage() {
                     id="format"
                     value={formData.format}
                     onChange={(e) => setFormData({ ...formData, format: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   >
                     {FORMATS.map((format) => (
                       <option key={format.value} value={format.value}>{format.label}</option>
@@ -195,7 +195,7 @@ export default function GenerateReportPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50"
               >
                 {loading ? (
                   <>

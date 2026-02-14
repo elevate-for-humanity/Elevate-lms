@@ -35,17 +35,17 @@ export function LicenseBanner({ license, onDismiss }: LicenseBannerProps) {
       : 0;
 
     return (
-      <div className="bg-blue-50 border-b border-blue-200">
+      <div className="bg-brand-blue-50 border-b border-brand-blue-200">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <div className="flex items-center justify-between gap-4">
             <div className="flex items-center gap-3">
-              <Clock className="w-5 h-5 text-blue-600" />
+              <Clock className="w-5 h-5 text-brand-blue-600" />
               <div>
-                <span className="font-semibold text-blue-900">Trial Mode</span>
-                <span className="text-blue-700 ml-2">
+                <span className="font-semibold text-brand-blue-900">Trial Mode</span>
+                <span className="text-brand-blue-700 ml-2">
                   You are evaluating the Elevate Workforce Platform.
                 </span>
-                <span className="text-blue-900 font-medium ml-2">
+                <span className="text-brand-blue-900 font-medium ml-2">
                   {daysRemaining} day{daysRemaining !== 1 ? 's' : ''} remaining.
                 </span>
               </div>
@@ -53,14 +53,14 @@ export function LicenseBanner({ license, onDismiss }: LicenseBannerProps) {
             <div className="flex items-center gap-3">
               <Link
                 href="/account/billing"
-                className="bg-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-blue-700 transition-colors"
+                className="bg-brand-blue-600 text-white px-4 py-1.5 rounded-lg text-sm font-semibold hover:bg-brand-blue-700 transition-colors"
               >
                 Manage Billing
               </Link>
               {onDismiss && (
                 <button
                   onClick={onDismiss}
-                  className="text-blue-400 hover:text-blue-600"
+                  className="text-brand-blue-400 hover:text-brand-blue-600"
                   aria-label="Dismiss"
                 >
                   <X className="w-5 h-5" />
@@ -68,7 +68,7 @@ export function LicenseBanner({ license, onDismiss }: LicenseBannerProps) {
               )}
             </div>
           </div>
-          <p className="text-xs text-blue-600 mt-1 ml-8">
+          <p className="text-xs text-brand-blue-600 mt-1 ml-8">
             Your card will be charged automatically when the trial ends.
           </p>
         </div>
@@ -145,7 +145,7 @@ export function LicenseBadge({ status, trialEndsAt }: { status: LicenseStatus; t
   if (status === 'trial' && trialEndsAt) {
     const daysRemaining = Math.ceil((trialEndsAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 text-xs font-medium rounded-full">
+      <span className="inline-flex items-center gap-1 px-2 py-1 bg-brand-blue-100 text-brand-blue-700 text-xs font-medium rounded-full">
         <Clock className="w-3 h-3" />
         Trial: {daysRemaining}d
       </span>

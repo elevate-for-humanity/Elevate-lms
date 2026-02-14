@@ -33,7 +33,7 @@ function LandingPage() {
           <Building2 className="w-10 h-10 text-white" />
         </div>
         <h1 className="text-3xl font-black text-white mb-3">Partner Shop</h1>
-        <p className="text-blue-200 text-lg max-w-xs mx-auto">
+        <p className="text-brand-blue-200 text-lg max-w-xs mx-auto">
           Manage apprentices, log hours, and track training progress at your barbershop.
         </p>
       </div>
@@ -51,8 +51,8 @@ function LandingPage() {
         </div>
 
         <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
-          <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-            <Users className="w-5 h-5 text-blue-400" />
+          <div className="w-10 h-10 bg-brand-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+            <Users className="w-5 h-5 text-brand-blue-400" />
           </div>
           <div>
             <h3 className="text-white font-semibold">Manage Your Team</h3>
@@ -61,8 +61,8 @@ function LandingPage() {
         </div>
 
         <div className="flex items-start gap-4 bg-slate-800 rounded-xl p-4">
-          <div className="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
-            <FileText className="w-5 h-5 text-blue-400" />
+          <div className="w-10 h-10 bg-brand-blue-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
+            <FileText className="w-5 h-5 text-brand-blue-400" />
           </div>
           <div>
             <h3 className="text-white font-semibold">Compliance Reports</h3>
@@ -75,7 +75,7 @@ function LandingPage() {
       <div className="px-6 pb-8 space-y-3">
         <Link
           href="/login?redirect=/pwa/shop-owner/dashboard"
-          className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700"
+          className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700"
         >
           <LogIn className="w-5 h-5" />
           Sign In
@@ -95,7 +95,7 @@ function LandingPage() {
         <p className="text-slate-500 text-sm">
           Host apprentices through the USDOL Registered Apprenticeship
         </p>
-        <Link href="/" className="text-blue-400 text-sm hover:underline">
+        <Link href="/" className="text-brand-blue-400 text-sm hover:underline">
           elevateforhumanity.org
         </Link>
       </div>
@@ -125,7 +125,7 @@ function Dashboard({
               <Building2 className="w-6 h-6 text-white" />
             </div>
             <div>
-              <p className="text-blue-200 text-sm">Partner Shop</p>
+              <p className="text-brand-blue-200 text-sm">Partner Shop</p>
               <h1 className="text-white font-bold text-lg">{shop.name}</h1>
             </div>
           </div>
@@ -148,15 +148,15 @@ function Dashboard({
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
-              <Users className="w-4 h-4 text-blue-200" />
-              <span className="text-blue-200 text-xs">Active Apprentices</span>
+              <Users className="w-4 h-4 text-brand-blue-200" />
+              <span className="text-brand-blue-200 text-xs">Active Apprentices</span>
             </div>
             <p className="text-3xl font-bold text-white">{apprentices.length}</p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
-              <Clock className="w-4 h-4 text-blue-200" />
-              <span className="text-blue-200 text-xs">Hours This Week</span>
+              <Clock className="w-4 h-4 text-brand-blue-200" />
+              <span className="text-brand-blue-200 text-xs">Hours This Week</span>
             </div>
             <p className="text-3xl font-bold text-white">{totalHoursThisWeek}</p>
           </div>
@@ -196,15 +196,15 @@ function Dashboard({
             <ChevronRight className="w-5 h-5 text-amber-400" />
           </Link>
 
-          <Link href="/pwa/shop-owner/checkin" className="flex items-center gap-4 bg-blue-500/20 border border-blue-500/30 rounded-xl p-4 active:opacity-80">
-            <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+          <Link href="/pwa/shop-owner/checkin" className="flex items-center gap-4 bg-brand-blue-500/20 border border-brand-blue-500/30 rounded-xl p-4 active:opacity-80">
+            <div className="w-12 h-12 bg-brand-blue-500 rounded-xl flex items-center justify-center">
               <QrCode className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Check-In QR Code</p>
-              <p className="text-blue-300 text-sm">Display for apprentices</p>
+              <p className="text-brand-blue-300 text-sm">Display for apprentices</p>
             </div>
-            <ChevronRight className="w-5 h-5 text-blue-400" />
+            <ChevronRight className="w-5 h-5 text-brand-blue-400" />
           </Link>
 
           <Link href="/pwa/shop-owner/log-hours" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
@@ -219,8 +219,8 @@ function Dashboard({
           </Link>
 
           <Link href="/pwa/shop-owner/apprentices" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <Users className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center">
+              <Users className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">My Apprentices</p>
@@ -230,8 +230,8 @@ function Dashboard({
           </Link>
 
           <Link href="/pwa/shop-owner/reports" className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <FileText className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center">
+              <FileText className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Reports</p>
@@ -257,7 +257,7 @@ function Dashboard({
           <div>
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-white font-bold text-lg">Apprentices</h2>
-              <Link href="/pwa/shop-owner/apprentices" className="text-blue-400 text-sm">View All</Link>
+              <Link href="/pwa/shop-owner/apprentices" className="text-brand-blue-400 text-sm">View All</Link>
             </div>
             
             <div className="space-y-3">
@@ -267,8 +267,8 @@ function Dashboard({
                   href={`/pwa/shop-owner/apprentices/${apprentice.id}`}
                   className="flex items-center gap-4 bg-slate-800 rounded-xl p-4 active:bg-slate-700"
                 >
-                  <div className="w-12 h-12 bg-blue-500/20 rounded-full flex items-center justify-center">
-                    <span className="text-blue-400 font-bold text-lg">
+                  <div className="w-12 h-12 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                    <span className="text-brand-blue-400 font-bold text-lg">
                       {apprentice.name.charAt(0)}
                     </span>
                   </div>
@@ -296,7 +296,7 @@ function Dashboard({
       {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-6 py-3 safe-area-inset-bottom">
         <div className="flex justify-around">
-          <Link href="/pwa/shop-owner" className="flex flex-col items-center gap-1 text-blue-400">
+          <Link href="/pwa/shop-owner" className="flex flex-col items-center gap-1 text-brand-blue-400">
             <Building2 className="w-6 h-6" />
             <span className="text-xs">Home</span>
           </Link>
@@ -372,7 +372,7 @@ export default function ShopOwnerPWAHome() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
+          <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-white">Loading...</p>
         </div>
       </div>
@@ -396,7 +396,7 @@ export default function ShopOwnerPWAHome() {
           </p>
           <Link
             href="/partner/onboarding"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-medium"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-medium"
           >
             Become a Partner
             <ChevronRight className="w-5 h-5" />

@@ -57,7 +57,7 @@ export default async function LocationsPage() {
           <MapPin className="w-16 h-16 text-gray-300 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Locations</h1>
           <p className="text-gray-600 mb-6">Location information is being updated.</p>
-          <Link href="/contact" className="text-blue-600 hover:underline">
+          <Link href="/contact" className="text-brand-blue-600 hover:underline">
             Contact us for location details
           </Link>
         </div>
@@ -78,7 +78,7 @@ export default async function LocationsPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-blue-600 py-20">
+      <section className="bg-brand-blue-600 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <MapPin className="h-20 w-20 text-white mx-auto mb-6" />
@@ -104,7 +104,7 @@ export default async function LocationsPage() {
                   
                   <div className="space-y-4">
                     <div className="flex items-start gap-3">
-                      <MapPin className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
+                      <MapPin className="w-5 h-5 text-brand-blue-600 mt-1 flex-shrink-0" />
                       <div>
                         <p className="text-gray-900">{mainOffice.address_line1}</p>
                         {mainOffice.address_line2 && (
@@ -118,8 +118,8 @@ export default async function LocationsPage() {
 
                     {mainOffice.phone && (
                       <div className="flex items-center gap-3">
-                        <Phone className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                        <a href={`tel:${mainOffice.phone.replace(/\D/g, '')}`} className="text-blue-600 hover:underline">
+                        <Phone className="w-5 h-5 text-brand-blue-600 flex-shrink-0" />
+                        <a href={`tel:${mainOffice.phone.replace(/\D/g, '')}`} className="text-brand-blue-600 hover:underline">
                           {mainOffice.phone}
                         </a>
                       </div>
@@ -127,8 +127,8 @@ export default async function LocationsPage() {
 
                     {mainOffice.email && (
                       <div className="flex items-center gap-3">
-                        <Mail className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                        <a href={`mailto:${mainOffice.email}`} className="text-blue-600 hover:underline">
+                        <Mail className="w-5 h-5 text-brand-blue-600 flex-shrink-0" />
+                        <a href={`mailto:${mainOffice.email}`} className="text-brand-blue-600 hover:underline">
                           {mainOffice.email}
                         </a>
                       </div>
@@ -142,7 +142,7 @@ export default async function LocationsPage() {
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
                     >
                       <Navigation className="w-5 h-5" />
                       Get Directions
@@ -152,7 +152,7 @@ export default async function LocationsPage() {
 
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                    <Clock className="w-5 h-5 text-blue-600" />
+                    <Clock className="w-5 h-5 text-brand-blue-600" />
                     Hours of Operation
                   </h4>
                   <div className="space-y-2 text-gray-600">
@@ -187,7 +187,7 @@ export default async function LocationsPage() {
                     {location.phone && (
                       <div className="flex items-center gap-2">
                         <Phone className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                        <a href={`tel:${location.phone.replace(/\D/g, '')}`} className="text-blue-600 hover:underline">
+                        <a href={`tel:${location.phone.replace(/\D/g, '')}`} className="text-brand-blue-600 hover:underline">
                           {location.phone}
                         </a>
                       </div>
@@ -196,7 +196,7 @@ export default async function LocationsPage() {
                     {location.email && (
                       <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-gray-400 flex-shrink-0" />
-                        <a href={`mailto:${location.email}`} className="text-blue-600 hover:underline">
+                        <a href={`mailto:${location.email}`} className="text-brand-blue-600 hover:underline">
                           {location.email}
                         </a>
                       </div>
@@ -210,7 +210,7 @@ export default async function LocationsPage() {
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 text-sm font-medium hover:underline"
+                      className="text-brand-blue-600 text-sm font-medium hover:underline"
                     >
                       Get Directions →
                     </a>
@@ -246,21 +246,21 @@ export default async function LocationsPage() {
         </section>
 
         {/* CTA */}
-        <section className="bg-blue-600 rounded-2xl p-8 text-white text-center">
+        <section className="bg-brand-blue-600 rounded-2xl p-8 text-white text-center">
           <h2 className="text-2xl font-bold mb-4">Ready to Visit?</h2>
-          <p className="text-blue-100 mb-6 max-w-xl mx-auto">
+          <p className="text-brand-blue-100 mb-6 max-w-xl mx-auto">
             Schedule a campus tour or meet with an enrollment advisor to learn about our programs.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/contact"
-              className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition"
+              className="px-6 py-3 bg-white text-brand-blue-600 font-semibold rounded-lg hover:bg-gray-100 transition"
             >
               Schedule a Visit
             </Link>
             <Link
               href="/apply"
-              className="px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg hover:bg-blue-400 transition"
+              className="px-6 py-3 bg-brand-blue-500 text-white font-semibold rounded-lg hover:bg-brand-blue-400 transition"
             >
               Apply Now
             </Link>

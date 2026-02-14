@@ -48,7 +48,7 @@ interface ProgressData {
   };
 }
 
-function ProgressBar({ current, target, color = 'bg-blue-500' }: { 
+function ProgressBar({ current, target, color = 'bg-brand-blue-500' }: { 
   current: number; 
   target: number; 
   color?: string;
@@ -117,7 +117,7 @@ export default function ShopOwnerProgressPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
+          <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-white">Loading progress...</p>
         </div>
       </div>
@@ -133,7 +133,7 @@ export default function ShopOwnerProgressPage() {
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/shop-owner/progress"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
+            className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
           >
             Sign In
           </Link>
@@ -151,15 +151,15 @@ export default function ShopOwnerProgressPage() {
     <div className="min-h-screen bg-slate-900 pb-20">
       <header className="bg-slate-700 px-4 pt-12 pb-6 safe-area-inset-top">
         <h1 className="text-2xl font-bold text-white mb-2">Shop Progress</h1>
-        <p className="text-blue-200">Track your team's advancement</p>
+        <p className="text-brand-blue-200">Track your team's advancement</p>
 
         <div className="grid grid-cols-2 gap-3 mt-4">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
-            <p className="text-blue-200 text-xs">Total Shop Hours</p>
+            <p className="text-brand-blue-200 text-xs">Total Shop Hours</p>
             <p className="text-2xl font-bold text-white">{summary.totalShopHours.toLocaleString()}</p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-3">
-            <p className="text-blue-200 text-xs">Avg Progress</p>
+            <p className="text-brand-blue-200 text-xs">Avg Progress</p>
             <p className="text-2xl font-bold text-white">{summary.avgProgress}%</p>
           </div>
         </div>
@@ -170,7 +170,7 @@ export default function ShopOwnerProgressPage() {
         <div className="bg-slate-800 rounded-xl p-4">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-white font-bold">Weekly Hours</h2>
-            <span className="text-blue-400 text-sm">{summary.totalWeeklyHours} hrs total</span>
+            <span className="text-brand-blue-400 text-sm">{summary.totalWeeklyHours} hrs total</span>
           </div>
           
           {weeklyData.length > 0 ? (
@@ -178,7 +178,7 @@ export default function ShopOwnerProgressPage() {
               {weeklyData.map((week, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-2">
                   <div 
-                    className="w-full bg-blue-500 rounded-t-lg transition-all duration-300"
+                    className="w-full bg-brand-blue-500 rounded-t-lg transition-all duration-300"
                     style={{ height: `${(week.hours / maxWeeklyHours) * 100}%`, minHeight: '4px' }}
                   />
                   <span className="text-slate-500 text-xs">{week.week.replace('Week ', 'W')}</span>
@@ -252,8 +252,8 @@ export default function ShopOwnerProgressPage() {
                   >
                     <div className="flex items-center justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
-                          <span className="text-blue-400 font-bold">
+                        <div className="w-10 h-10 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                          <span className="text-brand-blue-400 font-bold">
                             {apprentice.name.charAt(0)}
                           </span>
                         </div>
@@ -319,7 +319,7 @@ export default function ShopOwnerProgressPage() {
           
           <div className="bg-slate-800 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Calendar className="w-5 h-5 text-blue-400" />
+              <Calendar className="w-5 h-5 text-brand-blue-400" />
               <span className="text-slate-400 text-sm">This Month</span>
             </div>
             <p className="text-white font-bold">{summary.totalWeeklyHours} hrs</p>

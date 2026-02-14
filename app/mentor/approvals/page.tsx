@@ -315,10 +315,10 @@ export default async function MentorApprovalsPage({
                     <div
                       className={`font-semibold inline-block px-2 py-0.5 rounded text-xs ${
                         e.funding_phase === 'WIOA'
-                          ? 'bg-blue-100 text-blue-800'
+                          ? 'bg-brand-blue-100 text-brand-blue-800'
                           : e.funding_phase === 'PRE_WIOA'
                             ? 'bg-slate-100 text-black'
-                            : 'bg-blue-100 text-blue-800'
+                            : 'bg-brand-blue-100 text-brand-blue-800'
                       }`}
                     >
                       {e.funding_phase}

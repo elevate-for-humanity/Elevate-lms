@@ -79,7 +79,7 @@ export function SignMOUForm() {
                 HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
               >
             ) => setSignerName(e.target.value)}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             placeholder="Your full legal name"
           />
         </div>
@@ -101,7 +101,7 @@ export function SignMOUForm() {
                 HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
               >
             ) => setSignerTitle(e.target.value)}
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             placeholder="Owner, Manager, Director, etc."
           />
         </div>
@@ -129,7 +129,7 @@ export function SignMOUForm() {
               HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
             >
           ) => setAgreed(e.target.checked)}
-          className="mt-1 h-4 w-4 text-brand-blue-600 focus:ring-blue-500 border-slate-300 rounded"
+          className="mt-1 h-4 w-4 text-brand-blue-600 focus:ring-brand-blue-500 border-slate-300 rounded"
         />
         <label htmlFor="agreed" className="text-sm text-black">
           I have read and agree to the terms of this Memorandum of

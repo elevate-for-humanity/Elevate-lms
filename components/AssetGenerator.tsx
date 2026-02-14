@@ -186,7 +186,7 @@ export default function AssetGenerator() {
                     onClick={() => setAssetType(type.id)}
                     className={`p-4 rounded-lg border-2 text-left transition-all ${
                       assetType === type.id
-                        ? 'border-blue-600 bg-blue-50'
+                        ? 'border-brand-blue-600 bg-brand-blue-50'
                         : 'border-brand-border hover:border-brand-border-dark'
                     }`}
                   >

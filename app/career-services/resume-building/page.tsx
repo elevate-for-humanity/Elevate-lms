@@ -268,7 +268,7 @@ export default function ResumeBuildingPage() {
       {/* ATS Tips */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-blue-50 rounded-xl p-8 border-2 border-blue-200">
+          <div className="bg-brand-blue-50 rounded-xl p-8 border-2 border-brand-blue-200">
             <h2 className="text-2xl font-bold text-gray-900 mb-4 text-center">
               Beat the ATS (Applicant Tracking System)
             </h2>
@@ -278,27 +278,27 @@ export default function ResumeBuildingPage() {
 
             <div className="grid md:grid-cols-2 gap-4">
               <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">Use standard section headings</span>
               </div>
               <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">Include keywords from the job posting</span>
               </div>
               <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">Use a simple, clean format</span>
               </div>
               <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">Avoid tables, graphics, and headers/footers</span>
               </div>
               <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">Save as .docx or .pdf (check job posting)</span>
               </div>
               <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">Spell out acronyms at least once</span>
               </div>
             </div>

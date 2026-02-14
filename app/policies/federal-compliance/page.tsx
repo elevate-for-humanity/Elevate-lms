@@ -29,15 +29,15 @@ export default function FederalCompliancePage() {
         />
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 w-full">
           <div className="max-w-3xl">
-            <span className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500 text-white text-sm font-semibold rounded-full mb-6">
+            <span className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-500 text-white text-sm font-semibold rounded-full mb-6">
               <Shield className="w-4 h-4" />
               Compliance
             </span>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Federal Compliance Policy</h1>
-            <p className="text-xl text-blue-100">
+            <p className="text-xl text-brand-blue-100">
               Elevate for Humanity maintains full compliance with all applicable federal laws governing educational institutions and workforce development programs.
             </p>
-            <p className="text-sm text-blue-200 mt-4">Effective Date: January 1, 2025 | Last Updated: January 2026</p>
+            <p className="text-sm text-brand-blue-200 mt-4">Effective Date: January 1, 2025 | Last Updated: January 2026</p>
           </div>
         </div>
       </section>
@@ -57,10 +57,10 @@ export default function FederalCompliancePage() {
         </section>
 
         {/* FERPA Section */}
-        <section className="mb-12 bg-blue-50 rounded-2xl p-8 border-2 border-blue-200">
+        <section className="mb-12 bg-brand-blue-50 rounded-2xl p-8 border-2 border-brand-blue-200">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
-              <FileText className="w-7 h-7 text-blue-600" />
+            <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+              <FileText className="w-7 h-7 text-brand-blue-600" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900">FERPA Compliance</h2>
@@ -94,16 +94,16 @@ export default function FederalCompliancePage() {
             </p>
           </div>
           
-          <Link href="/policies/ferpa" className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition">
+          <Link href="/policies/ferpa" className="inline-flex items-center gap-2 mt-6 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition">
             View Complete FERPA Policy <ArrowRight className="w-5 h-5" />
           </Link>
         </section>
 
         {/* Title IX Section */}
-        <section className="mb-12 bg-blue-50 rounded-2xl p-8 border-2 border-blue-200">
+        <section className="mb-12 bg-brand-blue-50 rounded-2xl p-8 border-2 border-brand-blue-200">
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
-              <Scale className="w-7 h-7 text-blue-600" />
+            <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+              <Scale className="w-7 h-7 text-brand-blue-600" />
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Title IX Compliance</h2>

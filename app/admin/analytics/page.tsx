@@ -102,9 +102,9 @@ export default async function AnalyticsPage() {
 
   const getColorClasses = (color: string) => {
     const colors: Record<string, string> = {
-      blue: 'bg-blue-100 text-blue-600',
+      blue: 'bg-brand-blue-100 text-brand-blue-600',
       green: 'bg-green-100 text-green-600',
-      blue: 'bg-blue-100 text-blue-600',
+      blue: 'bg-brand-blue-100 text-brand-blue-600',
     };
     return colors[color] || colors.blue;
   };

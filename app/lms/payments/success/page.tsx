@@ -36,16 +36,16 @@ function SuccessContent() {
             <h3 className="font-semibold mb-3">What happens next?</h3>
             <ul className="space-y-3 text-sm text-gray-600">
               <li className="flex items-start gap-3">
-                <Calendar className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <Calendar className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <span>You will receive an email with your class schedule within 24 hours</span>
               </li>
               <li className="flex items-start gap-3">
-                <BookOpen className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <BookOpen className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <span>Access your student portal to view course materials</span>
               </li>
               {type === 'down-payment' && (
                 <li className="flex items-start gap-3">
-                  <Calendar className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Calendar className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Weekly payments of $50 will be charged every Monday</span>
                 </li>
               )}
@@ -55,7 +55,7 @@ function SuccessContent() {
           <div className="space-y-3">
             <Link
               href="/lms"
-              className="block w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700"
+              className="block w-full bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700"
             >
               Go to Student Portal
             </Link>
@@ -82,7 +82,7 @@ export default function PaymentSuccessPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto"></div>
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>

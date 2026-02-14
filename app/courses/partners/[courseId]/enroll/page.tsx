@@ -188,7 +188,7 @@ export default function EnrollPage({
                   {course.category}
                 </span>
                 <h2 className="text-2xl font-bold mb-2">{course.title}</h2>
-                <p className="text-blue-100 text-sm">
+                <p className="text-brand-blue-100 text-sm">
                   Provided by {course.provider.name}
                 </p>
               </div>
@@ -199,7 +199,7 @@ export default function EnrollPage({
                     : `$${course.retail_price}`}
                 </div>
                 {course.retail_price === 0 && (
-                  <div className="text-xs text-blue-100 mt-1">
+                  <div className="text-xs text-brand-blue-100 mt-1">
                     Through WIOA funding
                   </div>
                 )}
@@ -241,7 +241,7 @@ export default function EnrollPage({
             </div>
 
             {/* What Happens Next */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-8">
               <h3 className="text-lg font-semibold text-black mb-4 flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-brand-blue-600" />
                 What Happens Next

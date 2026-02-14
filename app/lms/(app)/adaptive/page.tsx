@@ -41,13 +41,13 @@ export default async function AdaptivePage() {
             <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
               <div className="flex items-center justify-between">
                 <div><p className="font-medium">Complete Module 3 Quiz</p><p className="text-sm text-gray-500">Based on your progress</p></div>
-                <span className="text-blue-600">→</span>
+                <span className="text-brand-blue-600">→</span>
               </div>
             </div>
             <div className="p-4 border rounded-lg hover:bg-gray-50 cursor-pointer">
               <div className="flex items-center justify-between">
                 <div><p className="font-medium">Review: Data Analysis Basics</p><p className="text-sm text-gray-500">Strengthen your foundation</p></div>
-                <span className="text-blue-600">→</span>
+                <span className="text-brand-blue-600">→</span>
               </div>
             </div>
           </div>

@@ -131,7 +131,7 @@ export default function DigitalBinder({
       case 'concern':
         return 'bg-yellow-100 text-yellow-800';
       case 'progress':
-        return 'bg-blue-100 text-blue-800';
+        return 'bg-brand-blue-100 text-brand-blue-800';
       default:
         return 'bg-gray-100 text-black';
     }
@@ -144,10 +144,10 @@ export default function DigitalBinder({
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold mb-1">Digital Binder</h2>
-            <p className="text-blue-100">{studentName} • {programName}</p>
+            <p className="text-brand-blue-100">{studentName} • {programName}</p>
           </div>
           <div className="text-right">
-            <div className="text-sm text-blue-100">Student ID</div>
+            <div className="text-sm text-brand-blue-100">Student ID</div>
             <div className="font-mono font-semibold">{studentId}</div>
           </div>
         </div>
@@ -159,7 +159,7 @@ export default function DigitalBinder({
           onClick={() => setActiveTab('documents')}
           className={`px-6 py-3 font-medium transition-colors ${
             activeTab === 'documents'
-              ? 'text-blue-600 border-b-2 border-blue-600'
+              ? 'text-brand-blue-600 border-b-2 border-brand-blue-600'
               : 'text-black hover:text-black'
           }`}
         >
@@ -169,7 +169,7 @@ export default function DigitalBinder({
           onClick={() => setActiveTab('notes')}
           className={`px-6 py-3 font-medium transition-colors ${
             activeTab === 'notes'
-              ? 'text-blue-600 border-b-2 border-blue-600'
+              ? 'text-brand-blue-600 border-b-2 border-brand-blue-600'
               : 'text-black hover:text-black'
           }`}
         >
@@ -179,7 +179,7 @@ export default function DigitalBinder({
           onClick={() => setActiveTab('tracking')}
           className={`px-6 py-3 font-medium transition-colors ${
             activeTab === 'tracking'
-              ? 'text-blue-600 border-b-2 border-blue-600'
+              ? 'text-brand-blue-600 border-b-2 border-brand-blue-600'
               : 'text-black hover:text-black'
           }`}
         >
@@ -192,7 +192,7 @@ export default function DigitalBinder({
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-lg font-semibold text-black">Required Documents</h3>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors">
               Upload Document
             </button>
           </div>
@@ -216,7 +216,7 @@ export default function DigitalBinder({
                   </div>
                   <div className="flex gap-2">
                     {doc.status === 'complete' && (
-                      <button className="px-3 py-2 text-sm text-blue-600 hover:bg-gray-50 rounded">
+                      <button className="px-3 py-2 text-sm text-brand-blue-600 hover:bg-gray-50 rounded">
                         View
                       </button>
                     )}
@@ -238,12 +238,12 @@ export default function DigitalBinder({
             <h3 className="text-lg font-semibold text-black mb-4">Case Notes & Progress Updates</h3>
 
             {/* Add Note Form */}
-            <Card className="p-4 mb-4 bg-blue-50 border-blue-200">
+            <Card className="p-4 mb-4 bg-brand-blue-50 border-brand-blue-200">
               <textarea
                 value={newNote}
                 onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setNewNote(e.target.value)}
                 placeholder="Add a new note about this student..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 rows={3}
               />
               <div className="flex items-center justify-between mt-3">
@@ -253,7 +253,7 @@ export default function DigitalBinder({
                   <option>Concern</option>
                   <option>Achievement</option>
                 </select>
-                <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors">
                   Add Note
                 </button>
               </div>
@@ -295,7 +295,7 @@ export default function DigitalBinder({
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2">
                 <div
-                  className="bg-blue-600 h-2 rounded-full"
+                  className="bg-brand-blue-600 h-2 rounded-full"
                   style={{ width: `${(trackingData.hoursCompleted / trackingData.hoursRequired) * 100}%` }}
                 />
               </div>

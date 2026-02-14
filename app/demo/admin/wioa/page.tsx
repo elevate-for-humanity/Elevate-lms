@@ -6,7 +6,7 @@ export default function DemoWioaPage() {
       <div className="space-y-4">
         <div className="grid sm:grid-cols-3 gap-3">
           <div className="bg-white rounded-lg border p-4 text-center">
-            <p className="text-2xl font-bold text-blue-600">38</p>
+            <p className="text-2xl font-bold text-brand-blue-600">38</p>
             <p className="text-xs text-gray-500">WIOA Eligible</p>
           </div>
           <div className="bg-white rounded-lg border p-4 text-center">

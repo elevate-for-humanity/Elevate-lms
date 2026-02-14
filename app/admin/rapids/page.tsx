@@ -24,7 +24,7 @@ export default function RapidsAdminPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Shield className="w-8 h-8 text-blue-600" />
+                <Shield className="w-8 h-8 text-brand-blue-600" />
                 <h1 className="text-2xl font-bold text-gray-900">
                   RAPIDS / USDOL Registration Status
                 </h1>
@@ -36,7 +36,7 @@ export default function RapidsAdminPage() {
             <div className="flex gap-3">
               <Link
                 href="/admin/rapids/apprentices"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 <Users className="w-4 h-4" />
                 Manage Apprentices
@@ -55,7 +55,7 @@ export default function RapidsAdminPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="bg-blue-600 rounded-xl p-6 mb-6 text-white">
+        <div className="bg-brand-blue-600 rounded-xl p-6 mb-6 text-white">
           <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
           <div className="grid md:grid-cols-3 gap-4">
             <Link
@@ -65,7 +65,7 @@ export default function RapidsAdminPage() {
               <Users className="w-6 h-6" />
               <div>
                 <p className="font-medium">View Apprentices</p>
-                <p className="text-sm text-blue-100">Manage RAPIDS registrations</p>
+                <p className="text-sm text-brand-blue-100">Manage RAPIDS registrations</p>
               </div>
             </Link>
             <a
@@ -77,7 +77,7 @@ export default function RapidsAdminPage() {
               <ExternalLink className="w-6 h-6" />
               <div>
                 <p className="font-medium">Open RAPIDS Portal</p>
-                <p className="text-sm text-blue-100">Submit data to DOL</p>
+                <p className="text-sm text-brand-blue-100">Submit data to DOL</p>
               </div>
             </a>
           </div>
@@ -104,7 +104,7 @@ export default function RapidsAdminPage() {
               href="/api/admin/rapids/export?type=progress&format=csv"
               className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <Download className="w-5 h-5 text-blue-600" />
+              <Download className="w-5 h-5 text-brand-blue-600" />
               <div>
                 <p className="font-medium text-gray-900">Progress Updates</p>
                 <p className="text-xs text-gray-500">OJT & RTI hours report</p>
@@ -114,7 +114,7 @@ export default function RapidsAdminPage() {
               href="/api/admin/rapids/export?type=completions&format=csv"
               className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
             >
-              <Download className="w-5 h-5 text-blue-600" />
+              <Download className="w-5 h-5 text-brand-blue-600" />
               <div>
                 <p className="font-medium text-gray-900">Completions</p>
                 <p className="text-xs text-gray-500">Program completions</p>
@@ -224,7 +224,7 @@ export default function RapidsAdminPage() {
                       {program.totalHours.toLocaleString()} hrs
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-blue-100 text-brand-blue-800">
                         {program.fundingType === 'self_pay' ? 'Self-Pay' : program.fundingType}
                       </span>
                     </td>
@@ -261,18 +261,18 @@ export default function RapidsAdminPage() {
         </div>
 
         {/* Procurement Statement */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 shadow-sm">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-semibold text-blue-900">Procurement Statement</h2>
+            <h2 className="text-lg font-semibold text-brand-blue-900">Procurement Statement</h2>
             <button
               onClick={() => navigator.clipboard?.writeText(procurementStatement)}
-              className="inline-flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-blue-700 bg-blue-100 rounded-lg hover:bg-blue-200 transition-colors"
+              className="inline-flex items-center gap-2 px-3 py-2.5 text-sm font-medium text-brand-blue-700 bg-brand-blue-100 rounded-lg hover:bg-brand-blue-200 transition-colors"
             >
               <Copy className="w-4 h-4" />
               Copy
             </button>
           </div>
-          <p className="text-blue-900 leading-relaxed">
+          <p className="text-brand-blue-900 leading-relaxed">
             {procurementStatement}
           </p>
         </div>

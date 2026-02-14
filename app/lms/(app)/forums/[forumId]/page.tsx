@@ -124,7 +124,7 @@ export default async function ForumPage({ params }: Props) {
             </div>
             <Link
               href={`/lms/forums/${forumId}/new`}
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               <Plus className="w-4 h-4" />
               New Thread
@@ -153,8 +153,8 @@ export default async function ForumPage({ params }: Props) {
                   href={`/lms/forums/${forumId}/threads/${thread.id}`}
                   className="flex items-center gap-4 p-4 hover:bg-slate-50 transition"
                 >
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <MessageSquare className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <MessageSquare className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -187,7 +187,7 @@ export default async function ForumPage({ params }: Props) {
               <p className="text-slate-600 mb-4">No threads yet. Start the conversation!</p>
               <Link
                 href={`/lms/forums/${forumId}/new`}
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 <Plus className="w-4 h-4" />
                 Create First Thread

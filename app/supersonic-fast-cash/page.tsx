@@ -47,7 +47,7 @@ export default function SupersonicFastCashPage() {
         {/* Animated background accents */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute top-20 left-10 w-72 h-72 bg-red-500/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-brand-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
         </div>
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
@@ -76,7 +76,7 @@ export default function SupersonicFastCashPage() {
               </Link>
               <Link
                 href="/supersonic-fast-cash/diy-taxes"
-                className="group px-12 py-6 bg-white text-blue-900 text-xl sm:text-2xl font-black rounded-2xl hover:bg-gray-50 shadow-2xl uppercase transform hover:scale-105 transition-all duration-300"
+                className="group px-12 py-6 bg-white text-brand-blue-900 text-xl sm:text-2xl font-black rounded-2xl hover:bg-gray-50 shadow-2xl uppercase transform hover:scale-105 transition-all duration-300"
               >
                 <span className="flex flex-col items-center justify-center gap-1">
                   <span className="flex items-center gap-3">
@@ -97,12 +97,12 @@ export default function SupersonicFastCashPage() {
                 <div className="text-gray-300 text-sm">Same Day Cash</div>
               </div>
               <div className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-                <Clock className="w-12 h-12 mx-auto mb-3 text-blue-400" />
+                <Clock className="w-12 h-12 mx-auto mb-3 text-brand-blue-400" />
                 <div className="font-black text-xl text-white mb-1">15 Minutes</div>
                 <div className="text-gray-300 text-sm">Fast Approval</div>
               </div>
               <div className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-                <Shield className="w-12 h-12 mx-auto mb-3 text-blue-400" />
+                <Shield className="w-12 h-12 mx-auto mb-3 text-brand-blue-400" />
                 <div className="font-black text-xl text-white mb-1">0% Interest</div>
                 <div className="text-gray-300 text-sm">No Hidden Fees</div>
               </div>
@@ -132,7 +132,7 @@ export default function SupersonicFastCashPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="relative text-center">
-              <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center font-black text-3xl mx-auto mb-6">
+              <div className="w-20 h-20 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-black text-3xl mx-auto mb-6">
                 1
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Apply Online</h3>
@@ -142,7 +142,7 @@ export default function SupersonicFastCashPage() {
             </div>
 
             <div className="relative text-center">
-              <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center font-black text-3xl mx-auto mb-6">
+              <div className="w-20 h-20 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-black text-3xl mx-auto mb-6">
                 2
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Get Approved</h3>
@@ -152,7 +152,7 @@ export default function SupersonicFastCashPage() {
             </div>
 
             <div className="relative text-center">
-              <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center font-black text-3xl mx-auto mb-6">
+              <div className="w-20 h-20 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-black text-3xl mx-auto mb-6">
                 3
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-4">Get Your Cash</h3>
@@ -165,7 +165,7 @@ export default function SupersonicFastCashPage() {
           <div className="text-center mt-12">
             <Link
               href="/supersonic-fast-cash/apply"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-blue-700 transition-colors shadow-lg"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-10 py-5 rounded-xl font-bold text-xl hover:bg-brand-blue-700 transition-colors shadow-lg"
             >
               Start Your Application
               <ArrowRight className="w-5 h-5" />
@@ -195,7 +195,7 @@ export default function SupersonicFastCashPage() {
                 <Image src="/images/business/program-tax-preparation.jpg" alt="Tax Preparation" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
                   Tax Preparation
                 </h3>
                 <p className="text-gray-600 text-sm">
@@ -229,7 +229,7 @@ export default function SupersonicFastCashPage() {
                 <Image src="/images/heroes/employer-partner-3.jpg" alt="DIY Tax Filing" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
                   DIY Tax Filing
                 </h3>
                 <p className="text-gray-600 text-sm">
@@ -276,14 +276,14 @@ export default function SupersonicFastCashPage() {
       </section>
 
       {/* Locations */}
-      <section className="py-20 bg-blue-900 text-white">
+      <section className="py-20 bg-brand-blue-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-4xl md:text-5xl font-black mb-6">
                 Visit Us Today
               </h2>
-              <p className="text-xl text-blue-200 mb-8">
+              <p className="text-xl text-brand-blue-200 mb-8">
                 Walk in or schedule an appointment. We&apos;re ready to help you get your money fast.
               </p>
 
@@ -292,8 +292,8 @@ export default function SupersonicFastCashPage() {
                   <MapPin className="w-8 h-8 text-red-400 flex-shrink-0" />
                   <div>
                     <h3 className="font-bold text-lg">Main Office</h3>
-                    <p className="text-blue-200">8888 Keystone Crossing, Suite 1300</p>
-                    <p className="text-blue-200">Indianapolis, IN 46240</p>
+                    <p className="text-brand-blue-200">8888 Keystone Crossing, Suite 1300</p>
+                    <p className="text-brand-blue-200">Indianapolis, IN 46240</p>
                   </div>
                 </div>
 
@@ -301,8 +301,8 @@ export default function SupersonicFastCashPage() {
                   <Clock className="w-8 h-8 text-red-400 flex-shrink-0" />
                   <div>
                     <h3 className="font-bold text-lg">Hours</h3>
-                    <p className="text-blue-200">Mon-Fri: 9am - 8pm</p>
-                    <p className="text-blue-200">Sat: 9am - 5pm | Sun: 12pm - 5pm</p>
+                    <p className="text-brand-blue-200">Mon-Fri: 9am - 8pm</p>
+                    <p className="text-brand-blue-200">Sat: 9am - 5pm | Sun: 12pm - 5pm</p>
                   </div>
                 </div>
 
@@ -310,7 +310,7 @@ export default function SupersonicFastCashPage() {
                   <Phone className="w-8 h-8 text-red-400 flex-shrink-0" />
                   <div>
                     <h3 className="font-bold text-lg">Contact Us</h3>
-                    <p className="text-blue-200">Get Help Online</p>
+                    <p className="text-brand-blue-200">Get Help Online</p>
                   </div>
                 </div>
               </div>
@@ -318,14 +318,14 @@ export default function SupersonicFastCashPage() {
               <div className="flex flex-col sm:flex-row gap-4 mt-8">
                 <Link
                   href="/supersonic-fast-cash/locations"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition-colors"
                 >
                   <MapPin className="w-5 h-5" />
                   All Locations
                 </Link>
                 <Link
                   href="/supersonic-fast-cash/book-appointment"
-                  className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition-colors"
                 >
                   <Calendar className="w-5 h-5" />
                   Book Appointment
@@ -361,7 +361,7 @@ export default function SupersonicFastCashPage() {
               href="/supersonic-fast-cash/calculator"
               className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <Calculator className="w-8 h-8 text-blue-600" />
+              <Calculator className="w-8 h-8 text-brand-blue-600" />
               <span className="font-semibold text-gray-900">Refund Calculator</span>
             </Link>
             <Link
@@ -375,7 +375,7 @@ export default function SupersonicFastCashPage() {
               href="/supersonic-fast-cash/upload-documents"
               className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <Upload className="w-8 h-8 text-blue-600" />
+              <Upload className="w-8 h-8 text-brand-blue-600" />
               <span className="font-semibold text-gray-900">Upload Documents</span>
             </Link>
             <Link

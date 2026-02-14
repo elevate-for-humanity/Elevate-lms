@@ -30,8 +30,8 @@ export default function ThankYouPage() {
             <h2 className="text-xl font-bold text-gray-900 mb-4">What Happens Next</h2>
             <div className="space-y-4">
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-blue-600 font-bold text-sm">1</span>
+                <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-brand-blue-600 font-bold text-sm">1</span>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Verification (1-3 business days)</h3>
@@ -42,8 +42,8 @@ export default function ThankYouPage() {
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-blue-600 font-bold text-sm">2</span>
+                <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-brand-blue-600 font-bold text-sm">2</span>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">MOU Review & Signing</h3>
@@ -53,8 +53,8 @@ export default function ThankYouPage() {
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-blue-600 font-bold text-sm">3</span>
+                <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-brand-blue-600 font-bold text-sm">3</span>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Site Approval</h3>
@@ -64,8 +64,8 @@ export default function ThankYouPage() {
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-blue-600 font-bold text-sm">4</span>
+                <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-brand-blue-600 font-bold text-sm">4</span>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Apprentice Matching</h3>
@@ -77,9 +77,9 @@ export default function ThankYouPage() {
             </div>
           </div>
 
-          <div className="bg-blue-50 p-6 rounded-xl mb-8">
+          <div className="bg-brand-blue-50 p-6 rounded-xl mb-8">
             <div className="flex items-center gap-3 mb-3">
-              <Clock className="w-5 h-5 text-blue-600" />
+              <Clock className="w-5 h-5 text-brand-blue-600" />
               <span className="font-semibold text-gray-900">Confirmation Email Sent</span>
             </div>
             <p className="text-gray-600 text-sm">
@@ -91,10 +91,10 @@ export default function ThankYouPage() {
           <div className="bg-gray-100 p-6 rounded-xl mb-8">
             <h3 className="font-semibold text-gray-900 mb-3">Questions?</h3>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a href="/support" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-blue-600">
+              <a href="/support" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-brand-blue-600">
                 <Phone className="w-4 h-4" /> Get Help Online
               </a>
-              <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-blue-600">
+              <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center justify-center gap-2 text-gray-700 hover:text-brand-blue-600">
                 <Mail className="w-4 h-4" /> elevate4humanityedu@gmail.com
               </a>
             </div>
@@ -109,7 +109,7 @@ export default function ThankYouPage() {
             </Link>
             <Link
               href="/partners/barbershop-apprenticeship"
-              className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+              className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700"
             >
               Back to Partner Info <ArrowRight className="w-5 h-5 ml-2" />
             </Link>

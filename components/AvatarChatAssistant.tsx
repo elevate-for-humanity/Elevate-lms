@@ -173,7 +173,7 @@ export default function AvatarChatAssistant({
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-20 md:bottom-6 ${positionClasses} z-40 flex items-center gap-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-full shadow-lg transition-all hover:scale-105`}
+        className={`fixed bottom-20 md:bottom-6 ${positionClasses} z-40 flex items-center gap-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-3 rounded-full shadow-lg transition-all hover:scale-105`}
       >
         <div className="relative">
           <MessageCircle className="w-6 h-6" />
@@ -194,7 +194,7 @@ export default function AvatarChatAssistant({
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-3 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {/* Mini avatar video */}
-          <div className="w-10 h-10 rounded-full overflow-hidden bg-blue-800 flex-shrink-0">
+          <div className="w-10 h-10 rounded-full overflow-hidden bg-brand-blue-800 flex-shrink-0">
             <video
               ref={videoRef}
               src={avatarVideoUrl}
@@ -206,27 +206,27 @@ export default function AvatarChatAssistant({
           </div>
           <div>
             <div className="font-semibold text-sm">{avatarName}</div>
-            <div className="text-xs text-blue-200">{avatarRole}</div>
+            <div className="text-xs text-brand-blue-200">{avatarRole}</div>
           </div>
         </div>
         <div className="flex items-center gap-1">
           <button
             onClick={() => setIsMuted(!isMuted)}
-            className="p-1.5 hover:bg-blue-500 rounded-full transition-colors"
+            className="p-1.5 hover:bg-brand-blue-500 rounded-full transition-colors"
             title={isMuted ? 'Unmute' : 'Mute'}
           >
             {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
           </button>
           <button
             onClick={() => setIsMinimized(!isMinimized)}
-            className="p-1.5 hover:bg-blue-500 rounded-full transition-colors"
+            className="p-1.5 hover:bg-brand-blue-500 rounded-full transition-colors"
             title={isMinimized ? 'Expand' : 'Minimize'}
           >
             {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
           </button>
           <button
             onClick={() => setIsOpen(false)}
-            className="p-1.5 hover:bg-blue-500 rounded-full transition-colors"
+            className="p-1.5 hover:bg-brand-blue-500 rounded-full transition-colors"
             title="Close"
           >
             <X className="w-4 h-4" />
@@ -257,7 +257,7 @@ export default function AvatarChatAssistant({
                 <div
                   className={`max-w-[85%] px-3 py-2 rounded-2xl text-sm ${
                     msg.role === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-md'
+                      ? 'bg-brand-blue-600 text-white rounded-br-md'
                       : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md shadow-sm'
                   }`}
                 >
@@ -293,13 +293,13 @@ export default function AvatarChatAssistant({
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className="p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-2 bg-brand-blue-600 text-white rounded-full hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <Send className="w-4 h-4" />
               </button>

@@ -72,7 +72,7 @@ export default function StaffApplicationForm() {
               id="firstName"
               name="firstName"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -88,7 +88,7 @@ export default function StaffApplicationForm() {
               id="lastName"
               name="lastName"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -104,7 +104,7 @@ export default function StaffApplicationForm() {
               id="email"
               name="email"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -120,7 +120,7 @@ export default function StaffApplicationForm() {
               id="phone"
               name="phone"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -143,7 +143,7 @@ export default function StaffApplicationForm() {
               id="role"
               name="role"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             >
               <option value="">Select role</option>
               <option value="staff">Staff</option>
@@ -164,7 +164,7 @@ export default function StaffApplicationForm() {
               name="position"
               required
               placeholder="e.g., Program Coordinator, HVAC Instructor"
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -179,7 +179,7 @@ export default function StaffApplicationForm() {
               id="experience"
               name="experience"
               rows={4}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="Describe your relevant work experience..."
             />
           </div>
@@ -195,7 +195,7 @@ export default function StaffApplicationForm() {
               id="education"
               name="education"
               rows={3}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="List your educational background..."
             />
           </div>
@@ -211,7 +211,7 @@ export default function StaffApplicationForm() {
               id="certifications"
               name="certifications"
               rows={3}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="List any relevant certifications or licenses..."
             />
           </div>
@@ -226,7 +226,7 @@ export default function StaffApplicationForm() {
             <select
               id="availability"
               name="availability"
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             >
               <option value="">Select availability</option>
               <option value="full-time">Full-time</option>
@@ -247,7 +247,7 @@ export default function StaffApplicationForm() {
               id="coverLetter"
               name="coverLetter"
               rows={6}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="Tell us why you'd be a great fit for this role..."
             />
           </div>
@@ -258,7 +258,7 @@ export default function StaffApplicationForm() {
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 min-h-[48px] px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 min-h-[48px] px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? 'Submitting...' : 'Submit Application'}
         </button>

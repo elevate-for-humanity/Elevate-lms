@@ -161,7 +161,7 @@ export default function PartnersPage() {
                   <li>Structured onboarding and retention support</li>
                 </ul>
                 <div className="mt-5">
-                  <Link href="/contact?type=employer" className="rounded-md bg-blue-600 px-5 py-2.5 text-white font-semibold hover:bg-blue-700">
+                  <Link href="/contact?type=employer" className="rounded-md bg-brand-blue-600 px-5 py-2.5 text-white font-semibold hover:bg-brand-blue-700">
                     Employer Intake
                   </Link>
                 </div>
@@ -198,7 +198,7 @@ export default function PartnersPage() {
           </div>
 
           <div className="mt-12 text-center">
-            <Link href="/contact" className="rounded-md bg-blue-600 px-7 py-3 text-white font-semibold hover:bg-blue-700">
+            <Link href="/contact" className="rounded-md bg-brand-blue-600 px-7 py-3 text-white font-semibold hover:bg-brand-blue-700">
               Start Partner Intake
             </Link>
           </div>
@@ -209,16 +209,16 @@ export default function PartnersPage() {
       <section className="bg-white">
         <div className="mx-auto max-w-6xl px-6 py-14">
           <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Building className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+              <Building className="w-6 h-6 text-brand-blue-600" />
             </div>
             <h2 className="text-2xl md:text-3xl font-bold">Government & Workforce Partners</h2>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {governmentPartners.map((partner) => (
-              <div key={partner.name} className="rounded-lg border-2 border-gray-200 bg-white p-6 hover:border-blue-500 transition-colors">
-                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full mb-3">
+              <div key={partner.name} className="rounded-lg border-2 border-gray-200 bg-white p-6 hover:border-brand-blue-500 transition-colors">
+                <span className="inline-block px-3 py-1 bg-brand-blue-100 text-brand-blue-700 text-xs font-semibold rounded-full mb-3">
                   {partner.type}
                 </span>
                 <h3 className="text-lg font-bold text-black mb-2">{partner.name}</h3>
@@ -287,7 +287,7 @@ export default function PartnersPage() {
           
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-black text-white">1</span>
               </div>
               <h3 className="font-bold text-white text-lg mb-2">Submit Inquiry</h3>
@@ -296,7 +296,7 @@ export default function PartnersPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-black text-white">2</span>
               </div>
               <h3 className="font-bold text-white text-lg mb-2">Discovery Call</h3>
@@ -305,7 +305,7 @@ export default function PartnersPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-black text-white">3</span>
               </div>
               <h3 className="font-bold text-white text-lg mb-2">Agreement</h3>
@@ -314,7 +314,7 @@ export default function PartnersPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-black text-white">4</span>
               </div>
               <h3 className="font-bold text-white text-lg mb-2">Launch</h3>
@@ -449,25 +449,25 @@ export default function PartnersPage() {
       <section className="bg-brand-blue-700 text-white">
         <div className="mx-auto max-w-4xl px-6 py-16 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Partner?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Join our network of employers, training providers, and workforce organizations 
             committed to creating pathways to sustainable careers.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/contact?type=employer" 
-              className="rounded-md bg-white px-8 py-4 text-blue-700 font-bold hover:bg-gray-100"
+              className="rounded-md bg-white px-8 py-4 text-brand-blue-700 font-bold hover:bg-gray-100"
             >
               Employer Partnership
             </Link>
             <Link 
               href="/contact?type=agency" 
-              className="rounded-md border-2 border-white px-8 py-4 font-bold hover:bg-white hover:text-blue-700"
+              className="rounded-md border-2 border-white px-8 py-4 font-bold hover:bg-white hover:text-brand-blue-700"
             >
               Agency Partnership
             </Link>
           </div>
-          <p className="mt-8 text-sm text-blue-200">
+          <p className="mt-8 text-sm text-brand-blue-200">
             Questions? <Link href="/contact?topic=partnership" className="underline hover:text-white">Contact us</Link>
           </p>
         </div>

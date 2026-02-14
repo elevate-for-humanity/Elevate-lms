@@ -132,7 +132,7 @@ export default async function CAREERSAFEPage() {
             Available Courses
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   OSHA 10-Hour Construction
@@ -150,7 +150,7 @@ export default async function CAREERSAFEPage() {
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   OSHA 30-Hour Construction
@@ -168,7 +168,7 @@ export default async function CAREERSAFEPage() {
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   OSHA 10-Hour General Industry
@@ -186,7 +186,7 @@ export default async function CAREERSAFEPage() {
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   OSHA 30-Hour General Industry

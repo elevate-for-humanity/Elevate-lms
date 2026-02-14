@@ -159,7 +159,7 @@ export default async function ServicesPage() {
                   </Link>
                   <Link
                     href="/support"
-                    className="inline-flex items-center justify-center px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                    className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
                   >
                     Call Get Help Online
                   </Link>
@@ -179,13 +179,13 @@ export default async function ServicesPage() {
                 key={index}
                 className="bg-white border border-gray-200 rounded-xl p-8 hover:shadow-lg transition-shadow"
               >
-                <div className="w-14 h-14 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
-                  <service.icon className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-6">
+                  <service.icon className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="text-2xl font-bold text-black mb-2">
                   {service.name}
                 </h3>
-                <div className="text-2xl font-bold text-blue-600 mb-4">
+                <div className="text-2xl font-bold text-brand-blue-600 mb-4">
                   {service.price}
                 </div>
                 <p className="text-black mb-6">{service.description}</p>
@@ -202,7 +202,7 @@ export default async function ServicesPage() {
                 </ul>
                 <Link
                   href={service.href || '/supersonic-fast-cash/book-appointment'}
-                  className="block w-full text-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                  className="block w-full text-center px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
                 >
                   {service.href ? 'Learn More' : 'Get Started'}
                 </Link>
@@ -227,8 +227,8 @@ export default async function ServicesPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
                 PTIN-Credentialed
@@ -251,8 +251,8 @@ export default async function ServicesPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
                 Fast Service

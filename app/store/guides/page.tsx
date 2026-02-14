@@ -98,19 +98,19 @@ export default function GuidesPage() {
             <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
               <BookOpen className="w-6 h-6 text-white" />
             </div>
-            <span className="text-blue-200 font-medium">Elevate Store</span>
+            <span className="text-brand-blue-200 font-medium">Elevate Store</span>
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4">
             Guides & Resources
           </h1>
-          <p className="text-xl text-blue-100 max-w-2xl mb-6">
+          <p className="text-xl text-brand-blue-100 max-w-2xl mb-6">
             Professional guides to help you build, scale, and maintain compliant workforce programs. 
             Written by industry experts with real-world experience.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link 
               href="#guides"
-              className="inline-flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
             >
               Browse Guides
               <ArrowRight className="w-5 h-5" />
@@ -132,7 +132,7 @@ export default function GuidesPage() {
       <section className="py-8 border-b">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-wrap gap-3 justify-center">
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-full text-sm font-medium">
+            <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-full text-sm font-medium">
               All Guides
             </button>
             {categories.map((cat) => (
@@ -178,7 +178,7 @@ export default function GuidesPage() {
                       <span className={`inline-block px-4 py-2 rounded-full text-sm font-bold ${
                         guide.price === 'Free' 
                           ? 'bg-green-500 text-white' 
-                          : 'bg-blue-600 text-white'
+                          : 'bg-brand-blue-600 text-white'
                       }`}>
                         {guide.badge}
                       </span>
@@ -189,18 +189,18 @@ export default function GuidesPage() {
                   {/* Content Side */}
                   <div className="p-8 lg:p-10">
                     <div className="flex items-start justify-between mb-4">
-                      <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <guide.icon className="w-7 h-7 text-blue-600" />
+                      <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                        <guide.icon className="w-7 h-7 text-brand-blue-600" />
                       </div>
                       <div className="text-right">
-                        <div className="text-3xl font-black text-blue-600">{guide.price}</div>
+                        <div className="text-3xl font-black text-brand-blue-600">{guide.price}</div>
                         {guide.originalPrice && (
                           <div className="text-sm text-slate-400 line-through">{guide.originalPrice}</div>
                         )}
                       </div>
                     </div>
 
-                    <p className="text-sm text-blue-600 font-medium mb-1">{guide.subtitle}</p>
+                    <p className="text-sm text-brand-blue-600 font-medium mb-1">{guide.subtitle}</p>
                     <h3 className="text-2xl font-bold text-slate-900 mb-3">{guide.title}</h3>
                     <p className="text-slate-600 mb-6">{guide.description}</p>
 
@@ -219,7 +219,7 @@ export default function GuidesPage() {
                     <div className="flex flex-wrap gap-4">
                       <Link
                         href={guide.href}
-                        className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                        className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
                       >
                         {guide.price === 'Free' ? 'Download Free' : 'View Details'}
                         <ArrowRight className="w-5 h-5" />
@@ -227,7 +227,7 @@ export default function GuidesPage() {
                       {guide.price !== 'Free' && (
                         <Link
                           href={`${guide.href}?buy=true`}
-                          className="inline-flex items-center gap-2 border-2 border-blue-600 text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                          className="inline-flex items-center gap-2 border-2 border-brand-blue-600 text-brand-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
                         >
                           Purchase Now
                         </Link>
@@ -253,7 +253,7 @@ export default function GuidesPage() {
               The audit checklists alone saved us months of preparation.&rdquo;
             </blockquote>
             <div className="flex items-center justify-center gap-4">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+              <div className="w-12 h-12 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold">
                 JM
               </div>
               <div className="text-left">
@@ -266,16 +266,16 @@ export default function GuidesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Need Custom Training Materials?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             We develop custom guides and training materials for enterprise clients.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
             >
               Contact Us
             </Link>

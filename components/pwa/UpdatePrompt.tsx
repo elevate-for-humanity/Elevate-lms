@@ -90,7 +90,7 @@ export function UpdatePrompt({ onUpdate }: UpdatePromptProps) {
   }
 
   return (
-    <div className="fixed top-0 left-0 right-0 bg-blue-600 text-white px-4 py-3 z-50 safe-area-inset-top">
+    <div className="fixed top-0 left-0 right-0 bg-brand-blue-600 text-white px-4 py-3 z-50 safe-area-inset-top">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <RefreshCw className={`w-5 h-5 ${updating ? 'animate-spin' : ''}`} />
@@ -102,13 +102,13 @@ export function UpdatePrompt({ onUpdate }: UpdatePromptProps) {
           <button
             onClick={handleUpdateClick}
             disabled={updating}
-            className="px-3 py-1 bg-white text-blue-600 rounded-lg text-sm font-medium hover:bg-blue-50 disabled:opacity-50"
+            className="px-3 py-1 bg-white text-brand-blue-600 rounded-lg text-sm font-medium hover:bg-brand-blue-50 disabled:opacity-50"
           >
             {updating ? 'Updating...' : 'Update'}
           </button>
           <button
             onClick={handleDismiss}
-            className="p-1 hover:bg-blue-500 rounded"
+            className="p-1 hover:bg-brand-blue-500 rounded"
           >
             <X className="w-4 h-4" />
           </button>

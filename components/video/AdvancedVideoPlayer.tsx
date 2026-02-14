@@ -290,7 +290,7 @@ export default function AdvancedVideoPlayer({
               max={duration}
               value={currentTime}
               onChange={handleSeek}
-              className="w-full h-1 bg-slate-700 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:cursor-pointer"
+              className="w-full h-1 bg-slate-700 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-brand-blue-500 [&::-webkit-slider-thumb]:cursor-pointer"
               style={{
                 background: `linear-gradient(to right, #3b82f6 0%, #3b82f6 ${(currentTime / duration) * 100}%, #475569 ${(currentTime / duration) * 100}%, #475569 100%)`,
               }}
@@ -303,7 +303,7 @@ export default function AdvancedVideoPlayer({
           {/* Left Controls */}
           <div className="flex items-center gap-4">
             {/* Play/Pause */}
-            <button onClick={togglePlay} className="hover:text-blue-400 transition-colors">
+            <button onClick={togglePlay} className="hover:text-brand-blue-400 transition-colors">
               {isPlaying ? (
                 <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd" />
@@ -316,7 +316,7 @@ export default function AdvancedVideoPlayer({
             </button>
 
             {/* Skip Backward */}
-            <button onClick={() => skip(-10)} className="hover:text-blue-400 transition-colors">
+            <button onClick={() => skip(-10)} className="hover:text-brand-blue-400 transition-colors">
               <svg className="w-6 h-6" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -325,7 +325,7 @@ d="M12.066 11.2a1 1 0 000 1.6l5.334 4A1 1 0 0019 16V8a1 1 0 00-1.6-.8l-5.333 4zM
             </button>
 
             {/* Skip Forward */}
-            <button onClick={() => skip(10)} className="hover:text-blue-400 transition-colors">
+            <button onClick={() => skip(10)} className="hover:text-brand-blue-400 transition-colors">
               <svg className="w-6 h-6" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -335,7 +335,7 @@ d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.93
 
             {/* Volume */}
             <div className="flex items-center gap-2">
-              <button onClick={toggleMute} className="hover:text-blue-400 transition-colors">
+              <button onClick={toggleMute} className="hover:text-brand-blue-400 transition-colors">
                 {isMuted || volume === 0 ? (
                   <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM12.293 7.293a1 1 0 011.414 0L15 8.586l1.293-1.293a1 1 0 111.414 1.414L16.414 10l1.293 1.293a1 1 0 01-1.414 1.414L15 11.414l-1.293 1.293a1 1 0 01-1.414-1.414L13.586 10l-1.293-1.293a1 1 0 010-1.414z" clipRule="evenodd" />
@@ -367,7 +367,7 @@ d="M11.933 12.8a1 1 0 000-1.6L6.6 7.2A1 1 0 005 8v8a1 1 0 001.6.8l5.333-4zM19.93
           <div className="flex items-center gap-4">
             {/* Captions */}
             {subtitles.length > 0 && (
-              <button onClick={toggleCaptions} className={`hover:text-blue-400 transition-colors ${captionsEnabled ? 'text-blue-400' : ''}`}>
+              <button onClick={toggleCaptions} className={`hover:text-brand-blue-400 transition-colors ${captionsEnabled ? 'text-brand-blue-400' : ''}`}>
                 <svg className="w-6 h-6" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -380,7 +380,7 @@ d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 0
             <div className="relative">
               <button
                 onClick={() => setShowSettings(!showSettings)}
-                className="hover:text-blue-400 transition-colors"
+                className="hover:text-brand-blue-400 transition-colors"
               >
                 <svg className="w-6 h-6" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
@@ -400,7 +400,7 @@ d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       key={rate}
                       onClick={() => changePlaybackRate(rate)}
                       className={`w-full text-left px-3 py-2 rounded hover:bg-slate-800 transition-colors ${
-                        playbackRate === rate ? 'bg-slate-800 text-blue-400' : ''
+                        playbackRate === rate ? 'bg-slate-800 text-brand-blue-400' : ''
                       }`}
                     >
                       {rate}x {rate === 1 && '(Normal)'}
@@ -411,7 +411,7 @@ d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </div>
 
             {/* Fullscreen */}
-            <button onClick={toggleFullscreen} className="hover:text-blue-400 transition-colors">
+            <button onClick={toggleFullscreen} className="hover:text-brand-blue-400 transition-colors">
               {isFullscreen ? (
                 <svg className="w-6 h-6" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">

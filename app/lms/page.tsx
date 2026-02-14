@@ -83,7 +83,7 @@ export default async function LMSPage() {
   const continueCourse = typedEnrollments.find(e => (e.progress || 0) > 0 && (e.progress || 0) < 100);
 
   return (
-    <div className="min-h-screen bg-blue-50">
+    <div className="min-h-screen bg-brand-blue-50">
       {/* Breadcrumbs */}
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
@@ -99,7 +99,7 @@ export default async function LMSPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-600 font-semibold text-sm uppercase tracking-wide">Learning Dashboard</p>
+              <p className="text-brand-blue-600 font-semibold text-sm uppercase tracking-wide">Learning Dashboard</p>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 mt-1">
                 Welcome back, {typedProfile?.full_name || 'Learner'}
               </h1>
@@ -125,7 +125,7 @@ export default async function LMSPage() {
         {/* Stats - ProLingo style centered */}
         <div className="flex flex-wrap justify-center gap-8 sm:gap-16 mb-12">
           <div className="text-center">
-            <div className="text-4xl sm:text-5xl font-bold text-blue-600">{typedEnrollments.length}</div>
+            <div className="text-4xl sm:text-5xl font-bold text-brand-blue-600">{typedEnrollments.length}</div>
             <div className="text-sm text-slate-500 mt-1">Courses Enrolled</div>
           </div>
           <div className="text-center">
@@ -145,7 +145,7 @@ export default async function LMSPage() {
         {/* Continue Learning - ProLingo style card */}
         {continueCourse && (
           <div className="bg-white rounded-3xl shadow-sm border p-6 sm:p-8 mb-8">
-            <p className="text-blue-600 font-semibold text-sm uppercase tracking-wide mb-4">Continue Learning</p>
+            <p className="text-brand-blue-600 font-semibold text-sm uppercase tracking-wide mb-4">Continue Learning</p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-6">
               <div className="w-full sm:w-48 h-32 bg-slate-100 rounded-2xl overflow-hidden flex-shrink-0 relative">
                 {continueCourse.course?.thumbnail_url ? (
@@ -158,11 +158,11 @@ export default async function LMSPage() {
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">{continueCourse.course?.title}</h2>
                 <div className="flex items-center gap-3 mb-4">
                   <div className="flex-1 max-w-xs h-2 bg-slate-200 rounded-full overflow-hidden">
-                    <div className="h-full bg-blue-600 rounded-full" style={{ width: `${continueCourse.progress}%` }} />
+                    <div className="h-full bg-brand-blue-600 rounded-full" style={{ width: `${continueCourse.progress}%` }} />
                   </div>
                   <span className="text-sm font-medium text-slate-600">{continueCourse.progress}% complete</span>
                 </div>
-                <Link href={`/lms/courses/${continueCourse.course?.id}`} className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-blue-700 transition">
+                <Link href={`/lms/courses/${continueCourse.course?.id}`} className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-full font-semibold hover:bg-brand-blue-700 transition">
                   <Play className="w-4 h-4" /> Continue Course
                 </Link>
               </div>
@@ -177,7 +177,7 @@ export default async function LMSPage() {
             <div className="bg-white rounded-3xl shadow-sm border p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-slate-900">My Courses</h2>
-                <Link href="/lms/courses" className="text-blue-600 text-sm font-semibold hover:underline">View All →</Link>
+                <Link href="/lms/courses" className="text-brand-blue-600 text-sm font-semibold hover:underline">View All →</Link>
               </div>
               {typedEnrollments.length > 0 ? (
                 <div className="space-y-4">
@@ -191,15 +191,15 @@ export default async function LMSPage() {
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-slate-900 truncate group-hover:text-blue-600 transition">{enrollment.course?.title}</h3>
+                        <h3 className="font-semibold text-slate-900 truncate group-hover:text-brand-blue-600 transition">{enrollment.course?.title}</h3>
                         <div className="flex items-center gap-3 mt-1">
                           <div className="flex-1 max-w-[120px] h-1.5 bg-slate-200 rounded-full overflow-hidden">
-                            <div className="h-full bg-blue-600 rounded-full" style={{ width: `${enrollment.progress || 0}%` }} />
+                            <div className="h-full bg-brand-blue-600 rounded-full" style={{ width: `${enrollment.progress || 0}%` }} />
                           </div>
                           <span className="text-xs text-slate-500">{enrollment.progress || 0}%</span>
                         </div>
                       </div>
-                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-blue-600 transition" />
+                      <ChevronRight className="w-5 h-5 text-slate-400 group-hover:text-brand-blue-600 transition" />
                     </Link>
                   ))}
                 </div>
@@ -207,7 +207,7 @@ export default async function LMSPage() {
                 <div className="text-center py-12">
                   <BookOpen className="w-12 h-12 mx-auto mb-4 text-slate-300" />
                   <p className="text-slate-500 mb-4">No courses enrolled yet</p>
-                  <Link href="/programs" className="text-blue-600 font-semibold hover:underline">Browse Programs →</Link>
+                  <Link href="/programs" className="text-brand-blue-600 font-semibold hover:underline">Browse Programs →</Link>
                 </div>
               )}
             </div>
@@ -217,7 +217,7 @@ export default async function LMSPage() {
               <div className="bg-white rounded-3xl shadow-sm border p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-slate-900">My Programs</h2>
-                  <Link href="/student/dashboard" className="text-blue-600 text-sm font-semibold hover:underline">View Dashboard →</Link>
+                  <Link href="/student/dashboard" className="text-brand-blue-600 text-sm font-semibold hover:underline">View Dashboard →</Link>
                 </div>
                 <div className="space-y-4">
                   {typedProgramEnrollments.map((enrollment: any) => (
@@ -231,13 +231,13 @@ export default async function LMSPage() {
                     </Link>
                   ))}
                   {typedStudentEnrollments.map((enrollment: any) => (
-                    <Link key={enrollment.id} href="/apprentice" className="flex items-center gap-4 p-4 bg-blue-50 rounded-2xl hover:bg-blue-100 transition">
-                      <div className="w-12 h-12 bg-blue-200 rounded-xl flex items-center justify-center"><Award className="w-6 h-6 text-blue-700" /></div>
+                    <Link key={enrollment.id} href="/apprentice" className="flex items-center gap-4 p-4 bg-brand-blue-50 rounded-2xl hover:bg-brand-blue-100 transition">
+                      <div className="w-12 h-12 bg-brand-blue-200 rounded-xl flex items-center justify-center"><Award className="w-6 h-6 text-brand-blue-700" /></div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-slate-900 truncate">{enrollment.program_slug || 'Apprenticeship'}</h3>
                         <p className="text-sm text-slate-500">Active Apprenticeship</p>
                       </div>
-                      <span className="px-3 py-1 bg-blue-200 text-blue-800 text-xs font-semibold rounded-full">Apprentice</span>
+                      <span className="px-3 py-1 bg-brand-blue-200 text-brand-blue-800 text-xs font-semibold rounded-full">Apprentice</span>
                     </Link>
                   ))}
                 </div>
@@ -248,7 +248,7 @@ export default async function LMSPage() {
             <div className="bg-white rounded-3xl shadow-sm border p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-bold text-slate-900">Upcoming Assignments</h2>
-                <Link href="/lms/assignments" className="text-blue-600 text-sm font-semibold hover:underline">View All →</Link>
+                <Link href="/lms/assignments" className="text-brand-blue-600 text-sm font-semibold hover:underline">View All →</Link>
               </div>
               {typedAssignments.length > 0 ? (
                 <div className="space-y-3">
@@ -300,7 +300,7 @@ export default async function LMSPage() {
             <div className="bg-white rounded-3xl shadow-sm border p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-lg font-bold text-slate-900">Certificates</h2>
-                <Link href="/lms/certificates" className="text-blue-600 text-sm font-semibold hover:underline">View All</Link>
+                <Link href="/lms/certificates" className="text-brand-blue-600 text-sm font-semibold hover:underline">View All</Link>
               </div>
               {typedCertificates.length > 0 ? (
                 <div className="space-y-3">
@@ -323,19 +323,19 @@ export default async function LMSPage() {
             </div>
 
             {/* Quick Links */}
-            <div className="bg-blue-50 rounded-3xl p-6">
+            <div className="bg-brand-blue-50 rounded-3xl p-6">
               <h3 className="font-bold text-slate-900 mb-4">Quick Links</h3>
               <div className="space-y-3">
-                <Link href="/lms/schedule" className="flex items-center gap-3 text-slate-700 hover:text-blue-600 transition">
+                <Link href="/lms/schedule" className="flex items-center gap-3 text-slate-700 hover:text-brand-blue-600 transition">
                   <Calendar className="w-5 h-5" /> <span className="text-sm font-medium">Class Schedule</span>
                 </Link>
-                <Link href="/lms/messages" className="flex items-center gap-3 text-slate-700 hover:text-blue-600 transition">
+                <Link href="/lms/messages" className="flex items-center gap-3 text-slate-700 hover:text-brand-blue-600 transition">
                   <MessageSquare className="w-5 h-5" /> <span className="text-sm font-medium">Messages</span>
                 </Link>
-                <Link href="/lms/analytics" className="flex items-center gap-3 text-slate-700 hover:text-blue-600 transition">
+                <Link href="/lms/analytics" className="flex items-center gap-3 text-slate-700 hover:text-brand-blue-600 transition">
                   <BarChart3 className="w-5 h-5" /> <span className="text-sm font-medium">Learning Analytics</span>
                 </Link>
-                <Link href="/support" className="flex items-center gap-3 text-slate-700 hover:text-blue-600 transition">
+                <Link href="/support" className="flex items-center gap-3 text-slate-700 hover:text-brand-blue-600 transition">
                   <Clock className="w-5 h-5" /> <span className="text-sm font-medium">Get Help</span>
                 </Link>
               </div>

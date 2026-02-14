@@ -107,7 +107,7 @@ export default function ShopLogHoursPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-blue-500 animate-spin" />
+        <Loader2 className="w-8 h-8 text-brand-blue-500 animate-spin" />
       </div>
     );
   }
@@ -156,7 +156,7 @@ export default function ShopLogHoursPage() {
                     onClick={() => setSelectedApprentice(apprentice.id)}
                     className={`w-full flex items-center gap-4 p-4 rounded-xl transition-colors ${
                       selectedApprentice === apprentice.id
-                        ? 'bg-blue-600 border-2 border-blue-400'
+                        ? 'bg-brand-blue-600 border-2 border-brand-blue-400'
                         : 'bg-slate-800 border-2 border-transparent'
                     }`}
                   >
@@ -185,7 +185,7 @@ export default function ShopLogHoursPage() {
                   type="date"
                   value={weekEnding}
                   onChange={(e) => setWeekEnding(e.target.value)}
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-12 pr-4 py-4 text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-12 pr-4 py-4 text-white focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -204,7 +204,7 @@ export default function ShopLogHoursPage() {
                   value={hours}
                   onChange={(e) => setHours(e.target.value)}
                   placeholder="e.g., 40"
-                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-12 pr-4 py-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-xl pl-12 pr-4 py-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -219,7 +219,7 @@ export default function ShopLogHoursPage() {
                   onClick={() => setHours(h.toString())}
                   className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                     hours === h.toString()
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-brand-blue-600 text-white'
                       : 'bg-slate-800 text-slate-400 border border-slate-700'
                   }`}
                 >
@@ -236,7 +236,7 @@ export default function ShopLogHoursPage() {
                 onChange={(e) => setNotes(e.target.value)}
                 placeholder="Any notes about this week's training..."
                 rows={3}
-                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-4 text-white placeholder-slate-500 focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent resize-none"
               />
             </div>
 
@@ -246,7 +246,7 @@ export default function ShopLogHoursPage() {
                 type="checkbox"
                 checked={attestation}
                 onChange={(e) => setAttestation(e.target.checked)}
-                className="w-5 h-5 mt-0.5 rounded border-slate-600 bg-slate-700 text-blue-600 focus:ring-blue-500"
+                className="w-5 h-5 mt-0.5 rounded border-slate-600 bg-slate-700 text-brand-blue-600 focus:ring-brand-blue-500"
               />
               <span className="text-slate-300 text-sm">
                 I attest that the hours reported above are accurate and that the apprentice was under proper supervision during all training activities.
@@ -257,7 +257,7 @@ export default function ShopLogHoursPage() {
             <button
               type="submit"
               disabled={submitting || !selectedApprentice || !hours || !attestation}
-              className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
@@ -282,7 +282,7 @@ export default function ShopLogHoursPage() {
             <Building2 className="w-6 h-6" />
             <span className="text-xs">Home</span>
           </Link>
-          <Link href="/pwa/shop-owner/log-hours" className="flex flex-col items-center gap-1 text-blue-400">
+          <Link href="/pwa/shop-owner/log-hours" className="flex flex-col items-center gap-1 text-brand-blue-400">
             <Clock className="w-6 h-6" />
             <span className="text-xs">Log</span>
           </Link>

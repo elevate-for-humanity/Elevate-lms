@@ -164,7 +164,7 @@ export default async function NrfPage() {
               href="https://www.nrffoundation.org/rise-up"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-white hover:bg-gray-100 text-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl flex items-center gap-2 justify-center"
+              className="bg-white hover:bg-gray-100 text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all shadow-2xl flex items-center gap-2 justify-center"
             >
               Learn More About RISE Up
               <ExternalLink className="w-5 h-5" />
@@ -181,8 +181,8 @@ export default async function NrfPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-2">
                 Industry-Recognized
@@ -203,7 +203,7 @@ export default async function NrfPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Clock className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-2">Self-Paced</h3>
@@ -253,7 +253,7 @@ export default async function NrfPage() {
                   <ul className="text-sm text-black space-y-1">
                     {course.topics.map((topic, idx) => (
                       <li key={idx} className="flex items-start gap-2">
-                        <span className="text-blue-600 mt-1">•</span>
+                        <span className="text-brand-blue-600 mt-1">•</span>
                         <span>{topic}</span>
                       </li>
                     ))}
@@ -262,7 +262,7 @@ export default async function NrfPage() {
 
                 <Link
                   href="/contact"
-                  className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors w-full justify-center"
+                  className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors w-full justify-center"
                 >
                   Enroll Now
                 </Link>
@@ -289,7 +289,7 @@ export default async function NrfPage() {
               <p className="text-black mb-4">
                 Includes NRF RISE Up credentials and job readiness training
               </p>
-              <span className="text-blue-600 font-semibold">
+              <span className="text-brand-blue-600 font-semibold">
                 Learn More →
               </span>
             </Link>
@@ -304,7 +304,7 @@ export default async function NrfPage() {
               <p className="text-black mb-4">
                 Includes retail business fundamentals and customer service
               </p>
-              <span className="text-blue-600 font-semibold">
+              <span className="text-brand-blue-600 font-semibold">
                 Learn More →
               </span>
             </Link>
@@ -313,7 +313,7 @@ export default async function NrfPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             Ready to Get Certified?
@@ -331,7 +331,7 @@ export default async function NrfPage() {
             </Link>
             <Link
               href="/contact"
-              className="bg-white hover:bg-gray-100 text-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
+              className="bg-white hover:bg-gray-100 text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-semibold transition-all"
             >
               Contact Us
             </Link>

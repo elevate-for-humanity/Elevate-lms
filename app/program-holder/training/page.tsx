@@ -54,12 +54,12 @@ export default async function TrainingPage() {
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Training" }]} />
         </div>
       {/* Header */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-7xl mx-auto px-6">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Program Holder Training & Resources
           </h1>
-          <p className="text-xl text-blue-100">
+          <p className="text-xl text-brand-blue-100">
             Watch our orientation video and access training materials to get
             started
           </p>
@@ -94,8 +94,8 @@ export default async function TrainingPage() {
                 </video>
               </div>
 
-              <div className="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <p className="text-sm text-blue-900">
+              <div className="mt-6 p-4 bg-brand-blue-50 rounded-lg border border-brand-blue-200">
+                <p className="text-sm text-brand-blue-900">
                   <strong>Duration:</strong> ~5 minutes |
                   <strong className="ml-4">Topics Covered:</strong> Platform
                   navigation, student enrollment, progress tracking, compliance
@@ -118,7 +118,7 @@ export default async function TrainingPage() {
             {/* Module 1 */}
             <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-blue-700">1</span>
+                <span className="text-2xl font-bold text-brand-blue-700">1</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Getting Started</h3>
               <p className="text-black mb-4">
@@ -127,7 +127,7 @@ export default async function TrainingPage() {
               </p>
               <Link
                 href="/program-holder/onboarding"
-                className="text-blue-700 font-semibold hover:underline"
+                className="text-brand-blue-700 font-semibold hover:underline"
               >
                 View Guide →
               </Link>
@@ -145,7 +145,7 @@ export default async function TrainingPage() {
               </p>
               <Link
                 href="/program-holder/students"
-                className="text-blue-700 font-semibold hover:underline"
+                className="text-brand-blue-700 font-semibold hover:underline"
               >
                 Manage Students →
               </Link>
@@ -154,7 +154,7 @@ export default async function TrainingPage() {
             {/* Module 3 */}
             <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-blue-700">3</span>
+                <span className="text-2xl font-bold text-brand-blue-700">3</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Compliance & Reporting</h3>
               <p className="text-black mb-4">
@@ -163,7 +163,7 @@ export default async function TrainingPage() {
               </p>
               <Link
                 href="/program-holder/compliance"
-                className="text-blue-700 font-semibold hover:underline"
+                className="text-brand-blue-700 font-semibold hover:underline"
               >
                 View Compliance →
               </Link>
@@ -181,7 +181,7 @@ export default async function TrainingPage() {
               </p>
               <Link
                 href="/program-holder/documents"
-                className="text-blue-700 font-semibold hover:underline"
+                className="text-brand-blue-700 font-semibold hover:underline"
               >
                 Manage Documents →
               </Link>
@@ -199,7 +199,7 @@ export default async function TrainingPage() {
               </p>
               <Link
                 href="/program-holder/support"
-                className="text-blue-700 font-semibold hover:underline"
+                className="text-brand-blue-700 font-semibold hover:underline"
               >
                 Get Support →
               </Link>
@@ -217,7 +217,7 @@ export default async function TrainingPage() {
               </p>
               <Link
                 href="/program-holder/handbook"
-                className="text-blue-700 font-semibold hover:underline"
+                className="text-brand-blue-700 font-semibold hover:underline"
               >
                 Read Handbook →
               </Link>
@@ -233,7 +233,7 @@ export default async function TrainingPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-4">
               Need Help?
             </h2>
-            <p className="text-base md:text-lg text-blue-100 mb-8">
+            <p className="text-base md:text-lg text-brand-blue-100 mb-8">
               Contact support if you have questions about managing your
               programs or need assistance.
             </p>
@@ -246,7 +246,7 @@ export default async function TrainingPage() {
               </Link>
               <Link
                 href="/program-holder/dashboard"
-                className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg"
+                className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
               >
                 Browse Programs
               </Link>

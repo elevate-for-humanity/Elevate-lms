@@ -193,8 +193,8 @@ export default function DisclosuresPage() {
           {/* Institutional Policies */}
           <div className="mb-12">
             <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Building className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Building className="w-5 h-5 text-brand-blue-600" />
               </div>
               Institutional Policies
             </h3>
@@ -210,15 +210,15 @@ export default function DisclosuresPage() {
                   <Link
                     key={policy.href}
                     href={policy.href}
-                    className="group bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-blue-500 hover:shadow-lg transition-all"
+                    className="group bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-brand-blue-500 hover:shadow-lg transition-all"
                   >
-                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-100 transition">
-                      <Icon className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-brand-blue-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-brand-blue-100 transition">
+                      <Icon className="w-6 h-6 text-brand-blue-600" />
                     </div>
-                    <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition">
+                    <h4 className="font-semibold text-gray-900 group-hover:text-brand-blue-600 transition">
                       {policy.title}
                     </h4>
-                    <span className="text-sm text-gray-500 group-hover:text-blue-500 flex items-center gap-1 mt-2">
+                    <span className="text-sm text-gray-500 group-hover:text-brand-blue-500 flex items-center gap-1 mt-2">
                       View Policy <ArrowRight className="w-3 h-3" />
                     </span>
                   </Link>
@@ -230,8 +230,8 @@ export default function DisclosuresPage() {
           {/* Academic Policies */}
           <div className="mb-12">
             <h3 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <GraduationCap className="w-5 h-5 text-brand-blue-600" />
               </div>
               Academic Policies
             </h3>
@@ -247,15 +247,15 @@ export default function DisclosuresPage() {
                   <Link
                     key={policy.href}
                     href={policy.href}
-                    className="group bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-blue-500 hover:shadow-lg transition-all"
+                    className="group bg-white border-2 border-gray-100 rounded-xl p-5 hover:border-brand-blue-500 hover:shadow-lg transition-all"
                   >
-                    <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-blue-100 transition">
-                      <Icon className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-brand-blue-50 rounded-xl flex items-center justify-center mb-4 group-hover:bg-brand-blue-100 transition">
+                      <Icon className="w-6 h-6 text-brand-blue-600" />
                     </div>
-                    <h4 className="font-semibold text-gray-900 group-hover:text-blue-600 transition">
+                    <h4 className="font-semibold text-gray-900 group-hover:text-brand-blue-600 transition">
                       {policy.title}
                     </h4>
-                    <span className="text-sm text-gray-500 group-hover:text-blue-500 flex items-center gap-1 mt-2">
+                    <span className="text-sm text-gray-500 group-hover:text-brand-blue-500 flex items-center gap-1 mt-2">
                       View Policy <ArrowRight className="w-3 h-3" />
                     </span>
                   </Link>
@@ -360,10 +360,10 @@ export default function DisclosuresPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-2xl p-8">
+            <div className="bg-brand-blue-50 border-2 border-brand-blue-200 rounded-2xl p-8">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                  <GraduationCap className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                  <GraduationCap className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-bold text-gray-900 text-lg mb-2">Program Delivery</h3>

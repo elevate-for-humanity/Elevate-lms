@@ -45,11 +45,11 @@ export default function CompliancePage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-blue-900/70" />
+        <div className="absolute inset-0 bg-brand-blue-900/70" />
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-7xl mx-auto px-4 w-full">
             <h1 className="text-4xl font-bold text-white mb-4">Compliance Center</h1>
-            <p className="text-xl text-blue-200 max-w-2xl">
+            <p className="text-xl text-brand-blue-200 max-w-2xl">
               Access our policies, certifications, and compliance documentation.
             </p>
           </div>
@@ -84,7 +84,7 @@ export default function CompliancePage() {
                         </span>
                       </td>
                       <td className="px-6 py-4 text-center">
-                        <button className="text-blue-600 hover:text-blue-700">
+                        <button className="text-brand-blue-600 hover:text-brand-blue-700">
                           <Download className="w-5 h-5" />
                         </button>
                       </td>
@@ -110,10 +110,10 @@ export default function CompliancePage() {
                 </div>
               ))}
             </div>
-            <div className="mt-6 bg-blue-50 rounded-xl p-6">
-              <h3 className="font-semibold text-blue-900 mb-2">Questions?</h3>
-              <p className="text-sm text-blue-700 mb-4">Contact our compliance team for any questions about our policies.</p>
-              <Link href="/contact" className="text-blue-600 hover:underline text-sm font-medium">
+            <div className="mt-6 bg-brand-blue-50 rounded-xl p-6">
+              <h3 className="font-semibold text-brand-blue-900 mb-2">Questions?</h3>
+              <p className="text-sm text-brand-blue-700 mb-4">Contact our compliance team for any questions about our policies.</p>
+              <Link href="/contact" className="text-brand-blue-600 hover:underline text-sm font-medium">
                 Contact Compliance Team
               </Link>
             </div>

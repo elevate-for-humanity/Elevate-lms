@@ -73,7 +73,7 @@ export default function ProgramHolderForm() {
               id="firstName"
               name="firstName"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -89,7 +89,7 @@ export default function ProgramHolderForm() {
               id="lastName"
               name="lastName"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -105,7 +105,7 @@ export default function ProgramHolderForm() {
               id="email"
               name="email"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -121,7 +121,7 @@ export default function ProgramHolderForm() {
               id="phone"
               name="phone"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -146,7 +146,7 @@ export default function ProgramHolderForm() {
               id="organizationName"
               name="organizationName"
               required
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -160,7 +160,7 @@ export default function ProgramHolderForm() {
             <select
               id="organizationType"
               name="organizationType"
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             >
               <option value="">Select type</option>
               <option value="school">School / Educational Institution</option>
@@ -186,7 +186,7 @@ export default function ProgramHolderForm() {
               id="website"
               name="website"
               placeholder="https://"
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -200,7 +200,7 @@ export default function ProgramHolderForm() {
             <select
               id="numberOfStudents"
               name="numberOfStudents"
-              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full min-h-[44px] px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             >
               <option value="">Select range</option>
               <option value="1-50">1-50 students</option>
@@ -221,7 +221,7 @@ export default function ProgramHolderForm() {
               id="programsOffered"
               name="programsOffered"
               rows={3}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="List the training programs you currently offer..."
             />
           </div>
@@ -237,7 +237,7 @@ export default function ProgramHolderForm() {
               id="partnershipGoals"
               name="partnershipGoals"
               rows={4}
-              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="What do you hope to achieve through this partnership?"
             />
           </div>
@@ -249,7 +249,7 @@ export default function ProgramHolderForm() {
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 min-h-[48px] px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 min-h-[48px] px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 disabled:bg-slate-400 disabled:cursor-not-allowed transition-colors"
         >
           {loading ? 'Submitting...' : 'Submit Partnership Application'}
         </button>

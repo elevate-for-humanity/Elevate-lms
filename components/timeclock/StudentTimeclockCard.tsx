@@ -156,7 +156,7 @@ export function StudentTimeclockCard({
 
       {/* Shift Info */}
       {timeclock.isShiftOpen && (
-        <div className="mb-4 p-3 rounded-md bg-blue-50">
+        <div className="mb-4 p-3 rounded-md bg-brand-blue-50">
           <div className="grid grid-cols-2 gap-2 text-sm">
             <div>
               <span className="text-gray-600">Clock In:</span>

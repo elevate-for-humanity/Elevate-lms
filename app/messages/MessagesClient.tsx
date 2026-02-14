@@ -154,7 +154,7 @@ export default function MessagesClient({ userId, initialConversations, participa
                       key={conv.id}
                       onClick={() => setSelectedConversation(conv.id)}
                       className={`w-full p-4 flex items-center gap-3 hover:bg-gray-50 border-b transition ${
-                        selectedConversation === conv.id ? 'bg-blue-50' : ''
+                        selectedConversation === conv.id ? 'bg-brand-blue-50' : ''
                       }`}
                     >
                       <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center flex-shrink-0">
@@ -227,13 +227,13 @@ export default function MessagesClient({ userId, initialConversations, participa
                         <div
                           className={`max-w-[70%] px-4 py-2 rounded-2xl ${
                             msg.sender_id === userId
-                              ? 'bg-blue-600 text-white'
+                              ? 'bg-brand-blue-600 text-white'
                               : 'bg-white border text-gray-900'
                           }`}
                         >
                           <p>{msg.content}</p>
                           <p className={`text-xs mt-1 ${
-                            msg.sender_id === userId ? 'text-blue-200' : 'text-gray-400'
+                            msg.sender_id === userId ? 'text-brand-blue-200' : 'text-gray-400'
                           }`}>
                             {formatTime(msg.created_at)}
                           </p>
@@ -252,12 +252,12 @@ export default function MessagesClient({ userId, initialConversations, participa
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Type a message..."
-                      className="flex-1 px-4 py-2 border rounded-full focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                      className="flex-1 px-4 py-2 border rounded-full focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     />
                     <button
                       type="submit"
                       disabled={!newMessage.trim() || sending}
-                      className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-3 bg-brand-blue-600 text-white rounded-full hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {sending ? (
                         <Loader2 className="w-5 h-5 animate-spin" />

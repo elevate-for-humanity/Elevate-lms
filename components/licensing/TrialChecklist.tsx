@@ -243,8 +243,8 @@ export function TrialChecklist({
           className="w-full flex items-center justify-between"
         >
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div className="text-left">
               <p className="font-semibold text-slate-900">Trial Setup Progress</p>
@@ -256,7 +256,7 @@ export function TrialChecklist({
           <div className="flex items-center gap-3">
             <div className="w-24 h-2 bg-slate-100 rounded-full overflow-hidden">
               <div
-                className="h-full bg-blue-600 transition-all"
+                className="h-full bg-brand-blue-600 transition-all"
                 style={{ width: `${progressPercent}%` }}
               />
             </div>
@@ -277,19 +277,19 @@ export function TrialChecklist({
             <h3 className="text-lg font-bold text-white">
               {orgType === 'school' ? 'School Setup Checklist' : 'Organization Setup Checklist'}
             </h3>
-            <p className="text-blue-100 text-sm mt-1">
+            <p className="text-brand-blue-100 text-sm mt-1">
               Complete these steps to get the most from your trial
             </p>
           </div>
           <button
             onClick={() => setCollapsed(true)}
-            className="text-blue-200 hover:text-white"
+            className="text-brand-blue-200 hover:text-white"
           >
             <ChevronUp className="w-5 h-5" />
           </button>
         </div>
         <div className="mt-4 flex items-center gap-3">
-          <div className="flex-1 h-2 bg-blue-500/30 rounded-full overflow-hidden">
+          <div className="flex-1 h-2 bg-brand-blue-500/30 rounded-full overflow-hidden">
             <div
               className="h-full bg-white transition-all"
               style={{ width: `${progressPercent}%` }}
@@ -382,7 +382,7 @@ export function TrialChecklist({
                         {step.href && !isComplete && (
                           <Link
                             href={step.href}
-                            className="flex-shrink-0 text-blue-600 hover:text-blue-800 text-sm font-medium"
+                            className="flex-shrink-0 text-brand-blue-600 hover:text-brand-blue-800 text-sm font-medium"
                           >
                             Start →
                           </Link>
@@ -411,13 +411,13 @@ export function TrialChecklist({
         <div className="flex items-center justify-between">
           <Link
             href="/support/contact?subject=trial-onboarding"
-            className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+            className="text-sm text-brand-blue-600 hover:text-brand-blue-800 font-medium"
           >
             Need help? Schedule an onboarding call
           </Link>
           <Link
             href="/store/licenses/managed"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors"
           >
             View Upgrade Options
             <ArrowRight className="w-4 h-4" />

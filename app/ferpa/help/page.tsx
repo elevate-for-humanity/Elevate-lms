@@ -114,7 +114,7 @@ export default async function FerpaHelpPage() {
                     href={resource.link}
                     className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 hover:shadow-md transition-shadow"
                   >
-                    <Icon className="w-6 h-6 text-blue-600 mb-2" />
+                    <Icon className="w-6 h-6 text-brand-blue-600 mb-2" />
                     <h3 className="font-semibold text-gray-900">{resource.title}</h3>
                     <p className="text-sm text-gray-500 mt-1">{resource.description}</p>
                   </Link>
@@ -150,12 +150,12 @@ export default async function FerpaHelpPage() {
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Contact FERPA Officer</h2>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:text-blue-700">
+                    <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:text-brand-blue-700">
                       elevate4humanityedu@gmail.com
                     </a>
                   </div>
@@ -166,7 +166,7 @@ export default async function FerpaHelpPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Phone</p>
-                    <a href="/support" className="text-blue-600 hover:text-blue-700">
+                    <a href="/support" className="text-brand-blue-600 hover:text-brand-blue-700">
                       Get Help Online
                     </a>
                   </div>
@@ -182,7 +182,7 @@ export default async function FerpaHelpPage() {
                   href="https://studentprivacy.ed.gov/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between text-sm text-blue-600 hover:text-blue-700"
+                  className="flex items-center justify-between text-sm text-brand-blue-600 hover:text-brand-blue-700"
                 >
                   Student Privacy Policy Office
                   <ExternalLink className="w-4 h-4" />
@@ -191,7 +191,7 @@ export default async function FerpaHelpPage() {
                   href="https://www2.ed.gov/policy/gen/guid/fpco/ferpa/index.html"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between text-sm text-blue-600 hover:text-blue-700"
+                  className="flex items-center justify-between text-sm text-brand-blue-600 hover:text-brand-blue-700"
                 >
                   FERPA Regulations
                   <ExternalLink className="w-4 h-4" />
@@ -200,7 +200,7 @@ export default async function FerpaHelpPage() {
                   href="https://studentprivacy.ed.gov/training"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-between text-sm text-blue-600 hover:text-blue-700"
+                  className="flex items-center justify-between text-sm text-brand-blue-600 hover:text-brand-blue-700"
                 >
                   Federal Training Resources
                   <ExternalLink className="w-4 h-4" />

@@ -256,8 +256,8 @@ export default function MarketplaceTermsPage() {
             </p>
           </section>
 
-          <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm text-blue-900">
+          <div className="mt-8 p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
+            <p className="text-sm text-brand-blue-900">
               <strong>
                 By making a purchase on the Marketplace, you acknowledge that
                 you have read, understood, and agree to these Marketplace Terms.

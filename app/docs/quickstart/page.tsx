@@ -35,14 +35,14 @@ export default function QuickstartPage() {
         <div className="space-y-4">
           {steps.map((step) => (
             <div key={step.num} className="bg-white rounded-xl shadow-sm border p-6 flex items-center gap-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-xl font-bold text-blue-600 flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center text-xl font-bold text-brand-blue-600 flex-shrink-0">
                 {step.num}
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900">{step.title}</h3>
                 <p className="text-gray-600">{step.desc}</p>
               </div>
-              <Link href={step.link} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <Link href={step.link} className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
                 Start <ArrowRight className="w-4 h-4" />
               </Link>
             </div>

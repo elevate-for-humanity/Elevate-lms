@@ -71,9 +71,9 @@ const policies = [
 ];
 
 const colorClasses: Record<string, { bg: string; border: string; icon: string }> = {
-  blue: { bg: 'bg-blue-50', border: 'border-blue-200', icon: 'text-blue-600' },
+  blue: { bg: 'bg-brand-blue-50', border: 'border-brand-blue-200', icon: 'text-brand-blue-600' },
   green: { bg: 'bg-green-50', border: 'border-green-200', icon: 'text-green-600' },
-  blue: { bg: 'bg-blue-50', border: 'border-blue-200', icon: 'text-blue-600' },
+  blue: { bg: 'bg-brand-blue-50', border: 'border-brand-blue-200', icon: 'text-brand-blue-600' },
   orange: { bg: 'bg-orange-50', border: 'border-orange-200', icon: 'text-orange-600' },
   rose: { bg: 'bg-rose-50', border: 'border-rose-200', icon: 'text-rose-600' },
   teal: { bg: 'bg-teal-50', border: 'border-teal-200', icon: 'text-teal-600' },
@@ -85,21 +85,21 @@ export default function EqualOpportunityPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Breadcrumbs */}
-      <div className="bg-blue-900 border-b border-blue-800">
+      <div className="bg-brand-blue-900 border-b border-blue-800">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'Equal Opportunity' }]} />
         </div>
       </div>
 
       {/* Hero */}
-      <section className="bg-blue-800 text-white py-16">
+      <section className="bg-brand-blue-800 text-white py-16">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
-            <Scale className="w-8 h-8 text-blue-300" />
-            <span className="text-blue-300 font-medium">Compliance</span>
+            <Scale className="w-8 h-8 text-brand-blue-300" />
+            <span className="text-brand-blue-300 font-medium">Compliance</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Equal Opportunity Employer</h1>
-          <p className="text-xl text-blue-100 max-w-3xl">
+          <p className="text-xl text-brand-blue-100 max-w-3xl">
             Elevate for Humanity is committed to providing equal opportunity in employment and 
             education without regard to race, color, religion, sex, national origin, age, 
             disability, genetic information, or any other protected status.
@@ -160,7 +160,7 @@ export default function EqualOpportunityPage() {
                       <Icon className={`w-6 h-6 ${colors.icon}`} />
                     </div>
                     <div className="flex-1">
-                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition flex items-center gap-2">
+                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-brand-blue-600 transition flex items-center gap-2">
                         {policy.title}
                         <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition" />
                       </h3>
@@ -200,7 +200,7 @@ export default function EqualOpportunityPage() {
               'Political Affiliation',
             ].map((item) => (
               <div key={item} className="flex items-center gap-2 text-gray-700">
-                <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                <div className="w-2 h-2 bg-brand-blue-500 rounded-full" />
                 {item}
               </div>
             ))}
@@ -208,7 +208,7 @@ export default function EqualOpportunityPage() {
         </section>
 
         {/* How to File a Complaint */}
-        <section className="bg-blue-50 rounded-xl border-2 border-blue-200 p-8 mb-12">
+        <section className="bg-brand-blue-50 rounded-xl border-2 border-brand-blue-200 p-8 mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">How to File a Complaint</h2>
           <p className="text-gray-700 mb-6">
             If you believe you have been discriminated against, you have the right to file a complaint. 
@@ -222,13 +222,13 @@ export default function EqualOpportunityPage() {
                 Contact our Equal Opportunity Officer:
               </p>
               <p className="text-gray-900">
-                Email: <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">elevate4humanityedu@gmail.com</a>
+                Email: <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">elevate4humanityedu@gmail.com</a>
               </p>
               <p className="text-gray-900">
-                Phone: <a href="/support" className="text-blue-600 hover:underline">Visit Support Center</a>
+                Phone: <a href="/support" className="text-brand-blue-600 hover:underline">Visit Support Center</a>
               </p>
               <p className="mt-4">
-                <Link href="/policies/grievance" className="text-blue-600 hover:underline text-sm font-medium">
+                <Link href="/policies/grievance" className="text-brand-blue-600 hover:underline text-sm font-medium">
                   View Grievance Procedure →
                 </Link>
               </p>
@@ -264,22 +264,22 @@ export default function EqualOpportunityPage() {
       </div>
 
       {/* CTA Section */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Need Assistance or Have Questions?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Contact us for accommodations, to file a complaint, or for more information about our equal opportunity policies.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center gap-2 bg-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-800 transition border border-white/30"
+              className="inline-flex items-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-800 transition border border-white/30"
             >
               <Phone className="w-5 h-5" /> Visit Support Center
             </a>

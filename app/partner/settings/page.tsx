@@ -40,7 +40,7 @@ export default function PartnerSettingsPage() {
             <h1 className="text-3xl font-bold text-gray-900">Partner Settings</h1>
             <p className="text-gray-600">Manage your organization profile and preferences</p>
           </div>
-          <Link href="/partner" className="text-blue-600 hover:text-blue-700">← Back to Portal</Link>
+          <Link href="/partner" className="text-brand-blue-600 hover:text-brand-blue-700">← Back to Portal</Link>
         </div>
 
         {saved && (
@@ -54,8 +54,8 @@ export default function PartnerSettingsPage() {
           {/* Organization Info */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Building2 className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-brand-blue-600" />
               </div>
               <h2 className="text-lg font-semibold text-gray-900">Organization Information</h2>
             </div>
@@ -123,8 +123,8 @@ export default function PartnerSettingsPage() {
           {/* Notifications */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3 mb-6">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Bell className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Bell className="w-5 h-5 text-brand-blue-600" />
               </div>
               <h2 className="text-lg font-semibold text-gray-900">Notification Preferences</h2>
             </div>
@@ -147,7 +147,7 @@ export default function PartnerSettingsPage() {
                       onChange={(e) => setSettings({ ...settings, [item.key]: e.target.checked })}
                       className="sr-only peer"
                     />
-                    <div className="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                    <div className="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600"></div>
                   </label>
                 </div>
               ))}
@@ -155,7 +155,7 @@ export default function PartnerSettingsPage() {
           </div>
 
           <div className="flex justify-end">
-            <button onClick={handleSave} className="flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button onClick={handleSave} className="flex items-center gap-2 px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
               <Save className="w-4 h-4" /> Save Settings
             </button>
           </div>

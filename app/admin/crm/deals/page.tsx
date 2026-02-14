@@ -30,8 +30,8 @@ export default async function DealsPage() {
   }
 
   const pipelineStages = [
-    { name: 'Discovery', deals: 3, value: '$45,000', color: 'bg-blue-500' },
-    { name: 'Proposal', deals: 4, value: '$120,000', color: 'bg-blue-500' },
+    { name: 'Discovery', deals: 3, value: '$45,000', color: 'bg-brand-blue-500' },
+    { name: 'Proposal', deals: 4, value: '$120,000', color: 'bg-brand-blue-500' },
     { name: 'Negotiation', deals: 2, value: '$85,000', color: 'bg-orange-500' },
     { name: 'Closed Won', deals: 5, value: '$175,000', color: 'bg-green-500' },
   ];
@@ -81,8 +81,8 @@ export default async function DealsPage() {
 
   const getStageColor = (stage: string) => {
     switch (stage) {
-      case 'Discovery': return 'bg-blue-100 text-blue-700 border-blue-200';
-      case 'Proposal': return 'bg-blue-100 text-blue-700 border-blue-200';
+      case 'Discovery': return 'bg-brand-blue-100 text-brand-blue-700 border-brand-blue-200';
+      case 'Proposal': return 'bg-brand-blue-100 text-brand-blue-700 border-brand-blue-200';
       case 'Negotiation': return 'bg-orange-100 text-orange-700 border-orange-200';
       case 'Closed Won': return 'bg-green-100 text-green-700 border-green-200';
       default: return 'bg-gray-100 text-gray-700 border-gray-200';
@@ -193,7 +193,7 @@ export default async function DealsPage() {
                     <div className="flex items-center gap-2 mt-1">
                       <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
                         <div 
-                          className={`h-full rounded-full ${deal.probability === 100 ? 'bg-green-500' : 'bg-blue-500'}`}
+                          className={`h-full rounded-full ${deal.probability === 100 ? 'bg-green-500' : 'bg-brand-blue-500'}`}
                           style={{ width: `${deal.probability}%` }}
                         />
                       </div>

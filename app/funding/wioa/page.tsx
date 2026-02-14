@@ -257,8 +257,8 @@ export default async function WioaPage() {
             </div>
           </div>
 
-          <div className="mt-8 bg-blue-50 rounded-lg p-6">
-            <p className="text-blue-900">
+          <div className="mt-8 bg-brand-blue-50 rounded-lg p-6">
+            <p className="text-brand-blue-900">
               <strong>Not sure if you qualify?</strong> Contact us. We'll
               connect you with your local WorkOne center and help you through
               the application process.
@@ -429,7 +429,7 @@ export default async function WioaPage() {
               href="https://www.in.gov/dwd/workone-centers/"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-block px-10 py-5 bg-brand-blue-700 text-white font-bold rounded-lg hover:bg-blue-800 border-2 border-white transition-all text-lg shadow-xl"
+              className="inline-block px-10 py-5 bg-brand-blue-700 text-white font-bold rounded-lg hover:bg-brand-blue-800 border-2 border-white transition-all text-lg shadow-xl"
             >
               Find Your WorkOne Center
             </a>

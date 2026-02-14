@@ -33,7 +33,7 @@ export default function AccreditationReportPage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Report" }]} />
       </div>
 <div className="max-w-6xl mx-auto">
-        <Link href="/admin/accreditation" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/admin/accreditation" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to Accreditation
         </Link>
@@ -43,7 +43,7 @@ export default function AccreditationReportPage() {
             <h1 className="text-2xl font-bold text-gray-900">Accreditation Compliance Report</h1>
             <p className="text-gray-600">Generated: {new Date().toLocaleDateString()}</p>
           </div>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+          <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2">
             <Download className="w-4 h-4" />
             Export PDF
           </button>
@@ -69,7 +69,7 @@ export default function AccreditationReportPage() {
             <p className="text-xl font-bold text-gray-900">{reportData.lastAudit}</p>
           </div>
           <div className="bg-white rounded-xl shadow-sm p-6">
-            <Clock className="w-8 h-8 text-blue-600 mb-3" />
+            <Clock className="w-8 h-8 text-brand-blue-600 mb-3" />
             <p className="text-sm text-gray-500">Next Audit</p>
             <p className="text-xl font-bold text-gray-900">{reportData.nextAudit}</p>
           </div>
@@ -106,7 +106,7 @@ export default function AccreditationReportPage() {
             {reportData.recentFindings.map((finding) => (
               <div key={finding.id} className="flex items-start gap-4 p-4 border rounded-lg">
                 <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-                  finding.type === 'observation' ? 'bg-yellow-100 text-yellow-700' : 'bg-blue-100 text-blue-700'
+                  finding.type === 'observation' ? 'bg-yellow-100 text-yellow-700' : 'bg-brand-blue-100 text-brand-blue-700'
                 }`}>
                   {finding.type}
                 </div>

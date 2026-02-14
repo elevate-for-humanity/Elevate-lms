@@ -15,7 +15,7 @@ const features = [
     icon: GraduationCap,
     title: 'Online Enrollment',
     desc: 'Apply for programs, upload documents, and track your application status — all from your phone or computer. No office visit required.',
-    color: 'bg-blue-50 text-blue-600',
+    color: 'bg-brand-blue-50 text-brand-blue-600',
   },
   {
     icon: DollarSign,

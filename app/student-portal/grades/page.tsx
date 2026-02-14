@@ -90,7 +90,7 @@ export default async function StudentPortalGradesPage() {
     if (!grade) return 'text-gray-600';
     const g = grade.toUpperCase();
     if (g.startsWith('A')) return 'text-green-600';
-    if (g.startsWith('B')) return 'text-blue-600';
+    if (g.startsWith('B')) return 'text-brand-blue-600';
     if (g.startsWith('C')) return 'text-yellow-600';
     if (g.startsWith('D')) return 'text-orange-600';
     return 'text-red-600';
@@ -111,9 +111,9 @@ export default async function StudentPortalGradesPage() {
         {/* Stats Summary */}
         <div className="grid md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-xl border p-6 text-center">
-            <GraduationCap className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+            <GraduationCap className="w-8 h-8 text-brand-blue-600 mx-auto mb-2" />
             <p className="text-sm text-gray-600 mb-1">Courses Completed</p>
-            <p className="text-3xl font-bold text-blue-600">{completedCourses.length}</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{completedCourses.length}</p>
           </div>
           <div className="bg-white rounded-xl border p-6 text-center">
             <BookOpen className="w-8 h-8 text-green-600 mx-auto mb-2" />
@@ -156,7 +156,7 @@ export default async function StudentPortalGradesPage() {
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                         enrollment.status === 'completed' 
                           ? 'bg-green-100 text-green-700'
-                          : 'bg-blue-100 text-blue-700'
+                          : 'bg-brand-blue-100 text-brand-blue-700'
                       }`}>
                         {enrollment.status === 'completed' ? 'Completed' : 'In Progress'}
                       </span>
@@ -186,7 +186,7 @@ export default async function StudentPortalGradesPage() {
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
                         enrollment.status === 'completed' 
                           ? 'bg-green-100 text-green-700'
-                          : 'bg-blue-100 text-blue-700'
+                          : 'bg-brand-blue-100 text-brand-blue-700'
                       }`}>
                         {enrollment.status === 'completed' ? 'Completed' : 'In Progress'}
                       </span>

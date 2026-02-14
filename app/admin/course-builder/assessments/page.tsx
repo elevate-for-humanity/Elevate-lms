@@ -35,7 +35,7 @@ export default async function AssessmentBankPage() {
               <h1 className="text-3xl font-bold text-gray-900">Assessment Bank</h1>
               <p className="text-gray-600 mt-1">Create and manage quizzes and assessments</p>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors">
               <Plus className="w-5 h-5" />
               Create Assessment
             </button>
@@ -46,8 +46,8 @@ export default async function AssessmentBankPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <FileQuestion className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <FileQuestion className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">0</p>
@@ -68,8 +68,8 @@ export default async function AssessmentBankPage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Clock className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <Clock className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">0</p>
@@ -98,7 +98,7 @@ export default async function AssessmentBankPage() {
               <input
                 type="text"
                 placeholder="Search assessments..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
             <select className="px-4 py-2 border border-gray-300 rounded-lg bg-white">
@@ -117,7 +117,7 @@ export default async function AssessmentBankPage() {
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No assessments yet</h3>
           <p className="text-gray-500 mb-6">Create quizzes and exams to test student knowledge</p>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors">
             <Plus className="w-5 h-5" />
             Create Assessment
           </button>
@@ -128,21 +128,21 @@ export default async function AssessmentBankPage() {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="font-semibold text-gray-900 mb-2">Import Questions</h3>
             <p className="text-sm text-gray-600 mb-4">Upload questions from CSV or Excel</p>
-            <button className="text-blue-600 text-sm font-medium hover:text-blue-700">
+            <button className="text-brand-blue-600 text-sm font-medium hover:text-brand-blue-700">
               Import →
             </button>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="font-semibold text-gray-900 mb-2">Question Bank</h3>
             <p className="text-sm text-gray-600 mb-4">Browse and reuse existing questions</p>
-            <button className="text-blue-600 text-sm font-medium hover:text-blue-700">
+            <button className="text-brand-blue-600 text-sm font-medium hover:text-brand-blue-700">
               Browse →
             </button>
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h3 className="font-semibold text-gray-900 mb-2">AI Generate</h3>
             <p className="text-sm text-gray-600 mb-4">Generate questions using AI</p>
-            <button className="text-blue-600 text-sm font-medium hover:text-blue-700">
+            <button className="text-brand-blue-600 text-sm font-medium hover:text-brand-blue-700">
               Generate →
             </button>
           </div>

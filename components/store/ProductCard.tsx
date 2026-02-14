@@ -46,14 +46,14 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
             <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded-full ${
               product.badge === 'Best Seller' ? 'bg-orange-500 text-white' :
               product.badge === 'New' ? 'bg-green-500 text-white' :
-              'bg-blue-500 text-white'
+              'bg-brand-blue-500 text-white'
             }`}>
               {product.badge}
             </span>
           )}
         </div>
         <div className="p-4">
-          <h3 className="font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition">{product.name}</h3>
+          <h3 className="font-bold text-gray-900 mb-1 group-hover:text-brand-blue-600 transition">{product.name}</h3>
           <div className="flex items-center gap-2 mb-2">
             <div className="flex items-center gap-0.5">
               <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
@@ -87,7 +87,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
             <span className={`absolute top-3 left-3 px-2 py-1 text-xs font-bold rounded-full ${
               product.badge === 'Best Seller' ? 'bg-orange-500 text-white' :
               product.badge === 'New' ? 'bg-green-500 text-white' :
-              'bg-blue-500 text-white'
+              'bg-brand-blue-500 text-white'
             }`}>
               {product.badge}
             </span>
@@ -96,8 +96,8 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
         <div className="flex-1 p-5 flex flex-col">
           <div className="flex items-start justify-between mb-2">
             <div>
-              <h3 className="font-bold text-lg text-gray-900 group-hover:text-blue-600 transition">{product.name}</h3>
-              <p className="text-blue-600 text-sm font-medium">{product.tagline}</p>
+              <h3 className="font-bold text-lg text-gray-900 group-hover:text-brand-blue-600 transition">{product.name}</h3>
+              <p className="text-brand-blue-600 text-sm font-medium">{product.tagline}</p>
             </div>
             <button 
               onClick={(e) => { e.preventDefault(); setIsWishlisted(!isWishlisted); }}
@@ -133,7 +133,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
               </Link>
               <Link
                 href={`/store/apps/${product.slug}`}
-                className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition flex items-center gap-1"
+                className="px-4 py-2 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-1"
               >
                 <ShoppingCart className="w-4 h-4" />
                 Buy
@@ -147,7 +147,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
 
   // Default variant
   return (
-    <div className="group bg-white rounded-2xl border-2 border-gray-100 overflow-hidden hover:border-blue-200 hover:shadow-2xl transition-all duration-300">
+    <div className="group bg-white rounded-2xl border-2 border-gray-100 overflow-hidden hover:border-brand-blue-200 hover:shadow-2xl transition-all duration-300">
       {/* Image */}
       <div className="relative aspect-video">
         <Image
@@ -163,7 +163,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
             <span className={`px-3 py-1 text-xs font-bold rounded-full ${
               product.badge === 'Best Seller' ? 'bg-orange-500 text-white' :
               product.badge === 'New' ? 'bg-green-500 text-white' :
-              'bg-blue-500 text-white'
+              'bg-brand-blue-500 text-white'
             }`}>
               {product.badge}
             </span>
@@ -207,8 +207,8 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
       
       {/* Content */}
       <div className="p-6">
-        <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition">{product.name}</h3>
-        <p className="text-blue-600 font-medium text-sm mb-3">{product.tagline}</p>
+        <h3 className="text-xl font-bold text-gray-900 mb-1 group-hover:text-brand-blue-600 transition">{product.name}</h3>
+        <p className="text-brand-blue-600 font-medium text-sm mb-3">{product.tagline}</p>
         <p className="text-gray-600 text-sm mb-4 line-clamp-2">{product.description}</p>
         
         {/* Features */}
@@ -243,7 +243,7 @@ export function ProductCard({ product, variant = 'default' }: ProductCardProps) 
             </Link>
             <Link
               href={`/store/apps/${product.slug}`}
-              className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition flex items-center gap-1"
+              className="px-4 py-2 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-1"
             >
               <ShoppingCart className="w-4 h-4" />
               Buy

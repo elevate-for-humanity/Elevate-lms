@@ -32,8 +32,8 @@ export default async function CalendarPage() {
 
   const getEventColor = (type: string) => {
     switch (type) {
-      case 'study': return 'bg-blue-500';
-      case 'workshop': return 'bg-blue-500';
+      case 'study': return 'bg-brand-blue-500';
+      case 'workshop': return 'bg-brand-blue-500';
       case 'webinar': return 'bg-green-500';
       case 'networking': return 'bg-orange-500';
       default: return 'bg-slate-500';
@@ -58,11 +58,11 @@ export default async function CalendarPage() {
         {/* Event Types Legend */}
         <div className="flex flex-wrap gap-4 mb-8">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+            <div className="w-3 h-3 rounded-full bg-brand-blue-500"></div>
             <span className="text-sm text-slate-600">Study Sessions</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+            <div className="w-3 h-3 rounded-full bg-brand-blue-500"></div>
             <span className="text-sm text-slate-600">Workshops</span>
           </div>
           <div className="flex items-center gap-2">
@@ -116,7 +116,7 @@ export default async function CalendarPage() {
                       })}
                     </div>
                     {event.is_virtual ? (
-                      <div className="flex items-center gap-1 text-blue-600">
+                      <div className="flex items-center gap-1 text-brand-blue-600">
                         <Video className="w-4 h-4" />
                         Virtual Event
                       </div>

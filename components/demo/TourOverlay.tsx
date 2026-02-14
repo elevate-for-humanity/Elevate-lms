@@ -203,11 +203,11 @@ export function TourOverlay({ tourId: propTourId, stepNumber: propStepNumber }: 
           </div>
           
           {/* Why It Matters */}
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-            <div className="text-xs font-semibold text-blue-800 uppercase tracking-wide mb-1">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-4 mb-6">
+            <div className="text-xs font-semibold text-brand-blue-800 uppercase tracking-wide mb-1">
               Why This Matters
             </div>
-            <p className="text-sm text-blue-900">
+            <p className="text-sm text-brand-blue-900">
               {currentStep.why_it_matters}
             </p>
           </div>

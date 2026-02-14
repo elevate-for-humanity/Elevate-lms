@@ -21,7 +21,7 @@ export default function ChangelogPage() {
           <ArrowLeft className="w-4 h-4" /> Back to Docs
         </Link>
         <div className="flex items-center gap-3 mb-8">
-          <FileText className="w-8 h-8 text-blue-600" />
+          <FileText className="w-8 h-8 text-brand-blue-600" />
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Changelog</h1>
             <p className="text-gray-600">Platform updates and release notes</p>
@@ -44,7 +44,7 @@ export default function ChangelogPage() {
               <ul className="space-y-2">
                 {release.changes.map((change, j) => (
                   <li key={j} className="flex items-start gap-2 text-gray-700">
-                    <span className="text-blue-500 mt-1">•</span> {change}
+                    <span className="text-brand-blue-500 mt-1">•</span> {change}
                   </li>
                 ))}
               </ul>

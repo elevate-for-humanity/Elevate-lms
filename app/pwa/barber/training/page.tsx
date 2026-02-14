@@ -65,14 +65,14 @@ function ModuleCard({ module, onSelect, apprenticeHours }: {
             ? 'bg-slate-700' 
             : progress === 100 
               ? 'bg-green-500/20' 
-              : 'bg-blue-500/20'
+              : 'bg-brand-blue-500/20'
         }`}>
           {module.locked ? (
             <Lock className="w-6 h-6 text-slate-500" />
           ) : progress === 100 ? (
             <CheckCircle className="w-6 h-6 text-green-400" />
           ) : (
-            <BookOpen className="w-6 h-6 text-blue-400" />
+            <BookOpen className="w-6 h-6 text-brand-blue-400" />
           )}
         </div>
         <div className="flex-1 min-w-0">
@@ -93,7 +93,7 @@ function ModuleCard({ module, onSelect, apprenticeHours }: {
               <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full ${
-                    progress === 100 ? 'bg-green-500' : 'bg-blue-500'
+                    progress === 100 ? 'bg-green-500' : 'bg-brand-blue-500'
                   }`}
                   style={{ width: `${progress}%` }}
                 />
@@ -118,14 +118,14 @@ function ChapterItem({ chapter, onComplete }: {
     : chapter.type === 'lab' ? BookOpen
     : FileText;
     
-  const typeColor = chapter.type === 'video' ? 'text-blue-400' 
+  const typeColor = chapter.type === 'video' ? 'text-brand-blue-400' 
     : chapter.type === 'quiz' ? 'text-amber-400' 
-    : chapter.type === 'lab' ? 'text-blue-400'
+    : chapter.type === 'lab' ? 'text-brand-blue-400'
     : 'text-green-400';
     
-  const typeBg = chapter.type === 'video' ? 'bg-blue-500/20' 
+  const typeBg = chapter.type === 'video' ? 'bg-brand-blue-500/20' 
     : chapter.type === 'quiz' ? 'bg-amber-500/20' 
-    : chapter.type === 'lab' ? 'bg-blue-500/20'
+    : chapter.type === 'lab' ? 'bg-brand-blue-500/20'
     : 'bg-green-500/20';
 
   const handleToggleComplete = async () => {
@@ -161,7 +161,7 @@ function ChapterItem({ chapter, onComplete }: {
       </div>
       {chapter.type === 'video' && !chapter.completed && chapter.contentUrl && (
         <a href={chapter.contentUrl} target="_blank" rel="noopener noreferrer">
-          <Play className="w-5 h-5 text-blue-400" />
+          <Play className="w-5 h-5 text-brand-blue-400" />
         </a>
       )}
     </div>
@@ -230,7 +230,7 @@ export default function BarberTrainingPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
+          <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-white">Loading training materials...</p>
         </div>
       </div>
@@ -246,7 +246,7 @@ export default function BarberTrainingPage() {
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/barber/training"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
+            className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
           >
             Sign In
           </Link>
@@ -270,7 +270,7 @@ export default function BarberTrainingPage() {
         <header className="bg-slate-800 px-4 pt-12 pb-6 safe-area-inset-top">
           <button 
             onClick={() => setSelectedModule(null)}
-            className="flex items-center gap-2 text-blue-400 mb-4"
+            className="flex items-center gap-2 text-brand-blue-400 mb-4"
           >
             <ChevronLeft className="w-5 h-5" />
             Back to Modules
@@ -282,7 +282,7 @@ export default function BarberTrainingPage() {
             <div className="flex-1">
               <div className="h-2 bg-slate-700 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-blue-500 rounded-full"
+                  className="h-full bg-brand-blue-500 rounded-full"
                   style={{ width: `${(currentModule.completed / currentModule.lessons) * 100}%` }}
                 />
               </div>
@@ -313,7 +313,7 @@ export default function BarberTrainingPage() {
               <Clock className="w-6 h-6" />
               <span className="text-xs">Log</span>
             </Link>
-            <Link href="/pwa/barber/training" className="flex flex-col items-center gap-1 text-blue-400">
+            <Link href="/pwa/barber/training" className="flex flex-col items-center gap-1 text-brand-blue-400">
               <BookOpen className="w-6 h-6" />
               <span className="text-xs">Learn</span>
             </Link>
@@ -331,12 +331,12 @@ export default function BarberTrainingPage() {
     <div className="min-h-screen bg-slate-900 pb-20">
       <header className="bg-slate-700 px-4 pt-12 pb-6 safe-area-inset-top">
         <h1 className="text-2xl font-bold text-white mb-1">{data.course.title}</h1>
-        <p className="text-blue-200 text-sm mb-1">{data.course.subtitle}</p>
-        <p className="text-blue-300 text-xs">Powered by {data.course.partner}</p>
+        <p className="text-brand-blue-200 text-sm mb-1">{data.course.subtitle}</p>
+        <p className="text-brand-blue-300 text-xs">Powered by {data.course.partner}</p>
         
         <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 mt-4">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-blue-200 text-sm">Overall Progress</span>
+            <span className="text-brand-blue-200 text-sm">Overall Progress</span>
             <span className="text-white font-bold">{data.progress.percentComplete}%</span>
           </div>
           <div className="h-2 bg-white/20 rounded-full overflow-hidden">
@@ -346,10 +346,10 @@ export default function BarberTrainingPage() {
             />
           </div>
           <div className="flex justify-between mt-2">
-            <p className="text-blue-200 text-sm">
+            <p className="text-brand-blue-200 text-sm">
               {data.progress.completedLessons} of {data.progress.totalLessons} lessons
             </p>
-            <p className="text-blue-200 text-sm">
+            <p className="text-brand-blue-200 text-sm">
               {data.apprenticeHours} hours logged
             </p>
           </div>
@@ -364,7 +364,7 @@ export default function BarberTrainingPage() {
             placeholder="Search modules..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full bg-slate-800 text-white rounded-xl pl-10 pr-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-slate-800 text-white rounded-xl pl-10 pr-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           />
         </div>
       </div>
@@ -390,7 +390,7 @@ export default function BarberTrainingPage() {
             <Clock className="w-6 h-6" />
             <span className="text-xs">Log</span>
           </Link>
-          <Link href="/pwa/barber/training" className="flex flex-col items-center gap-1 text-blue-400">
+          <Link href="/pwa/barber/training" className="flex flex-col items-center gap-1 text-brand-blue-400">
             <BookOpen className="w-6 h-6" />
             <span className="text-xs">Learn</span>
           </Link>

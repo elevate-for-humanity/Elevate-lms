@@ -36,7 +36,7 @@ export default function CRMFollowUpsPage() {
             <h1 className="text-2xl font-bold text-gray-900">Follow-ups</h1>
             <p className="text-gray-600">Manage your follow-up tasks and reminders</p>
           </div>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+          <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Add Follow-up
           </button>
@@ -54,19 +54,19 @@ export default function CRMFollowUpsPage() {
 
         <div className="bg-white rounded-xl shadow-sm">
           <div className="p-4 border-b flex items-center gap-4">
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
               <option>All Types</option>
               <option>Calls</option>
               <option>Emails</option>
               <option>Meetings</option>
             </select>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
               <option>All Priority</option>
               <option>High</option>
               <option>Medium</option>
               <option>Low</option>
             </select>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
               <option>All Status</option>
               <option>Pending</option>
               <option>Scheduled</option>
@@ -78,12 +78,12 @@ export default function CRMFollowUpsPage() {
             {followUps.map((item) => (
               <div key={item.id} className="p-4 flex items-center gap-4 hover:bg-gray-50">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  item.type === 'call' ? 'bg-blue-100' :
-                  item.type === 'email' ? 'bg-green-100' : 'bg-blue-100'
+                  item.type === 'call' ? 'bg-brand-blue-100' :
+                  item.type === 'email' ? 'bg-green-100' : 'bg-brand-blue-100'
                 }`}>
-                  {item.type === 'call' && <Phone className="w-5 h-5 text-blue-600" />}
+                  {item.type === 'call' && <Phone className="w-5 h-5 text-brand-blue-600" />}
                   {item.type === 'email' && <Mail className="w-5 h-5 text-green-600" />}
-                  {item.type === 'meeting' && <Calendar className="w-5 h-5 text-blue-600" />}
+                  {item.type === 'meeting' && <Calendar className="w-5 h-5 text-brand-blue-600" />}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export default function CRMFollowUpsPage() {
                 </div>
                 <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                   item.status === 'completed' ? 'bg-green-100 text-green-700' :
-                  item.status === 'scheduled' ? 'bg-blue-100 text-blue-700' :
+                  item.status === 'scheduled' ? 'bg-brand-blue-100 text-brand-blue-700' :
                   'bg-yellow-100 text-yellow-700'
                 }`}>
                   {item.status}

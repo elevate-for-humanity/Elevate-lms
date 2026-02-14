@@ -155,7 +155,7 @@ export function CourseReviewsPanel({
           <button
             type="submit"
             disabled={submitting}
-            className="rounded-full bg-blue-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-60"
+            className="rounded-full bg-brand-blue-600 px-4 py-2.5 text-xs font-semibold text-white hover:bg-brand-blue-700 disabled:opacity-60"
           >
             {submitting ? "Submitting…" : "Submit review"}
           </button>

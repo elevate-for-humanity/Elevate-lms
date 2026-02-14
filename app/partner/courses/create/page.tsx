@@ -126,7 +126,7 @@ export default function CreateCoursePage() {
       <div className="max-w-3xl mx-auto">
         <div className="bg-white shadow rounded-lg p-8">
           <div className="flex items-center gap-3 mb-8">
-            <BookOpen className="w-8 h-8 text-blue-600" />
+            <BookOpen className="w-8 h-8 text-brand-blue-600" />
             <div>
               <h1 className="text-3xl font-bold text-gray-900">Create Partner Course</h1>
               <p className="mt-1 text-gray-600">Add a new course to your LMS platform</p>
@@ -163,7 +163,7 @@ export default function CreateCoursePage() {
                 <select
                   value={selectedLicense}
                   onChange={(e) => setSelectedLicense(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   required
                 >
                   <option value="">Choose a license...</option>
@@ -177,30 +177,30 @@ export default function CreateCoursePage() {
               </div>
 
               {selectedLicenseData && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h4 className="font-medium text-blue-900 mb-2">License Details</h4>
+                <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+                  <h4 className="font-medium text-brand-blue-900 mb-2">License Details</h4>
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div>
-                      <span className="text-blue-700">Model:</span>
-                      <span className="ml-2 font-medium text-blue-900">
+                      <span className="text-brand-blue-700">Model:</span>
+                      <span className="ml-2 font-medium text-brand-blue-900">
                         {selectedLicenseData.lms_model}
                       </span>
                     </div>
                     <div>
-                      <span className="text-blue-700">Create Courses:</span>
-                      <span className="ml-2 font-medium text-blue-900">
+                      <span className="text-brand-blue-700">Create Courses:</span>
+                      <span className="ml-2 font-medium text-brand-blue-900">
                         {selectedLicenseData.can_create_courses ? 'Yes' : 'No'}
                       </span>
                     </div>
                     <div>
-                      <span className="text-blue-700">Upload SCORM:</span>
-                      <span className="ml-2 font-medium text-blue-900">
+                      <span className="text-brand-blue-700">Upload SCORM:</span>
+                      <span className="ml-2 font-medium text-brand-blue-900">
                         {selectedLicenseData.can_upload_scorm ? 'Yes' : 'No'}
                       </span>
                     </div>
                     <div>
-                      <span className="text-blue-700">Enrollments:</span>
-                      <span className="ml-2 font-medium text-blue-900">
+                      <span className="text-brand-blue-700">Enrollments:</span>
+                      <span className="ml-2 font-medium text-brand-blue-900">
                         {selectedLicenseData.current_enrollments}/{selectedLicenseData.max_enrollments}
                       </span>
                     </div>
@@ -216,7 +216,7 @@ export default function CreateCoursePage() {
                   type="text"
                   value={courseName}
                   onChange={(e) => setCourseName(e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="Introduction to HVAC Systems"
                   required
                 />
@@ -230,7 +230,7 @@ export default function CreateCoursePage() {
                   value={courseDescription}
                   onChange={(e) => setCourseDescription(e.target.value)}
                   rows={4}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="Describe what students will learn in this course..."
                   required
                 />
@@ -245,7 +245,7 @@ export default function CreateCoursePage() {
                   value={duration}
                   onChange={(e) => setDuration(e.target.value)}
                   min="1"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="40"
                   required
                 />
@@ -264,7 +264,7 @@ export default function CreateCoursePage() {
                         onChange={(e) => setScormFile(e.target.files?.[0] || null)}
                         className="hidden"
                       />
-                      <div className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 transition-colors">
+                      <div className="flex items-center justify-center gap-2 px-4 py-2 border-2 border-dashed border-gray-300 rounded-lg hover:border-brand-blue-400 transition-colors">
                         <Upload className="w-5 h-5 text-gray-400" />
                         <span className="text-gray-600">
                           {scormFile ? scormFile.name : 'Upload SCORM package (.zip)'}
@@ -279,7 +279,7 @@ export default function CreateCoursePage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   {loading ? 'Creating Course...' : 'Create Course'}
                 </button>

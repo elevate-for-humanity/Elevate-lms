@@ -77,7 +77,7 @@ export default async function AdminFerpaPage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-              <Shield className="w-8 h-8 text-blue-600" />
+              <Shield className="w-8 h-8 text-brand-blue-600" />
               FERPA Compliance Dashboard
             </h1>
             <p className="text-gray-600 mt-1">
@@ -93,7 +93,7 @@ export default async function AdminFerpaPage() {
             </Link>
             <Link
               href="/admin/ferpa/training"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium"
             >
               Staff Training
             </Link>
@@ -108,12 +108,12 @@ export default async function AdminFerpaPage() {
                 <stat.icon className={`w-8 h-8 ${
                   stat.color === 'green' ? 'text-green-600' :
                   stat.color === 'yellow' ? 'text-yellow-600' :
-                  stat.color === 'blue' ? 'text-blue-600' : 'text-gray-600'
+                  stat.color === 'blue' ? 'text-brand-blue-600' : 'text-gray-600'
                 }`} />
                 <span className={`text-xs font-medium px-2 py-1 rounded-full ${
                   stat.color === 'green' ? 'bg-green-100 text-green-700' :
                   stat.color === 'yellow' ? 'bg-yellow-100 text-yellow-700' :
-                  stat.color === 'blue' ? 'bg-blue-100 text-blue-700' : 'bg-gray-100 text-gray-700'
+                  stat.color === 'blue' ? 'bg-brand-blue-100 text-brand-blue-700' : 'bg-gray-100 text-gray-700'
                 }`}>
                   {stat.color === 'green' ? 'Good' : stat.color === 'yellow' ? 'Action Needed' : 'Info'}
                 </span>
@@ -134,14 +134,14 @@ export default async function AdminFerpaPage() {
                   href="/admin/ferpa/consent-forms"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <FileText className="w-5 h-5 text-blue-600" />
+                  <FileText className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-gray-700">Manage Consent Forms</span>
                 </Link>
                 <Link
                   href="/admin/ferpa/access-requests"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <Eye className="w-5 h-5 text-blue-600" />
+                  <Eye className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-gray-700">Review Access Requests</span>
                 </Link>
                 <Link
@@ -197,7 +197,7 @@ export default async function AdminFerpaPage() {
                       <input
                         type="text"
                         placeholder="Search..."
-                        className="pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="pl-9 pr-4 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                       />
                     </div>
                     <button className="p-2 border rounded-lg hover:bg-gray-50">
@@ -218,7 +218,7 @@ export default async function AdminFerpaPage() {
                         <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
                           activity.status === 'complete' ? 'bg-green-100 text-green-700' :
                           activity.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                          'bg-blue-100 text-blue-700'
+                          'bg-brand-blue-100 text-brand-blue-700'
                         }`}>
                           {activity.status}
                         </span>
@@ -231,7 +231,7 @@ export default async function AdminFerpaPage() {
               <div className="p-4 border-t">
                 <Link
                   href="/admin/ferpa/activity"
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
                 >
                   View All Activity →
                 </Link>

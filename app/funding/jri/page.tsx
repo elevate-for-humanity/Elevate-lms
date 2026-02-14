@@ -91,7 +91,7 @@ export default function JRIFundingPage() {
               <div className="space-y-3">
                 {eligibility.map((item) => (
                   <div key={item} className="flex items-start gap-3 bg-white rounded-xl p-4 border border-slate-200">
-                    <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <p className="text-slate-700">{item}</p>
                   </div>
                 ))}

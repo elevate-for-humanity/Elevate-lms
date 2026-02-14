@@ -66,7 +66,7 @@ export function JourneyChecklist() {
           {STEPS.map((step, index) => (
             <div key={step.number} className="relative flex gap-6 items-start">
               {/* Step number circle */}
-              <div className="relative z-10 flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
+              <div className="relative z-10 flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
                 {step.number}
               </div>
 
@@ -74,7 +74,7 @@ export function JourneyChecklist() {
               <div className="flex-1 bg-white rounded-lg shadow-sm border border-slate-200 p-6">
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    <div className="text-blue-600">{step.icon}</div>
+                    <div className="text-brand-blue-600">{step.icon}</div>
                     <h3 className="text-xl font-bold text-black">
                       {step.title}
                     </h3>
@@ -92,11 +92,11 @@ export function JourneyChecklist() {
       </div>
 
       {/* Summary box */}
-      <div className="mt-12 bg-blue-50 border-2 border-blue-600 rounded-lg p-8 text-center">
-        <h4 className="text-2xl font-bold text-blue-900 mb-3">
+      <div className="mt-12 bg-brand-blue-50 border-2 border-brand-blue-600 rounded-lg p-8 text-center">
+        <h4 className="text-2xl font-bold text-brand-blue-900 mb-3">
           Total Timeline: 2-4 Weeks to Start
         </h4>
-        <p className="text-blue-900 text-lg">
+        <p className="text-brand-blue-900 text-lg">
           From application to first day of training, most students start within
           2-4 weeks.
         </p>

@@ -200,7 +200,7 @@ export default function DataImportPage() {
           <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[80vh] overflow-hidden">
             <div className="flex items-center justify-between p-4 border-b">
               <div className="flex items-center gap-3">
-                <Eye className="w-5 h-5 text-blue-600" />
+                <Eye className="w-5 h-5 text-brand-blue-600" />
                 <h3 className="font-bold text-gray-900">Preview Import Data</h3>
               </div>
               <button
@@ -300,13 +300,13 @@ export default function DataImportPage() {
                   }}
                   className={`p-4 rounded-lg border-2 text-left transition-all ${
                     isSelected
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-brand-blue-500 bg-brand-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
                   <div className="flex items-start gap-3">
-                    <div className={`p-2 rounded-lg ${isSelected ? 'bg-blue-100' : 'bg-gray-100'}`}>
-                      <Icon className={`w-5 h-5 ${isSelected ? 'text-blue-600' : 'text-gray-600'}`} />
+                    <div className={`p-2 rounded-lg ${isSelected ? 'bg-brand-blue-100' : 'bg-gray-100'}`}>
+                      <Icon className={`w-5 h-5 ${isSelected ? 'text-brand-blue-600' : 'text-gray-600'}`} />
                     </div>
                     <div>
                       <h3 className="font-bold text-gray-900">{type.name}</h3>
@@ -316,7 +316,7 @@ export default function DataImportPage() {
                           e.stopPropagation();
                           downloadTemplate(type.template);
                         }}
-                        className="mt-2 text-sm text-blue-600 hover:underline flex items-center gap-1"
+                        className="mt-2 text-sm text-brand-blue-600 hover:underline flex items-center gap-1"
                       >
                         <Download className="w-3 h-3" />
                         Download template
@@ -342,7 +342,7 @@ export default function DataImportPage() {
               onDrop={handleDrop}
               className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
                 dragActive
-                  ? 'border-blue-500 bg-blue-50'
+                  ? 'border-brand-blue-500 bg-brand-blue-50'
                   : file
                   ? 'border-green-500 bg-green-50'
                   : 'border-gray-300 hover:border-gray-400'
@@ -374,7 +374,7 @@ export default function DataImportPage() {
                     Drag and drop your CSV file here, or
                   </p>
                   <label className="inline-block">
-                    <span className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer hover:bg-blue-700">
+                    <span className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer hover:bg-brand-blue-700">
                       Browse Files
                     </span>
                     <input

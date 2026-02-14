@@ -84,8 +84,8 @@ export default async function ProgramCatalogPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <GraduationCap className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Total Programs</p>
@@ -108,8 +108,8 @@ export default async function ProgramCatalogPage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Building2 className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Building2 className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Categories</p>
@@ -136,8 +136,8 @@ export default async function ProgramCatalogPage() {
           {/* Full Catalog */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-start gap-4">
-              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                <FileText className="w-7 h-7 text-blue-600" />
+              <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                <FileText className="w-7 h-7 text-brand-blue-600" />
               </div>
               <div className="flex-1">
                 <h3 className="text-lg font-semibold text-gray-900">Full Program Catalog</h3>
@@ -148,7 +148,7 @@ export default async function ProgramCatalogPage() {
                 <div className="flex items-center gap-3">
                   <Link
                     href="/api/admin/catalog/full?format=pdf"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 text-sm font-medium"
                   >
                     <Download className="w-4 h-4" />
                     Download PDF
@@ -214,7 +214,7 @@ export default async function ProgramCatalogPage() {
                     <h4 className="font-medium text-gray-900 text-sm">{program.name}</h4>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                       <span>{program.duration}</span>
-                      {program.clockHours && <span className="text-blue-600 font-medium">{program.clockHours} hrs</span>}
+                      {program.clockHours && <span className="text-brand-blue-600 font-medium">{program.clockHours} hrs</span>}
                     </div>
                   </div>
                 ))}
@@ -233,7 +233,7 @@ export default async function ProgramCatalogPage() {
                     <h4 className="font-medium text-gray-900 text-sm">{program.name}</h4>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                       <span>{program.duration}</span>
-                      {program.clockHours && <span className="text-blue-600 font-medium">{program.clockHours} hrs</span>}
+                      {program.clockHours && <span className="text-brand-blue-600 font-medium">{program.clockHours} hrs</span>}
                     </div>
                   </div>
                 ))}
@@ -243,7 +243,7 @@ export default async function ProgramCatalogPage() {
             {/* Technology */}
             <div className="p-6">
               <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
+                <span className="w-3 h-3 bg-brand-blue-500 rounded-full"></span>
                 Technology ({categories.technology.length} programs)
               </h3>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -252,7 +252,7 @@ export default async function ProgramCatalogPage() {
                     <h4 className="font-medium text-gray-900 text-sm">{program.name}</h4>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                       <span>{program.duration}</span>
-                      {program.clockHours && <span className="text-blue-600 font-medium">{program.clockHours} hrs</span>}
+                      {program.clockHours && <span className="text-brand-blue-600 font-medium">{program.clockHours} hrs</span>}
                     </div>
                   </div>
                 ))}
@@ -262,7 +262,7 @@ export default async function ProgramCatalogPage() {
             {/* Business */}
             <div className="p-6">
               <h3 className="text-md font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
+                <span className="w-3 h-3 bg-brand-blue-500 rounded-full"></span>
                 Business & Finance ({categories.business.length} programs)
               </h3>
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -271,7 +271,7 @@ export default async function ProgramCatalogPage() {
                     <h4 className="font-medium text-gray-900 text-sm">{program.name}</h4>
                     <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
                       <span>{program.duration}</span>
-                      {program.clockHours && <span className="text-blue-600 font-medium">{program.clockHours} hrs</span>}
+                      {program.clockHours && <span className="text-brand-blue-600 font-medium">{program.clockHours} hrs</span>}
                     </div>
                   </div>
                 ))}
@@ -281,7 +281,7 @@ export default async function ProgramCatalogPage() {
         </div>
 
         {/* Export Options */}
-        <div className="mt-8 bg-blue-50 rounded-xl p-6">
+        <div className="mt-8 bg-brand-blue-50 rounded-xl p-6">
           <h3 className="font-semibold text-gray-900 mb-4">Export Options</h3>
           <div className="flex flex-wrap gap-3">
             <Link

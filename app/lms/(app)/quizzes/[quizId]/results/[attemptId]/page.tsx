@@ -200,7 +200,7 @@ export default async function QuizResultsPage({ params }: Props) {
           {canRetake && !passed && (
             <Link
               href={`/lms/quizzes/${quizId}`}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 transition"
+              className="flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-semibold hover:bg-brand-blue-700 transition"
             >
               <RotateCcw className="w-5 h-5" />
               Retake Quiz

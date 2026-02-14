@@ -47,7 +47,7 @@ export default function CacheDiagnostic() {
           </dl>
         </div>
 
-        <div className="bg-blue-50 p-6 rounded-lg">
+        <div className="bg-brand-blue-50 p-6 rounded-lg">
           <h2 className="text-xl font-semibold mb-4">Check Response Headers</h2>
           <p className="mb-4">
             Open browser DevTools → Network → Reload → Click this page request

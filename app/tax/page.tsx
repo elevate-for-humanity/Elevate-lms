@@ -60,7 +60,7 @@ export default function TaxServicesPage() {
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6">
               Tax Preparation Services
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 mb-8">
+            <p className="text-xl md:text-2xl text-brand-blue-100 mb-8">
               Choose the tax service that fits your needs. Free VITA tax preparation for 
               eligible individuals or professional services through Supersonic Fast Cash.
             </p>
@@ -96,10 +96,10 @@ export default function TaxServicesPage() {
             <Link href="/supersonic-fast-cash" className="px-4 py-2 bg-red-100 text-red-800 rounded-full text-sm font-medium hover:bg-red-200 transition-colors">
               Supersonic Fast Cash
             </Link>
-            <Link href="/tax" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+            <Link href="/tax" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               Locations
             </Link>
-            <Link href="/tax" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+            <Link href="/tax" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               What to Bring
             </Link>
             <Link href="/tax/volunteer" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
@@ -298,8 +298,8 @@ export default function TaxServicesPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                <Clock className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+                <Clock className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Fast Processing</h3>
               <p className="text-gray-600">
@@ -319,8 +319,8 @@ export default function TaxServicesPage() {
             </div>
 
             <div className="bg-white rounded-xl p-6 shadow-sm">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+                <Shield className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-2">Audit Support</h3>
               <p className="text-gray-600">
@@ -379,10 +379,10 @@ export default function TaxServicesPage() {
 
             <Link
               href="/tax/upload"
-              className="bg-white p-6 rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all group"
+              className="bg-white p-6 rounded-xl border-2 border-gray-200 hover:border-brand-blue-500 hover:shadow-lg transition-all group"
             >
-              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
-                <FileCheck className="w-6 h-6 text-blue-600 group-hover:text-white" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-brand-blue-600 transition-colors">
+                <FileCheck className="w-6 h-6 text-brand-blue-600 group-hover:text-white" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">
                 Secure Document Upload
@@ -390,14 +390,14 @@ export default function TaxServicesPage() {
               <p className="text-sm text-gray-600 mb-4">
                 Upload your tax documents securely for faster processing.
               </p>
-              <div className="flex items-center text-blue-600 font-semibold text-sm">
+              <div className="flex items-center text-brand-blue-600 font-semibold text-sm">
                 Upload Documents <ArrowRight className="w-4 h-4 ml-2" />
               </div>
             </Link>
 
             <div className="bg-white p-6 rounded-xl border-2 border-gray-200">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Shield className="w-6 h-6 text-blue-600" />
+                <Shield className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">
                 IRS Resources
@@ -410,7 +410,7 @@ export default function TaxServicesPage() {
                   href="https://irs.treasury.gov/freetaxprep/"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-sm text-blue-600 hover:underline"
+                  className="block text-sm text-brand-blue-600 hover:underline"
                 >
                   IRS Free Tax Prep →
                 </a>
@@ -418,7 +418,7 @@ export default function TaxServicesPage() {
                   href="https://www.irs.gov/refunds"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="block text-sm text-blue-600 hover:underline"
+                  className="block text-sm text-brand-blue-600 hover:underline"
                 >
                   Where&apos;s My Refund? →
                 </a>
@@ -429,12 +429,12 @@ export default function TaxServicesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-blue-900">
+      <section className="py-20 bg-brand-blue-900">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-black text-white mb-6">
             Ready to File Your Taxes?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Don&apos;t wait until the last minute. Get your maximum refund today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -453,27 +453,27 @@ export default function TaxServicesPage() {
               <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
-          <p className="mt-8 text-blue-200">
+          <p className="mt-8 text-brand-blue-200">
             <Phone className="inline-block w-4 h-4 mr-2" />
             Questions? Contact us at Get Help Online
           </p>
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-blue-100 mb-6">Apply today for free career training programs.</p>
+          <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
               Get Help Online

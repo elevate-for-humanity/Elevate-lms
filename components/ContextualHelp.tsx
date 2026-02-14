@@ -62,7 +62,7 @@ export function ContextualHelp({
       <button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
-        className="text-gray-400 hover:text-blue-600 transition-colors"
+        className="text-gray-400 hover:text-brand-blue-600 transition-colors"
         aria-label="Help"
         type="button"
       >
@@ -97,7 +97,7 @@ export function ContextualHelp({
                 href={learnMoreUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium"
               >
                 Learn more
                 <ExternalLink className="w-3 h-3" />
@@ -144,18 +144,18 @@ export function HelpSection({
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
       <button
         onClick={() => setIsExpanded(!isExpanded)}
         className="flex items-center justify-between w-full text-left"
         type="button"
       >
         <div className="flex items-center gap-2">
-          <HelpCircle className="w-5 h-5 text-blue-600" />
-          <span className="font-medium text-blue-900">{title}</span>
+          <HelpCircle className="w-5 h-5 text-brand-blue-600" />
+          <span className="font-medium text-brand-blue-900">{title}</span>
         </div>
         <svg
-          className={`w-5 h-5 text-blue-600 transition-transform ${
+          className={`w-5 h-5 text-brand-blue-600 transition-transform ${
             isExpanded ? 'rotate-180' : ''
           }`}
           fill="none"
@@ -172,7 +172,7 @@ export function HelpSection({
       </button>
 
       {isExpanded && (
-        <div className="mt-3 text-sm text-blue-800 leading-relaxed">
+        <div className="mt-3 text-sm text-brand-blue-800 leading-relaxed">
           {children}
         </div>
       )}

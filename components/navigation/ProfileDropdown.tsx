@@ -191,7 +191,7 @@ export function ProfileDropdown({ className }: Props) {
     return (
       <Link
         href="/login"
-        className={`px-4 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 ${className || ''}`}
+        className={`px-4 py-2 text-sm font-medium text-gray-700 hover:text-brand-blue-600 ${className || ''}`}
       >
         Sign In
       </Link>
@@ -202,7 +202,7 @@ export function ProfileDropdown({ className }: Props) {
     <div className={`relative ${className || ''}`} ref={dropdownRef}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+        className="relative w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-bold hover:shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2"
         aria-label="Profile menu"
         aria-expanded={isOpen}
       >
@@ -248,7 +248,7 @@ export function ProfileDropdown({ className }: Props) {
                 <div className="font-semibold text-gray-900 truncate">{profile.full_name}</div>
                 <div className="text-sm text-gray-500 truncate">{profile.email}</div>
                 {profile.role && (
-                  <span className="inline-block mt-1 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded capitalize">
+                  <span className="inline-block mt-1 text-xs bg-brand-blue-100 text-brand-blue-700 px-2 py-0.5 rounded capitalize">
                     {profile.role}
                   </span>
                 )}
@@ -258,13 +258,13 @@ export function ProfileDropdown({ className }: Props) {
 
           {/* Quick Stats */}
           <div className="px-4 py-3 border-b bg-gray-50 flex items-center justify-between text-sm">
-            <Link href="/lms/courses" className="text-center hover:text-blue-600" onClick={() => setIsOpen(false)}>
+            <Link href="/lms/courses" className="text-center hover:text-brand-blue-600" onClick={() => setIsOpen(false)}>
               <div className="font-semibold text-gray-900">My Courses</div>
             </Link>
-            <Link href="/lms/certificates" className="text-center hover:text-blue-600" onClick={() => setIsOpen(false)}>
+            <Link href="/lms/certificates" className="text-center hover:text-brand-blue-600" onClick={() => setIsOpen(false)}>
               <div className="font-semibold text-gray-900">Certificates</div>
             </Link>
-            <Link href="/notifications" className="text-center hover:text-blue-600 relative" onClick={() => setIsOpen(false)}>
+            <Link href="/notifications" className="text-center hover:text-brand-blue-600 relative" onClick={() => setIsOpen(false)}>
               <div className="font-semibold text-gray-900">
                 Notifications
                 {notifications.unread > 0 && (

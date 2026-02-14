@@ -71,7 +71,7 @@ export function AcknowledgeHandbookForm() {
           required
           value={fullName}
           onChange={(e) => setFullName(e.target.value)}
-          className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
           placeholder="Your full legal name"
         />
       </div>
@@ -89,7 +89,7 @@ export function AcknowledgeHandbookForm() {
           required
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
           placeholder="Program Director"
         />
       </div>
@@ -100,7 +100,7 @@ export function AcknowledgeHandbookForm() {
             type="checkbox"
             checked={agreed}
             onChange={(e) => setAgreed(e.target.checked)}
-            className="mt-1 w-5 h-5 text-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-blue-500"
+            className="mt-1 w-5 h-5 text-brand-blue-600 border-slate-300 rounded focus:ring-2 focus:ring-brand-blue-500"
           />
           <span className="text-black font-medium">
             I acknowledge that I have read, understood, and agree to comply with
@@ -120,7 +120,7 @@ export function AcknowledgeHandbookForm() {
       <button
         type="submit"
         disabled={isSubmitting || !agreed}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-lg transition text-lg"
+        className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-lg transition text-lg"
       >
         {isSubmitting ? 'Submitting...' : 'Submit Acknowledgement'}
       </button>

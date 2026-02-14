@@ -195,7 +195,7 @@ export default function TransferHoursApproval({
                     href={th.proof_doc_path}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 text-sm underline"
+                    className="text-brand-blue-400 hover:text-brand-blue-300 text-sm underline"
                   >
                     View Document →
                   </a>

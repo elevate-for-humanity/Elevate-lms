@@ -245,12 +245,12 @@ export default async function CompliancePage() {
 
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-4">
-                  <Shield className="h-11 w-11 text-blue-600" />
+                  <Shield className="h-11 w-11 text-brand-blue-600" />
                   <h3 className="font-semibold text-black">
                     Student Management
                   </h3>
                 </div>
-                <div className="text-3xl font-bold text-blue-600 mb-2">
+                <div className="text-3xl font-bold text-brand-blue-600 mb-2">
                   {Math.round(studentScore)}%
                 </div>
                 <p className="text-sm text-black">

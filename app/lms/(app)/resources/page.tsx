@@ -239,9 +239,9 @@ export default async function ResourcesPage() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="flex flex-col items-center p-4 bg-white rounded-xl border border-gray-200 hover:border-blue-500 hover:shadow-md transition-all"
+                className="flex flex-col items-center p-4 bg-white rounded-xl border border-gray-200 hover:border-brand-blue-500 hover:shadow-md transition-all"
               >
-                <link.icon className="w-6 h-6 text-blue-600 mb-2" />
+                <link.icon className="w-6 h-6 text-brand-blue-600 mb-2" />
                 <span className="text-sm font-medium text-gray-900 text-center">
                   {link.title}
                 </span>
@@ -258,14 +258,14 @@ export default async function ResourcesPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {resourceCategories.map((category) => {
               const colorClasses: Record<string, string> = {
-                blue: 'bg-blue-50 border-blue-200',
-                blue: 'bg-blue-50 border-blue-200',
+                blue: 'bg-brand-blue-50 border-brand-blue-200',
+                blue: 'bg-brand-blue-50 border-brand-blue-200',
                 green: 'bg-green-50 border-green-200',
                 red: 'bg-red-50 border-red-200',
               };
               const iconColors: Record<string, string> = {
-                blue: 'text-blue-600',
-                blue: 'text-blue-600',
+                blue: 'text-brand-blue-600',
+                blue: 'text-brand-blue-600',
                 green: 'text-green-600',
                 red: 'text-red-600',
               };
@@ -343,24 +343,24 @@ export default async function ResourcesPage() {
 
         {/* Contact Support */}
         <section>
-          <div className="bg-blue-600 rounded-xl p-8 text-white">
+          <div className="bg-brand-blue-600 rounded-xl p-8 text-white">
             <div className="max-w-2xl">
               <h2 className="text-2xl font-bold mb-2">Need Help?</h2>
-              <p className="text-blue-100 mb-6">
+              <p className="text-brand-blue-100 mb-6">
                 Our student success team is here to support you with any questions
                 about your program, career goals, or support services.
               </p>
               <div className="flex flex-wrap gap-4">
                 <Link
                   href="/lms/support"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-white text-brand-blue-600 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
                 >
                   <Phone className="w-5 h-5" />
                   Contact Support
                 </Link>
                 <Link
                   href="/lms/help"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-400 transition-colors"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-500 text-white rounded-lg font-semibold hover:bg-brand-blue-400 transition-colors"
                 >
                   <BookOpen className="w-5 h-5" />
                   Help Center

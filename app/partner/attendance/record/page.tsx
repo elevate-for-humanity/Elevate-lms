@@ -71,7 +71,7 @@ export default async function RecordAttendancePage() {
         </div>
       </div>
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link href="/partner/attendance" className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/partner/attendance" className="inline-flex items-center text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />Back to Attendance
         </Link>
         <div className="bg-white rounded-xl shadow-sm p-8">

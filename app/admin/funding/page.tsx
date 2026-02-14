@@ -28,8 +28,8 @@ export default async function FundingPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Funding</h3><p className="text-3xl font-bold text-green-600 mt-2">$3.2M</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Allocated</h3><p className="text-3xl font-bold text-blue-600 mt-2">$2.8M</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Available</h3><p className="text-3xl font-bold text-blue-600 mt-2">$400K</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Allocated</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">$2.8M</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Available</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">$400K</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active Grants</h3><p className="text-3xl font-bold text-orange-600 mt-2">12</p></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

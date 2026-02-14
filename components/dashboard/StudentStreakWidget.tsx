@@ -122,7 +122,7 @@ export function StudentStreakWidget() {
             <button
               type="button"
               onClick={saveGoal}
-              className="rounded-full bg-blue-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-blue-700"
+              className="rounded-full bg-brand-blue-600 px-3 py-2 text-[11px] font-semibold text-white hover:bg-brand-blue-700"
             >
               Save
             </button>

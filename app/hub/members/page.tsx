@@ -55,7 +55,7 @@ export default async function MembersPage() {
           {members?.map((member: any) => (
             <div key={member.id} className="bg-white rounded-2xl border border-slate-200 p-6 hover:shadow-lg transition">
               <div className="flex items-start gap-4">
-                <div className="w-14 h-14 rounded-full bg-blue-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                <div className="w-14 h-14 rounded-full bg-brand-blue-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                   {member.full_name?.charAt(0) || 'U'}
                 </div>
                 <div className="flex-1 min-w-0">
@@ -72,7 +72,7 @@ export default async function MembersPage() {
                   {member.points || 0} points
                 </span>
                 <div className="flex items-center gap-2">
-                  <button className="p-2 text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition">
+                  <button className="p-2 text-slate-500 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded-lg transition">
                     <MessageSquare className="w-4 h-4" />
                   </button>
                   <button className="p-2 text-slate-500 hover:text-green-600 hover:bg-green-50 rounded-lg transition">

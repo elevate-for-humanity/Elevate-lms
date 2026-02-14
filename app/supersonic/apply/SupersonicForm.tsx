@@ -203,11 +203,11 @@ export default function SupersonicForm({ userId, existingProfile }: Props) {
                 Browse Files
               </button>
             </div>
-            <div className="bg-blue-50 rounded-lg p-4 flex gap-3">
-              <AlertCircle className="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" />
+            <div className="bg-brand-blue-50 rounded-lg p-4 flex gap-3">
+              <AlertCircle className="w-5 h-5 text-brand-blue-500 flex-shrink-0 mt-0.5" />
               <div className="text-sm">
-                <p className="font-medium text-blue-900">Secure Upload</p>
-                <p className="text-blue-700">Your documents are encrypted and securely stored.</p>
+                <p className="font-medium text-brand-blue-900">Secure Upload</p>
+                <p className="text-brand-blue-700">Your documents are encrypted and securely stored.</p>
               </div>
             </div>
           </div>

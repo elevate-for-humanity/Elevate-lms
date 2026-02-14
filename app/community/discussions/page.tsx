@@ -75,7 +75,7 @@ export default async function DiscussionsPage() {
           </div>
           <Link
             href="/community/discussions/new"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
           >
             <Plus className="w-4 h-4" />
             New Discussion
@@ -90,7 +90,7 @@ export default async function DiscussionsPage() {
               <div className="space-y-2">
                 <Link
                   href="/community/discussions"
-                  className="block px-3 py-2 rounded-lg bg-blue-50 text-blue-700 font-medium"
+                  className="block px-3 py-2 rounded-lg bg-brand-blue-50 text-brand-blue-700 font-medium"
                 >
                   All Discussions
                 </Link>
@@ -119,7 +119,7 @@ export default async function DiscussionsPage() {
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <h3 className="font-semibold text-gray-900 hover:text-blue-600">
+                        <h3 className="font-semibold text-gray-900 hover:text-brand-blue-600">
                           {discussion.title}
                         </h3>
                         <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
@@ -153,7 +153,7 @@ export default async function DiscussionsPage() {
                 <p className="text-gray-600 mb-6">Be the first to start a conversation!</p>
                 <Link
                   href="/community/discussions/new"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
                 >
                   <Plus className="w-4 h-4" />
                   Start a Discussion

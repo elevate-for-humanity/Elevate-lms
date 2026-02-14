@@ -96,9 +96,9 @@ export function AssignmentActivity({
       </div>
 
       {/* Instructions */}
-      <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <h3 className="font-semibold text-blue-900 mb-2">Instructions</h3>
-        <div className="text-blue-800 text-sm whitespace-pre-wrap">{instructions}</div>
+      <div className="mb-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+        <h3 className="font-semibold text-brand-blue-900 mb-2">Instructions</h3>
+        <div className="text-brand-blue-800 text-sm whitespace-pre-wrap">{instructions}</div>
       </div>
 
       {/* Submission Area */}

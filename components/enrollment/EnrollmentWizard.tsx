@@ -78,7 +78,7 @@ export default function EnrollmentWizard({
             <div key={step.id} className="flex items-center flex-1">
               <div className="flex flex-col items-center">
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  currentStep >= step.id ? 'bg-blue-600 text-white' : 'bg-gray-200'
+                  currentStep >= step.id ? 'bg-brand-blue-600 text-white' : 'bg-gray-200'
                 }`}>
                   {currentStep > step.id ? <CheckCircle className="w-6 h-6" /> : step.id}
                 </div>
@@ -89,7 +89,7 @@ export default function EnrollmentWizard({
               </div>
               {idx < STEPS.length - 1 && (
                 <div className={`flex-1 h-1 mx-4 ${
-                  currentStep > step.id ? 'bg-blue-600' : 'bg-gray-200'
+                  currentStep > step.id ? 'bg-brand-blue-600' : 'bg-gray-200'
                 }`} />
               )}
             </div>
@@ -206,7 +206,7 @@ export default function EnrollmentWizard({
           {currentStep < STEPS.length ? (
             <button
               onClick={nextStep}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg flex items-center gap-2"
+              className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg flex items-center gap-2"
             >
               Next
               <ChevronRight className="w-4 h-4" />

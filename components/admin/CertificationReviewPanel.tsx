@@ -183,7 +183,7 @@ export function CertificationReviewPanel({
                 href={submission.certificate_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-200 transition-colors"
+                className="inline-flex items-center gap-2 bg-brand-blue-100 text-brand-blue-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-blue-200 transition-colors"
               >
                 <ExternalLink className="w-4 h-4" />
                 View Uploaded Certificate
@@ -200,7 +200,7 @@ export function CertificationReviewPanel({
               <textarea
                 value={reviewNotes[submission.id] || ''}
                 onChange={(e) => setReviewNotes(prev => ({ ...prev, [submission.id]: e.target.value }))}
-                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 rows={3}
                 placeholder="Add notes about this submission..."
               />
@@ -260,7 +260,7 @@ export function CertificationReviewPanel({
           onClick={() => setActiveTab('recent')}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             activeTab === 'recent'
-              ? 'bg-blue-100 text-blue-800'
+              ? 'bg-brand-blue-100 text-brand-blue-800'
               : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
           }`}
         >

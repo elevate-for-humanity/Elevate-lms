@@ -180,7 +180,7 @@ export default async function AdminShopsPage() {
 
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
             <div className="flex items-center gap-3">
-              <Users className="w-8 h-8 text-blue-600" />
+              <Users className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <div className="text-2xl font-bold text-black">
                   {shopsWithDocs.reduce(

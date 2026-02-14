@@ -150,7 +150,7 @@ export default function CapitalReadinessGuidePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <span className="inline-block px-4 py-1 bg-blue-600/20 text-blue-400 text-sm font-medium rounded-full mb-6">
+              <span className="inline-block px-4 py-1 bg-brand-blue-600/20 text-brand-blue-400 text-sm font-medium rounded-full mb-6">
                 Digital Guide
               </span>
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
@@ -208,7 +208,7 @@ export default function CapitalReadinessGuidePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <div key={index} className="bg-white rounded-xl p-6 shadow-sm">
-                <feature.icon className="w-10 h-10 text-blue-600 mb-4" />
+                <feature.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <p className="font-semibold text-slate-900">{feature.text}</p>
               </div>
             ))}
@@ -239,21 +239,21 @@ export default function CapitalReadinessGuidePage() {
             <div className="bg-slate-100 rounded-2xl p-8">
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
-                  <Building2 className="w-8 h-8 text-blue-600 flex-shrink-0" />
+                  <Building2 className="w-8 h-8 text-brand-blue-600 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold mb-1">Workforce-Funded Organizations</h3>
                     <p className="text-slate-600 text-sm">Navigate WIOA, reporting, and audit requirements</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <ShieldCheck className="w-8 h-8 text-blue-600 flex-shrink-0" />
+                  <ShieldCheck className="w-8 h-8 text-brand-blue-600 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold mb-1">Licensed Operators</h3>
                     <p className="text-slate-600 text-sm">Build institutional trust and compliance systems</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <Users className="w-8 h-8 text-blue-600 flex-shrink-0" />
+                  <Users className="w-8 h-8 text-brand-blue-600 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold mb-1">Nonprofits & Employers</h3>
                     <p className="text-slate-600 text-sm">Access funding and scale sustainably</p>
@@ -277,7 +277,7 @@ export default function CapitalReadinessGuidePage() {
                 key={index} 
                 className={`flex items-center gap-4 p-5 ${index !== chapters.length - 1 ? 'border-b border-slate-100' : ''}`}
               >
-                <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-semibold text-sm">
+                <span className="w-8 h-8 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center font-semibold text-sm">
                   {index + 1}
                 </span>
                 <span className="text-slate-900">{chapter}</span>
@@ -298,7 +298,7 @@ export default function CapitalReadinessGuidePage() {
           <div className="flex flex-wrap justify-center gap-4 lg:gap-0">
             {['Education', 'Compliance', 'Capital', 'Sustainability'].map((step, index) => (
               <div key={step} className="flex items-center">
-                <div className="bg-blue-600 text-white px-6 py-4 rounded-lg font-semibold">
+                <div className="bg-brand-blue-600 text-white px-6 py-4 rounded-lg font-semibold">
                   {step}
                 </div>
                 {index < 3 && (
@@ -341,17 +341,17 @@ export default function CapitalReadinessGuidePage() {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-slate-700 rounded-2xl p-8 lg:p-12 text-white text-center">
             <h2 className="text-3xl font-bold mb-4">Get the Guide</h2>
-            <p className="text-blue-100 mb-8 max-w-xl mx-auto">
+            <p className="text-brand-blue-100 mb-8 max-w-xl mx-auto">
               Start building institutional trust today. Includes the full ebook, integrated workbook, 
               and readiness scoring system.
             </p>
             
             <div className="text-5xl font-bold mb-2">$39</div>
-            <p className="text-blue-200 mb-8">One-time purchase • Lifetime updates</p>
+            <p className="text-brand-blue-200 mb-8">One-time purchase • Lifetime updates</p>
             
             <BuyButton productId="capital-readiness-guide" price="$39" variant="white" />
             
-            <p className="text-sm text-blue-200 mt-6">
+            <p className="text-sm text-brand-blue-200 mt-6">
               Free inside Elevate programs • Included with enterprise licenses
             </p>
           </div>
@@ -361,7 +361,7 @@ export default function CapitalReadinessGuidePage() {
       {/* Enterprise */}
       <section className="py-16 lg:py-24 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Award className="w-12 h-12 text-blue-600 mx-auto mb-6" />
+          <Award className="w-12 h-12 text-brand-blue-600 mx-auto mb-6" />
           <h2 className="text-3xl font-bold mb-4">Enterprise & Licensing</h2>
           <p className="text-lg text-slate-600 mb-8 max-w-2xl mx-auto">
             Need this for your workforce program, employer training, or organizational onboarding? 

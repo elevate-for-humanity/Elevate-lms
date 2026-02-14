@@ -81,7 +81,7 @@ export default function IncentivesPage() {
         <div className="mb-8">
           <Link
             href="/admin/dashboard"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Dashboard
           </Link>
@@ -149,10 +149,10 @@ export default function IncentivesPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Users className="w-6 h-6 text-blue-600" />
+              <Users className="w-6 h-6 text-brand-blue-600" />
               <h3 className="text-sm font-medium text-black">Paid Out</h3>
             </div>
-            <p className="text-3xl font-bold text-blue-600">{stats.paid}</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{stats.paid}</p>
             <p className="text-xs text-black mt-1">Completed programs</p>
           </div>
         </div>
@@ -255,8 +255,8 @@ export default function IncentivesPage() {
                       <span
                         className={`px-2 py-2 text-xs rounded ${
                           incentive.program_type === 'WEX'
-                            ? 'bg-blue-100 text-blue-800'
-                            : 'bg-blue-100 text-blue-800'
+                            ? 'bg-brand-blue-100 text-brand-blue-800'
+                            : 'bg-brand-blue-100 text-brand-blue-800'
                         }`}
                       >
                         {incentive.program_type}
@@ -287,7 +287,7 @@ export default function IncentivesPage() {
                           incentive.status === 'paid'
                             ? 'bg-brand-green-100 text-green-800'
                             : incentive.status === 'approved'
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'bg-brand-blue-100 text-brand-blue-800'
                               : incentive.status === 'pending'
                                 ? 'bg-yellow-100 text-yellow-800'
                                 : 'bg-red-100 text-red-800'
@@ -299,7 +299,7 @@ export default function IncentivesPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <Link
                         href={`/admin/incentives/${incentive.id}`}
-                        className="text-brand-blue-600 hover:text-blue-900"
+                        className="text-brand-blue-600 hover:text-brand-blue-900"
                       >
                         View
                       </Link>
@@ -312,11 +312,11 @@ export default function IncentivesPage() {
         </div>
 
         {/* Info Box */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-semibold text-blue-900 mb-2">
+        <div className="mt-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+          <h3 className="font-semibold text-brand-blue-900 mb-2">
             About WEX and OJT Programs
           </h3>
-          <div className="text-sm text-blue-800 space-y-2">
+          <div className="text-sm text-brand-blue-800 space-y-2">
             <p>
               <strong>WEX (Work Experience):</strong> Provides wage subsidies to
               employers who hire and train eligible participants. Typically

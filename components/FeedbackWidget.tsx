@@ -86,7 +86,7 @@ export default function FeedbackWidget({ userId }: FeedbackWidgetProps) {
       {/* Floating Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 w-14 h-14 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-110 z-40 flex items-center justify-center"
+        className="fixed bottom-6 right-6 w-14 h-14 bg-brand-blue-600 text-white rounded-full shadow-lg hover:bg-brand-blue-700 transition-all hover:scale-110 z-40 flex items-center justify-center"
         title="Send Feedback"
       >
         <MessageSquare className="w-6 h-6" />
@@ -149,7 +149,7 @@ d="M5 13l4 4L19 7" />
                         onClick={() => setType(ft.value)}
                         className={`p-4 border-2 rounded-lg text-left transition-all ${
                           type === ft.value
-                            ? 'border-blue-600 bg-blue-50'
+                            ? 'border-brand-blue-600 bg-brand-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -167,7 +167,7 @@ d="M5 13l4 4L19 7" />
                   <select
                     value={category}
                     onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   >
                     <option value="">Select a category</option>
                     {categories.map(cat => (
@@ -185,7 +185,7 @@ d="M5 13l4 4L19 7" />
                     type="text"
                     value={title}
                     onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setTitle(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     placeholder="Brief summary of your feedback"
                     required
                   />
@@ -200,15 +200,15 @@ d="M5 13l4 4L19 7" />
                     value={description}
                     onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setDescription(e.target.value)}
                     rows={5}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     placeholder="Provide as much detail as possible..."
                     required
                   />
                 </div>
 
                 {/* Info */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-800">
+                <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-brand-blue-800">
                     <strong>Note:</strong> Your feedback will include the current page URL and browser information to help us investigate issues.
                   </p>
                 </div>
@@ -229,7 +229,7 @@ d="M5 13l4 4L19 7" />
                 <button
                   onClick={handleSubmit}
                   disabled={isSubmitting || !type || !title || !description}
-                  className="flex items-center gap-2 px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-2 px-6 py-2 text-white bg-brand-blue-600 rounded-lg hover:bg-brand-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSubmitting ? (
                     <>

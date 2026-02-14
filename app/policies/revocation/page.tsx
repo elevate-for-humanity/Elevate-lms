@@ -69,7 +69,7 @@ export default function RevocationPage() {
               </ul>
             </div>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mb-6">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mb-6">
               <h3 className="text-lg font-bold text-black mb-3">Serious Misconduct</h3>
               <p className="text-black mb-2">Discovered after graduation:</p>
               <ul className="list-disc pl-6 text-black space-y-1">
@@ -86,7 +86,7 @@ export default function RevocationPage() {
             <div className="bg-gray-50 rounded-xl p-8 border-2 border-gray-200 mb-6">
               <div className="space-y-6">
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     1
                   </div>
                   <div>
@@ -112,7 +112,7 @@ export default function RevocationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>
@@ -303,15 +303,15 @@ export default function RevocationPage() {
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/credentials" className="text-blue-600 hover:underline">Credentials Policy</a></li>
-                <li><a href="/policies/academic-integrity" className="text-blue-600 hover:underline">Academic Integrity Policy</a></li>
-                <li><a href="/policies/student-code" className="text-blue-600 hover:underline">Student Code of Conduct</a></li>
-                <li><a href="/policies/verification" className="text-blue-600 hover:underline">Verification Policy</a></li>
+                <li><a href="/policies/credentials" className="text-brand-blue-600 hover:underline">Credentials Policy</a></li>
+                <li><a href="/policies/academic-integrity" className="text-brand-blue-600 hover:underline">Academic Integrity Policy</a></li>
+                <li><a href="/policies/student-code" className="text-brand-blue-600 hover:underline">Student Code of Conduct</a></li>
+                <li><a href="/policies/verification" className="text-brand-blue-600 hover:underline">Verification Policy</a></li>
               </ul>
             </div>
           </div>

@@ -133,10 +133,10 @@ export default function InstructorsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center gap-3 mb-2">
-              <BookOpen className="h-11 w-11 text-blue-600" />
+              <BookOpen className="h-11 w-11 text-brand-blue-600" />
               <p className="text-sm text-black">Total Courses</p>
             </div>
-            <p className="text-3xl font-bold text-blue-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {instructors.reduce(
                 (acc, i) => acc + (i.instructor_courses?.length || 0),
                 0
@@ -246,7 +246,7 @@ export default function InstructorsPage() {
                                 (ic: Record<string, any>, idx: number) => (
                                   <span
                                     key={idx}
-                                    className="text-xs bg-blue-100 text-brand-blue-700 px-2 py-2 rounded"
+                                    className="text-xs bg-brand-blue-100 text-brand-blue-700 px-2 py-2 rounded"
                                   >
                                     {ic.course?.name}
                                   </span>

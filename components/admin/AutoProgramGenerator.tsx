@@ -444,11 +444,11 @@ export function AutoProgramGenerator() {
       )}
       {/* Generation Status */}
       {isGenerating && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-6">
           <div className="flex items-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mr-4" />
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-blue-600 mr-4" />
             <div>
-              <h3 className="font-semibold text-blue-900">
+              <h3 className="font-semibold text-brand-blue-900">
                 🤖 AI Program Generator Working...
               </h3>
               <div className="text-sm text-brand-info mt-1">
@@ -582,7 +582,7 @@ export function AutoProgramGenerator() {
             <div className="flex space-x-3">
               <button
                 onClick={() => setSelectedProgram(program)}
-                className="text-sm bg-brand-surface text-brand-info px-4 py-2 rounded hover:bg-blue-200"
+                className="text-sm bg-brand-surface text-brand-info px-4 py-2 rounded hover:bg-brand-blue-200"
               >
                 📊 View Details
               </button>

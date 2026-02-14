@@ -33,9 +33,9 @@ export default function ResponseSLAPage() {
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Response Time Standards</h2>
             
             <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+              <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200">
                 <h3 className="text-xl font-bold text-black mb-3">Email Inquiries</h3>
-                <p className="text-3xl font-black text-blue-600 mb-2">24-48 hrs</p>
+                <p className="text-3xl font-black text-brand-blue-600 mb-2">24-48 hrs</p>
                 <p className="text-black">General questions and non-urgent matters</p>
               </div>
 
@@ -45,9 +45,9 @@ export default function ResponseSLAPage() {
                 <p className="text-black">During business hours (8 AM - 6 PM EST)</p>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+              <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200">
                 <h3 className="text-xl font-bold text-black mb-3">Applications</h3>
-                <p className="text-3xl font-black text-blue-600 mb-2">2-3 Days</p>
+                <p className="text-3xl font-black text-brand-blue-600 mb-2">2-3 Days</p>
                 <p className="text-black">Initial review and response</p>
               </div>
 
@@ -144,7 +144,7 @@ export default function ResponseSLAPage() {
             </div>
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Business Hours</h2>
-            <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200 mb-6">
+            <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200 mb-6">
               <ul className="space-y-2 text-black">
                 <li><strong>Monday - Friday:</strong> 8:00 AM - 6:00 PM EST</li>
                 <li><strong>Saturday:</strong> 9:00 AM - 1:00 PM EST (limited services)</li>
@@ -209,13 +209,13 @@ export default function ResponseSLAPage() {
               <li><strong>Emergency:</strong> (317) 314-3757 ext. 911</li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/acceptable-use" className="text-blue-600 hover:underline">Acceptable Use Policy</a></li>
-                <li><a href="/policies/student-code" className="text-blue-600 hover:underline">Student Code of Conduct</a></li>
+                <li><a href="/policies/acceptable-use" className="text-brand-blue-600 hover:underline">Acceptable Use Policy</a></li>
+                <li><a href="/policies/student-code" className="text-brand-blue-600 hover:underline">Student Code of Conduct</a></li>
               </ul>
             </div>
           </div>

@@ -109,7 +109,7 @@ function StatusBadge({ status }: { status: 'active' | 'pending' | 'renewal' }) {
   const styles = {
     active: 'bg-green-100 text-green-800 border-green-200',
     pending: 'bg-yellow-100 text-yellow-800 border-yellow-200',
-    renewal: 'bg-blue-100 text-blue-800 border-blue-200',
+    renewal: 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-200',
   };
   
   const labels = {
@@ -132,11 +132,11 @@ function CredentialCard({ credential }: { credential: VerifiableCredential }) {
   const Icon = credential.icon;
   
   return (
-    <div className="bg-white rounded-xl border-2 border-gray-200 p-6 hover:border-blue-300 transition">
+    <div className="bg-white rounded-xl border-2 border-gray-200 p-6 hover:border-brand-blue-300 transition">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Icon className="w-6 h-6 text-blue-600" />
+          <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+            <Icon className="w-6 h-6 text-brand-blue-600" />
           </div>
           <div>
             <h3 className="font-bold text-gray-900">{credential.name}</h3>
@@ -168,7 +168,7 @@ function CredentialCard({ credential }: { credential: VerifiableCredential }) {
             href={credential.verificationUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 text-sm font-medium"
+            className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
           >
             Verify Online <ExternalLink className="w-4 h-4" />
           </a>
@@ -196,8 +196,8 @@ export default function VerifyCredentialsPage() {
       <section className="bg-slate-700 text-white py-16">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
-            <BadgeCheck className="w-10 h-10 text-blue-400" />
-            <span className="text-blue-400 font-medium">Credential Verification</span>
+            <BadgeCheck className="w-10 h-10 text-brand-blue-400" />
+            <span className="text-brand-blue-400 font-medium">Credential Verification</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Verify Our Credentials
@@ -213,33 +213,33 @@ export default function VerifyCredentialsPage() {
       {/* Quick Verification Box */}
       <section className="py-8">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="bg-blue-600 text-white rounded-xl p-6 md:p-8">
+          <div className="bg-brand-blue-600 text-white rounded-xl p-6 md:p-8">
             <h2 className="text-xl font-bold mb-4">Quick Verification</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <p className="text-blue-100 mb-4">
+                <p className="text-brand-blue-100 mb-4">
                   For workforce board staff and government agencies conducting compliance reviews:
                 </p>
                 <ul className="space-y-2 text-sm">
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-blue-300 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-4 h-4 text-brand-blue-300 flex-shrink-0 mt-0.5" />
                     <span><strong>ETPL:</strong> INTraining Location ID 10004621</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-blue-300 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-4 h-4 text-brand-blue-300 flex-shrink-0 mt-0.5" />
                     <span><strong>RAPIDS:</strong> 2025-IN-132301</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-blue-300 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-4 h-4 text-brand-blue-300 flex-shrink-0 mt-0.5" />
                     <span><strong>Legal Name:</strong> Elevate for Humanity Inc.</span>
                   </li>
                 </ul>
               </div>
               <div className="flex flex-col justify-center">
-                <p className="text-blue-100 mb-3">Need documentation?</p>
+                <p className="text-brand-blue-100 mb-3">Need documentation?</p>
                 <Link
                   href="/contact"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition"
                 >
                   Request Verification Letter
                 </Link>
@@ -253,7 +253,7 @@ export default function VerifyCredentialsPage() {
       <section className="py-8">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Shield className="w-6 h-6 text-blue-600" />
+            <Shield className="w-6 h-6 text-brand-blue-600" />
             Federal Credentials
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -268,7 +268,7 @@ export default function VerifyCredentialsPage() {
       <section className="py-8">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <Building2 className="w-6 h-6 text-blue-600" />
+            <Building2 className="w-6 h-6 text-brand-blue-600" />
             State Credentials (Indiana)
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
@@ -283,7 +283,7 @@ export default function VerifyCredentialsPage() {
       <section className="py-8">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-            <FileCheck className="w-6 h-6 text-blue-600" />
+            <FileCheck className="w-6 h-6 text-brand-blue-600" />
             Funding Eligibility
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -308,30 +308,30 @@ export default function VerifyCredentialsPage() {
               </p>
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Phone className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <Phone className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Phone</p>
-                    <a href="/support" className="font-medium text-gray-900 hover:text-blue-600">
+                    <a href="/support" className="font-medium text-gray-900 hover:text-brand-blue-600">
                       Get Help Online
                     </a>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Mail className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <Mail className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <a href="mailto:elevate4humanityedu@gmail.com" className="font-medium text-gray-900 hover:text-blue-600">
+                    <a href="mailto:elevate4humanityedu@gmail.com" className="font-medium text-gray-900 hover:text-brand-blue-600">
                       elevate4humanityedu@gmail.com
                     </a>
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <MapPin className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Address</p>
@@ -345,28 +345,28 @@ export default function VerifyCredentialsPage() {
               <div className="space-y-3">
                 <Link
                   href="/accreditation"
-                  className="flex items-center justify-between p-3 bg-white rounded-lg border hover:border-blue-300 transition"
+                  className="flex items-center justify-between p-3 bg-white rounded-lg border hover:border-brand-blue-300 transition"
                 >
                   <span className="font-medium">Accreditation & Approvals</span>
                   <ExternalLink className="w-4 h-4 text-gray-400" />
                 </Link>
                 <Link
                   href="/federal-compliance"
-                  className="flex items-center justify-between p-3 bg-white rounded-lg border hover:border-blue-300 transition"
+                  className="flex items-center justify-between p-3 bg-white rounded-lg border hover:border-brand-blue-300 transition"
                 >
                   <span className="font-medium">Federal Compliance</span>
                   <ExternalLink className="w-4 h-4 text-gray-400" />
                 </Link>
                 <Link
                   href="/disclosures"
-                  className="flex items-center justify-between p-3 bg-white rounded-lg border hover:border-blue-300 transition"
+                  className="flex items-center justify-between p-3 bg-white rounded-lg border hover:border-brand-blue-300 transition"
                 >
                   <span className="font-medium">Disclosures</span>
                   <ExternalLink className="w-4 h-4 text-gray-400" />
                 </Link>
                 <Link
                   href="/compliance"
-                  className="flex items-center justify-between p-3 bg-white rounded-lg border hover:border-blue-300 transition"
+                  className="flex items-center justify-between p-3 bg-white rounded-lg border hover:border-brand-blue-300 transition"
                 >
                   <span className="font-medium">Compliance Center</span>
                   <ExternalLink className="w-4 h-4 text-gray-400" />

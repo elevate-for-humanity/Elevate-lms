@@ -154,7 +154,7 @@ export default async function WorkforceBoardPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition shadow-lg"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-brand-blue-50 transition shadow-lg"
             >
               Sign In to Portal
               <ArrowRight className="w-5 h-5" />
@@ -198,7 +198,7 @@ export default async function WorkforceBoardPage() {
                 </div>
                 <div className="p-4">
                   <p className="text-slate-600 text-sm">{feature.description}</p>
-                  <span className="inline-flex items-center gap-1 text-blue-600 font-medium text-sm mt-2 group-hover:gap-2 transition-all">
+                  <span className="inline-flex items-center gap-1 text-brand-blue-600 font-medium text-sm mt-2 group-hover:gap-2 transition-all">
                     Learn More <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
@@ -248,13 +248,13 @@ export default async function WorkforceBoardPage() {
           <h2 className="text-3xl md:text-4xl font-bold mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Access real-time workforce data and performance metrics
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-blue-50 transition"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-brand-blue-50 transition"
             >
               Sign In
               <ArrowRight className="w-5 h-5" />

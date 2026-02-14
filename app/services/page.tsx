@@ -117,7 +117,7 @@ export default function ServicesPage() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600">
                     {service.title}
                   </h3>
                   <p className="text-gray-600">{service.description}</p>
@@ -129,7 +129,7 @@ export default function ServicesPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-blue-600">
+      <section className="py-16 px-4 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-white mb-6">
             Need Help?
@@ -137,13 +137,13 @@ export default function ServicesPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100"
+              className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100"
             >
               Contact Us
             </Link>
             <Link
               href="/faq"
-              className="inline-block border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-700"
+              className="inline-block border-2 border-white text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-700"
             >
               View FAQ
             </Link>

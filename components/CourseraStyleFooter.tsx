@@ -12,7 +12,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/about"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   About Us
                 </Link>
@@ -20,7 +20,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/careers"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Careers
                 </Link>
@@ -29,7 +29,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/contact"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Contact
                 </Link>
@@ -44,7 +44,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/programs"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   All Programs
                 </Link>
@@ -52,7 +52,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/programs/medical-assistant"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Medical Assistant
                 </Link>
@@ -60,7 +60,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/programs/hvac-technician"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   HVAC Technician
                 </Link>
@@ -68,7 +68,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/programs/barber-apprenticeship"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Barber Apprenticeship
                 </Link>
@@ -83,7 +83,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/apply"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Apply Now
                 </Link>
@@ -91,7 +91,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/employers"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   For Employers
                 </Link>
@@ -99,7 +99,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/partners"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   For Partners
                 </Link>
@@ -115,7 +115,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/faq"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   FAQ
                 </Link>
@@ -123,7 +123,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/support"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Help Center
                 </Link>
@@ -131,7 +131,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/directory"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Directory
                 </Link>
@@ -139,7 +139,7 @@ export default function CourseraStyleFooter() {
               <li>
                 <Link
                   href="/philanthropy"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Community Impact
                 </Link>
@@ -150,9 +150,9 @@ export default function CourseraStyleFooter() {
 
         {/* Compliance Section */}
         <div className="pt-8 border-t border-gray-200 mb-6">
-          <div className="bg-blue-50 border border-blue-100 rounded-lg p-6 space-y-4">
+          <div className="bg-brand-blue-50 border border-brand-blue-100 rounded-lg p-6 space-y-4">
             <div className="flex flex-wrap items-center gap-3 text-sm">
-              <span className="font-bold text-blue-900">🏛️ Government-Contracted Workforce Training Provider</span>
+              <span className="font-bold text-brand-blue-900">🏛️ Government-Contracted Workforce Training Provider</span>
               <span className="text-gray-400">|</span>
               <span className="text-black">ETPL-Approved</span>
               <span className="text-gray-400">|</span>
@@ -163,12 +163,12 @@ export default function CourseraStyleFooter() {
               A program of <strong>Selfish Inc</strong>, a 501(c)(3) nonprofit organization serving Marion County and surrounding areas through partnerships with EmployIndy, Indiana Department of Workforce Development, and the U.S. Department of Labor.
             </div>
 
-            <div className="text-xs text-black leading-relaxed bg-white p-3 rounded border border-blue-200">
+            <div className="text-xs text-black leading-relaxed bg-white p-3 rounded border border-brand-blue-200">
               <strong>⚖️ Equal Opportunity Employer/Program:</strong> Elevate for Humanity is an equal opportunity employer and does not discriminate on the basis of race, color, religion, sex, national origin, age, disability, veteran status, sexual orientation, gender identity, or any other protected characteristic. Auxiliary aids and services are available upon request to individuals with disabilities. <strong>Indiana Relay:</strong> 711 or 800-743-3333 (TDD).
             </div>
 
             <div className="text-xs text-black">
-              <strong>Contact:</strong> (317) 314-3757 | <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">elevate4humanityedu@gmail.com</a> | Serving 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240
+              <strong>Contact:</strong> (317) 314-3757 | <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">elevate4humanityedu@gmail.com</a> | Serving 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240
             </div>
           </div>
         </div>
@@ -179,7 +179,7 @@ export default function CourseraStyleFooter() {
             {/* Logo and Copyright */}
             <div className="flex flex-col items-start gap-2">
               <div className="flex items-center gap-4">
-                <div className="text-xl font-bold text-blue-600">Elevate</div>
+                <div className="text-xl font-bold text-brand-blue-600">Elevate</div>
                 <span className="text-sm text-gray-500">
                   © {new Date().getFullYear()} Elevate for Humanity
                 </span>
@@ -192,7 +192,7 @@ export default function CourseraStyleFooter() {
                 href="https://facebook.com/elevateforhumanity"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-600 transition"
+                className="text-gray-400 hover:text-brand-blue-600 transition"
                 aria-label="Facebook"
               >
                 <Facebook className="w-5 h-5" />
@@ -200,13 +200,13 @@ export default function CourseraStyleFooter() {
               <a
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-600 transition"
+                className="text-gray-400 hover:text-brand-blue-600 transition"
                />
               <a
                 href="https://linkedin.com/company/elevate-for-humanity"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-600 transition"
+                className="text-gray-400 hover:text-brand-blue-600 transition"
                 aria-label="LinkedIn"
               >
                 <Linkedin className="w-5 h-5" />
@@ -215,7 +215,7 @@ export default function CourseraStyleFooter() {
                 href="https://instagram.com/elevateforhumanity"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-600 transition"
+                className="text-gray-400 hover:text-brand-blue-600 transition"
                 aria-label="Instagram"
               >
                 <Instagram className="w-5 h-5" />
@@ -224,7 +224,7 @@ export default function CourseraStyleFooter() {
                 href="https://youtube.com/@elevateforhumanity"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-gray-400 hover:text-blue-600 transition"
+                className="text-gray-400 hover:text-brand-blue-600 transition"
                 aria-label="YouTube"
               >
                 <Youtube className="w-5 h-5" />
@@ -233,13 +233,13 @@ export default function CourseraStyleFooter() {
 
             {/* Legal Links */}
             <div className="flex items-center gap-4 text-sm text-gray-500">
-              <Link href="/privacy-policy" aria-label="Link" className="hover:text-blue-600">
+              <Link href="/privacy-policy" aria-label="Link" className="hover:text-brand-blue-600">
                 Privacy
               </Link>
-              <Link href="/terms-of-service" aria-label="Link" className="hover:text-blue-600">
+              <Link href="/terms-of-service" aria-label="Link" className="hover:text-brand-blue-600">
                 Terms
               </Link>
-              <Link href="/accessibility" aria-label="Link" className="hover:text-blue-600">
+              <Link href="/accessibility" aria-label="Link" className="hover:text-brand-blue-600">
                 Accessibility
               </Link>
             </div>

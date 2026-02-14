@@ -19,7 +19,7 @@ export function HowItWorks({ steps, variant = 'horizontal' }: HowItWorksProps) {
         {steps.map((step, index) => (
           <div key={step.number} className="flex gap-4">
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg">
+              <div className="w-12 h-12 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold text-lg">
                 {step.number}
               </div>
             </div>
@@ -28,7 +28,7 @@ export function HowItWorks({ steps, variant = 'horizontal' }: HowItWorksProps) {
               <p className="text-black">{step.description}</p>
             </div>
             {step.icon && (
-              <div className="flex-shrink-0 text-blue-600">
+              <div className="flex-shrink-0 text-brand-blue-600">
                 {step.icon}
               </div>
             )}
@@ -44,15 +44,15 @@ export function HowItWorks({ steps, variant = 'horizontal' }: HowItWorksProps) {
         <div key={step.number} className="relative">
           {/* Connector line */}
           {index < steps.length - 1 && (
-            <div className="hidden md:block absolute top-6 left-[calc(50%+24px)] w-[calc(100%-48px)] h-0.5 bg-blue-200" />
+            <div className="hidden md:block absolute top-6 left-[calc(50%+24px)] w-[calc(100%-48px)] h-0.5 bg-brand-blue-200" />
           )}
 
           <div className="relative bg-white rounded-lg p-6 text-center">
-            <div className="w-12 h-12 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold text-lg mx-auto mb-4 relative z-10">
+            <div className="w-12 h-12 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold text-lg mx-auto mb-4 relative z-10">
               {step.number}
             </div>
             {step.icon && (
-              <div className="text-blue-600 flex justify-center mb-3">
+              <div className="text-brand-blue-600 flex justify-center mb-3">
                 {step.icon}
               </div>
             )}

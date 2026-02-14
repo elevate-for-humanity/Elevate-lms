@@ -12,7 +12,7 @@ export default function DemoApplicationsPage() {
               <p className="text-sm text-gray-500">{s.program} — {s.status}</p>
             </div>
             <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-              s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'
+              s.status === 'active' ? 'bg-green-100 text-green-700' : 'bg-brand-blue-100 text-brand-blue-700'
             }`}>
               {s.status}
             </span>

@@ -124,14 +124,14 @@ export default function CookieConsentBanner() {
       <div className="fixed inset-0 bg-black/50 z-[9998]" />
 
       {/* Banner */}
-      <div className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl border-t-4 border-blue-600 z-[9999] animate-slide-up">
+      <div className="fixed bottom-0 left-0 right-0 bg-white shadow-2xl border-t-4 border-brand-blue-600 z-[9999] animate-slide-up">
         <div className="max-w-7xl mx-auto p-6">
           {!showSettings ? (
             // Simple Banner
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div className="flex items-start gap-4 flex-1">
-                <div className="p-3 bg-blue-100 rounded-lg flex-shrink-0">
-                  <Cookie className="w-6 h-6 text-blue-600" />
+                <div className="p-3 bg-brand-blue-100 rounded-lg flex-shrink-0">
+                  <Cookie className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-black mb-2">
@@ -142,17 +142,17 @@ export default function CookieConsentBanner() {
                     By clicking "Accept All", you consent to our use of cookies.
                   </p>
                   <div className="flex flex-wrap gap-2 text-xs">
-                    <Link href="/privacy-policy" aria-label="Link" className="text-blue-600 hover:underline">
+                    <Link href="/privacy-policy" aria-label="Link" className="text-brand-blue-600 hover:underline">
                       Privacy Policy
                     </Link>
                     <span className="text-gray-400">•</span>
-                    <Link href="/cookies" aria-label="Link" className="text-blue-600 hover:underline">
+                    <Link href="/cookies" aria-label="Link" className="text-brand-blue-600 hover:underline">
                       Cookie Policy
                     </Link>
                     <span className="text-gray-400">•</span>
                     <button
                       onClick={() => setShowSettings(true)}
-                      className="text-blue-600 hover:underline"
+                      className="text-brand-blue-600 hover:underline"
                     >
                       Manage Preferences
                     </button>
@@ -169,7 +169,7 @@ export default function CookieConsentBanner() {
                 </button>
                 <button
                   onClick={acceptAll}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium shadow-lg"
+                  className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-medium shadow-lg"
                 >
                   Accept All Cookies
                 </button>
@@ -180,7 +180,7 @@ export default function CookieConsentBanner() {
             <div>
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <Settings className="w-6 h-6 text-blue-600" />
+                  <Settings className="w-6 h-6 text-brand-blue-600" />
                   <h3 className="text-xl font-bold text-black">
                     Cookie Preferences
                   </h3>
@@ -232,7 +232,7 @@ export default function CookieConsentBanner() {
                         onChange={() => togglePreference('functional')}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600" />
                     </label>
                   </div>
                 </div>
@@ -254,7 +254,7 @@ export default function CookieConsentBanner() {
                         onChange={() => togglePreference('analytics')}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600" />
                     </label>
                   </div>
                 </div>
@@ -276,7 +276,7 @@ export default function CookieConsentBanner() {
                         onChange={() => togglePreference('marketing')}
                         className="sr-only peer"
                       />
-                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600" />
+                      <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-brand-blue-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-blue-600" />
                     </label>
                   </div>
                 </div>
@@ -291,7 +291,7 @@ export default function CookieConsentBanner() {
                 </button>
                 <button
                   onClick={savePreferences}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium shadow-lg"
+                  className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-medium shadow-lg"
                 >
                   Save Preferences
                 </button>

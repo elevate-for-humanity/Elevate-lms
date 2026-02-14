@@ -267,7 +267,7 @@ export default function NewCampaignPage() {
                         >
                       ) => setCampaign({ ...campaign, name: e.target.value })}
                       placeholder="e.g., Welcome Series - January 2025"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     />
                   </div>
 
@@ -288,7 +288,7 @@ export default function NewCampaignPage() {
                         setCampaign({ ...campaign, subject: e.target.value })
                       }
                       placeholder="e.g., Welcome to Elevate for Humanity!"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     />
                     <p className="mt-1 text-sm text-black">
                       Use variables like {'{{firstName}}'} for personalization
@@ -312,7 +312,7 @@ export default function NewCampaignPage() {
                         ) =>
                           setCampaign({ ...campaign, fromName: e.target.value })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       />
                     </div>
                     <div>
@@ -334,7 +334,7 @@ export default function NewCampaignPage() {
                             fromEmail: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       />
                     </div>
                   </div>
@@ -355,7 +355,7 @@ export default function NewCampaignPage() {
                       ) =>
                         setCampaign({ ...campaign, replyTo: e.target.value })
                       }
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     />
                   </div>
 
@@ -385,7 +385,7 @@ export default function NewCampaignPage() {
                           }
                           className={`p-4 border-2 rounded-lg text-left transition-colors ${
                             campaign.template === key
-                              ? 'border-brand-blue-600 bg-blue-50'
+                              ? 'border-brand-blue-600 bg-brand-blue-50'
                               : 'border-gray-200 hover:border-gray-300'
                           }`}
                         >
@@ -416,7 +416,7 @@ export default function NewCampaignPage() {
                         setCampaign({ ...campaign, customHtml: e.target.value })
                       }
                       rows={12}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       placeholder="Edit HTML or use template..."
                     />
                   </div>
@@ -479,7 +479,7 @@ export default function NewCampaignPage() {
                         key={list.value}
                         className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-colors ${
                           campaign.recipientList === list.value
-                            ? 'border-brand-blue-600 bg-blue-50'
+                            ? 'border-brand-blue-600 bg-brand-blue-50'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >

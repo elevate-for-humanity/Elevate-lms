@@ -86,8 +86,8 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
     <div className="space-y-6">
       {/* Existing Appointments */}
       {existingAppointments.length > 0 && (
-        <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-          <h3 className="font-medium text-blue-900 mb-3">Your Upcoming Appointments</h3>
+        <div className="bg-brand-blue-50 rounded-xl p-4 border border-brand-blue-200">
+          <h3 className="font-medium text-brand-blue-900 mb-3">Your Upcoming Appointments</h3>
           <div className="space-y-2">
             {existingAppointments.map(apt => (
               <div key={apt.id} className="flex items-center justify-between bg-white rounded-lg p-3">
@@ -99,7 +99,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
                 </div>
                 <span className={`px-2 py-1 rounded text-xs ${
                   apt.status === 'scheduled' ? 'bg-green-100 text-green-700' :
-                  apt.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                  apt.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-700' :
                   'bg-gray-100 text-gray-700'
                 }`}>
                   {apt.status}

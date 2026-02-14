@@ -183,7 +183,7 @@ export default async function CareersPage() {
               {benefits.map((benefit, index) => (
                 <div
                   key={index}
-                  className="bg-white text-center p-8 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition"
+                  className="bg-white text-center p-8 rounded-lg border-2 border-gray-200 hover:border-brand-blue-500 hover:shadow-lg transition"
                 >
                   <div className="w-16 h-16 mx-auto mb-4">
                     <Image 
@@ -215,7 +215,7 @@ export default async function CareersPage() {
               {openPositions.map((position) => (
                 <div
                   key={position.id}
-                  className="bg-white rounded-lg border border-gray-200 p-6 hover:border-blue-500 hover:shadow-lg transition"
+                  className="bg-white rounded-lg border border-gray-200 p-6 hover:border-brand-blue-500 hover:shadow-lg transition"
                 >
                   <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     <div className="flex-1">
@@ -228,14 +228,14 @@ export default async function CareersPage() {
                       </p>
                       <div className="flex flex-wrap gap-3 text-sm">
                         {position.department?.name && (
-                          <span className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full">
+                          <span className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full">
                             {position.department.name}
                           </span>
                         )}
                         <span className="bg-brand-green-100 text-green-700 px-3 py-2 rounded-full">
                           Remote
                         </span>
-                        <span className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full">
+                        <span className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full">
                           {getEmploymentTypeDisplay(position.employment_type)}
                         </span>
                         {(position.min_salary || position.max_salary) && (

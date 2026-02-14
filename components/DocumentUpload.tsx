@@ -162,10 +162,10 @@ export default function DocumentUpload({
         onDrop={handleDrop}
         className={`relative border-2 border-dashed rounded-2xl p-12 transition-all ${
           isDragging
-            ? 'border-blue-500 bg-blue-50'
+            ? 'border-brand-blue-500 bg-brand-blue-50'
             : error
             ? 'border-red-300 bg-red-50'
-            : 'border-gray-300 bg-gray-50 hover:border-blue-400 hover:bg-gray-50'
+            : 'border-gray-300 bg-gray-50 hover:border-brand-blue-400 hover:bg-gray-50'
         }`}
       >
         <input
@@ -183,7 +183,7 @@ export default function DocumentUpload({
             className="inline-block"
           >
             <div className={`w-16 h-16 mx-auto mb-4 rounded-full flex items-center justify-center ${
-              isDragging ? 'bg-blue-600' : 'bg-gray-200'
+              isDragging ? 'bg-brand-blue-600' : 'bg-gray-200'
             }`}>
               <Upload className={`w-8 h-8 ${isDragging ? 'text-white' : 'text-black'}`} />
             </div>
@@ -199,7 +199,7 @@ export default function DocumentUpload({
 
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-all shadow-md hover:shadow-lg"
+            className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition-all shadow-md hover:shadow-lg"
           >
             Choose Files
           </button>
@@ -244,7 +244,7 @@ export default function DocumentUpload({
               Uploaded Files ({successCount}/{files.length})
             </h4>
             {uploadingCount > 0 && (
-              <span className="text-sm text-blue-600">
+              <span className="text-sm text-brand-blue-600">
                 Uploading {uploadingCount} file{uploadingCount > 1 ? 's' : ''}...
               </span>
             )}
@@ -267,14 +267,14 @@ export default function DocumentUpload({
                     <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       file.status === 'success' ? 'bg-green-100' :
                       file.status === 'error' ? 'bg-red-100' :
-                      'bg-blue-100'
+                      'bg-brand-blue-100'
                     }`}>
                       {file.status === 'success' ? (
                         <Check className="w-6 h-6 text-green-600" />
                       ) : file.status === 'error' ? (
                         <AlertCircle className="w-6 h-6 text-brand-orange-600" />
                       ) : (
-                        <FileIcon className="w-6 h-6 text-blue-600" />
+                        <FileIcon className="w-6 h-6 text-brand-blue-600" />
                       )}
                     </div>
 
@@ -294,7 +294,7 @@ export default function DocumentUpload({
                         <div className="mb-2">
                           <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                             <motion.div
-                              className="h-full bg-blue-600"
+                              className="h-full bg-brand-blue-600"
                               initial={{ width: 0 }}
                               animate={{ width: `${file.progress}%` }}
                               transition={{ duration: 0.3 }}
@@ -304,7 +304,7 @@ export default function DocumentUpload({
                             <span className="text-xs text-black">
                               Uploading... {Math.round(file.progress)}%
                             </span>
-                            <Loader className="w-4 h-4 text-blue-600 animate-spin" />
+                            <Loader className="w-4 h-4 text-brand-blue-600 animate-spin" />
                           </div>
                         </div>
                       )}
@@ -330,7 +330,7 @@ export default function DocumentUpload({
                         <>
                           <button
                             onClick={() => window.open(file.url, '_blank')}
-                            className="p-2 text-black hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
+                            className="p-2 text-black hover:text-brand-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
                             title="Preview"
                           >
                             <Eye className="w-5 h-5" />

@@ -145,7 +145,7 @@ export default function AttendanceRecordForm({
       <button 
         type="submit" 
         disabled={submitting}
-        className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white py-3 rounded-lg font-bold flex items-center justify-center"
+        className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-brand-blue-400 text-white py-3 rounded-lg font-bold flex items-center justify-center"
       >
         <Save className="w-5 h-5 mr-2" />
         {submitting ? 'Saving...' : 'Save Attendance'}

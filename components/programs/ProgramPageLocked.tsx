@@ -95,7 +95,7 @@ export function ProgramPageLocked({
                 key={index}
                 className="flex items-start gap-4 bg-slate-50 p-6 rounded-lg"
               >
-                <Users className="h-10 w-10 text-blue-600 flex-shrink-0 mt-1" />
+                <Users className="h-10 w-10 text-brand-blue-600 flex-shrink-0 mt-1" />
                 <p className="text-lg text-black">{item}</p>
               </div>
             ))}
@@ -135,7 +135,7 @@ export function ProgramPageLocked({
 
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-slate-50 p-8 rounded-lg text-center">
-              <Clock className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <Clock className="h-12 w-12 text-brand-blue-600 mx-auto mb-4" />
               <div className="text-3xl font-bold text-black mb-2">
                 {duration}
               </div>
@@ -143,7 +143,7 @@ export function ProgramPageLocked({
             </div>
 
             <div className="bg-slate-50 p-8 rounded-lg text-center">
-              <Clock className="h-12 w-12 text-blue-600 mx-auto mb-4" />
+              <Clock className="h-12 w-12 text-brand-blue-600 mx-auto mb-4" />
               <div className="text-3xl font-bold text-black mb-2">
                 {schedule}
               </div>
@@ -178,7 +178,7 @@ export function ProgramPageLocked({
             <div className="grid md:grid-cols-2 gap-6">
               {rapidsId && (
                 <div className="bg-slate-50 p-6 rounded-lg text-center">
-                  <Shield className="h-11 w-11 text-blue-600 mx-auto mb-4" />
+                  <Shield className="h-11 w-11 text-brand-blue-600 mx-auto mb-4" />
                   <div className="text-sm text-black mb-2">
                     DOL Registered
                   </div>
@@ -205,7 +205,7 @@ export function ProgramPageLocked({
       )}
 
       {/* 5. WHAT HAPPENS NEXT */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">What Happens Next</h2>
 
@@ -213,17 +213,17 @@ export function ProgramPageLocked({
             <div>
               <div className="text-4xl font-bold mb-2">1</div>
               <div className="text-lg font-semibold mb-2">Apply</div>
-              <div className="text-blue-100">Fill out simple application</div>
+              <div className="text-brand-blue-100">Fill out simple application</div>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">2</div>
               <div className="text-lg font-semibold mb-2">Get Approved</div>
-              <div className="text-blue-100">We handle funding paperwork</div>
+              <div className="text-brand-blue-100">We handle funding paperwork</div>
             </div>
             <div>
               <div className="text-4xl font-bold mb-2">3</div>
               <div className="text-lg font-semibold mb-2">Start Training</div>
-              <div className="text-blue-100">Begin your program</div>
+              <div className="text-brand-blue-100">Begin your program</div>
             </div>
           </div>
 

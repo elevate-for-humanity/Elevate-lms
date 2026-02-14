@@ -83,7 +83,7 @@ export function VerifiedCredentials() {
                 href={cred.verifyUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                className="inline-flex items-center gap-2 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
               >
                 {cred.verifyText}
                 <ExternalLink className="h-4 w-4" />
@@ -95,7 +95,7 @@ export function VerifiedCredentials() {
         <div className="mt-8 text-center">
           <a
             href="/accreditation"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold"
+            className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
           >
             View Full Accreditation Details
             <ExternalLink className="h-4 w-4" />

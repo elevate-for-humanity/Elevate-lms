@@ -89,7 +89,7 @@ export default function CompetencyTracking() {
     : competencies.filter(c => c.category === activeCategory);
 
   const levelColors: Record<string, string> = {
-    beginner: 'bg-blue-100 text-blue-700',
+    beginner: 'bg-brand-blue-100 text-brand-blue-700',
     intermediate: 'bg-purple-100 text-purple-700',
     advanced: 'bg-orange-100 text-orange-700',
     expert: 'bg-red-100 text-red-700',
@@ -199,7 +199,7 @@ export default function CompetencyTracking() {
           <h3 className="text-xl font-bold mb-4">Competency Framework</h3>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <h4 className="font-semibold text-blue-700 mb-2">Beginner</h4>
+              <h4 className="font-semibold text-brand-blue-700 mb-2">Beginner</h4>
               <p className="text-sm text-black">Basic understanding and awareness</p>
             </div>
             <div>

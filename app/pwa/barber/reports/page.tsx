@@ -46,7 +46,7 @@ export default function BarberReportsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function BarberReportsPage() {
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-slate-800 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-5 h-5 text-blue-400" />
+              <Clock className="w-5 h-5 text-brand-blue-400" />
               <span className="text-slate-400 text-sm">Total Hours</span>
             </div>
             <p className="text-3xl font-bold text-white">{summary.totalHours}</p>
@@ -85,21 +85,21 @@ export default function BarberReportsPage() {
         </div>
 
         {/* Progress to Goal */}
-        <div className="bg-blue-500/20 border border-blue-500/30 rounded-xl p-4">
+        <div className="bg-brand-blue-500/20 border border-brand-blue-500/30 rounded-xl p-4">
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
-              <Award className="w-5 h-5 text-blue-400" />
+              <Award className="w-5 h-5 text-brand-blue-400" />
               <span className="text-white font-medium">Progress to 2,000 Hours</span>
             </div>
-            <span className="text-blue-300 font-bold">{summary.milestoneProgress}%</span>
+            <span className="text-brand-blue-300 font-bold">{summary.milestoneProgress}%</span>
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-blue-500 rounded-full"
+              className="h-full bg-brand-blue-500 rounded-full"
               style={{ width: `${summary.milestoneProgress}%` }}
             />
           </div>
-          <p className="text-blue-200 text-sm mt-2">
+          <p className="text-brand-blue-200 text-sm mt-2">
             {2000 - summary.totalHours} hours remaining
           </p>
         </div>
@@ -129,16 +129,16 @@ export default function BarberReportsPage() {
           
           <Link 
             href="/pwa/barber/reports/export"
-            className="flex items-center gap-4 bg-blue-600 rounded-xl p-4 active:bg-blue-700"
+            className="flex items-center gap-4 bg-brand-blue-600 rounded-xl p-4 active:bg-brand-blue-700"
           >
-            <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-brand-blue-500 rounded-xl flex items-center justify-center">
               <Download className="w-6 h-6 text-white" />
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Export Hours Report</p>
-              <p className="text-blue-200 text-sm">PDF, CSV, or Excel format</p>
+              <p className="text-brand-blue-200 text-sm">PDF, CSV, or Excel format</p>
             </div>
-            <ChevronRight className="w-5 h-5 text-blue-200" />
+            <ChevronRight className="w-5 h-5 text-brand-blue-200" />
           </Link>
 
           <Link 

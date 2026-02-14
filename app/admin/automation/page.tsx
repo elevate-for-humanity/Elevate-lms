@@ -135,7 +135,7 @@ export default async function AutomationLogPage() {
           <div className="bg-white rounded-xl shadow-sm">
             <div className="p-4 border-b flex items-center justify-between">
               <h2 className="font-bold text-gray-900 flex items-center gap-2">
-                <Mail className="w-5 h-5 text-blue-500" />
+                <Mail className="w-5 h-5 text-brand-blue-500" />
                 Email/SMS Delivery Log
               </h2>
               <span className="text-sm text-gray-500">{deliveryLogs?.length || 0} records</span>
@@ -221,7 +221,7 @@ export default async function AutomationLogPage() {
         {/* Cron Job Status */}
         <div className="mt-8 bg-white rounded-xl shadow-sm p-6">
           <h2 className="font-bold text-gray-900 mb-4 flex items-center gap-2">
-            <RefreshCw className="w-5 h-5 text-blue-500" />
+            <RefreshCw className="w-5 h-5 text-brand-blue-500" />
             Scheduled Jobs
           </h2>
           <div className="grid md:grid-cols-3 gap-4">

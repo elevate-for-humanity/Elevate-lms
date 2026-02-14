@@ -71,7 +71,7 @@ export default async function DIYStartPage() {
                   <p className="text-sm text-black mb-3">Work with a tax professional</p>
                   <Link
                     href="/supersonic-fast-cash/book-appointment"
-                    className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-semibold transition-colors"
+                    className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded text-sm font-semibold transition-colors"
                   >
                     Book Appointment
                   </Link>

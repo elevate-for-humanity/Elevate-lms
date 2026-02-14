@@ -67,7 +67,7 @@ export default async function ProgramHolderNotificationsPage() {
           </div>
           <Link
             href="/program-holder/settings/notifications"
-            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium"
           >
             Notification Settings
           </Link>
@@ -92,13 +92,13 @@ export default async function ProgramHolderNotificationsPage() {
                 className={`bg-white rounded-lg border p-4 transition ${
                   notification.read
                     ? 'border-gray-200'
-                    : 'border-blue-200 bg-blue-50'
+                    : 'border-brand-blue-200 bg-brand-blue-50'
                 }`}
               >
                 <div className="flex items-start gap-4">
                   <div
                     className={`w-2 h-2 rounded-full mt-2 ${
-                      notification.read ? 'bg-gray-300' : 'bg-blue-600'
+                      notification.read ? 'bg-gray-300' : 'bg-brand-blue-600'
                     }`}
                   />
                   <div className="flex-1">
@@ -124,7 +124,7 @@ export default async function ProgramHolderNotificationsPage() {
                       {notification.action_url && (
                         <Link
                           href={notification.action_url}
-                          className="flex items-center gap-1 text-blue-600 hover:text-blue-700 font-medium"
+                          className="flex items-center gap-1 text-brand-blue-600 hover:text-brand-blue-700 font-medium"
                         >
                           {notification.action_label || 'View'}
                           <ExternalLink className="w-3 h-3" />
@@ -139,7 +139,7 @@ export default async function ProgramHolderNotificationsPage() {
                     >
                       <button
                         type="submit"
-                        className="text-sm text-blue-600 hover:text-blue-700 font-medium flex items-center gap-1"
+                        className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium flex items-center gap-1"
                       >
                         <Check className="w-4 h-4" />
                         Mark Read

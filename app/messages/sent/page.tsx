@@ -21,14 +21,14 @@ export default function SentMessagesPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-8">
-        <Link href="/messages" className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/messages" className="inline-flex items-center text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Messages
         </Link>
 
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center">
-            <Send className="w-8 h-8 text-blue-600 mr-3" />
+            <Send className="w-8 h-8 text-brand-blue-600 mr-3" />
             <h1 className="text-2xl font-bold text-gray-900">Sent Messages</h1>
           </div>
           <span className="text-gray-500">{sentMessages.length} messages</span>
@@ -39,8 +39,8 @@ export default function SentMessagesPage() {
             <div className="divide-y divide-gray-200">
               {sentMessages.map((message) => (
                 <div key={message.id} className="p-4 hover:bg-gray-50 flex items-center">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-4">
-                    <Mail className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center mr-4">
+                    <Mail className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between mb-1">
@@ -51,7 +51,7 @@ export default function SentMessagesPage() {
                     <p className="text-sm text-gray-500 truncate">{message.preview}</p>
                   </div>
                   <div className="flex items-center gap-2 ml-4">
-                    <button className="p-2 text-gray-400 hover:text-blue-600 transition" title="View">
+                    <button className="p-2 text-gray-400 hover:text-brand-blue-600 transition" title="View">
                       <Eye className="w-5 h-5" />
                     </button>
                     <button className="p-2 text-gray-400 hover:text-red-600 transition" title="Delete">

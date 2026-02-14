@@ -83,7 +83,7 @@ export function QuizForm({ quizId, quizTitle, questions }: QuizFormProps) {
                       key={option.id}
                       className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition ${
                         answers[question.id] === option.id
-                          ? 'border-blue-500 bg-blue-50'
+                          ? 'border-brand-blue-500 bg-brand-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
@@ -93,7 +93,7 @@ export function QuizForm({ quizId, quizTitle, questions }: QuizFormProps) {
                         value={option.id}
                         checked={answers[question.id] === option.id}
                         onChange={() => handleAnswerChange(question.id, option.id)}
-                        className="w-4 h-4 text-blue-600"
+                        className="w-4 h-4 text-brand-blue-600"
                       />
                       <span className="text-gray-700">{option.text}</span>
                     </label>
@@ -107,7 +107,7 @@ export function QuizForm({ quizId, quizTitle, questions }: QuizFormProps) {
             <button
               type="submit"
               disabled={submitting || answeredCount < totalQuestions}
-              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-medium rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? (
                 <>

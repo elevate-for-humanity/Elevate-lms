@@ -54,7 +54,7 @@ export function CredentialBadges({
         {showVerifyLink && (
           <Link
             href="/verify-credentials"
-            className="text-xs text-blue-600 hover:underline"
+            className="text-xs text-brand-blue-600 hover:underline"
           >
             Verify
           </Link>
@@ -82,7 +82,7 @@ export function CredentialBadges({
           {showVerifyLink && (
             <Link
               href="/verify-credentials"
-              className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               Verify Credentials <ExternalLink className="w-3 h-3" />
             </Link>
@@ -100,7 +100,7 @@ export function CredentialBadges({
         {showVerifyLink && (
           <Link
             href="/verify-credentials"
-            className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700 font-medium"
+            className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium"
           >
             Verify All <ExternalLink className="w-4 h-4" />
           </Link>
@@ -139,7 +139,7 @@ export function CredentialBadgeStrip({ className = '' }: { className?: string })
       <span className="text-gray-500">Verified:</span>
       <div className="flex items-center gap-2">
         <span className="inline-flex items-center gap-1 text-gray-700">
-          <Shield className="w-4 h-4 text-blue-600" />
+          <Shield className="w-4 h-4 text-brand-blue-600" />
           DOL
         </span>
         <span className="text-gray-300">|</span>
@@ -155,7 +155,7 @@ export function CredentialBadgeStrip({ className = '' }: { className?: string })
       </div>
       <Link
         href="/verify-credentials"
-        className="text-blue-600 hover:underline"
+        className="text-brand-blue-600 hover:underline"
       >
         Verify →
       </Link>

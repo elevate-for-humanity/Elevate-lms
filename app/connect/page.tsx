@@ -369,8 +369,8 @@ export default function ConnectPage() {
                 </code>
               </pre>
               
-              <div className="mt-4 p-4 bg-blue-500/10 rounded-lg">
-                <p className="text-blue-300 text-sm font-medium mb-2">
+              <div className="mt-4 p-4 bg-brand-blue-500/10 rounded-lg">
+                <p className="text-brand-blue-300 text-sm font-medium mb-2">
                   {integration.platform} Instructions:
                 </p>
                 <ol className="list-decimal list-inside space-y-1 text-slate-300 text-sm">

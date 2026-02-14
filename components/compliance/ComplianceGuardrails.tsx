@@ -40,17 +40,17 @@ export function NoGuaranteeDisclaimer({ className = '' }: DisclaimerProps) {
  */
 export function FundingDisclaimer({ className = '' }: DisclaimerProps) {
   return (
-    <div className={`bg-blue-50 border border-blue-200 rounded-lg p-4 ${className}`}>
+    <div className={`bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 ${className}`}>
       <div className="flex items-start gap-3">
-        <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-        <div className="text-sm text-blue-800">
+        <Info className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+        <div className="text-sm text-brand-blue-800">
           <p className="font-semibold mb-1">Funding Eligibility</p>
           <p>
             Eligibility for WIOA, WRG, or other funding programs is determined by 
             WorkOne / Indiana Career Connect, not by Elevate for Humanity. Submitting 
             an application does not guarantee funding approval.
           </p>
-          <Link href="/check-eligibility" className="text-blue-700 hover:underline mt-2 inline-block">
+          <Link href="/check-eligibility" className="text-brand-blue-700 hover:underline mt-2 inline-block">
             Check eligibility requirements →
           </Link>
         </div>
@@ -180,17 +180,17 @@ export function ApplicationConsent({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+        className="mt-1 h-4 w-4 rounded border-gray-300 text-brand-blue-600 focus:ring-brand-blue-500"
         required
       />
       <span className="text-sm text-gray-700">
         I understand that submitting this application does not guarantee eligibility, 
         funding approval, or enrollment. I acknowledge that I have read and agree to the{' '}
-        <Link href="/terms-of-service" className="text-blue-600 hover:underline">
+        <Link href="/terms-of-service" className="text-brand-blue-600 hover:underline">
           Terms of Service
         </Link>{' '}
         and{' '}
-        <Link href="/legal/disclosures" className="text-blue-600 hover:underline">
+        <Link href="/legal/disclosures" className="text-brand-blue-600 hover:underline">
           Disclosures
         </Link>.
       </span>

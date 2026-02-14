@@ -69,29 +69,29 @@ export default function ContactPage() {
       {/* Contact Information */}
       <section className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center hover:border-blue-600 transition">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <Phone className="w-8 h-8 text-blue-600" />
+          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center hover:border-brand-blue-600 transition">
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Phone className="w-8 h-8 text-brand-blue-600" />
             </div>
             <h3 className="text-xl font-bold text-black mb-3">Phone</h3>
-            <a href="/support" className="text-blue-600 hover:text-blue-800 font-semibold text-lg">
+            <a href="/support" className="text-brand-blue-600 hover:text-brand-blue-800 font-semibold text-lg">
               Visit Support Center
             </a>
             <p className="text-gray-600 mt-2 text-sm">Contact us for immediate assistance</p>
           </div>
 
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center hover:border-blue-600 transition">
+          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center hover:border-brand-blue-600 transition">
             <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <Mail className="w-8 h-8 text-orange-600" />
             </div>
             <h3 className="text-xl font-bold text-black mb-3">Email</h3>
-            <a href="mailto:Supersonicfastcashllc@gmail.com" className="text-blue-600 hover:text-blue-800 font-semibold break-all">
+            <a href="mailto:Supersonicfastcashllc@gmail.com" className="text-brand-blue-600 hover:text-brand-blue-800 font-semibold break-all">
               Supersonicfastcashllc@gmail.com
             </a>
             <p className="text-gray-600 mt-2 text-sm">Email us anytime</p>
           </div>
 
-          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center hover:border-blue-600 transition">
+          <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 text-center hover:border-brand-blue-600 transition">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <MapPin className="w-8 h-8 text-green-600" />
             </div>
@@ -104,7 +104,7 @@ export default function ContactPage() {
         {/* Hours */}
         <div className="bg-slate-700 rounded-2xl p-8 mb-16">
           <div className="flex items-center gap-3 mb-6">
-            <Clock className="w-8 h-8 text-blue-600" />
+            <Clock className="w-8 h-8 text-brand-blue-600" />
             <h2 className="text-3xl font-bold text-black">Business Hours</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-6">
@@ -149,7 +149,7 @@ export default function ContactPage() {
         <div className="max-w-3xl mx-auto">
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
             <div className="flex items-center gap-3 mb-6">
-              <MessageSquare className="w-8 h-8 text-blue-600" />
+              <MessageSquare className="w-8 h-8 text-brand-blue-600" />
               <h2 className="text-3xl font-bold text-black">Send Us a Message</h2>
             </div>
 
@@ -165,7 +165,7 @@ export default function ContactPage() {
                     setSuccess(false);
                     setFormData({ firstName: '', lastName: '', email: '', phone: '', subject: '', message: '' });
                   }}
-                  className="text-blue-600 hover:underline"
+                  className="text-brand-blue-600 hover:underline"
                 >
                   Send another message
                 </button>
@@ -183,7 +183,7 @@ export default function ContactPage() {
                       required
                       value={formData.firstName}
                       onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-600 focus:outline-none"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-brand-blue-600 focus:outline-none"
                     />
                   </div>
                   <div>
@@ -196,7 +196,7 @@ export default function ContactPage() {
                       required
                       value={formData.lastName}
                       onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-600 focus:outline-none"
+                      className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-brand-blue-600 focus:outline-none"
                     />
                   </div>
                 </div>
@@ -211,7 +211,7 @@ export default function ContactPage() {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-600 focus:outline-none"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-brand-blue-600 focus:outline-none"
                   />
                 </div>
 
@@ -224,7 +224,7 @@ export default function ContactPage() {
                     id="phone"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-600 focus:outline-none"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-brand-blue-600 focus:outline-none"
                   />
                 </div>
 
@@ -237,7 +237,7 @@ export default function ContactPage() {
                     required
                     value={formData.subject}
                     onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-600 focus:outline-none"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-brand-blue-600 focus:outline-none"
                   >
                     <option value="">Select a subject</option>
                     <option value="tax-prep">Tax Preparation</option>
@@ -258,7 +258,7 @@ export default function ContactPage() {
                     required
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-600 focus:outline-none resize-none"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-brand-blue-600 focus:outline-none resize-none"
                     placeholder="Tell us how we can help you..."
                   ></textarea>
                 </div>

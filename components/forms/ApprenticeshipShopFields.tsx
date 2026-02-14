@@ -193,8 +193,8 @@ export function ApprenticeshipShopFields({
         <p className="text-sm text-slate-600 mb-4">
           Provide details about the shop where you will complete your apprenticeship training.
         </p>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-          <p className="text-sm text-blue-800 flex items-start gap-2">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-3 mb-4">
+          <p className="text-sm text-brand-blue-800 flex items-start gap-2">
             <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <span>
               <strong>Tip:</strong> Submit 2–3 shop options if possible. Requirements vary by region, 

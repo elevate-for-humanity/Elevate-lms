@@ -86,7 +86,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
             </div>
             <button
               type="button"
-              className="absolute bottom-0 right-0 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700"
+              className="absolute bottom-0 right-0 p-2 bg-brand-blue-600 text-white rounded-full hover:bg-brand-blue-700"
             >
               <Camera className="w-4 h-4" />
             </button>
@@ -111,7 +111,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
               name="full_name"
               value={formData.full_name}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               placeholder="Your full name"
             />
           </div>
@@ -136,7 +136,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
               name="phone"
               value={formData.phone}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               placeholder="(555) 123-4567"
             />
           </div>
@@ -149,7 +149,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
               name="location"
               value={formData.location}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               placeholder="City, State"
             />
           </div>
@@ -163,7 +163,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
             value={formData.bio}
             onChange={handleChange}
             rows={4}
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             placeholder="Tell us about yourself..."
           />
         </div>
@@ -182,7 +182,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
               name="website"
               value={formData.website}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               placeholder="https://yourwebsite.com"
             />
           </div>
@@ -195,7 +195,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
               name="linkedin_url"
               value={formData.linkedin_url}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               placeholder="https://linkedin.com/in/yourprofile"
             />
           </div>
@@ -216,7 +216,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
         <button
           type="submit"
           disabled={loading}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>

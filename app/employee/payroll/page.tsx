@@ -29,7 +29,7 @@ export default function PayrollPage() {
             <h1 className="text-3xl font-bold text-gray-900">Payroll</h1>
             <p className="text-gray-600">View your pay stubs and earnings</p>
           </div>
-          <Link href="/employee/payroll/history" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
+          <Link href="/employee/payroll/history" className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-4 py-2 rounded-lg font-medium transition flex items-center">
             <Clock className="w-4 h-4 mr-2" />
             View History
           </Link>
@@ -39,7 +39,7 @@ export default function PayrollPage() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
           <h2 className="text-lg font-bold text-gray-900 mb-4">Current Pay Period</h2>
           <div className="grid md:grid-cols-4 gap-6">
-            <div className="bg-blue-50 rounded-lg p-4">
+            <div className="bg-brand-blue-50 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Pay Period</p>
               <p className="text-lg font-bold text-gray-900">Jan 16-31, 2026</p>
             </div>
@@ -47,7 +47,7 @@ export default function PayrollPage() {
               <p className="text-sm text-gray-600 mb-1">Hours Worked</p>
               <p className="text-lg font-bold text-gray-900">72 hours</p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-4">
+            <div className="bg-brand-blue-50 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Estimated Gross</p>
               <p className="text-lg font-bold text-gray-900">$2,450.00</p>
             </div>
@@ -84,7 +84,7 @@ export default function PayrollPage() {
                     <CheckCircle className="w-3 h-3 mr-1" />
                     {stub.status}
                   </span>
-                  <button className="p-2 text-gray-400 hover:text-blue-600 transition">
+                  <button className="p-2 text-gray-400 hover:text-brand-blue-600 transition">
                     <Download className="w-5 h-5" />
                   </button>
                 </div>
@@ -99,7 +99,7 @@ export default function PayrollPage() {
           <div className="grid md:grid-cols-2 gap-4">
             <div className="border rounded-lg p-4 flex items-center justify-between">
               <div className="flex items-center">
-                <FileText className="w-8 h-8 text-blue-600 mr-3" />
+                <FileText className="w-8 h-8 text-brand-blue-600 mr-3" />
                 <div>
                   <p className="font-medium text-gray-900">W-2 (2025)</p>
                   <p className="text-sm text-gray-600">Available Jan 31, 2026</p>
@@ -111,13 +111,13 @@ export default function PayrollPage() {
             </div>
             <div className="border rounded-lg p-4 flex items-center justify-between">
               <div className="flex items-center">
-                <FileText className="w-8 h-8 text-blue-600 mr-3" />
+                <FileText className="w-8 h-8 text-brand-blue-600 mr-3" />
                 <div>
                   <p className="font-medium text-gray-900">W-4</p>
                   <p className="text-sm text-gray-600">Update withholdings</p>
                 </div>
               </div>
-              <Link href="/employee/documents" className="text-blue-600 hover:text-blue-700">
+              <Link href="/employee/documents" className="text-brand-blue-600 hover:text-brand-blue-700">
                 Edit
               </Link>
             </div>

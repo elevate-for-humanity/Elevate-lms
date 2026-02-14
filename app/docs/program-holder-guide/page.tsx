@@ -20,26 +20,26 @@ export default function ProgramHolderGuidePage() {
           <ArrowLeft className="w-4 h-4" /> Back to Docs
         </Link>
         <div className="flex items-center gap-3 mb-8">
-          <BookOpen className="w-8 h-8 text-blue-600" />
+          <BookOpen className="w-8 h-8 text-brand-blue-600" />
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Program Holder Guide</h1>
             <p className="text-gray-600">Complete guide to managing your training programs</p>
           </div>
         </div>
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-          <h2 className="font-semibold text-blue-900 mb-2">Getting Started</h2>
-          <p className="text-blue-800 mb-4">Welcome to the Elevate Program Holder Portal. This guide will help you manage your training programs effectively.</p>
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-8">
+          <h2 className="font-semibold text-brand-blue-900 mb-2">Getting Started</h2>
+          <p className="text-brand-blue-800 mb-4">Welcome to the Elevate Program Holder Portal. This guide will help you manage your training programs effectively.</p>
           <div className="flex gap-4">
-            <Link href="/program-holder" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Go to Portal</Link>
-            <Link href="/docs/quickstart" className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50">Quick Start</Link>
+            <Link href="/program-holder" className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">Go to Portal</Link>
+            <Link href="/docs/quickstart" className="px-4 py-2 border border-brand-blue-600 text-brand-blue-600 rounded-lg hover:bg-brand-blue-50">Quick Start</Link>
           </div>
         </div>
         <div className="grid md:grid-cols-2 gap-6">
           {sections.map((section, i) => (
             <div key={i} className="bg-white rounded-xl shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <section.icon className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                  <section.icon className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <h3 className="font-semibold text-gray-900">{section.title}</h3>
               </div>

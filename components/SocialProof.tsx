@@ -176,8 +176,8 @@ export default function SocialProof() {
           </div>
 
           <div className="bg-white rounded-xl p-6 shadow-lg text-center border border-slate-200">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mb-3">
-              <Star className="w-6 h-6 text-blue-600" />
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-brand-blue-100 rounded-full mb-3">
+              <Star className="w-6 h-6 text-brand-blue-600" />
             </div>
             <div className="text-3xl font-bold text-black mb-1">4.9/5</div>
             <div className="text-sm text-black">Average Rating</div>

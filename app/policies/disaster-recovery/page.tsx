@@ -41,21 +41,21 @@ export default function DisasterRecoveryPage() {
 
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Recovery Objectives</h2>
         <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+          <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-5 h-5 text-blue-600" />
+              <Clock className="w-5 h-5 text-brand-blue-600" />
               <h3 className="text-lg font-bold text-black m-0">Recovery Time Objective (RTO)</h3>
             </div>
-            <p className="text-3xl font-black text-blue-600 mb-1">&lt; 4 hours</p>
+            <p className="text-3xl font-black text-brand-blue-600 mb-1">&lt; 4 hours</p>
             <p className="text-sm text-gray-600 m-0">Maximum acceptable downtime</p>
           </div>
 
-          <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+          <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200">
             <div className="flex items-center gap-2 mb-2">
-              <Database className="w-5 h-5 text-blue-600" />
+              <Database className="w-5 h-5 text-brand-blue-600" />
               <h3 className="text-lg font-bold text-black m-0">Recovery Point Objective (RPO)</h3>
             </div>
-            <p className="text-3xl font-black text-blue-600 mb-1">24 hours</p>
+            <p className="text-3xl font-black text-brand-blue-600 mb-1">24 hours</p>
             <p className="text-sm text-gray-600 m-0">Maximum acceptable data loss</p>
           </div>
         </div>
@@ -195,28 +195,28 @@ export default function DisasterRecoveryPage() {
           <li><strong>Phone:</strong> (317) 314-3757</li>
         </ul>
 
-        <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+        <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
           <p className="text-black mb-2">
             <strong>Related Policies:</strong>
           </p>
           <ul className="list-disc pl-6 text-black space-y-1 m-0">
             <li>
-              <Link href="/policies/disaster-recovery-test" className="text-blue-600 hover:underline">
+              <Link href="/policies/disaster-recovery-test" className="text-brand-blue-600 hover:underline">
                 Disaster Recovery Test Report
               </Link>
             </li>
             <li>
-              <Link href="/policies/incident-response" className="text-blue-600 hover:underline">
+              <Link href="/policies/incident-response" className="text-brand-blue-600 hover:underline">
                 Incident Response Policy
               </Link>
             </li>
             <li>
-              <Link href="/policies/sla" className="text-blue-600 hover:underline">
+              <Link href="/policies/sla" className="text-brand-blue-600 hover:underline">
                 Service Level Agreement
               </Link>
             </li>
             <li>
-              <Link href="/policies/data-retention" className="text-blue-600 hover:underline">
+              <Link href="/policies/data-retention" className="text-brand-blue-600 hover:underline">
                 Data Retention Policy
               </Link>
             </li>

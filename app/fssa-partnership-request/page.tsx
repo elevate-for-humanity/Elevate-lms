@@ -84,25 +84,25 @@ export default function FSSAPartnershipRequestPage() {
             <p className="text-lg text-black mb-6">
               We've received your FSSA/SNAP E&T partnership request.
             </p>
-            <div className="bg-blue-50 rounded-lg p-6 mb-6 text-left">
+            <div className="bg-brand-blue-50 rounded-lg p-6 mb-6 text-left">
               <h3 className="font-bold text-black mb-3">
                 What Happens Next:
               </h3>
               <ul className="space-y-2 text-black">
                 <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">1.</span>
+                  <span className="text-brand-blue-600 mr-2">1.</span>
                   Our partnerships team will review your request
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">2.</span>
+                  <span className="text-brand-blue-600 mr-2">2.</span>
                   We'll contact you within 1-2 business days
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">3.</span>
+                  <span className="text-brand-blue-600 mr-2">3.</span>
                   We'll schedule a discovery call to discuss your needs
                 </li>
                 <li className="flex items-start">
-                  <span className="text-blue-600 mr-2">4.</span>
+                  <span className="text-brand-blue-600 mr-2">4.</span>
                   We'll provide detailed SNAP E&T capability information
                 </li>
               </ul>
@@ -123,7 +123,7 @@ export default function FSSAPartnershipRequestPage() {
             <div className="mt-8 space-x-4">
               <Link
                 href="/snap-et-partner"
-                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Back to SNAP E&T Info
               </Link>
@@ -166,7 +166,7 @@ export default function FSSAPartnershipRequestPage() {
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-xl p-6 shadow-md">
             <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <CheckCircle className="w-6 h-6 text-blue-600" />
+              <CheckCircle className="w-6 h-6 text-brand-blue-600" />
             </div>
             <h3 className="font-bold text-black mb-2">ETPL Approved</h3>
             <p className="text-sm text-black">
@@ -214,7 +214,7 @@ export default function FSSAPartnershipRequestPage() {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     placeholder="Full name"
                   />
                 </div>
@@ -230,7 +230,7 @@ export default function FSSAPartnershipRequestPage() {
                     required
                     value={formData.organization}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     placeholder="Indiana FSSA, WorkOne, etc."
                   />
                 </div>
@@ -245,7 +245,7 @@ export default function FSSAPartnershipRequestPage() {
                     name="title"
                     value={formData.title}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     placeholder="SNAP E&T Coordinator"
                   />
                 </div>
@@ -261,7 +261,7 @@ export default function FSSAPartnershipRequestPage() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     placeholder="john.smith@fssa.in.gov"
                   />
                 </div>
@@ -276,7 +276,7 @@ export default function FSSAPartnershipRequestPage() {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     placeholder="(317) 314-3757"
                   />
                 </div>
@@ -290,7 +290,7 @@ export default function FSSAPartnershipRequestPage() {
                     required
                     value={formData.partnershipType}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   >
                     <option value="">Select type...</option>
                     <option value="fssa">Indiana FSSA</option>
@@ -319,7 +319,7 @@ export default function FSSAPartnershipRequestPage() {
                     name="programsInterest"
                     value={formData.programsInterest}
                     onChange={handleChange}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     placeholder="CNA, HVAC, Barber, CDL, etc."
                   />
                 </div>
@@ -334,7 +334,7 @@ export default function FSSAPartnershipRequestPage() {
                     value={formData.message}
                     onChange={handleChange}
                     rows={6}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     placeholder="Tell us about your SNAP E&T needs, number of participants, timeline, etc."
                   />
                 </div>
@@ -359,7 +359,7 @@ export default function FSSAPartnershipRequestPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
               >
                 {loading ? (
                   <>

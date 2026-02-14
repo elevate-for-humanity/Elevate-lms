@@ -196,7 +196,7 @@ export default async function ReviewQueuePage({
                     </span>
                     <Link
                       href={`/admin/review-queue/${item.id}`}
-                      className="px-3 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
+                      className="px-3 py-1.5 bg-brand-blue-600 text-white text-sm font-medium rounded-lg hover:bg-brand-blue-700"
                     >
                       Review
                     </Link>

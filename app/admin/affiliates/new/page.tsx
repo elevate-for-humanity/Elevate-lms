@@ -16,14 +16,14 @@ export default function NewAffiliatePage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "New" }]} />
       </div>
 <div className="max-w-2xl mx-auto">
-        <Link href="/admin/affiliates" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/admin/affiliates" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to Affiliates
         </Link>
 
         <div className="flex items-center gap-3 mb-8">
-          <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-            <Users className="w-6 h-6 text-blue-600" />
+          <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+            <Users className="w-6 h-6 text-brand-blue-600" />
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Add New Affiliate</h1>
@@ -42,7 +42,7 @@ export default function NewAffiliatePage() {
                   <input
                     type="text"
                     placeholder="First name"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -50,7 +50,7 @@ export default function NewAffiliatePage() {
                   <input
                     type="text"
                     placeholder="Smith"
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -62,7 +62,7 @@ export default function NewAffiliatePage() {
                   <input
                     type="email"
                     placeholder="your.email@gmail.com"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -74,7 +74,7 @@ export default function NewAffiliatePage() {
                   <input
                     type="tel"
                     placeholder="(555) 123-4567"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -86,7 +86,7 @@ export default function NewAffiliatePage() {
                   <input
                     type="url"
                     placeholder="https://example.com"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -99,7 +99,7 @@ export default function NewAffiliatePage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Affiliate Type</label>
-                <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
                   <option>Individual</option>
                   <option>Organization</option>
                   <option>Workforce Board</option>
@@ -116,7 +116,7 @@ export default function NewAffiliatePage() {
                     placeholder="10"
                     min="0"
                     max="50"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
                 <p className="text-sm text-gray-500 mt-1">Standard rate is 10% of referred sales</p>
@@ -127,7 +127,7 @@ export default function NewAffiliatePage() {
                 <input
                   type="text"
                   placeholder="Auto-generated if left blank"
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -135,8 +135,8 @@ export default function NewAffiliatePage() {
                 <label className="block text-sm font-medium text-gray-700 mb-3">Programs to Promote</label>
                 <div className="space-y-2">
                   {['Barber Apprenticeship', 'Medical Assistant Training', 'IT Certifications', 'WOTC Services', 'All Programs'].map((program) => (
-                    <label key={program} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-blue-300">
-                      <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
+                    <label key={program} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-brand-blue-300">
+                      <input type="checkbox" className="w-4 h-4 text-brand-blue-600 rounded" />
                       <span className="text-sm text-gray-700">{program}</span>
                     </label>
                   ))}
@@ -148,7 +148,7 @@ export default function NewAffiliatePage() {
                 <textarea
                   rows={3}
                   placeholder="Any additional notes about this affiliate..."
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -163,7 +163,7 @@ export default function NewAffiliatePage() {
             </Link>
             <button
               type="submit"
-              className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center gap-2"
+              className="px-8 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
               Add Affiliate

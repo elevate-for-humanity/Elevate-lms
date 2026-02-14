@@ -166,7 +166,7 @@ export default function DocumentsPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue-600"></div>
       </div>
     );
   }
@@ -235,11 +235,11 @@ export default function DocumentsPage() {
                   <label className={`flex items-center gap-2 px-4 py-2 rounded-lg cursor-pointer transition-colors ${
                     uploading === doc.id
                       ? 'bg-gray-100 text-gray-400'
-                      : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+                      : 'bg-brand-blue-50 text-brand-blue-600 hover:bg-brand-blue-100'
                   }`}>
                     {uploading === doc.id ? (
                       <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-brand-blue-600"></div>
                         Uploading...
                       </>
                     ) : (
@@ -279,7 +279,7 @@ export default function DocumentsPage() {
           disabled={!allUploaded || submitting}
           className={`w-full py-4 px-6 rounded-lg font-semibold transition-colors ${
             allUploaded && !submitting
-              ? 'bg-blue-600 hover:bg-blue-700 text-white'
+              ? 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white'
               : 'bg-gray-200 text-gray-500 cursor-not-allowed'
           }`}
         >

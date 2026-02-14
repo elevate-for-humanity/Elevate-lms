@@ -27,8 +27,8 @@ const PATHWAY_LABELS = {
 const STATUS_COLORS = {
   not_started: 'bg-gray-100 text-gray-600',
   identity_pending: 'bg-yellow-100 text-yellow-700',
-  workforce_screening: 'bg-blue-100 text-blue-700',
-  employer_screening: 'bg-blue-100 text-blue-700',
+  workforce_screening: 'bg-brand-blue-100 text-brand-blue-700',
+  employer_screening: 'bg-brand-blue-100 text-brand-blue-700',
   financial_readiness: 'bg-orange-100 text-orange-700',
   program_readiness: 'bg-cyan-100 text-cyan-700',
   pending_signature: 'bg-amber-100 text-amber-700',
@@ -143,9 +143,9 @@ export default function AdminIntakePage() {
                         Let me ask a few questions to see if you might be eligible."
                       </p>
                     </div>
-                    <div className="bg-blue-50 p-4 rounded-lg">
-                      <p className="font-medium text-blue-800">2. Employer-Sponsored</p>
-                      <p className="text-sm text-blue-700 mt-1">
+                    <div className="bg-brand-blue-50 p-4 rounded-lg">
+                      <p className="font-medium text-brand-blue-800">2. Employer-Sponsored</p>
+                      <p className="text-sm text-brand-blue-700 mt-1">
                         "Some students enroll through employer partnerships. Does your employer offer 
                         tuition reimbursement or training support?"
                       </p>
@@ -453,7 +453,7 @@ function IntakeDetailModal({
                   step.completed 
                     ? 'bg-green-100 text-green-600' 
                     : activeStep === step.id 
-                    ? 'bg-blue-100 text-blue-600'
+                    ? 'bg-brand-blue-100 text-brand-blue-600'
                     : 'bg-gray-100 text-gray-400'
                 }`}>
                   {step.completed ? (
@@ -502,11 +502,11 @@ function IntakeDetailModal({
               disabled={saving || intake.funding_pathway === 'employer_sponsored'}
               className={`p-4 rounded-lg border-2 text-left transition ${
                 intake.funding_pathway === 'employer_sponsored'
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-200 hover:border-blue-300'
+                  ? 'border-brand-blue-500 bg-brand-blue-50'
+                  : 'border-gray-200 hover:border-brand-blue-300'
               }`}
             >
-              <Building2 className="w-6 h-6 text-blue-600 mb-2" />
+              <Building2 className="w-6 h-6 text-brand-blue-600 mb-2" />
               <p className="font-medium text-gray-900">Employer-Sponsored</p>
               <p className="text-xs text-gray-500 mt-1">Post-hire reimbursement</p>
             </button>

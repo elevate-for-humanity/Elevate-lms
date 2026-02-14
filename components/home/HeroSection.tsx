@@ -83,7 +83,7 @@ export default function HeroSection({ user, activeEnrollment, isLoading = false 
                   <>
                     <Link 
                       href="/apply"
-                      className="inline-flex items-center justify-center bg-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-blue-700 transition-all text-lg"
+                      className="inline-flex items-center justify-center bg-brand-blue-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-brand-blue-700 transition-all text-lg"
                     >
                       Apply Now
                     </Link>

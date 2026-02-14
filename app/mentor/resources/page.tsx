@@ -24,7 +24,7 @@ export default function MentorResourcesPage() {
 <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
-            <Link href="/mentor/dashboard" className="hover:text-blue-600">Mentor Dashboard</Link>
+            <Link href="/mentor/dashboard" className="hover:text-brand-blue-600">Mentor Dashboard</Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900 font-medium">Resources</span>
           </nav>
@@ -36,13 +36,13 @@ export default function MentorResourcesPage() {
           {resources.map((resource) => (
             <div key={resource.id} className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow">
               <div className="flex items-start gap-4">
-                <div className={`p-3 rounded-lg ${resource.type === 'video' ? 'bg-blue-100' : 'bg-blue-100'}`}>
-                  {resource.type === 'video' ? <Video className="w-6 h-6 text-blue-600" /> : <FileText className="w-6 h-6 text-blue-600" />}
+                <div className={`p-3 rounded-lg ${resource.type === 'video' ? 'bg-brand-blue-100' : 'bg-brand-blue-100'}`}>
+                  {resource.type === 'video' ? <Video className="w-6 h-6 text-brand-blue-600" /> : <FileText className="w-6 h-6 text-brand-blue-600" />}
                 </div>
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 mb-1">{resource.title}</h3>
                   <p className="text-sm text-gray-500 mb-3">{resource.category}</p>
-                  <button className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm">
+                  <button className="flex items-center gap-1 text-brand-blue-600 hover:text-brand-blue-700 text-sm">
                     {resource.type === 'video' ? <>Watch <ExternalLink className="w-4 h-4" /></> : <>Download <Download className="w-4 h-4" /></>}
                   </button>
                 </div>

@@ -229,8 +229,8 @@ export default async function NewReportPage() {
               </form>
 
               {/* Note about submission */}
-              <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
+              <div className="mt-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+                <p className="text-sm text-brand-blue-800">
                   <strong>Note:</strong> Report submission is currently handled
                   manually. Please contact support at{' '}
                   <a
@@ -245,11 +245,11 @@ export default async function NewReportPage() {
             </div>
 
             {/* Help Text */}
-            <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">
+            <div className="mt-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-brand-blue-900 mb-2">
                 Reporting Guidelines
               </h3>
-              <ul className="text-blue-800 space-y-2 text-sm">
+              <ul className="text-brand-blue-800 space-y-2 text-sm">
                 <li>• Reports are due every Monday for the previous week</li>
                 <li>
                   • Include total hours worked and progress for each student

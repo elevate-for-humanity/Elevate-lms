@@ -33,7 +33,7 @@ const documents = [
     description: 'Regulatory compliance, required disclosures, consumer protection, and accessibility.',
     href: '/legal/governance/compliance',
     icon: Scale,
-    color: 'bg-blue-100 text-blue-700',
+    color: 'bg-brand-blue-100 text-brand-blue-700',
     owner: 'Chief Compliance Officer',
   },
   {
@@ -51,7 +51,7 @@ const documents = [
     description: 'E-commerce operations, payment processing, digital licensing, and refund policies.',
     href: '/legal/governance/store-payments',
     icon: ShoppingCart,
-    color: 'bg-blue-100 text-blue-700',
+    color: 'bg-brand-blue-100 text-brand-blue-700',
     owner: 'Director of Operations',
   },
   {

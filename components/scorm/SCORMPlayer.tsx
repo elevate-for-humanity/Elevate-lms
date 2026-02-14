@@ -239,7 +239,7 @@ export function SCORMPlayer({
                   <div className="text-sm text-black">Progress:</div>
                   <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-blue-600 transition-all duration-300"
+                      className="h-full bg-brand-blue-600 transition-all duration-300"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
@@ -259,7 +259,7 @@ export function SCORMPlayer({
               {isCompleted && (!maxAttempts || attempts < maxAttempts) && (
                 <button
                   onClick={handleRestart}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
                 >
                   <RotateCcw className="w-4 h-4" />
                   <span>Restart</span>
@@ -283,7 +283,7 @@ export function SCORMPlayer({
         {isLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4" />
               <p className="text-black">Loading course content...</p>
             </div>
           </div>

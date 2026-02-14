@@ -97,7 +97,7 @@ export default async function EnrollmentSuccessPage() {
             <div className="flex justify-between items-center py-3">
               <span className="text-slate-600">Sponsor</span>
               <div className="flex items-center gap-2">
-                <Shield className="w-4 h-4 text-blue-600" />
+                <Shield className="w-4 h-4 text-brand-blue-600" />
                 <span className="font-bold text-slate-900">Elevate for Humanity</span>
               </div>
             </div>

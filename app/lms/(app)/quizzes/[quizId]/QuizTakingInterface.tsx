@@ -153,7 +153,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
               )}
               <button
                 onClick={() => setShowConfirmSubmit(true)}
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="bg-brand-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Submit Quiz
               </button>
@@ -164,7 +164,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
           <div className="mt-4">
             <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
               <div 
-                className="h-full bg-blue-600 transition-all duration-300"
+                className="h-full bg-brand-blue-600 transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -183,7 +183,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
               {/* Question Header */}
               <div className="flex items-start justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
+                  <span className="bg-brand-blue-100 text-brand-blue-800 px-3 py-1 rounded-full text-sm font-semibold">
                     {currentQuestion.points} {currentQuestion.points === 1 ? 'point' : 'points'}
                   </span>
                   <span className="text-slate-500 text-sm capitalize">
@@ -222,18 +222,18 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
                         onClick={() => handleAnswerSelect(currentQuestion.id, answer.id)}
                         className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition ${
                           isSelected
-                            ? 'border-blue-600 bg-blue-50'
+                            ? 'border-brand-blue-600 bg-brand-blue-50'
                             : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                         }`}
                       >
                         <span className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                           isSelected
-                            ? 'bg-blue-600 text-white'
+                            ? 'bg-brand-blue-600 text-white'
                             : 'bg-slate-100 text-slate-600'
                         }`}>
                           {letter}
                         </span>
-                        <span className={`flex-1 ${isSelected ? 'text-blue-900' : 'text-slate-700'}`}>
+                        <span className={`flex-1 ${isSelected ? 'text-brand-blue-900' : 'text-slate-700'}`}>
                           {answer.answer_text}
                         </span>
                       </button>
@@ -279,7 +279,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
                       onClick={() => setCurrentIndex(idx)}
                       className={`relative w-10 h-10 rounded-lg font-semibold text-sm transition ${
                         isCurrent
-                          ? 'bg-blue-600 text-white'
+                          ? 'bg-brand-blue-600 text-white'
                           : isAnswered
                           ? 'bg-green-100 text-green-700'
                           : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -346,7 +346,7 @@ export default function QuizTakingInterface({ quiz, questions, attemptId, visito
               <button
                 onClick={handleSubmit}
                 disabled={isSubmitting}
-                className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
+                className="flex-1 px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition disabled:opacity-50"
               >
                 {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
               </button>

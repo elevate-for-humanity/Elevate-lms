@@ -41,8 +41,8 @@ async function getSubmissionsData() {
 
 function getStatusBadge(status: string) {
   const badges: Record<string, { color: string; text: string }> = {
-    submitted: { color: 'bg-blue-100 text-blue-800', text: '🔵 Submitted' },
-    confirmed: { color: 'bg-blue-100 text-blue-800', text: '🟣 Confirmed' },
+    submitted: { color: 'bg-brand-blue-100 text-brand-blue-800', text: '🔵 Submitted' },
+    confirmed: { color: 'bg-brand-blue-100 text-brand-blue-800', text: '🟣 Confirmed' },
     under_review: {
       color: 'bg-yellow-100 text-yellow-800',
       text: '🟡 Under Review',
@@ -288,7 +288,7 @@ export default async function GrantSubmissionsPage() {
                             href={submission.portal_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                            className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium"
                           >
                             Portal →
                           </a>

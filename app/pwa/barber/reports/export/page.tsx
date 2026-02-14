@@ -142,7 +142,7 @@ export default function ExportReportsPage() {
                   className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-700 transition-colors"
                 >
                   <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
-                    <Printer className="w-5 h-5 text-blue-400" />
+                    <Printer className="w-5 h-5 text-brand-blue-400" />
                   </div>
                   <span className="text-slate-300 text-sm">Print</span>
                 </button>
@@ -152,7 +152,7 @@ export default function ExportReportsPage() {
                 className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-700 transition-colors"
               >
                 <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
-                  <Mail className="w-5 h-5 text-blue-400" />
+                  <Mail className="w-5 h-5 text-brand-blue-400" />
                 </div>
                 <span className="text-slate-300 text-sm">Email</span>
               </button>
@@ -162,7 +162,7 @@ export default function ExportReportsPage() {
                   className="flex flex-col items-center gap-2 p-3 rounded-xl hover:bg-slate-700 transition-colors"
                 >
                   <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
-                    <Share2 className="w-5 h-5 text-blue-400" />
+                    <Share2 className="w-5 h-5 text-brand-blue-400" />
                   </div>
                   <span className="text-slate-300 text-sm">Share</span>
                 </button>
@@ -175,7 +175,7 @@ export default function ExportReportsPage() {
               <a
                 href={downloadUrl}
                 download={`hours-report.${options.format === 'excel' ? 'xlsx' : options.format}`}
-                className="block w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700"
+                className="block w-full bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700"
               >
                 <Download className="w-5 h-5 inline mr-2" />
                 Download Again
@@ -234,18 +234,18 @@ export default function ExportReportsPage() {
                 onClick={() => setOptions(prev => ({ ...prev, format: format.value }))}
                 className={`w-full flex items-center gap-4 p-4 rounded-xl transition-colors ${
                   options.format === format.value
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }`}
               >
                 <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  options.format === format.value ? 'bg-blue-500' : 'bg-slate-600'
+                  options.format === format.value ? 'bg-brand-blue-500' : 'bg-slate-600'
                 }`}>
                   {format.icon}
                 </div>
                 <div className="text-left flex-1">
                   <div className="font-medium">{format.label}</div>
-                  <div className={`text-sm ${options.format === format.value ? 'text-blue-200' : 'text-slate-500'}`}>
+                  <div className={`text-sm ${options.format === format.value ? 'text-brand-blue-200' : 'text-slate-500'}`}>
                     {format.description}
                   </div>
                 </div>
@@ -270,7 +270,7 @@ export default function ExportReportsPage() {
                 onClick={() => setOptions(prev => ({ ...prev, dateRange: range.value }))}
                 className={`p-3 rounded-xl text-sm font-medium transition-colors ${
                   options.dateRange === range.value
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }`}
               >
@@ -287,7 +287,7 @@ export default function ExportReportsPage() {
                   type="date"
                   value={options.customStartDate}
                   onChange={(e) => setOptions(prev => ({ ...prev, customStartDate: e.target.value }))}
-                  className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
               <div>
@@ -297,7 +297,7 @@ export default function ExportReportsPage() {
                   value={options.customEndDate}
                   onChange={(e) => setOptions(prev => ({ ...prev, customEndDate: e.target.value }))}
                   max={new Date().toISOString().split('T')[0]}
-                  className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
             </div>
@@ -314,7 +314,7 @@ export default function ExportReportsPage() {
                 type="checkbox"
                 checked={options.groupByCategory}
                 onChange={(e) => setOptions(prev => ({ ...prev, groupByCategory: e.target.checked }))}
-                className="w-5 h-5 rounded bg-slate-600 border-slate-500 text-blue-600 focus:ring-blue-500"
+                className="w-5 h-5 rounded bg-slate-600 border-slate-500 text-brand-blue-600 focus:ring-brand-blue-500"
               />
             </label>
             <label className="flex items-center justify-between p-3 bg-slate-700 rounded-xl cursor-pointer">
@@ -323,7 +323,7 @@ export default function ExportReportsPage() {
                 type="checkbox"
                 checked={options.includeSignatures}
                 onChange={(e) => setOptions(prev => ({ ...prev, includeSignatures: e.target.checked }))}
-                className="w-5 h-5 rounded bg-slate-600 border-slate-500 text-blue-600 focus:ring-blue-500"
+                className="w-5 h-5 rounded bg-slate-600 border-slate-500 text-brand-blue-600 focus:ring-brand-blue-500"
               />
             </label>
             {options.format === 'pdf' && (
@@ -336,7 +336,7 @@ export default function ExportReportsPage() {
                   type="checkbox"
                   checked={options.includePhotos}
                   onChange={(e) => setOptions(prev => ({ ...prev, includePhotos: e.target.checked }))}
-                  className="w-5 h-5 rounded bg-slate-600 border-slate-500 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 rounded bg-slate-600 border-slate-500 text-brand-blue-600 focus:ring-brand-blue-500"
                 />
               </label>
             )}
@@ -347,7 +347,7 @@ export default function ExportReportsPage() {
         <button
           onClick={handleExport}
           disabled={loading}
-          className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {loading ? (
             <>

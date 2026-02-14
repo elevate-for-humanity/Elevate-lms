@@ -91,7 +91,7 @@ export default function ExternalProgressAdminClient({ initialRows }: Props) {
         </div>
       )}
 
-      <div className="rounded-lg border bg-blue-50 p-4 text-sm">
+      <div className="rounded-lg border bg-brand-blue-50 p-4 text-sm">
         <p className="font-semibold mb-2">How this works</p>
         <ul className="space-y-1 text-black">
           <li>

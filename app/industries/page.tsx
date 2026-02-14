@@ -163,14 +163,14 @@ export default async function IndustriesPage() {
                 <Link
                   key={industry.id}
                   href={industry.href}
-                  className="group bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-blue-500 hover:shadow-xl transition-all"
+                  className="group bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-blue-500 hover:shadow-xl transition-all"
                 >
                   <div className="flex items-start gap-4 mb-4">
-                    <div className="flex-shrink-0 w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-colors">
-                      <Icon className="h-11 w-11 text-blue-600 group-hover:text-white transition-colors" />
+                    <div className="flex-shrink-0 w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center group-hover:bg-brand-blue-600 transition-colors">
+                      <Icon className="h-11 w-11 text-brand-blue-600 group-hover:text-white transition-colors" />
                     </div>
                     <div className="flex-1">
-                      <h2 className="text-2xl font-black text-black mb-2 group-hover:text-blue-600 transition-colors">
+                      <h2 className="text-2xl font-black text-black mb-2 group-hover:text-brand-blue-600 transition-colors">
                         {industry.name}
                       </h2>
                     </div>
@@ -195,7 +195,7 @@ export default async function IndustriesPage() {
                     </ul>
                   </div>
 
-                  <div className="flex items-center gap-2 text-blue-600 font-bold group-hover:gap-4 transition-all">
+                  <div className="flex items-center gap-2 text-brand-blue-600 font-bold group-hover:gap-4 transition-all">
                     <span>Explore Programs</span>
                     <ArrowRight className="h-5 w-5" />
                   </div>

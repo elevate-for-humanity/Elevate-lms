@@ -118,7 +118,7 @@ export function RealOutcomes() {
     <section className="py-16 bg-white">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
-          <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-800 px-4 py-2 rounded-full mb-4">
+          <div className="inline-flex items-center gap-2 bg-brand-blue-100 text-brand-blue-800 px-4 py-2 rounded-full mb-4">
             <TrendingUp className="h-4 w-4" />
             <span className="text-sm font-semibold">
               Live Data from Production Database
@@ -142,7 +142,7 @@ export function RealOutcomes() {
                 className="bg-slate-50 border border-slate-200 rounded-lg p-6"
               >
                 <div className="flex items-center justify-between mb-4">
-                  <Icon className="h-10 w-10 text-blue-600" />
+                  <Icon className="h-10 w-10 text-brand-blue-600" />
                   {outcome.verified && (
                     <span className="text-xs bg-green-100 text-green-800 px-2 py-2 rounded-full font-semibold">
                       Verified
@@ -183,7 +183,7 @@ export function RealOutcomes() {
                     href="/api/public/metrics"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-blue-400 hover:text-blue-300 font-semibold text-sm"
+                    className="text-brand-blue-400 hover:text-brand-blue-300 font-semibold text-sm"
                   >
                     View Raw API Data →
                   </a>

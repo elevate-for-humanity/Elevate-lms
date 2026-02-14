@@ -88,7 +88,7 @@ export function FeedbackForm({ courseId, courseName, onSubmit }: FeedbackFormPro
             value={feedback}
             onChange={e => setFeedback(e.target.value)}
             rows={4}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             placeholder="What did you like? What could be improved?"
           />
         </div>
@@ -96,7 +96,7 @@ export function FeedbackForm({ courseId, courseName, onSubmit }: FeedbackFormPro
         <button
           type="submit"
           disabled={submitting || rating === 0}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-medium rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {submitting ? (
             <>

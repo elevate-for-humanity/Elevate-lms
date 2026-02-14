@@ -133,7 +133,7 @@ export default function ProgramEnrollment({ program, userId, onEnrollmentComplet
               type="checkbox"
               checked={meetsRequirements}
               onChange={(e) => setMeetsRequirements(e.target.checked)}
-              className="w-4 h-4 text-blue-600 rounded focus:ring-blue-500"
+              className="w-4 h-4 text-brand-blue-600 rounded focus:ring-brand-blue-500"
             />
             <span className="text-sm text-yellow-900">
               I confirm that I meet all the requirements listed above
@@ -156,7 +156,7 @@ export default function ProgramEnrollment({ program, userId, onEnrollmentComplet
               onClick={() => setSelectedPaymentPlan('full')}
               className={`border-2 rounded-lg p-4 cursor-pointer transition ${
                 selectedPaymentPlan === 'full'
-                  ? 'border-blue-500 bg-blue-50'
+                  ? 'border-brand-blue-500 bg-brand-blue-50'
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
@@ -166,7 +166,7 @@ export default function ProgramEnrollment({ program, userId, onEnrollmentComplet
                     type="radio"
                     checked={selectedPaymentPlan === 'full'}
                     onChange={() => setSelectedPaymentPlan('full')}
-                    className="w-4 h-4 text-blue-600"
+                    className="w-4 h-4 text-brand-blue-600"
                   />
                   <div>
                     <p className="font-semibold text-black">Pay in Full</p>
@@ -185,7 +185,7 @@ export default function ProgramEnrollment({ program, userId, onEnrollmentComplet
               onClick={() => setSelectedPaymentPlan('installments')}
               className={`border-2 rounded-lg p-4 cursor-pointer transition ${
                 selectedPaymentPlan === 'installments'
-                  ? 'border-blue-500 bg-blue-50'
+                  ? 'border-brand-blue-500 bg-brand-blue-50'
                   : 'border-gray-300 hover:border-gray-400'
               }`}
             >
@@ -195,7 +195,7 @@ export default function ProgramEnrollment({ program, userId, onEnrollmentComplet
                     type="radio"
                     checked={selectedPaymentPlan === 'installments'}
                     onChange={() => setSelectedPaymentPlan('installments')}
-                    className="w-4 h-4 text-blue-600"
+                    className="w-4 h-4 text-brand-blue-600"
                   />
                   <div>
                     <p className="font-semibold text-black">Payment Plan</p>
@@ -272,7 +272,7 @@ export default function ProgramEnrollment({ program, userId, onEnrollmentComplet
       <button
         onClick={handleEnrollment}
         disabled={loading || (program.requirements && program.requirements.length > 0 && !meetsRequirements)}
-        className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold text-lg hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+        className="w-full bg-brand-blue-600 text-white py-4 rounded-lg font-semibold text-lg hover:bg-brand-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
       >
         {loading ? (
           <>

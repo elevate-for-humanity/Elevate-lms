@@ -178,7 +178,7 @@ export function ARTrainingModules() {
                   <div className="flex justify-between text-sm text-black mb-4">
                     <span>⏱️ {module.duration}</span>
                     <span className={`px-2 py-0.5 rounded text-xs ${
-                      module.difficulty === 'beginner' ? 'bg-blue-100 text-blue-700' :
+                      module.difficulty === 'beginner' ? 'bg-brand-blue-100 text-brand-blue-700' :
                       module.difficulty === 'intermediate' ? 'bg-purple-100 text-purple-700' :
                       'bg-red-100 text-red-700'
                     }`}>

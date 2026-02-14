@@ -52,7 +52,7 @@ export function ProgramCard({
         {/* Stats */}
         <div className="flex items-center gap-4 mb-4 text-sm">
           <div className="flex items-center gap-2 text-black">
-            <Clock size={16} className="text-blue-600" />
+            <Clock size={16} className="text-brand-blue-600" />
             <span className="font-semibold">{duration}</span>
           </div>
           <div className="flex items-center gap-2 text-black">

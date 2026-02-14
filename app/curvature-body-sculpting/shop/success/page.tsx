@@ -24,12 +24,12 @@ export default function OrderSuccessPage({
           Thank you for shopping with Meri-Go-Round. Your order has been received and is being processed.
         </p>
 
-        <div className="bg-blue-50 rounded-lg p-4 mb-6">
-          <div className="flex items-center justify-center gap-2 text-blue-700">
+        <div className="bg-brand-blue-50 rounded-lg p-4 mb-6">
+          <div className="flex items-center justify-center gap-2 text-brand-blue-700">
             <Package className="w-5 h-5" />
             <span className="font-medium">Shipping Confirmation</span>
           </div>
-          <p className="text-blue-600 text-sm mt-2">
+          <p className="text-brand-blue-600 text-sm mt-2">
             You'll receive an email with tracking information once your order ships.
           </p>
         </div>
@@ -37,7 +37,7 @@ export default function OrderSuccessPage({
         <div className="space-y-3">
           <Link
             href="/curvature-body-sculpting/shop"
-            className="flex items-center justify-center gap-2 w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+            className="flex items-center justify-center gap-2 w-full py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
           >
             Continue Shopping <ArrowRight className="w-4 h-4" />
           </Link>
@@ -54,7 +54,7 @@ export default function OrderSuccessPage({
         <div className="mt-8 pt-6 border-t border-gray-200">
           <p className="text-sm text-gray-500">
             Questions about your order? Contact us at{' '}
-            <a href="mailto:curvaturebodysculpting@gmail.com" className="text-blue-600 hover:underline">
+            <a href="mailto:curvaturebodysculpting@gmail.com" className="text-brand-blue-600 hover:underline">
               curvaturebodysculpting@gmail.com
             </a>
           </p>

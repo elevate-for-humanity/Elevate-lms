@@ -66,7 +66,7 @@ export default function AddToCartButton({ product, quantity = 1, className }: Ad
         <button
           onClick={handleAddToCart}
           disabled={isAdding}
-          className={`flex-1 px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${className || ''}`}
+          className={`flex-1 px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed ${className || ''}`}
         >
           {isAdding ? 'Adding...' : 'Add to Cart'}
         </button>

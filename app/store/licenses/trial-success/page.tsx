@@ -57,8 +57,8 @@ function TrialSuccessContent() {
           
           <div className="space-y-4">
             <div className="flex gap-4 p-4 bg-gray-50 rounded-xl">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Download className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Download className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900">Download the codebase</h3>
@@ -67,7 +67,7 @@ function TrialSuccessContent() {
                 </p>
                 <Link 
                   href="/account/licenses" 
-                  className="text-blue-600 text-sm font-medium hover:underline inline-flex items-center gap-1"
+                  className="text-brand-blue-600 text-sm font-medium hover:underline inline-flex items-center gap-1"
                 >
                   Go to My Licenses <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -75,8 +75,8 @@ function TrialSuccessContent() {
             </div>
 
             <div className="flex gap-4 p-4 bg-gray-50 rounded-xl">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <BookOpen className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <BookOpen className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <h3 className="font-bold text-gray-900">Read the documentation</h3>
@@ -85,7 +85,7 @@ function TrialSuccessContent() {
                 </p>
                 <Link 
                   href="/docs" 
-                  className="text-blue-600 text-sm font-medium hover:underline inline-flex items-center gap-1"
+                  className="text-brand-blue-600 text-sm font-medium hover:underline inline-flex items-center gap-1"
                 >
                   View Documentation <ArrowRight className="w-4 h-4" />
                 </Link>
@@ -116,7 +116,7 @@ function TrialSuccessContent() {
         <div className="text-center text-sm text-gray-500">
           <p>
             Manage your licenses in{' '}
-            <Link href="/account/billing" className="text-blue-600 hover:underline">
+            <Link href="/account/billing" className="text-brand-blue-600 hover:underline">
               Account → Billing
             </Link>.
           </p>
@@ -129,7 +129,7 @@ function TrialSuccessContent() {
 function LoadingFallback() {
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-      <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+      <Loader2 className="w-10 h-10 text-brand-blue-500 animate-spin" />
     </div>
   );
 }

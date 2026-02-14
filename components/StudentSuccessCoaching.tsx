@@ -138,7 +138,7 @@ export function StudentSuccessCoaching() {
                     )}
                   </div>
                   <span className={`px-3 py-2 rounded text-sm ${
-                    session.status === 'scheduled' ? 'bg-blue-100 text-blue-700' :
+                    session.status === 'scheduled' ? 'bg-brand-blue-100 text-brand-blue-700' :
                     session.status === 'completed' ? 'bg-green-100 text-green-700' :
                     'bg-gray-100 text-black'
                   }`}>
@@ -167,7 +167,7 @@ export function StudentSuccessCoaching() {
                   <span className={`px-3 py-2 rounded text-sm ${
                     goal.status === 'on-track' ? 'bg-green-100 text-green-700' :
                     goal.status === 'at-risk' ? 'bg-yellow-100 text-yellow-700' :
-                    'bg-blue-100 text-blue-700'
+                    'bg-brand-blue-100 text-brand-blue-700'
                   }`}>
                     {goal.status}
                   </span>
@@ -194,17 +194,17 @@ export function StudentSuccessCoaching() {
             <Card className="p-6">
               <h3 className="text-xl font-bold mb-4">Study Skills</h3>
               <ul className="space-y-2">
-                <li className="text-blue-600 hover:underline cursor-pointer">Time Management Guide</li>
-                <li className="text-blue-600 hover:underline cursor-pointer">Note-Taking Strategies</li>
-                <li className="text-blue-600 hover:underline cursor-pointer">Test Preparation Tips</li>
+                <li className="text-brand-blue-600 hover:underline cursor-pointer">Time Management Guide</li>
+                <li className="text-brand-blue-600 hover:underline cursor-pointer">Note-Taking Strategies</li>
+                <li className="text-brand-blue-600 hover:underline cursor-pointer">Test Preparation Tips</li>
               </ul>
             </Card>
             <Card className="p-6">
               <h3 className="text-xl font-bold mb-4">Career Resources</h3>
               <ul className="space-y-2">
-                <li className="text-blue-600 hover:underline cursor-pointer">Resume Writing Workshop</li>
-                <li className="text-blue-600 hover:underline cursor-pointer">Interview Preparation</li>
-                <li className="text-blue-600 hover:underline cursor-pointer">Networking Strategies</li>
+                <li className="text-brand-blue-600 hover:underline cursor-pointer">Resume Writing Workshop</li>
+                <li className="text-brand-blue-600 hover:underline cursor-pointer">Interview Preparation</li>
+                <li className="text-brand-blue-600 hover:underline cursor-pointer">Networking Strategies</li>
               </ul>
             </Card>
           </div>

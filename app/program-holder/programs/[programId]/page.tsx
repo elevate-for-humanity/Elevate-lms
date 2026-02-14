@@ -142,7 +142,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
             </Link>
             <Link
               href={`/program-holder/programs/${programId}/enroll`}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <UserPlus className="w-4 h-4" />
               Enroll Student
@@ -155,8 +155,8 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
       <div className="grid grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Users className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+              <Users className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-900">{enrollmentCount || 0}</p>
@@ -177,8 +177,8 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-900">{courseCount || 0}</p>
@@ -204,7 +204,7 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
         <div className="lg:col-span-2 bg-white rounded-xl border border-slate-200 p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-slate-900">Recent Enrollments</h2>
-            <Link href={`/program-holder/programs/${programId}/students`} className="text-sm text-blue-600 hover:underline">
+            <Link href={`/program-holder/programs/${programId}/students`} className="text-sm text-brand-blue-600 hover:underline">
               View All
             </Link>
           </div>
@@ -213,8 +213,8 @@ export default async function ProgramHolderProgramPage({ params }: Props) {
               {enrollments.map((enrollment: any) => (
                 <div key={enrollment.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 font-semibold">
+                    <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-brand-blue-600 font-semibold">
                         {enrollment.profiles?.first_name?.[0]}{enrollment.profiles?.last_name?.[0]}
                       </span>
                     </div>

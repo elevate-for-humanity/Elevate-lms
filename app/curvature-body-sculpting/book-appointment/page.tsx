@@ -168,7 +168,7 @@ export default function BookAppointmentPage() {
           </div>
           <Link
             href="/curvature-body-sculpting"
-            className="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700"
+            className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:text-brand-blue-700"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Curvature Body Sculpting
@@ -202,15 +202,15 @@ export default function BookAppointmentPage() {
             <div key={s} className="flex items-center gap-2">
               <div
                 className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${
-                  step >= s ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+                  step >= s ? 'bg-brand-blue-600 text-white' : 'bg-gray-200 text-gray-500'
                 }`}
               >
                 {step > s ? <CheckCircle className="w-5 h-5" /> : s}
               </div>
-              <span className={`text-sm ${step >= s ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+              <span className={`text-sm ${step >= s ? 'text-brand-blue-600 font-medium' : 'text-gray-500'}`}>
                 {s === 1 ? 'Service' : s === 2 ? 'Date & Time' : 'Your Info'}
               </span>
-              {s < 3 && <div className={`w-12 h-0.5 ${step > s ? 'bg-blue-600' : 'bg-gray-200'}`} />}
+              {s < 3 && <div className={`w-12 h-0.5 ${step > s ? 'bg-brand-blue-600' : 'bg-gray-200'}`} />}
             </div>
           ))}
         </div>
@@ -225,7 +225,7 @@ export default function BookAppointmentPage() {
               <h2 className="text-xl font-bold mb-6">Select a Service</h2>
               {loading ? (
                 <div className="flex items-center justify-center py-12">
-                  <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+                  <Loader2 className="w-8 h-8 text-brand-blue-600 animate-spin" />
                   <span className="ml-3 text-gray-600">Loading services...</span>
                 </div>
               ) : services.length === 0 ? (
@@ -245,8 +245,8 @@ export default function BookAppointmentPage() {
                         onClick={() => setSelectedService(service.id)}
                         className={`p-4 rounded-xl border-2 text-left transition ${
                           selectedService === service.id
-                            ? 'border-blue-600 bg-blue-50'
-                            : 'border-gray-200 hover:border-blue-300'
+                            ? 'border-brand-blue-600 bg-brand-blue-50'
+                            : 'border-gray-200 hover:border-brand-blue-300'
                         }`}
                       >
                         <div className="flex items-start justify-between">
@@ -254,7 +254,7 @@ export default function BookAppointmentPage() {
                             <h3 className="font-bold text-gray-900">{service.name}</h3>
                             <p className="text-sm text-gray-600">{duration}</p>
                           </div>
-                          <span className={`font-bold ${price === 'FREE' ? 'text-green-600' : 'text-blue-600'}`}>
+                          <span className={`font-bold ${price === 'FREE' ? 'text-green-600' : 'text-brand-blue-600'}`}>
                             {price}
                           </span>
                         </div>
@@ -267,7 +267,7 @@ export default function BookAppointmentPage() {
                 <button
                   onClick={() => setStep(2)}
                   disabled={!selectedService}
-                  className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
+                  className="px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
                 >
                   Continue <ArrowRight className="w-4 h-4" />
                 </button>
@@ -290,8 +290,8 @@ export default function BookAppointmentPage() {
                       onClick={() => setSelectedDate(formatDate(date))}
                       className={`p-3 rounded-lg border text-center transition ${
                         selectedDate === formatDate(date)
-                          ? 'border-blue-600 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 hover:border-blue-300'
+                          ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-700'
+                          : 'border-gray-200 hover:border-brand-blue-300'
                       }`}
                     >
                       <div className="text-xs text-gray-500">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
@@ -317,8 +317,8 @@ export default function BookAppointmentPage() {
                           isBooked
                             ? 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed line-through'
                             : selectedTime === time
-                            ? 'border-blue-600 bg-blue-50 text-blue-700'
-                            : 'border-gray-200 hover:border-blue-300'
+                            ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-700'
+                            : 'border-gray-200 hover:border-brand-blue-300'
                         }`}
                       >
                         {time}
@@ -338,7 +338,7 @@ export default function BookAppointmentPage() {
                 <button
                   onClick={() => setStep(3)}
                   disabled={!selectedDate || !selectedTime}
-                  className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
+                  className="px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
                 >
                   Continue <ArrowRight className="w-4 h-4" />
                 </button>
@@ -352,8 +352,8 @@ export default function BookAppointmentPage() {
               <h2 className="text-xl font-bold mb-6">Your Information</h2>
               
               {/* Summary */}
-              <div className="bg-blue-50 rounded-lg p-4 mb-6">
-                <p className="text-sm text-blue-700">
+              <div className="bg-brand-blue-50 rounded-lg p-4 mb-6">
+                <p className="text-sm text-brand-blue-700">
                   <strong>{services.find(s => s.id === selectedService)?.name}</strong> on{' '}
                   <strong>{selectedDate}</strong> at <strong>{selectedTime}</strong>
                 </p>
@@ -367,7 +367,7 @@ export default function BookAppointmentPage() {
                     required
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   />
                 </div>
                 <div>
@@ -377,7 +377,7 @@ export default function BookAppointmentPage() {
                     required
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   />
                 </div>
               </div>
@@ -390,7 +390,7 @@ export default function BookAppointmentPage() {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   />
                 </div>
                 <div>
@@ -400,7 +400,7 @@ export default function BookAppointmentPage() {
                     required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   />
                 </div>
               </div>
@@ -412,7 +412,7 @@ export default function BookAppointmentPage() {
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   placeholder="Any special requests or concerns..."
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
 

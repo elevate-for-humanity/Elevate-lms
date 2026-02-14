@@ -177,7 +177,7 @@ export default async function InteractiveCoursesPage() {
                       className="object-cover"
                     />
                     <div className="absolute top-3 left-3">
-                      <span className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
+                      <span className="bg-brand-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
                         {course.level}
                       </span>
                     </div>
@@ -216,7 +216,7 @@ export default async function InteractiveCoursesPage() {
                     ) : (
                       <Link
                         href={`/lms/courses/${course.id}`}
-                        className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center py-2 rounded-lg font-medium transition"
+                        className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center py-2 rounded-lg font-medium transition"
                       >
                         View Course
                       </Link>

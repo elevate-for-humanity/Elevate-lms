@@ -112,7 +112,7 @@ function PaymentForm({
         </p>
         <button
           onClick={() => window.location.href = `/courses/${courseId}`}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
         >
           Go to Course
         </button>
@@ -172,7 +172,7 @@ function PaymentForm({
       <button
         type="submit"
         disabled={!stripe || isProcessing}
-        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isProcessing ? (
           <>
@@ -190,11 +190,11 @@ function PaymentForm({
       {/* Terms */}
       <p className="text-xs text-gray-500 text-center">
         By completing this purchase, you agree to our{' '}
-        <a href="/terms" className="text-blue-600 hover:underline">
+        <a href="/terms" className="text-brand-blue-600 hover:underline">
           Terms of Service
         </a>{' '}
         and{' '}
-        <a href="/privacy" className="text-blue-600 hover:underline">
+        <a href="/privacy" className="text-brand-blue-600 hover:underline">
           Privacy Policy
         </a>
       </p>
@@ -237,7 +237,7 @@ export default function CheckoutForm(props: CheckoutFormProps) {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
       </div>
     );
   }

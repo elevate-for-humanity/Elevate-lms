@@ -45,7 +45,7 @@ export default async function BlogAdminPage() {
         <h2 className="text-xl font-semibold mb-4">Editorial Workflow</h2>
 
         <div className="space-y-4">
-          <div className="border-l-4 border-blue-500 pl-4">
+          <div className="border-l-4 border-brand-blue-500 pl-4">
             <h3 className="font-semibold">Draft Posts</h3>
             <p className="text-sm text-black">{draftCount} posts in progress</p>
           </div>
@@ -67,7 +67,7 @@ export default async function BlogAdminPage() {
         </div>
 
         <div className="mt-6">
-          <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" aria-label="Action button">
+          <button className="bg-brand-blue-600 text-white px-4 py-2 rounded hover:bg-brand-blue-700" aria-label="Action button">
             Create New Post
           </button>
         </div>

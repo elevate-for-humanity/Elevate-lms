@@ -42,7 +42,7 @@ const leaderboardData = [
     points: 1950,
     courses: 1,
     avatar: 'LC',
-    color: 'bg-blue-500',
+    color: 'bg-brand-blue-500',
   },
 ];
 
@@ -62,7 +62,7 @@ export function Leaderboard() {
             key={user.rank}
             className={`flex items-center gap-4 p-3 rounded-lg transition-all ${
               user.isCurrentUser
-                ? 'bg-blue-50 border-2 border-orange-500'
+                ? 'bg-brand-blue-50 border-2 border-orange-500'
                 : 'bg-gray-50 border border-gray-200 hover:border-gray-300'
             }`}
           >
@@ -89,7 +89,7 @@ export function Leaderboard() {
             {/* User Info */}
             <div className="flex-1 min-w-0">
               <p
-                className={`font-semibold text-sm ${user.isCurrentUser ? 'text-blue-900' : 'text-black'}`}
+                className={`font-semibold text-sm ${user.isCurrentUser ? 'text-brand-blue-900' : 'text-black'}`}
               >
                 {user.name}
               </p>

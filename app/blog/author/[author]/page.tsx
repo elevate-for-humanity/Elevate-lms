@@ -102,7 +102,7 @@ export default async function AuthorPage({
               )}
               <div className="p-6">
                 {post.category && (
-                  <span className="inline-block px-3 py-2 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full mb-3">
+                  <span className="inline-block px-3 py-2 bg-brand-blue-100 text-brand-blue-800 text-sm font-semibold rounded-full mb-3">
                     {post.category}
                   </span>
                 )}

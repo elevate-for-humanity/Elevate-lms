@@ -158,7 +158,7 @@ export function DocumentUploadForm({ requirements }: Props) {
             value={documentType}
             onChange={(e) => setDocumentType(e.target.value)}
             required
-            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
           >
             <option value="">Select document type...</option>
             {requirements.map((req) => (
@@ -170,12 +170,12 @@ export function DocumentUploadForm({ requirements }: Props) {
         </div>
 
         {selectedRequirement && (
-          <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-semibold text-blue-900 mb-2">Instructions</h4>
-            <p className="text-sm text-blue-800 mb-3">
+          <div className="mb-6 p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
+            <h4 className="font-semibold text-brand-blue-900 mb-2">Instructions</h4>
+            <p className="text-sm text-brand-blue-800 mb-3">
               {selectedRequirement.instructions}
             </p>
-            <div className="text-xs text-blue-700">
+            <div className="text-xs text-brand-blue-700">
               <strong>Accepted formats:</strong>{' '}
               {selectedRequirement.accepted_formats.join(', ').toUpperCase()}
               <br />
@@ -189,7 +189,7 @@ export function DocumentUploadForm({ requirements }: Props) {
           <label className="block text-sm font-semibold mb-2">
             Upload File *
           </label>
-          <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-blue-500 transition">
+          <div className="border-2 border-dashed border-slate-300 rounded-lg p-8 text-center hover:border-brand-blue-500 transition">
             <Upload className="w-16 h-16 text-slate-400 mx-auto mb-4" />
             <input
               type="file"
@@ -200,7 +200,7 @@ export function DocumentUploadForm({ requirements }: Props) {
               id="fileUpload"
             />
             <label htmlFor="fileUpload" className="cursor-pointer">
-              <span className="text-blue-600 font-semibold text-lg">
+              <span className="text-brand-blue-600 font-semibold text-lg">
                 Click to upload
               </span>
               <span className="text-black"> or drag and drop</span>
@@ -230,7 +230,7 @@ export function DocumentUploadForm({ requirements }: Props) {
         <button
           type="submit"
           disabled={loading || !file || !documentType}
-          className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-8 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Uploading...' : 'Upload Document'}
         </button>

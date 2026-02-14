@@ -64,14 +64,14 @@ export default function ProgramPaymentOptions({
       </div>
 
       {/* Funding Priority Message */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-        <p className="text-sm text-blue-900 font-semibold mb-2">
+      <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
+        <p className="text-sm text-brand-blue-900 font-semibold mb-2">
           ✅ Check Free Funding First!
         </p>
         <p className="text-sm text-black">
           Most students qualify for 100% FREE training through WIOA, WRG, or
           JRI.
-          <a href="/apply" className="text-blue-600 underline font-bold ml-1">
+          <a href="/apply" className="text-brand-blue-600 underline font-bold ml-1">
             Apply here to check eligibility
           </a>
         </p>
@@ -120,19 +120,19 @@ export default function ProgramPaymentOptions({
           onClick={() => setPaymentMethod('stripe')}
           className={`w-full text-left p-6 rounded-lg border-2 transition ${
             paymentMethod === 'stripe'
-              ? 'border-blue-600 bg-blue-50'
-              : 'border-gray-300 hover:border-blue-400'
+              ? 'border-brand-blue-600 bg-brand-blue-50'
+              : 'border-gray-300 hover:border-brand-blue-400'
           }`}
         >
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-3">
-              <CreditCard className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+              <CreditCard className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
               <div>
                 <h4 className="font-bold text-lg mb-1">Stripe Payment Plan</h4>
                 <p className="text-sm text-black mb-2">
                   Break up payments over 12 months
                 </p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-2xl font-bold text-brand-blue-600">
                   ${stripeMonthly}/month
                 </p>
                 <p className="text-xs text-gray-500 mt-1">
@@ -141,7 +141,7 @@ export default function ProgramPaymentOptions({
               </div>
             </div>
             {paymentMethod === 'stripe' && (
-              <CheckCircle className="w-6 h-6 text-blue-600" />
+              <CheckCircle className="w-6 h-6 text-brand-blue-600" />
             )}
           </div>
         </button>

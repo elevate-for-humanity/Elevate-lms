@@ -41,16 +41,16 @@ export default async function GrantsPage() {
     .reduce((sum, a) => sum + (parseFloat(a.amount_awarded) || 0), 0);
 
   const stats = [
-    { label: 'Open Opportunities', value: openGrants.toString(), icon: FileText, color: 'text-blue-600', bgColor: 'bg-blue-100' },
+    { label: 'Open Opportunities', value: openGrants.toString(), icon: FileText, color: 'text-brand-blue-600', bgColor: 'bg-brand-blue-100' },
     { label: 'Available Funding', value: `$${(totalFunding / 1000).toFixed(0)}K`, icon: DollarSign, color: 'text-green-600', bgColor: 'bg-green-100' },
     { label: 'Pending Applications', value: pendingApps.toString(), icon: Clock, color: 'text-yellow-600', bgColor: 'bg-yellow-100' },
-    { label: 'Awarded This Year', value: `$${approvedAmount.toLocaleString()}`, icon: Circle, color: 'text-blue-600', bgColor: 'bg-blue-100' },
+    { label: 'Awarded This Year', value: `$${approvedAmount.toLocaleString()}`, icon: Circle, color: 'text-brand-blue-600', bgColor: 'bg-brand-blue-100' },
   ];
 
   const statusColors: Record<string, string> = {
     open: 'bg-green-100 text-green-700',
     closed: 'bg-gray-100 text-gray-600',
-    upcoming: 'bg-blue-100 text-blue-700',
+    upcoming: 'bg-brand-blue-100 text-brand-blue-700',
   };
 
   return (
@@ -63,7 +63,7 @@ export default async function GrantsPage() {
           </div>
           <Link
             href="/admin/grants/new"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+            className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
           >
             <Plus className="w-4 h-4" />
             Add Opportunity
@@ -99,7 +99,7 @@ export default async function GrantsPage() {
                 <p className="text-gray-600 mb-6">Add grant opportunities to track funding sources.</p>
                 <Link
                   href="/admin/grants/new"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
                 >
                   <Plus className="w-4 h-4" />
                   Add Opportunity
@@ -165,7 +165,7 @@ export default async function GrantsPage() {
                         app.status === 'approved' ? 'bg-green-100 text-green-700' :
                         app.status === 'denied' ? 'bg-red-100 text-red-700' :
                         app.status === 'under_review' ? 'bg-yellow-100 text-yellow-700' :
-                        'bg-blue-100 text-blue-700'
+                        'bg-brand-blue-100 text-brand-blue-700'
                       }`}>
                         {app.status.replace('_', ' ')}
                       </span>

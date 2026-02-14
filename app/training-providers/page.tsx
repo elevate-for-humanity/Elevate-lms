@@ -120,21 +120,21 @@ export default function TrainingProvidersPage() {
               Partner With Us to Deliver Workforce Training
             </h1>
             
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-brand-blue-100 mb-8">
               Join our network of approved training providers. We connect you with WIOA-funded students, handle enrollment paperwork, and help you grow your program.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
                 href="/partners/training-provider"
-                className="inline-flex items-center justify-center gap-2 bg-white text-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-blue-50 transition"
+                className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-50 transition"
               >
                 Become a Partner
                 <ArrowRight className="w-5 h-5" />
               </Link>
               <a
                 href="/support"
-                className="inline-flex items-center justify-center gap-2 bg-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition border border-blue-600"
+                className="inline-flex items-center justify-center gap-2 bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition border border-brand-blue-600"
               >
                 <Phone className="w-5 h-5" />
                 Call Get Help Online
@@ -260,7 +260,7 @@ export default function TrainingProvidersPage() {
               { step: 4, title: 'Receive Students', desc: 'Start receiving pre-screened, funded students.' },
             ].map((item) => (
               <div key={item.step} className="text-center">
-                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+                <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                   {item.step}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{item.title}</h3>
@@ -272,24 +272,24 @@ export default function TrainingProvidersPage() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 bg-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-white">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
               <div className="text-4xl md:text-5xl font-bold mb-2">500+</div>
-              <div className="text-blue-200">Students Placed</div>
+              <div className="text-brand-blue-200">Students Placed</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold mb-2">50+</div>
-              <div className="text-blue-200">Partner Providers</div>
+              <div className="text-brand-blue-200">Partner Providers</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold mb-2">85%</div>
-              <div className="text-blue-200">Job Placement Rate</div>
+              <div className="text-brand-blue-200">Job Placement Rate</div>
             </div>
             <div>
               <div className="text-4xl md:text-5xl font-bold mb-2">$0</div>
-              <div className="text-blue-200">Cost to Partners</div>
+              <div className="text-brand-blue-200">Cost to Partners</div>
             </div>
           </div>
         </div>
@@ -307,7 +307,7 @@ export default function TrainingProvidersPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/partners/training-provider"
-              className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition text-lg"
             >
               Apply to Partner
               <ArrowRight className="w-5 h-5" />
@@ -322,7 +322,7 @@ export default function TrainingProvidersPage() {
           </div>
           <p className="mt-8 text-gray-500">
             Questions? Email us at{' '}
-            <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">
               elevate4humanityedu@gmail.com
             </a>
           </p>

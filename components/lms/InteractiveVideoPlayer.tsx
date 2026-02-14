@@ -351,15 +351,15 @@ export default function InteractiveVideoPlayer({
                             ? 'border-red-500 bg-red-50'
                             : 'border-gray-200'
                         : quizAnswer === index
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-blue-300'
+                          ? 'border-brand-blue-500 bg-brand-blue-50'
+                          : 'border-gray-200 hover:border-brand-blue-300'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                           quizAnswer === index
-                            ? 'border-blue-500 bg-blue-500'
+                            ? 'border-brand-blue-500 bg-brand-blue-500'
                             : 'border-gray-300'
                         }`}
                       >
@@ -396,7 +396,7 @@ export default function InteractiveVideoPlayer({
                 <button
                   onClick={submitQuizAnswer}
                   disabled={quizAnswer === null}
-                  className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="w-full py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   Submit Answer
                 </button>
@@ -436,7 +436,7 @@ export default function InteractiveVideoPlayer({
           {/* Control Buttons */}
           <div className="flex items-center justify-between text-white">
             <div className="flex items-center gap-4">
-              <button onClick={togglePlay} className="hover:text-blue-400">
+              <button onClick={togglePlay} className="hover:text-brand-blue-400">
                 {isPlaying ? (
                   <Pause className="w-6 h-6" />
                 ) : (
@@ -444,16 +444,16 @@ export default function InteractiveVideoPlayer({
                 )}
               </button>
 
-              <button onClick={() => skip(-10)} className="hover:text-blue-400">
+              <button onClick={() => skip(-10)} className="hover:text-brand-blue-400">
                 <SkipBack className="w-5 h-5" />
               </button>
 
-              <button onClick={() => skip(10)} className="hover:text-blue-400">
+              <button onClick={() => skip(10)} className="hover:text-brand-blue-400">
                 <SkipForward className="w-5 h-5" />
               </button>
 
               <div className="flex items-center gap-2">
-                <button onClick={toggleMute} className="hover:text-blue-400">
+                <button onClick={toggleMute} className="hover:text-brand-blue-400">
                   {isMuted ? (
                     <VolumeX className="w-5 h-5" />
                   ) : (
@@ -494,14 +494,14 @@ export default function InteractiveVideoPlayer({
 
               <button
                 onClick={() => setShowCaptions(!showCaptions)}
-                className={`hover:text-blue-400 ${showCaptions ? 'text-blue-400' : ''}`}
+                className={`hover:text-brand-blue-400 ${showCaptions ? 'text-brand-blue-400' : ''}`}
               >
                 <MessageSquare className="w-5 h-5" />
               </button>
 
               <button
                 onClick={toggleFullscreen}
-                className="hover:text-blue-400"
+                className="hover:text-brand-blue-400"
               >
                 <Maximize className="w-5 h-5" />
               </button>
@@ -517,7 +517,7 @@ export default function InteractiveVideoPlayer({
             onClick={() => setActiveTab('transcript')}
             className={`flex items-center gap-2 px-6 py-3 ${
               activeTab === 'transcript'
-                ? 'border-b-2 border-blue-500 text-blue-400'
+                ? 'border-b-2 border-brand-blue-500 text-brand-blue-400'
                 : 'text-gray-400'
             }`}
           >
@@ -528,7 +528,7 @@ export default function InteractiveVideoPlayer({
             onClick={() => setActiveTab('notes')}
             className={`flex items-center gap-2 px-6 py-3 ${
               activeTab === 'notes'
-                ? 'border-b-2 border-blue-500 text-blue-400'
+                ? 'border-b-2 border-brand-blue-500 text-brand-blue-400'
                 : 'text-gray-400'
             }`}
           >
@@ -551,7 +551,7 @@ export default function InteractiveVideoPlayer({
                     }`}
                     onClick={() => handleSeek(segment.start)}
                   >
-                    <span className="text-blue-400 text-sm mr-3">
+                    <span className="text-brand-blue-400 text-sm mr-3">
                       {formatTime(segment.start)}
                     </span>
                     <span className="text-gray-300">{segment.text}</span>
@@ -576,7 +576,7 @@ export default function InteractiveVideoPlayer({
                 />
                 <button
                   onClick={addNote}
-                  className="px-4 py-2 bg-blue-600 rounded hover:bg-blue-700"
+                  className="px-4 py-2 bg-brand-blue-600 rounded hover:bg-brand-blue-700"
                 >
                   Add Note
                 </button>
@@ -588,7 +588,7 @@ export default function InteractiveVideoPlayer({
                     <div className="flex items-center justify-between mb-2">
                       <button
                         onClick={() => handleSeek(note.timestamp)}
-                        className="text-blue-400 text-sm hover:underline"
+                        className="text-brand-blue-400 text-sm hover:underline"
                       >
                         {formatTime(note.timestamp)}
                       </button>

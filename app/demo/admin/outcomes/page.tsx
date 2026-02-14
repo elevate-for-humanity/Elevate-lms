@@ -11,7 +11,7 @@ export default function DemoOutcomesPage() {
           <p className="text-sm text-gray-500">Placement Rate</p>
         </div>
         <div className="bg-white rounded-lg border p-4 text-center">
-          <p className="text-3xl font-bold text-blue-600">${m.averageWage}</p>
+          <p className="text-3xl font-bold text-brand-blue-600">${m.averageWage}</p>
           <p className="text-sm text-gray-500">Avg Hourly Wage</p>
         </div>
         <div className="bg-white rounded-lg border p-4 text-center">

@@ -171,12 +171,12 @@ export default async function StudentsPage() {
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <TrendingUp className="h-11 w-11 text-blue-600" />
+                  <TrendingUp className="h-11 w-11 text-brand-blue-600" />
                   <h3 className="text-sm font-medium text-black">
                     Completed
                   </h3>
                 </div>
-                <p className="text-3xl font-bold text-blue-600">
+                <p className="text-3xl font-bold text-brand-blue-600">
                   {completedEnrollments || 0}
                 </p>
               </div>
@@ -251,7 +251,7 @@ export default async function StudentsPage() {
                                           enrollment.status === 'active'
                                             ? 'bg-brand-green-100 text-green-700'
                                             : enrollment.status === 'completed'
-                                              ? 'bg-blue-100 text-brand-blue-700'
+                                              ? 'bg-brand-blue-100 text-brand-blue-700'
                                               : 'bg-gray-100 text-black'
                                         }`}
                                       >

@@ -117,7 +117,7 @@ export default async function ThreadPage({ params }: Props) {
           <div className="p-6 border-b border-slate-100">
             <h1 className="text-2xl font-bold text-slate-900 mb-4">{thread.title}</h1>
             <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
                 {author?.avatar_url ? (
                   <img
                     src={author.avatar_url}
@@ -125,7 +125,7 @@ export default async function ThreadPage({ params }: Props) {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                 ) : (
-                  <span className="text-blue-600 font-semibold">
+                  <span className="text-brand-blue-600 font-semibold">
                     {author?.full_name?.charAt(0) || 'A'}
                   </span>
                 )}
@@ -157,7 +157,7 @@ export default async function ThreadPage({ params }: Props) {
 
           {/* Thread Actions */}
           <div className="px-6 py-3 bg-slate-50 border-t border-slate-100 flex items-center gap-4">
-            <button className="flex items-center gap-2 text-slate-600 hover:text-blue-600 transition">
+            <button className="flex items-center gap-2 text-slate-600 hover:text-brand-blue-600 transition">
               <ThumbsUp className="w-4 h-4" />
               <span className="text-sm">Like</span>
             </button>

@@ -103,7 +103,7 @@ export default function LoginForm() {
               >
             ) => setEmail(e.target.value)}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             placeholder="your.email@gmail.com"
           />
         </div>
@@ -125,7 +125,7 @@ export default function LoginForm() {
               >
             ) => setPassword(e.target.value)}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             placeholder="••••••••"
           />
         </div>
@@ -134,7 +134,7 @@ export default function LoginForm() {
           <label className="flex items-center">
             <input
               type="checkbox"
-              className="h-4 w-4 text-brand-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              className="h-4 w-4 text-brand-blue-600 focus:ring-brand-blue-500 border-gray-300 rounded"
             />
             <span className="ml-2 text-sm text-black">Remember me</span>
           </label>

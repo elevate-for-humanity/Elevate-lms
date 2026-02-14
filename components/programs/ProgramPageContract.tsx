@@ -173,7 +173,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
                 {config.badges.map((badge, i) => (
                   <span
                     key={i}
-                    className="px-4 py-2 bg-blue-600 text-white text-sm font-bold rounded-full"
+                    className="px-4 py-2 bg-brand-blue-600 text-white text-sm font-bold rounded-full"
                   >
                     {badge}
                   </span>
@@ -279,7 +279,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
       </section>
 
       {/* LEARNING OUTCOMES */}
-      <section className="bg-blue-900 text-white py-16">
+      <section className="bg-brand-blue-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8">What You Will Learn</h2>
           <div className="grid md:grid-cols-3 gap-8">
@@ -290,7 +290,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
               </h3>
               <ul className="space-y-2">
                 {config.outcomes.knowledge.map((item, i) => (
-                  <li key={i} className="text-blue-100">• {item}</li>
+                  <li key={i} className="text-brand-blue-100">• {item}</li>
                 ))}
               </ul>
             </div>
@@ -301,7 +301,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
               </h3>
               <ul className="space-y-2">
                 {config.outcomes.skills.map((item, i) => (
-                  <li key={i} className="text-blue-100">• {item}</li>
+                  <li key={i} className="text-brand-blue-100">• {item}</li>
                 ))}
               </ul>
             </div>
@@ -312,7 +312,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
               </h3>
               <ul className="space-y-2">
                 {config.outcomes.compliance.map((item, i) => (
-                  <li key={i} className="text-blue-100">• {item}</li>
+                  <li key={i} className="text-brand-blue-100">• {item}</li>
                 ))}
               </ul>
             </div>

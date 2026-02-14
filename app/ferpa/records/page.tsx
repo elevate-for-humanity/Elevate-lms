@@ -131,7 +131,7 @@ export default async function FerpaRecordsPage() {
             <div className="flex items-center gap-3">
               <Link
                 href="/ferpa/records/search"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 <Search className="w-4 h-4" />
                 Search Records
@@ -146,8 +146,8 @@ export default async function FerpaRecordsPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <User className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <User className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{totalStudents || 0}</p>
@@ -168,8 +168,8 @@ export default async function FerpaRecordsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Shield className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Shield className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-green-600">Compliant</p>
@@ -237,7 +237,7 @@ export default async function FerpaRecordsPage() {
                         {student.email}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-blue-100 text-brand-blue-800">
                           {student.enrollments?.length || 0} enrollments
                         </span>
                       </td>
@@ -247,7 +247,7 @@ export default async function FerpaRecordsPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <Link
                           href={`/admin/learner/${student.id}`}
-                          className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+                          className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:text-brand-blue-700"
                         >
                           <Eye className="w-4 h-4" />
                           View Record

@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function PartnerDashboardPage() {
   const stats = [
-    { icon: Users, label: 'Active Students', value: '47', color: 'text-blue-600', bg: 'bg-blue-100' },
+    { icon: Users, label: 'Active Students', value: '47', color: 'text-brand-blue-600', bg: 'bg-brand-blue-100' },
     { icon: DollarSign, label: 'Revenue MTD', value: '$12,450', color: 'text-green-600', bg: 'bg-green-100' },
     { icon: TrendingUp, label: 'Completion Rate', value: '89%', color: 'text-purple-600', bg: 'bg-purple-100' },
     { icon: Calendar, label: 'Sessions This Week', value: '12', color: 'text-orange-600', bg: 'bg-orange-100' },
@@ -75,7 +75,7 @@ export default function PartnerDashboardPage() {
           <h2 className="text-lg font-bold text-gray-900 mb-4">Quick Actions</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
             {quickActions.map((action, i) => (
-              <Link key={i} href={action.href} className="flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition text-center">
+              <Link key={i} href={action.href} className="flex flex-col items-center gap-2 p-4 bg-gray-50 rounded-lg hover:bg-brand-blue-50 hover:text-brand-blue-600 transition text-center">
                 <action.icon className="w-6 h-6" />
                 <span className="text-sm font-medium">{action.label}</span>
               </Link>
@@ -90,7 +90,7 @@ export default function PartnerDashboardPage() {
             <div className="space-y-4">
               {recentActivity.map((item, i) => (
                 <div key={i} className="flex items-start gap-3 pb-4 border-b border-gray-100 last:border-0 last:pb-0">
-                  <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0" />
+                  <div className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2 flex-shrink-0" />
                   <div>
                     <p className="font-medium text-gray-900 text-sm">{item.action}</p>
                     <p className="text-gray-600 text-sm">{item.detail}</p>

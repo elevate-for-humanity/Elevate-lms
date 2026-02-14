@@ -74,7 +74,7 @@ export function CalendarWidget({ userId }: CalendarWidgetProps) {
   const getEventColor = (type: string) => {
     switch (type) {
       case 'assignment':
-        return 'bg-blue-500';
+        return 'bg-brand-blue-500';
       case 'quiz':
         return 'bg-purple-500';
       case 'deadline':

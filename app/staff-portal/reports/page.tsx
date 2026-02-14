@@ -136,7 +136,7 @@ export default async function StaffReportsPage() {
         {/* Stats Overview */}
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 border">
-            <Users className="w-8 h-8 text-blue-500 mb-2" />
+            <Users className="w-8 h-8 text-brand-blue-500 mb-2" />
             <p className="text-2xl font-bold">{totalStudents || 0}</p>
             <p className="text-gray-600 text-sm">Total Students</p>
             <p className="text-xs text-green-600 mt-1">+{newStudentsThisWeek || 0} this week</p>
@@ -152,7 +152,7 @@ export default async function StaffReportsPage() {
             <p className="text-gray-600 text-sm">Completed This Month</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <Clock className="w-8 h-8 text-blue-500 mb-2" />
+            <Clock className="w-8 h-8 text-brand-blue-500 mb-2" />
             <p className="text-2xl font-bold">{attendanceToday || 0}</p>
             <p className="text-gray-600 text-sm">Attendance Today</p>
           </div>
@@ -203,14 +203,14 @@ export default async function StaffReportsPage() {
                     </td>
                     <td className="px-4 py-3 text-sm">{enrollment.program?.name || 'N/A'}</td>
                     <td className="px-4 py-3">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded text-xs uppercase">
+                      <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-700 rounded text-xs uppercase">
                         {enrollment.funding_type || 'self_pay'}
                       </span>
                     </td>
                     <td className="px-4 py-3">
                       <span className={`px-2 py-1 rounded text-xs ${
                         enrollment.status === 'active' ? 'bg-green-100 text-green-700' :
-                        enrollment.status === 'completed' ? 'bg-blue-100 text-blue-700' :
+                        enrollment.status === 'completed' ? 'bg-brand-blue-100 text-brand-blue-700' :
                         enrollment.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
                         'bg-gray-100 text-gray-700'
                       }`}>

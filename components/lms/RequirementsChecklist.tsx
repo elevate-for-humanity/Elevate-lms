@@ -112,9 +112,9 @@ export function RequirementsChecklist({ requirements, enrollmentId }: Requiremen
           bgColor = 'bg-yellow-50';
           iconColor = 'text-yellow-600';
         } else if (isPending) {
-          borderColor = 'border-blue-500';
-          bgColor = 'bg-blue-50';
-          iconColor = 'text-blue-600';
+          borderColor = 'border-brand-blue-500';
+          bgColor = 'bg-brand-blue-50';
+          iconColor = 'text-brand-blue-600';
         }
 
         return (
@@ -152,7 +152,7 @@ export function RequirementsChecklist({ requirements, enrollmentId }: Requiremen
               {!isCompleted && (
                 <Link
                   href={getActionLink(req)}
-                  className="text-sm text-blue-600 hover:underline font-semibold"
+                  className="text-sm text-brand-blue-600 hover:underline font-semibold"
                 >
                   {getActionText(req.requirement_type)}
                 </Link>

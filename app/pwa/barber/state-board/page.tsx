@@ -44,8 +44,8 @@ const STUDY_TOPICS: StudyTopic[] = [
 ];
 
 const CATEGORY_COLORS = {
-  theory: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
-  practical: { bg: 'bg-blue-500/20', text: 'text-blue-400' },
+  theory: { bg: 'bg-brand-blue-500/20', text: 'text-brand-blue-400' },
+  practical: { bg: 'bg-brand-blue-500/20', text: 'text-brand-blue-400' },
   sanitation: { bg: 'bg-green-500/20', text: 'text-green-400' },
   laws: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
 };
@@ -62,7 +62,7 @@ export default function StateBoardPrepPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
   }

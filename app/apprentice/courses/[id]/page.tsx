@@ -202,7 +202,7 @@ export default async function ApprenticeCourseDetailPage({
                   module.completed
                     ? 'border-green-200 bg-green-50'
                     : isCurrent
-                    ? 'border-blue-500 shadow-lg'
+                    ? 'border-brand-blue-500 shadow-lg'
                     : isLocked
                     ? 'border-slate-200 opacity-60'
                     : 'border-slate-200'
@@ -216,7 +216,7 @@ export default async function ApprenticeCourseDetailPage({
                         module.completed
                           ? 'bg-green-500 text-white'
                           : isCurrent
-                          ? 'bg-blue-500 text-white'
+                          ? 'bg-brand-blue-500 text-white'
                           : 'bg-slate-200 text-slate-500'
                       }`}
                     >
@@ -249,7 +249,7 @@ export default async function ApprenticeCourseDetailPage({
                       ) : isCurrent ? (
                         <Link
                           href={`/apprentice/courses/${params.id}/modules/${module.id}`}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition"
                         >
                           <PlayCircle className="w-4 h-4" />
                           Start

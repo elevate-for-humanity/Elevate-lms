@@ -129,7 +129,7 @@ export function NotificationBell() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllAsRead}
-                className="text-xs text-blue-600 hover:text-blue-700"
+                className="text-xs text-brand-blue-600 hover:text-brand-blue-700"
               >
                 {t('notifications.markAllRead')}
               </button>
@@ -148,7 +148,7 @@ export function NotificationBell() {
                 <div
                   key={notification.id}
                   className={`px-4 py-3 border-b border-gray-50 hover:bg-gray-50 transition-colors ${
-                    !notification.read ? 'bg-blue-50/50' : ''
+                    !notification.read ? 'bg-brand-blue-50/50' : ''
                   }`}
                 >
                   <div className="flex items-start gap-3">

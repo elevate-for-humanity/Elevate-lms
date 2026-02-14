@@ -38,7 +38,7 @@ export default async function FileManagerPage() {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input type="text" placeholder="Search files..." className="pl-10 pr-4 py-2 border rounded-lg" />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
               <Upload className="w-5 h-5" /> Upload
             </button>
           </div>
@@ -70,7 +70,7 @@ export default async function FileManagerPage() {
           <div className="p-8 text-center">
             <File className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-600">No recent files</p>
-            <button className="mt-4 text-blue-600 hover:underline">Upload your first file</button>
+            <button className="mt-4 text-brand-blue-600 hover:underline">Upload your first file</button>
           </div>
         </div>
       </div>

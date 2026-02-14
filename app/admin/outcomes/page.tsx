@@ -28,8 +28,8 @@ export default async function OutcomesPage() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Employment Rate</h3><p className="text-3xl font-bold text-green-600 mt-2">78%</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Credential Rate</h3><p className="text-3xl font-bold text-blue-600 mt-2">85%</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Wage Gain</h3><p className="text-3xl font-bold text-blue-600 mt-2">$4.50/hr</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Credential Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">85%</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Wage Gain</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">$4.50/hr</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Retention (6mo)</h3><p className="text-3xl font-bold text-orange-600 mt-2">82%</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Outcome Details</h2><p className="text-gray-500">Detailed outcome tracking and reporting</p></div>

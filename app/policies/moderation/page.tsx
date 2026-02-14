@@ -32,7 +32,7 @@ export default function ModerationPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">What We Moderate</h2>
             
-            <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+            <div className="bg-brand-blue-50 rounded-xl p-6 border-2 border-brand-blue-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Content Subject to Moderation</h3>
               <ul className="list-disc pl-6 text-black space-y-2">
                 <li>Discussion forum posts and comments</li>
@@ -121,7 +121,7 @@ export default function ModerationPage() {
             <div className="bg-gray-50 rounded-xl p-8 border-2 border-gray-200 mb-6">
               <div className="space-y-6">
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     1
                   </div>
                   <div>
@@ -145,7 +145,7 @@ export default function ModerationPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>
@@ -297,15 +297,15 @@ export default function ModerationPage() {
               <li><strong>Response Time:</strong> 24-48 hours for most reports</li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/content" className="text-blue-600 hover:underline">Content Policy</a></li>
-                <li><a href="/policies/community-guidelines" className="text-blue-600 hover:underline">Community Guidelines</a></li>
-                <li><a href="/policies/acceptable-use" className="text-blue-600 hover:underline">Acceptable Use Policy</a></li>
-                <li><a href="/policies/student-code" className="text-blue-600 hover:underline">Student Code of Conduct</a></li>
+                <li><a href="/policies/content" className="text-brand-blue-600 hover:underline">Content Policy</a></li>
+                <li><a href="/policies/community-guidelines" className="text-brand-blue-600 hover:underline">Community Guidelines</a></li>
+                <li><a href="/policies/acceptable-use" className="text-brand-blue-600 hover:underline">Acceptable Use Policy</a></li>
+                <li><a href="/policies/student-code" className="text-brand-blue-600 hover:underline">Student Code of Conduct</a></li>
               </ul>
             </div>
           </div>

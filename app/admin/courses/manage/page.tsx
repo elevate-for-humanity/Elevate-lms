@@ -55,7 +55,7 @@ export default async function ManageCoursesPage() {
               <h1 className="text-3xl font-bold text-gray-900">Manage Courses</h1>
               <p className="text-gray-600 mt-2">{count || 0} courses in the system</p>
             </div>
-            <Link href="/admin/courses/create" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            <Link href="/admin/courses/create" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
               Create Course
             </Link>
           </div>
@@ -85,7 +85,7 @@ export default async function ManageCoursesPage() {
                     <span className={`px-2 py-1 rounded-full text-xs ${course.status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600'}`}>
                       {course.status || 'draft'}
                     </span>
-                    <Link href={`/admin/courses/${course.id}`} className="text-blue-600 hover:text-blue-800 text-sm">Edit</Link>
+                    <Link href={`/admin/courses/${course.id}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">Edit</Link>
                   </div>
                 </div>
               ))

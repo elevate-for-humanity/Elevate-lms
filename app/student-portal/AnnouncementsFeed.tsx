@@ -99,7 +99,7 @@ export default function AnnouncementsFeed() {
       case 'event':
         return 'border-green-600';
       default:
-        return 'border-blue-600';
+        return 'border-brand-blue-600';
     }
   };
 
@@ -111,7 +111,7 @@ export default function AnnouncementsFeed() {
       case 'event':
         return 'bg-green-100 text-green-700';
       default:
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-brand-blue-100 text-brand-blue-700';
     }
   };
 

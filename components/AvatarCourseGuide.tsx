@@ -123,7 +123,7 @@ export default function AvatarCourseGuide({
         <div className="flex items-center gap-2 mb-3">
           <div className="flex-1 h-1 bg-gray-200 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-blue-600 transition-all duration-300"
+              className="h-full bg-brand-blue-600 transition-all duration-300"
               style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
             />
           </div>
@@ -141,7 +141,7 @@ export default function AvatarCourseGuide({
           <a
             href={step.action.href}
             onClick={step.action.onClick}
-            className="block w-full text-center bg-blue-600 text-white py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors mb-3"
+            className="block w-full text-center bg-brand-blue-600 text-white py-2 rounded-lg font-medium hover:bg-brand-blue-700 transition-colors mb-3"
           >
             {step.action.label}
           </a>
@@ -170,7 +170,7 @@ export default function AvatarCourseGuide({
 
           <button
             onClick={nextStep}
-            className="flex items-center gap-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             <span className="text-sm font-medium">{isLastStep ? 'Finish' : 'Next'}</span>
             <ChevronRight className="w-4 h-4" />

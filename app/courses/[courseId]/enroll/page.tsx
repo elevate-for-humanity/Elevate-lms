@@ -90,8 +90,8 @@ export default function CourseEnrollPage({
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Clock className="h-10 w-10 text-blue-600" />
+                <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                  <Clock className="h-10 w-10 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-bold text-black mb-1">
@@ -104,8 +104,8 @@ export default function CourseEnrollPage({
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <Award className="h-10 w-10 text-blue-600" />
+                <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                  <Award className="h-10 w-10 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-bold text-black mb-1">
@@ -118,8 +118,8 @@ export default function CourseEnrollPage({
               </div>
             </div>
 
-            <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <p className="text-sm text-blue-900">
+            <div className="mt-8 p-4 bg-brand-blue-50 rounded-lg border border-brand-blue-200">
+              <p className="text-sm text-brand-blue-900">
                 <strong>100% Money-Back Guarantee:</strong> If you're not satisfied within 30 days, we'll refund your purchase.
               </p>
             </div>
@@ -181,11 +181,11 @@ export default function CourseEnrollPage({
             <div className="mt-8 pt-6 border-t border-gray-200">
               <p className="text-xs text-gray-500 text-center">
                 By enrolling, you agree to our{' '}
-                <a href="/terms-of-service" className="text-blue-600 hover:underline">
+                <a href="/terms-of-service" className="text-brand-blue-600 hover:underline">
                   Terms of Service
                 </a>{' '}
                 and{' '}
-                <a href="/privacy-policy" className="text-blue-600 hover:underline">
+                <a href="/privacy-policy" className="text-brand-blue-600 hover:underline">
                   Privacy Policy
                 </a>
               </p>

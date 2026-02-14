@@ -172,7 +172,7 @@ function SignupFormContent() {
                 >
               ) => setFormData({ ...formData, firstName: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="First name"
             />
           </div>
@@ -194,7 +194,7 @@ function SignupFormContent() {
                 >
               ) => setFormData({ ...formData, lastName: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="Doe"
             />
           </div>
@@ -217,7 +217,7 @@ function SignupFormContent() {
               >
             ) => setFormData({ ...formData, email: e.target.value })}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             placeholder="your.email@gmail.com"
           />
         </div>
@@ -240,7 +240,7 @@ function SignupFormContent() {
             ) => setFormData({ ...formData, password: e.target.value })}
             required
             minLength={8}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             placeholder="••••••••"
           />
           <p className="mt-1 text-xs text-black">
@@ -265,7 +265,7 @@ function SignupFormContent() {
               >
             ) => setFormData({ ...formData, confirmPassword: e.target.value })}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             placeholder="••••••••"
           />
         </div>
@@ -275,7 +275,7 @@ function SignupFormContent() {
             type="checkbox"
             id="terms"
             required
-            className="mt-1 h-4 w-4 text-brand-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            className="mt-1 h-4 w-4 text-brand-blue-600 focus:ring-brand-blue-500 border-gray-300 rounded"
           />
           <label htmlFor="terms" className="ml-2 text-sm text-black">
             I agree to the{' '}
@@ -377,7 +377,7 @@ export default function SignupForm() {
             <div className="h-10 bg-gray-200 rounded"></div>
             <div className="h-10 bg-gray-200 rounded"></div>
             <div className="h-10 bg-gray-200 rounded"></div>
-            <div className="h-12 bg-blue-200 rounded"></div>
+            <div className="h-12 bg-brand-blue-200 rounded"></div>
           </div>
         </div>
       }

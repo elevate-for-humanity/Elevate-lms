@@ -112,7 +112,7 @@ export default async function EmployerDashboardOrchestrated() {
           <div className="grid md:grid-cols-3 gap-4">
             <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
               <div className="flex items-center justify-between mb-2">
-                <Briefcase className="h-11 w-11 text-blue-600" />
+                <Briefcase className="h-11 w-11 text-brand-blue-600" />
                 <span className="text-3xl font-bold text-black">
                   {postings?.length || 0}
                 </span>
@@ -159,19 +159,19 @@ export default async function EmployerDashboardOrchestrated() {
             <div
               className={`rounded-lg shadow-sm border p-6 ${
                 apprenticeshipProgram
-                  ? 'bg-blue-50 border-blue-600'
+                  ? 'bg-brand-blue-50 border-brand-blue-600'
                   : 'bg-white border-slate-200'
               }`}
             >
               <div className="flex items-center justify-between mb-2">
                 <TrendingUp
                   className={`h-11 w-11 ${
-                    apprenticeshipProgram ? 'text-blue-600' : 'text-slate-400'
+                    apprenticeshipProgram ? 'text-brand-blue-600' : 'text-slate-400'
                   }`}
                 />
                 <span
                   className={`text-3xl font-bold ${
-                    apprenticeshipProgram ? 'text-blue-900' : 'text-black'
+                    apprenticeshipProgram ? 'text-brand-blue-900' : 'text-black'
                   }`}
                 >
                   {apprenticeshipProgram ? '1' : '0'}
@@ -179,7 +179,7 @@ export default async function EmployerDashboardOrchestrated() {
               </div>
               <div
                 className={`text-sm ${
-                  apprenticeshipProgram ? 'text-blue-900' : 'text-black'
+                  apprenticeshipProgram ? 'text-brand-blue-900' : 'text-black'
                 }`}
               >
                 Apprenticeship Programs
@@ -287,7 +287,7 @@ export default async function EmployerDashboardOrchestrated() {
                     </div>
                     <a
                       href={`/employer/postings/${posting.id}`}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition text-sm"
+                      className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition text-sm"
                     >
                       View
                     </a>
@@ -303,7 +303,7 @@ export default async function EmployerDashboardOrchestrated() {
           {/* Company Info */}
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="flex items-center gap-3 mb-4">
-              <Building2 className="h-11 w-11 text-blue-600" />
+              <Building2 className="h-11 w-11 text-brand-blue-600" />
               <div>
                 <h3 className="font-bold text-black">
                   {profile.company_name || 'Your Company'}
@@ -332,7 +332,7 @@ export default async function EmployerDashboardOrchestrated() {
               {profile.verified && (
                 <a
                   href="/employer/postings/new"
-                  className="block w-full text-center px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                  className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
                 >
                   Post New Job
                 </a>
@@ -348,17 +348,17 @@ export default async function EmployerDashboardOrchestrated() {
 
           {/* Apprenticeship CTA */}
           {!apprenticeshipProgram && profile.verified && (
-            <div className="bg-blue-50 rounded-lg border-2 border-blue-600 p-6">
-              <h3 className="text-lg font-bold text-blue-900 mb-3">
+            <div className="bg-brand-blue-50 rounded-lg border-2 border-brand-blue-600 p-6">
+              <h3 className="text-lg font-bold text-brand-blue-900 mb-3">
                 Build Your Talent Pipeline
               </h3>
-              <p className="text-blue-800 mb-4 text-sm">
+              <p className="text-brand-blue-800 mb-4 text-sm">
                 Start an apprenticeship program and train workers specifically
                 for your needs.
               </p>
               <a
                 href="/employer/apprenticeship/new"
-                className="block w-full text-center px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Learn More
               </a>
@@ -366,14 +366,14 @@ export default async function EmployerDashboardOrchestrated() {
           )}
 
           {/* Support Card */}
-          <div className="bg-blue-50 rounded-lg border-2 border-blue-600 p-6">
-            <h3 className="text-lg font-bold text-blue-900 mb-3">Need Help?</h3>
-            <p className="text-blue-800 mb-4 text-sm">
+          <div className="bg-brand-blue-50 rounded-lg border-2 border-brand-blue-600 p-6">
+            <h3 className="text-lg font-bold text-brand-blue-900 mb-3">Need Help?</h3>
+            <p className="text-brand-blue-800 mb-4 text-sm">
               Our team is here to help you find the right candidates.
             </p>
             <a
               href="/support"
-              className="block w-full text-center px-4 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="block w-full text-center px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               Call Get Help Online
             </a>
@@ -388,49 +388,49 @@ export default async function EmployerDashboardOrchestrated() {
               <Link
                 href="/employer/jobs"
                 aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
               >
                 My Jobs
               </Link>
               <Link
                 href="/employer/post-job"
                 aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
               >
                 Post Job
               </Link>
               <Link
                 href="/employer/candidates"
                 aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
               >
                 Candidates
               </Link>
               <Link
                 href="/employer/placements"
                 aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
               >
                 Placements
               </Link>
               <Link
                 href="/employer/opportunities"
                 aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
               >
                 Opportunities
               </Link>
               <Link
                 href="/employer/analytics"
                 aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
               >
                 Analytics
               </Link>
               <Link
                 href="/employer/settings"
                 aria-label="Link"
-                className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm"
+                className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm"
               >
                 Settings
               </Link>

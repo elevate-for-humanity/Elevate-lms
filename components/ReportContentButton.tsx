@@ -172,8 +172,8 @@ d="M5 13l4 4L19 7" />
                 </div>
 
                 {/* Info */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <p className="text-sm text-blue-800">
+                <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+                  <p className="text-sm text-brand-blue-800">
                     Your report will be reviewed by our moderation team. False reports may result in account restrictions.
                   </p>
                 </div>

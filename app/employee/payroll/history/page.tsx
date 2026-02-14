@@ -34,7 +34,7 @@ export default function PayrollHistoryPage() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
-        <Link href="/employee/payroll" className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/employee/payroll" className="inline-flex items-center text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Payroll
         </Link>
@@ -62,7 +62,7 @@ export default function PayrollHistoryPage() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
           <h2 className="text-lg font-bold text-gray-900 mb-4">Year-to-Date Summary</h2>
           <div className="grid md:grid-cols-4 gap-6">
-            <div className="bg-blue-50 rounded-lg p-4">
+            <div className="bg-brand-blue-50 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Gross Pay</p>
               <p className="text-2xl font-bold text-gray-900">${ytdTotals.grossPay.toLocaleString()}</p>
             </div>
@@ -70,7 +70,7 @@ export default function PayrollHistoryPage() {
               <p className="text-sm text-gray-600 mb-1">Net Pay</p>
               <p className="text-2xl font-bold text-gray-900">${ytdTotals.netPay.toLocaleString()}</p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-4">
+            <div className="bg-brand-blue-50 rounded-lg p-4">
               <p className="text-sm text-gray-600 mb-1">Total Hours</p>
               <p className="text-2xl font-bold text-gray-900">{ytdTotals.hours}</p>
             </div>
@@ -103,7 +103,7 @@ export default function PayrollHistoryPage() {
                   <td className="px-6 py-4 text-right text-gray-600">${pay.grossPay.toFixed(2)}</td>
                   <td className="px-6 py-4 text-right font-semibold text-gray-900">${pay.netPay.toFixed(2)}</td>
                   <td className="px-6 py-4 text-center">
-                    <button className="text-blue-600 hover:text-blue-700">
+                    <button className="text-brand-blue-600 hover:text-brand-blue-700">
                       <Download className="w-5 h-5" />
                     </button>
                   </td>

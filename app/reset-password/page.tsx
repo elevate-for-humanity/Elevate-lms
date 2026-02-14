@@ -50,7 +50,7 @@ export default function ResetPasswordPage() {
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-semibold"
+            className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Login
@@ -99,7 +99,7 @@ export default function ResetPasswordPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-black"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 text-black"
                   placeholder="your.email@gmail.com"
                 />
               </div>
@@ -108,7 +108,7 @@ export default function ResetPasswordPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Sending...' : 'Send Reset Link'}
             </button>
@@ -127,7 +127,7 @@ export default function ResetPasswordPage() {
 
         <p className="text-center text-sm text-gray-500 mt-8">
           Don't have an account?{' '}
-          <Link href="/signup" className="text-blue-600 hover:underline font-semibold">
+          <Link href="/signup" className="text-brand-blue-600 hover:underline font-semibold">
             Sign up for free
           </Link>
         </p>

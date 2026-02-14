@@ -167,7 +167,7 @@ export function ModuleListForProgram({
   if (loading) {
     return (
       <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+        <Loader2 className="w-6 h-6 animate-spin text-brand-blue-600" />
       </div>
     );
   }
@@ -191,7 +191,7 @@ export function ModuleListForProgram({
           {editable && (
             <Link
               href={`/admin/programs/${programId}/modules/new`}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Plus className="w-4 h-4" />
               Add First Module
@@ -237,10 +237,10 @@ export function ModuleListForProgram({
 
                   {/* Module Icon */}
                   <div className={`p-3 rounded-lg ${
-                    module.is_published ? 'bg-blue-100' : 'bg-slate-200'
+                    module.is_published ? 'bg-brand-blue-100' : 'bg-slate-200'
                   }`}>
                     <Icon className={`w-5 h-5 ${
-                      module.is_published ? 'text-blue-600' : 'text-slate-500'
+                      module.is_published ? 'text-brand-blue-600' : 'text-slate-500'
                     }`} />
                   </div>
 
@@ -303,7 +303,7 @@ export function ModuleListForProgram({
                       <Link
                         href={`/student/scorm/${module.scorm_package_id}`}
                         target="_blank"
-                        className="flex items-center gap-1 text-xs text-blue-600 hover:underline"
+                        className="flex items-center gap-1 text-xs text-brand-blue-600 hover:underline"
                       >
                         <ExternalLink className="w-3 h-3" />
                         Preview SCORM
@@ -353,7 +353,7 @@ export function ModuleListForProgram({
       {editable && modules.length > 0 && (
         <Link
           href={`/admin/programs/${programId}/modules/new`}
-          className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-blue-500 hover:text-blue-600 transition-colors"
+          className="flex items-center justify-center gap-2 w-full py-3 border-2 border-dashed border-slate-300 rounded-lg text-slate-500 hover:border-brand-blue-500 hover:text-brand-blue-600 transition-colors"
         >
           <Plus className="w-4 h-4" />
           Add Module

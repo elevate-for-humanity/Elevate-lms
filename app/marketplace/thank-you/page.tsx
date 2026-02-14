@@ -114,7 +114,7 @@ function MarketplaceThankYouContent() {
             instructions.
           </p>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 text-left">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-6 text-left">
             <h2 className="font-semibold text-lg mb-4">Purchase Details</h2>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">

@@ -119,7 +119,7 @@ export default function UserManagementTable({ users: initialUsers }: Props) {
               placeholder="Search by name or email..."
               value={searchTerm}
               onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setSearchTerm(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -127,7 +127,7 @@ export default function UserManagementTable({ users: initialUsers }: Props) {
           <select
             value={roleFilter}
             onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setRoleFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
           >
             <option value="all">All Roles</option>
             <option value="student">Students</option>
@@ -142,7 +142,7 @@ export default function UserManagementTable({ users: initialUsers }: Props) {
           <select
             value={statusFilter}
             onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setStatusFilter(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
           >
             <option value="all">All Status</option>
             <option value="active">Active</option>
@@ -186,8 +186,8 @@ export default function UserManagementTable({ users: initialUsers }: Props) {
                 <tr key={user.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-blue-600 font-semibold text-sm">
+                      <div className="flex-shrink-0 h-10 w-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-brand-blue-600 font-semibold text-sm">
                           {user.full_name?.[0]?.toUpperCase() || user.email[0].toUpperCase()}
                         </span>
                       </div>
@@ -236,7 +236,7 @@ export default function UserManagementTable({ users: initialUsers }: Props) {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <Link
                       href={`/admin/users/${user.id}`}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
+                      className="text-brand-blue-600 hover:text-brand-blue-900 mr-4"
                     >
                       View
                     </Link>

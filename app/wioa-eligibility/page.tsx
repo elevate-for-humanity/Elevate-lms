@@ -67,7 +67,7 @@ export default function WIOAEligibilityPage() {
               <div key={item.step} className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
                 <div className="relative h-[160px] sm:h-[180px]">
                   <Image src={item.image} alt={item.title} fill className="object-cover" />
-                  <div className="absolute top-3 left-3 w-9 h-9 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow">
+                  <div className="absolute top-3 left-3 w-9 h-9 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow">
                     {item.step}
                   </div>
                 </div>
@@ -76,12 +76,12 @@ export default function WIOAEligibilityPage() {
                   <p className="text-slate-600 text-sm leading-relaxed mb-3">{item.desc}</p>
                   {item.external ? (
                     <a href={item.href} target="_blank" rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                      className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-brand-blue-700 transition-colors">
                       {item.cta} <ArrowRight className="w-4 h-4" />
                     </a>
                   ) : (
                     <Link href={item.href}
-                      className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+                      className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm hover:bg-brand-blue-700 transition-colors">
                       {item.cta} <ArrowRight className="w-4 h-4" />
                     </Link>
                   )}
@@ -137,7 +137,7 @@ export default function WIOAEligibilityPage() {
               'Low-income households',
             ].map((item) => (
               <div key={item} className="flex items-center gap-3 bg-slate-50 rounded-lg px-4 py-3">
-                <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0" />
+                <span className="w-2 h-2 bg-brand-blue-600 rounded-full flex-shrink-0" />
                 <span className="text-slate-700 text-sm">{item}</span>
               </div>
             ))}
@@ -164,7 +164,7 @@ export default function WIOAEligibilityPage() {
                 <div className="p-4">
                   <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>
                   <p className="text-slate-600 text-sm mb-2">{item.desc}</p>
-                  <span className="text-blue-600 font-semibold text-sm group-hover:underline">Learn More →</span>
+                  <span className="text-brand-blue-600 font-semibold text-sm group-hover:underline">Learn More →</span>
                 </div>
               </Link>
             ))}
@@ -199,7 +199,7 @@ export default function WIOAEligibilityPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-10 sm:py-14 bg-blue-600">
+      <section className="py-10 sm:py-14 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready to Get Started?</h2>
           <p className="text-white/90 mb-6 text-sm sm:text-base">
@@ -207,7 +207,7 @@ export default function WIOAEligibilityPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
-              className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors">
+              className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors">
               Register at Indiana Career Connect
             </a>
             <Link href="/apply"

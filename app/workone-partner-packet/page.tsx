@@ -60,11 +60,11 @@ export default function WorkOnePartnerPacketPage() {
                 <div className="px-4 py-2 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full">
                   <span className="text-sm font-bold text-green-300">Registered Apprenticeship Sponsor</span>
                 </div>
-                <div className="px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full">
-                  <span className="text-sm font-bold text-blue-300">ETPL Approved</span>
+                <div className="px-4 py-2 bg-brand-blue-500/20 backdrop-blur-sm border border-brand-blue-400/30 rounded-full">
+                  <span className="text-sm font-bold text-brand-blue-300">ETPL Approved</span>
                 </div>
-                <div className="px-4 py-2 bg-blue-500/20 backdrop-blur-sm border border-blue-400/30 rounded-full">
-                  <span className="text-sm font-bold text-blue-300">WIOA | WRG Eligible</span>
+                <div className="px-4 py-2 bg-brand-blue-500/20 backdrop-blur-sm border border-brand-blue-400/30 rounded-full">
+                  <span className="text-sm font-bold text-brand-blue-300">WIOA | WRG Eligible</span>
                 </div>
               </div>
 
@@ -212,10 +212,10 @@ export default function WorkOnePartnerPacketPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-brand-blue-600" />
               </div>
-              <span className="text-blue-600 font-semibold">Section 2</span>
+              <span className="text-brand-blue-600 font-semibold">Section 2</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               How It Works for WorkOne
@@ -286,10 +286,10 @@ export default function WorkOnePartnerPacketPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <div className="flex items-center justify-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <GraduationCap className="w-5 h-5 text-brand-blue-600" />
               </div>
-              <span className="text-blue-600 font-semibold">Section 3</span>
+              <span className="text-brand-blue-600 font-semibold">Section 3</span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
               ETPL-Approved Programs

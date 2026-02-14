@@ -67,14 +67,14 @@ export default function OnboardingPrompt({ userId, userRole }: OnboardingPromptP
             <h3 className="text-xl font-bold text-white mb-2">
               {primaryFlow.name}
             </h3>
-            <p className="text-blue-100 mb-4">
+            <p className="text-brand-blue-100 mb-4">
               Take a quick tour to learn how to make the most of your experience.
               It only takes a few minutes!
             </p>
             <div className="flex flex-wrap gap-3">
               <button
                 onClick={handleStart}
-                className="flex items-center gap-2 px-6 py-2 bg-white text-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-2 px-6 py-2 bg-white text-brand-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
               >
                 Start Tour
                 <ChevronRight className="w-4 h-4" />

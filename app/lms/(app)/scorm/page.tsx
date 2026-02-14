@@ -29,10 +29,10 @@ export default async function ScormPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {modules && modules.length > 0 ? modules.map((module: any) => (
             <div key={module.id} className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md">
-              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4"><svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg></div>
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4"><svg className="w-6 h-6 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg></div>
               <h3 className="font-semibold mb-2">{module.title}</h3>
               <p className="text-sm text-gray-500 mb-4">{module.description || 'Interactive module'}</p>
-              <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Launch</button>
+              <button className="w-full bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Launch</button>
             </div>
           )) : <div className="col-span-full bg-white rounded-lg shadow-sm border p-8 text-center text-gray-500">No SCORM modules available</div>}
         </div>

@@ -110,7 +110,7 @@ function getEnvBadge(): { label: string; color: string } {
   if (isPreview) {
     return { label: 'PREVIEW', color: 'bg-yellow-100 text-yellow-800 border-yellow-200' };
   }
-  return { label: 'DEVELOPMENT', color: 'bg-blue-100 text-blue-800 border-blue-200' };
+  return { label: 'DEVELOPMENT', color: 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-200' };
 }
 
 export default function AdminHeader() {
@@ -144,7 +144,7 @@ export default function AdminHeader() {
       <div className="h-full flex items-center justify-between px-4">
         {/* Logo */}
         <Link href="/admin/dashboard" className="flex items-center gap-2">
-          <Shield className="w-8 h-8 text-blue-400" />
+          <Shield className="w-8 h-8 text-brand-blue-400" />
           <span className="font-bold text-lg hidden sm:block">Admin Panel</span>
         </Link>
         

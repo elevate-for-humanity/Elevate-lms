@@ -59,7 +59,7 @@ export default function NotificationPreferencesForm({
     <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
       {/* In-App Notifications */}
       <div className="flex items-start gap-4">
-        <Bell className="w-6 h-6 text-blue-600 mt-1" />
+        <Bell className="w-6 h-6 text-brand-blue-600 mt-1" />
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-black mb-1">
             In-App Notifications
@@ -78,7 +78,7 @@ export default function NotificationPreferencesForm({
 
       {/* Email Notifications */}
       <div className="flex items-start gap-4">
-        <Mail className="w-6 h-6 text-blue-600 mt-1" />
+        <Mail className="w-6 h-6 text-brand-blue-600 mt-1" />
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-black mb-1">
             Email Notifications
@@ -96,7 +96,7 @@ export default function NotificationPreferencesForm({
                   email_enabled: e.target.checked,
                 })
               }
-              className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+              className="w-5 h-5 text-brand-blue-600 rounded border-gray-300 focus:ring-brand-blue-500"
             />
             <span className="text-sm font-medium text-black">
               Enable email notifications
@@ -109,7 +109,7 @@ export default function NotificationPreferencesForm({
 
       {/* SMS Notifications */}
       <div className="flex items-start gap-4">
-        <MessageSquare className="w-6 h-6 text-blue-600 mt-1" />
+        <MessageSquare className="w-6 h-6 text-brand-blue-600 mt-1" />
         <div className="flex-1">
           <h3 className="text-lg font-semibold text-black mb-1">
             SMS Notifications
@@ -130,7 +130,7 @@ export default function NotificationPreferencesForm({
                   })
                 }
                 disabled={!preferences.sms_consent}
-                className="w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500 disabled:opacity-50"
+                className="w-5 h-5 text-brand-blue-600 rounded border-gray-300 focus:ring-brand-blue-500 disabled:opacity-50"
               />
               <span className="text-sm font-medium text-black">
                 Enable SMS notifications
@@ -145,7 +145,7 @@ export default function NotificationPreferencesForm({
                 onChange={(e) =>
                   setPreferences({ ...preferences, phone_e164: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
 
               <label className="flex items-start gap-2 cursor-pointer">
@@ -158,7 +158,7 @@ export default function NotificationPreferencesForm({
                       sms_consent: e.target.checked,
                     })
                   }
-                  className="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 mt-0.5"
+                  className="w-4 h-4 text-brand-blue-600 rounded border-gray-300 focus:ring-brand-blue-500 mt-0.5"
                 />
                 <span className="text-xs text-black">
                   I consent to receive SMS notifications at this number. Message
@@ -187,7 +187,7 @@ export default function NotificationPreferencesForm({
         <button
           onClick={handleSave}
           disabled={saving}
-          className="px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+          className="px-6 py-2 bg-brand-blue-600 text-white font-medium rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
         >
           {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Preferences'}
         </button>

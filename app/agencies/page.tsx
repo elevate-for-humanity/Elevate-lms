@@ -149,7 +149,7 @@ export default async function AgenciesPage() {
               const Icon = feature.icon;
               return (
                 <div key={index} className="bg-white rounded-xl p-6 shadow-sm border text-center">
-                  <Icon className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                  <Icon className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
                   <h3 className="font-bold text-lg mb-2">{feature.title}</h3>
                   <p className="text-gray-600 text-sm">{feature.description}</p>
                 </div>
@@ -182,22 +182,22 @@ export default async function AgenciesPage() {
             <div className="bg-gray-100 rounded-xl p-8">
               <div className="grid grid-cols-2 gap-6">
                 <div className="bg-white rounded-lg p-6 text-center">
-                  <Building2 className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+                  <Building2 className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
                   <div className="text-2xl font-bold">50+</div>
                   <div className="text-gray-600 text-sm">Partner Organizations</div>
                 </div>
                 <div className="bg-white rounded-lg p-6 text-center">
-                  <Users className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+                  <Users className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
                   <div className="text-2xl font-bold">WIOA</div>
                   <div className="text-gray-600 text-sm">Compliant</div>
                 </div>
                 <div className="bg-white rounded-lg p-6 text-center">
-                  <DollarSign className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+                  <DollarSign className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
                   <div className="text-2xl font-bold">ETPL</div>
                   <div className="text-gray-600 text-sm">Listed</div>
                 </div>
                 <div className="bg-white rounded-lg p-6 text-center">
-                  <TrendingUp className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+                  <TrendingUp className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
                   <div className="text-2xl font-bold">Full</div>
                   <div className="text-gray-600 text-sm">Reporting</div>
                 </div>
@@ -225,7 +225,7 @@ export default async function AgenciesPage() {
           <div className="mt-8 text-center">
             <Link
               href="/policies"
-              className="text-blue-600 hover:text-blue-800 font-medium"
+              className="text-brand-blue-600 hover:text-brand-blue-800 font-medium"
             >
               View All Policies →
             </Link>
@@ -274,30 +274,30 @@ export default async function AgenciesPage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Modernize Your Workforce System?
           </h2>
-          <p className="text-blue-100 mb-8">
+          <p className="text-brand-blue-100 mb-8">
             Schedule a demo to see how our platform can support your agency&apos;s goals.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/license/demo"
-              className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Schedule Demo <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-800 transition border border-white/30"
+              className="inline-flex items-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-800 transition border border-white/30"
             >
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition"
             >
               <Phone className="w-5 h-5" />
               Get Help Online

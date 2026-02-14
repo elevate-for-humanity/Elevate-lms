@@ -65,8 +65,8 @@ export default function JRIPage() {
                 ))}
               </ul>
             </div>
-            <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-              <h3 className="font-bold text-blue-800 mb-4">Covered Services</h3>
+            <div className="bg-brand-blue-50 rounded-xl p-6 border border-brand-blue-200">
+              <h3 className="font-bold text-brand-blue-800 mb-4">Covered Services</h3>
               <ul className="space-y-3">
                 {[
                   'Tuition and training fees',
@@ -76,7 +76,7 @@ export default function JRIPage() {
                   'Job placement support',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}
@@ -99,7 +99,7 @@ export default function JRIPage() {
             <h2>Application Process</h2>
             <ol>
               <li>Obtain a referral from your probation/parole officer or case manager</li>
-              <li>Complete the online application at <Link href="/apply" className="text-blue-600">elevateforhumanity.org/apply</Link></li>
+              <li>Complete the online application at <Link href="/apply" className="text-brand-blue-600">elevateforhumanity.org/apply</Link></li>
               <li>Attend an orientation session (virtual or in-person)</li>
               <li>Meet with an enrollment counselor to select your program</li>
               <li>Begin training upon enrollment approval</li>
@@ -127,7 +127,7 @@ export default function JRIPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Questions About JRI?</h2>
             <p className="text-gray-600 mb-6">Contact our enrollment team for more information about JRI eligibility and available programs.</p>
             <div className="flex flex-wrap gap-4">
-              <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
+              <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition">
                 <Mail className="w-4 h-4" /> Email Us
               </a>
               <a href="/support" className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">

@@ -31,7 +31,7 @@ export default function AIHubPage() {
       {/* Hero */}
       <section className="bg-zinc-900  via-white  py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-900 rounded-full text-sm font-bold mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-100 text-brand-blue-900 rounded-full text-sm font-bold mb-6">
             <Brain className="w-4 h-4" />
             AI-Powered Learning
           </div>
@@ -55,9 +55,9 @@ export default function AIHubPage() {
             {/* AI Tutor */}
             <Link
               href="/ai-tutor"
-              className="group bg-zinc-900   rounded-2xl p-8 border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all"
+              className="group bg-zinc-900   rounded-2xl p-8 border-2 border-brand-blue-200 hover:border-brand-blue-400 hover:shadow-xl transition-all"
             >
-              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6">
                 <Brain className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-3">
@@ -68,11 +68,11 @@ export default function AIHubPage() {
                 you understand course material, solve problems, and learn
                 faster.
               </p>
-              <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-4 transition-all">
+              <div className="flex items-center gap-2 text-brand-blue-600 font-semibold group-hover:gap-4 transition-all">
                 <span>Start Learning</span>
                 <span>→</span>
               </div>
-              <div className="mt-6 pt-6 border-t border-blue-200">
+              <div className="mt-6 pt-6 border-t border-brand-blue-200">
                 <div className="flex items-center gap-2 text-sm text-black">
                   <Sparkles className="w-4 h-4 text-yellow-500" />
                   <span>Most Popular</span>
@@ -104,9 +104,9 @@ export default function AIHubPage() {
             {/* AI Course Builder */}
             <Link
               href="/ai/course-builder"
-              className="group bg-zinc-900   rounded-2xl p-8 border-2 border-blue-200 hover:border-blue-400 hover:shadow-xl transition-all"
+              className="group bg-zinc-900   rounded-2xl p-8 border-2 border-brand-blue-200 hover:border-brand-blue-400 hover:shadow-xl transition-all"
             >
-              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mb-6">
+              <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center mb-6">
                 <BookOpen className="w-8 h-8 text-white" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-3">
@@ -116,11 +116,11 @@ export default function AIHubPage() {
                 Create complete training courses in minutes. AI generates
                 outlines, lessons, quizzes, and materials automatically.
               </p>
-              <div className="flex items-center gap-2 text-blue-600 font-semibold group-hover:gap-4 transition-all">
+              <div className="flex items-center gap-2 text-brand-blue-600 font-semibold group-hover:gap-4 transition-all">
                 <span>Build Course</span>
                 <span>→</span>
               </div>
-              <div className="mt-6 pt-6 border-t border-blue-200">
+              <div className="mt-6 pt-6 border-t border-brand-blue-200">
                 <div className="flex items-center gap-2 text-sm text-black">
                   <Target className="w-4 h-4 text-orange-500" />
                   <span>For Instructors</span>
@@ -203,8 +203,8 @@ export default function AIHubPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-blue-600">1</span>
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-brand-blue-600">1</span>
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
                 Ask Questions
@@ -229,8 +229,8 @@ export default function AIHubPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-2xl font-bold text-blue-600">3</span>
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-2xl font-bold text-brand-blue-600">3</span>
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
                 Learn Faster
@@ -255,7 +255,7 @@ export default function AIHubPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/ai-tutor"
-              className="px-8 py-4 bg-white text-blue-600 font-bold rounded-lg hover:bg-gray-50 transition-colors"
+              className="px-8 py-4 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-gray-50 transition-colors"
             >
               Try AI Tutor Now
             </Link>

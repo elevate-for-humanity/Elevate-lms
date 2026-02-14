@@ -26,7 +26,7 @@ export default function Highlights() {
                 </p>
                 <Link
                   href="/wioa-eligibility"
-                  className="inline-block px-6 py-2 bg-white text-blue-900 font-semibold rounded hover:bg-gray-100 transition"
+                  className="inline-block px-6 py-2 bg-white text-brand-blue-900 font-semibold rounded hover:bg-gray-100 transition"
                 >
                   Check Now
                 </Link>
@@ -50,7 +50,7 @@ export default function Highlights() {
                 </p>
                 <Link
                   href="/programs"
-                  className="inline-block px-6 py-2 bg-white text-blue-900 font-semibold rounded hover:bg-gray-100 transition"
+                  className="inline-block px-6 py-2 bg-white text-brand-blue-900 font-semibold rounded hover:bg-gray-100 transition"
                 >
                   View Programs
                 </Link>
@@ -74,7 +74,7 @@ export default function Highlights() {
                 </p>
                 <Link
                   href="/apply"
-                  className="inline-block px-6 py-2 bg-white text-blue-900 font-semibold rounded hover:bg-gray-100 transition"
+                  className="inline-block px-6 py-2 bg-white text-brand-blue-900 font-semibold rounded hover:bg-gray-100 transition"
                 >
                   Apply Now
                 </Link>

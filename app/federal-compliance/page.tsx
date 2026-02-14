@@ -26,8 +26,8 @@ export default function FederalCompliancePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="max-w-3xl">
             <div className="flex items-center gap-3 mb-6">
-              <Shield className="w-10 h-10 text-blue-400" />
-              <span className="text-blue-400 font-medium">Regulatory Compliance</span>
+              <Shield className="w-10 h-10 text-brand-blue-400" />
+              <span className="text-brand-blue-400 font-medium">Regulatory Compliance</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Federal Compliance
@@ -47,8 +47,8 @@ export default function FederalCompliancePage() {
           {/* WIOA Compliance */}
           <div className="mb-16">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <Shield className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <Shield className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold text-black mb-2">
@@ -95,8 +95,8 @@ export default function FederalCompliancePage() {
           {/* FERPA Compliance */}
           <div className="mb-16">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                <FileText className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                <FileText className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold text-black mb-2">
@@ -253,14 +253,14 @@ export default function FederalCompliancePage() {
           </div>
 
           {/* Contact */}
-          <div className="bg-blue-50 border-2 border-blue-600 rounded-xl p-8">
-            <h3 className="text-2xl font-bold text-blue-900 mb-4">
+          <div className="bg-brand-blue-50 border-2 border-brand-blue-600 rounded-xl p-8">
+            <h3 className="text-2xl font-bold text-brand-blue-900 mb-4">
               Questions or Concerns?
             </h3>
-            <p className="text-blue-800 mb-6">
+            <p className="text-brand-blue-800 mb-6">
               If you have questions about our compliance policies or wish to file a complaint, please contact us:
             </p>
-            <div className="space-y-2 text-blue-900">
+            <div className="space-y-2 text-brand-blue-900">
               <p><strong>Email:</strong> elevate4humanityedu@gmail.com</p>
               <p><strong>Phone:</strong> Get Help Online</p>
               <p><strong>Address:</strong> Indianapolis, IN</p>
@@ -271,21 +271,21 @@ export default function FederalCompliancePage() {
           <div className="mt-12 grid md:grid-cols-3 gap-6">
             <Link
               href="/privacy-policy"
-              className="block p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-blue-600 transition"
+              className="block p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-brand-blue-600 transition"
             >
               <h4 className="font-bold text-black mb-2">Privacy Policy</h4>
               <p className="text-sm text-black">How we protect your personal information</p>
             </Link>
             <Link
               href="/accessibility"
-              className="block p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-blue-600 transition"
+              className="block p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-brand-blue-600 transition"
             >
               <h4 className="font-bold text-black mb-2">Accessibility</h4>
               <p className="text-sm text-black">Our commitment to digital accessibility</p>
             </Link>
             <Link
               href="/security"
-              className="block p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-blue-600 transition"
+              className="block p-6 bg-white border-2 border-gray-200 rounded-xl hover:border-brand-blue-600 transition"
             >
               <h4 className="font-bold text-black mb-2">Security</h4>
               <p className="text-sm text-black">How we keep your data secure</p>
@@ -295,22 +295,22 @@ export default function FederalCompliancePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Questions About Compliance?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Contact our compliance team for more information about our policies and procedures.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center gap-2 bg-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-800 transition border border-white/30"
+              className="inline-flex items-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-800 transition border border-white/30"
             >
               <Phone className="w-5 h-5" /> Get Help Online
             </a>

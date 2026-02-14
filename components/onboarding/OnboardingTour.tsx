@@ -186,8 +186,8 @@ export function OnboardingTour({
             <div className="flex items-start justify-between mb-4">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-3">
-                  <Sparkles className="w-5 h-5 text-blue-500" />
-                  <span className="text-sm font-medium text-blue-600">
+                  <Sparkles className="w-5 h-5 text-brand-blue-500" />
+                  <span className="text-sm font-medium text-brand-blue-600">
                     Step {currentStep + 1} of {steps.length}
                   </span>
                 </div>
@@ -211,7 +211,7 @@ export function OnboardingTour({
                 {step.action.href ? (
                   <a
                     href={step.action.href}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-50 text-brand-blue-600 rounded-lg hover:bg-brand-blue-100 transition text-sm font-medium"
                   >
                     {step.action.label}
                     <ChevronRight className="w-4 h-4" />
@@ -219,7 +219,7 @@ export function OnboardingTour({
                 ) : (
                   <button
                     onClick={step.action.onClick}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-sm font-medium"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-50 text-brand-blue-600 rounded-lg hover:bg-brand-blue-100 transition text-sm font-medium"
                   >
                     {step.action.label}
                   </button>
@@ -235,9 +235,9 @@ export function OnboardingTour({
                   onClick={() => goToStep(index)}
                   className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${
                     index === currentStep
-                      ? 'w-8 bg-blue-600'
+                      ? 'w-8 bg-brand-blue-600'
                       : index < currentStep
-                      ? 'bg-blue-400'
+                      ? 'bg-brand-blue-400'
                       : 'bg-gray-200 hover:bg-gray-300'
                   }`}
                   aria-label={`Go to step ${index + 1}`}
@@ -265,7 +265,7 @@ export function OnboardingTour({
                 )}
                 <button
                   onClick={handleNext}
-                  className="px-6 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition flex items-center gap-1"
+                  className="px-6 py-2.5 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition flex items-center gap-1"
                 >
                   {currentStep < steps.length - 1 ? (
                     <>

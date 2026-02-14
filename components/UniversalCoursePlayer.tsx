@@ -115,9 +115,9 @@ export function UniversalCoursePlayer({
 
             {/* Completion Instructions Overlay */}
             {!isScorm && (
-              <div className="absolute top-4 left-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg z-10">
+              <div className="absolute top-4 left-4 right-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 shadow-lg z-10">
                 <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                  <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center">
                     <AlertCircle className="w-5 h-5 text-white" />
                   </div>
                   <div className="flex-1">
@@ -141,8 +141,8 @@ export function UniversalCoursePlayer({
           /* Redirect Option */
           <div className="flex items-center justify-center h-full p-8">
             <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <ExternalLink className="w-10 h-10 text-blue-600" />
+              <div className="w-20 h-20 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <ExternalLink className="w-10 h-10 text-brand-blue-600" />
               </div>
               <h2 className="text-2xl font-bold text-black mb-4">
                 Continue to {partnerName}
@@ -155,7 +155,7 @@ export function UniversalCoursePlayer({
                   href={displayUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-bold text-lg rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
+                  className="inline-flex items-center gap-2 px-8 py-4 bg-brand-blue-600 text-white font-bold text-lg rounded-lg hover:bg-brand-blue-700 transition-colors shadow-lg"
                 >
                   Open {partnerName} Course
                   <ExternalLink className="w-5 h-5" />

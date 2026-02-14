@@ -29,13 +29,13 @@ export default async function ProfilePage() {
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex items-center gap-6 mb-6">
-            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center"><span className="text-3xl text-blue-600 font-bold">{(profile?.full_name || 'U')[0]}</span></div>
+            <div className="w-20 h-20 bg-brand-blue-100 rounded-full flex items-center justify-center"><span className="text-3xl text-brand-blue-600 font-bold">{(profile?.full_name || 'U')[0]}</span></div>
             <div><h2 className="text-xl font-semibold">{profile?.full_name || 'User'}</h2><p className="text-gray-500">{profile?.email || user.email}</p></div>
           </div>
           <div className="grid grid-cols-3 gap-4 text-center">
-            <div className="p-4 bg-gray-50 rounded-lg"><p className="text-2xl font-bold text-blue-600">{completedCourses || 0}</p><p className="text-sm text-gray-500">Courses Completed</p></div>
+            <div className="p-4 bg-gray-50 rounded-lg"><p className="text-2xl font-bold text-brand-blue-600">{completedCourses || 0}</p><p className="text-sm text-gray-500">Courses Completed</p></div>
             <div className="p-4 bg-gray-50 rounded-lg"><p className="text-2xl font-bold text-green-600">{certificates || 0}</p><p className="text-sm text-gray-500">Certificates</p></div>
-            <div className="p-4 bg-gray-50 rounded-lg"><p className="text-2xl font-bold text-blue-600">0</p><p className="text-sm text-gray-500">Badges</p></div>
+            <div className="p-4 bg-gray-50 rounded-lg"><p className="text-2xl font-bold text-brand-blue-600">0</p><p className="text-sm text-gray-500">Badges</p></div>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6">
@@ -43,7 +43,7 @@ export default async function ProfilePage() {
           <form className="space-y-4">
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label><input type="text" className="w-full border rounded-lg px-3 py-2" defaultValue={profile?.full_name || ''} /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Bio</label><textarea className="w-full border rounded-lg px-3 py-2" rows={3} defaultValue={profile?.bio || ''} placeholder="Tell us about yourself" /></div>
-            <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Save Changes</button>
+            <button type="submit" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Save Changes</button>
           </form>
         </div>
       </div>

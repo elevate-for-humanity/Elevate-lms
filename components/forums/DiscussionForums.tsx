@@ -341,7 +341,7 @@ export default function DiscussionForums() {
                   placeholder="Search discussions..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
@@ -373,7 +373,7 @@ export default function DiscussionForums() {
           {/* Categories Grid */}
           {loading ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto" />
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -384,11 +384,11 @@ export default function DiscussionForums() {
                     setSelectedCategory(category);
                     setActiveView('threads');
                   }}
-                  className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer border-l-4 border-blue-500"
+                  className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow cursor-pointer border-l-4 border-brand-blue-500"
                 >
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-lg bg-blue-100 flex items-center justify-center flex-shrink-0">
-                      <MessageSquare className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 rounded-lg bg-brand-blue-100 flex items-center justify-center flex-shrink-0">
+                      <MessageSquare className="w-6 h-6 text-brand-blue-600" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h3 className="text-lg font-semibold text-black mb-1">
@@ -430,7 +430,7 @@ export default function DiscussionForums() {
                 setActiveView('categories');
                 setSelectedCategory(null);
               }}
-              className="text-blue-600 hover:text-blue-700 mb-4 flex items-center gap-2 font-medium"
+              className="text-brand-blue-600 hover:text-brand-blue-700 mb-4 flex items-center gap-2 font-medium"
             >
               <ArrowLeft className="w-5 h-5" />
               Back to Categories
@@ -450,7 +450,7 @@ export default function DiscussionForums() {
                 onClick={() => setSortBy('recent')}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors ${
                   sortBy === 'recent'
-                    ? 'bg-blue-100 text-blue-700'
+                    ? 'bg-brand-blue-100 text-brand-blue-700'
                     : 'text-black hover:bg-gray-100'
                 }`}
               >
@@ -461,7 +461,7 @@ export default function DiscussionForums() {
                 onClick={() => setSortBy('popular')}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 font-medium transition-colors ${
                   sortBy === 'popular'
-                    ? 'bg-blue-100 text-blue-700'
+                    ? 'bg-brand-blue-100 text-brand-blue-700'
                     : 'text-black hover:bg-gray-100'
                 }`}
               >
@@ -472,7 +472,7 @@ export default function DiscussionForums() {
             {currentUser && (
               <button
                 onClick={() => setShowNewThreadModal(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 font-medium transition-colors"
+                className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 flex items-center gap-2 font-medium transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 New Thread
@@ -483,7 +483,7 @@ export default function DiscussionForums() {
           {/* Threads List */}
           {loading ? (
             <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto" />
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto" />
             </div>
           ) : threads.length === 0 ? (
             <div className="bg-white rounded-lg shadow-sm p-12 text-center">
@@ -497,7 +497,7 @@ export default function DiscussionForums() {
               {currentUser && (
                 <button
                   onClick={() => setShowNewThreadModal(true)}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                  className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium"
                 >
                   Create First Thread
                 </button>
@@ -520,12 +520,12 @@ export default function DiscussionForums() {
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
                             {thread.is_pinned && (
-                              <Pin className="w-4 h-4 text-blue-600" />
+                              <Pin className="w-4 h-4 text-brand-blue-600" />
                             )}
                             {thread.is_locked && (
                               <Lock className="w-4 h-4 text-gray-400" />
                             )}
-                            <h3 className="text-lg font-semibold text-black hover:text-blue-600">
+                            <h3 className="text-lg font-semibold text-black hover:text-brand-blue-600">
                               {thread.title}
                             </h3>
                           </div>
@@ -572,7 +572,7 @@ export default function DiscussionForums() {
                       value={newThreadTitle}
                       onChange={(e) => setNewThreadTitle(e.target.value)}
                       placeholder="What's your question or topic?"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div>
@@ -584,7 +584,7 @@ export default function DiscussionForums() {
                       onChange={(e) => setNewThreadContent(e.target.value)}
                       placeholder="Provide details about your question or topic..."
                       rows={6}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     />
                   </div>
                   <div className="flex items-center justify-end gap-3">
@@ -599,7 +599,7 @@ export default function DiscussionForums() {
                       disabled={
                         !newThreadTitle.trim() || !newThreadContent.trim()
                       }
-                      className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                      className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
                     >
                       Create Thread
                     </button>
@@ -623,7 +623,7 @@ export default function DiscussionForums() {
             setActiveView('threads');
             setSelectedThread(null);
           }}
-          className="text-blue-600 hover:text-blue-700 mb-4 flex items-center gap-2 font-medium"
+          className="text-brand-blue-600 hover:text-brand-blue-700 mb-4 flex items-center gap-2 font-medium"
         >
           <ArrowLeft className="w-5 h-5" />
           Back to Threads
@@ -685,13 +685,13 @@ export default function DiscussionForums() {
               onChange={(e) => setNewPostContent(e.target.value)}
               placeholder="Share your thoughts..."
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent mb-4"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent mb-4"
             />
             <div className="flex items-center justify-end">
               <button
                 onClick={createPost}
                 disabled={!newPostContent.trim()}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
+                className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
               >
                 <Send className="w-5 h-5" />
                 Post Reply
@@ -701,13 +701,13 @@ export default function DiscussionForums() {
         )}
 
         {!currentUser && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 text-center">
             <p className="text-black mb-4">
               Please log in to reply to this thread
             </p>
             <Link
               href="/login"
-              className="inline-block px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              className="inline-block px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium"
             >
               Log In
             </Link>

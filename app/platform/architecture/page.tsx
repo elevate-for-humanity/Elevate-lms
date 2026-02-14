@@ -53,34 +53,34 @@ export default async function ArchitecturePage() {
         </p>
 
         <div className="grid md:grid-cols-2 gap-8 mb-12">
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-8">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8">
             <h2 className="text-2xl font-bold mb-4 text-black">
               Core Infrastructure
             </h2>
             <ul className="space-y-3 text-black">
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
                 <span>
                   <strong>Multi-tenant architecture</strong> - Complete data
                   isolation per organization
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
                 <span>
                   <strong>Row-level security (RLS)</strong> - Database-enforced
                   access control
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
                 <span>
                   <strong>License enforcement</strong> - Automatic seat and
                   feature limits
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
                 <span>
                   <strong>Stripe subscription billing</strong> - Automated
                   payment processing
@@ -123,41 +123,41 @@ export default async function ArchitecturePage() {
             </ul>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-8">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8">
             <h2 className="text-2xl font-bold mb-4 text-black">
               Mobile & AI
             </h2>
             <ul className="space-y-3 text-black">
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
                 <span>
                   <strong>Native mobile app</strong> - iOS and Android (React
                   Native + Expo)
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
                 <span>
                   <strong>Push notifications</strong> - Expo push notification
                   service
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
                 <span>
                   <strong>Offline mode</strong> - Download courses, sync when
                   online
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
                 <span>
                   <strong>AI tutoring</strong> - 5 AI systems for learner
                   support
                 </span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
                 <span>
                   <strong>Biometric auth</strong> - Face ID, Touch ID,
                   Fingerprint
@@ -243,7 +243,7 @@ export default async function ArchitecturePage() {
           </div>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-8">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8">
           <h2 className="text-2xl font-bold mb-4 text-black">
             Technical Stack
           </h2>

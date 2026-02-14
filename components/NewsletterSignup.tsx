@@ -74,7 +74,7 @@ export default function NewsletterSignup() {
               Stay Connected
             </h3>
           </div>
-          <p className="text-lg text-blue-100 mb-6">
+          <p className="text-lg text-brand-blue-100 mb-6">
             Get updates on new programs, success stories, hiring events, and
             opportunities delivered to your inbox.
           </p>
@@ -106,7 +106,7 @@ export default function NewsletterSignup() {
             <button
               type="submit"
               disabled={status === 'loading' || status === 'success'}
-              className="px-6 py-3 bg-white text-blue-600 font-bold rounded-lg hover:bg-slate-50 transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+              className="px-6 py-3 bg-white text-brand-blue-600 font-bold rounded-lg hover:bg-slate-50 transition disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
             >
               {status === 'loading'
                 ? 'Subscribing...'
@@ -131,7 +131,7 @@ export default function NewsletterSignup() {
             </div>
           )}
 
-          <p className="text-xs text-blue-200 mt-4">
+          <p className="text-xs text-brand-blue-200 mt-4">
             We respect your privacy. Unsubscribe anytime. View our{' '}
             <a href="/privacy-policy" className="underline hover:text-white">
               Privacy Policy

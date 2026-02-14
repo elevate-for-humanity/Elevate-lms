@@ -8,7 +8,7 @@ export function SocialLinks() {
         href={SOCIAL_LINKS.facebook}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-gray-600 hover:text-blue-600 transition"
+        className="text-gray-600 hover:text-brand-blue-600 transition"
         aria-label="Facebook"
       >
         <Facebook className="w-5 h-5" />
@@ -17,7 +17,7 @@ export function SocialLinks() {
         href={SOCIAL_LINKS.instagram}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-gray-600 hover:text-blue-600 transition"
+        className="text-gray-600 hover:text-brand-blue-600 transition"
         aria-label="Instagram"
       >
         <Instagram className="w-5 h-5" />
@@ -26,7 +26,7 @@ export function SocialLinks() {
         href={SOCIAL_LINKS.linkedin}
         target="_blank"
         rel="noopener noreferrer"
-        className="text-gray-600 hover:text-blue-600 transition"
+        className="text-gray-600 hover:text-brand-blue-600 transition"
         aria-label="LinkedIn"
       >
         <Linkedin className="w-5 h-5" />

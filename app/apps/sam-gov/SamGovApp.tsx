@@ -52,15 +52,15 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
       )}
 
       {/* Header */}
-      <header className="bg-blue-900 text-white">
+      <header className="bg-brand-blue-900 text-white">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-              <Building2 className="w-6 h-6 text-blue-900" />
+              <Building2 className="w-6 h-6 text-brand-blue-900" />
             </div>
             <div>
               <h1 className="font-bold">SAM.gov Assistant</h1>
-              <p className="text-blue-200 text-sm">Registration & Compliance</p>
+              <p className="text-brand-blue-200 text-sm">Registration & Compliance</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -70,7 +70,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-xs flex items-center justify-center">{alerts.length}</span>
               </div>
             )}
-            <Link href="/apps/sam-gov/settings" className="p-2 hover:bg-blue-800 rounded-lg">
+            <Link href="/apps/sam-gov/settings" className="p-2 hover:bg-brand-blue-800 rounded-lg">
               <Settings className="w-5 h-5" />
             </Link>
           </div>
@@ -80,7 +80,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
             <button
               key={tab}
               onClick={() => setActiveTab(tab as any)}
-              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-gray-50 text-blue-900' : 'text-blue-200 hover:bg-blue-800'}`}
+              className={`px-4 py-3 text-sm font-medium rounded-t-lg ${activeTab === tab ? 'bg-gray-50 text-brand-blue-900' : 'text-brand-blue-200 hover:bg-brand-blue-800'}`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
@@ -96,7 +96,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
               <div className="bg-white rounded-xl p-6 border">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-500 text-sm">Total Entities</span>
-                  <Building2 className="w-5 h-5 text-blue-500" />
+                  <Building2 className="w-5 h-5 text-brand-blue-500" />
                 </div>
                 <p className="text-3xl font-bold">{entities.length}</p>
               </div>
@@ -126,7 +126,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
             {/* Quick Actions */}
             <div className="grid md:grid-cols-4 gap-4">
               <button onClick={() => setShowNewModal(true)} className="bg-white rounded-xl p-6 border hover:shadow-lg transition text-left">
-                <Plus className="w-8 h-8 text-blue-600 mb-3" />
+                <Plus className="w-8 h-8 text-brand-blue-600 mb-3" />
                 <h3 className="font-bold">New Registration</h3>
                 <p className="text-sm text-gray-500 mt-1">Start a new SAM.gov registration</p>
               </button>
@@ -136,7 +136,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
                 <p className="text-sm text-gray-500 mt-1">Import from CSV or SAM.gov</p>
               </button>
               <button className="bg-white rounded-xl p-6 border hover:shadow-lg transition text-left">
-                <RefreshCw className="w-8 h-8 text-blue-600 mb-3" />
+                <RefreshCw className="w-8 h-8 text-brand-blue-600 mb-3" />
                 <h3 className="font-bold">Sync SAM.gov</h3>
                 <p className="text-sm text-gray-500 mt-1">Update from SAM.gov API</p>
               </button>
@@ -157,7 +157,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
                   <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
                   <h3 className="font-bold mb-2">No entities yet</h3>
                   <p className="text-gray-500 mb-4">Start by creating a new SAM.gov registration</p>
-                  <button onClick={() => setShowNewModal(true)} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                  <button onClick={() => setShowNewModal(true)} className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg">
                     Create First Entity
                   </button>
                 </div>
@@ -271,7 +271,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
               </div>
               <div className="flex gap-3">
                 <button type="button" onClick={() => setShowNewModal(false)} className="flex-1 px-4 py-3 border rounded-lg">Cancel</button>
-                <button type="submit" disabled={loading} className="flex-1 px-4 py-3 bg-blue-600 text-white rounded-lg disabled:opacity-50">
+                <button type="submit" disabled={loading} className="flex-1 px-4 py-3 bg-brand-blue-600 text-white rounded-lg disabled:opacity-50">
                   {loading ? 'Creating...' : 'Create'}
                 </button>
               </div>

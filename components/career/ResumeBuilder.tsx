@@ -141,7 +141,7 @@ export function ResumeBuilder({ initialData, onSave }: ResumeBuilderProps) {
             <Eye className="w-4 h-4" />
             Preview
           </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors flex items-center gap-2">
+          <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition-colors flex items-center gap-2">
             <Download className="w-4 h-4" />
             Download PDF
           </button>

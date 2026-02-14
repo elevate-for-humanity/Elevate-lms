@@ -165,7 +165,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as 'recent' | 'helpful')}
-          className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="px-4 py-2 border border-slate-300 rounded-lg text-sm font-medium text-black focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
         >
           <option value="recent">Most Recent</option>
           <option value="helpful">Most Helpful</option>
@@ -238,7 +238,7 @@ d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326
 
       {/* Write Review Button */}
       <div className="mt-8 text-center">
-        <button className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all">
+        <button className="px-8 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition-all">
           Write a Review
         </button>
       </div>

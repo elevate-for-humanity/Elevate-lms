@@ -65,7 +65,7 @@ export default function GovernanceContactPage() {
       <div className="bg-slate-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
-            <Mail className="w-8 h-8 text-blue-400" />
+            <Mail className="w-8 h-8 text-brand-blue-400" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Governance Contact
@@ -88,18 +88,18 @@ export default function GovernanceContactPage() {
             {contactCategories.map((category) => (
               <div 
                 key={category.title}
-                className="border border-slate-200 rounded-xl p-6 hover:border-blue-300 transition-colors"
+                className="border border-slate-200 rounded-xl p-6 hover:border-brand-blue-300 transition-colors"
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <category.icon className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <category.icon className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <h3 className="font-semibold text-slate-900">{category.title}</h3>
                 </div>
                 <p className="text-slate-600 text-sm mb-4">{category.description}</p>
                 <a 
                   href={`mailto:${category.email}`}
-                  className="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700"
+                  className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:text-brand-blue-700"
                 >
                   <Mail className="w-4 h-4" />
                   {category.email}
@@ -113,7 +113,7 @@ export default function GovernanceContactPage() {
         </section>
 
         {/* What to Include */}
-        <section className="mb-12 bg-blue-50 rounded-xl p-6 border border-blue-100">
+        <section className="mb-12 bg-brand-blue-50 rounded-xl p-6 border border-brand-blue-100">
           <h2 className="text-xl font-bold text-slate-900 mb-4">What to Include in Your Inquiry</h2>
           <ul className="space-y-2 text-slate-700">
             <li>• Your name and organization (if applicable)</li>
@@ -137,7 +137,7 @@ export default function GovernanceContactPage() {
           </ul>
           <Link
             href="/governance/authoritative-docs"
-            className="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700"
+            className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:text-brand-blue-700"
           >
             <FileText className="w-4 h-4" />
             View Authoritative Documents Index

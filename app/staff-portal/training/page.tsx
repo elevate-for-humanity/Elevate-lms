@@ -99,7 +99,7 @@ export default async function StaffTrainingPage() {
             </div>
             <Link
               href="/staff-portal/dashboard"
-              className="text-blue-600 hover:text-blue-700 font-medium"
+              className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
               ← Back to Dashboard
             </Link>
@@ -113,7 +113,7 @@ export default async function StaffTrainingPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-2">
-              <BookOpen className="h-11 w-11 text-blue-600" />
+              <BookOpen className="h-11 w-11 text-brand-blue-600" />
               <span className="text-3xl font-bold text-black">
                 {totalModules}
               </span>
@@ -143,7 +143,7 @@ export default async function StaffTrainingPage() {
 
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-2">
-              <Clock className="h-11 w-11 text-blue-600" />
+              <Clock className="h-11 w-11 text-brand-blue-600" />
               <span className="text-3xl font-bold text-black">
                 {completionPercentage}%
               </span>
@@ -164,7 +164,7 @@ export default async function StaffTrainingPage() {
           </div>
           <div className="w-full bg-slate-200 rounded-full h-4">
             <div
-              className="bg-blue-600 h-4 rounded-full transition-all duration-500"
+              className="bg-brand-blue-600 h-4 rounded-full transition-all duration-500"
               style={{ width: `${completionPercentage}%` }}
             />
           </div>
@@ -259,7 +259,7 @@ export default async function StaffTrainingPage() {
                         href={module.video_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
                       >
                         <PlayCircle className="h-5 w-5" />
                         Watch Video

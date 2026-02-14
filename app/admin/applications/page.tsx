@@ -44,11 +44,11 @@ const stateLabels: Record<string, string> = {
 const stateColors: Record<string, string> = {
   started: 'bg-gray-100 text-gray-800',
   pending: 'bg-yellow-100 text-yellow-800',
-  submitted: 'bg-blue-100 text-blue-800',
+  submitted: 'bg-brand-blue-100 text-brand-blue-800',
   approved: 'bg-green-100 text-green-800',
   rejected: 'bg-red-100 text-red-800',
-  in_review: 'bg-blue-100 text-blue-800',
-  eligibility_complete: 'bg-blue-100 text-blue-800',
+  in_review: 'bg-brand-blue-100 text-brand-blue-800',
+  eligibility_complete: 'bg-brand-blue-100 text-brand-blue-800',
   documents_complete: 'bg-indigo-100 text-indigo-800',
   review_ready: 'bg-yellow-100 text-yellow-800',
 };
@@ -60,9 +60,9 @@ const typeLabels: Record<string, string> = {
 };
 
 const typeColors: Record<string, string> = {
-  student: 'bg-blue-50 text-blue-700 border-blue-200',
+  student: 'bg-brand-blue-50 text-brand-blue-700 border-brand-blue-200',
   partner: 'bg-green-50 text-green-700 border-green-200',
-  employer: 'bg-blue-50 text-blue-700 border-blue-200',
+  employer: 'bg-brand-blue-50 text-brand-blue-700 border-brand-blue-200',
 };
 
 export default async function ApplicationsPage({

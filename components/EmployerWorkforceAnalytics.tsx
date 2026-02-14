@@ -82,7 +82,7 @@ export default function EmployerWorkforceAnalytics() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Avg Time to Hire</h3>
-            <p className="text-3xl font-bold text-blue-600">{metrics.avgTimeToHire} days</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{metrics.avgTimeToHire} days</p>
             <p className="text-sm text-green-600">↓ 8% improvement</p>
           </Card>
 

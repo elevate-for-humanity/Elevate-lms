@@ -80,7 +80,7 @@ export function BuyNowButton({
             <button
               onClick={() => handleCheckout('plan')}
               disabled={loading}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg hover:bg-blue-700 transition-all disabled:opacity-50"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-full bg-brand-blue-600 px-6 py-3 text-sm font-bold text-white shadow-lg hover:bg-brand-blue-700 transition-all disabled:opacity-50"
             >
               <CreditCard size={18} />
               {loading ? 'Processing...' : `Payment Plan - $${Math.ceil(price / 4)}/mo`}

@@ -26,7 +26,7 @@ export default function HeaderDesktopNav({ items }: HeaderDesktopNavProps) {
         <div key={item.name} className="relative group">
           <Link
             href={item.href}
-            className="text-slate-700 hover:text-blue-600 font-medium text-sm transition-colors py-2"
+            className="text-slate-700 hover:text-brand-blue-600 font-medium text-sm transition-colors py-2"
           >
             {item.name}
           </Link>
@@ -47,7 +47,7 @@ export default function HeaderDesktopNav({ items }: HeaderDesktopNavProps) {
                     <Link
                       key={subItem.name}
                       href={subItem.href}
-                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-blue-600"
+                      className="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-blue-600"
                     >
                       {subItem.name}
                     </Link>

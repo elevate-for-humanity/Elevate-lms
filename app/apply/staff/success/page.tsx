@@ -41,7 +41,7 @@ export default async function StaffApplicationSuccess() {
           Thank you for your interest in joining our team. We'll review your
           application and contact you if we'd like to move forward.
         </p>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 text-left">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-6 text-left">
           <h2 className="font-semibold text-black mb-2">What's Next?</h2>
           <ol className="space-y-2 text-sm text-black">
             <li>1. Our team will review your qualifications</li>

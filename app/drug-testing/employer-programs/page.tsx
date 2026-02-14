@@ -117,7 +117,7 @@ export default function EmployerProgramsPage() {
             Back to Drug Testing
           </Link>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center">
               <Building2 className="w-8 h-8 text-white" />
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white">Employer Drug Testing Programs</h1>
@@ -128,7 +128,7 @@ export default function EmployerProgramsPage() {
           </p>
           <a
             href="/support"
-            className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition text-lg"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition text-lg"
           >
             <Phone className="w-5 h-5" />
             Set Up Account
@@ -166,8 +166,8 @@ export default function EmployerProgramsPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {benefits.map((benefit) => (
               <div key={benefit.title} className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <benefit.icon className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <benefit.icon className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{benefit.title}</h3>
                 <p className="text-gray-600 text-sm">{benefit.description}</p>
@@ -178,10 +178,10 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* Volume Pricing */}
-      <section className="py-16 bg-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold mb-8 text-center">Volume Discounts</h2>
-          <p className="text-blue-200 text-center mb-8">
+          <p className="text-brand-blue-200 text-center mb-8">
             The more you test, the more you save. All prices are per person.
           </p>
           <div className="bg-white/10 rounded-xl overflow-hidden">
@@ -196,13 +196,13 @@ export default function EmployerProgramsPage() {
                 {volumePricing.map((tier, idx) => (
                   <tr key={tier.volume} className={idx < volumePricing.length - 1 ? 'border-b border-white/10' : ''}>
                     <td className="px-6 py-4">{tier.volume}</td>
-                    <td className="px-6 py-4 text-right font-medium text-blue-200">{tier.discount}</td>
+                    <td className="px-6 py-4 text-right font-medium text-brand-blue-200">{tier.discount}</td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-          <p className="text-blue-200 text-center mt-6 text-sm">
+          <p className="text-brand-blue-200 text-center mt-6 text-sm">
             Contact us for a custom quote based on your specific needs.
           </p>
         </div>
@@ -220,7 +220,7 @@ export default function EmployerProgramsPage() {
               { step: 4, title: 'Start Testing', desc: 'Send employees to any of our 20,000+ locations nationwide.' },
             ].map((item) => (
               <div key={item.step} className="flex gap-6 items-start">
-                <div className="w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
+                <div className="w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0">
                   {item.step}
                 </div>
                 <div className="pt-2">
@@ -305,23 +305,23 @@ export default function EmployerProgramsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Set Up Your Program?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Contact us today for a free consultation and custom quote.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
             >
               <Phone className="w-5 h-5" />
               Get Help Online
             </a>
             <Link
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 bg-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-800 transition text-lg border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-800 transition text-lg border-2 border-white"
             >
               Request Quote
             </Link>

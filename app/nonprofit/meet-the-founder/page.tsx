@@ -43,7 +43,7 @@ export default async function MeetTheFounderPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-4 py-16">
-        <Link href="/nonprofit" className="text-blue-600 hover:text-blue-700 mb-8 inline-block">
+        <Link href="/nonprofit" className="text-brand-blue-600 hover:text-brand-blue-700 mb-8 inline-block">
           ← Back to Selfish Inc.
         </Link>
 
@@ -66,12 +66,12 @@ export default async function MeetTheFounderPage() {
             resources they need to thrive.
           </p>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-8">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mt-8">
             <h3 className="text-xl font-bold text-black mb-3">Get Involved</h3>
             <p className="text-black mb-4">
               Join us in our mission to support mental wellness and holistic healing.
             </p>
-            <Link href="/rise-foundation/get-involved" className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition">
+            <Link href="/rise-foundation/get-involved" className="inline-block bg-brand-blue-600 text-white px-6 py-3 rounded-lg hover:bg-brand-blue-700 transition">
               Learn More
             </Link>
           </div>

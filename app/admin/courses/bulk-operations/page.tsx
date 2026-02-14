@@ -116,7 +116,7 @@ export default async function BulkOperationsPage() {
                 <h3 className="text-sm font-medium text-black mb-2">
                   Recent
                 </h3>
-                <p className="text-3xl font-bold text-blue-600">
+                <p className="text-3xl font-bold text-brand-blue-600">
                   {items?.filter((i) => {
                     const created = new Date(i.created_at);
                     const weekAgo = new Date();

@@ -15,7 +15,7 @@ export default function LicenseAgreementPage() {
       </div>
 <div className="max-w-4xl mx-auto px-4">
         <div className="bg-white rounded-xl shadow-sm p-8 md:p-12">
-          <div className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-4">
+          <div className="inline-block px-3 py-1 bg-brand-blue-100 text-brand-blue-700 text-sm font-medium rounded-full mb-4">
             For Licensees
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Software License Agreement</h1>

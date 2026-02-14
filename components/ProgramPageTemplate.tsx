@@ -108,15 +108,15 @@ export default function ProgramPageTemplate({
           <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Duration */}
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor"
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-brand-blue-600" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
 d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
               </div>
               <h3 className="text-lg font-bold text-black mb-2">Program Duration</h3>
-              <p className="text-2xl font-bold text-blue-600">{duration}</p>
+              <p className="text-2xl font-bold text-brand-blue-600">{duration}</p>
             </div>
 
             {/* Format */}

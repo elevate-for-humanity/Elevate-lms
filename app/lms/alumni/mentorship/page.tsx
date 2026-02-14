@@ -49,11 +49,11 @@ export default async function MentorshipPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-blue-900/60" />
+        <div className="absolute inset-0 bg-brand-blue-900/60" />
         <div className="relative z-10 h-full flex items-center">
           <div className="max-w-6xl mx-auto px-4 w-full">
             <h1 className="text-4xl font-bold text-white mb-2">Mentorship Program</h1>
-            <p className="text-xl text-blue-100">Connect with experienced professionals in your field</p>
+            <p className="text-xl text-brand-blue-100">Connect with experienced professionals in your field</p>
           </div>
         </div>
       </section>
@@ -109,7 +109,7 @@ export default async function MentorshipPage() {
                 </div>
                 <div className="p-6">
                   <h3 className="font-semibold text-gray-900">{mentor.profile?.full_name || 'Industry Mentor'}</h3>
-                  <p className="text-sm text-blue-600 mb-2">{mentor.expertise || 'Industry Professional'}</p>
+                  <p className="text-sm text-brand-blue-600 mb-2">{mentor.expertise || 'Industry Professional'}</p>
                   <p className="text-gray-600 text-sm mb-4 line-clamp-3">{mentor.bio || 'Experienced professional ready to help guide your career.'}</p>
                   <div className="flex items-center gap-2 text-sm text-gray-500 mb-4">
                     <Calendar className="w-4 h-4" />
@@ -117,7 +117,7 @@ export default async function MentorshipPage() {
                   </div>
                   <Link
                     href={`/lms/alumni/mentorship/${mentor.id}`}
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
                   >
                     <MessageSquare className="w-4 h-4" />
                     Connect
@@ -136,7 +136,7 @@ export default async function MentorshipPage() {
               <p className="text-gray-600 mb-6">Check back soon as we expand our mentor network.</p>
               <Link 
                 href="/lms/alumni"
-                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
               >
                 Return to Alumni Portal
               </Link>

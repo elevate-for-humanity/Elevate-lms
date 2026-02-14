@@ -131,7 +131,7 @@ export default function MobileNav() {
                     className={[
                       'rounded-xl px-4 py-3 font-semibold transition',
                       active
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-brand-blue-600 text-white'
                         : 'border border-gray-300 hover:bg-gray-50',
                     ].join(' ')}
                   >

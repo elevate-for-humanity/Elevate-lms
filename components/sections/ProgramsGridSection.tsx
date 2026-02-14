@@ -45,7 +45,7 @@ export function ProgramsGridSection({ title, programs }: ProgramsGridSectionProp
 
               {/* Content */}
               <div className="p-6">
-                <h3 className="text-xl font-bold text-black mb-2 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-bold text-black mb-2 group-hover:text-brand-blue-600 transition-colors">
                   {program.name}
                 </h3>
                 <p className="text-black mb-4 line-clamp-2">

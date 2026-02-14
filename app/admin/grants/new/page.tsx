@@ -40,7 +40,7 @@ export default function NewGrantPage() {
                   name="title"
                   required
                   placeholder="e.g., Workforce Innovation Grant"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
               
@@ -53,7 +53,7 @@ export default function NewGrantPage() {
                   name="funder"
                   required
                   placeholder="e.g., US Department of Labor"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
 
@@ -65,7 +65,7 @@ export default function NewGrantPage() {
                   name="description"
                   rows={3}
                   placeholder="Brief description of the grant opportunity..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -88,7 +88,7 @@ export default function NewGrantPage() {
                   min="0"
                   step="1000"
                   placeholder="50000"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
               <div>
@@ -101,7 +101,7 @@ export default function NewGrantPage() {
                   min="0"
                   step="1000"
                   placeholder="250000"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -121,7 +121,7 @@ export default function NewGrantPage() {
                 <input
                   type="date"
                   name="deadline"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
               <div>
@@ -130,7 +130,7 @@ export default function NewGrantPage() {
                 </label>
                 <select
                   name="status"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="open">Open</option>
                   <option value="upcoming">Upcoming</option>
@@ -154,7 +154,7 @@ export default function NewGrantPage() {
                 type="text"
                 name="focusAreas"
                 placeholder="e.g., workforce, healthcare, technology, education"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
               <p className="text-xs text-gray-500 mt-1">Enter keywords separated by commas</p>
             </div>
@@ -175,7 +175,7 @@ export default function NewGrantPage() {
                   type="url"
                   name="applicationUrl"
                   placeholder="https://grants.gov/..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
               <div>
@@ -186,7 +186,7 @@ export default function NewGrantPage() {
                   name="eligibility"
                   rows={4}
                   placeholder="Enter each requirement on a new line:&#10;- Must be a 501(c)(3) organization&#10;- Minimum 2 years of operation&#10;- Located in Indiana"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -202,7 +202,7 @@ export default function NewGrantPage() {
             </Link>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Add Grant Opportunity
             </button>

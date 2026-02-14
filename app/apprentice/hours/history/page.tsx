@@ -78,7 +78,7 @@ export default async function HoursHistoryPage() {
 
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 border">
-            <Clock className="w-8 h-8 text-blue-500 mb-2" />
+            <Clock className="w-8 h-8 text-brand-blue-500 mb-2" />
             <p className="text-2xl font-bold">{totalHours}</p>
             <p className="text-gray-600 text-sm">Total Hours Logged</p>
           </div>
@@ -93,7 +93,7 @@ export default async function HoursHistoryPage() {
             <p className="text-gray-600 text-sm">Progress to Goal</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <Calendar className="w-8 h-8 text-blue-500 mb-2" />
+            <Calendar className="w-8 h-8 text-brand-blue-500 mb-2" />
             <p className="text-2xl font-bold">{targetHours - approvedHours}</p>
             <p className="text-gray-600 text-sm">Hours Remaining</p>
           </div>

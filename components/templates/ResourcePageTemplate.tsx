@@ -162,7 +162,7 @@ export function ResourcePageTemplate({
             </h2>
             <div className="space-y-6">
               {faqs.map((faq, index) => (
-                <div key={index} className="border-l-4 border-blue-500 pl-4">
+                <div key={index} className="border-l-4 border-brand-blue-500 pl-4">
                   <h3 className="font-semibold text-slate-900 mb-2">{faq.question}</h3>
                   <p className="text-slate-700">{faq.answer}</p>
                 </div>
@@ -193,13 +193,13 @@ export function ResourcePageTemplate({
             <div className="flex flex-wrap gap-3">
               <Link 
                 href="/governance"
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
               >
                 Governance Documents →
               </Link>
               <Link 
                 href="/governance/security"
-                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
               >
                 Security & Data Protection →
               </Link>
@@ -207,7 +207,7 @@ export function ResourcePageTemplate({
                 <Link 
                   key={index}
                   href={link.href}
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
                 >
                   {link.label} →
                 </Link>
@@ -226,10 +226,10 @@ export function ResourcePageTemplate({
                   <Link
                     key={index}
                     href={resource.href}
-                    className="block p-4 border border-slate-200 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors"
+                    className="block p-4 border border-slate-200 rounded-lg hover:border-brand-blue-500 hover:bg-brand-blue-50 transition-colors"
                   >
                     <span className="font-medium text-slate-900">{resource.label}</span>
-                    <span className="text-blue-600 ml-2">→</span>
+                    <span className="text-brand-blue-600 ml-2">→</span>
                   </Link>
                 ))}
               </div>

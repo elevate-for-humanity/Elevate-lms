@@ -122,7 +122,7 @@ export default async function FerpaReportsPage() {
             </div>
             <Link
               href="/ferpa/reports/generate"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <BarChart3 className="w-4 h-4" />
               Custom Report
@@ -157,9 +157,9 @@ export default async function FerpaReportsPage() {
             {reportTypes.map((report) => {
               const Icon = report.icon;
               const colorClasses: Record<string, string> = {
-                blue: 'bg-blue-100 text-blue-600',
+                blue: 'bg-brand-blue-100 text-brand-blue-600',
                 green: 'bg-green-100 text-green-600',
-                blue: 'bg-blue-100 text-blue-600',
+                blue: 'bg-brand-blue-100 text-brand-blue-600',
                 orange: 'bg-orange-100 text-orange-600',
                 red: 'bg-red-100 text-red-600',
                 indigo: 'bg-indigo-100 text-indigo-600',
@@ -178,7 +178,7 @@ export default async function FerpaReportsPage() {
                   <div className="flex items-center gap-2">
                     <Link
                       href={`/ferpa/reports/generate?type=${report.id}`}
-                      className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+                      className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium"
                     >
                       Generate
                     </Link>

@@ -98,7 +98,7 @@ export function EmailCampaignManager() {
                     <h3 className="text-xl font-bold">{campaign.name}</h3>
                     <span className={`px-3 py-2 rounded text-xs font-medium ${
                       campaign.status === 'sent' ? 'bg-green-100 text-green-700' :
-                      campaign.status === 'scheduled' ? 'bg-blue-100 text-blue-700' :
+                      campaign.status === 'scheduled' ? 'bg-brand-blue-100 text-brand-blue-700' :
                       'bg-gray-100 text-black'
                     }`}>
                       {campaign.status.toUpperCase()}

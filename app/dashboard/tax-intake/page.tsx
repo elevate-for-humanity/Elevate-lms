@@ -69,7 +69,7 @@ export default async function TaxIntakePage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'completed': return 'bg-green-100 text-green-700';
-      case 'in_progress': return 'bg-blue-100 text-blue-700';
+      case 'in_progress': return 'bg-brand-blue-100 text-brand-blue-700';
       case 'pending': return 'bg-yellow-100 text-yellow-700';
       case 'cancelled': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
@@ -101,7 +101,7 @@ export default async function TaxIntakePage() {
         {/* Stats */}
         <div className="grid md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 border">
-            <Clock className="w-8 h-8 text-blue-500 mb-2" />
+            <Clock className="w-8 h-8 text-brand-blue-500 mb-2" />
             <p className="text-2xl font-bold">{todayCount || 0}</p>
             <p className="text-gray-600 text-sm">Today's Appointments</p>
           </div>
@@ -116,7 +116,7 @@ export default async function TaxIntakePage() {
             <p className="text-gray-600 text-sm">Completed</p>
           </div>
           <div className="bg-white rounded-xl p-6 border">
-            <Users className="w-8 h-8 text-blue-500 mb-2" />
+            <Users className="w-8 h-8 text-brand-blue-500 mb-2" />
             <p className="text-2xl font-bold">{totalCount || 0}</p>
             <p className="text-gray-600 text-sm">Total Clients</p>
           </div>

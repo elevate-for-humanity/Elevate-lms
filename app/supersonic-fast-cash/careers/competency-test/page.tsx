@@ -415,7 +415,7 @@ export default function CompetencyTest() {
               Tax Preparer Competency Test
             </h1>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-6">
               <h2 className="font-bold text-lg mb-3">Test Information:</h2>
               <ul className="space-y-2 text-sm">
                 <li>
@@ -681,7 +681,7 @@ export default function CompetencyTest() {
             ) : (
               <button
                 onClick={handleSubmit}
-                className="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700"
+                className="flex-1 bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700"
               >
                 Submit Test
               </button>

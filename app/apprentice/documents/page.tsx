@@ -64,7 +64,7 @@ export default async function ApprenticeDocumentsPage() {
             <h1 className="text-2xl font-bold">Documents</h1>
             <p className="text-gray-600">Access your apprenticeship documents and forms</p>
           </div>
-          <button className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
+          <button className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-blue-700 transition">
             <Upload className="w-5 h-5" />
             Upload Document
           </button>
@@ -82,7 +82,7 @@ export default async function ApprenticeDocumentsPage() {
                   {displayDocuments.map((doc: any) => (
                     <div key={doc.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                       <div className="flex items-center gap-4">
-                        <FileText className="w-10 h-10 text-blue-500" />
+                        <FileText className="w-10 h-10 text-brand-blue-500" />
                         <div>
                           <h3 className="font-medium">{doc.name}</h3>
                           <p className="text-sm text-gray-500">
@@ -93,7 +93,7 @@ export default async function ApprenticeDocumentsPage() {
                       <a
                         href={doc.url || '#'}
                         download
-                        className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                        className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700"
                       >
                         <Download className="w-5 h-5" />
                       </a>
@@ -120,7 +120,7 @@ export default async function ApprenticeDocumentsPage() {
                     <li key={form.id}>
                       <a
                         href={form.url || '#'}
-                        className="flex items-center gap-2 text-blue-600 hover:underline"
+                        className="flex items-center gap-2 text-brand-blue-600 hover:underline"
                       >
                         <FileText className="w-4 h-4" />
                         {form.name}
@@ -138,17 +138,17 @@ export default async function ApprenticeDocumentsPage() {
               <h3 className="font-semibold mb-4">Quick Links</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/apprentice/handbook" className="text-blue-600 hover:underline">
+                  <Link href="/apprentice/handbook" className="text-brand-blue-600 hover:underline">
                     Apprentice Handbook
                   </Link>
                 </li>
                 <li>
-                  <Link href="/apprentice/hours" className="text-blue-600 hover:underline">
+                  <Link href="/apprentice/hours" className="text-brand-blue-600 hover:underline">
                     Log Hours
                   </Link>
                 </li>
                 <li>
-                  <Link href="/apprentice/transfer-hours" className="text-blue-600 hover:underline">
+                  <Link href="/apprentice/transfer-hours" className="text-brand-blue-600 hover:underline">
                     Transfer Hours
                   </Link>
                 </li>

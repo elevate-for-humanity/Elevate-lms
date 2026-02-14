@@ -99,16 +99,16 @@ export default async function ApprenticePortalPage() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* NEXT REQUIRED ACTION - Always visible at top */}
-        <div className="bg-blue-600 text-white rounded-xl p-6 mb-8 shadow-lg">
+        <div className="bg-brand-blue-600 text-white rounded-xl p-6 mb-8 shadow-lg">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-blue-100 text-sm font-medium uppercase tracking-wide mb-1">Next Required Action</p>
+              <p className="text-brand-blue-100 text-sm font-medium uppercase tracking-wide mb-1">Next Required Action</p>
               <h2 className="text-2xl font-bold">{nextAction.label}</h2>
-              <p className="text-blue-100 mt-1">{nextAction.description}</p>
+              <p className="text-brand-blue-100 mt-1">{nextAction.description}</p>
             </div>
             <Link
               href={nextAction.href}
-              className="bg-white text-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 transition flex items-center gap-2"
+              className="bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-50 transition flex items-center gap-2"
             >
               Start Now
               <ArrowRight className="w-5 h-5" />
@@ -132,7 +132,7 @@ export default async function ApprenticePortalPage() {
             <div className="flex-1">
               <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-blue-600 rounded-full transition-all"
+                  className="h-full bg-brand-blue-600 rounded-full transition-all"
                   style={{ width: `${Math.min((totalHours / requiredHours) * 100, 100)}%` }}
                 />
               </div>
@@ -151,7 +151,7 @@ export default async function ApprenticePortalPage() {
               href={link.href}
               className="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-shadow"
             >
-              <link.icon className="w-8 h-8 text-blue-600 mb-3" />
+              <link.icon className="w-8 h-8 text-brand-blue-600 mb-3" />
               <h3 className="font-semibold text-gray-900 mb-1">{link.name}</h3>
               <p className="text-sm text-gray-600">{link.description}</p>
             </Link>
@@ -170,7 +170,7 @@ export default async function ApprenticePortalPage() {
                     <p className="text-sm text-gray-600">Status: {enrollment.status}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-lg font-semibold text-blue-600">{enrollment.progress || 0}%</p>
+                    <p className="text-lg font-semibold text-brand-blue-600">{enrollment.progress || 0}%</p>
                     <p className="text-sm text-gray-600">Complete</p>
                   </div>
                 </div>

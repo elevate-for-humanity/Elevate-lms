@@ -45,7 +45,7 @@ export function BookingConfirmation({
           {/* Before the Call */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <FileText className="w-5 h-5 text-blue-600" />
+              <FileText className="w-5 h-5 text-brand-blue-600" />
               <h3 className="font-semibold text-gray-900">Before the Call</h3>
             </div>
             <ul className="space-y-2 text-sm text-gray-700 ml-7">
@@ -67,7 +67,7 @@ export function BookingConfirmation({
           {/* During the Call */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Clock className="w-5 h-5 text-blue-600" />
+              <Clock className="w-5 h-5 text-brand-blue-600" />
               <h3 className="font-semibold text-gray-900">During the Call (15 minutes)</h3>
             </div>
             <ul className="space-y-2 text-sm text-gray-700 ml-7">
@@ -106,7 +106,7 @@ export function BookingConfirmation({
           {/* After the Call */}
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <Users className="w-5 h-5 text-blue-600" />
+              <Users className="w-5 h-5 text-brand-blue-600" />
               <h3 className="font-semibold text-gray-900">After the Call</h3>
             </div>
             <ul className="space-y-2 text-sm text-gray-700 ml-7">
@@ -138,8 +138,8 @@ export function BookingConfirmation({
         </div>
 
         {/* Footer */}
-        <div className="bg-blue-50 px-6 py-4 border-t border-blue-100">
-          <p className="text-sm text-blue-800 font-medium text-center">
+        <div className="bg-brand-blue-50 px-6 py-4 border-t border-brand-blue-100">
+          <p className="text-sm text-brand-blue-800 font-medium text-center">
             That's it. No surprises.
           </p>
         </div>

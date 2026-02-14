@@ -72,7 +72,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
               <div className="flex flex-wrap gap-4">
                 <Link
                   href={`/apply?program=${program.slug}`}
-                  className="inline-flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg"
+                  className="inline-flex items-center gap-2 bg-white text-brand-blue-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg"
                 >
                   Check Eligibility
                 </Link>
@@ -115,7 +115,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
                 .filter((outcome) => outcome && outcome.trim())
                 .map((outcome, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <span className="text-blue-600 font-bold text-xl">✓</span>
+                    <span className="text-brand-blue-600 font-bold text-xl">✓</span>
                     <span className="text-black">{outcome}</span>
                   </li>
                 ))}
@@ -136,16 +136,16 @@ export function ProgramTemplate({ program }: { program: Program }) {
             )}
 
             {/* Credentials & Outcomes Box */}
-            <div className="mt-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-2xl p-6">
-              <h3 className="text-xl font-bold mb-4 text-blue-900 flex items-center gap-2">
+            <div className="mt-8 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-brand-blue-200 rounded-2xl p-6">
+              <h3 className="text-xl font-bold mb-4 text-brand-blue-900 flex items-center gap-2">
                 <span className="text-2xl">🎓</span> Credentials You'll Earn
               </h3>
               
               {/* Certificate of Completion */}
-              <div className="mb-4 bg-white rounded-xl p-4 border border-blue-100">
+              <div className="mb-4 bg-white rounded-xl p-4 border border-brand-blue-100">
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-blue-600 font-bold">📜</span>
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-brand-blue-600 font-bold">📜</span>
                   </div>
                   <div>
                     <h4 className="font-bold text-gray-900">Certificate of Completion</h4>
@@ -177,8 +177,8 @@ export function ProgramTemplate({ program }: { program: Program }) {
               )}
 
               {/* Post-Completion Pathway */}
-              <div className="mt-4 pt-4 border-t border-blue-200">
-                <h4 className="font-semibold text-blue-900 mb-2">What Happens After Completion?</h4>
+              <div className="mt-4 pt-4 border-t border-brand-blue-200">
+                <h4 className="font-semibold text-brand-blue-900 mb-2">What Happens After Completion?</h4>
                 <ul className="space-y-2 text-sm text-gray-700">
                   <li className="flex items-center gap-2">
                     <span className="text-green-500">→</span>
@@ -254,10 +254,10 @@ export function ProgramTemplate({ program }: { program: Program }) {
               {program.whatYouLearn.map((item, i) => (
                 <div
                   key={i}
-                  className="bg-blue-50 border border-blue-100 rounded-xl p-4"
+                  className="bg-brand-blue-50 border border-brand-blue-100 rounded-xl p-4"
                 >
                   <div className="flex items-start gap-3">
-                    <span className="text-blue-600 font-bold">{i + 1}.</span>
+                    <span className="text-brand-blue-600 font-bold">{i + 1}.</span>
                     <span className="text-black">{item}</span>
                   </div>
                 </div>
@@ -329,11 +329,11 @@ export function ProgramTemplate({ program }: { program: Program }) {
             </p>
             <div className="space-y-4">
               <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">1</span>
+                <span className="w-6 h-6 rounded-full bg-brand-blue-100 text-brand-blue-600 flex items-center justify-center text-sm font-bold">1</span>
                 <span className="text-slate-700">Application submitted</span>
               </div>
               <div className="flex items-center gap-3">
-                <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">2</span>
+                <span className="w-6 h-6 rounded-full bg-brand-blue-100 text-brand-blue-600 flex items-center justify-center text-sm font-bold">2</span>
                 <span className="text-slate-700">Payment received (if self-pay)</span>
               </div>
               <div className="flex items-center gap-3">
@@ -352,7 +352,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
             <div className="mt-8">
               <Link
                 href={`/apply?program=${program.slug}`}
-                className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
               >
                 Start Application
               </Link>
@@ -405,7 +405,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
             <ul className="space-y-3">
               {program.requirements.map((req, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span className="text-black">{req}</span>
                 </li>
               ))}
@@ -420,11 +420,11 @@ export function ProgramTemplate({ program }: { program: Program }) {
           <h2 className="text-3xl font-bold mb-6 text-black">
             Funding Options
           </h2>
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-8">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-8">
             <ul className="space-y-3">
               {program.fundingOptions.map((option, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="text-blue-600 font-bold text-xl">$</span>
+                  <span className="text-brand-blue-600 font-bold text-xl">$</span>
                   <span className="text-black">{option}</span>
                 </li>
               ))}
@@ -496,7 +496,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
           <div className="flex flex-wrap justify-center gap-4 mb-8">
             <Link
               href={program.ctaPrimary.href}
-              className="inline-flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-10 py-5 rounded-xl font-bold text-lg transition shadow-2xl"
+              className="inline-flex items-center gap-2 bg-white text-brand-blue-600 hover:bg-gray-50 px-10 py-5 rounded-xl font-bold text-lg transition shadow-2xl"
             >
               {program.ctaPrimary.label}
             </Link>
@@ -532,11 +532,11 @@ function Card({ title, value, highlight }: { title: string; value: string; highl
   return (
     <div className={`rounded-xl p-6 shadow-sm ${
       highlight 
-        ? 'bg-blue-50 border-2 border-blue-200' 
+        ? 'bg-brand-blue-50 border-2 border-brand-blue-200' 
         : 'bg-white border border-gray-200'
     }`}>
-      <div className={`text-sm mb-2 ${highlight ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>{title}</div>
-      <div className={`text-base font-semibold ${highlight ? 'text-blue-900' : 'text-black'}`}>{value}</div>
+      <div className={`text-sm mb-2 ${highlight ? 'text-brand-blue-600 font-medium' : 'text-gray-500'}`}>{title}</div>
+      <div className={`text-base font-semibold ${highlight ? 'text-brand-blue-900' : 'text-black'}`}>{value}</div>
     </div>
   );
 }
@@ -545,7 +545,7 @@ function Step({ n, title, desc }: { n: number; title: string; desc: string }) {
   return (
     <div className="bg-white border border-gray-200 rounded-xl p-6">
       <div className="flex flex-col items-center text-center">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-600 text-white text-xl font-bold mb-4">
+        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-blue-600 text-white text-xl font-bold mb-4">
           {n}
         </div>
         <div className="font-bold text-black mb-2">{title}</div>

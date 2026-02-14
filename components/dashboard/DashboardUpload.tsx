@@ -119,8 +119,8 @@ export function DashboardUpload({
     <div className="bg-white rounded-lg border border-slate-200 p-6">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
-        <div className="p-2 bg-blue-50 rounded-lg">
-          <Upload className="h-5 w-5 text-blue-600" />
+        <div className="p-2 bg-brand-blue-50 rounded-lg">
+          <Upload className="h-5 w-5 text-brand-blue-600" />
         </div>
         <div>
           <h3 className="text-lg font-bold text-black">{title}</h3>
@@ -147,7 +147,7 @@ export function DashboardUpload({
 
       {/* Uploading State */}
       {uploading && (
-        <div className="mb-4 bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
+        <div className="mb-4 bg-brand-blue-50 border border-brand-blue-200 text-brand-blue-700 px-4 py-3 rounded">
           Uploading file...
         </div>
       )}
@@ -181,7 +181,7 @@ export function DashboardUpload({
                     href={file.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 text-blue-600 hover:bg-gray-50 rounded transition"
+                    className="p-2 text-brand-blue-600 hover:bg-gray-50 rounded transition"
                     title="Download"
                   >
                     <Download className="h-4 w-4" />

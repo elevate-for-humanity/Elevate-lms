@@ -44,7 +44,7 @@ export default function DivorceSupportPage() {
       </section>
 
       <div className="max-w-4xl mx-auto px-4 py-12">
-        <Link href="/rise-foundation" className="text-blue-600 hover:text-blue-700 mb-8 inline-block">
+        <Link href="/rise-foundation" className="text-brand-blue-600 hover:text-brand-blue-700 mb-8 inline-block">
           ← Back to Rise Forward Foundation
         </Link>
 

@@ -48,7 +48,7 @@ export default function ProgramCoursesPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4"></div>
           <p className="text-black">Loading courses...</p>
         </div>
       </div>
@@ -112,14 +112,14 @@ export default function ProgramCoursesPage() {
       <div className="max-w-7xl mx-auto px-6 py-12">
         {courses.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <BookOpen className="w-16 h-16 text-blue-600 mx-auto mb-4" />
+            <BookOpen className="w-16 h-16 text-brand-blue-600 mx-auto mb-4" />
             <h2 className="text-2xl font-bold mb-2">Enroll Through Our Admissions Team</h2>
             <p className="text-black mb-6">
               This program requires enrollment through our admissions process. 
               Apply now to get started with personalized guidance.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/apply" className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition">
+              <Link href="/apply" className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition">
                 Apply Now
               </Link>
               <Link href="/programs" className="inline-block bg-white border-2 border-gray-300 hover:border-gray-400 text-black px-6 py-3 rounded-lg font-semibold transition">
@@ -251,7 +251,7 @@ export default function ProgramCoursesPage() {
 
                     <button
                       onClick={() => handleEnroll(course.id, course.price)}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
+                      className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
                     >
                       {course.price === 0 ? (
                         <>
@@ -269,7 +269,7 @@ export default function ProgramCoursesPage() {
 
                   <Link 
                     href={`/courses/${course.id}`}
-                    className="block text-center text-blue-600 hover:text-blue-700 text-sm font-semibold"
+                    className="block text-center text-brand-blue-600 hover:text-brand-blue-700 text-sm font-semibold"
                   >
                     View Course Details →
                   </Link>

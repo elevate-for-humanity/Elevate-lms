@@ -20,7 +20,7 @@ function Section({ id, number, title, children }: { id: string; number: string; 
   return (
     <section id={id} className="scroll-mt-24">
       <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-baseline gap-3">
-        <span className="text-blue-600 font-mono text-sm">{number}</span>
+        <span className="text-brand-blue-600 font-mono text-sm">{number}</span>
         {title}
       </h2>
       <div className="text-slate-700 leading-relaxed space-y-4 pl-8">
@@ -78,7 +78,7 @@ export default function PrivacyPolicyPage() {
                   <li key={item.id}>
                     <a
                       href={`#${item.id}`}
-                      className="text-slate-600 hover:text-blue-600 transition-colors flex items-baseline gap-2"
+                      className="text-slate-600 hover:text-brand-blue-600 transition-colors flex items-baseline gap-2"
                     >
                       <span className="text-slate-400 font-mono text-xs">{String(i + 1).padStart(2, '0')}</span>
                       {item.label}
@@ -89,9 +89,9 @@ export default function PrivacyPolicyPage() {
               <div className="mt-8 pt-6 border-t border-slate-200">
                 <p className="text-xs text-slate-400 mb-2">Related Policies</p>
                 <ul className="space-y-1.5 text-sm">
-                  <li><Link href="/terms-of-service" className="text-blue-600 hover:underline">Terms of Service</Link></li>
-                  <li><Link href="/accessibility" className="text-blue-600 hover:underline">Accessibility Statement</Link></li>
-                  <li><Link href="/disclosures" className="text-blue-600 hover:underline">Disclosures</Link></li>
+                  <li><Link href="/terms-of-service" className="text-brand-blue-600 hover:underline">Terms of Service</Link></li>
+                  <li><Link href="/accessibility" className="text-brand-blue-600 hover:underline">Accessibility Statement</Link></li>
+                  <li><Link href="/disclosures" className="text-brand-blue-600 hover:underline">Disclosures</Link></li>
                 </ul>
               </div>
             </div>
@@ -101,7 +101,7 @@ export default function PrivacyPolicyPage() {
           <div className="space-y-12">
 
             {/* Intro */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
               <p className="text-slate-800 leading-relaxed">
                 {ORG_NAME} (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting the privacy of students,
                 applicants, employers, and visitors who use our website, learning management system, and
@@ -300,7 +300,7 @@ export default function PrivacyPolicyPage() {
               </ul>
               <p>
                 No system is 100% secure. If you believe your account has been compromised,
-                contact us immediately at <a href={`mailto:${ORG_EMAIL}`} className="text-blue-600 hover:underline">{ORG_EMAIL}</a>.
+                contact us immediately at <a href={`mailto:${ORG_EMAIL}`} className="text-brand-blue-600 hover:underline">{ORG_EMAIL}</a>.
               </p>
             </Section>
 
@@ -361,8 +361,8 @@ export default function PrivacyPolicyPage() {
                 <li><strong>Complaint</strong> — File a complaint with the U.S. Department of Education (for FERPA) or the Indiana Attorney General</li>
               </ul>
               <p>
-                To exercise any of these rights, email <a href={`mailto:${ORG_EMAIL}`} className="text-blue-600 hover:underline">{ORG_EMAIL}</a> or
-                call <a href={`tel:${ORG_PHONE.replace(/[^0-9]/g, '')}`} className="text-blue-600 hover:underline">{ORG_PHONE}</a>.
+                To exercise any of these rights, email <a href={`mailto:${ORG_EMAIL}`} className="text-brand-blue-600 hover:underline">{ORG_EMAIL}</a> or
+                call <a href={`tel:${ORG_PHONE.replace(/[^0-9]/g, '')}`} className="text-brand-blue-600 hover:underline">{ORG_PHONE}</a>.
                 We will respond within 30 days.
               </p>
             </Section>
@@ -444,8 +444,8 @@ export default function PrivacyPolicyPage() {
                 <div className="grid sm:grid-cols-2 gap-4 text-sm text-slate-700">
                   <div>
                     <p className="font-semibold text-slate-900 mb-1">Privacy Inquiries</p>
-                    <p>Email: <a href={`mailto:${ORG_EMAIL}`} className="text-blue-600 hover:underline">{ORG_EMAIL}</a></p>
-                    <p>Phone: <a href={`tel:${ORG_PHONE.replace(/[^0-9]/g, '')}`} className="text-blue-600 hover:underline">{ORG_PHONE}</a></p>
+                    <p>Email: <a href={`mailto:${ORG_EMAIL}`} className="text-brand-blue-600 hover:underline">{ORG_EMAIL}</a></p>
+                    <p>Phone: <a href={`tel:${ORG_PHONE.replace(/[^0-9]/g, '')}`} className="text-brand-blue-600 hover:underline">{ORG_PHONE}</a></p>
                     <p>Address: {ORG_ADDRESS}</p>
                   </div>
                   <div>
@@ -463,9 +463,9 @@ export default function PrivacyPolicyPage() {
             <div className="lg:hidden border-t border-slate-200 pt-8 mt-8">
               <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Related Policies</h3>
               <div className="flex flex-wrap gap-4 text-sm">
-                <Link href="/terms-of-service" className="text-blue-600 hover:underline">Terms of Service</Link>
-                <Link href="/accessibility" className="text-blue-600 hover:underline">Accessibility Statement</Link>
-                <Link href="/disclosures" className="text-blue-600 hover:underline">Disclosures</Link>
+                <Link href="/terms-of-service" className="text-brand-blue-600 hover:underline">Terms of Service</Link>
+                <Link href="/accessibility" className="text-brand-blue-600 hover:underline">Accessibility Statement</Link>
+                <Link href="/disclosures" className="text-brand-blue-600 hover:underline">Disclosures</Link>
               </div>
             </div>
 

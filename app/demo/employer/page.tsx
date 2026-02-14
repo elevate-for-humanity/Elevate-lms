@@ -9,7 +9,7 @@ export default function DemoEmployerPage() {
     <DemoPageShell title="Employer Dashboard" description={`${employer.name} — Partner Portal`}>
       <div className="grid sm:grid-cols-3 gap-3 mb-6">
         <div className="bg-white rounded-lg border p-4 text-center">
-          <p className="text-2xl font-bold text-blue-600">{employer.apprentices}</p>
+          <p className="text-2xl font-bold text-brand-blue-600">{employer.apprentices}</p>
           <p className="text-xs text-gray-500">Active Apprentices</p>
         </div>
         <div className="bg-white rounded-lg border p-4 text-center">
@@ -35,7 +35,7 @@ export default function DemoEmployerPage() {
               </p>
               <div className="w-20 h-1.5 bg-gray-100 rounded-full mt-1">
                 <div
-                  className="h-full bg-blue-500 rounded-full"
+                  className="h-full bg-brand-blue-500 rounded-full"
                   style={{ width: `${Math.round((s.hours_completed / s.hours_required) * 100)}%` }}
                 />
               </div>

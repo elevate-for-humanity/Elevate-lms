@@ -313,7 +313,7 @@ export function ProgramPageTemplate({
             
             {outcomes.averageSalary && (
               <div className="bg-slate-800 rounded-2xl p-6">
-                <DollarSign className="w-10 h-10 text-blue-400 mb-4" />
+                <DollarSign className="w-10 h-10 text-brand-blue-400 mb-4" />
                 <h3 className="text-xl font-bold mb-4">Earning Potential</h3>
                 <p className="text-3xl font-bold text-green-400">{outcomes.averageSalary}</p>
                 <p className="text-slate-400 mt-2">Average annual salary</p>

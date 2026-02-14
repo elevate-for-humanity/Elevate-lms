@@ -401,9 +401,9 @@ export default function FranchiseAdminDashboard() {
                       className="flex items-center gap-4 p-3 border rounded-lg"
                     >
                       <div className={`p-2 rounded-full ${
-                        activity.type === 'return' ? 'bg-blue-100 text-blue-600' :
+                        activity.type === 'return' ? 'bg-brand-blue-100 text-brand-blue-600' :
                         activity.type === 'office' ? 'bg-green-100 text-green-600' :
-                        'bg-blue-100 text-blue-600'
+                        'bg-brand-blue-100 text-brand-blue-600'
                       }`}>
                         {activity.type === 'return' ? <FileText className="h-4 w-4" /> :
                          activity.type === 'office' ? <Building2 className="h-4 w-4" /> :

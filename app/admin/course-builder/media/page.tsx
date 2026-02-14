@@ -35,7 +35,7 @@ export default async function MediaLibraryPage() {
               <h1 className="text-3xl font-bold text-gray-900">Media Library</h1>
               <p className="text-gray-600 mt-1">Manage videos, images, and documents for courses</p>
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors">
               <Upload className="w-5 h-5" />
               Upload Files
             </button>
@@ -46,8 +46,8 @@ export default async function MediaLibraryPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Video className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <Video className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">0</p>
@@ -68,8 +68,8 @@ export default async function MediaLibraryPage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <FileText className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <FileText className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">0</p>
@@ -98,7 +98,7 @@ export default async function MediaLibraryPage() {
               <input
                 type="text"
                 placeholder="Search media..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
             <div className="flex gap-2">
@@ -127,7 +127,7 @@ export default async function MediaLibraryPage() {
           </div>
           <h3 className="text-lg font-medium text-gray-900 mb-2">No media files yet</h3>
           <p className="text-gray-500 mb-6">Upload videos, images, and documents for your courses</p>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors">
             <Upload className="w-5 h-5" />
             Upload Files
           </button>

@@ -253,14 +253,14 @@ export default function InstrumentedVideoPlayer({
           <p className="text-gray-400 text-center mb-4">{errorMessage}</p>
           <button
             onClick={handleRetry}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 px-4 py-2 rounded-lg transition-colors"
           >
             <RefreshCw className="w-4 h-4" />
             Try Again
           </button>
           <a
             href="/support"
-            className="mt-4 text-sm text-blue-400 hover:underline"
+            className="mt-4 text-sm text-brand-blue-400 hover:underline"
           >
             Contact Support
           </a>
@@ -277,7 +277,7 @@ export default function InstrumentedVideoPlayer({
       {isLoading && (
         <div className="absolute inset-0 bg-gray-900 flex items-center justify-center z-10">
           <div className="animate-pulse flex flex-col items-center">
-            <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <div className="w-16 h-16 border-4 border-brand-blue-500 border-t-transparent rounded-full animate-spin" />
             <p className="text-white mt-4">Loading video...</p>
           </div>
         </div>
@@ -290,7 +290,7 @@ export default function InstrumentedVideoPlayer({
           className="absolute inset-0 z-20 bg-black/50 flex items-center justify-center cursor-pointer"
         >
           <div className="bg-white/90 rounded-xl px-6 py-4 flex items-center gap-3 shadow-xl">
-            <Volume2 className="w-6 h-6 text-blue-600" />
+            <Volume2 className="w-6 h-6 text-brand-blue-600" />
             <span className="text-gray-900 font-semibold">Tap to play with sound</span>
           </div>
         </button>
@@ -323,7 +323,7 @@ export default function InstrumentedVideoPlayer({
               max={duration || 100}
               value={currentTime}
               onChange={handleSeek}
-              className="w-full h-1 bg-gray-600 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-blue-500 [&::-webkit-slider-thumb]:rounded-full"
+              className="w-full h-1 bg-gray-600 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:bg-brand-blue-500 [&::-webkit-slider-thumb]:rounded-full"
             />
           </div>
 
@@ -331,7 +331,7 @@ export default function InstrumentedVideoPlayer({
             <div className="flex items-center gap-4">
               <button
                 onClick={togglePlay}
-                className="text-white hover:text-blue-400 transition-colors"
+                className="text-white hover:text-brand-blue-400 transition-colors"
                 aria-label={isPlaying ? 'Pause' : 'Play'}
               >
                 {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
@@ -339,7 +339,7 @@ export default function InstrumentedVideoPlayer({
 
               <button
                 onClick={toggleMute}
-                className="text-white hover:text-blue-400 transition-colors"
+                className="text-white hover:text-brand-blue-400 transition-colors"
                 aria-label={isMuted ? 'Unmute' : 'Mute'}
               >
                 {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
@@ -352,7 +352,7 @@ export default function InstrumentedVideoPlayer({
 
             <button
               onClick={toggleFullscreen}
-              className="text-white hover:text-blue-400 transition-colors"
+              className="text-white hover:text-brand-blue-400 transition-colors"
               aria-label="Fullscreen"
             >
               <Maximize className="w-5 h-5" />

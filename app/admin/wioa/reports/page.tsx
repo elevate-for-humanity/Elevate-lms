@@ -31,7 +31,7 @@ export default function WIOAReportsPage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Reports" }]} />
       </div>
 <div className="max-w-6xl mx-auto">
-        <Link href="/admin/wioa" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/admin/wioa" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to WIOA Management
         </Link>
@@ -42,13 +42,13 @@ export default function WIOAReportsPage() {
             <p className="text-gray-600">Generate performance and compliance reports</p>
           </div>
           <div className="flex gap-3">
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
               <option>Q4 2024</option>
               <option>Q3 2024</option>
               <option>Q2 2024</option>
               <option>Q1 2024</option>
             </select>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+            <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2">
               <BarChart3 className="w-4 h-4" />
               Generate Report
             </button>
@@ -58,7 +58,7 @@ export default function WIOAReportsPage() {
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           {metrics.map((metric, index) => (
             <div key={index} className="bg-white rounded-xl shadow-sm p-6">
-              <metric.icon className="w-8 h-8 text-blue-600 mb-3" />
+              <metric.icon className="w-8 h-8 text-brand-blue-600 mb-3" />
               <p className="text-2xl font-bold text-gray-900">{metric.value}</p>
               <div className="flex items-center justify-between">
                 <p className="text-sm text-gray-600">{metric.label}</p>
@@ -76,8 +76,8 @@ export default function WIOAReportsPage() {
             {reportTypes.map((report) => (
               <div key={report.id} className="p-6 flex items-center justify-between hover:bg-gray-50">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                    <FileText className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                    <FileText className="w-6 h-6 text-brand-blue-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">{report.name}</h3>
@@ -94,7 +94,7 @@ export default function WIOAReportsPage() {
                       <Calendar className="w-4 h-4" />
                       Schedule
                     </button>
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+                    <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2">
                       <Download className="w-4 h-4" />
                       Download
                     </button>

@@ -178,7 +178,7 @@ export default async function LeaderboardPage() {
 
         {/* Current User Stats */}
         {currentUserEntry && currentUserEntry.points > 0 && (
-          <div className="bg-blue-600 rounded-2xl p-6 text-white mb-8">
+          <div className="bg-brand-blue-600 rounded-2xl p-6 text-white mb-8">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
@@ -195,31 +195,31 @@ export default async function LeaderboardPage() {
                   )}
                 </div>
                 <div>
-                  <p className="text-blue-100 text-sm">Your Ranking</p>
+                  <p className="text-brand-blue-100 text-sm">Your Ranking</p>
                   <p className="text-2xl font-bold">{currentUserEntry.name}</p>
                 </div>
               </div>
               <div className="text-right">
                 <div className="text-4xl font-black">#{currentUserRank || '—'}</div>
-                <div className="text-blue-100">{currentUserEntry.points.toLocaleString()} points</div>
+                <div className="text-brand-blue-100">{currentUserEntry.points.toLocaleString()} points</div>
               </div>
             </div>
             <div className="grid grid-cols-4 gap-4 mt-6 pt-6 border-t border-white/20">
               <div className="text-center">
                 <div className="text-2xl font-bold">{currentUserEntry.coursesCompleted}</div>
-                <div className="text-xs text-blue-100">Courses</div>
+                <div className="text-xs text-brand-blue-100">Courses</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">{currentUserEntry.lessonsCompleted}</div>
-                <div className="text-xs text-blue-100">Lessons</div>
+                <div className="text-xs text-brand-blue-100">Lessons</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">{currentUserEntry.quizzesPassed}</div>
-                <div className="text-xs text-blue-100">Quizzes</div>
+                <div className="text-xs text-brand-blue-100">Quizzes</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">{currentUserEntry.streak}</div>
-                <div className="text-xs text-blue-100">Day Streak</div>
+                <div className="text-xs text-brand-blue-100">Day Streak</div>
               </div>
             </div>
           </div>
@@ -241,7 +241,7 @@ export default async function LeaderboardPage() {
                   <div
                     key={entry.userId}
                     className={`flex items-center gap-4 p-4 ${getRankBg(rank)} ${
-                      isCurrentUser ? 'ring-2 ring-blue-500 ring-inset' : ''
+                      isCurrentUser ? 'ring-2 ring-brand-blue-500 ring-inset' : ''
                     }`}
                   >
                     <div className="w-10 h-10 flex items-center justify-center">
@@ -266,7 +266,7 @@ export default async function LeaderboardPage() {
                       <p className="font-semibold text-slate-900 truncate">
                         {entry.name}
                         {isCurrentUser && (
-                          <span className="ml-2 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                          <span className="ml-2 text-xs bg-brand-blue-100 text-brand-blue-700 px-2 py-0.5 rounded-full">
                             You
                           </span>
                         )}
@@ -303,7 +303,7 @@ export default async function LeaderboardPage() {
               </p>
               <Link
                 href="/lms/courses"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
               >
                 <BookOpen className="w-5 h-5" />
                 Start Learning
@@ -326,8 +326,8 @@ export default async function LeaderboardPage() {
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Target className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <div className="font-semibold text-slate-900">+10</div>
@@ -335,8 +335,8 @@ export default async function LeaderboardPage() {
               </div>
             </div>
             <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <div className="font-semibold text-slate-900">+0-50</div>
@@ -357,7 +357,7 @@ export default async function LeaderboardPage() {
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href="/lms/community" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="/lms/community" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
             ← Back to Community
           </Link>
         </div>

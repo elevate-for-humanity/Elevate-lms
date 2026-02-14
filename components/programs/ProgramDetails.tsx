@@ -125,7 +125,7 @@ export function ProgramDetails({ program }: { program: Program }) {
               <div className="border-t border-slate-200 pt-6 mt-6">
                 <h4 className="text-sm font-bold text-black mb-4 flex items-center gap-2">
                   <svg
-                    className="w-5 h-5 text-blue-600"
+                    className="w-5 h-5 text-brand-blue-600"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
@@ -139,10 +139,10 @@ export function ProgramDetails({ program }: { program: Program }) {
                   Flexible Payment Option
                 </h4>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-3">
+                <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-3">
                   <div className="flex items-start gap-2 mb-2">
                     <svg
-                      className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5"
+                      className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5"
                       fill="currentColor"
                       viewBox="0 0 20 20"
                     >
@@ -153,17 +153,17 @@ export function ProgramDetails({ program }: { program: Program }) {
                       />
                     </svg>
                     <div>
-                      <p className="text-xs font-semibold text-blue-900 mb-1">
+                      <p className="text-xs font-semibold text-brand-blue-900 mb-1">
                         Can't Wait for Funding? Pay in 4 with Klarna/Afterpay/Zip
                       </p>
-                      <p className="text-xs text-blue-800">
+                      <p className="text-xs text-brand-blue-800">
                         Start training immediately and split your payment into
                         easy monthly installments with 0% APR options available.
                       </p>
                     </div>
                   </div>
 
-                  <div className="space-y-2 text-xs text-blue-800 mt-3">
+                  <div className="space-y-2 text-xs text-brand-blue-800 mt-3">
                     <div className="flex items-center gap-2">
                       <svg
                         className="w-4 h-4 text-green-600"
@@ -230,8 +230,8 @@ export function ProgramDetails({ program }: { program: Program }) {
                 </div>
 
                 <div className="space-y-3">
-                  <div className="bg-white border-2 border-blue-600 rounded-lg p-4 text-center">
-                    <div className="text-3xl font-bold text-blue-600 mb-1">
+                  <div className="bg-white border-2 border-brand-blue-600 rounded-lg p-4 text-center">
+                    <div className="text-3xl font-bold text-brand-blue-600 mb-1">
                       ${programPrice.toLocaleString()}
                     </div>
                     <div className="text-sm text-black">

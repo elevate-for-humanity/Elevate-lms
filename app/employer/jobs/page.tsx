@@ -71,7 +71,7 @@ export default async function EmployerJobsPage() {
               {profile.verified && (
                 <Link
                   href="/employer/post-job"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
                 >
                   <Plus className="w-4 h-4" />
                   Post New Job
@@ -185,7 +185,7 @@ export default async function EmployerJobsPage() {
             {profile.verified ? (
               <Link
                 href="/employer/post-job"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
               >
                 <Plus className="w-5 h-5" />
                 Post Your First Job
@@ -250,7 +250,7 @@ function JobCard({ job, isDraft, isClosed }: { job: any; isDraft?: boolean; isCl
         <div className="flex gap-2">
           <Link
             href={`/employer/postings/${job.id}`}
-            className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition"
+            className="p-2 text-gray-600 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded-lg transition"
             title="View"
           >
             <Eye className="w-5 h-5" />

@@ -50,12 +50,12 @@ export default function CareerApplicationPage({ params }: { params: { id: string
             <div className="space-y-4">
               <Link 
                 href="/careers"
-                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 View More Positions
               </Link>
               <p className="text-sm text-gray-500">
-                Questions? Email us at <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600">elevate4humanityedu@gmail.com</a>
+                Questions? Email us at <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600">elevate4humanityedu@gmail.com</a>
               </p>
             </div>
           </div>
@@ -71,7 +71,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
       </div>
 <div className="max-w-4xl mx-auto px-4">
         {/* Back Link */}
-        <Link href="/careers" className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-6">
+        <Link href="/careers" className="inline-flex items-center text-brand-blue-600 hover:text-brand-blue-700 mb-6">
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Careers
         </Link>
@@ -108,7 +108,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
                 required
                 value={formData.firstName}
                 onChange={(e) => setFormData({...formData, firstName: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 placeholder="First name"
               />
             </div>
@@ -119,7 +119,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
                 required
                 value={formData.lastName}
                 onChange={(e) => setFormData({...formData, lastName: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 placeholder="Doe"
               />
             </div>
@@ -130,7 +130,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 placeholder="john@example.com"
               />
             </div>
@@ -141,7 +141,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
                 required
                 value={formData.phone}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 placeholder="(317) 555-0123"
               />
             </div>
@@ -155,7 +155,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
                 type="url"
                 value={formData.linkedIn}
                 onChange={(e) => setFormData({...formData, linkedIn: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 placeholder="https://linkedin.com/in/yourprofile"
               />
             </div>
@@ -165,7 +165,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
                 type="url"
                 value={formData.portfolio}
                 onChange={(e) => setFormData({...formData, portfolio: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 placeholder="https://yourportfolio.com"
               />
             </div>
@@ -174,7 +174,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
           {/* Resume Upload */}
           <div className="mb-8">
             <label className="block text-sm font-medium text-gray-700 mb-2">Resume/CV *</label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition cursor-pointer">
+            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-brand-blue-500 transition cursor-pointer">
               <input
                 type="file"
                 accept=".pdf,.doc,.docx"
@@ -204,7 +204,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
               value={formData.coverLetter}
               onChange={(e) => setFormData({...formData, coverLetter: e.target.value})}
               rows={5}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="Tell us why you're interested in this position and what makes you a great fit..."
             />
           </div>
@@ -217,7 +217,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
               value={formData.experience}
               onChange={(e) => setFormData({...formData, experience: e.target.value})}
               rows={4}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="Briefly describe your relevant experience and qualifications..."
             />
           </div>
@@ -230,7 +230,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
                 required
                 value={formData.availability}
                 onChange={(e) => setFormData({...formData, availability: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               >
                 <option value="">Select availability</option>
                 <option value="immediate">Immediately</option>
@@ -245,7 +245,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
                 type="text"
                 value={formData.salary}
                 onChange={(e) => setFormData({...formData, salary: e.target.value})}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 placeholder="e.g., $50,000 - $60,000"
               />
             </div>
@@ -256,7 +256,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
             <select
               value={formData.heardAbout}
               onChange={(e) => setFormData({...formData, heardAbout: e.target.value})}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             >
               <option value="">Select an option</option>
               <option value="linkedin">LinkedIn</option>
@@ -274,7 +274,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
             <button
               type="submit"
               disabled={submitting}
-              className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
             >
               {submitting ? 'Submitting...' : 'Submit Application'}
             </button>
@@ -284,7 +284,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
         {/* Contact Info */}
         <div className="mt-8 text-center text-gray-600">
           <p>Questions about this position? Contact us at{' '}
-            <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">
               elevate4humanityedu@gmail.com
             </a>
           </p>

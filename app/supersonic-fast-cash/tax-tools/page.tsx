@@ -61,7 +61,7 @@ export default async function TaxToolsPage() {
       <section id="tax-form" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 mb-12">
-            <FileText className="w-12 h-12 text-blue-600" />
+            <FileText className="w-12 h-12 text-brand-blue-600" />
             <h2 className="text-4xl font-black text-black">IRS Forms</h2>
           </div>
 
@@ -70,16 +70,16 @@ export default async function TaxToolsPage() {
               href="https://www.irs.gov/forms-pubs/about-form-1040"
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-blue-50 rounded-lg p-6 border border-blue-200 hover:border-blue-500 transition-all"
+              className="group bg-brand-blue-50 rounded-lg p-6 border border-brand-blue-200 hover:border-brand-blue-500 transition-all"
             >
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-2xl font-black text-blue-600">Form 1040</h3>
-                <ExternalLink className="w-6 h-6 text-blue-600 group-hover:translate-x-1 transition-transform" />
+                <h3 className="text-2xl font-black text-brand-blue-600">Form 1040</h3>
+                <ExternalLink className="w-6 h-6 text-brand-blue-600 group-hover:translate-x-1 transition-transform" />
               </div>
               <p className="text-black mb-4">
                 U.S. Individual Income Tax Return
               </p>
-              <div className="flex items-center gap-2 text-blue-600 font-bold">
+              <div className="flex items-center gap-2 text-brand-blue-600 font-bold">
                 <Download className="w-5 h-5" />
                 <span>Download PDF</span>
               </div>
@@ -127,16 +127,16 @@ export default async function TaxToolsPage() {
               href="https://www.irs.gov/forms-pubs/about-form-1099-misc"
               target="_blank"
               rel="noopener noreferrer"
-              className="group bg-blue-50 rounded-2xl p-6 border-2 border-blue-200 hover:border-blue-500 transition-all transform hover:scale-105"
+              className="group bg-brand-blue-50 rounded-2xl p-6 border-2 border-brand-blue-200 hover:border-brand-blue-500 transition-all transform hover:scale-105"
             >
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-2xl font-black text-blue-600">
+                <h3 className="text-2xl font-black text-brand-blue-600">
                   Form 1099
                 </h3>
-                <ExternalLink className="w-6 h-6 text-blue-600 group-hover:translate-x-1 transition-transform" />
+                <ExternalLink className="w-6 h-6 text-brand-blue-600 group-hover:translate-x-1 transition-transform" />
               </div>
               <p className="text-black mb-4">Miscellaneous Income</p>
-              <div className="flex items-center gap-2 text-blue-600 font-bold">
+              <div className="flex items-center gap-2 text-brand-blue-600 font-bold">
                 <Download className="w-5 h-5" />
                 <span>Download PDF</span>
               </div>
@@ -197,10 +197,10 @@ export default async function TaxToolsPage() {
                 2024 Tax Year
               </h3>
               <div className="space-y-4">
-                <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-xl">
+                <div className="flex items-start gap-4 p-4 bg-brand-blue-50 rounded-xl">
                   <div className="flex-shrink-0 w-20 text-center">
-                    <div className="text-3xl font-black text-blue-600">APR</div>
-                    <div className="text-2xl font-black text-blue-600">15</div>
+                    <div className="text-3xl font-black text-brand-blue-600">APR</div>
+                    <div className="text-2xl font-black text-brand-blue-600">15</div>
                   </div>
                   <div>
                     <div className="font-black text-black mb-1">
@@ -248,12 +248,12 @@ export default async function TaxToolsPage() {
                   </div>
                 </div>
 
-                <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-xl">
+                <div className="flex items-start gap-4 p-4 bg-brand-blue-50 rounded-xl">
                   <div className="flex-shrink-0 w-20 text-center">
-                    <div className="text-3xl font-black text-blue-600">
+                    <div className="text-3xl font-black text-brand-blue-600">
                       APR
                     </div>
-                    <div className="text-2xl font-black text-blue-600">
+                    <div className="text-2xl font-black text-brand-blue-600">
                       15
                     </div>
                   </div>
@@ -352,16 +352,16 @@ export default async function TaxToolsPage() {
           <div className="grid md:grid-cols-3 gap-8">
             <Link
               href="/supersonic-fast-cash/calculator"
-              className="group bg-blue-50 rounded-2xl p-8 border-2 border-blue-200 hover:border-blue-500 transition-all transform hover:scale-105"
+              className="group bg-brand-blue-50 rounded-2xl p-8 border-2 border-brand-blue-200 hover:border-brand-blue-500 transition-all transform hover:scale-105"
             >
-              <Calculator className="w-12 h-12 text-blue-600 mb-4" />
+              <Calculator className="w-12 h-12 text-brand-blue-600 mb-4" />
               <h3 className="text-2xl font-black text-black mb-3">
                 Refund Calculator
               </h3>
               <p className="text-black mb-4">
                 Estimate your tax refund amount
               </p>
-              <div className="flex items-center gap-2 text-blue-600 font-bold">
+              <div className="flex items-center gap-2 text-brand-blue-600 font-bold">
                 <span>Calculate Now</span>
                 <ExternalLink className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </div>

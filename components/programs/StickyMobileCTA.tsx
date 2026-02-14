@@ -46,14 +46,14 @@ export function StickyMobileCTA({
       <div className="p-4 flex gap-2">
         <a
           href={primaryHref}
-          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+          className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
         >
           {primaryText}
           <ArrowRight className="w-4 h-4" />
         </a>
         <a
           href={secondaryHref}
-          className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-white text-blue-600 border-2 border-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+          className="flex-1 inline-flex items-center justify-center px-4 py-3 bg-white text-brand-blue-600 border-2 border-brand-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
         >
           {secondaryText}
         </a>

@@ -23,7 +23,7 @@ export default function StudentPortalSchedulePage() {
           <option>Fall 2024</option>
           <option>Spring 2025</option>
         </select>
-        <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+        <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
           Export Calendar
         </button>
       </div>
@@ -48,7 +48,7 @@ export default function StudentPortalSchedulePage() {
                     <td key={`${day}-${time}`} className="py-1 px-2">
                       {/* Sample classes */}
                       {day === 'Monday' && time === '9:00 AM' && (
-                        <div className="bg-blue-100 border-l-4 border-blue-500 p-2 rounded text-sm">
+                        <div className="bg-brand-blue-100 border-l-4 border-brand-blue-500 p-2 rounded text-sm">
                           <div className="font-medium">ENG 101</div>
                           <div className="text-gray-600">Room 204</div>
                         </div>
@@ -60,13 +60,13 @@ export default function StudentPortalSchedulePage() {
                         </div>
                       )}
                       {day === 'Tuesday' && time === '10:00 AM' && (
-                        <div className="bg-blue-100 border-l-4 border-blue-500 p-2 rounded text-sm">
+                        <div className="bg-brand-blue-100 border-l-4 border-brand-blue-500 p-2 rounded text-sm">
                           <div className="font-medium">CHEM 201</div>
                           <div className="text-gray-600">Lab 302</div>
                         </div>
                       )}
                       {day === 'Wednesday' && time === '9:00 AM' && (
-                        <div className="bg-blue-100 border-l-4 border-blue-500 p-2 rounded text-sm">
+                        <div className="bg-brand-blue-100 border-l-4 border-brand-blue-500 p-2 rounded text-sm">
                           <div className="font-medium">ENG 101</div>
                           <div className="text-gray-600">Room 204</div>
                         </div>
@@ -78,7 +78,7 @@ export default function StudentPortalSchedulePage() {
                         </div>
                       )}
                       {day === 'Thursday' && time === '10:00 AM' && (
-                        <div className="bg-blue-100 border-l-4 border-blue-500 p-2 rounded text-sm">
+                        <div className="bg-brand-blue-100 border-l-4 border-brand-blue-500 p-2 rounded text-sm">
                           <div className="font-medium">CHEM 201</div>
                           <div className="text-gray-600">Lab 302</div>
                         </div>
@@ -90,7 +90,7 @@ export default function StudentPortalSchedulePage() {
                         </div>
                       )}
                       {day === 'Friday' && time === '9:00 AM' && (
-                        <div className="bg-blue-100 border-l-4 border-blue-500 p-2 rounded text-sm">
+                        <div className="bg-brand-blue-100 border-l-4 border-brand-blue-500 p-2 rounded text-sm">
                           <div className="font-medium">ENG 101</div>
                           <div className="text-gray-600">Room 204</div>
                         </div>
@@ -116,7 +116,7 @@ export default function StudentPortalSchedulePage() {
         <div className="grid md:grid-cols-2 gap-4">
           <div className="border rounded-lg p-4">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-4 h-4 bg-blue-500 rounded"></div>
+              <div className="w-4 h-4 bg-brand-blue-500 rounded"></div>
               <h3 className="font-medium">English Composition 101</h3>
             </div>
             <p className="text-sm text-gray-600">MWF 9:00 AM - 9:50 AM | Room 204</p>
@@ -132,7 +132,7 @@ export default function StudentPortalSchedulePage() {
           </div>
           <div className="border rounded-lg p-4">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-4 h-4 bg-blue-500 rounded"></div>
+              <div className="w-4 h-4 bg-brand-blue-500 rounded"></div>
               <h3 className="font-medium">Chemistry 201</h3>
             </div>
             <p className="text-sm text-gray-600">TTh 10:00 AM - 11:30 AM | Lab 302</p>

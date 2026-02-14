@@ -112,16 +112,16 @@ export function PricingTiers({
             key={tier.id}
             className={`relative bg-white rounded-2xl border-2 p-6 transition-all cursor-pointer ${
               tier.popular
-                ? 'border-blue-500 shadow-lg scale-105'
+                ? 'border-brand-blue-500 shadow-lg scale-105'
                 : selectedTier === tier.id
-                ? 'border-blue-400 shadow-md'
+                ? 'border-brand-blue-400 shadow-md'
                 : 'border-gray-200 hover:border-gray-300'
             }`}
             onClick={() => setSelectedTier(tier.id)}
           >
             {tier.popular && (
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                <span className="inline-flex items-center gap-1 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                <span className="inline-flex items-center gap-1 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
                   <Star className="w-3 h-3" /> Most Popular
                 </span>
               </div>
@@ -155,7 +155,7 @@ export function PricingTiers({
               href={`/enroll/${programSlug}?tier=${tier.id}`}
               className={`block w-full text-center py-3 rounded-xl font-semibold transition ${
                 tier.popular
-                  ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                  ? 'bg-brand-blue-600 hover:bg-brand-blue-700 text-white'
                   : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
               }`}
             >
@@ -166,8 +166,8 @@ export function PricingTiers({
       </div>
 
       {fundingAvailable && (
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-center">
-          <p className="text-blue-800">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-4 text-center">
+          <p className="text-brand-blue-800">
             <strong>Funding may be available!</strong> Many participants qualify for 
             workforce funding that covers all or part of program costs.{' '}
             <Link href="/funding" className="underline font-semibold">

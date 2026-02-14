@@ -69,9 +69,9 @@ export default async function ApplicationsPage() {
 
 
   const statusColors: Record<string, string> = {
-    'New': 'bg-blue-100 text-blue-700',
+    'New': 'bg-brand-blue-100 text-brand-blue-700',
     'Reviewed': 'bg-yellow-100 text-yellow-700',
-    'Interview': 'bg-blue-100 text-blue-700',
+    'Interview': 'bg-brand-blue-100 text-brand-blue-700',
     'Offered': 'bg-green-100 text-green-700',
     'Rejected': 'bg-red-100 text-red-700',
   };
@@ -83,9 +83,9 @@ export default async function ApplicationsPage() {
 
   const stats = [
     { label: 'Total', count: applications.length, color: 'text-gray-900' },
-    { label: 'New', count: newCount, color: 'text-blue-600' },
+    { label: 'New', count: newCount, color: 'text-brand-blue-600' },
     { label: 'In Review', count: reviewCount, color: 'text-yellow-600' },
-    { label: 'Interview', count: interviewCount, color: 'text-blue-600' },
+    { label: 'Interview', count: interviewCount, color: 'text-brand-blue-600' },
     { label: 'Offered', count: offeredCount, color: 'text-green-600' },
   ];
 
@@ -96,7 +96,7 @@ export default async function ApplicationsPage() {
       <section className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex items-center gap-3 mb-2">
-            <FileText className="w-8 h-8 text-blue-600" />
+            <FileText className="w-8 h-8 text-brand-blue-600" />
             <h1 className="text-3xl font-bold text-gray-900">Applications</h1>
           </div>
           <p className="text-gray-600">Review and manage applications from candidates</p>
@@ -126,7 +126,7 @@ export default async function ApplicationsPage() {
               <input
                 type="text"
                 placeholder="Search applications..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
             <div className="flex gap-3">
@@ -197,7 +197,7 @@ export default async function ApplicationsPage() {
                   </button>
                   <Link
                     href={`/employer-portal/applications/${app.id}`}
-                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700"
+                    className="px-4 py-2 bg-brand-blue-600 text-white text-sm font-medium rounded-lg hover:bg-brand-blue-700"
                   >
                     Review
                   </Link>

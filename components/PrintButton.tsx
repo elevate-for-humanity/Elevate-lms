@@ -18,7 +18,7 @@ export default function PrintButton({
   return (
     <button
       onClick={handlePrint}
-      className={`print-button flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors ${className}`}
+      className={`print-button flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors ${className}`}
       aria-label="Print this page"
     >
       <Printer className="w-5 h-5" />

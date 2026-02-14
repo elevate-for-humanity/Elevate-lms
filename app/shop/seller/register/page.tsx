@@ -22,7 +22,7 @@ export default function SellerRegisterPage() {
           <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h1>
           <p className="text-gray-600 mb-6">We will review your seller application and get back to you within 2-3 business days.</p>
-          <Link href="/" className="text-blue-600 font-medium">Return to Home</Link>
+          <Link href="/" className="text-brand-blue-600 font-medium">Return to Home</Link>
         </div>
       </div>
     );
@@ -37,11 +37,11 @@ export default function SellerRegisterPage() {
         </div>
       </div>
 
-      <div className="bg-blue-900 text-white py-12">
+      <div className="bg-brand-blue-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Store className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h1 className="text-3xl font-bold mb-2">Become a Seller</h1>
-          <p className="text-blue-100">Sell your products and courses on the Elevate marketplace</p>
+          <p className="text-brand-blue-100">Sell your products and courses on the Elevate marketplace</p>
         </div>
       </div>
       <div className="max-w-2xl mx-auto px-4 py-12">
@@ -69,7 +69,7 @@ export default function SellerRegisterPage() {
               <textarea rows={4} value={formData.description} onChange={(e) => setFormData({...formData, description: e.target.value})}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg resize-none" placeholder="Describe your products or courses..." />
             </div>
-            <button type="submit" className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-bold transition">
+            <button type="submit" className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white py-4 rounded-lg font-bold transition">
               Submit Application
             </button>
           </form>

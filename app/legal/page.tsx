@@ -24,7 +24,7 @@ export default async function LegalPage() {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">Legal</h1>
-            <p className="text-lg text-blue-100">
+            <p className="text-lg text-brand-blue-100">
               Legal documents, agreements, and policies.
             </p>
           </div>

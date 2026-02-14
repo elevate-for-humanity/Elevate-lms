@@ -64,10 +64,10 @@ export default async function MyCoursesPage() {
       </div>
 
       {/* Header */}
-      <section className="bg-blue-800 text-white py-12">
+      <section className="bg-brand-blue-800 text-white py-12">
         <div className="max-w-6xl mx-auto px-4">
           <h1 className="text-3xl font-bold mb-2">My Courses</h1>
-          <p className="text-blue-100">Continue learning and advancing your career</p>
+          <p className="text-brand-blue-100">Continue learning and advancing your career</p>
         </div>
       </section>
 
@@ -83,7 +83,7 @@ export default async function MyCoursesPage() {
               <p className="text-gray-600 mb-6">Purchase a course to start learning.</p>
               <Link
                 href="/career-services/courses"
-                className="inline-flex items-center bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700"
+                className="inline-flex items-center bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700"
               >
                 Browse Courses
                 <ArrowRight className="w-5 h-5 ml-2" />
@@ -106,7 +106,7 @@ export default async function MyCoursesPage() {
                     />
                     <div className="absolute inset-0 bg-slate-800/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition">
                       <div className="bg-white rounded-full p-4">
-                        <Play className="w-8 h-8 text-blue-600" fill="currentColor" />
+                        <Play className="w-8 h-8 text-brand-blue-600" fill="currentColor" />
                       </div>
                     </div>
                   </div>
@@ -161,7 +161,7 @@ export default async function MyCoursesPage() {
                       </span>
                       <Link
                         href={`/career-services/courses/${course.slug}`}
-                        className="text-blue-600 font-medium text-sm hover:underline"
+                        className="text-brand-blue-600 font-medium text-sm hover:underline"
                       >
                         Learn More →
                       </Link>

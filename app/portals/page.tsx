@@ -91,9 +91,9 @@ const portals = [
 ];
 
 const colorClasses: Record<string, { bg: string; text: string; border: string; light: string }> = {
-  blue: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
+  blue: { bg: 'bg-brand-blue-600', text: 'text-brand-blue-600', border: 'border-brand-blue-200', light: 'bg-brand-blue-50' },
   green: { bg: 'bg-green-600', text: 'text-green-600', border: 'border-green-200', light: 'bg-green-50' },
-  blue: { bg: 'bg-blue-600', text: 'text-blue-600', border: 'border-blue-200', light: 'bg-blue-50' },
+  blue: { bg: 'bg-brand-blue-600', text: 'text-brand-blue-600', border: 'border-brand-blue-200', light: 'bg-brand-blue-50' },
   orange: { bg: 'bg-orange-600', text: 'text-orange-600', border: 'border-orange-200', light: 'bg-orange-50' },
   teal: { bg: 'bg-teal-600', text: 'text-teal-600', border: 'border-teal-200', light: 'bg-teal-50' },
   indigo: { bg: 'bg-indigo-600', text: 'text-indigo-600', border: 'border-indigo-200', light: 'bg-indigo-50' },
@@ -121,11 +121,11 @@ export default function PortalsPage() {
               <span>Secure Access</span>
             </div>
             <div className="flex items-center gap-2">
-              <Clock className="w-5 h-5 text-blue-400" />
+              <Clock className="w-5 h-5 text-brand-blue-400" />
               <span>24/7 Availability</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-blue-400" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-400" />
               <span>Real-Time Updates</span>
             </div>
           </div>
@@ -210,7 +210,7 @@ export default function PortalsPage() {
               href="/login?redirect=/student-portal/dashboard"
               className="flex items-center justify-center gap-3 px-6 py-4 bg-slate-800 rounded-xl hover:bg-slate-700 transition-colors"
             >
-              <GraduationCap className="w-6 h-6 text-blue-400" />
+              <GraduationCap className="w-6 h-6 text-brand-blue-400" />
               <span className="font-semibold">Student Sign In</span>
             </Link>
             <Link

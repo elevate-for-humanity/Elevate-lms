@@ -8,7 +8,7 @@ export default function DemoAuditLogsPage() {
         {DEMO_RECENT_ACTIVITY.map((a) => (
           <div key={a.id} className="p-4 flex items-start gap-3">
             <div className={`w-2 h-2 rounded-full mt-2 ${
-              a.type === 'enrollment' ? 'bg-blue-500' :
+              a.type === 'enrollment' ? 'bg-brand-blue-500' :
               a.type === 'hours' ? 'bg-green-500' :
               a.type === 'completion' ? 'bg-purple-500' :
               'bg-gray-400'

@@ -110,7 +110,7 @@ export function EligibilityChecker() {
           type="button"
           onClick={handleSubmit}
           disabled={!allRequiredAnswered}
-          className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition"
+          className="w-full bg-brand-blue-600 text-white py-4 rounded-lg font-bold text-lg hover:bg-brand-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed transition"
         >
           Check Eligibility
         </button>

@@ -77,7 +77,7 @@ export default async function ContactsPage() {
               <h1 className="text-3xl font-bold text-gray-900">Contact Management</h1>
               <p className="text-gray-600 mt-2">Review and respond to contact form submissions</p>
             </div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
               Export Contacts
             </button>
           </div>
@@ -88,7 +88,7 @@ export default async function ContactsPage() {
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-medium text-gray-500">Total Contacts</h3>
-              <span className="text-blue-600 bg-blue-100 p-2 rounded-lg">
+              <span className="text-brand-blue-600 bg-brand-blue-100 p-2 rounded-lg">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                 </svg>

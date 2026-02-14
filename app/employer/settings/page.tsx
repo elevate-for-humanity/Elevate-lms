@@ -63,7 +63,7 @@ export default async function EmployerSettingsPage() {
         {/* Company Profile */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
-            <Building2 className="w-6 h-6 text-blue-600" />
+            <Building2 className="w-6 h-6 text-brand-blue-600" />
             <h2 className="text-lg font-semibold">Company Profile</h2>
           </div>
           
@@ -75,7 +75,7 @@ export default async function EmployerSettingsPage() {
               <input
                 type="text"
                 defaultValue={profile.company_name || ''}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 placeholder="Your Company Name"
               />
             </div>
@@ -85,7 +85,7 @@ export default async function EmployerSettingsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Industry
                 </label>
-                <select className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <select className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
                   <option value="">Select Industry</option>
                   <option value="healthcare">Healthcare</option>
                   <option value="construction">Construction</option>
@@ -100,7 +100,7 @@ export default async function EmployerSettingsPage() {
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Company Size
                 </label>
-                <select className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+                <select className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
                   <option value="">Select Size</option>
                   <option value="1-10">1-10 employees</option>
                   <option value="11-50">11-50 employees</option>
@@ -117,14 +117,14 @@ export default async function EmployerSettingsPage() {
               </label>
               <textarea
                 rows={3}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 placeholder="Brief description of your company..."
               />
             </div>
 
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
             >
               Save Company Profile
             </button>
@@ -147,7 +147,7 @@ export default async function EmployerSettingsPage() {
                 <input
                   type="text"
                   defaultValue={profile.full_name || ''}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
               <div>
@@ -156,7 +156,7 @@ export default async function EmployerSettingsPage() {
                 </label>
                 <input
                   type="text"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   placeholder="e.g., HR Manager"
                 />
               </div>
@@ -172,7 +172,7 @@ export default async function EmployerSettingsPage() {
                   <input
                     type="email"
                     defaultValue={profile.email || user.email || ''}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>
@@ -185,7 +185,7 @@ export default async function EmployerSettingsPage() {
                   <input
                     type="tel"
                     defaultValue={profile.phone || ''}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>
@@ -199,7 +199,7 @@ export default async function EmployerSettingsPage() {
                 <MapPin className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
                 <textarea
                   rows={2}
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   placeholder="Street address, City, State, ZIP"
                 />
               </div>
@@ -207,7 +207,7 @@ export default async function EmployerSettingsPage() {
 
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
             >
               Save Contact Info
             </button>
@@ -217,7 +217,7 @@ export default async function EmployerSettingsPage() {
         {/* Verification Status */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex items-center gap-3 mb-4">
-            <Shield className="w-6 h-6 text-blue-600" />
+            <Shield className="w-6 h-6 text-brand-blue-600" />
             <h2 className="text-lg font-semibold">Verification Status</h2>
           </div>
           
@@ -269,7 +269,7 @@ export default async function EmployerSettingsPage() {
                 <div className="font-medium">New Applications</div>
                 <div className="text-sm text-gray-600">Get notified when candidates apply to your jobs</div>
               </div>
-              <input type="checkbox" defaultChecked className="w-5 h-5 text-blue-600 rounded" />
+              <input type="checkbox" defaultChecked className="w-5 h-5 text-brand-blue-600 rounded" />
             </label>
             
             <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
@@ -277,7 +277,7 @@ export default async function EmployerSettingsPage() {
                 <div className="font-medium">New Candidates</div>
                 <div className="text-sm text-gray-600">Get notified when new candidates match your criteria</div>
               </div>
-              <input type="checkbox" defaultChecked className="w-5 h-5 text-blue-600 rounded" />
+              <input type="checkbox" defaultChecked className="w-5 h-5 text-brand-blue-600 rounded" />
             </label>
             
             <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
@@ -285,7 +285,7 @@ export default async function EmployerSettingsPage() {
                 <div className="font-medium">Weekly Digest</div>
                 <div className="text-sm text-gray-600">Receive a weekly summary of activity</div>
               </div>
-              <input type="checkbox" className="w-5 h-5 text-blue-600 rounded" />
+              <input type="checkbox" className="w-5 h-5 text-brand-blue-600 rounded" />
             </label>
           </div>
         </div>

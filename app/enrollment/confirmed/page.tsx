@@ -86,7 +86,7 @@ function EnrollmentConfirmedContent() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue-600"></div>
       </div>
     );
   }
@@ -118,7 +118,7 @@ function EnrollmentConfirmedContent() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <Award className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Award className="w-5 h-5 text-brand-blue-600 mt-0.5" />
               <div>
                 <p className="text-sm text-gray-500">Program</p>
                 <p className="font-semibold text-gray-900">{enrollment.program_name}</p>
@@ -134,7 +134,7 @@ function EnrollmentConfirmedContent() {
             </div>
 
             <div className="flex items-start gap-3">
-              <Calendar className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Calendar className="w-5 h-5 text-brand-blue-600 mt-0.5" />
               <div>
                 <p className="text-sm text-gray-500">Confirmed Date</p>
                 <p className="font-semibold text-gray-900">{confirmDate}</p>
@@ -142,7 +142,7 @@ function EnrollmentConfirmedContent() {
             </div>
 
             <div className="flex items-start gap-3">
-              <Building2 className="w-5 h-5 text-blue-600 mt-0.5" />
+              <Building2 className="w-5 h-5 text-brand-blue-600 mt-0.5" />
               <div>
                 <p className="text-sm text-gray-500">Sponsor</p>
                 <p className="font-semibold text-gray-900">Elevate for Humanity (USDOL Registered)</p>
@@ -154,7 +154,7 @@ function EnrollmentConfirmedContent() {
         {/* CTA Button */}
         <Link
           href="/enrollment/orientation"
-          className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center font-semibold py-4 px-6 rounded-lg transition-colors"
+          className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center font-semibold py-4 px-6 rounded-lg transition-colors"
         >
           Start Orientation
         </Link>
@@ -172,7 +172,7 @@ export default function EnrollmentConfirmedPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue-600"></div>
       </div>
     }>
       <EnrollmentConfirmedContent />

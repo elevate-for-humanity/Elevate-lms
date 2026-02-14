@@ -66,11 +66,11 @@ export default async function SupersonicApplyPage() {
           <div className="bg-white rounded-xl border p-8 text-center">
             <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
               existingApplication.status === 'approved' ? 'bg-green-100' :
-              existingApplication.status === 'pending' ? 'bg-yellow-100' : 'bg-blue-100'
+              existingApplication.status === 'pending' ? 'bg-yellow-100' : 'bg-brand-blue-100'
             }`}>
               <Zap className={`w-8 h-8 ${
                 existingApplication.status === 'approved' ? 'text-green-600' :
-                existingApplication.status === 'pending' ? 'text-yellow-600' : 'text-blue-600'
+                existingApplication.status === 'pending' ? 'text-yellow-600' : 'text-brand-blue-600'
               }`} />
             </div>
             <h2 className="text-xl font-semibold mb-2">Application {existingApplication.status}</h2>

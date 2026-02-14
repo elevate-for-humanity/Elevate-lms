@@ -68,8 +68,8 @@ export default async function InstructorProgramsPage() {
               <div key={program.id} className="bg-white rounded-lg shadow-sm border overflow-hidden">
                 <div className="p-6">
                   <div className="flex items-start gap-3 mb-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <BookOpen className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                      <BookOpen className="w-6 h-6 text-brand-blue-600" />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">{program.name}</h3>
@@ -94,7 +94,7 @@ export default async function InstructorProgramsPage() {
 
                   <Link
                     href={`/instructor/programs/${program.id}`}
-                    className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    className="block w-full text-center px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
                   >
                     View Program
                   </Link>

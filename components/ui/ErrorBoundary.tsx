@@ -48,7 +48,7 @@ export function ErrorBoundaryUI({
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <button
             onClick={reset}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2"
             aria-label="Try loading the page again"
           >
             <RefreshCw className="h-5 w-5" aria-hidden="true" />
@@ -77,7 +77,7 @@ export function ErrorBoundaryUI({
           <p>If this problem persists, please contact support:</p>
           <a 
             href="mailto:support@elevateforhumanity.org" 
-            className="text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="text-brand-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           >
             support@elevateforhumanity.org
           </a>

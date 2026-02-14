@@ -34,7 +34,7 @@ export default async function EmployerProposalPage({ params }: { params: { id: s
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Proposed Terms</label><textarea className="w-full border rounded-lg px-3 py-2" rows={4} placeholder="Describe partnership terms..." /></div>
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Expected Outcomes</label><textarea className="w-full border rounded-lg px-3 py-2" rows={3} placeholder="Expected hiring commitments, training support, etc." /></div>
             <div className="flex gap-4 pt-4 border-t">
-              <button className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Send Proposal</button>
+              <button className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Send Proposal</button>
               <button className="px-4 py-2 border rounded-lg hover:bg-gray-50">Save Draft</button>
             </div>
           </div>

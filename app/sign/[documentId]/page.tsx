@@ -109,7 +109,7 @@ export default function SignDocumentPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Loading document...</p>
         </div>
       </div>
@@ -129,7 +129,7 @@ export default function SignDocumentPage() {
           <p className="text-gray-600 mb-6">{error}</p>
           <Link
             href="/dashboard"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
           >
             Return to Dashboard
           </Link>
@@ -153,7 +153,7 @@ export default function SignDocumentPage() {
           </p>
           <Link
             href="/dashboard"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
           >
             Return to Dashboard
           </Link>
@@ -208,7 +208,7 @@ export default function SignDocumentPage() {
               type="text"
               value={signature}
               onChange={(e) => setSignature(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               placeholder="Your full legal name"
             />
           </div>
@@ -219,7 +219,7 @@ export default function SignDocumentPage() {
                 type="checkbox"
                 checked={agreed}
                 onChange={(e) => setAgreed(e.target.checked)}
-                className="mt-1 h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="mt-1 h-4 w-4 text-brand-blue-600 border-gray-300 rounded focus:ring-brand-blue-500"
               />
               <span className="text-sm text-gray-600">
                 I have read and agree to the terms of this document. I understand that by typing my name above, 
@@ -232,7 +232,7 @@ export default function SignDocumentPage() {
             <button
               onClick={handleSign}
               disabled={!signature.trim() || !agreed || signing}
-              className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="flex-1 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
             >
               {signing ? 'Signing...' : 'Sign Document'}
             </button>

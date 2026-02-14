@@ -97,20 +97,20 @@ export default async function CourseDetailPage({
                 </span>
               )}
               <h1 className="text-4xl lg:text-5xl font-bold mb-4">{course.title}</h1>
-              <p className="text-xl text-blue-200 mb-6">{course.subtitle}</p>
+              <p className="text-xl text-brand-blue-200 mb-6">{course.subtitle}</p>
               <p className="text-gray-300 mb-8">{course.description}</p>
 
               <div className="flex flex-wrap gap-6 mb-8 text-sm">
                 <div className="flex items-center gap-2">
-                  <Play className="w-5 h-5 text-blue-400" />
+                  <Play className="w-5 h-5 text-brand-blue-400" />
                   <span>{course.lesson_count} video lessons</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Clock className="w-5 h-5 text-blue-400" />
+                  <Clock className="w-5 h-5 text-brand-blue-400" />
                   <span>{course.duration_hours} hours of content</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Award className="w-5 h-5 text-blue-400" />
+                  <Award className="w-5 h-5 text-brand-blue-400" />
                   <span>Certificate included</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -137,7 +137,7 @@ export default async function CourseDetailPage({
                 </div>
                 {/* Sezzle Widget - shows "or 4 interest-free payments" */}
                 {Number(course.price) >= 35 && Number(course.price) <= 2500 && (
-                  <div className="sezzle-hero-widget text-blue-200" />
+                  <div className="sezzle-hero-widget text-brand-blue-200" />
                 )}
               </div>
             </div>
@@ -153,7 +153,7 @@ export default async function CourseDetailPage({
                 />
                 <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                   <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center cursor-pointer hover:scale-110 transition">
-                    <Play className="w-8 h-8 text-blue-600 ml-1" fill="currentColor" />
+                    <Play className="w-8 h-8 text-brand-blue-600 ml-1" fill="currentColor" />
                   </div>
                 </div>
               </div>
@@ -238,15 +238,15 @@ export default async function CourseDetailPage({
               <p className="text-gray-600 text-sm">Not satisfied? Get a full refund within 30 days, no questions asked.</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Download className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Download className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Lifetime Access</h3>
               <p className="text-gray-600 text-sm">Buy once, access forever. Including all future updates.</p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <MessageSquare className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <MessageSquare className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Expert Support</h3>
               <p className="text-gray-600 text-sm">Get your questions answered by career experts.</p>
@@ -259,13 +259,13 @@ export default async function CourseDetailPage({
       <section className="py-16 bg-slate-700 text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Improve Your Career?</h2>
-          <p className="text-blue-100 mb-8">
+          <p className="text-brand-blue-100 mb-8">
             Join thousands of professionals who have accelerated their careers with our courses.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href={`/career-services/courses/${slug}/checkout`}
-              className="inline-flex items-center justify-center bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-blue-50 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-50 transition"
             >
               Enroll Now - ${Number(course.price).toFixed(0)}
               <ArrowRight className="w-5 h-5 ml-2" />

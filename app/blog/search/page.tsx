@@ -75,7 +75,7 @@ export default async function BlogSearchPage({
                 name="q"
                 defaultValue={query}
                 placeholder="Search articles..."
-                className="w-full px-4 py-3 pl-12 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 pl-12 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 autoFocus
               />
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
@@ -116,7 +116,7 @@ export default async function BlogSearchPage({
                 )}
                 <div className="p-6">
                   {post.category && (
-                    <span className="inline-block px-3 py-2 bg-blue-100 text-blue-800 text-sm font-semibold rounded-full mb-3">
+                    <span className="inline-block px-3 py-2 bg-brand-blue-100 text-brand-blue-800 text-sm font-semibold rounded-full mb-3">
                       {post.category}
                     </span>
                   )}

@@ -73,14 +73,14 @@ export default async function LearningHubPage() {
               count="500+ lessons"
             />
             <ResourceCard
-              icon={<FileText className="w-12 h-12 text-blue-600" />}
+              icon={<FileText className="w-12 h-12 text-brand-blue-600" />}
               title="Syllabi"
               description="View course syllabi and requirements"
               href="/syllabi"
               count="100+ courses"
             />
             <ResourceCard
-              icon={<NotebookPen className="w-12 h-12 text-blue-600" />}
+              icon={<NotebookPen className="w-12 h-12 text-brand-blue-600" />}
               title="Workbooks"
               description="Interactive digital workbooks"
               href="/workbooks"
@@ -142,20 +142,20 @@ export default async function LearningHubPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-blue-100 mb-6">Apply today for free career training programs.</p>
+          <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <Link
               href="/inquiry"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               Ask a Question
             </Link>
@@ -172,7 +172,7 @@ function ResourceCard({ icon, title, description, href, count }: any) {
       <div className="mb-4 group-hover:scale-110 transition-transform">{icon}</div>
       <h3 className="text-xl font-bold mb-2">{title}</h3>
       <p className="text-black mb-3">{description}</p>
-      <p className="text-sm font-semibold text-blue-600">{count}</p>
+      <p className="text-sm font-semibold text-brand-blue-600">{count}</p>
     </Link>
   );
 }

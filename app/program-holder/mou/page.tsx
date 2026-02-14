@@ -37,14 +37,14 @@ export default async function ProgramHolderMOUPage() {
               <div><p className="text-sm text-gray-500">Expiration Date</p><p className="font-medium">{mou.expiry_date ? new Date(mou.expiry_date).toLocaleDateString() : 'N/A'}</p></div>
             </div>
             <div className="flex gap-4">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Download MOU</button>
+              <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Download MOU</button>
               <button className="border px-4 py-2 rounded-lg hover:bg-gray-50">Request Amendment</button>
             </div>
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
             <p className="text-gray-500 mb-4">No MOU on file</p>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Request MOU</button>
+            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Request MOU</button>
           </div>
         )}
       </div>

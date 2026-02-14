@@ -153,7 +153,7 @@ export default async function CoursePage({ params }: { params: Params }) {
         <div className="max-w-7xl mx-auto px-4 py-12">
           <div className="grid lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2">
-              <nav className="flex items-center gap-2 text-blue-200 text-sm mb-4">
+              <nav className="flex items-center gap-2 text-brand-blue-200 text-sm mb-4">
                 <Link href="/lms/dashboard" className="hover:text-white">Dashboard</Link>
                 <ChevronRight className="w-4 h-4" />
                 <Link href="/lms/courses" className="hover:text-white">Courses</Link>
@@ -164,7 +164,7 @@ export default async function CoursePage({ params }: { params: Params }) {
               <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.title}</h1>
               
               {course.description && (
-                <p className="text-blue-100 text-lg mb-6">{course.description}</p>
+                <p className="text-brand-blue-100 text-lg mb-6">{course.description}</p>
               )}
 
               <div className="flex flex-wrap items-center gap-6 text-sm">
@@ -218,7 +218,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                     </div>
                     <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-blue-600 rounded-full transition-all"
+                        className="h-full bg-brand-blue-600 rounded-full transition-all"
                         style={{ width: `${progressPercentage}%` }}
                       />
                     </div>
@@ -227,7 +227,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                   {nextLesson ? (
                     <Link
                       href={`/lms/courses/${courseId}/lessons/${nextLesson.id}`}
-                      className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+                      className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-brand-blue-700 transition"
                     >
                       <Play className="w-5 h-5" />
                       {completedLessons > 0 ? 'Continue Learning' : 'Start Course'}
@@ -242,7 +242,7 @@ export default async function CoursePage({ params }: { params: Params }) {
               ) : (
                 <Link
                   href={`/lms/enroll?course=${courseId}`}
-                  className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+                  className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-brand-blue-700 transition"
                 >
                   Enroll Now
                 </Link>
@@ -293,7 +293,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                             isCompleted
                               ? 'bg-green-100 text-green-600'
-                              : 'bg-blue-100 text-blue-600'
+                              : 'bg-brand-blue-100 text-brand-blue-600'
                           }`}>
                             {isCompleted ? (
                               <CheckCircle className="w-5 h-5" />
@@ -339,8 +339,8 @@ export default async function CoursePage({ params }: { params: Params }) {
                       href={`/lms/quizzes/${quiz.id}`}
                       className="flex items-center gap-4 p-4 hover:bg-slate-50 transition border-b border-slate-100 last:border-b-0"
                     >
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-brand-blue-600" />
                       </div>
                       <div className="flex-1">
                         <h3 className="font-medium text-slate-900">{quiz.title}</h3>
@@ -407,7 +407,7 @@ export default async function CoursePage({ params }: { params: Params }) {
             {/* AI Instructor */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <div className="flex items-center gap-2 mb-4">
-                <Bot className="w-5 h-5 text-blue-600" />
+                <Bot className="w-5 h-5 text-brand-blue-600" />
                 <h3 className="font-semibold text-slate-900">AI Study Assistant</h3>
               </div>
               <AIInstructor />
@@ -438,7 +438,7 @@ export default async function CoursePage({ params }: { params: Params }) {
         {enrollment && (
           <div className="mt-12">
             <div className="flex items-center gap-2 mb-6">
-              <MessageSquare className="w-6 h-6 text-blue-600" />
+              <MessageSquare className="w-6 h-6 text-brand-blue-600" />
               <h2 className="text-2xl font-bold text-slate-900">Course Discussions</h2>
             </div>
             <DiscussionForum />

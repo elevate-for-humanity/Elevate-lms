@@ -101,7 +101,7 @@ export default async function TrainingPage() {
           </div>
 
           {/* Requirements */}
-          <div className="bg-blue-50 rounded-lg p-8 border border-blue-200">
+          <div className="bg-brand-blue-50 rounded-lg p-8 border border-brand-blue-200">
             <h3 className="text-2xl font-bold mb-4">Requirements</h3>
             <div className="grid md:grid-cols-2 gap-6">
               <div>

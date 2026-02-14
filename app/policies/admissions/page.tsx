@@ -39,7 +39,7 @@ export default function AdmissionsPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">General Admission Requirements</h2>
             
-            <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+            <div className="bg-brand-blue-50 rounded-xl p-6 border-2 border-brand-blue-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Basic Requirements</h3>
               <p className="text-black mb-4">All applicants must meet the following:</p>
               <ul className="list-disc pl-6 text-black space-y-2">
@@ -90,7 +90,7 @@ export default function AdmissionsPage() {
             <div className="bg-gray-50 rounded-xl p-8 border-2 border-gray-200 mb-6">
               <div className="space-y-6">
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     1
                   </div>
                   <div>
@@ -127,7 +127,7 @@ export default function AdmissionsPage() {
                 </div>
 
                 <div className="flex gap-6">
-                  <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
+                  <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-xl">
                     3
                   </div>
                   <div>
@@ -212,7 +212,7 @@ export default function AdmissionsPage() {
                 </ul>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+              <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200">
                 <h3 className="text-lg font-bold text-black mb-3">Other Options</h3>
                 <ul className="list-disc pl-6 text-black space-y-2">
                   <li>Employer sponsorship</li>
@@ -295,18 +295,18 @@ export default function AdmissionsPage() {
               <li><strong>Phone:</strong> (317) 314-3757</li>
               <li><strong>Office Hours:</strong> Monday-Friday, 8:00 AM - 6:00 PM EST</li>
               <li><strong>Location:</strong> 3737 N Meridian St, Suite 200, Indianapolis, IN 46208</li>
-              <li><strong>Apply Online:</strong> <a href="/apply" className="text-blue-600 hover:underline">www.elevateforhumanity.org/apply</a></li>
+              <li><strong>Apply Online:</strong> <a href="/apply" className="text-brand-blue-600 hover:underline">www.elevateforhumanity.org/apply</a></li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/funding-verification" className="text-blue-600 hover:underline">Funding Verification Policy</a></li>
-                <li><a href="/policies/verification" className="text-blue-600 hover:underline">Identity Verification Policy</a></li>
-                <li><a href="/policies/student-code" className="text-blue-600 hover:underline">Student Code of Conduct</a></li>
-                <li><a href="/policies/progress" className="text-blue-600 hover:underline">Progress Policy</a></li>
+                <li><a href="/policies/funding-verification" className="text-brand-blue-600 hover:underline">Funding Verification Policy</a></li>
+                <li><a href="/policies/verification" className="text-brand-blue-600 hover:underline">Identity Verification Policy</a></li>
+                <li><a href="/policies/student-code" className="text-brand-blue-600 hover:underline">Student Code of Conduct</a></li>
+                <li><a href="/policies/progress" className="text-brand-blue-600 hover:underline">Progress Policy</a></li>
               </ul>
             </div>
           </div>

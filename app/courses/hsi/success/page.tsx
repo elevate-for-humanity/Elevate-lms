@@ -82,7 +82,7 @@ export default async function HSISuccessPage({
               href={enrollment.course.hsi_enrollment_link}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition-colors"
             >
               Start HSI Training <ExternalLink className="w-5 h-5" />
             </a>
@@ -97,10 +97,10 @@ export default async function HSISuccessPage({
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white rounded-xl p-6 shadow-sm border text-center">
-              <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Mail className="w-7 h-7 text-blue-600" />
+              <div className="w-14 h-14 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Mail className="w-7 h-7 text-brand-blue-600" />
               </div>
-              <div className="text-sm text-blue-600 font-semibold mb-2">Step 1</div>
+              <div className="text-sm text-brand-blue-600 font-semibold mb-2">Step 1</div>
               <h3 className="font-bold text-gray-900 mb-2">Check Your Email</h3>
               <p className="text-gray-600 text-sm">
                 You'll receive an email from HSI with your login credentials within 24 hours.
@@ -135,9 +135,9 @@ export default async function HSISuccessPage({
       {/* Important Information */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-blue-50 rounded-2xl p-8">
+          <div className="bg-brand-blue-50 rounded-2xl p-8">
             <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <Calendar className="w-6 h-6 text-blue-600" />
+              <Calendar className="w-6 h-6 text-brand-blue-600" />
               Important Information
             </h2>
             <ul className="space-y-4">
@@ -181,11 +181,11 @@ export default async function HSISuccessPage({
                 Questions about your enrollment or funding?
               </p>
               <div className="space-y-2">
-                <a href="/support" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                <a href="/support" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700">
                   <Phone className="w-4 h-4" />
                   Get Help Online
                 </a>
-                <a href="mailto:elevateforhumanity@gmail.com" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                <a href="mailto:elevateforhumanity@gmail.com" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700">
                   <Mail className="w-4 h-4" />
                   elevateforhumanity@gmail.com
                 </a>
@@ -198,7 +198,7 @@ export default async function HSISuccessPage({
                 Issues with the HSI learning platform?
               </p>
               <div className="space-y-2">
-                <a href="mailto:support@hsi.com" className="flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                <a href="mailto:support@hsi.com" className="flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700">
                   <Mail className="w-4 h-4" />
                   support@hsi.com
                 </a>

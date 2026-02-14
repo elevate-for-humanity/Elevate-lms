@@ -62,7 +62,7 @@ export function HeroWithVoiceover({
           <div className="mt-6">
             <button
               onClick={handlePlaySound}
-              className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg transition-all"
+              className="px-8 py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold rounded-lg transition-all"
             >
               🔊 Play with Sound
             </button>

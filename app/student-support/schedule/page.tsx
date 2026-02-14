@@ -34,10 +34,10 @@ export default async function SchedulePage() {
             <h2 className="text-xl font-bold mb-4">Sign in to schedule your appointment</h2>
             <p className="text-gray-600 mb-6">Create a free account or sign in to book a time with one of our advisors. No phone call needed — pick a time that works for you.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/login?redirect=/student-support/schedule" className="bg-blue-600 text-white font-bold px-8 py-3 rounded-lg hover:bg-blue-700 transition">Sign In</Link>
-              <Link href="/signup" className="border-2 border-blue-600 text-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-blue-50 transition">Create Free Account</Link>
+              <Link href="/login?redirect=/student-support/schedule" className="bg-brand-blue-600 text-white font-bold px-8 py-3 rounded-lg hover:bg-brand-blue-700 transition">Sign In</Link>
+              <Link href="/signup" className="border-2 border-brand-blue-600 text-brand-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-brand-blue-50 transition">Create Free Account</Link>
             </div>
-            <p className="text-sm text-gray-500 mt-6">Or get immediate help: <Link href="/support" className="text-blue-600 hover:underline">Visit our Help Center</Link> or <Link href="/faq" className="text-blue-600 hover:underline">check our FAQ</Link></p>
+            <p className="text-sm text-gray-500 mt-6">Or get immediate help: <Link href="/support" className="text-brand-blue-600 hover:underline">Visit our Help Center</Link> or <Link href="/faq" className="text-brand-blue-600 hover:underline">check our FAQ</Link></p>
           </div>
         </div>
       </div>

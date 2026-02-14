@@ -38,8 +38,8 @@ export default async function EmployerVerificationPage() {
 <h1 className="text-3xl font-bold mb-6">Employer Verification</h1>
       
       {!user && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <p className="text-blue-900">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
+          <p className="text-brand-blue-900">
             <Link href="/login" className="font-semibold hover:underline">Login</Link> or{' '}
             <Link href="/signup" className="font-semibold hover:underline">create an account</Link> to get verified as an employer.
           </p>
@@ -51,7 +51,7 @@ export default async function EmployerVerificationPage() {
           Complete your employer verification to access all features.
         </p>
         <div className="space-y-4">
-          <div className="border-l-4 border-blue-500 pl-4">
+          <div className="border-l-4 border-brand-blue-500 pl-4">
             <h3 className="font-semibold mb-2">Required Documents:</h3>
             <ul className="list-disc list-inside text-black space-y-1">
               <li>Business license or registration</li>

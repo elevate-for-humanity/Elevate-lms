@@ -56,7 +56,7 @@ export function EmployerTalentPipeline() {
 
   const stageColors: Record<string, string> = {
     sourced: 'bg-gray-100 text-black',
-    screening: 'bg-blue-100 text-blue-700',
+    screening: 'bg-brand-blue-100 text-brand-blue-700',
     interview: 'bg-purple-100 text-purple-700',
     offer: 'bg-orange-100 text-orange-700',
     hired: 'bg-green-100 text-green-700',

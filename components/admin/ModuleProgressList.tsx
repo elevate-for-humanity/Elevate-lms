@@ -59,7 +59,7 @@ export default function ModuleProgressList({
       case 'completed':
         return 'text-green-400 bg-green-500/10 border-green-500/30';
       case 'in_progress':
-        return 'text-blue-400 bg-blue-500/10 border-blue-500/30';
+        return 'text-brand-blue-400 bg-brand-blue-500/10 border-brand-blue-500/30';
       case 'awaiting_proof':
         return 'text-yellow-400 bg-yellow-500/10 border-yellow-500/30';
       default:
@@ -183,7 +183,7 @@ export default function ModuleProgressList({
                   href={progress.partner_completion_proof_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 underline"
+                  className="text-brand-blue-400 hover:text-brand-blue-300 underline"
                 >
                   View →
                 </a>
@@ -208,7 +208,7 @@ export default function ModuleProgressList({
                   href={progress.module.external_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-blue-400 hover:text-blue-300 underline text-xs"
+                  className="text-brand-blue-400 hover:text-brand-blue-300 underline text-xs"
                 >
                   Open →
                 </a>
@@ -250,7 +250,7 @@ export default function ModuleProgressList({
             <div className="text-xs text-slate-400">Completed</div>
           </div>
           <div>
-            <div className="text-2xl font-bold text-blue-400">
+            <div className="text-2xl font-bold text-brand-blue-400">
               {sortedProgress.filter(p => p.status === 'in_progress').length}
             </div>
             <div className="text-xs text-slate-400">In Progress</div>

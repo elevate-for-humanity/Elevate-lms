@@ -28,7 +28,7 @@ const activities = [
     type: 'enrollment',
     icon: BookOpen,
     color: 'text-brand-orange-600',
-    bgColor: 'bg-blue-100',
+    bgColor: 'bg-brand-blue-100',
     title: 'Enrolled in Course',
     course: 'HVAC Technician Training',
     time: '3 days ago',

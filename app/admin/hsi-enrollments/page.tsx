@@ -86,7 +86,7 @@ export default async function HSIEnrollmentsPage() {
               </div>
               <Link
                 href="/admin/courses/partners"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
               >
                 Manage Partner Courses
               </Link>
@@ -136,7 +136,7 @@ export default async function HSIEnrollmentsPage() {
                           enrollment.status === 'completed'
                             ? 'bg-green-100 text-green-800'
                             : enrollment.status === 'active'
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'bg-brand-blue-100 text-brand-blue-800'
                               : 'bg-gray-100 text-black'
                         }`}
                       >

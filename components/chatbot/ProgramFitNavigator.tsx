@@ -40,7 +40,7 @@ export function ProgramFitNavigator({
     return (
       <button
         onClick={openChat}
-        className={`text-sm text-gray-600 hover:text-blue-600 transition-colors ${className}`}
+        className={`text-sm text-gray-600 hover:text-brand-blue-600 transition-colors ${className}`}
       >
         Program Fit Review
       </button>
@@ -62,7 +62,7 @@ export function ProgramFitNavigator({
           </div>
           <button
             onClick={openChat}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors whitespace-nowrap"
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors whitespace-nowrap"
           >
             Run a Program Fit Review
             <ArrowRight className="w-4 h-4" />
@@ -89,14 +89,14 @@ export function ProgramFitNavigator({
             <HelpCircle className="w-5 h-5" />
           </button>
         </div>
-        <p className="text-sm text-blue-100 mt-1">
+        <p className="text-sm text-brand-blue-100 mt-1">
           Guided intake for institutions evaluating program operations and credentialing systems.
         </p>
       </div>
 
       {/* Info panel (expandable) */}
       {showInfo && (
-        <div className="bg-blue-50 border-b border-blue-100 px-6 py-4">
+        <div className="bg-brand-blue-50 border-b border-brand-blue-100 px-6 py-4">
           <div className="flex justify-between items-start">
             <div>
               <h4 className="font-semibold text-gray-900 mb-2">What is this?</h4>
@@ -126,7 +126,7 @@ export function ProgramFitNavigator({
 
         <button
           onClick={openChat}
-          className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors"
+          className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 bg-brand-blue-600 text-white font-semibold rounded-xl hover:bg-brand-blue-700 transition-colors"
         >
           See if this fits your program
           <ArrowRight className="w-4 h-4" />

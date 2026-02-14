@@ -67,7 +67,7 @@ function EnrollConfirmationContent() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600 mx-auto mb-4" />
           <p className="text-gray-600">Confirming your enrollment...</p>
         </div>
       </div>
@@ -81,7 +81,7 @@ function EnrollConfirmationContent() {
           <p className="text-gray-600 mb-6">{error}</p>
           <Link
             href="/contact"
-            className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+            className="inline-flex items-center justify-center px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition"
           >
             Contact Support
           </Link>
@@ -129,8 +129,8 @@ function EnrollConfirmationContent() {
         </div>
 
         {/* Critical Message */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-6">
-          <p className="text-blue-900 font-medium text-center">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-6">
+          <p className="text-brand-blue-900 font-medium text-center">
             Payment secures your enrollment. Training access unlocks after approval and shop assignment.
           </p>
         </div>
@@ -222,14 +222,14 @@ function EnrollConfirmationContent() {
               href="/messages"
               className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition"
             >
-              <MessageCircle className="w-5 h-5 text-blue-600" />
+              <MessageCircle className="w-5 h-5 text-brand-blue-600" />
               <span className="text-gray-700">Message your enrollment advisor</span>
             </Link>
             <Link
               href="/documents/upload"
               className="flex items-center gap-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition"
             >
-              <FileText className="w-5 h-5 text-blue-600" />
+              <FileText className="w-5 h-5 text-brand-blue-600" />
               <span className="text-gray-700">Upload required documents</span>
             </Link>
           </div>
@@ -240,15 +240,15 @@ function EnrollConfirmationContent() {
           <h2 className="font-semibold text-gray-900 mb-3">What Happens Next?</h2>
           <ol className="space-y-2 text-gray-700">
             <li className="flex gap-2">
-              <span className="font-bold text-blue-600">1.</span>
+              <span className="font-bold text-brand-blue-600">1.</span>
               We'll contact you within 2 business days to discuss shop placement.
             </li>
             <li className="flex gap-2">
-              <span className="font-bold text-blue-600">2.</span>
+              <span className="font-bold text-brand-blue-600">2.</span>
               Once a shop sponsor is assigned, you'll complete compliance paperwork.
             </li>
             <li className="flex gap-2">
-              <span className="font-bold text-blue-600">3.</span>
+              <span className="font-bold text-brand-blue-600">3.</span>
               After approval, your portal and training materials unlock automatically.
             </li>
           </ol>
@@ -258,9 +258,9 @@ function EnrollConfirmationContent() {
         <div className="text-center">
           <p className="text-gray-600 mb-2">Questions about your enrollment?</p>
           <p className="text-gray-900">
-            <a href="/support" className="text-blue-600 font-semibold underline">Visit our Help Center</a> or <a href="/faq" className="text-blue-600 font-semibold underline">check our FAQ</a>
+            <a href="/support" className="text-brand-blue-600 font-semibold underline">Visit our Help Center</a> or <a href="/faq" className="text-brand-blue-600 font-semibold underline">check our FAQ</a>
             {' '}or email{' '}
-            <a href="mailto:enroll@elevateforhumanity.org" className="text-blue-600 font-semibold underline">
+            <a href="mailto:enroll@elevateforhumanity.org" className="text-brand-blue-600 font-semibold underline">
               enroll@elevateforhumanity.org
             </a>
           </p>
@@ -274,7 +274,7 @@ export default function EnrollConfirmationPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     }>
       <EnrollConfirmationContent />

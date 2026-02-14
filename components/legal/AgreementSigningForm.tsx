@@ -208,7 +208,7 @@ export default function AgreementSigningForm({
                     href={agreement.url}
                     target="_blank"
                     onClick={() => markAsReviewed(agreement.type)}
-                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition"
+                    className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-brand-blue-600 hover:text-brand-blue-700 hover:bg-brand-blue-50 rounded-lg transition"
                   >
                     <FileText className="w-4 h-4" />
                     Read Agreement
@@ -229,7 +229,7 @@ export default function AgreementSigningForm({
           <button
             onClick={() => setStep('sign')}
             disabled={!allReviewed}
-            className="w-full py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
+            className="w-full py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition"
           >
             Continue to Sign
           </button>
@@ -256,7 +256,7 @@ export default function AgreementSigningForm({
                 value={signerName}
                 onChange={(e) => setSignerName(e.target.value)}
                 placeholder="Enter your full legal name"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 required
               />
             </div>
@@ -270,7 +270,7 @@ export default function AgreementSigningForm({
                 value={signerEmail}
                 onChange={(e) => setSignerEmail(e.target.value)}
                 placeholder="Enter your email address"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 required
               />
             </div>
@@ -284,7 +284,7 @@ export default function AgreementSigningForm({
                 value={signerTitle}
                 onChange={(e) => setSignerTitle(e.target.value)}
                 placeholder="e.g., CEO, Director, Owner"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
           </div>
@@ -300,7 +300,7 @@ export default function AgreementSigningForm({
                 onClick={() => setSignatureMethod('typed')}
                 className={`flex-1 py-2 px-4 rounded-lg border-2 font-medium transition ${
                   signatureMethod === 'typed'
-                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                    ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-700'
                     : 'border-gray-200 text-gray-600 hover:border-gray-300'
                 }`}
               >
@@ -311,7 +311,7 @@ export default function AgreementSigningForm({
                 onClick={() => setSignatureMethod('drawn')}
                 className={`flex-1 py-2 px-4 rounded-lg border-2 font-medium transition ${
                   signatureMethod === 'drawn'
-                    ? 'border-blue-600 bg-blue-50 text-blue-700'
+                    ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-700'
                     : 'border-gray-200 text-gray-600 hover:border-gray-300'
                 }`}
               >
@@ -331,7 +331,7 @@ export default function AgreementSigningForm({
                 value={typedSignature}
                 onChange={(e) => setTypedSignature(e.target.value)}
                 placeholder="Type your full name as signature"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-signature text-2xl"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 font-signature text-2xl"
                 style={{ fontFamily: "'Brush Script MT', cursive" }}
               />
               {typedSignature && (
@@ -368,7 +368,7 @@ export default function AgreementSigningForm({
                 type="checkbox"
                 checked={acknowledged}
                 onChange={(e) => setAcknowledged(e.target.checked)}
-                className="mt-1 w-5 h-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500"
+                className="mt-1 w-5 h-5 text-brand-blue-600 rounded border-gray-300 focus:ring-brand-blue-500"
               />
               <span className="text-sm text-gray-700">
                 I confirm that I have read and understand all agreements listed above. I agree to
@@ -380,11 +380,11 @@ export default function AgreementSigningForm({
           </div>
 
           {/* Agreements Being Signed */}
-          <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <p className="text-sm font-medium text-blue-900 mb-2">
+          <div className="p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
+            <p className="text-sm font-medium text-brand-blue-900 mb-2">
               You are signing the following agreements:
             </p>
-            <ul className="text-sm text-blue-800 space-y-1">
+            <ul className="text-sm text-brand-blue-800 space-y-1">
               {pendingAgreements.map((a) => (
                 <li key={a.type} className="flex items-center gap-2">
                   <Pen className="w-3 h-3" />

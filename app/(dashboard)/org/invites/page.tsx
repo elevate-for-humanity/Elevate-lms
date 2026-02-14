@@ -182,7 +182,7 @@ export default function OrgInvitesPage() {
         <div className="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
           <button
             onClick={() => setShowInviteForm(true)}
-            className="inline-flex items-center justify-center rounded-md border border-transparent bg-brand-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            className="inline-flex items-center justify-center rounded-md border border-transparent bg-brand-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-brand-blue-700 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2"
           >
             Send Invitation
           </button>
@@ -215,7 +215,7 @@ export default function OrgInvitesPage() {
                   required
                   value={inviteEmail}
                   onChange={(e) => setInviteEmail(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500 sm:text-sm"
                   placeholder="your.email@gmail.com"
                 />
               </div>
@@ -231,7 +231,7 @@ export default function OrgInvitesPage() {
                   id="role"
                   value={inviteRole}
                   onChange={(e) => setInviteRole(e.target.value)}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500 sm:text-sm"
                 >
                   <option value="member">Member</option>
                   <option value="admin">Admin</option>
@@ -335,7 +335,7 @@ export default function OrgInvitesPage() {
                             <div className="flex justify-end space-x-2">
                               <button
                                 onClick={() => resendInvite(invite.id)}
-                                className="text-brand-blue-600 hover:text-blue-900"
+                                className="text-brand-blue-600 hover:text-brand-blue-900"
                               >
                                 Resend
                               </button>

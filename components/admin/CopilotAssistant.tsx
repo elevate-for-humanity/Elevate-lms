@@ -154,7 +154,7 @@ export function CopilotAssistant() {
   return (
     <div className="copilot-assistant bg-white rounded-lg shadow-lg p-6">
       <div className="flex items-center mb-6">
-        <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center mr-3">
+        <div className="w-10 h-10 bg-brand-blue-500 rounded-full flex items-center justify-center mr-3">
           <span className="text-white font-bold">🤖</span>
         </div>
         <div>
@@ -178,7 +178,7 @@ export function CopilotAssistant() {
                   ? 'bg-yellow-50 border-yellow-400 text-yellow-800'
                   : msg.type === 'error'
                     ? 'bg-red-50 border-red-400 text-red-800'
-                    : 'bg-blue-50 border-blue-400 text-brand-info'
+                    : 'bg-brand-blue-50 border-brand-blue-400 text-brand-info'
             }`}
           >
             <p className="font-medium">{msg.message}</p>

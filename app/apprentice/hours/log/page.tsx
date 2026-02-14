@@ -156,17 +156,17 @@ export default function LogApprenticeHoursPage() {
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Hour Type <span className="text-red-500">*</span></label>
               <div className="grid grid-cols-2 gap-4">
-                <label className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition ${formData.type === 'ojt' ? 'border-blue-600 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}>
+                <label className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition ${formData.type === 'ojt' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-300 hover:border-gray-400'}`}>
                   <input type="radio" name="type" value="ojt" checked={formData.type === 'ojt'} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="sr-only" />
-                  <Building className={`w-6 h-6 mr-2 ${formData.type === 'ojt' ? 'text-blue-600' : 'text-gray-400'}`} />
+                  <Building className={`w-6 h-6 mr-2 ${formData.type === 'ojt' ? 'text-brand-blue-600' : 'text-gray-400'}`} />
                   <div className="text-left">
                     <p className="font-bold text-gray-900">OJT</p>
                     <p className="text-xs text-gray-600">On-the-Job Training</p>
                   </div>
                 </label>
-                <label className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition ${formData.type === 'rti' ? 'border-blue-600 bg-blue-50' : 'border-gray-300 hover:border-gray-400'}`}>
+                <label className={`flex items-center justify-center p-4 border-2 rounded-lg cursor-pointer transition ${formData.type === 'rti' ? 'border-brand-blue-600 bg-brand-blue-50' : 'border-gray-300 hover:border-gray-400'}`}>
                   <input type="radio" name="type" value="rti" checked={formData.type === 'rti'} onChange={(e) => setFormData({ ...formData, type: e.target.value })} className="sr-only" />
-                  <Award className={`w-6 h-6 mr-2 ${formData.type === 'rti' ? 'text-blue-600' : 'text-gray-400'}`} />
+                  <Award className={`w-6 h-6 mr-2 ${formData.type === 'rti' ? 'text-brand-blue-600' : 'text-gray-400'}`} />
                   <div className="text-left">
                     <p className="font-bold text-gray-900">RTI</p>
                     <p className="text-xs text-gray-600">Related Technical Instruction</p>

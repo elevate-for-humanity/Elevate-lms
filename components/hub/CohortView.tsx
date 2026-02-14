@@ -163,14 +163,14 @@ export default function CohortView({ showBy = 'program' }: { showBy?: 'program' 
     <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
       <div className="p-4 border-b border-slate-200 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Users className="w-5 h-5 text-blue-500" />
+          <Users className="w-5 h-5 text-brand-blue-500" />
           <h3 className="font-bold text-slate-900">Cohort Overview</h3>
         </div>
         <div className="relative">
           <select
             value={groupBy}
             onChange={(e) => setGroupBy(e.target.value as any)}
-            className="appearance-none bg-slate-100 border-0 rounded-lg px-3 py-1.5 pr-8 text-sm font-medium text-slate-700 cursor-pointer focus:ring-2 focus:ring-blue-500"
+            className="appearance-none bg-slate-100 border-0 rounded-lg px-3 py-1.5 pr-8 text-sm font-medium text-slate-700 cursor-pointer focus:ring-2 focus:ring-brand-blue-500"
           >
             <option value="program">By Program</option>
             <option value="funding">By Funding</option>
@@ -202,7 +202,7 @@ export default function CohortView({ showBy = 'program' }: { showBy?: 'program' 
                   <span className="font-medium text-slate-900">{cohort.at_risk}</span>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <div className="w-2 h-2 rounded-full bg-blue-500"></div>
+                  <div className="w-2 h-2 rounded-full bg-brand-blue-500"></div>
                   <span className="text-slate-600">Completed:</span>
                   <span className="font-medium text-slate-900">{cohort.completed}</span>
                 </div>
@@ -213,7 +213,7 @@ export default function CohortView({ showBy = 'program' }: { showBy?: 'program' 
                 <div className="mt-3">
                   <div className="h-1.5 bg-slate-100 rounded-full overflow-hidden flex">
                     <div 
-                      className="bg-blue-500 rounded-full"
+                      className="bg-brand-blue-500 rounded-full"
                       style={{ width: `${(cohort.completed / cohort.total) * 100}%` }}
                     />
                     <div 

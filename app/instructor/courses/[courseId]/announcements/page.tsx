@@ -102,7 +102,7 @@ export default function InstructorAnnouncementsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
       </div>
     );
   }
@@ -117,7 +117,7 @@ export default function InstructorAnnouncementsPage() {
         <div className="mb-8">
           <Link 
             href={`/instructor/courses/${courseId}`}
-            className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-4"
+            className="inline-flex items-center text-brand-blue-600 hover:text-brand-blue-700 mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Course
@@ -129,7 +129,7 @@ export default function InstructorAnnouncementsPage() {
             </div>
             <button
               onClick={() => setShowForm(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
             >
               <Plus className="w-4 h-4" />
               New Announcement
@@ -141,8 +141,8 @@ export default function InstructorAnnouncementsPage() {
         <div className="grid grid-cols-2 gap-4 mb-8">
           <div className="bg-white rounded-xl border p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Bell className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Bell className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{announcements.length}</p>
@@ -177,7 +177,7 @@ export default function InstructorAnnouncementsPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Announcement title..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -190,7 +190,7 @@ export default function InstructorAnnouncementsPage() {
                   onChange={(e) => setMessage(e.target.value)}
                   placeholder="Write your announcement..."
                   rows={5}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -198,7 +198,7 @@ export default function InstructorAnnouncementsPage() {
                 <button
                   type="submit"
                   disabled={posting}
-                  className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50"
                 >
                   <Send className="w-4 h-4" />
                   {posting ? 'Posting...' : 'Post Announcement'}
@@ -249,7 +249,7 @@ export default function InstructorAnnouncementsPage() {
               </p>
               <button
                 onClick={() => setShowForm(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
               >
                 <Plus className="w-4 h-4" />
                 Create First Announcement

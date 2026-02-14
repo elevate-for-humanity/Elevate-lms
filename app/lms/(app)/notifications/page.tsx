@@ -79,10 +79,10 @@ export default async function NotificationsPage() {
 
   const getIconColor = (type: string) => {
     switch (type) {
-      case 'course': return 'bg-blue-100 text-blue-600';
+      case 'course': return 'bg-brand-blue-100 text-brand-blue-600';
       case 'assignment': return 'bg-orange-100 text-orange-600';
       case 'grade': return 'bg-green-100 text-green-600';
-      case 'message': return 'bg-blue-100 text-blue-600';
+      case 'message': return 'bg-brand-blue-100 text-brand-blue-600';
       case 'alert': return 'bg-red-100 text-red-600';
       case 'success': return 'bg-green-100 text-green-600';
       default: return 'bg-slate-100 text-slate-600';
@@ -157,7 +157,7 @@ export default async function NotificationsPage() {
                     return (
                       <div
                         key={notification.id}
-                        className={`p-4 hover:bg-slate-50 transition ${!notification.read_at ? 'bg-blue-50' : ''}`}
+                        className={`p-4 hover:bg-slate-50 transition ${!notification.read_at ? 'bg-brand-blue-50' : ''}`}
                       >
                         <div className="flex items-start gap-4">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${iconColor}`}>
@@ -178,7 +178,7 @@ export default async function NotificationsPage() {
                           {notification.action_url && (
                             <Link
                               href={notification.action_url}
-                              className="text-blue-600 text-sm font-medium hover:text-blue-700"
+                              className="text-brand-blue-600 text-sm font-medium hover:text-brand-blue-700"
                             >
                               View
                             </Link>
@@ -203,7 +203,7 @@ export default async function NotificationsPage() {
                     return (
                       <div
                         key={notification.id}
-                        className={`p-4 hover:bg-slate-50 transition ${!notification.read_at ? 'bg-blue-50' : ''}`}
+                        className={`p-4 hover:bg-slate-50 transition ${!notification.read_at ? 'bg-brand-blue-50' : ''}`}
                       >
                         <div className="flex items-start gap-4">
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${iconColor}`}>

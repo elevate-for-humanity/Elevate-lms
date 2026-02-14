@@ -139,7 +139,7 @@ export default function AuthoritativeDocsPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* How to Use */}
-        <section className="mb-12 bg-blue-50 rounded-xl p-6 border border-blue-100">
+        <section className="mb-12 bg-brand-blue-50 rounded-xl p-6 border border-brand-blue-100">
           <h2 className="text-xl font-bold text-slate-900 mb-4">How to Use This Index</h2>
           <ul className="space-y-2 text-slate-700">
             <li><strong>Users:</strong> Reference these documents to understand how services work.</li>
@@ -162,8 +162,8 @@ export default function AuthoritativeDocsPage() {
                 className="border border-slate-200 rounded-xl p-6 hover:border-slate-300 transition-colors"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <doc.icon className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <doc.icon className="w-6 h-6 text-brand-blue-600" />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
@@ -189,7 +189,7 @@ export default function AuthoritativeDocsPage() {
                     {doc.link && (
                       <Link 
                         href={doc.link}
-                        className="inline-flex items-center gap-2 text-blue-600 text-sm font-medium hover:text-blue-700"
+                        className="inline-flex items-center gap-2 text-brand-blue-600 text-sm font-medium hover:text-brand-blue-700"
                       >
                         View Summary <ExternalLink className="w-4 h-4" />
                       </Link>

@@ -55,8 +55,8 @@ export default async function AlumniJobsPage() {
               <div key={job.id} className="bg-white rounded-xl border p-6 hover:shadow-lg transition">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Building className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                      <Building className="w-6 h-6 text-brand-blue-600" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
@@ -81,7 +81,7 @@ export default async function AlumniJobsPage() {
                   </div>
                   <Link
                     href={`/lms/alumni/jobs/${job.id}`}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                    className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 text-sm"
                   >
                     View Details
                   </Link>
@@ -99,7 +99,7 @@ export default async function AlumniJobsPage() {
             <p className="text-gray-600 mb-6">Check back soon for exclusive job opportunities from our employer partners.</p>
             <Link 
               href="/lms/alumni"
-              className="text-blue-600 hover:underline"
+              className="text-brand-blue-600 hover:underline"
             >
               Return to Alumni Portal
             </Link>

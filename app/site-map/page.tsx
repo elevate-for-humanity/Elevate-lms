@@ -235,7 +235,7 @@ export default async function SitemapPage() {
         <div className="bg-slate-700 text-white py-16">
           <div className="max-w-7xl mx-auto px-4">
             <h1 className="text-4xl font-bold mb-4">Sitemap</h1>
-            <p className="text-blue-100 text-lg">
+            <p className="text-brand-blue-100 text-lg">
               Browse all pages and features of the Elevate for Humanity platform.
             </p>
           </div>
@@ -253,7 +253,7 @@ export default async function SitemapPage() {
                     <li key={link.href}>
                       <Link
                         href={link.href}
-                        className="text-sm text-slate-600 hover:text-blue-600 hover:underline transition-colors"
+                        className="text-sm text-slate-600 hover:text-brand-blue-600 hover:underline transition-colors"
                       >
                         {link.name}
                       </Link>
@@ -274,7 +274,7 @@ export default async function SitemapPage() {
             <div className="flex flex-wrap justify-center gap-4">
               <Link
                 href="/contact"
-                className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Contact Us
               </Link>

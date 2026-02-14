@@ -54,7 +54,7 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-6xl mx-auto px-4 w-full pb-10 sm:pb-14">
             {config.hero.tag && (
-              <p className={`font-semibold text-sm mb-2 uppercase tracking-wide ${config.hero.tagColor || 'text-blue-300'}`}>
+              <p className={`font-semibold text-sm mb-2 uppercase tracking-wide ${config.hero.tagColor || 'text-brand-blue-300'}`}>
                 {config.hero.tag}
               </p>
             )}

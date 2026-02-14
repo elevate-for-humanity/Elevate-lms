@@ -70,7 +70,7 @@ export default function ApprenticesPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
+          <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-white">Loading apprentices...</p>
         </div>
       </div>
@@ -86,7 +86,7 @@ export default function ApprenticesPage() {
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/shop-owner/apprentices"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
+            className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
           >
             Sign In
           </Link>
@@ -137,8 +137,8 @@ export default function ApprenticesPage() {
                       className="block bg-slate-800 rounded-xl p-4 active:bg-slate-700"
                     >
                       <div className="flex items-center gap-4 mb-3">
-                        <div className="w-14 h-14 bg-blue-500/20 rounded-full flex items-center justify-center">
-                          <span className="text-blue-400 font-bold text-xl">
+                        <div className="w-14 h-14 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                          <span className="text-brand-blue-400 font-bold text-xl">
                             {apprentice.name.charAt(0)}
                           </span>
                         </div>
@@ -228,7 +228,7 @@ export default function ApprenticesPage() {
             <Clock className="w-6 h-6" />
             <span className="text-xs">Log</span>
           </Link>
-          <Link href="/pwa/shop-owner/apprentices" className="flex flex-col items-center gap-1 text-blue-400">
+          <Link href="/pwa/shop-owner/apprentices" className="flex flex-col items-center gap-1 text-brand-blue-400">
             <Users className="w-6 h-6" />
             <span className="text-xs">Team</span>
           </Link>

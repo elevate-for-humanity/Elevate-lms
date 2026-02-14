@@ -114,14 +114,14 @@ export default function PartnerLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-blue-800 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-brand-blue-800 flex items-center justify-center px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-4">
             <Building className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Partner Portal</h1>
-          <p className="text-blue-200">Sign in to access your partner dashboard</p>
+          <p className="text-brand-blue-200">Sign in to access your partner dashboard</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-xl p-8">
@@ -142,7 +142,7 @@ export default function PartnerLoginPage() {
                   required 
                   value={email} 
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" 
                   placeholder="partner@company.com" 
                 />
               </div>
@@ -157,7 +157,7 @@ export default function PartnerLoginPage() {
                   required 
                   value={password} 
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500" 
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" 
                   placeholder="••••••••" 
                 />
               </div>
@@ -165,10 +165,10 @@ export default function PartnerLoginPage() {
 
             <div className="flex items-center justify-between">
               <label className="flex items-center">
-                <input type="checkbox" className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" />
+                <input type="checkbox" className="w-4 h-4 text-brand-blue-600 border-gray-300 rounded focus:ring-brand-blue-500" />
                 <span className="ml-2 text-sm text-gray-600">Remember me</span>
               </label>
-              <Link href="/forgot-password" className="text-sm text-blue-600 hover:text-blue-700">
+              <Link href="/forgot-password" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
                 Forgot password?
               </Link>
             </div>
@@ -176,7 +176,7 @@ export default function PartnerLoginPage() {
             <button 
               type="submit" 
               disabled={isLoading}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-bold transition disabled:opacity-50 flex items-center justify-center"
+              className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white py-3 rounded-lg font-bold transition disabled:opacity-50 flex items-center justify-center"
             >
               {isLoading ? 'Signing in...' : (
                 <>
@@ -192,7 +192,7 @@ export default function PartnerLoginPage() {
               type="button"
               onClick={handleMagicLink}
               disabled={isLoading}
-              className="w-full text-blue-600 hover:text-blue-700 py-2 text-sm font-medium disabled:opacity-50"
+              className="w-full text-brand-blue-600 hover:text-brand-blue-700 py-2 text-sm font-medium disabled:opacity-50"
             >
               Send me a magic link instead
             </button>
@@ -201,7 +201,7 @@ export default function PartnerLoginPage() {
           <div className="mt-6 pt-6 border-t text-center">
             <p className="text-gray-600">
               Not a partner yet?{' '}
-              <Link href="/partner/apply" className="text-blue-600 font-medium hover:text-blue-700">
+              <Link href="/partner/apply" className="text-brand-blue-600 font-medium hover:text-brand-blue-700">
                 Apply here
               </Link>
             </p>

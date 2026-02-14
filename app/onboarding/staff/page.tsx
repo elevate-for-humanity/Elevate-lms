@@ -42,12 +42,12 @@ export default async function StaffOnboardingPage() {
           {steps.map((step, i) => (
             <div key={i} className="p-6 flex items-center gap-4">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                step.status === 'complete' ? 'bg-green-100' : step.status === 'current' ? 'bg-blue-100' : 'bg-gray-100'
+                step.status === 'complete' ? 'bg-green-100' : step.status === 'current' ? 'bg-brand-blue-100' : 'bg-gray-100'
               }`}>
                 {step.status === 'complete' ? (
                   <CheckCircle className="w-6 h-6 text-green-600" />
                 ) : step.status === 'current' ? (
-                  <Clock className="w-6 h-6 text-blue-600" />
+                  <Clock className="w-6 h-6 text-brand-blue-600" />
                 ) : (
                   <step.icon className="w-6 h-6 text-gray-400" />
                 )}
@@ -57,7 +57,7 @@ export default async function StaffOnboardingPage() {
                 <p className="text-gray-600 text-sm">{step.description}</p>
               </div>
               {step.status === 'current' && (
-                <Link href={`/onboarding/staff/${step.title.toLowerCase().replace(/\s+/g, '-')}`} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium">
+                <Link href={`/onboarding/staff/${step.title.toLowerCase().replace(/\s+/g, '-')}`} className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 text-sm font-medium">
                   Continue
                 </Link>
               )}
@@ -68,10 +68,10 @@ export default async function StaffOnboardingPage() {
           ))}
         </div>
 
-        <div className="mt-8 p-6 bg-blue-50 rounded-xl">
+        <div className="mt-8 p-6 bg-brand-blue-50 rounded-xl">
           <h3 className="font-semibold text-gray-900 mb-2">Need Help?</h3>
           <p className="text-gray-600 text-sm mb-4">Contact HR if you have questions about onboarding.</p>
-          <Link href="/contact" className="text-blue-600 hover:underline font-medium">Contact HR →</Link>
+          <Link href="/contact" className="text-brand-blue-600 hover:underline font-medium">Contact HR →</Link>
         </div>
       </div>
     </div>

@@ -231,7 +231,7 @@ export default async function CashAdvancesAdminPage() {
                               : app.status === 'denied'
                                 ? 'bg-red-100 text-red-800'
                                 : app.status === 'funded'
-                                  ? 'bg-blue-100 text-blue-800'
+                                  ? 'bg-brand-blue-100 text-brand-blue-800'
                                   : 'bg-slate-100 text-black'
                         }`}
                       >
@@ -244,7 +244,7 @@ export default async function CashAdvancesAdminPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Link
                         href={`/admin/cash-advances/applications/${app.id}`}
-                        className="text-brand-blue-600 hover:text-blue-900 mr-4"
+                        className="text-brand-blue-600 hover:text-brand-blue-900 mr-4"
                       >
                         View
                       </Link>
@@ -274,16 +274,16 @@ export default async function CashAdvancesAdminPage() {
             <h3 className="text-lg font-bold mb-2">
               🏦 EPS Financial Partnership
             </h3>
-            <p className="text-blue-100 mb-1">
+            <p className="text-brand-blue-100 mb-1">
               Powered by Pathward®, N.A. | www.epstax.net
             </p>
-            <p className="text-sm text-blue-200">
+            <p className="text-sm text-brand-blue-200">
               Industry-leading refund advances and cash advance solutions
             </p>
           </div>
           <div className="text-right">
             <div className="text-2xl font-bold">44,000+</div>
-            <div className="text-sm text-blue-200">Tax Offices Enrolled</div>
+            <div className="text-sm text-brand-blue-200">Tax Offices Enrolled</div>
           </div>
         </div>
 
@@ -292,7 +292,7 @@ export default async function CashAdvancesAdminPage() {
             <h4 className="font-semibold mb-2">
               <DollarSign className="w-5 h-5 inline-block" /> E-Advance
             </h4>
-            <p className="text-sm text-blue-100">
+            <p className="text-sm text-brand-blue-100">
               No cost taxpayer advance loan program with no in-season marketing
               fees
             </p>
@@ -301,7 +301,7 @@ export default async function CashAdvancesAdminPage() {
             <h4 className="font-semibold mb-2">
               <BarChart className="w-5 h-5 inline-block" /> E-Collect
             </h4>
-            <p className="text-sm text-blue-100">
+            <p className="text-sm text-brand-blue-100">
               Simple, low-cost ($20) refund transfer program
             </p>
           </div>
@@ -309,7 +309,7 @@ export default async function CashAdvancesAdminPage() {
             <h4 className="font-semibold mb-2">
               <Gift className="w-5 h-5 inline-block" /> E-Bonus
             </h4>
-            <p className="text-sm text-blue-100">
+            <p className="text-sm text-brand-blue-100">
               High incentive refund transfer - earn up to $20 more per return
             </p>
           </div>
@@ -471,7 +471,7 @@ export default async function CashAdvancesAdminPage() {
             <h2 className="text-2xl md:text-3xl font-bold mb-6">
               Ready to Get Started?
             </h2>
-            <p className="text-base md:text-lg mb-8 text-blue-100">
+            <p className="text-base md:text-lg mb-8 text-brand-blue-100">
               Call (317) 314-3757 or apply online for a better career today.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -483,7 +483,7 @@ export default async function CashAdvancesAdminPage() {
               </Link>
               <Link
                 href="/programs"
-                className="bg-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-600 border-2 border-white text-lg"
+                className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg"
               >
                 View Programs
               </Link>

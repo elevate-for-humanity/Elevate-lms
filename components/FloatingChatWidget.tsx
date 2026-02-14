@@ -88,7 +88,7 @@ export default function FloatingChatWidget() {
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-blue-600 text-white shadow-2xl hover:bg-blue-700 transition-all hover:scale-110"
+          className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 flex h-12 w-12 md:h-16 md:w-16 items-center justify-center rounded-full bg-brand-blue-600 text-white shadow-2xl hover:bg-brand-blue-700 transition-all hover:scale-110"
           aria-label="Open chat"
         >
           <svg className="h-6 w-6 sm:h-8 sm:w-8" fill="none" stroke="currentColor"
@@ -107,7 +107,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 
       {isOpen && (
         <div className="fixed bottom-0 right-0 md:bottom-6 md:right-6 z-50 flex h-[80vh] md:h-[600px] w-full md:w-[400px] flex-col md:rounded-2xl border border-slate-200 bg-white shadow-2xl">
           {/* Header */}
-          <div className="flex items-center justify-between rounded-t-2xl bg-blue-600 px-4 py-3 text-white">
+          <div className="flex items-center justify-between rounded-t-2xl bg-brand-blue-600 px-4 py-3 text-white">
             <div className="flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/20">
                 <svg className="h-5 w-5" fill="none" stroke="currentColor"
@@ -118,7 +118,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 
               </div>
               <div>
                 <h3 className="font-semibold text-sm">AI Assistant</h3>
-                <p className="text-xs text-blue-100">Online • Instant replies</p>
+                <p className="text-xs text-brand-blue-100">Online • Instant replies</p>
               </div>
             </div>
             <button
@@ -144,7 +144,7 @@ d="M6 18L18 6M6 6l12 12" />
                 <div
                   className={`max-w-[85%] rounded-2xl px-4 py-2 text-sm ${
                     message.role === "user"
-                      ? "bg-blue-600 text-white"
+                      ? "bg-brand-blue-600 text-white"
                       : "bg-slate-100 text-black"
                   }`}
                 >
@@ -191,13 +191,13 @@ d="M6 18L18 6M6 6l12 12" />
                 value={input}
                 onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setInput(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                className="flex-1 rounded-xl border border-slate-300 px-3 py-2 text-sm focus:border-brand-blue-500 focus:outline-none focus:ring-1 focus:ring-brand-blue-500"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={isLoading || !input.trim()}
-                className="flex-shrink-0 rounded-xl bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+                className="flex-shrink-0 rounded-xl bg-brand-blue-600 px-4 py-2 text-white hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
               >
                 <svg className="h-5 w-5" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
@@ -211,7 +211,7 @@ d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
           {/* Footer */}
           <div className="border-t border-slate-200 bg-slate-50 px-4 py-2 text-center">
             <p className="text-xs text-black">
-              Need more help? <a href="/contact" className="text-blue-600 hover:text-blue-700 font-medium">Contact Support</a>
+              Need more help? <a href="/contact" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">Contact Support</a>
             </p>
           </div>
         </div>

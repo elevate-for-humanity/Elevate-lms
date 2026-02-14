@@ -17,7 +17,7 @@ const badges = [
     name: 'Quick Learner',
     description: 'Complete 5 lessons in one week',
     icon: Zap,
-    color: 'bg-blue-500',
+    color: 'bg-brand-blue-500',
     earned: true,
     earnedDate: '2024-11-05',
   },

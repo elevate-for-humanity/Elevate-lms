@@ -31,7 +31,7 @@ interface Props {
 }
 
 const industryColors: Record<string, string> = {
-  Healthcare: 'bg-blue-100 text-blue-700',
+  Healthcare: 'bg-brand-blue-100 text-brand-blue-700',
   HVAC: 'bg-orange-100 text-orange-700',
   Beauty: 'bg-pink-100 text-pink-700',
   Transportation: 'bg-green-100 text-green-700',
@@ -159,7 +159,7 @@ export default function EmployerPartners({
     return (
       <section className="py-16 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 flex justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
         </div>
       </section>
     );
@@ -185,7 +185,7 @@ export default function EmployerPartners({
           </div>
           {showCTA && (
             <div className="text-center mt-6">
-              <Link href="/employers" className="text-blue-600 hover:underline font-medium">
+              <Link href="/employers" className="text-brand-blue-600 hover:underline font-medium">
                 View all partners →
               </Link>
             </div>
@@ -212,8 +212,8 @@ export default function EmployerPartners({
                 className="bg-white rounded-xl p-4 shadow-sm hover:shadow-md transition-shadow"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Building2 className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <Building2 className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900 text-sm">{partner.name}</h3>
@@ -236,7 +236,7 @@ export default function EmployerPartners({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-full text-sm font-semibold mb-4">
             <Building2 className="w-4 h-4" />
             {stats.totalPartners}+ Employer Partners
           </div>
@@ -252,7 +252,7 @@ export default function EmployerPartners({
         {showStats && (
           <div className="grid md:grid-cols-4 gap-6 mb-16">
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
-              <div className="text-4xl font-bold text-blue-600 mb-2">{stats.totalPartners}+</div>
+              <div className="text-4xl font-bold text-brand-blue-600 mb-2">{stats.totalPartners}+</div>
               <div className="text-gray-700 font-semibold">Employer Partners</div>
             </div>
             <div className="bg-white rounded-xl p-6 shadow-lg text-center">
@@ -279,7 +279,7 @@ export default function EmployerPartners({
                 className="flex-shrink-0 w-64 bg-white rounded-xl p-6 shadow-md hover:shadow-xl transition-shadow"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <div className="w-12 h-12 bg-brand-blue-600 rounded-lg flex items-center justify-center">
                     {partner.logo_url ? (
                       <Image src={partner.logo_url} alt={partner.name} width={32} height={32} className="rounded" />
                     ) : (
@@ -362,7 +362,7 @@ export default function EmployerPartners({
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/employers"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-all shadow-lg text-lg"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-all shadow-lg text-lg"
               >
                 Become a Partner
                 <ArrowRight className="w-5 h-5" />

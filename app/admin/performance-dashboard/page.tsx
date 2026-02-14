@@ -118,10 +118,10 @@ export default async function AdminPerformanceDashboardPage() {
               <div>
                 <p className="text-sm text-gray-500">Total Leads</p>
                 <p className="text-3xl font-bold text-gray-900 mt-1">{totalLeads || 0}</p>
-                <p className="text-sm text-blue-600 mt-1">{enrolledLeads || 0} enrolled</p>
+                <p className="text-sm text-brand-blue-600 mt-1">{enrolledLeads || 0} enrolled</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Users className="w-6 h-6 text-brand-blue-600" />
               </div>
             </div>
           </div>
@@ -144,8 +144,8 @@ export default async function AdminPerformanceDashboardPage() {
                 <p className="text-3xl font-bold text-gray-900 mt-1">{employerContacts || 0}</p>
                 <p className="text-sm text-gray-500 mt-1">of {totalContacts || 0} contacts</p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Award className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Award className="w-6 h-6 text-brand-blue-600" />
               </div>
             </div>
           </div>
@@ -182,7 +182,7 @@ export default async function AdminPerformanceDashboardPage() {
                 <p className="text-sm text-gray-500">Draft</p>
               </div>
             </div>
-            <Link href="/admin/course-builder" className="text-sm text-blue-600 hover:text-blue-700">
+            <Link href="/admin/course-builder" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
               Manage courses →
             </Link>
           </div>
@@ -232,7 +232,7 @@ export default async function AdminPerformanceDashboardPage() {
                 <span className="font-semibold text-gray-900">{enrollmentRate}%</span>
               </div>
             </div>
-            <Link href="/admin/leads" className="block mt-4 text-sm text-blue-600 hover:text-blue-700">
+            <Link href="/admin/leads" className="block mt-4 text-sm text-brand-blue-600 hover:text-brand-blue-700">
               View all leads →
             </Link>
           </div>
@@ -254,7 +254,7 @@ export default async function AdminPerformanceDashboardPage() {
                 <span className="font-semibold text-gray-900">{wotcApprovalRate}%</span>
               </div>
             </div>
-            <Link href="/admin/wotc" className="block mt-4 text-sm text-blue-600 hover:text-blue-700">
+            <Link href="/admin/wotc" className="block mt-4 text-sm text-brand-blue-600 hover:text-brand-blue-700">
               View WOTC applications →
             </Link>
           </div>
@@ -280,7 +280,7 @@ export default async function AdminPerformanceDashboardPage() {
                 </span>
               </div>
             </div>
-            <Link href="/admin/crm/contacts" className="block mt-4 text-sm text-blue-600 hover:text-blue-700">
+            <Link href="/admin/crm/contacts" className="block mt-4 text-sm text-brand-blue-600 hover:text-brand-blue-700">
               View all contacts →
             </Link>
           </div>
@@ -292,28 +292,28 @@ export default async function AdminPerformanceDashboardPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <Link 
               href="/admin/leads"
-              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
+              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-brand-blue-300 transition-colors"
             >
-              <Users className="w-5 h-5 text-blue-600" />
+              <Users className="w-5 h-5 text-brand-blue-600" />
               <span className="font-medium text-gray-900">Leads</span>
             </Link>
             <Link 
               href="/admin/campaigns"
-              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
+              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-brand-blue-300 transition-colors"
             >
               <Award className="w-5 h-5 text-green-600" />
               <span className="font-medium text-gray-900">Campaigns</span>
             </Link>
             <Link 
               href="/admin/course-builder"
-              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
+              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-brand-blue-300 transition-colors"
             >
-              <BookOpen className="w-5 h-5 text-blue-600" />
+              <BookOpen className="w-5 h-5 text-brand-blue-600" />
               <span className="font-medium text-gray-900">Courses</span>
             </Link>
             <Link 
               href="/admin/wotc"
-              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-blue-300 transition-colors"
+              className="flex items-center gap-3 p-4 rounded-lg border border-gray-200 hover:border-brand-blue-300 transition-colors"
             >
               <DollarSign className="w-5 h-5 text-orange-600" />
               <span className="font-medium text-gray-900">WOTC</span>

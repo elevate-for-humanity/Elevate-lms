@@ -35,11 +35,11 @@ export default function PartnerSupportPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-blue-900 text-white py-12">
+      <div className="bg-brand-blue-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <HelpCircle className="w-12 h-12 mx-auto mb-4 text-blue-300" />
+          <HelpCircle className="w-12 h-12 mx-auto mb-4 text-brand-blue-300" />
           <h1 className="text-3xl font-bold mb-2">Partner Support</h1>
-          <p className="text-blue-200">We are here to help you succeed. Reach out through any channel below.</p>
+          <p className="text-brand-blue-200">We are here to help you succeed. Reach out through any channel below.</p>
         </div>
       </div>
 
@@ -48,11 +48,11 @@ export default function PartnerSupportPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
           {supportChannels.map((channel, i) => (
             <Link key={i} href={channel.href} className="bg-white rounded-xl shadow-sm p-6 border hover:shadow-md transition text-center">
-              <channel.icon className="w-10 h-10 text-blue-600 mx-auto mb-4" />
+              <channel.icon className="w-10 h-10 text-brand-blue-600 mx-auto mb-4" />
               <h3 className="font-bold text-gray-900 mb-1">{channel.title}</h3>
               <p className="text-sm text-gray-600 mb-2">{channel.description}</p>
               <p className="text-xs text-gray-500 mb-4">{channel.detail}</p>
-              <span className="text-blue-600 font-medium text-sm">{channel.cta} →</span>
+              <span className="text-brand-blue-600 font-medium text-sm">{channel.cta} →</span>
             </Link>
           ))}
         </div>
@@ -60,7 +60,7 @@ export default function PartnerSupportPage() {
         {/* Business Hours */}
         <div className="bg-white rounded-xl shadow-sm p-6 border mb-12">
           <div className="flex items-center gap-3 mb-4">
-            <Clock className="w-6 h-6 text-blue-600" />
+            <Clock className="w-6 h-6 text-brand-blue-600" />
             <h2 className="text-lg font-bold text-gray-900">Support Hours</h2>
           </div>
           <div className="grid md:grid-cols-3 gap-4">
@@ -98,14 +98,14 @@ export default function PartnerSupportPage() {
         {/* Resources */}
         <div className="grid md:grid-cols-2 gap-6">
           <Link href="/docs" className="bg-white rounded-xl shadow-sm p-6 border hover:shadow-md transition flex items-start gap-4">
-            <BookOpen className="w-8 h-8 text-blue-600 flex-shrink-0" />
+            <BookOpen className="w-8 h-8 text-brand-blue-600 flex-shrink-0" />
             <div>
               <h3 className="font-bold text-gray-900 mb-1">Documentation</h3>
               <p className="text-gray-600 text-sm">Guides for using the partner portal, managing students, and generating reports.</p>
             </div>
           </Link>
           <Link href="/webinars" className="bg-white rounded-xl shadow-sm p-6 border hover:shadow-md transition flex items-start gap-4">
-            <Video className="w-8 h-8 text-blue-600 flex-shrink-0" />
+            <Video className="w-8 h-8 text-brand-blue-600 flex-shrink-0" />
             <div>
               <h3 className="font-bold text-gray-900 mb-1">Training Webinars</h3>
               <p className="text-gray-600 text-sm">Watch recorded training sessions on platform features and best practices.</p>

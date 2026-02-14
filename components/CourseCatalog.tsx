@@ -212,7 +212,7 @@ export function CourseCatalog() {
                     {course.category}
                   </span>
                   <span className={`px-2 py-2 text-xs rounded ${
-                    course.level === 'beginner' ? 'bg-blue-100 text-blue-700' :
+                    course.level === 'beginner' ? 'bg-brand-blue-100 text-brand-blue-700' :
                     course.level === 'intermediate' ? 'bg-purple-100 text-purple-700' :
                     'bg-red-100 text-red-700'
                   }`}>

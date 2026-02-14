@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 function StatusBadge({ status }: { status: string }) {
   const config: Record<string, { bg: string; text: string; icon: typeof CheckCircle }> = {
     active: { bg: 'bg-green-100', text: 'text-green-700', icon: CheckCircle },
-    completed: { bg: 'bg-blue-100', text: 'text-blue-700', icon: CheckCircle },
+    completed: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700', icon: CheckCircle },
     pending: { bg: 'bg-amber-100', text: 'text-amber-700', icon: Clock },
     eligible: { bg: 'bg-green-100', text: 'text-green-700', icon: CheckCircle },
     ineligible: { bg: 'bg-red-100', text: 'text-red-700', icon: XCircle },
@@ -123,10 +123,10 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
               <div className="text-sm font-medium text-slate-500 mb-2">Demographics</div>
               <div className="flex flex-wrap gap-2">
                 {caseFile.profile.demographics?.veteran && (
-                  <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">Veteran</span>
+                  <span className="bg-brand-blue-100 text-brand-blue-700 px-2 py-0.5 rounded text-xs">Veteran</span>
                 )}
                 {caseFile.profile.demographics?.justiceInvolved && (
-                  <span className="bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">Justice-Involved</span>
+                  <span className="bg-brand-blue-100 text-brand-blue-700 px-2 py-0.5 rounded text-xs">Justice-Involved</span>
                 )}
                 {caseFile.profile.demographics?.disability && (
                   <span className="bg-amber-100 text-amber-700 px-2 py-0.5 rounded text-xs">Disability</span>
@@ -239,7 +239,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
                       </span>
                     )}
                     {cred.verificationUrl && (
-                      <Link href={cred.verificationUrl} className="text-blue-600 text-sm hover:underline">
+                      <Link href={cred.verificationUrl} className="text-brand-blue-600 text-sm hover:underline">
                         View
                       </Link>
                     )}

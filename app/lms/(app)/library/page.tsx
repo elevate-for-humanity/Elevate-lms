@@ -114,7 +114,7 @@ export default async function LibraryPage() {
       case 'video':
         return 'bg-red-100 text-red-600';
       case 'document':
-        return 'bg-blue-100 text-blue-600';
+        return 'bg-brand-blue-100 text-brand-blue-600';
       case 'link':
         return 'bg-green-100 text-green-600';
       default:
@@ -156,17 +156,17 @@ export default async function LibraryPage() {
               <input
                 type="text"
                 placeholder="Search library..."
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
             <div className="flex gap-2">
-              <select className="px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select className="px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500">
                 <option value="">All Types</option>
                 <option value="document">Documents</option>
                 <option value="video">Videos</option>
                 <option value="link">Links</option>
               </select>
-              <select className="px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select className="px-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500">
                 <option value="">All Courses</option>
                 {enrollments?.map(e => (
                   <option key={e.course_id} value={e.course_id}>
@@ -196,8 +196,8 @@ export default async function LibraryPage() {
                       >
                         <div className="p-4 border-b border-slate-200 bg-slate-50">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                              <Folder className="w-5 h-5 text-blue-600" />
+                            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                              <Folder className="w-5 h-5 text-brand-blue-600" />
                             </div>
                             <div>
                               <h3 className="font-bold text-slate-900">{enrollment.courses?.title}</h3>
@@ -240,7 +240,7 @@ export default async function LibraryPage() {
                                       href={material.file_url}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                                      className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
                                     >
                                       {material.type === 'link' ? (
                                         <>
@@ -279,7 +279,7 @@ export default async function LibraryPage() {
                     return (
                       <div
                         key={resource.id}
-                        className="bg-white rounded-xl border border-slate-200 p-4 hover:border-blue-300 hover:shadow-md transition"
+                        className="bg-white rounded-xl border border-slate-200 p-4 hover:border-brand-blue-300 hover:shadow-md transition"
                       >
                         <div className="flex items-start gap-3 mb-3">
                           <div className={`w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0 ${colorClass}`}>
@@ -304,7 +304,7 @@ export default async function LibraryPage() {
                               href={resource.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                              className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
                             >
                               View →
                             </a>
@@ -326,7 +326,7 @@ export default async function LibraryPage() {
             </p>
             <Link
               href="/lms/courses"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
             >
               <BookOpen className="w-5 h-5" />
               Browse Courses
@@ -335,7 +335,7 @@ export default async function LibraryPage() {
         )}
 
         {/* Quick Access */}
-        <div className="mt-8 bg-blue-600 rounded-2xl p-6 text-white">
+        <div className="mt-8 bg-brand-blue-600 rounded-2xl p-6 text-white">
           <h2 className="text-xl font-bold mb-4">Quick Access</h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-4 gap-4">
             <Link

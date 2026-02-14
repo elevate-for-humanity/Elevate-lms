@@ -114,11 +114,11 @@ export default async function LearnerDetailPage({ params }: Props) {
 
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center">
               {learner.avatar_url ? (
                 <img src={learner.avatar_url} alt={`${learner.first_name} ${learner.last_name}`} className="w-16 h-16 rounded-full object-cover" />
               ) : (
-                <User className="w-8 h-8 text-blue-600" />
+                <User className="w-8 h-8 text-brand-blue-600" />
               )}
             </div>
             <div>
@@ -159,8 +159,8 @@ export default async function LearnerDetailPage({ params }: Props) {
       <div className="grid grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-900">{enrollments?.length || 0}</p>
@@ -192,8 +192,8 @@ export default async function LearnerDetailPage({ params }: Props) {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Award className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+              <Award className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-900">{certificates?.length || 0}</p>
@@ -233,7 +233,7 @@ export default async function LearnerDetailPage({ params }: Props) {
                       <div className="flex items-center gap-2">
                         <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-blue-600 rounded-full"
+                            className="h-full bg-brand-blue-600 rounded-full"
                             style={{ width: `${enrollment.progress || 0}%` }}
                           />
                         </div>
@@ -243,7 +243,7 @@ export default async function LearnerDetailPage({ params }: Props) {
                       </div>
                       <span className={`text-xs ${
                         enrollment.status === 'completed' ? 'text-green-600' :
-                        enrollment.status === 'active' ? 'text-blue-600' : 'text-slate-500'
+                        enrollment.status === 'active' ? 'text-brand-blue-600' : 'text-slate-500'
                       }`}>
                         {enrollment.status}
                       </span>
@@ -264,12 +264,12 @@ export default async function LearnerDetailPage({ params }: Props) {
                 {recentActivity.map((activity: any) => (
                   <div key={activity.id} className="flex items-center gap-3 py-2 border-b border-slate-100 last:border-0">
                     <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                      activity.completed ? 'bg-green-100' : 'bg-blue-100'
+                      activity.completed ? 'bg-green-100' : 'bg-brand-blue-100'
                     }`}>
                       {activity.completed ? (
                         <CheckCircle className="w-4 h-4 text-green-600" />
                       ) : (
-                        <Clock className="w-4 h-4 text-blue-600" />
+                        <Clock className="w-4 h-4 text-brand-blue-600" />
                       )}
                     </div>
                     <div className="flex-1">

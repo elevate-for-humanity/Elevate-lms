@@ -96,10 +96,10 @@ export default function DirectoryPage() {
                     <div className="flex items-start justify-between gap-4">
                       <div>
                         <h3 className="font-bold text-slate-900 text-lg">{p.name}</h3>
-                        <p className="text-sm text-blue-600 font-medium">{p.type}</p>
+                        <p className="text-sm text-brand-blue-600 font-medium">{p.type}</p>
                       </div>
                       {p.url && (
-                        <a href={p.url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline flex items-center gap-1 flex-shrink-0">
+                        <a href={p.url} target="_blank" rel="noopener noreferrer" className="text-sm text-brand-blue-600 hover:underline flex items-center gap-1 flex-shrink-0">
                           <Globe className="w-4 h-4" /> Website
                         </a>
                       )}
@@ -120,8 +120,8 @@ export default function DirectoryPage() {
           <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">External Resources</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {resources.map((r) => (
-              <a key={r.name} href={r.url} target="_blank" rel="noopener noreferrer" className="block bg-white rounded-xl p-5 border border-slate-200 hover:border-blue-300 hover:shadow-sm transition group">
-                <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{r.name}</h3>
+              <a key={r.name} href={r.url} target="_blank" rel="noopener noreferrer" className="block bg-white rounded-xl p-5 border border-slate-200 hover:border-brand-blue-300 hover:shadow-sm transition group">
+                <h3 className="font-semibold text-slate-900 group-hover:text-brand-blue-600 transition-colors">{r.name}</h3>
                 <p className="text-sm text-slate-500 mt-1">{r.desc}</p>
               </a>
             ))}

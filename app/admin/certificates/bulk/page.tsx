@@ -94,7 +94,7 @@ export default async function BulkCertificatesPage() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Certificate Template
                   </label>
-                  <select className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                  <select className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500">
                     <option value="">Select a template</option>
                     {templates?.map((template: any) => (
                       <option key={template.id} value={template.id}>
@@ -110,7 +110,7 @@ export default async function BulkCertificatesPage() {
                   </label>
                   <input 
                     type="date" 
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     defaultValue={new Date().toISOString().split('T')[0]}
                   />
                 </div>
@@ -121,21 +121,21 @@ export default async function BulkCertificatesPage() {
                   </label>
                   <input 
                     type="text" 
-                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="Director Name"
                   />
                 </div>
 
-                <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mt-4">
+                <button className="w-full bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 mt-4">
                   Issue Selected Certificates
                 </button>
               </div>
             </div>
 
-            <div className="bg-blue-50 rounded-lg p-4 mt-4">
-              <h3 className="font-medium text-blue-900">Eligible Participants</h3>
-              <p className="text-3xl font-bold text-blue-600 mt-1">{eligibleCount || 0}</p>
-              <p className="text-sm text-blue-700">Ready for certificate issuance</p>
+            <div className="bg-brand-blue-50 rounded-lg p-4 mt-4">
+              <h3 className="font-medium text-brand-blue-900">Eligible Participants</h3>
+              <p className="text-3xl font-bold text-brand-blue-600 mt-1">{eligibleCount || 0}</p>
+              <p className="text-sm text-brand-blue-700">Ready for certificate issuance</p>
             </div>
           </div>
 
@@ -148,7 +148,7 @@ export default async function BulkCertificatesPage() {
                   <p className="text-sm text-gray-500">Select participants to issue certificates</p>
                 </div>
                 <div className="flex gap-2">
-                  <button className="text-sm text-blue-600 hover:text-blue-800">Select All</button>
+                  <button className="text-sm text-brand-blue-600 hover:text-brand-blue-800">Select All</button>
                   <span className="text-gray-300">|</span>
                   <button className="text-sm text-gray-600 hover:text-gray-800">Clear</button>
                 </div>
@@ -157,13 +157,13 @@ export default async function BulkCertificatesPage() {
                 {eligibleParticipants && eligibleParticipants.length > 0 ? (
                   eligibleParticipants.map((enrollment: any) => (
                     <div key={enrollment.id} className="p-4 flex items-center gap-4 hover:bg-gray-50">
-                      <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
+                      <input type="checkbox" className="w-4 h-4 text-brand-blue-600 rounded" />
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">
                           {enrollment.profiles?.full_name || 'Unknown'}
                         </p>
                         <p className="text-sm text-gray-500">{enrollment.profiles?.email}</p>
-                        <p className="text-sm text-blue-600">{enrollment.courses?.title}</p>
+                        <p className="text-sm text-brand-blue-600">{enrollment.courses?.title}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm text-gray-500">Completed</p>

@@ -99,7 +99,7 @@ export default async function AssignmentsPage() {
       if (submission.grade !== null) {
         return { status: 'graded', label: 'Graded', color: 'bg-green-100 text-green-700', icon: CheckCircle };
       }
-      return { status: 'submitted', label: 'Submitted', color: 'bg-blue-100 text-blue-700', icon: CheckCircle };
+      return { status: 'submitted', label: 'Submitted', color: 'bg-brand-blue-100 text-brand-blue-700', icon: CheckCircle };
     }
     if (dueDate < now) {
       return { status: 'overdue', label: 'Overdue', color: 'bg-red-100 text-red-700', icon: AlertCircle };
@@ -157,8 +157,8 @@ export default async function AssignmentsPage() {
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Upload className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Upload className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.submitted}</div>
@@ -242,7 +242,7 @@ export default async function AssignmentsPage() {
               <BookOpen className="w-16 h-16 text-slate-300 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-slate-900 mb-2">No Assignments Yet</h3>
               <p className="text-slate-600 mb-6">Assignments from your enrolled courses will appear here.</p>
-              <Link href="/lms/courses" className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition">
+              <Link href="/lms/courses" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition">
                 Browse Courses
               </Link>
             </div>

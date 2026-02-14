@@ -94,7 +94,7 @@ export default async function ProductsPage() {
                 <input
                   type="text"
                   placeholder="Search products..."
-                  className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 w-64"
+                  className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 w-64"
                 />
               </div>
               <button className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
@@ -103,7 +103,7 @@ export default async function ProductsPage() {
               </button>
               <Link
                 href="/shop/cart"
-                className="inline-flex items-center gap-2 px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="inline-flex items-center gap-2 px-3 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
               >
                 <ShoppingCart className="w-4 h-4" />
                 Cart
@@ -122,7 +122,7 @@ export default async function ProductsPage() {
                 key={category}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   category === 'All'
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
                 }`}
               >
@@ -174,7 +174,7 @@ export default async function ProductsPage() {
                     </div>
                     <button
                       disabled={!product.in_stock}
-                      className="p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="p-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <ShoppingCart className="w-4 h-4" />
                     </button>
@@ -188,7 +188,7 @@ export default async function ProductsPage() {
             <Package className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">No products available</h2>
             <p className="text-gray-600 mb-6">Check back soon for new products and learning materials.</p>
-            <Link href="/shop" className="text-blue-600 hover:underline">
+            <Link href="/shop" className="text-brand-blue-600 hover:underline">
               Return to Shop
             </Link>
           </div>

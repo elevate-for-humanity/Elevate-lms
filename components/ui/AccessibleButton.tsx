@@ -22,9 +22,9 @@ export const AccessibleButton = forwardRef<HTMLButtonElement, AccessibleButtonPr
     const baseStyles = 'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-4 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variants = {
-      primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-300',
+      primary: 'bg-brand-blue-600 text-white hover:bg-brand-blue-700 focus:ring-brand-blue-300',
       secondary: 'bg-gray-600 text-white hover:bg-gray-700 focus:ring-gray-300',
-      outline: 'border-2 border-blue-600 text-blue-600 hover:bg-gray-50 focus:ring-blue-300',
+      outline: 'border-2 border-brand-blue-600 text-brand-blue-600 hover:bg-gray-50 focus:ring-brand-blue-300',
       ghost: 'text-black hover:bg-gray-100 focus:ring-gray-300',
     };
 

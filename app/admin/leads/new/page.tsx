@@ -42,7 +42,7 @@ export default async function NewLeadPage() {
                 type="text"
                 name="first_name"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
             <div>
@@ -51,7 +51,7 @@ export default async function NewLeadPage() {
                 type="text"
                 name="last_name"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
           </div>
@@ -63,7 +63,7 @@ export default async function NewLeadPage() {
                 type="email"
                 name="email"
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
             <div>
@@ -72,7 +72,7 @@ export default async function NewLeadPage() {
                 type="tel"
                 name="phone"
                 placeholder="(317) 314-3757"
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
           </div>
@@ -80,7 +80,7 @@ export default async function NewLeadPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Program Interest</label>
-              <select name="program_interest" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <select name="program_interest" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500">
                 <option value="">Select a program...</option>
                 <option value="CNA">CNA</option>
                 <option value="Medical Admin">Medical Administrative Assistant</option>
@@ -93,7 +93,7 @@ export default async function NewLeadPage() {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Source</label>
-              <select name="source" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+              <select name="source" className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500">
                 <option value="website">Website</option>
                 <option value="referral">Referral</option>
                 <option value="social_media">Social Media</option>
@@ -111,7 +111,7 @@ export default async function NewLeadPage() {
             <textarea
               name="notes"
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               placeholder="Additional notes about this lead..."
             />
           </div>
@@ -122,7 +122,7 @@ export default async function NewLeadPage() {
             </Link>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Add Lead
             </button>

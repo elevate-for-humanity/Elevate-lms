@@ -32,7 +32,7 @@ export default function BusinessPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
-            <span className="inline-block bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Business Training</span>
+            <span className="inline-block bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Business Training</span>
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">Business &amp; Entrepreneurship</h1>
             <p className="text-sm sm:text-lg text-white/90 max-w-xl">
               Tax preparation, financial services, and business startup training. Learn to run your own business.
@@ -90,7 +90,7 @@ export default function BusinessPage() {
               { step: '4', title: 'Start Earning', desc: 'Work for a firm or open your own business.' },
             ].map((s) => (
               <div key={s.step} className="flex items-start gap-4 bg-white rounded-lg p-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
+                <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{s.title}</h3>
                   <p className="text-slate-600 text-sm">{s.desc}</p>
@@ -101,12 +101,12 @@ export default function BusinessPage() {
         </div>
       </section>
 
-      <section className="py-8 sm:py-14 bg-blue-600">
+      <section className="py-8 sm:py-14 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Business Career</h2>
           <p className="text-white/90 mb-6 text-sm">Learn tax prep and start your own business. Apply today.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=business" className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
+            <Link href="/apply?program=business" className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">
               Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
             <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

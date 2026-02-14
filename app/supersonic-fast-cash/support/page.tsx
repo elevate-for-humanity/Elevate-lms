@@ -84,7 +84,7 @@ export default function SupportPage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Support" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-blue-50 py-16">
+      <section className="bg-brand-blue-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-semibold text-gray-900 mb-4">
             Support Center
@@ -104,29 +104,29 @@ export default function SupportPage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
-              <Phone className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+              <Phone className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Phone</h3>
               <a 
                 href="/support" 
-                className="text-blue-600 font-medium hover:text-blue-700"
+                className="text-brand-blue-600 font-medium hover:text-brand-blue-700"
               >
                 Get Help Online
               </a>
             </div>
 
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
-              <Mail className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+              <Mail className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Email</h3>
               <a 
                 href="mailto:support@supersonicfastcash.com" 
-                className="text-blue-600 font-medium hover:text-blue-700"
+                className="text-brand-blue-600 font-medium hover:text-brand-blue-700"
               >
                 support@supersonicfastcash.com
               </a>
             </div>
 
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
-              <Clock className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+              <Clock className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Hours</h3>
               <p className="text-gray-600 text-sm">
                 Mon-Fri: 9am-6pm EST<br />
@@ -148,7 +148,7 @@ export default function SupportPage() {
             {faqs.map((category) => (
               <div key={category.category}>
                 <div className="flex items-center gap-3 mb-6">
-                  <category.icon className="w-6 h-6 text-blue-600" />
+                  <category.icon className="w-6 h-6 text-brand-blue-600" />
                   <h3 className="text-xl font-semibold text-gray-900">
                     {category.category}
                   </h3>
@@ -161,7 +161,7 @@ export default function SupportPage() {
                       className="bg-white border border-gray-200 rounded-xl p-6"
                     >
                       <div className="flex items-start gap-3">
-                        <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                        <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                         <div>
                           <h4 className="font-medium text-gray-900 mb-2">{faq.q}</h4>
                           <p className="text-gray-600 text-sm">{faq.a}</p>
@@ -220,12 +220,12 @@ export default function SupportPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-900">
+      <section className="py-16 bg-brand-blue-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-semibold text-white mb-4">
             Ready to file?
           </h2>
-          <p className="text-blue-200 mb-8">
+          <p className="text-brand-blue-200 mb-8">
             Start your tax return today.
           </p>
           <Link

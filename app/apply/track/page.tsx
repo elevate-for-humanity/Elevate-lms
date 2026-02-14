@@ -35,8 +35,8 @@ const statusConfig = {
   contacted: {
     icon: Phone,
     color: 'text-brand-blue-600',
-    bg: 'bg-blue-50',
-    border: 'border-blue-200',
+    bg: 'bg-brand-blue-50',
+    border: 'border-brand-blue-200',
     label: 'Contacted',
     description:
       'An advisor has reached out to you. Please check your email or phone.',

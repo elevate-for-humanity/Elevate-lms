@@ -54,7 +54,7 @@ const SUPPORT_CATEGORIES = [
     title: 'Technical Support',
     description: 'Issues with login, video playback, or platform features',
     icon: HelpCircle,
-    color: 'bg-blue-100 text-blue-600',
+    color: 'bg-brand-blue-100 text-brand-blue-600',
   },
   {
     title: 'Course Questions',
@@ -66,7 +66,7 @@ const SUPPORT_CATEGORIES = [
     title: 'Account & Billing',
     description: 'Account settings, enrollment, or payment questions',
     icon: FileText,
-    color: 'bg-blue-100 text-blue-600',
+    color: 'bg-brand-blue-100 text-brand-blue-600',
   },
   {
     title: 'Career Services',
@@ -134,7 +134,7 @@ export default async function SupportPage() {
             <input
               type="text"
               placeholder="Search for help articles..."
-              className="w-full pl-12 pr-4 py-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-lg"
+              className="w-full pl-12 pr-4 py-4 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-blue-500 text-lg"
             />
           </div>
         </div>
@@ -146,7 +146,7 @@ export default async function SupportPage() {
             return (
               <button
                 key={category.title}
-                className="bg-white rounded-xl p-6 border border-slate-200 hover:border-blue-300 hover:shadow-md transition text-left"
+                className="bg-white rounded-xl p-6 border border-slate-200 hover:border-brand-blue-300 hover:shadow-md transition text-left"
               >
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 ${category.color}`}>
                   <IconComponent className="w-6 h-6" />
@@ -179,7 +179,7 @@ export default async function SupportPage() {
                 ))}
               </div>
               <div className="p-6 bg-slate-50 border-t border-slate-200">
-                <Link href="/help" className="text-blue-600 font-medium hover:text-blue-700">
+                <Link href="/help" className="text-brand-blue-600 font-medium hover:text-brand-blue-700">
                   View All Help Articles →
                 </Link>
               </div>
@@ -189,14 +189,14 @@ export default async function SupportPage() {
           {/* Contact Options */}
           <div className="space-y-6">
             {/* Live Chat */}
-            <div className="bg-blue-600 rounded-2xl p-6 text-white">
+            <div className="bg-brand-blue-600 rounded-2xl p-6 text-white">
               <MessageSquare className="w-10 h-10 mb-4 opacity-90" />
               <h3 className="text-xl font-bold mb-2">Live Chat</h3>
-              <p className="text-blue-100 mb-4">Chat with our support team in real-time.</p>
-              <button className="w-full bg-white text-blue-600 px-4 py-3 rounded-xl font-bold hover:bg-blue-50 transition">
+              <p className="text-brand-blue-100 mb-4">Chat with our support team in real-time.</p>
+              <button className="w-full bg-white text-brand-blue-600 px-4 py-3 rounded-xl font-bold hover:bg-brand-blue-50 transition">
                 Start Chat
               </button>
-              <div className="flex items-center gap-2 mt-4 text-sm text-blue-200">
+              <div className="flex items-center gap-2 mt-4 text-sm text-brand-blue-200">
                 <Clock className="w-4 h-4" />
                 <span>Available Mon-Fri, 9am-6pm EST</span>
               </div>
@@ -206,7 +206,7 @@ export default async function SupportPage() {
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h3 className="font-bold text-slate-900 mb-4">Other Ways to Reach Us</h3>
               <div className="space-y-4">
-                <a href="/support" className="flex items-center gap-3 text-slate-600 hover:text-blue-600">
+                <a href="/support" className="flex items-center gap-3 text-slate-600 hover:text-brand-blue-600">
                   <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                     <Phone className="w-5 h-5" />
                   </div>
@@ -215,7 +215,7 @@ export default async function SupportPage() {
                     <div className="text-sm">Get Help Online</div>
                   </div>
                 </a>
-                <a href="mailto:elevate4humanityedu@gmail.com" className="flex items-center gap-3 text-slate-600 hover:text-blue-600">
+                <a href="mailto:elevate4humanityedu@gmail.com" className="flex items-center gap-3 text-slate-600 hover:text-brand-blue-600">
                   <div className="w-10 h-10 bg-slate-100 rounded-lg flex items-center justify-center">
                     <Mail className="w-5 h-5" />
                   </div>
@@ -230,8 +230,8 @@ export default async function SupportPage() {
             {/* Submit Support Request */}
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <PenSquare className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                  <PenSquare className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-slate-900">Submit a Request</h3>
               </div>
@@ -239,14 +239,14 @@ export default async function SupportPage() {
             </div>
 
             {/* AI Tutor */}
-            <div className="bg-blue-50 rounded-2xl border border-blue-200 p-6">
-              <h3 className="font-bold text-blue-900 mb-2">Need Course Help?</h3>
-              <p className="text-sm text-blue-800 mb-4">
+            <div className="bg-brand-blue-50 rounded-2xl border border-brand-blue-200 p-6">
+              <h3 className="font-bold text-brand-blue-900 mb-2">Need Course Help?</h3>
+              <p className="text-sm text-brand-blue-800 mb-4">
                 Our AI Tutor can help with course questions 24/7.
               </p>
               <Link
                 href="/lms/ai-tutor"
-                className="block w-full text-center bg-blue-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
+                className="block w-full text-center bg-brand-blue-600 text-white px-4 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
               >
                 Ask AI Tutor
               </Link>

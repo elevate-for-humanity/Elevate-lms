@@ -203,7 +203,7 @@ export function HubNavigation({ initialCategories }: Props) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
-            <Link href="/" className="text-xl font-bold text-blue-600">
+            <Link href="/" className="text-xl font-bold text-brand-blue-600">
               Elevate Hub
             </Link>
           </div>
@@ -222,7 +222,7 @@ export function HubNavigation({ initialCategories }: Props) {
               {user ? (
                 <Link 
                   href="/dashboard" 
-                  className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg font-medium"
+                  className="px-4 py-2 text-brand-blue-600 hover:bg-brand-blue-50 rounded-lg font-medium"
                 >
                   Dashboard
                 </Link>
@@ -236,7 +236,7 @@ export function HubNavigation({ initialCategories }: Props) {
               )}
               <Link 
                 href="/apply" 
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium"
               >
                 Get Started
               </Link>
@@ -279,7 +279,7 @@ export function HubNavigation({ initialCategories }: Props) {
               {user ? (
                 <Link
                   href="/dashboard"
-                  className="block w-full px-4 py-3 text-center text-blue-600 border border-blue-600 rounded-lg hover:bg-blue-50"
+                  className="block w-full px-4 py-3 text-center text-brand-blue-600 border border-brand-blue-600 rounded-lg hover:bg-brand-blue-50"
                   onClick={closeMobileMenu}
                 >
                   Dashboard
@@ -295,7 +295,7 @@ export function HubNavigation({ initialCategories }: Props) {
               )}
               <Link
                 href="/apply"
-                className="block w-full px-4 py-3 bg-blue-600 text-white text-center rounded-lg hover:bg-blue-700"
+                className="block w-full px-4 py-3 bg-brand-blue-600 text-white text-center rounded-lg hover:bg-brand-blue-700"
                 onClick={closeMobileMenu}
               >
                 Get Started
@@ -317,7 +317,7 @@ function NavDropdown({ title, items }: { title: string; items: NavItem[] }) {
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
     >
-      <button className="flex items-center gap-1 text-gray-700 hover:text-blue-600 font-medium py-2">
+      <button className="flex items-center gap-1 text-gray-700 hover:text-brand-blue-600 font-medium py-2">
         {title}
         <ChevronDown className={`w-4 h-4 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
@@ -367,7 +367,7 @@ function MobileSection({
             <Link
               key={item.id}
               href={item.href}
-              className="block py-2 text-gray-600 hover:text-blue-600"
+              className="block py-2 text-gray-600 hover:text-brand-blue-600"
               onClick={onItemClick}
             >
               <div className="font-medium">{item.name}</div>

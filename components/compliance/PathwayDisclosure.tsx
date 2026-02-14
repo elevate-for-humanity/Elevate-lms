@@ -39,10 +39,10 @@ export default function PathwayDisclosure({
 
   if (variant === 'compact') {
     return (
-      <div className={`bg-blue-50 border border-blue-200 rounded-lg p-4 ${className}`}>
+      <div className={`bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 ${className}`}>
         <div className="flex items-start gap-3">
-          <Shield className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-blue-800">
+          <Shield className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+          <p className="text-sm text-brand-blue-800">
             {COMPACT_DISCLOSURE}
           </p>
         </div>
@@ -54,8 +54,8 @@ export default function PathwayDisclosure({
   return (
     <div className={`bg-gray-50 border border-gray-200 rounded-xl p-6 ${className}`}>
       <div className="flex items-start gap-4">
-        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-          <Shield className="w-5 h-5 text-blue-600" />
+        <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+          <Shield className="w-5 h-5 text-brand-blue-600" />
         </div>
         <div>
           <h4 className="font-bold text-gray-900 mb-2">Career Pathway Disclosure</h4>

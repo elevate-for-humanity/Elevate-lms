@@ -47,13 +47,13 @@ export default function BarberOrientationPage() {
         <div className="space-y-4">
           <p>The {config.programTitle} requires <strong>{config.hoursLabel}</strong> of combined training:</p>
           <div className="grid gap-4 mt-4">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-bold text-blue-900">On-the-Job Training (OJT)</h4>
-              <p className="text-blue-800 text-sm">{config.ojtDescription}</p>
+            <div className="bg-brand-blue-50 p-4 rounded-lg">
+              <h4 className="font-bold text-brand-blue-900">On-the-Job Training (OJT)</h4>
+              <p className="text-brand-blue-800 text-sm">{config.ojtDescription}</p>
             </div>
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-bold text-blue-900">Related Technical Instruction (RTI)</h4>
-              <p className="text-blue-800 text-sm">{config.rtiDescription}</p>
+            <div className="bg-brand-blue-50 p-4 rounded-lg">
+              <h4 className="font-bold text-brand-blue-900">Related Technical Instruction (RTI)</h4>
+              <p className="text-brand-blue-800 text-sm">{config.rtiDescription}</p>
             </div>
           </div>
           <p className="text-sm text-slate-600 mt-4">
@@ -207,7 +207,7 @@ export default function BarberOrientationPage() {
           </div>
           <div className="h-2 bg-slate-200 rounded-full overflow-hidden">
             <div 
-              className="h-full bg-blue-600 transition-all duration-300"
+              className="h-full bg-brand-blue-600 transition-all duration-300"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -220,7 +220,7 @@ export default function BarberOrientationPage() {
           {/* Section Header */}
           <div className="bg-slate-900 px-6 py-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-brand-blue-600 rounded-lg flex items-center justify-center">
                 <CurrentIcon className="w-5 h-5 text-white" />
               </div>
               <h2 className="text-xl font-bold text-white">
@@ -242,7 +242,7 @@ export default function BarberOrientationPage() {
                   type="checkbox"
                   checked={acknowledged}
                   onChange={(e) => setAcknowledged(e.target.checked)}
-                  className="w-5 h-5 mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+                  className="w-5 h-5 mt-0.5 rounded border-slate-300 text-brand-blue-600 focus:ring-brand-blue-500"
                 />
                 <span className="text-slate-700">
                   <strong>I understand my responsibilities and agree to proceed.</strong>
@@ -269,14 +269,14 @@ export default function BarberOrientationPage() {
               <button
                 onClick={handleComplete}
                 disabled={!acknowledged || submitting}
-                className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-blue-700 transition"
+                className="px-8 py-3 bg-brand-blue-600 text-white font-bold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed hover:bg-brand-blue-700 transition"
               >
                 {submitting ? 'Processing...' : 'Continue to Program'}
               </button>
             ) : (
               <button
                 onClick={handleNext}
-                className="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition"
+                className="px-8 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Next
               </button>

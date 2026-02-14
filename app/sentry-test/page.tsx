@@ -39,7 +39,7 @@ export default function SentryTestPage() {
             Sentry.captureMessage("Sentry Test Message - Manual Capture");
             alert("Test message sent to Sentry!");
           }}
-          className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+          className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
         >
           Send Test Message
         </button>

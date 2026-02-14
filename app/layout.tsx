@@ -192,7 +192,7 @@ export default function RootLayout({
           .text-white{color:#fff}
           .text-black{color:#111827}
           .bg-white{background-color:#fff}
-          .bg-blue-600{background-color:#2563eb}
+          .bg-brand-blue-600{background-color:#2563eb}
           .bg-orange-500{background-color:#f97316}
           .rounded-md{border-radius:0.375rem}
           .font-bold{font-weight:700}

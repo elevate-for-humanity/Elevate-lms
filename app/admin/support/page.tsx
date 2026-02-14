@@ -30,16 +30,16 @@ interface Ticket {
 }
 
 const statusColors: Record<string, string> = {
-  open: 'bg-blue-100 text-blue-700',
+  open: 'bg-brand-blue-100 text-brand-blue-700',
   in_progress: 'bg-yellow-100 text-yellow-700',
-  waiting: 'bg-blue-100 text-blue-700',
+  waiting: 'bg-brand-blue-100 text-brand-blue-700',
   resolved: 'bg-green-100 text-green-700',
   closed: 'bg-gray-100 text-gray-700',
 };
 
 const priorityColors: Record<string, string> = {
   low: 'bg-gray-100 text-gray-600',
-  medium: 'bg-blue-100 text-blue-600',
+  medium: 'bg-brand-blue-100 text-brand-blue-600',
   high: 'bg-orange-100 text-orange-600',
   urgent: 'bg-red-100 text-red-600',
 };
@@ -108,8 +108,8 @@ export default function AdminSupportPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white p-6 rounded-xl shadow-sm">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Inbox className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Inbox className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-black">{stats.open}</p>
@@ -162,13 +162,13 @@ export default function AdminSupportPage() {
                 placeholder="Search tickets..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 text-black"
               />
             </div>
             <select
               value={filter.status}
               onChange={(e) => setFilter({ ...filter, status: e.target.value })}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 text-black"
             >
               <option value="">All Status</option>
               <option value="open">Open</option>
@@ -180,7 +180,7 @@ export default function AdminSupportPage() {
             <select
               value={filter.category}
               onChange={(e) => setFilter({ ...filter, category: e.target.value })}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-black"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 text-black"
             >
               <option value="">All Categories</option>
               <option value="technical">Technical</option>
@@ -197,7 +197,7 @@ export default function AdminSupportPage() {
         <div className="bg-white rounded-xl shadow-sm overflow-hidden">
           {loading ? (
             <div className="p-12 text-center">
-              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+              <div className="w-8 h-8 border-4 border-brand-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4" />
               <p className="text-gray-600">Loading tickets...</p>
             </div>
           ) : filteredTickets.length === 0 ? (
@@ -223,7 +223,7 @@ export default function AdminSupportPage() {
                     <td className="px-6 py-4">
                       <Link
                         href={`/admin/support/${ticket.id}`}
-                        className="font-mono text-sm text-blue-600 hover:underline"
+                        className="font-mono text-sm text-brand-blue-600 hover:underline"
                       >
                         {ticket.ticket_number}
                       </Link>
@@ -231,7 +231,7 @@ export default function AdminSupportPage() {
                     <td className="px-6 py-4">
                       <Link
                         href={`/admin/support/${ticket.id}`}
-                        className="font-medium text-black hover:text-blue-600 line-clamp-1"
+                        className="font-medium text-black hover:text-brand-blue-600 line-clamp-1"
                       >
                         {ticket.subject}
                       </Link>

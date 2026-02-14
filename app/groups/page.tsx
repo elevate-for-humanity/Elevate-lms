@@ -46,14 +46,14 @@ export default async function GroupsPage() {
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-            <Users className="w-8 h-8 text-blue-600" /> Study Groups
+            <Users className="w-8 h-8 text-brand-blue-600" /> Study Groups
           </h1>
           <div className="flex gap-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
               <input type="text" placeholder="Search groups..." className="pl-10 pr-4 py-2 border rounded-lg" />
             </div>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
               <Plus className="w-5 h-5" /> Create Group
             </button>
           </div>
@@ -71,7 +71,7 @@ export default async function GroupsPage() {
             <Users className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-700 mb-2">No Study Groups Yet</h2>
             <p className="text-gray-500 mb-6">Be the first to create a study group for your program!</p>
-            <button className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
               <Plus className="w-5 h-5" /> Create First Group
             </button>
           </div>
@@ -90,7 +90,7 @@ export default async function GroupsPage() {
                   <span className="flex items-center gap-1"><Users className="w-4 h-4" /> {group.member_count} members</span>
                   <span className="flex items-center gap-1"><MessageSquare className="w-4 h-4" /> Chat</span>
                 </div>
-                <button className="w-full py-2 border rounded-lg text-blue-600 hover:bg-blue-50">Join Group</button>
+                <button className="w-full py-2 border rounded-lg text-brand-blue-600 hover:bg-brand-blue-50">Join Group</button>
               </div>
             ))}
           </div>

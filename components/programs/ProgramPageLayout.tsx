@@ -31,10 +31,10 @@ interface ProgramPageLayoutProps {
 
 const colorClasses = {
   blue: {
-    badge: 'bg-blue-600',
-    cta: 'bg-blue-600',
-    ctaHover: 'hover:bg-blue-700',
-    ctaText: 'text-blue-600',
+    badge: 'bg-brand-blue-600',
+    cta: 'bg-brand-blue-600',
+    ctaHover: 'hover:bg-brand-blue-700',
+    ctaText: 'text-brand-blue-600',
   },
   orange: {
     badge: 'bg-orange-500',
@@ -117,7 +117,7 @@ export default function ProgramPageLayout({
             </Link>
             <Link 
               href="/wioa-eligibility"
-              className="inline-flex items-center text-white text-lg border-b-2 border-white pb-1 hover:border-blue-400 hover:text-blue-400 transition-all duration-300"
+              className="inline-flex items-center text-white text-lg border-b-2 border-white pb-1 hover:border-brand-blue-400 hover:text-brand-blue-400 transition-all duration-300"
             >
               Check Eligibility
             </Link>
@@ -152,7 +152,7 @@ export default function ProgramPageLayout({
                     {program.title}
                   </h2>
                   <p className="text-gray-600 mb-4">{program.description}</p>
-                  <span className="text-blue-600 font-semibold group-hover:underline">
+                  <span className="text-brand-blue-600 font-semibold group-hover:underline">
                     Learn More →
                   </span>
                 </div>

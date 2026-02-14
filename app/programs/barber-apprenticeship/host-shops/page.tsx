@@ -34,7 +34,7 @@ export default function HostShopsPage() {
         <div className="absolute inset-0 bg-slate-800/30" />
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-5xl mx-auto px-6 pb-12 w-full">
-            <div className="inline-block bg-blue-800 text-white text-sm font-semibold px-4 py-1 rounded-full mb-4">
+            <div className="inline-block bg-brand-blue-800 text-white text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Partner Opportunity
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
@@ -104,8 +104,8 @@ export default function HostShopsPage() {
           {/* Benefit 2 - Image Right */}
           <div className="grid md:grid-cols-2 gap-12 items-center mb-20">
             <div className="order-2 md:order-1">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mb-6">
-                <Shield className="w-8 h-8 text-blue-700" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-2xl flex items-center justify-center mb-6">
+                <Shield className="w-8 h-8 text-brand-blue-700" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4">Zero Paperwork for You</h3>
               <p className="text-lg text-black mb-4">
@@ -113,13 +113,13 @@ export default function HostShopsPage() {
               </p>
               <ul className="space-y-2 text-black">
                 <li className="flex items-center gap-2">
-                  <span className="text-blue-600 font-bold">✓</span> Digital hour tracking system
+                  <span className="text-brand-blue-600 font-bold">✓</span> Digital hour tracking system
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-blue-600 font-bold">✓</span> State board compliance handled
+                  <span className="text-brand-blue-600 font-bold">✓</span> State board compliance handled
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-blue-600 font-bold">✓</span> Simple attendance verification
+                  <span className="text-brand-blue-600 font-bold">✓</span> Simple attendance verification
                 </li>
               </ul>
             </div>
@@ -306,7 +306,7 @@ export default function HostShopsPage() {
 function BenefitCard({ icon, title, description }: { icon: React.ReactNode; title: string; description: string }) {
   return (
     <div className="text-center p-6">
-      <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-blue-800">
+      <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-brand-blue-800">
         {icon}
       </div>
       <h3 className="font-bold text-lg mb-2 text-black">{title}</h3>

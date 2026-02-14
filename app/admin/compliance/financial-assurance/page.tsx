@@ -65,7 +65,7 @@ function getStatusColor(status: string) {
     case 'active': return 'bg-green-100 text-green-700';
     case 'expiring_soon': return 'bg-yellow-100 text-yellow-700';
     case 'expired': return 'bg-red-100 text-red-700';
-    case 'pending': return 'bg-blue-100 text-blue-700';
+    case 'pending': return 'bg-brand-blue-100 text-brand-blue-700';
     default: return 'bg-gray-100 text-gray-700';
   }
 }
@@ -138,7 +138,7 @@ export default async function FinancialAssurancePage() {
               <Download className="w-4 h-4" />
               Export
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
               <Plus className="w-4 h-4" />
               Add New
             </button>
@@ -163,8 +163,8 @@ export default async function FinancialAssurancePage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <DollarSign className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <DollarSign className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Total Coverage</p>
@@ -201,8 +201,8 @@ export default async function FinancialAssurancePage() {
 
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Next Renewal</p>
@@ -288,7 +288,7 @@ export default async function FinancialAssurancePage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-2">
-                          <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                          <button className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium">
                             View
                           </button>
                           <button className="text-gray-600 hover:text-gray-700 text-sm font-medium">
@@ -369,17 +369,17 @@ export default async function FinancialAssurancePage() {
         </div>
 
         {/* Notification Settings */}
-        <div className="mt-8 bg-blue-50 rounded-xl p-6">
+        <div className="mt-8 bg-brand-blue-50 rounded-xl p-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-              <Bell className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <Bell className="w-6 h-6 text-brand-blue-600" />
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-gray-900">Renewal Reminders</h3>
               <p className="text-sm text-gray-600 mt-1">
                 Get notified 90, 60, and 30 days before your financial assurances expire.
               </p>
-              <button className="mt-3 text-sm text-blue-600 hover:text-blue-700 font-medium">
+              <button className="mt-3 text-sm text-brand-blue-600 hover:text-brand-blue-700 font-medium">
                 Configure Notifications →
               </button>
             </div>

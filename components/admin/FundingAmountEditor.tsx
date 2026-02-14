@@ -111,7 +111,7 @@ export default function FundingAmountEditor({
             max="100"
             defaultValue={currentValues?.wage_rate_hour}
             placeholder="0.00"
-            className="w-full pl-8 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+            className="w-full pl-8 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-brand-blue-500"
           />
           <span className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm">
             /hour
@@ -135,7 +135,7 @@ export default function FundingAmountEditor({
             min="0"
             defaultValue={currentValues?.stipend_total_amount}
             placeholder="0.00"
-            className="w-full pl-8 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+            className="w-full pl-8 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-brand-blue-500"
           />
         </div>
       </div>
@@ -156,7 +156,7 @@ export default function FundingAmountEditor({
             min="0"
             defaultValue={currentValues?.tuition_covered_amount}
             placeholder="0.00"
-            className="w-full pl-8 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+            className="w-full pl-8 pr-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-brand-blue-500"
           />
         </div>
       </div>
@@ -171,7 +171,7 @@ export default function FundingAmountEditor({
           name="external_case_id"
           defaultValue={currentValues?.external_case_id}
           placeholder="e.g., WO-2024-12345"
-          className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-blue-500"
+          className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white focus:outline-none focus:border-brand-blue-500"
         />
       </div>
 

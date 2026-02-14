@@ -37,7 +37,7 @@ export default async function WIOAEligibilityPage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Eligibility" }]} />
       </div>
 <div className="max-w-7xl mx-auto">
-        <Link href="/admin/wioa" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/admin/wioa" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to WIOA Management
         </Link>
@@ -66,16 +66,16 @@ export default async function WIOAEligibilityPage() {
               <input
                 type="text"
                 placeholder="Search applications..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               />
             </div>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
               <option>All Categories</option>
               <option>Adult</option>
               <option>Dislocated Worker</option>
               <option>Youth</option>
             </select>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
               <option>All Status</option>
               <option>Pending</option>
               <option>Approved</option>
@@ -90,7 +90,7 @@ export default async function WIOAEligibilityPage() {
               <p className="text-gray-600 mb-6">WIOA eligibility applications will appear here once submitted.</p>
               <Link
                 href="/wioa-eligibility"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
               >
                 <Plus className="w-4 h-4" />
                 Start New Application
@@ -115,8 +115,8 @@ export default async function WIOAEligibilityPage() {
                     <tr key={app.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                            <User className="w-5 h-5 text-blue-600" />
+                          <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                            <User className="w-5 h-5 text-brand-blue-600" />
                           </div>
                           <div>
                             <p className="font-medium text-gray-900">
@@ -127,7 +127,7 @@ export default async function WIOAEligibilityPage() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <span className="px-3 py-1 bg-blue-100 text-blue-700 text-sm rounded-full">
+                        <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 text-sm rounded-full">
                           {app.eligibility_category || 'Adult'}
                         </span>
                       </td>
@@ -156,7 +156,7 @@ export default async function WIOAEligibilityPage() {
                       <td className="px-6 py-4">
                         <Link
                           href={`/admin/wioa/verify?id=${app.id}`}
-                          className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition"
+                          className="px-4 py-2 bg-brand-blue-600 text-white text-sm rounded-lg hover:bg-brand-blue-700 transition"
                         >
                           Review
                         </Link>

@@ -96,7 +96,7 @@ export default async function MobileAppPage() {
           </h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="text-center p-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-blue-100 rounded-full mb-4">
                 <Smartphone className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
@@ -122,8 +122,8 @@ export default async function MobileAppPage() {
             </div>
 
             <div className="text-center p-6">
-              <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mb-4">
-                <Bell className="w-8 h-8 text-blue-600" />
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-brand-blue-100 rounded-full mb-4">
+                <Bell className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-semibold mb-3 text-black">
                 Push Notifications
@@ -273,7 +273,7 @@ export default async function MobileAppPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-6">
             Ready to Get Started?
           </h2>
-          <p className="text-base md:text-lg mb-8 text-blue-100">
+          <p className="text-base md:text-lg mb-8 text-brand-blue-100">
             Install the app now and take your career development journey with
             you wherever you go.
           </p>

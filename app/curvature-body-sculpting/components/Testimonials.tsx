@@ -58,7 +58,7 @@ export default function Testimonials() {
     return (
       <section className="py-20 bg-white">
         <div className="flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+          <Loader2 className="w-8 h-8 text-brand-blue-600 animate-spin" />
         </div>
       </section>
     );
@@ -101,7 +101,7 @@ export default function Testimonials() {
                 key={index}
                 className="bg-gray-50 rounded-2xl p-6 relative"
               >
-                <Quote className="absolute top-4 right-4 w-8 h-8 text-blue-200" />
+                <Quote className="absolute top-4 right-4 w-8 h-8 text-brand-blue-200" />
                 <div className="flex items-center gap-1 mb-3">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <Star
@@ -119,7 +119,7 @@ export default function Testimonials() {
                   <div>
                     <p className="font-semibold text-gray-900">{review.name}</p>
                     {review.service && (
-                      <p className="text-sm text-blue-600">{review.service}</p>
+                      <p className="text-sm text-brand-blue-600">{review.service}</p>
                     )}
                   </div>
                   <span className="text-xs text-gray-400">{review.date}</span>
@@ -143,7 +143,7 @@ export default function Testimonials() {
                   key={i}
                   onClick={() => setCurrentIndex(i)}
                   className={`w-2 h-2 rounded-full transition ${
-                    i === currentIndex ? 'bg-blue-600' : 'bg-gray-300'
+                    i === currentIndex ? 'bg-brand-blue-600' : 'bg-gray-300'
                   }`}
                   aria-label={`Go to page ${i + 1}`}
                 />
@@ -164,7 +164,7 @@ export default function Testimonials() {
             href="https://www.google.com/maps/place/Curvature+Body+Sculpting"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700"
+            className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:text-brand-blue-700"
           >
             See all reviews on Google
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">

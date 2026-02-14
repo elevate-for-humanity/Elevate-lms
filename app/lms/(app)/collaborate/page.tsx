@@ -84,14 +84,14 @@ export default async function CollaboratePage() {
         <div className="flex items-center justify-between mb-8">
           <div>
             <h1 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-              <Users className="w-8 h-8 text-blue-600" />
+              <Users className="w-8 h-8 text-brand-blue-600" />
               Collaborate
             </h1>
             <p className="text-gray-600 mt-1">
               Work together with classmates on projects and study sessions
             </p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
             <Plus className="w-5 h-5" />
             Create Group
           </button>
@@ -103,18 +103,18 @@ export default async function CollaboratePage() {
             <Link
               key={index}
               href={tool.href}
-              className="bg-white rounded-xl p-6 shadow-sm border hover:border-blue-300 hover:shadow-md transition-all"
+              className="bg-white rounded-xl p-6 shadow-sm border hover:border-brand-blue-300 hover:shadow-md transition-all"
             >
               <div className="flex items-start gap-4">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                  tool.color === 'blue' ? 'bg-blue-100' :
+                  tool.color === 'blue' ? 'bg-brand-blue-100' :
                   tool.color === 'green' ? 'bg-green-100' :
-                  tool.color === 'blue' ? 'bg-blue-100' : 'bg-orange-100'
+                  tool.color === 'blue' ? 'bg-brand-blue-100' : 'bg-orange-100'
                 }`}>
                   <tool.icon className={`w-6 h-6 ${
-                    tool.color === 'blue' ? 'text-blue-600' :
+                    tool.color === 'blue' ? 'text-brand-blue-600' :
                     tool.color === 'green' ? 'text-green-600' :
-                    tool.color === 'blue' ? 'text-blue-600' : 'text-orange-600'
+                    tool.color === 'blue' ? 'text-brand-blue-600' : 'text-orange-600'
                   }`} />
                 </div>
                 <div className="flex-1">
@@ -133,7 +133,7 @@ export default async function CollaboratePage() {
           <div className="bg-white rounded-xl shadow-sm border">
             <div className="p-6 border-b flex items-center justify-between">
               <h2 className="font-semibold text-gray-900">My Study Groups</h2>
-              <Link href="/lms/study-groups" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+              <Link href="/lms/study-groups" className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium">
                 View All
               </Link>
             </div>
@@ -146,7 +146,7 @@ export default async function CollaboratePage() {
                 </p>
                 <Link
                   href="/lms/study-groups"
-                  className="text-blue-600 hover:text-blue-700 font-medium text-sm"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm"
                 >
                   Browse Study Groups →
                 </Link>
@@ -158,7 +158,7 @@ export default async function CollaboratePage() {
           <div className="bg-white rounded-xl shadow-sm border">
             <div className="p-6 border-b flex items-center justify-between">
               <h2 className="font-semibold text-gray-900">Upcoming Sessions</h2>
-              <Link href="/lms/collaborate/meetings" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+              <Link href="/lms/collaborate/meetings" className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium">
                 Schedule
               </Link>
             </div>
@@ -169,7 +169,7 @@ export default async function CollaboratePage() {
                 <p className="text-gray-600 text-sm mb-4">
                   Schedule a study session with your group
                 </p>
-                <button className="text-blue-600 hover:text-blue-700 font-medium text-sm">
+                <button className="text-brand-blue-600 hover:text-brand-blue-700 font-medium text-sm">
                   Schedule Session →
                 </button>
               </div>
@@ -178,19 +178,19 @@ export default async function CollaboratePage() {
         </div>
 
         {/* Tips */}
-        <div className="mt-8 bg-blue-50 rounded-xl p-6">
+        <div className="mt-8 bg-brand-blue-50 rounded-xl p-6">
           <h3 className="font-semibold text-gray-900 mb-4">Collaboration Tips</h3>
           <div className="grid md:grid-cols-3 gap-4 text-sm text-gray-700">
             <div className="flex items-start gap-2">
-              <MessageSquare className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <MessageSquare className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Use the chat feature to stay connected with your study partners</span>
             </div>
             <div className="flex items-start gap-2">
-              <Share2 className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <Share2 className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Share notes and resources in your group's shared documents</span>
             </div>
             <div className="flex items-start gap-2">
-              <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <Clock className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Schedule regular study sessions to stay on track</span>
             </div>
           </div>

@@ -164,23 +164,23 @@ export default async function VerificationPage() {
                 </div>
               </div>
             ) : (
-              <div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
+              <div className="bg-brand-blue-50 border-l-4 border-brand-blue-500 p-6 mb-8">
                 <div className="flex items-start">
-                  <AlertCircle className="h-10 w-10 text-blue-600 mr-3 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="h-10 w-10 text-brand-blue-600 mr-3 flex-shrink-0 mt-0.5" />
                   <div>
-                    <h3 className="text-lg font-semibold text-blue-900 mb-1">
+                    <h3 className="text-lg font-semibold text-brand-blue-900 mb-1">
                       Verification In Progress
                     </h3>
-                    <p className="text-blue-800 mb-2">
+                    <p className="text-brand-blue-800 mb-2">
                       Complete all required steps to get verified.
                     </p>
-                    <div className="w-full bg-blue-200 rounded-full h-2 mt-3">
+                    <div className="w-full bg-brand-blue-200 rounded-full h-2 mt-3">
                       <div
-                        className="bg-blue-600 h-2 rounded-full transition-all"
+                        className="bg-brand-blue-600 h-2 rounded-full transition-all"
                         style={{ width: `${verificationProgress}%` }}
                       />
                     </div>
-                    <p className="text-sm text-blue-700 mt-2">
+                    <p className="text-sm text-brand-blue-700 mt-2">
                       {requiredCompleted} of {requiredTotal} required items
                       completed
                     </p>
@@ -253,24 +253,24 @@ export default async function VerificationPage() {
             </div>
 
             {/* Help Section */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-brand-blue-900 mb-2">
                 Need Help?
               </h3>
-              <p className="text-blue-800 mb-4">
+              <p className="text-brand-blue-800 mb-4">
                 Contact our team for assistance with the verification process.
               </p>
               <div className="flex flex-col sm:flex-row gap-3">
                 <a
                   href="mailto:elevate4humanityedu@gmail.com"
-                  className="inline-flex items-center text-blue-900 hover:text-blue-700 font-medium"
+                  className="inline-flex items-center text-brand-blue-900 hover:text-brand-blue-700 font-medium"
                 >
                   <Mail className="h-4 w-4 mr-2" />
                   Email Support
                 </a>
                 <a
                   href="/support"
-                  className="inline-flex items-center text-blue-900 hover:text-blue-700 font-medium"
+                  className="inline-flex items-center text-brand-blue-900 hover:text-brand-blue-700 font-medium"
                 >
                   <Phone className="h-4 w-4 mr-2" />
                   Contact Us

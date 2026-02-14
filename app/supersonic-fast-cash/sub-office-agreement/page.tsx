@@ -97,7 +97,7 @@ export default function SubOfficeAgreementPage() {
             <div className="flex gap-4 justify-center">
               <button
                 onClick={() => window.print()}
-                className="px-6 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700"
+                className="px-6 py-3 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700"
               >
                 <Download className="w-5 h-5 inline mr-2" />
                 Download PDF
@@ -122,14 +122,14 @@ export default function SubOfficeAgreementPage() {
       </div>
 <div className="max-w-4xl mx-auto px-4">
         {/* Header */}
-        <div className="bg-blue-900 text-white rounded-t-lg p-8">
+        <div className="bg-brand-blue-900 text-white rounded-t-lg p-8">
           <div className="flex items-center gap-4 mb-4">
             <Shield className="w-12 h-12" />
             <div>
               <h1 className="text-3xl font-black uppercase">
                 Sub-Office Agreement
               </h1>
-              <p className="text-blue-200">
+              <p className="text-brand-blue-200">
                 Supersonic Fast Cash Tax Preparation
               </p>
             </div>
@@ -459,7 +459,7 @@ export default function SubOfficeAgreementPage() {
                 <button
                   type="button"
                   onClick={clearSignature}
-                  className="mt-2 text-sm text-blue-600 hover:underline"
+                  className="mt-2 text-sm text-brand-blue-600 hover:underline"
                 >
                   Clear Signature
                 </button>
@@ -486,7 +486,7 @@ export default function SubOfficeAgreementPage() {
               <button
                 type="submit"
                 disabled={!agreed}
-                className="w-full py-4 bg-blue-900 text-white font-black text-lg rounded-lg hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed uppercase"
+                className="w-full py-4 bg-brand-blue-900 text-white font-black text-lg rounded-lg hover:bg-brand-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed uppercase"
               >
                 <FileText className="w-5 h-5 inline mr-2" />
                 Sign Agreement Digitally

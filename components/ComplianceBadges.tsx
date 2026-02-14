@@ -20,9 +20,9 @@ export function ComplianceBadges({
   return (
     <div className="flex flex-wrap items-center gap-3">
       {showDOL && (
-        <div className="flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-full">
-          <Shield className="w-4 h-4 text-blue-700" />
-          <span className="text-sm font-semibold text-blue-900">DOL Registered</span>
+        <div className="flex items-center gap-2 px-4 py-2 bg-brand-blue-50 border border-brand-blue-200 rounded-full">
+          <Shield className="w-4 h-4 text-brand-blue-700" />
+          <span className="text-sm font-semibold text-brand-blue-900">DOL Registered</span>
         </div>
       )}
 

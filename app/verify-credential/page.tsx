@@ -52,7 +52,7 @@ export default function VerifyCredentialPage() {
       <section className="bg-white border-b border-gray-200">
         <div className="max-w-4xl mx-auto px-6 py-8">
           <div className="flex items-center gap-3 mb-2">
-            <Shield className="w-8 h-8 text-blue-600" />
+            <Shield className="w-8 h-8 text-brand-blue-600" />
             <h1 className="text-3xl font-semibold text-black">
               Verify Credential
             </h1>
@@ -86,7 +86,7 @@ export default function VerifyCredentialPage() {
                     value={code}
                     onChange={(e) => setCode(e.target.value)}
                     placeholder="crd_XXXXXXXXXXXXXXXXXXXX"
-                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-lg font-mono"
+                    className="w-full px-4 py-3 border-2 border-gray-300 rounded-lg focus:border-brand-blue-500 focus:outline-none text-lg font-mono"
                     required
                   />
                   <Search className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-black" />
@@ -96,7 +96,7 @@ export default function VerifyCredentialPage() {
               <button
                 type="submit"
                 disabled={loading || !code.trim()}
-                className="w-full bg-blue-600 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                className="w-full bg-brand-blue-600 text-white py-3 px-6 rounded-lg font-semibold text-lg hover:bg-brand-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
               >
                 {loading ? 'Verifying...' : 'Verify Credential'}
               </button>
@@ -240,7 +240,7 @@ export default function VerifyCredentialPage() {
           </div>
 
           {/* Info Section */}
-          <div className="mt-12 bg-blue-50 rounded-lg p-6">
+          <div className="mt-12 bg-brand-blue-50 rounded-lg p-6">
             <h2 className="text-xl font-bold text-black mb-4">
               About Credential Verification
             </h2>

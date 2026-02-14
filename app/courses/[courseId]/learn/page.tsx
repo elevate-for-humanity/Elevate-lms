@@ -23,7 +23,7 @@ export default async function LearnPage({ params }: { params: { courseId: string
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href={`/courses/${params.courseId}`} className="text-blue-600 hover:text-blue-800 text-sm">← Back to Course</Link>
+          <Link href={`/courses/${params.courseId}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">← Back to Course</Link>
           <h1 className="text-2xl font-bold text-gray-900 mt-2">{course?.title || 'Course'}</h1>
           <div className="flex items-center gap-4 mt-2">
             <span className="text-sm text-gray-500">{lessons?.length || 0} lessons</span>
@@ -38,7 +38,7 @@ export default async function LearnPage({ params }: { params: { courseId: string
                 {lessons && lessons.length > 0 ? lessons.map((lesson: any, i: number) => (
                   <Link key={lesson.id} href={`/courses/${params.courseId}/lessons/${lesson.id}`} className="block p-2 rounded hover:bg-gray-50">
                     <div className="flex items-center gap-2">
-                      <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-xs">{i + 1}</span>
+                      <span className="w-6 h-6 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center text-xs">{i + 1}</span>
                       <span className="text-sm">{lesson.title}</span>
                     </div>
                   </Link>

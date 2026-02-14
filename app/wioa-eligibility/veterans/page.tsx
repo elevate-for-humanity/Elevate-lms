@@ -96,7 +96,7 @@ export default async function VeteransPage() {
       </section>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <Link href="/wioa-eligibility" className="text-blue-600 hover:underline mb-6 inline-block">
+        <Link href="/wioa-eligibility" className="text-brand-blue-600 hover:underline mb-6 inline-block">
           ← Back to WIOA Eligibility
         </Link>
 
@@ -114,8 +114,8 @@ export default async function VeteransPage() {
             {benefits.map((benefit, index) => {
               const IconComponent = benefit.icon;
               return (
-                <div key={index} className="flex items-start gap-4 bg-blue-50 rounded-lg p-4">
-                  <IconComponent className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+                <div key={index} className="flex items-start gap-4 bg-brand-blue-50 rounded-lg p-4">
+                  <IconComponent className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-bold">{benefit.title}</h3>
                     <p className="text-gray-600 text-sm">{benefit.description}</p>
@@ -145,7 +145,7 @@ export default async function VeteransPage() {
           <ul className="space-y-3">
             {requiredDocuments.map((doc, index) => (
               <li key={index} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">{doc}</span>
               </li>
             ))}
@@ -175,7 +175,7 @@ export default async function VeteransPage() {
 
         {/* Testimonials */}
         {testimonials && testimonials.length > 0 && (
-          <div className="bg-blue-50 rounded-lg p-8 mb-8">
+          <div className="bg-brand-blue-50 rounded-lg p-8 mb-8">
             <h3 className="text-xl font-bold mb-6">Veteran Success Stories</h3>
             <div className="space-y-6">
               {testimonials.map((testimonial: any) => (
@@ -183,7 +183,7 @@ export default async function VeteransPage() {
                   <p className="text-gray-600 italic mb-3">"{testimonial.content}"</p>
                   <div className="font-semibold">{testimonial.name}</div>
                   {testimonial.branch && (
-                    <div className="text-sm text-blue-600">{testimonial.branch}</div>
+                    <div className="text-sm text-brand-blue-600">{testimonial.branch}</div>
                   )}
                 </div>
               ))}
@@ -192,21 +192,21 @@ export default async function VeteransPage() {
         )}
 
         {/* CTA */}
-        <div className="bg-blue-600 rounded-lg p-8 text-center text-white">
+        <div className="bg-brand-blue-600 rounded-lg p-8 text-center text-white">
           <h3 className="text-2xl font-bold mb-4">Ready to Get Started?</h3>
-          <p className="text-blue-100 mb-6">
+          <p className="text-brand-blue-100 mb-6">
             Apply today and receive priority processing as a veteran.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="bg-white text-brand-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-brand-blue-700 transition"
             >
               <Phone className="w-5 h-5" />
               Get Help Online

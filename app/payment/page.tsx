@@ -45,7 +45,7 @@ export default async function PaymentPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Payment Options
             </h1>
-            <p className="text-lg text-blue-100">
+            <p className="text-lg text-brand-blue-100">
               Flexible payment solutions to help you invest in your future.
             </p>
           </div>

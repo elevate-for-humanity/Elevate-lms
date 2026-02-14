@@ -94,8 +94,8 @@ export default function SSNVerificationForm({
           Administration. This is a free service and helps confirm your
           identity.
         </p>
-        <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-400">
-          <p className="text-sm text-blue-900">
+        <div className="mt-4 p-4 bg-brand-blue-50 border-l-4 border-brand-blue-400">
+          <p className="text-sm text-brand-blue-900">
             <strong>
               <CheckCircle className="w-5 h-5 inline-block" /> FREE Service
             </strong>{' '}
@@ -167,7 +167,7 @@ export default function SSNVerificationForm({
             placeholder="XXX-XX-XXXX"
             maxLength={11}
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
           />
           <p className="text-xs text-black mt-1">
             <Lock className="w-5 h-5 inline-block" /> We only store the last 4
@@ -188,7 +188,7 @@ export default function SSNVerificationForm({
               }
               placeholder="First name"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -204,7 +204,7 @@ export default function SSNVerificationForm({
               }
               placeholder="Doe"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
         </div>
@@ -220,7 +220,7 @@ export default function SSNVerificationForm({
               setFormData({ ...formData, dateOfBirth: e.target.value })
             }
             required
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
           />
         </div>
 
@@ -228,7 +228,7 @@ export default function SSNVerificationForm({
           <button
             type="submit"
             disabled={loading || result?.verified}
-            className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2"
+            className="w-full bg-brand-blue-600 text-white px-6 py-3 rounded-lg hover:bg-brand-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="animate-spin" size={20} />}
             {loading
@@ -254,7 +254,7 @@ export default function SSNVerificationForm({
             href="https://www.ssa.gov/employer/ssnv.htm"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:underline"
+            className="text-brand-blue-600 hover:underline"
           >
             Learn more about SSA verification →
           </a>

@@ -73,7 +73,7 @@ export function VideoConferencingIntegration() {
                 <h3 className="text-xl font-bold">{meeting.title}</h3>
                 <span className={`px-3 py-2 rounded text-xs font-medium ${
                   meeting.status === 'live' ? 'bg-red-100 text-red-700' :
-                  meeting.status === 'upcoming' ? 'bg-blue-100 text-blue-700' :
+                  meeting.status === 'upcoming' ? 'bg-brand-blue-100 text-brand-blue-700' :
                   'bg-gray-100 text-black'
                 }`}>
                   {meeting.status === 'live' && '🔴 '}{meeting.status.toUpperCase()}

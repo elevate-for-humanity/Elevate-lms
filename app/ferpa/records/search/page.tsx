@@ -161,7 +161,7 @@ export default async function FerpaRecordsSearchPage({
                     name="q"
                     defaultValue={query}
                     placeholder="Enter student name or email..."
-                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     minLength={2}
                     required
                   />
@@ -175,7 +175,7 @@ export default async function FerpaRecordsSearchPage({
                   id="type"
                   name="type"
                   defaultValue={searchType}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="all">All Fields</option>
                   <option value="name">Name Only</option>
@@ -185,7 +185,7 @@ export default async function FerpaRecordsSearchPage({
               <div className="sm:self-end">
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="w-full sm:w-auto px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
                 >
                   Search
                 </button>
@@ -237,7 +237,7 @@ export default async function FerpaRecordsSearchPage({
                           <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
                             <span>ID: {student.id.slice(0, 8)}...</span>
                             <span>Created: {formatDate(student.created_at)}</span>
-                            <span className="inline-flex items-center px-2 py-0.5 rounded bg-blue-100 text-blue-700">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded bg-brand-blue-100 text-brand-blue-700">
                               {student.enrollments?.length || 0} enrollments
                             </span>
                           </div>
@@ -245,7 +245,7 @@ export default async function FerpaRecordsSearchPage({
                       </div>
                       <Link
                         href={`/admin/learner/${student.id}`}
-                        className="inline-flex items-center gap-2 px-4 py-2 text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="inline-flex items-center gap-2 px-4 py-2 text-sm text-brand-blue-600 hover:text-brand-blue-700 hover:bg-brand-blue-50 rounded-lg transition-colors"
                       >
                         <Eye className="w-4 h-4" />
                         View Full Record

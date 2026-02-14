@@ -30,13 +30,13 @@ export default function AdminLoginPage() {
                 <input type="checkbox" className="w-4 h-4 rounded" />
                 <span className="text-sm text-gray-600">Remember me</span>
               </label>
-              <Link href="/auth/forgot-password" className="text-sm text-blue-600 hover:text-blue-800">Forgot password?</Link>
+              <Link href="/auth/forgot-password" className="text-sm text-brand-blue-600 hover:text-brand-blue-800">Forgot password?</Link>
             </div>
-            <button type="submit" className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Sign In</button>
+            <button type="submit" className="w-full bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Sign In</button>
           </form>
         </div>
         <p className="text-center text-sm text-gray-500 mt-4">
-          <Link href="/login" className="text-blue-600 hover:text-blue-800">Back to main login</Link>
+          <Link href="/login" className="text-brand-blue-600 hover:text-brand-blue-800">Back to main login</Link>
         </p>
       </div>
     </div>

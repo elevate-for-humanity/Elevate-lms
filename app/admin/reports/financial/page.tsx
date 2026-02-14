@@ -50,7 +50,7 @@ export default async function FinancialReportPage() {
 
   const wotcStatusColors: Record<string, string> = {
     draft: 'bg-gray-100 text-gray-600',
-    submitted: 'bg-blue-100 text-blue-700',
+    submitted: 'bg-brand-blue-100 text-brand-blue-700',
     pending_review: 'bg-yellow-100 text-yellow-700',
     approved: 'bg-green-100 text-green-700',
     denied: 'bg-red-100 text-red-700',
@@ -84,22 +84,22 @@ export default async function FinancialReportPage() {
           
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <DollarSign className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <DollarSign className="w-5 h-5 text-brand-blue-600" />
               </div>
               <span className="text-sm text-gray-600">Grants Awarded</span>
             </div>
-            <p className="text-3xl font-bold text-blue-600">${totalGrantsAwarded.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-brand-blue-600">${totalGrantsAwarded.toLocaleString()}</p>
           </div>
           
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <FileText className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <FileText className="w-5 h-5 text-brand-blue-600" />
               </div>
               <span className="text-sm text-gray-600">Available Grants</span>
             </div>
-            <p className="text-3xl font-bold text-blue-600">${(availableFunding / 1000).toFixed(0)}K</p>
+            <p className="text-3xl font-bold text-brand-blue-600">${(availableFunding / 1000).toFixed(0)}K</p>
           </div>
           
           <div className="bg-white rounded-xl shadow-sm p-6">
@@ -118,7 +118,7 @@ export default async function FinancialReportPage() {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">WOTC Applications</h2>
-              <Link href="/admin/wotc" className="text-sm text-blue-600 hover:text-blue-700">
+              <Link href="/admin/wotc" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
                 View All
               </Link>
             </div>
@@ -154,7 +154,7 @@ export default async function FinancialReportPage() {
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-lg font-semibold text-gray-900">Grant Applications</h2>
-              <Link href="/admin/grants" className="text-sm text-blue-600 hover:text-blue-700">
+              <Link href="/admin/grants" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
                 View All
               </Link>
             </div>
@@ -197,7 +197,7 @@ export default async function FinancialReportPage() {
         <div className="bg-white rounded-xl shadow-sm p-6">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold text-gray-900">Open Grant Opportunities</h2>
-            <Link href="/admin/grants/new" className="text-sm text-blue-600 hover:text-blue-700">
+            <Link href="/admin/grants/new" className="text-sm text-brand-blue-600 hover:text-brand-blue-700">
               Add New
             </Link>
           </div>

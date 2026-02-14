@@ -141,10 +141,10 @@ export default async function LearnerOnboardingPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-blue-600 text-white py-12">
+      <div className="bg-brand-blue-600 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl font-bold mb-2">Welcome to Elevate for Humanity</h1>
-          <p className="text-blue-100 text-lg">
+          <p className="text-brand-blue-100 text-lg">
             {enrollment?.programs?.name 
               ? `Complete your onboarding for ${enrollment.programs.name}`
               : 'Complete these steps to get started with your training'}
@@ -156,7 +156,7 @@ export default async function LearnerOnboardingPage() {
               <span>Onboarding Progress</span>
               <span>{progress}% Complete</span>
             </div>
-            <div className="h-3 bg-blue-800 rounded-full overflow-hidden">
+            <div className="h-3 bg-brand-blue-800 rounded-full overflow-hidden">
               <div 
                 className="h-full bg-green-400 rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
@@ -183,8 +183,8 @@ export default async function LearnerOnboardingPage() {
             </Link>
           </div>
         ) : (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8">
-            <p className="text-blue-800">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-8">
+            <p className="text-brand-blue-800">
               Complete all steps below to finish your onboarding and begin your training.
             </p>
           </div>
@@ -228,7 +228,7 @@ export default async function LearnerOnboardingPage() {
                     {!isComplete && (
                       <Link
                         href={step.href}
-                        className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-800 font-medium text-sm"
+                        className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-800 font-medium text-sm"
                       >
                         <Icon className="w-4 h-4" />
                         Complete this step
@@ -257,7 +257,7 @@ export default async function LearnerOnboardingPage() {
             </Link>
             <Link
               href="/contact"
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               Contact Support
             </Link>

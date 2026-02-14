@@ -22,7 +22,7 @@ export default async function LivePage({ params }: { params: { courseId: string 
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href={`/courses/${params.courseId}`} className="text-blue-600 hover:text-blue-800 text-sm">← Back to Course</Link>
+          <Link href={`/courses/${params.courseId}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">← Back to Course</Link>
           <h1 className="text-2xl font-bold text-gray-900 mt-2">{course?.title} - Live Sessions</h1>
           <p className="text-gray-600 mt-1">Join live classes and interact with instructors</p>
         </div>
@@ -43,7 +43,7 @@ export default async function LivePage({ params }: { params: { courseId: string 
                   <p className="font-medium">{session.title || 'Live Session'}</p>
                   <p className="text-sm text-gray-500">{new Date(session.scheduled_at).toLocaleString()}</p>
                 </div>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 text-sm">Set Reminder</button>
+                <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 text-sm">Set Reminder</button>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No upcoming sessions scheduled</div>}
           </div>

@@ -34,7 +34,7 @@ export default async function InstructorPerformancePage() {
             {instructors && instructors.length > 0 ? instructors.map((instructor: any) => (
               <div key={instructor.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><span className="text-blue-600 font-medium">{(instructor.full_name || 'I')[0]}</span></div>
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center"><span className="text-brand-blue-600 font-medium">{(instructor.full_name || 'I')[0]}</span></div>
                   <div><p className="font-medium">{instructor.full_name || 'Instructor'}</p><p className="text-sm text-gray-500">{instructor.email}</p></div>
                 </div>
                 <div className="flex items-center gap-6 text-sm">

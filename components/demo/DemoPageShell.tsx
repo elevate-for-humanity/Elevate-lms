@@ -17,7 +17,7 @@ interface DemoPageShellProps {
 export function DemoPageShell({ title, description, children }: DemoPageShellProps) {
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-blue-600 text-white text-center py-2.5 px-4 text-sm flex items-center justify-center gap-2">
+      <div className="bg-brand-blue-600 text-white text-center py-2.5 px-4 text-sm flex items-center justify-center gap-2">
         <Info className="w-4 h-4" />
         <span>Demo Mode — Read-only sample data</span>
       </div>

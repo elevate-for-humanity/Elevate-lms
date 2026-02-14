@@ -56,7 +56,7 @@ export default function AccessibilityPage() {
             to improve the accessibility of our content and services.
           </p>
 
-          <div className="bg-blue-50 border-l-4 border-brand-blue-600 p-6 my-6">
+          <div className="bg-brand-blue-50 border-l-4 border-brand-blue-600 p-6 my-6">
             <p className="text-lg text-black font-semibold">
               If you experience difficulty accessing content or services, please
               contact us and we will assist promptly.
@@ -134,7 +134,7 @@ export default function AccessibilityPage() {
           </ul>
         </div>
 
-        <div className="bg-blue-50 border-l-4 border-brand-blue-600 p-6 mb-8">
+        <div className="bg-brand-blue-50 border-l-4 border-brand-blue-600 p-6 mb-8">
           <h3 className="text-xl font-bold text-black mb-4">
             Need Assistance?
           </h3>

@@ -42,7 +42,7 @@ export default function DOLFundingPage() {
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-6xl mx-auto px-4 w-full pb-10 sm:pb-14">
-            <p className="text-blue-300 font-semibold text-sm mb-2 uppercase tracking-wide">U.S. Department of Labor</p>
+            <p className="text-brand-blue-300 font-semibold text-sm mb-2 uppercase tracking-wide">U.S. Department of Labor</p>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Registered Apprenticeship</h1>
             <p className="text-lg text-white/90 max-w-2xl">Earn while you learn. Get paid during training and graduate with a nationally recognized credential.</p>
           </div>
@@ -94,12 +94,12 @@ export default function DOLFundingPage() {
           <p className="text-slate-600 text-center mb-10 max-w-2xl mx-auto">Programs registered with the U.S. Department of Labor.</p>
           <div className="grid sm:grid-cols-2 gap-4 max-w-3xl mx-auto">
             {programs.map((p) => (
-              <Link key={p.name} href={p.href} className="flex items-center justify-between p-5 bg-slate-50 rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-sm transition group">
+              <Link key={p.name} href={p.href} className="flex items-center justify-between p-5 bg-slate-50 rounded-xl border border-slate-200 hover:border-brand-blue-300 hover:shadow-sm transition group">
                 <div>
-                  <h3 className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors">{p.name}</h3>
+                  <h3 className="font-bold text-slate-900 group-hover:text-brand-blue-600 transition-colors">{p.name}</h3>
                   <p className="text-sm text-slate-500">{p.duration}</p>
                 </div>
-                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-blue-600 transition-colors" />
+                <ArrowRight className="w-5 h-5 text-slate-400 group-hover:text-brand-blue-600 transition-colors" />
               </Link>
             ))}
           </div>

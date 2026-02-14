@@ -114,7 +114,7 @@ export default function WorkbooksPage() {
       {/* Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Info Banner */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-8">
           <div className="flex items-start gap-4">
             <FileText className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
             <div>
@@ -149,7 +149,7 @@ export default function WorkbooksPage() {
                 {program.materials.map((material) => (
                   <div
                     key={material.file}
-                    className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-md transition"
+                    className="border border-slate-200 rounded-lg p-4 hover:border-brand-blue-300 hover:shadow-md transition"
                   >
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex-1">
@@ -220,7 +220,7 @@ export default function WorkbooksPage() {
               href="/resources"
               className="block p-6 bg-white rounded-lg hover:shadow-md transition"
             >
-              <Download className="w-8 h-8 text-blue-600 mb-3" />
+              <Download className="w-8 h-8 text-brand-blue-600 mb-3" />
               <h3 className="font-bold text-black mb-2">Download Center</h3>
               <p className="text-sm text-black">
                 Forms, guides, and documents

@@ -95,7 +95,7 @@ function SortableModule(data: any) {
         </div>
         <button
           onClick={() => onEdit(module)}
-          className="p-2 text-blue-600 hover:bg-gray-50 rounded"
+          className="p-2 text-brand-blue-600 hover:bg-gray-50 rounded"
         >
           <Edit className="w-4 h-4" />
         </button>
@@ -142,7 +142,7 @@ function SortableLesson(data: any) {
         </div>
         <button
           onClick={() => onEdit(lesson)}
-          className="p-1 text-blue-600 hover:bg-gray-50 rounded"
+          className="p-1 text-brand-blue-600 hover:bg-gray-50 rounded"
         >
           <Edit className="w-3 h-3" />
         </button>
@@ -318,7 +318,7 @@ export default function CourseAuthoringTool() {
                     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                   >
                 ) => setCourse({ ...course, title: e.target.value })}
-                className="text-2xl font-bold border-none focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2"
+                className="text-2xl font-bold border-none focus:outline-none focus:ring-2 focus:ring-brand-blue-500 rounded px-2"
                 placeholder="Course Title"
               />
               <input
@@ -329,13 +329,13 @@ export default function CourseAuthoringTool() {
                     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                   >
                 ) => setCourse({ ...course, description: e.target.value })}
-                className="text-black border-none focus:outline-none focus:ring-2 focus:ring-blue-500 rounded px-2 mt-1 w-full"
+                className="text-black border-none focus:outline-none focus:ring-2 focus:ring-brand-blue-500 rounded px-2 mt-1 w-full"
                 placeholder="Course Description"
               />
             </div>
             <button
               onClick={saveCourse}
-              className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Save className="w-4 h-4" />
               Save Course
@@ -353,7 +353,7 @@ export default function CourseAuthoringTool() {
                 <h2 className="text-lg font-bold">Course Structure</h2>
                 <button
                   onClick={addModule}
-                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+                  className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 text-sm"
                 >
                   <Plus className="w-4 h-4" />
                   Add Module
@@ -418,7 +418,7 @@ export default function CourseAuthoringTool() {
 
                         <button
                           onClick={() => addLesson(module.id)}
-                          className="ml-8 mt-2 flex items-center gap-2 px-3 py-2 text-sm text-blue-600 hover:bg-gray-50 rounded"
+                          className="ml-8 mt-2 flex items-center gap-2 px-3 py-2 text-sm text-brand-blue-600 hover:bg-gray-50 rounded"
                         >
                           <Plus className="w-3 h-3" />
                           Add Lesson
@@ -451,7 +451,7 @@ export default function CourseAuthoringTool() {
                             title: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       />
                     </div>
                     <div>
@@ -467,13 +467,13 @@ export default function CourseAuthoringTool() {
                           })
                         }
                         rows={4}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       />
                     </div>
                     <div className="flex gap-3">
                       <button
                         onClick={() => saveModule(editingModule)}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
                       >
                         Save Module
                       </button>
@@ -506,7 +506,7 @@ export default function CourseAuthoringTool() {
                             title: e.target.value,
                           })
                         }
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       />
                     </div>
                     <div>
@@ -522,7 +522,7 @@ export default function CourseAuthoringTool() {
                           })
                         }
                         rows={4}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       />
                     </div>
 
@@ -557,7 +557,7 @@ export default function CourseAuthoringTool() {
                           setShowLessonForm(false);
                           setEditingLesson(null);
                         }}
-                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                        className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
                       >
                         Save Lesson
                       </button>

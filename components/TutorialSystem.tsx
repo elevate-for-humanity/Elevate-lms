@@ -109,8 +109,8 @@ export function TutorialSystem({
         <div className="flex items-start justify-between p-6 border-b   ">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <BookOpen className="w-5 h-5 text-blue-600" />
-              <span className="text-sm font-medium text-blue-600">
+              <BookOpen className="w-5 h-5 text-brand-blue-600" />
+              <span className="text-sm font-medium text-brand-blue-600">
                 {tutorial.category}
               </span>
             </div>
@@ -142,7 +142,7 @@ export function TutorialSystem({
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-brand-blue-600 h-2 rounded-full transition-all duration-300"
               style={{
                 width: `${((currentStepIndex + 1) / tutorial.steps.length) * 100}%`,
               }}
@@ -158,7 +158,7 @@ export function TutorialSystem({
             </h3>
 
             {/* Step type indicator */}
-            <div className="inline-flex items-center gap-2 px-3 py-2 bg-blue-100 text-blue-700 rounded-full text-sm mb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-full text-sm mb-4">
               {currentStep.type === 'video' && <Play className="w-4 h-4" />}
               {currentStep.type === 'interactive' && '🎯'}
               {currentStep.type === 'quiz' && '❓'}
@@ -202,16 +202,16 @@ export function TutorialSystem({
 
           {/* Interactive action */}
           {currentStep.action && currentStep.type === 'interactive' && (
-            <div className="mt-6 p-4 bg-blue-50 border-2 border-blue-200 rounded-lg">
+            <div className="mt-6 p-4 bg-brand-blue-50 border-2 border-brand-blue-200 rounded-lg">
               <div className="flex items-start gap-3">
-                <div className="flex-shrink-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
                   !
                 </div>
                 <div className="flex-1">
-                  <h4 className="font-semibold text-blue-900 mb-1">
+                  <h4 className="font-semibold text-brand-blue-900 mb-1">
                     Try it yourself
                   </h4>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-sm text-brand-blue-700">
                     {currentStep.action.type === 'click' && 'Click the highlighted element to continue'}
                     {currentStep.action.type === 'input' && 'Fill in the required field'}
                     {currentStep.action.type === 'navigate' && 'Navigate to the specified page'}
@@ -228,7 +228,7 @@ export function TutorialSystem({
                 <p className="text-sm text-black mb-3">
                   Test your understanding before moving forward
                 </p>
-                <button className="w-full py-2 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+                <button className="w-full py-2 px-4 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors">
                   Start Quiz
                 </button>
               </div>
@@ -253,9 +253,9 @@ export function TutorialSystem({
                 key={index}
                 className={`w-2 h-2 rounded-full transition-colors ${
                   index === currentStepIndex
-                    ? 'bg-blue-600 w-6'
+                    ? 'bg-brand-blue-600 w-6'
                     : completedSteps.includes(tutorial.steps[index].id)
-                    ? 'bg-blue-400'
+                    ? 'bg-brand-blue-400'
                     : 'bg-gray-300'
                 }`}
               />
@@ -264,7 +264,7 @@ export function TutorialSystem({
 
           <button
             onClick={handleNext}
-            className="flex items-center gap-2 px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex items-center gap-2 px-6 py-2 text-white bg-brand-blue-600 rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             {isLastStep ? (
               <>
@@ -330,7 +330,7 @@ export function TutorialLibrary({ userId, userRole }: { userId: string; userRole
                 <button
                   key={tutorial.id}
                   onClick={() => setSelectedTutorial(tutorial)}
-                  className="text-left p-6 bg-white border border-gray-200 rounded-lg hover:border-blue-300 hover:shadow-md transition-all"
+                  className="text-left p-6 bg-white border border-gray-200 rounded-lg hover:border-brand-blue-300 hover:shadow-md transition-all"
                 >
                   <div className="flex items-start justify-between mb-3">
                     <div className="flex-1">

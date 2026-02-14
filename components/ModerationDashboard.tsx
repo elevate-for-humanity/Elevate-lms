@@ -97,7 +97,7 @@ export default function ModerationDashboard() {
       harassment: 'bg-red-100 text-red-800',
       inappropriate: 'bg-orange-100 text-orange-800',
       copyright: 'bg-purple-100 text-purple-800',
-      misinformation: 'bg-blue-100 text-blue-800',
+      misinformation: 'bg-brand-blue-100 text-brand-blue-800',
       hate_speech: 'bg-red-100 text-red-800',
       violence: 'bg-red-100 text-red-800',
       other: 'bg-gray-100 text-black',
@@ -130,7 +130,7 @@ export default function ModerationDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
       </div>
     );
   }
@@ -144,7 +144,7 @@ export default function ModerationDashboard() {
           <p className="text-black">Review and manage reported content</p>
         </div>
         <div className="flex items-center gap-2">
-          <Shield className="w-8 h-8 text-blue-600" />
+          <Shield className="w-8 h-8 text-brand-blue-600" />
         </div>
       </div>
 
@@ -185,11 +185,11 @@ export default function ModerationDashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-black">Avg Review Time</p>
-                <p className="text-2xl font-bold text-blue-600">
+                <p className="text-2xl font-bold text-brand-blue-600">
                   {stats.averageReviewTime.toFixed(1)}h
                 </p>
               </div>
-              <TrendingUp className="w-8 h-8 text-blue-400" />
+              <TrendingUp className="w-8 h-8 text-brand-blue-400" />
             </div>
           </div>
         </div>
@@ -206,7 +206,7 @@ export default function ModerationDashboard() {
                 onClick={() => setFilter(f)}
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   filter === f
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-gray-100 text-black hover:bg-gray-200'
                 }`}
               >
@@ -274,7 +274,7 @@ export default function ModerationDashboard() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => setSelectedReport(report)}
-                        className="text-blue-600 hover:text-blue-800"
+                        className="text-brand-blue-600 hover:text-brand-blue-800"
                         title="Review"
                       >
                         <Eye className="w-5 h-5" />

@@ -134,7 +134,7 @@ export default function MicroProgramsPage() {
                   <p className="text-slate-600 text-base mb-2">{p.desc}</p>
                   <div className="flex items-center justify-between">
                     <span className="text-slate-500 text-sm">{p.duration}</span>
-                    <span className="text-blue-600 font-semibold text-sm group-hover:underline">Learn More →</span>
+                    <span className="text-brand-blue-600 font-semibold text-sm group-hover:underline">Learn More →</span>
                   </div>
                 </div>
               </Link>

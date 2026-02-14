@@ -149,7 +149,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
           <h1 className="text-3xl font-bold text-gray-900">Course Builder</h1>
           <p className="text-gray-600 mt-2">Create and manage courses for your programs</p>
         </div>
-        <button onClick={openCreateModal} className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2">
+        <button onClick={openCreateModal} className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium flex items-center gap-2">
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
           New Course
         </button>
@@ -167,7 +167,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Total Courses</h3>
-          <p className="text-3xl font-bold text-blue-600">{courses.length}</p>
+          <p className="text-3xl font-bold text-brand-blue-600">{courses.length}</p>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h3 className="text-sm font-medium text-gray-500 mb-2">Published</h3>
@@ -182,14 +182,14 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
         <button onClick={openCreateModal} className="bg-white rounded-lg shadow-sm border p-4 hover:shadow-md text-center">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+          <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+            <svg className="w-5 h-5 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
           </div>
           <p className="font-medium text-gray-900">Create Course</p>
         </button>
         <Link href="/admin/course-builder/templates" className="bg-white rounded-lg shadow-sm border p-4 hover:shadow-md text-center">
-          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
-            <svg className="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
+          <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center mx-auto mb-2">
+            <svg className="w-5 h-5 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" /></svg>
           </div>
           <p className="font-medium text-gray-900">Templates</p>
         </Link>
@@ -252,7 +252,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
         ) : (
           <div className="px-6 py-12 text-center">
             <p className="text-gray-500 mb-4">{searchTerm ? 'No courses match your search' : 'No courses found'}</p>
-            <button onClick={openCreateModal} className="text-blue-600 hover:underline">Create your first course</button>
+            <button onClick={openCreateModal} className="text-brand-blue-600 hover:underline">Create your first course</button>
           </div>
         )}
       </div>
@@ -275,7 +275,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="e.g., Introduction to Barbering"
                 />
               </div>
@@ -285,7 +285,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="Course description..."
                 />
               </div>
@@ -294,7 +294,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
                 <select
                   value={formData.program_id}
                   onChange={(e) => setFormData({ ...formData, program_id: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 >
                   <option value="">Select a program (optional)</option>
                   {programs.map((program) => (
@@ -309,7 +309,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
                   min="0"
                   value={formData.duration_hours}
                   onChange={(e) => setFormData({ ...formData, duration_hours: e.target.value })}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="e.g., 40"
                 />
               </div>
@@ -334,7 +334,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="flex-1 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50"
                 >
                   {loading ? 'Saving...' : (editingCourse ? 'Update Course' : 'Create Course')}
                 </button>

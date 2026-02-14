@@ -12,11 +12,11 @@ interface AlertProps {
 export function Alert({ type, title, message, dismissible, onDismiss }: AlertProps) {
   const types = {
     info: {
-      bg: 'bg-blue-50',
-      border: 'border-blue-200',
-      text: 'text-blue-900',
+      bg: 'bg-brand-blue-50',
+      border: 'border-brand-blue-200',
+      text: 'text-brand-blue-900',
       icon: Info,
-      iconColor: 'text-blue-600',
+      iconColor: 'text-brand-blue-600',
     },
     warning: {
       bg: 'bg-yellow-50',

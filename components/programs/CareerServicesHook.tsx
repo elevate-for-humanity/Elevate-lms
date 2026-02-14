@@ -135,7 +135,7 @@ Notes: ${formData.get('notes') || 'None'}
         <div className="mt-6 pt-6 border-t border-gray-200 text-center">
           <Link
             href="/career-services"
-            className="text-blue-600 hover:text-blue-700 font-medium inline-flex items-center gap-2"
+            className="text-brand-blue-600 hover:text-brand-blue-700 font-medium inline-flex items-center gap-2"
           >
             View All Career Services <ArrowRight className="w-4 h-4" />
           </Link>
@@ -188,7 +188,7 @@ Notes: ${formData.get('notes') || 'None'}
                       type="text"
                       name="name"
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       placeholder="Your name"
                     />
                   </div>
@@ -200,7 +200,7 @@ Notes: ${formData.get('notes') || 'None'}
                       type="email"
                       name="email"
                       required
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       placeholder="your@email.com"
                     />
                   </div>
@@ -211,7 +211,7 @@ Notes: ${formData.get('notes') || 'None'}
                     <input
                       type="tel"
                       name="phone"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       placeholder="(317) 314-3757"
                     />
                   </div>
@@ -234,14 +234,14 @@ Notes: ${formData.get('notes') || 'None'}
                     <textarea
                       name="notes"
                       rows={3}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       placeholder="Any specific questions or needs?"
                     />
                   </div>
                   <button
                     type="submit"
                     disabled={submitting}
-                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
+                    className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white py-3 rounded-lg font-semibold transition disabled:opacity-50"
                   >
                     {submitting ? 'Submitting...' : 'Submit Request'}
                   </button>

@@ -116,7 +116,7 @@ export default async function StaffDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-2">
-              <Users className="h-11 w-11 text-blue-600" />
+              <Users className="h-11 w-11 text-brand-blue-600" />
               <span className="text-3xl font-bold text-black">
                 {totalStudents || 0}
               </span>
@@ -166,7 +166,7 @@ export default async function StaffDashboard() {
 
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-2">
-              <Clock className="h-11 w-11 text-blue-600" />
+              <Clock className="h-11 w-11 text-brand-blue-600" />
               <span className="text-3xl font-bold text-black">
                 {pendingEnrollments || 0}
               </span>
@@ -225,12 +225,12 @@ export default async function StaffDashboard() {
                 </div>
               )}
               {(pendingEnrollments || 0) > 0 && (
-                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <div className="flex items-center gap-2 text-blue-900 font-semibold">
+                <div className="p-3 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
+                  <div className="flex items-center gap-2 text-brand-blue-900 font-semibold">
                     <Clock className="h-5 w-5" />
                     {pendingEnrollments} Pending Enrollments
                   </div>
-                  <div className="text-sm text-blue-800 mt-1">
+                  <div className="text-sm text-brand-blue-800 mt-1">
                     Review and approve new enrollments
                   </div>
                 </div>
@@ -291,7 +291,7 @@ export default async function StaffDashboard() {
                             enrollment.status === 'completed'
                               ? 'bg-green-100 text-green-800'
                               : enrollment.status === 'active'
-                                ? 'bg-blue-100 text-blue-800'
+                                ? 'bg-brand-blue-100 text-brand-blue-800'
                                 : enrollment.status === 'pending'
                                   ? 'bg-yellow-100 text-yellow-800'
                                   : 'bg-slate-100 text-black'
@@ -319,13 +319,13 @@ export default async function StaffDashboard() {
         <div className="mt-8">
           <h3 className="text-lg font-semibold text-black mb-4">Staff Tools</h3>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <Link href="/staff-portal/students" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Students</Link>
-            <Link href="/staff-portal/courses" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Courses</Link>
-            <Link href="/staff-portal/campaigns" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Campaigns</Link>
-            <Link href="/staff-portal/customer-service" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Customer Service</Link>
-            <Link href="/staff-portal/processes" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Processes</Link>
-            <Link href="/staff-portal/qa-checklist" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">QA Checklist</Link>
-            <Link href="/staff-portal/training" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Training</Link>
+            <Link href="/staff-portal/students" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Students</Link>
+            <Link href="/staff-portal/courses" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Courses</Link>
+            <Link href="/staff-portal/campaigns" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Campaigns</Link>
+            <Link href="/staff-portal/customer-service" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Customer Service</Link>
+            <Link href="/staff-portal/processes" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Processes</Link>
+            <Link href="/staff-portal/qa-checklist" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">QA Checklist</Link>
+            <Link href="/staff-portal/training" aria-label="Link" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Training</Link>
           </div>
         </div>
       </div>

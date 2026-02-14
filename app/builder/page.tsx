@@ -228,7 +228,7 @@ export default function BuildPage() {
       <header className="border-b border-white/10 bg-slate-800 backdrop-blur sticky top-0 z-10">
         <div className="max-w-3xl mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-brand-blue-500 flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-white" />
             </div>
             <div>
@@ -256,13 +256,13 @@ export default function BuildPage() {
               <div
                 className={`max-w-[85%] ${
                   message.role === 'user'
-                    ? 'bg-blue-600 text-white rounded-2xl rounded-br-md px-5 py-3'
+                    ? 'bg-brand-blue-600 text-white rounded-2xl rounded-br-md px-5 py-3'
                     : 'text-white'
                 }`}
               >
                 {message.role === 'ai' && (
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0 mt-1">
+                    <div className="w-8 h-8 rounded-full bg-brand-blue-500 flex items-center justify-center flex-shrink-0 mt-1">
                       <Sparkles className="w-4 h-4 text-white" />
                     </div>
                     <div className="space-y-3">
@@ -315,7 +315,7 @@ export default function BuildPage() {
           {/* Typing indicator */}
           {isTyping && (
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-brand-blue-500 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div className="flex gap-1 py-3">
@@ -329,12 +329,12 @@ export default function BuildPage() {
           {/* Generating animation */}
           {isGenerating && (
             <div className="flex items-start gap-3">
-              <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center">
+              <div className="w-8 h-8 rounded-full bg-brand-blue-500 flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-white" />
               </div>
               <div className="bg-white/5 rounded-2xl p-6 space-y-4">
                 <div className="flex items-center gap-3">
-                  <Loader2 className="w-5 h-5 text-blue-400 animate-spin" />
+                  <Loader2 className="w-5 h-5 text-brand-blue-400 animate-spin" />
                   <span className="text-white">Building your platform...</span>
                 </div>
                 <div className="space-y-2 text-sm text-slate-400">
@@ -387,7 +387,7 @@ export default function BuildPage() {
               <div className="mt-6 flex flex-col sm:flex-row gap-4">
                 <a
                   href={`/preview/${generatedSite.previewId}`}
-                  className="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all"
+                  className="flex-1 py-4 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all"
                 >
                   View Full Preview
                   <ArrowRight className="w-5 h-5" />
@@ -446,12 +446,12 @@ export default function BuildPage() {
                 onChange={(e) => setInputValue(e.target.value)}
                 placeholder="Type your answer..."
                 autoFocus
-                className="flex-1 px-5 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="flex-1 px-5 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
               <button
                 type="submit"
                 disabled={!inputValue.trim()}
-                className="px-6 py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white rounded-xl transition-colors"
+                className="px-6 py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-slate-700 disabled:cursor-not-allowed text-white rounded-xl transition-colors"
               >
                 <Send className="w-5 h-5" />
               </button>

@@ -358,7 +358,7 @@ export default function DocumentsPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-blue-50 border-l-4 border-blue-400 p-6">
+      <section className="mt-8 rounded-2xl bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6">
         <h3 className="font-semibold text-black">Printable Checklist</h3>
         <p className="mt-2 text-sm text-black">
           Download and print the IRS VITA intake checklist:{' '}

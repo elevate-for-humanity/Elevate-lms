@@ -114,7 +114,7 @@ export const Select: React.FC<SelectProps> = ({
           className={`
             w-full px-4 py-2 text-left border rounded-md transition-all duration-200
             focus:outline-none focus:ring-2 focus:ring-offset-1
-            ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-300 focus:border-orange-500 focus:ring-blue-500'}
+            ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : 'border-slate-300 focus:border-orange-500 focus:ring-brand-blue-500'}
             ${disabled ? 'bg-slate-100 cursor-not-allowed opacity-60' : 'bg-white cursor-pointer hover:border-slate-400'}
             ${fullWidth ? 'w-full' : ''}
           `}
@@ -149,7 +149,7 @@ export const Select: React.FC<SelectProps> = ({
                     value={searchQuery}
                     onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setSearchQuery(e.target.value)}
                     placeholder="Search..."
-                    className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>
@@ -170,7 +170,7 @@ export const Select: React.FC<SelectProps> = ({
                       className={`
                         w-full px-4 py-2 text-left text-sm transition-colors
                         ${option.disabled ? 'text-slate-400 cursor-not-allowed' : 'text-black hover:bg-slate-50 cursor-pointer'}
-                        ${isSelected ? 'bg-blue-50 text-brand-orange-600' : ''}
+                        ${isSelected ? 'bg-brand-blue-50 text-brand-orange-600' : ''}
                       `}
                     >
                       <div className="flex items-center justify-between">

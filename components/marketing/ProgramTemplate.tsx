@@ -254,13 +254,13 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                     <span className="text-black">
                       Certification Pass Rate
                     </span>
-                    <span className="text-2xl font-bold text-blue-600">
+                    <span className="text-2xl font-bold text-brand-blue-600">
                       {program.outcomes.certificationPass}%
                     </span>
                   </div>
                   <div className="w-full bg-slate-200 rounded-full h-3">
                     <div
-                      className="bg-blue-600 h-3 rounded-full"
+                      className="bg-brand-blue-600 h-3 rounded-full"
                       style={{
                         width: `${program.outcomes.certificationPass}%`,
                       }}
@@ -330,8 +330,8 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
             </div>
 
             <div className="p-6 bg-slate-50 rounded-2xl border border-slate-200">
-              <div className="w-12 h-12 rounded-xl bg-blue-100 flex items-center justify-center mb-4">
-                <GraduationCap size={24} className="text-blue-600" />
+              <div className="w-12 h-12 rounded-xl bg-brand-blue-100 flex items-center justify-center mb-4">
+                <GraduationCap size={24} className="text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-black mb-2">
                 Requirements
@@ -340,7 +340,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.requirements.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-blue-600" />
+                    <CheckCircle size={16} className="text-brand-blue-600" />
                     <span>{item}</span>
                   </li>
                 ))}

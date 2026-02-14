@@ -26,10 +26,10 @@ interface ButtonProps {
 }
 
 const variantClasses = {
-  primary: 'bg-blue-600 text-white hover:bg-blue-700 shadow-button',
+  primary: 'bg-brand-blue-600 text-white hover:bg-brand-blue-700 shadow-button',
   secondary:
     'bg-white text-black border-2 border-slate-300 hover:border-slate-400',
-  tertiary: 'text-blue-600 hover:text-blue-700 hover:underline',
+  tertiary: 'text-brand-blue-600 hover:text-brand-blue-700 hover:underline',
 };
 
 const sizeClasses = {
@@ -51,7 +51,7 @@ export function Button({
   const baseClasses = cn(
     'inline-flex items-center justify-center gap-2',
     'font-semibold rounded-button transition-all duration-200',
-    'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2',
+    'focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2',
     'disabled:opacity-50 disabled:cursor-not-allowed',
     variantClasses[variant],
     variant !== 'tertiary' && sizeClasses[size],

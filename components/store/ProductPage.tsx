@@ -232,7 +232,7 @@ export function ProductPage({ product }: ProductPageProps) {
                   key={i}
                   onClick={() => setSelectedImage(i)}
                   className={`relative w-24 h-16 rounded-lg overflow-hidden flex-shrink-0 border-2 transition ${
-                    selectedImage === i ? 'border-blue-600' : 'border-transparent hover:border-gray-300'
+                    selectedImage === i ? 'border-brand-blue-600' : 'border-transparent hover:border-gray-300'
                   }`}
                 >
                   {img.type === 'video' ? (
@@ -251,7 +251,7 @@ export function ProductPage({ product }: ProductPageProps) {
           <div>
             {/* Category Badge */}
             <div className="flex items-center gap-3 mb-4">
-              <span className="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">
+              <span className="bg-brand-blue-100 text-brand-blue-800 text-xs font-bold px-3 py-1 rounded-full">
                 {product.category}
               </span>
               <span className="text-gray-500 text-sm">by {product.developer}</span>
@@ -261,7 +261,7 @@ export function ProductPage({ product }: ProductPageProps) {
             <h1 className="text-3xl md:text-4xl font-black text-gray-900 mb-2">
               {product.name}
             </h1>
-            <p className="text-xl text-blue-600 font-medium mb-4">{product.tagline}</p>
+            <p className="text-xl text-brand-blue-600 font-medium mb-4">{product.tagline}</p>
 
             {/* Rating */}
             <div className="flex items-center gap-4 mb-6">
@@ -274,7 +274,7 @@ export function ProductPage({ product }: ProductPageProps) {
                 ))}
                 <span className="font-bold ml-1">{product.rating}</span>
               </div>
-              <Link href="#reviews" className="text-blue-600 hover:underline">
+              <Link href="#reviews" className="text-brand-blue-600 hover:underline">
                 {product.reviewCount} reviews
               </Link>
             </div>
@@ -304,15 +304,15 @@ export function ProductPage({ product }: ProductPageProps) {
                     onClick={() => setSelectedPlan(i)}
                     className={`w-full flex items-center justify-between p-4 rounded-lg border-2 transition ${
                       selectedPlan === i 
-                        ? 'border-blue-600 bg-blue-50' 
+                        ? 'border-brand-blue-600 bg-brand-blue-50' 
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        selectedPlan === i ? 'border-blue-600' : 'border-gray-300'
+                        selectedPlan === i ? 'border-brand-blue-600' : 'border-gray-300'
                       }`}>
-                        {selectedPlan === i && <div className="w-3 h-3 bg-blue-600 rounded-full" />}
+                        {selectedPlan === i && <div className="w-3 h-3 bg-brand-blue-600 rounded-full" />}
                       </div>
                       <div className="text-left">
                         <p className="font-bold text-gray-900">{plan.name}</p>
@@ -333,7 +333,7 @@ export function ProductPage({ product }: ProductPageProps) {
 
             {/* CTA Buttons */}
             <div className="flex gap-3 mb-6">
-              <button className="flex-1 bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition flex items-center justify-center gap-2">
+              <button className="flex-1 bg-brand-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-blue-700 transition flex items-center justify-center gap-2">
                 <ShoppingCart className="w-5 h-5" />
                 Add to Cart
               </button>
@@ -378,7 +378,7 @@ export function ProductPage({ product }: ProductPageProps) {
                 key={tab}
                 href={`#${tab.toLowerCase()}`}
                 className={`py-4 px-2 font-medium border-b-2 whitespace-nowrap ${
-                  i === 0 ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
+                  i === 0 ? 'border-brand-blue-600 text-brand-blue-600' : 'border-transparent text-gray-500 hover:text-gray-700'
                 }`}
               >
                 {tab}
@@ -409,8 +409,8 @@ export function ProductPage({ product }: ProductPageProps) {
                   const IconComponent = iconMap[feature.icon] || Zap;
                   return (
                     <div key={i} className="bg-gray-50 rounded-xl p-6">
-                      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                        <IconComponent className="w-6 h-6 text-blue-600" />
+                      <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+                        <IconComponent className="w-6 h-6 text-brand-blue-600" />
                       </div>
                       <h3 className="font-bold text-gray-900 mb-2">{feature.title}</h3>
                       <p className="text-gray-600 text-sm">{feature.description}</p>
@@ -577,12 +577,12 @@ export function ProductPage({ product }: ProductPageProps) {
             </div>
 
             {/* Support */}
-            <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
+            <div className="bg-brand-blue-50 rounded-xl border border-brand-blue-200 p-6">
               <h3 className="font-bold text-gray-900 mb-2">Need Help?</h3>
               <p className="text-sm text-gray-600 mb-4">Our support team is here to help you get started.</p>
               <a 
                 href={`mailto:${product.supportEmail}`}
-                className="block w-full text-center bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition"
+                className="block w-full text-center bg-brand-blue-600 text-white py-3 rounded-lg font-medium hover:bg-brand-blue-700 transition"
               >
                 Contact Support
               </a>

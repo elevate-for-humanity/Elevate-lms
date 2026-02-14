@@ -60,7 +60,7 @@ export default async function CaseFilesListPage() {
               <input
                 type="text"
                 placeholder="Search by name, email, or case number..."
-                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
             <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50">
@@ -83,7 +83,7 @@ export default async function CaseFilesListPage() {
             <div className="text-slate-600 text-sm">Active</div>
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
-            <div className="text-2xl font-bold text-blue-600">
+            <div className="text-2xl font-bold text-brand-blue-600">
               {cases.filter(c => c.eligibilityStatus === 'eligible').length}
             </div>
             <div className="text-slate-600 text-sm">Eligible</div>
@@ -150,7 +150,7 @@ export default async function CaseFilesListPage() {
                       <td className="py-3 px-4">
                         <Link
                           href={`/staff-portal/cases/${caseFile.id}`}
-                          className="text-blue-600 hover:text-blue-700 flex items-center gap-1 text-sm font-medium"
+                          className="text-brand-blue-600 hover:text-brand-blue-700 flex items-center gap-1 text-sm font-medium"
                         >
                           View <ChevronRight className="w-4 h-4" />
                         </Link>

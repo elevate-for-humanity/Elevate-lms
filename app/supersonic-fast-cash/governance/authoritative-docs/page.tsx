@@ -192,9 +192,9 @@ export default function SupersonicAuthoritativeDocsPage() {
               >
                 <div className="flex items-start gap-4">
                   <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                    doc.highlight ? 'bg-emerald-200' : 'bg-blue-100'
+                    doc.highlight ? 'bg-emerald-200' : 'bg-brand-blue-100'
                   }`}>
-                    <doc.icon className={`w-6 h-6 ${doc.highlight ? 'text-emerald-700' : 'text-blue-600'}`} />
+                    <doc.icon className={`w-6 h-6 ${doc.highlight ? 'text-emerald-700' : 'text-brand-blue-600'}`} />
                   </div>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">

@@ -86,8 +86,8 @@ export const Radio = React.forwardRef<HTMLInputElement, RadioProps>(
               relative flex items-center justify-center w-5 h-5 border-2 rounded-full
               transition-all duration-200 cursor-pointer
               border-slate-300
-              peer-checked:border-blue-600
-              peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-blue-500
+              peer-checked:border-brand-blue-600
+              peer-focus:ring-2 peer-focus:ring-offset-2 peer-focus:ring-brand-blue-500
               peer-disabled:opacity-50 peer-disabled:cursor-not-allowed
               ${className}
             `}

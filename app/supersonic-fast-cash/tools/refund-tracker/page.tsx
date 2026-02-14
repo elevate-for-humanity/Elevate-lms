@@ -77,10 +77,10 @@ export default function RefundTrackerPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'received':
-        return <Clock className="w-12 h-12 text-blue-200" />;
+        return <Clock className="w-12 h-12 text-brand-blue-200" />;
       case 'processing':
       case 'submitted':
-        return <TrendingUp className="w-12 h-12 text-blue-200" />;
+        return <TrendingUp className="w-12 h-12 text-brand-blue-200" />;
       case 'accepted':
         return <CheckCircle className="w-12 h-12 text-green-200" />;
       case 'action_required':
@@ -97,9 +97,9 @@ export default function RefundTrackerPage() {
       case 'action_required':
         return 'bg-red-600';
       case 'submitted':
-        return 'bg-blue-700';
+        return 'bg-brand-blue-700';
       default:
-        return 'bg-blue-600';
+        return 'bg-brand-blue-600';
     }
   };
 
@@ -178,24 +178,24 @@ export default function RefundTrackerPage() {
             </div>
 
             {/* Info Box */}
-            <div className="mt-8 bg-blue-50 rounded-xl p-6">
+            <div className="mt-8 bg-brand-blue-50 rounded-xl p-6">
               <h3 className="font-semibold mb-3">When to Check:</h3>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>
                     <strong>E-filed:</strong> 24 hours after IRS accepts your
                     return
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>
                     <strong>Paper filed:</strong> 4 weeks after mailing
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>
                     <strong>Amended return:</strong> 3 weeks after filing
                   </span>
@@ -350,7 +350,7 @@ export default function RefundTrackerPage() {
                 href="https://www.irs.gov/refunds"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white hover:bg-blue-700 rounded-xl font-semibold transition"
+                className="flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white hover:bg-brand-blue-700 rounded-xl font-semibold transition"
               >
                 IRS Official Site
                 <ExternalLink className="w-4 h-4" />

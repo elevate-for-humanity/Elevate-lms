@@ -51,7 +51,7 @@ export default async function TaxPreparersPage() {
         <div className="mb-8">
           <Link
             href="/admin/tax-filing"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Tax Filing
           </Link>
@@ -76,7 +76,7 @@ export default async function TaxPreparersPage() {
             <div className="text-black text-sm">Active</div>
           </div>
           <div className="bg-white p-6 rounded-lg shadow">
-            <div className="text-3xl font-bold text-blue-600">VITA</div>
+            <div className="text-3xl font-bold text-brand-blue-600">VITA</div>
             <div className="text-black text-sm">Certified</div>
           </div>
         </div>
@@ -105,14 +105,14 @@ export default async function TaxPreparersPage() {
                         <span className="px-2 py-2 bg-brand-green-100 text-green-800 text-xs rounded">
                           VITA Certified
                         </span>
-                        <span className="px-2 py-2 bg-blue-100 text-blue-800 text-xs rounded">
+                        <span className="px-2 py-2 bg-brand-blue-100 text-brand-blue-800 text-xs rounded">
                           Active
                         </span>
                       </div>
                     </div>
                     <Link
                       href={`/admin/users/${item.id}`}
-                      className="text-brand-blue-600 hover:text-blue-800 text-sm"
+                      className="text-brand-blue-600 hover:text-brand-blue-800 text-sm"
                     >
                       View Profile →
                     </Link>

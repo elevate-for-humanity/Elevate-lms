@@ -24,7 +24,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-blue-900 via-blue-800 to-blue-700 py-20">
         <div className="max-w-6xl mx-auto px-4">
-          <div className="flex items-center gap-2 text-blue-200 mb-4">
+          <div className="flex items-center gap-2 text-brand-blue-200 mb-4">
             <MapPin className="w-5 h-5" />
             <span className="text-sm font-medium uppercase tracking-wider">
               VITA Sites Across {state.name}
@@ -33,7 +33,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
           <h1 className="text-4xl md:text-5xl font-black text-white mb-6">
             {state.taxPreparation.headline}
           </h1>
-          <p className="text-xl text-blue-100 mb-8 max-w-3xl">
+          <p className="text-xl text-brand-blue-100 mb-8 max-w-3xl">
             {state.taxPreparation.description}
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
@@ -72,7 +72,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
       </section>
 
       {/* Eligibility Section */}
-      <section className="py-16 bg-blue-50">
+      <section className="py-16 bg-brand-blue-50">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-gray-900 mb-8">
             Who Qualifies for Free Tax Preparation?
@@ -110,7 +110,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
             {state.majorCities.map((city) => (
               <span 
                 key={city} 
-                className="px-4 py-2 bg-blue-50 rounded-full text-gray-700"
+                className="px-4 py-2 bg-brand-blue-50 rounded-full text-gray-700"
               >
                 {city}
               </span>
@@ -118,7 +118,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
           </div>
           <p className="mt-6 text-gray-600">
             Plus many more locations throughout {state.name}.{' '}
-            <Link href="/tax" className="text-blue-600 hover:underline">
+            <Link href="/tax" className="text-brand-blue-600 hover:underline">
               View all locations →
             </Link>
           </p>
@@ -136,7 +136,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
               <Link
                 key={s.slug}
                 href={`/supersonic-fast-cash/tax-preparation-${s.slug}`}
-                className="p-4 bg-white rounded-lg hover:bg-blue-50 transition-colors text-center shadow-sm"
+                className="p-4 bg-white rounded-lg hover:bg-brand-blue-50 transition-colors text-center shadow-sm"
               >
                 <span className="font-medium text-gray-900">{s.name}</span>
               </Link>
@@ -146,26 +146,26 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Get Your Maximum Refund
           </h2>
-          <p className="text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-brand-blue-100 mb-8 max-w-2xl mx-auto">
             Our IRS-certified volunteers ensure you get every credit and deduction you deserve.
             Schedule your free appointment today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/tax"
-              className="inline-flex items-center px-8 py-4 bg-white text-blue-600 rounded-lg text-lg font-bold hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center px-8 py-4 bg-white text-brand-blue-600 rounded-lg text-lg font-bold hover:bg-gray-100 transition-colors"
             >
               <Calendar className="mr-2 w-5 h-5" />
               Book Appointment
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center px-8 py-4 bg-blue-500 text-white rounded-lg text-lg font-bold hover:bg-blue-400 transition-colors"
+              className="inline-flex items-center px-8 py-4 bg-brand-blue-500 text-white rounded-lg text-lg font-bold hover:bg-brand-blue-400 transition-colors"
             >
               <Phone className="mr-2 w-5 h-5" />
               Call Now

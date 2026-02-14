@@ -291,7 +291,7 @@ export default function AdminDashboard() {
               recentActivity.slice(0, 10).map((activity) => (
                 <div key={activity.id} className="flex items-start space-x-4 border-b pb-3 last:border-0">
                   <div className="mt-1">
-                    {activity.type === 'enrollment' && <Users className="h-5 w-5 text-blue-600" />}
+                    {activity.type === 'enrollment' && <Users className="h-5 w-5 text-brand-blue-600" />}
                     {activity.type === 'completion' && <GraduationCap className="h-5 w-5 text-green-600" />}
                     {activity.type === 'placement' && <Briefcase className="h-5 w-5 text-purple-600" />}
                     {activity.type === 'alert' && <AlertCircle className="h-5 w-5 text-brand-orange-600" />}

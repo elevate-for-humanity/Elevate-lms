@@ -68,7 +68,7 @@ export default async function AdminApiKeysPage() {
             <h1 className="text-3xl font-bold text-gray-900">API Keys</h1>
             <p className="text-gray-600 mt-1">Manage API keys for external integrations</p>
           </div>
-          <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+          <button className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 transition-colors">
             <Plus className="w-5 h-5" />
             Generate New Key
           </button>
@@ -122,7 +122,7 @@ export default async function AdminApiKeysPage() {
               <Key className="w-12 h-12 text-gray-300 mx-auto mb-4" />
               <h3 className="text-lg font-medium text-gray-900 mb-2">No API keys yet</h3>
               <p className="text-gray-500 mb-4">Generate your first API key to get started with integrations</p>
-              <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+              <button className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
                 <Plus className="w-5 h-5" />
                 Generate New Key
               </button>

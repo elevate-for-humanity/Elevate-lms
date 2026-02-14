@@ -67,7 +67,7 @@ export default async function HelpArticlesPage() {
         </div>
       </div>
 
-      <div className="relative bg-blue-800 text-white py-16">
+      <div className="relative bg-brand-blue-800 text-white py-16">
         <Image
           src="/images/misc/help-hero.jpg"
           alt="Help Center"
@@ -77,7 +77,7 @@ export default async function HelpArticlesPage() {
         />
         <div className="relative max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl font-bold mb-4">Help Center</h1>
-          <p className="text-xl text-blue-100 mb-8">Find answers to your questions</p>
+          <p className="text-xl text-brand-blue-100 mb-8">Find answers to your questions</p>
           <div className="relative max-w-xl mx-auto">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input 
@@ -103,8 +103,8 @@ export default async function HelpArticlesPage() {
                 >
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <FileText className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                        <FileText className="w-5 h-5 text-brand-blue-600" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900">{category.name}</h3>
@@ -134,10 +134,10 @@ export default async function HelpArticlesPage() {
                 </Link>
               ))}
             </div>
-            <div className="mt-6 bg-blue-50 rounded-xl p-6">
-              <h3 className="font-semibold text-blue-900 mb-2">Can&apos;t find what you need?</h3>
-              <p className="text-sm text-blue-700 mb-4">Our support team is here to help.</p>
-              <Link href="/contact" className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
+            <div className="mt-6 bg-brand-blue-50 rounded-xl p-6">
+              <h3 className="font-semibold text-brand-blue-900 mb-2">Can&apos;t find what you need?</h3>
+              <p className="text-sm text-brand-blue-700 mb-4">Our support team is here to help.</p>
+              <Link href="/contact" className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-blue-700">
                 Contact Support
               </Link>
             </div>

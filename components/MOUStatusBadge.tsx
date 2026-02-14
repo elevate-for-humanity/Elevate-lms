@@ -34,8 +34,8 @@ export function MOUStatusBadge({
     },
     sent: {
       label: 'Sent',
-      color: 'text-blue-700',
-      bgColor: 'bg-blue-100',
+      color: 'text-brand-blue-700',
+      bgColor: 'bg-brand-blue-100',
       icon: Clock,
     },
     signed_by_holder: {
@@ -124,11 +124,11 @@ export function MOUStatusAlert({
 
   if (status === 'pending' || status === 'sent') {
     return (
-      <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+      <div className="flex items-start gap-3 p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
         <AlertCircle className="h-5 w-5 text-brand-orange-600 mt-0.5 flex-shrink-0" />
         <div>
-          <p className="font-medium text-blue-900">Action Required: Sign MOU</p>
-          <p className="text-sm text-blue-700 mt-1">
+          <p className="font-medium text-brand-blue-900">Action Required: Sign MOU</p>
+          <p className="text-sm text-brand-blue-700 mt-1">
             Please review and sign your MOU to begin training participants and
             receiving revenue share payments.
           </p>

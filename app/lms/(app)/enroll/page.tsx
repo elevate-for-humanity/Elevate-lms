@@ -132,7 +132,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                         />
                       </div>
                     ) : (
-                      <div className="h-40 bg-blue-600 flex items-center justify-center">
+                      <div className="h-40 bg-brand-blue-600 flex items-center justify-center">
                         <BookOpen className="w-12 h-12 text-white/50" />
                       </div>
                     )}
@@ -172,7 +172,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                         </div>
                         <Link
                           href={`/lms/courses/${course.id}/enroll`}
-                          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                          className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
                         >
                           Enroll
                           <ArrowRight className="w-4 h-4" />
@@ -199,13 +199,13 @@ export default async function EnrollPage({ searchParams }: Props) {
                     key={course.id}
                     className="bg-white rounded-2xl border border-slate-200 overflow-hidden hover:shadow-lg transition"
                   >
-                    <div className="h-40 bg-blue-600 flex items-center justify-center">
+                    <div className="h-40 bg-brand-blue-600 flex items-center justify-center">
                       <BookOpen className="w-12 h-12 text-white/50" />
                     </div>
 
                     <div className="p-5">
                       {provider && (
-                        <p className="text-xs text-blue-600 font-semibold mb-1">
+                        <p className="text-xs text-brand-blue-600 font-semibold mb-1">
                           {provider.provider_name}
                         </p>
                       )}
@@ -246,7 +246,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                             href={course.enrollment_link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                            className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
                           >
                             Enroll
                             <ArrowRight className="w-4 h-4" />
@@ -254,7 +254,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                         ) : (
                           <Link
                             href={`/lms/courses/${course.id}/enroll`}
-                            className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                            className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
                           >
                             Enroll
                             <ArrowRight className="w-4 h-4" />
@@ -272,8 +272,8 @@ export default async function EnrollPage({ searchParams }: Props) {
         {/* No Courses Available */}
         {availableCourses.length === 0 && availablePartnerCourses.length === 0 && (
           <div className="bg-white rounded-2xl border border-slate-200 p-12 text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-brand-blue-600" />
             </div>
             <h2 className="text-xl font-bold text-slate-900 mb-2">All Caught Up!</h2>
             <p className="text-slate-600 mb-6">
@@ -281,7 +281,7 @@ export default async function EnrollPage({ searchParams }: Props) {
             </p>
             <Link
               href="/lms/courses"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               View My Courses
               <ArrowRight className="w-4 h-4" />
@@ -291,17 +291,17 @@ export default async function EnrollPage({ searchParams }: Props) {
 
         {/* Already Enrolled Section */}
         {enrolledCourseIds.size > 0 && (
-          <section className="mt-12 bg-blue-50 rounded-2xl p-6">
+          <section className="mt-12 bg-brand-blue-50 rounded-2xl p-6">
             <div className="flex items-center justify-between">
               <div>
-                <h3 className="font-bold text-blue-900">Already Enrolled</h3>
-                <p className="text-blue-700 text-sm">
+                <h3 className="font-bold text-brand-blue-900">Already Enrolled</h3>
+                <p className="text-brand-blue-700 text-sm">
                   You&apos;re enrolled in {enrolledCourseIds.size} course{enrolledCourseIds.size !== 1 ? 's' : ''}.
                 </p>
               </div>
               <Link
                 href="/lms/dashboard"
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Go to Dashboard
               </Link>

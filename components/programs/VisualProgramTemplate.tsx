@@ -57,7 +57,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
             <div className="flex flex-wrap gap-3">
               <Link
                 href={`/apply?program=${slug}`}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg"
+                className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg"
               >
                 Check Eligibility
               </Link>
@@ -121,7 +121,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
       )}
 
       {/* ELIGIBILITY & FUNDING */}
-      <section className="py-12 px-4 bg-blue-50">
+      <section className="py-12 px-4 bg-brand-blue-50">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-2xl font-bold mb-4 text-gray-900">Eligibility & Funding</h2>
           <p className="text-gray-700 mb-2">
@@ -135,7 +135,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
           </p>
           <Link
             href={`/apply?program=${slug}`}
-            className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
+            className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
           >
             Check Eligibility
           </Link>
@@ -153,11 +153,11 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
               </p>
               <div className="space-y-4 max-w-md mx-auto">
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">1</span>
+                  <span className="w-6 h-6 rounded-full bg-brand-blue-100 text-brand-blue-600 flex items-center justify-center text-sm font-bold">1</span>
                   <span className="text-slate-700">Application submitted</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm font-bold">2</span>
+                  <span className="w-6 h-6 rounded-full bg-brand-blue-100 text-brand-blue-600 flex items-center justify-center text-sm font-bold">2</span>
                   <span className="text-slate-700">Payment received (if self-pay)</span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -227,7 +227,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
             </h2>
             <Link
               href={`/apply?program=${slug}`}
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition shadow-lg"
+              className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition shadow-lg"
             >
               Start Eligibility Review
             </Link>
@@ -270,7 +270,7 @@ function StepCard({ image, step, label, description }: { image: string; step: nu
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent" />
-        <div className="absolute top-3 left-3 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
+        <div className="absolute top-3 left-3 w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm">
           {step}
         </div>
         <div className="absolute bottom-3 left-3 right-3">

@@ -53,7 +53,7 @@ export function ArchetypeBase({
                   {finalContent.cta.primary && (
                     <a
                       href={finalContent.cta.primaryHref || '#'}
-                      className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition"
+                      className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition"
                     >
                       {finalContent.cta.primary}
                     </a>

@@ -20,7 +20,7 @@ export default function MOUPage() {
 <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <Link
           href="/"
-          className="text-brand-blue-600 hover:text-blue-800 mb-6 inline-block"
+          className="text-brand-blue-600 hover:text-brand-blue-800 mb-6 inline-block"
         >
           ← Back to Home
         </Link>

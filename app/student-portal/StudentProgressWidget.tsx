@@ -145,12 +145,12 @@ export default function StudentProgressWidget() {
 
         {/* Tasks */}
         {hasTasks && (
-          <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
-            <div className="flex items-center gap-2 text-blue-700 mb-1">
+          <div className="bg-brand-blue-50 rounded-lg p-4 border border-brand-blue-100">
+            <div className="flex items-center gap-2 text-brand-blue-700 mb-1">
               <FileText className="w-5 h-5" />
               <span className="text-sm font-medium">Tasks Completed</span>
             </div>
-            <p className="text-3xl font-bold text-blue-800">
+            <p className="text-3xl font-bold text-brand-blue-800">
               {data.completedTasks} / {data.totalTasks}
             </p>
           </div>
@@ -196,7 +196,7 @@ export default function StudentProgressWidget() {
       <div className="mt-6 pt-4 border-t border-gray-100">
         <Link
           href="/student-portal/hours"
-          className="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700"
+          className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:text-brand-blue-700"
         >
           View Full Progress Report
           <ArrowRight className="w-4 h-4" />

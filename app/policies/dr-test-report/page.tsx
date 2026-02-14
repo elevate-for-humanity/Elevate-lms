@@ -150,9 +150,9 @@ export default function DRTestReportPage() {
               within the documented RTO/RPO targets.
             </p>
 
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-              <h3 className="font-bold text-blue-900 mb-2">Next Scheduled Test</h3>
-              <p className="text-blue-800 m-0">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-8">
+              <h3 className="font-bold text-brand-blue-900 mb-2">Next Scheduled Test</h3>
+              <p className="text-brand-blue-800 m-0">
                 Disaster recovery drills are conducted periodically to ensure continued 
                 recoverability. The next scheduled test will be documented here upon completion.
               </p>
@@ -160,9 +160,9 @@ export default function DRTestReportPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Related Documentation</h2>
             <ul className="list-disc pl-6 mb-6 text-black space-y-2">
-              <li><Link href="/policies/disaster-recovery" className="text-blue-600 hover:underline">Disaster Recovery Plan</Link></li>
-              <li><Link href="/policies/sla" className="text-blue-600 hover:underline">Service Level Agreement</Link></li>
-              <li><Link href="/policies/incident-response" className="text-blue-600 hover:underline">Incident Response Policy</Link></li>
+              <li><Link href="/policies/disaster-recovery" className="text-brand-blue-600 hover:underline">Disaster Recovery Plan</Link></li>
+              <li><Link href="/policies/sla" className="text-brand-blue-600 hover:underline">Service Level Agreement</Link></li>
+              <li><Link href="/policies/incident-response" className="text-brand-blue-600 hover:underline">Incident Response Policy</Link></li>
             </ul>
           </div>
 

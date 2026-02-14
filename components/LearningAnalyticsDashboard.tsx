@@ -183,7 +183,7 @@ export default function LearningAnalyticsDashboard() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Engagement Score</h3>
-            <p className="text-3xl font-bold text-blue-600">{learningMetrics.engagementScore}%</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{learningMetrics.engagementScore}%</p>
             <p className="text-sm text-yellow-600">→ Stable</p>
           </Card>
 
@@ -232,10 +232,10 @@ export default function LearningAnalyticsDashboard() {
           <Card className="p-6">
             <h3 className="text-xl font-bold mb-4">Learning Patterns</h3>
             <div className="space-y-4">
-              <div className="p-4 bg-blue-50 rounded">
-                <h4 className="font-semibold text-blue-900 mb-1">Peak Performance Time</h4>
-                <p className="text-sm text-blue-700">9:00 AM - 11:00 AM</p>
-                <p className="text-xs text-blue-600 mt-1">Highest scores achieved during this window</p>
+              <div className="p-4 bg-brand-blue-50 rounded">
+                <h4 className="font-semibold text-brand-blue-900 mb-1">Peak Performance Time</h4>
+                <p className="text-sm text-brand-blue-700">9:00 AM - 11:00 AM</p>
+                <p className="text-xs text-brand-blue-600 mt-1">Highest scores achieved during this window</p>
               </div>
 
               <div className="p-4 bg-purple-50 rounded">
@@ -262,7 +262,7 @@ export default function LearningAnalyticsDashboard() {
                 className={`p-4 rounded-lg border-l-4 ${
                   insight.type === 'risk' ? 'bg-red-50 border-red-500' :
                   insight.type === 'opportunity' ? 'bg-green-50 border-green-500' :
-                  'bg-blue-50 border-blue-500'
+                  'bg-brand-blue-50 border-brand-blue-500'
                 }`}
               >
                 <div className="flex justify-between items-start mb-2">

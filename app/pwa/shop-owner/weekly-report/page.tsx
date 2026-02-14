@@ -73,7 +73,7 @@ export default function ShopWeeklyReportPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
   }
@@ -98,7 +98,7 @@ export default function ShopWeeklyReportPage() {
             </Link>
             <div>
               <h1 className="text-xl font-bold text-white">Weekly Report</h1>
-              <p className="text-blue-200 text-sm">
+              <p className="text-brand-blue-200 text-sm">
                 Week ending {new Date(report.weekEnding).toLocaleDateString()}
               </p>
             </div>
@@ -119,11 +119,11 @@ export default function ShopWeeklyReportPage() {
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
             <p className="text-3xl font-bold text-white">{report.totalHours}</p>
-            <p className="text-blue-200 text-sm">Total Hours</p>
+            <p className="text-brand-blue-200 text-sm">Total Hours</p>
           </div>
           <div className="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-center">
             <p className="text-3xl font-bold text-white">{report.apprenticeCount}</p>
-            <p className="text-blue-200 text-sm">Apprentices</p>
+            <p className="text-brand-blue-200 text-sm">Apprentices</p>
           </div>
         </div>
       </header>
@@ -199,8 +199,8 @@ export default function ShopWeeklyReportPage() {
                   )}
                   className="w-full p-4 flex items-center gap-4 hover:bg-slate-700/50"
                 >
-                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
-                    <span className="text-blue-400 font-bold">
+                  <div className="w-10 h-10 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                    <span className="text-brand-blue-400 font-bold">
                       {apprentice.name.charAt(0)}
                     </span>
                   </div>
@@ -234,7 +234,7 @@ export default function ShopWeeklyReportPage() {
                     </div>
                     <Link 
                       href={`/pwa/shop-owner/apprentices/${apprentice.id}`}
-                      className="flex items-center justify-center gap-2 text-blue-400 text-sm"
+                      className="flex items-center justify-center gap-2 text-brand-blue-400 text-sm"
                     >
                       View Details
                       <ChevronRight className="w-4 h-4" />
@@ -285,7 +285,7 @@ export default function ShopWeeklyReportPage() {
             <Users className="w-6 h-6" />
             <span className="text-xs">Team</span>
           </Link>
-          <Link href="/pwa/shop-owner/reports" className="flex flex-col items-center gap-1 text-blue-400">
+          <Link href="/pwa/shop-owner/reports" className="flex flex-col items-center gap-1 text-brand-blue-400">
             <FileText className="w-6 h-6" />
             <span className="text-xs">Reports</span>
           </Link>

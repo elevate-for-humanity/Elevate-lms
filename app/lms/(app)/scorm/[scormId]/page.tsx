@@ -123,7 +123,7 @@ export default async function ScormPage({ params }: Props) {
               <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
                 <div
                   className={`h-full rounded-full transition-all ${
-                    isCompleted ? 'bg-green-500' : 'bg-blue-600'
+                    isCompleted ? 'bg-green-500' : 'bg-brand-blue-600'
                   }`}
                   style={{ width: `${progressPercentage}%` }}
                 />
@@ -134,17 +134,17 @@ export default async function ScormPage({ params }: Props) {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mb-8">
             <div className="bg-slate-50 rounded-xl p-4 text-center">
-              <BookOpen className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+              <BookOpen className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
               <p className="text-sm text-slate-600">Type</p>
               <p className="font-semibold">SCORM {scorm.scorm_version || '1.2'}</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-4 text-center">
-              <Clock className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+              <Clock className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
               <p className="text-sm text-slate-600">Duration</p>
               <p className="font-semibold">{scorm.duration_minutes || 30} min</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-4 text-center">
-              <CheckCircle className="w-6 h-6 text-blue-600 mx-auto mb-2" />
+              <CheckCircle className="w-6 h-6 text-brand-blue-600 mx-auto mb-2" />
               <p className="text-sm text-slate-600">Status</p>
               <p className="font-semibold capitalize">{progress?.status || 'Not Started'}</p>
             </div>
@@ -156,7 +156,7 @@ export default async function ScormPage({ params }: Props) {
               href={scorm.launch_url}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition"
+              className="w-full flex items-center justify-center gap-2 bg-brand-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-blue-700 transition"
             >
               <Play className="w-5 h-5" />
               {progress ? 'Continue Learning' : 'Start Learning'}
@@ -174,19 +174,19 @@ export default async function ScormPage({ params }: Props) {
           <h2 className="text-lg font-semibold text-slate-900 mb-4">Instructions</h2>
           <ul className="space-y-3 text-slate-600">
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold">1</span>
+              <span className="w-6 h-6 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold">1</span>
               <span>Click the &quot;Start Learning&quot; button to launch the content in a new window.</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold">2</span>
+              <span className="w-6 h-6 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold">2</span>
               <span>Complete all sections of the course material.</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold">3</span>
+              <span className="w-6 h-6 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold">3</span>
               <span>Your progress will be automatically tracked and saved.</span>
             </li>
             <li className="flex items-start gap-3">
-              <span className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold">4</span>
+              <span className="w-6 h-6 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0 text-sm font-semibold">4</span>
               <span>Close the window when finished to return to this page.</span>
             </li>
           </ul>

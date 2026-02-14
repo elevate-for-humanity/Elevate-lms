@@ -145,7 +145,7 @@ export default async function ReviewDetailPage({
 
   const statusColors: Record<string, string> = {
     open: 'bg-yellow-100 text-yellow-800',
-    in_progress: 'bg-blue-100 text-blue-800',
+    in_progress: 'bg-brand-blue-100 text-brand-blue-800',
     resolved: 'bg-green-100 text-green-800',
     escalated: 'bg-red-100 text-red-800',
   };
@@ -210,7 +210,7 @@ export default async function ReviewDetailPage({
                     href={document.file_url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-2 text-blue-600 hover:underline"
+                    className="inline-flex items-center gap-2 text-brand-blue-600 hover:underline"
                   >
                     <Download className="w-4 h-4" />
                     Download Document

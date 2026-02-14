@@ -246,7 +246,7 @@ export default function AnalyticsPage() {
                 onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
                   setTimeRange(e.target.value as '7d' | '30d' | '90d' | 'all')
                 }
-                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               >
                 <option value="7d">Last 7 Days</option>
                 <option value="30d">Last 30 Days</option>
@@ -335,7 +335,7 @@ export default function AnalyticsPage() {
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-semibold text-black">Total Clicks</h3>
-              <MousePointerClick className="w-5 h-5 text-blue-600" />
+              <MousePointerClick className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div className="text-3xl font-bold text-black mb-2">
               {data.overview.totalClicks.toLocaleString()}
@@ -403,7 +403,7 @@ export default function AnalyticsPage() {
                   <div className="flex items-center space-x-2">
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full"
+                        className="bg-brand-blue-600 h-2 rounded-full"
                         style={{
                           width: `${(day.clicks / Math.max(...data.timeline.map((d) => d.clicks))) * 100}%`,
                         }}
@@ -520,9 +520,9 @@ interface StatCardProps {
 
 function StatCard({ title, value, icon: Icon, color, trend }: StatCardProps) {
   const colorClasses = {
-    blue: 'text-brand-blue-600 bg-blue-50',
+    blue: 'text-brand-blue-600 bg-brand-blue-50',
     green: 'text-brand-green-600 bg-green-50',
-    blue: 'text-blue-600 bg-blue-50',
+    blue: 'text-brand-blue-600 bg-brand-blue-50',
     red: 'text-brand-orange-600 bg-red-50',
   };
 

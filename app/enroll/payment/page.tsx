@@ -105,7 +105,7 @@ function EnrollPaymentContent() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600 mx-auto mb-4" />
           <p className="text-gray-600">Verifying your application...</p>
         </div>
       </div>
@@ -122,7 +122,7 @@ function EnrollPaymentContent() {
           </p>
           <Link
             href="/programs/barber-apprenticeship/apply"
-            className="inline-flex items-center justify-center w-full px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition"
+            className="inline-flex items-center justify-center w-full px-6 py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-semibold rounded-lg transition"
           >
             Start Application
           </Link>
@@ -160,8 +160,8 @@ function EnrollPaymentContent() {
         )}
 
         {/* Critical messaging */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-          <p className="text-blue-900 font-medium text-center">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-8">
+          <p className="text-brand-blue-900 font-medium text-center">
             Payment secures your enrollment. Training access unlocks after approval and shop assignment.
           </p>
         </div>
@@ -173,14 +173,14 @@ function EnrollPaymentContent() {
             onClick={() => setSelectedOption('full')}
             className={`w-full p-6 rounded-xl border-2 text-left transition ${
               selectedOption === 'full'
-                ? 'border-blue-600 bg-blue-50'
+                ? 'border-brand-blue-600 bg-brand-blue-50'
                 : 'border-gray-200 bg-white hover:border-gray-300'
             }`}
           >
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-4">
                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                  selectedOption === 'full' ? 'border-blue-600 bg-blue-600' : 'border-gray-300'
+                  selectedOption === 'full' ? 'border-brand-blue-600 bg-brand-blue-600' : 'border-gray-300'
                 }`}>
                   {selectedOption === 'full' && <CheckCircle className="w-4 h-4 text-white" />}
                 </div>
@@ -206,14 +206,14 @@ function EnrollPaymentContent() {
             onClick={() => setSelectedOption('deposit')}
             className={`w-full p-6 rounded-xl border-2 text-left transition ${
               selectedOption === 'deposit'
-                ? 'border-blue-600 bg-blue-50'
+                ? 'border-brand-blue-600 bg-brand-blue-50'
                 : 'border-gray-200 bg-white hover:border-gray-300'
             }`}
           >
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-4">
                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                  selectedOption === 'deposit' ? 'border-blue-600 bg-blue-600' : 'border-gray-300'
+                  selectedOption === 'deposit' ? 'border-brand-blue-600 bg-brand-blue-600' : 'border-gray-300'
                 }`}>
                   {selectedOption === 'deposit' && <CheckCircle className="w-4 h-4 text-white" />}
                 </div>
@@ -221,7 +221,7 @@ function EnrollPaymentContent() {
                   <div className="flex items-center gap-2">
                     <CreditCard className="w-5 h-5 text-gray-600" />
                     <span className="font-semibold text-gray-900">{PRICING.deposit.label}</span>
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-brand-blue-100 text-brand-blue-700 px-2 py-0.5 rounded-full">
                       {PRICING.deposit.savings}
                     </span>
                   </div>
@@ -239,14 +239,14 @@ function EnrollPaymentContent() {
             onClick={() => setSelectedOption('installment')}
             className={`w-full p-6 rounded-xl border-2 text-left transition ${
               selectedOption === 'installment'
-                ? 'border-blue-600 bg-blue-50'
+                ? 'border-brand-blue-600 bg-brand-blue-50'
                 : 'border-gray-200 bg-white hover:border-gray-300'
             }`}
           >
             <div className="flex items-start justify-between">
               <div className="flex items-start gap-4">
                 <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                  selectedOption === 'installment' ? 'border-blue-600 bg-blue-600' : 'border-gray-300'
+                  selectedOption === 'installment' ? 'border-brand-blue-600 bg-brand-blue-600' : 'border-gray-300'
                 }`}>
                   {selectedOption === 'installment' && <CheckCircle className="w-4 h-4 text-white" />}
                 </div>
@@ -254,7 +254,7 @@ function EnrollPaymentContent() {
                   <div className="flex items-center gap-2">
                     <Calendar className="w-5 h-5 text-gray-600" />
                     <span className="font-semibold text-gray-900">{PRICING.installment.label}</span>
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
+                    <span className="text-xs bg-brand-blue-100 text-brand-blue-700 px-2 py-0.5 rounded-full">
                       {PRICING.installment.savings}
                     </span>
                   </div>
@@ -282,7 +282,7 @@ function EnrollPaymentContent() {
         <button
           onClick={handlePayment}
           disabled={loading}
-          className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-bold text-lg rounded-xl transition flex items-center justify-center gap-2"
+          className="w-full py-4 bg-brand-blue-600 hover:bg-brand-blue-700 disabled:bg-brand-blue-400 text-white font-bold text-lg rounded-xl transition flex items-center justify-center gap-2"
         >
           {loading ? (
             <>
@@ -326,7 +326,7 @@ function EnrollPaymentContent() {
 
         {/* Contact */}
         <p className="text-center text-gray-500 text-sm mt-6">
-          Questions? <a href="/faq" className="text-blue-600 underline">Check our FAQ</a> or <a href="/support" className="text-blue-600 underline">contact support</a>
+          Questions? <a href="/faq" className="text-brand-blue-600 underline">Check our FAQ</a> or <a href="/support" className="text-brand-blue-600 underline">contact support</a>
         </p>
       </div>
     </div>
@@ -337,7 +337,7 @@ export default function EnrollPaymentPage() {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     }>
       <EnrollPaymentContent />

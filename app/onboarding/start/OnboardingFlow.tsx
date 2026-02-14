@@ -97,7 +97,7 @@ export default function OnboardingFlow({
                       onClick={() => setCurrentStep(index)}
                       className={`w-full flex items-start gap-3 p-3 rounded-lg text-left transition-colors ${
                         isCurrent
-                          ? 'bg-blue-50 border-2 border-brand-blue-600'
+                          ? 'bg-brand-blue-50 border-2 border-brand-blue-600'
                           : isComplete
                             ? 'bg-green-50 border border-green-200 hover:bg-brand-green-100'
                             : 'bg-slate-50 border border-slate-200 hover:bg-slate-100'
@@ -116,7 +116,7 @@ export default function OnboardingFlow({
                             isComplete
                               ? 'text-green-900'
                               : isCurrent
-                                ? 'text-blue-900'
+                                ? 'text-brand-blue-900'
                                 : 'text-black'
                           }`}
                         >
@@ -135,7 +135,7 @@ export default function OnboardingFlow({
                   onClick={() => setCurrentStep(documents.length)}
                   className={`w-full flex items-start gap-3 p-3 rounded-lg text-left transition-colors ${
                     currentStep === documents.length
-                      ? 'bg-blue-50 border-2 border-brand-blue-600'
+                      ? 'bg-brand-blue-50 border-2 border-brand-blue-600'
                       : payrollComplete
                         ? 'bg-green-50 border border-green-200 hover:bg-brand-green-100'
                         : 'bg-slate-50 border border-slate-200 hover:bg-slate-100'
@@ -154,7 +154,7 @@ export default function OnboardingFlow({
                         payrollComplete
                           ? 'text-green-900'
                           : currentStep === documents.length
-                            ? 'text-blue-900'
+                            ? 'text-brand-blue-900'
                             : 'text-black'
                       }`}
                     >
@@ -287,7 +287,7 @@ function DocumentStep({
       {/* Document Header */}
       <div className="border-b border-slate-200 p-6">
         <div className="flex items-start gap-4">
-          <div className="p-3 bg-blue-100 rounded-lg">
+          <div className="p-3 bg-brand-blue-100 rounded-lg">
             <FileText className="w-6 h-6 text-brand-blue-600" />
           </div>
           <div className="flex-1">
@@ -322,7 +322,7 @@ function DocumentStep({
                 value={signature}
                 onChange={(e) => setSignature(e.target.value)}
                 placeholder="Type your full name"
-                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
               <p className="text-sm text-black mt-1">
                 Must match: <strong>{userName}</strong>
@@ -338,7 +338,7 @@ function DocumentStep({
               type="checkbox"
               checked={acknowledged}
               onChange={(e) => setAcknowledged(e.target.checked)}
-              className="mt-1 w-5 h-5 text-brand-blue-600 border-slate-300 rounded focus:ring-blue-500"
+              className="mt-1 w-5 h-5 text-brand-blue-600 border-slate-300 rounded focus:ring-brand-blue-500"
             />
             <span className="text-sm text-black">
               I have read and understood this document. I acknowledge that this

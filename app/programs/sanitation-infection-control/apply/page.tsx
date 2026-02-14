@@ -36,7 +36,7 @@ export default function ApplyPage() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Program Quick Facts</h2>
           <div className="grid md:grid-cols-3 gap-4">
             <div className="flex items-center gap-3">
-              <Clock className="w-6 h-6 text-blue-600" />
+              <Clock className="w-6 h-6 text-brand-blue-600" />
               <div>
                 <p className="text-sm text-slate-600">Duration</p>
                 <p className="font-bold text-slate-900">32 Weeks</p>
@@ -62,23 +62,23 @@ export default function ApplyPage() {
         {/* Prerequisites */}
         <div className="mb-8">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Prerequisites</h2>
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
             <ul className="space-y-3">
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
-                <span className="text-blue-900">High school diploma or equivalent</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-900">High school diploma or equivalent</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
-                <span className="text-blue-900">Willingness to learn infection control and sanitation procedures</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-900">Willingness to learn infection control and sanitation procedures</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
-                <span className="text-blue-900">Ability to pass background check</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-900">Ability to pass background check</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="text-blue-600 font-bold">•</span>
-                <span className="text-blue-900">Prior janitorial or healthcare cleaning experience preferred (not required)</span>
+                <span className="text-brand-blue-600 font-bold">•</span>
+                <span className="text-brand-blue-900">Prior janitorial or healthcare cleaning experience preferred (not required)</span>
               </li>
             </ul>
           </div>
@@ -136,8 +136,8 @@ export default function ApplyPage() {
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           {/* Option 1: Get More Information */}
           <div className="bg-slate-50 rounded-2xl p-8 text-center">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="w-8 h-8 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
@@ -147,7 +147,7 @@ export default function ApplyPage() {
             </p>
             <Link
               href="/inquiry?program=sanitation-infection-control"
-              className="inline-flex items-center justify-center w-full px-6 py-4 bg-white text-blue-600 font-bold rounded-full border-2 border-blue-600 hover:bg-blue-50 transition"
+              className="inline-flex items-center justify-center w-full px-6 py-4 bg-white text-brand-blue-600 font-bold rounded-full border-2 border-brand-blue-600 hover:bg-brand-blue-50 transition"
             >
               Request Information
             </Link>
@@ -185,7 +185,7 @@ export default function ApplyPage() {
         <div className="mt-8">
           <Link
             href="/programs/sanitation-infection-control"
-            className="inline-flex items-center text-blue-600 hover:text-blue-700"
+            className="inline-flex items-center text-brand-blue-600 hover:text-brand-blue-700"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Program Details

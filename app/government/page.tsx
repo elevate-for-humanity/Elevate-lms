@@ -84,13 +84,13 @@ export default async function GovernmentPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/contact"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-gray-100 transition-colors"
                 >
                   Schedule a Meeting
                 </Link>
                 <Link
                   href="/workone-partner-packet"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-blue-700 text-white rounded-lg font-bold hover:bg-blue-600 transition-colors border-2 border-white/30"
+                  className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-700 text-white rounded-lg font-bold hover:bg-brand-blue-600 transition-colors border-2 border-white/30"
                 >
                   View Partner Packet
                 </Link>
@@ -153,8 +153,8 @@ export default async function GovernmentPage() {
                 />
               </div>
               <div className="p-8">
-                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-white">
-                  <Building2 className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-white">
+                  <Building2 className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Workforce Development Boards</h3>
                 <p className="text-gray-600 mb-4">
@@ -225,8 +225,8 @@ export default async function GovernmentPage() {
                 />
               </div>
               <div className="p-8">
-                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-white">
-                  <Shield className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-6 -mt-14 relative z-10 border-4 border-white">
+                  <Shield className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">Federal Programs</h3>
                 <p className="text-gray-600 mb-4">
@@ -368,10 +368,10 @@ export default async function GovernmentPage() {
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="font-medium text-gray-700">Program Completion Rate</span>
-                      <span className="font-bold text-blue-600">87%</span>
+                      <span className="font-bold text-brand-blue-600">87%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-blue-600 h-3 rounded-full" style={{ width: '87%' }} />
+                      <div className="bg-brand-blue-600 h-3 rounded-full" style={{ width: '87%' }} />
                     </div>
                   </div>
                   <div>
@@ -386,10 +386,10 @@ export default async function GovernmentPage() {
                   <div>
                     <div className="flex justify-between mb-2">
                       <span className="font-medium text-gray-700">Employment Rate (Q2)</span>
-                      <span className="font-bold text-blue-600">78%</span>
+                      <span className="font-bold text-brand-blue-600">78%</span>
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-3">
-                      <div className="bg-blue-600 h-3 rounded-full" style={{ width: '78%' }} />
+                      <div className="bg-brand-blue-600 h-3 rounded-full" style={{ width: '78%' }} />
                     </div>
                   </div>
                   <div>
@@ -436,8 +436,8 @@ export default async function GovernmentPage() {
                 />
               </div>
               <div className="p-6 text-center">
-                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
-                  <TrendingUp className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
+                  <TrendingUp className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Proven Results</h3>
                 <p className="text-sm text-gray-600">
@@ -478,8 +478,8 @@ export default async function GovernmentPage() {
                 />
               </div>
               <div className="p-6 text-center">
-                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
-                  <Handshake className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto -mt-12 mb-3 border-4 border-white relative z-10">
+                  <Handshake className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">Employer Network</h3>
                 <p className="text-sm text-gray-600">
@@ -514,7 +514,7 @@ export default async function GovernmentPage() {
       </section>
 
       {/* Funding Streams */}
-      <section className="py-16 bg-blue-50">
+      <section className="py-16 bg-brand-blue-50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
@@ -541,7 +541,7 @@ export default async function GovernmentPage() {
               return (
                 <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
                   <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                    <IconComponent className="w-6 h-6 text-blue-600" />
+                    <IconComponent className="w-6 h-6 text-brand-blue-600" />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2">{item.name}</h3>
                   <p className="text-sm text-gray-600">{item.desc}</p>
@@ -561,7 +561,7 @@ export default async function GovernmentPage() {
             fill
             className="object-cover"
           />
-          <div className="absolute inset-0 bg-blue-600/90" />
+          <div className="absolute inset-0 bg-brand-blue-600/90" />
         </div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
@@ -575,14 +575,14 @@ export default async function GovernmentPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/support"
-              className="inline-flex items-center justify-center px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-gray-100 transition-colors"
+              className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-gray-100 transition-colors"
             >
               <Phone className="w-5 h-5 mr-2" />
               Get Help Online
             </a>
             <a
               href="mailto:elevate4humanityedu@gmail.com"
-              className="inline-flex items-center justify-center px-8 py-4 bg-blue-700 text-white rounded-lg font-bold hover:bg-blue-800 transition-colors border-2 border-white/30"
+              className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-700 text-white rounded-lg font-bold hover:bg-brand-blue-800 transition-colors border-2 border-white/30"
             >
               <Mail className="w-5 h-5 mr-2" />
               elevate4humanityedu@gmail.com

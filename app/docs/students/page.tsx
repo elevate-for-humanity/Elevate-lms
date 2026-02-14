@@ -27,7 +27,7 @@ export default function StudentDocsPage() {
       </div>
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="flex items-center gap-3 mb-8">
-          <GraduationCap className="w-10 h-10 text-blue-600" />
+          <GraduationCap className="w-10 h-10 text-brand-blue-600" />
           <h1 className="text-3xl font-bold text-gray-900">Student Guide</h1>
         </div>
         <div className="bg-white rounded-xl shadow-sm border divide-y">

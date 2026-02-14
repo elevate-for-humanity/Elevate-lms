@@ -167,7 +167,7 @@ export default function BillingSettingsPage() {
             <h2 className="text-lg font-semibold text-gray-900">Payment Methods</h2>
             <button
               onClick={handleManageBilling}
-              className="inline-flex items-center gap-2 text-blue-600 hover:underline text-sm"
+              className="inline-flex items-center gap-2 text-brand-blue-600 hover:underline text-sm"
             >
               <Plus className="w-4 h-4" />
               Add Method
@@ -207,7 +207,7 @@ export default function BillingSettingsPage() {
               <p className="text-gray-600 mb-4">No payment methods on file</p>
               <button
                 onClick={handleManageBilling}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
               >
                 <Plus className="w-4 h-4" />
                 Add Payment Method

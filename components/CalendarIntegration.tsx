@@ -47,7 +47,7 @@ export function CalendarIntegration() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'class': return 'bg-blue-100 text-blue-700';
+      case 'class': return 'bg-brand-blue-100 text-brand-blue-700';
       case 'meeting': return 'bg-green-100 text-green-700';
       case 'deadline': return 'bg-red-100 text-red-700';
       default: return 'bg-purple-100 text-purple-700';
@@ -142,7 +142,7 @@ export function CalendarIntegration() {
               <h3 className="font-bold mb-4">Event Types</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-blue-500 rounded" />
+                  <div className="w-3 h-3 bg-brand-blue-500 rounded" />
                   <span>Classes</span>
                 </div>
                 <div className="flex items-center gap-2">

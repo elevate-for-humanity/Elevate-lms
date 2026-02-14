@@ -94,7 +94,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
         <div className="max-w-7xl mx-auto px-6">
           <Link
             href="/supersonic-fast-cash/training/courses"
-            className="inline-flex items-center gap-2 text-blue-200 hover:text-white mb-6 transition-colors"
+            className="inline-flex items-center gap-2 text-brand-blue-200 hover:text-white mb-6 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to All Courses
@@ -105,7 +105,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
               <h1 className="text-3xl md:text-4xl font-bold mb-4">
                 {course.title}
               </h1>
-              <p className="text-xl text-blue-100 mb-6">
+              <p className="text-xl text-brand-blue-100 mb-6">
                 {course.description}
               </p>
               
@@ -175,8 +175,8 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
                     className="p-4 hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <PlayCircle className="w-5 h-5 text-blue-600" />
+                      <div className="flex-shrink-0 w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                        <PlayCircle className="w-5 h-5 text-brand-blue-600" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 mb-1">
@@ -247,7 +247,7 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
             >
               Apply to Join Our Team
             </Link>
-            <button className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+            <button className="inline-block bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
               Purchase Course - ${course.price}
             </button>
           </div>

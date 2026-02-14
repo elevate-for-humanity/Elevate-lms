@@ -32,10 +32,10 @@ interface ProgramCategoryPageProps {
 
 const colorClasses = {
   blue: {
-    button: 'bg-blue-600 hover:bg-blue-700',
-    badge: 'bg-blue-600',
-    text: 'text-blue-600',
-    light: 'bg-blue-50',
+    button: 'bg-brand-blue-600 hover:bg-brand-blue-700',
+    badge: 'bg-brand-blue-600',
+    text: 'text-brand-blue-600',
+    light: 'bg-brand-blue-50',
   },
   orange: {
     button: 'bg-orange-500 hover:bg-orange-600',
@@ -212,7 +212,7 @@ export default function ProgramCategoryPage({
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
                     {program.title}
                   </h3>
                   <p className="text-slate-600 mb-4 line-clamp-2">{program.description}</p>

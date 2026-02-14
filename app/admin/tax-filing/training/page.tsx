@@ -45,7 +45,7 @@ export default async function TaxPreparerTrainingPage() {
         <div className="mb-8">
           <Link
             href="/admin/tax-filing"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Tax Filing
           </Link>
@@ -134,11 +134,11 @@ export default async function TaxPreparerTrainingPage() {
           </div>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-brand-blue-900 mb-2">
             Training Resources
           </h3>
-          <ul className="space-y-2 text-blue-800">
+          <ul className="space-y-2 text-brand-blue-800">
             <li>• IRS VITA Training Materials</li>
             <li>• Practice Tax Scenarios</li>
             <li>• Certification Tests</li>

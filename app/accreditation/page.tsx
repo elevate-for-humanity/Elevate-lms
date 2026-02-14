@@ -153,11 +153,11 @@ export default async function AccreditationPage() {
               const Icon = accred.icon || Award;
               return (
                 <div key={index} className="bg-white rounded-xl shadow-sm border p-6">
-                  <Icon className="w-10 h-10 text-blue-600 mb-4" />
+                  <Icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                   <h3 className="font-bold text-lg mb-2">{accred.name}</h3>
                   <p className="text-gray-600 mb-2">{accred.description}</p>
                   {accred.id_number && (
-                    <p className="text-sm text-blue-600 font-mono">{accred.id_number}</p>
+                    <p className="text-sm text-brand-blue-600 font-mono">{accred.id_number}</p>
                   )}
                 </div>
               );
@@ -235,7 +235,7 @@ export default async function AccreditationPage() {
             <div className="text-center mt-8">
               <Link
                 href="/programs"
-                className="text-blue-600 font-medium hover:underline"
+                className="text-brand-blue-600 font-medium hover:underline"
               >
                 View all programs →
               </Link>
@@ -272,24 +272,24 @@ export default async function AccreditationPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Start Your Training?
           </h2>
-          <p className="text-blue-100 mb-8">
+          <p className="text-brand-blue-100 mb-8">
             Enroll in an accredited program and qualify for free training through WIOA funding.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <Link
               href="/programs"
-              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition"
+              className="border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition"
             >
               Browse Programs
             </Link>

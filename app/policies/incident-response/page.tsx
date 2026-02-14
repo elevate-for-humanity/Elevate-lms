@@ -53,12 +53,12 @@ export default function IncidentResponsePage() {
                 </p>
               </div>
 
-              <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
+              <div className="bg-brand-blue-50 border-l-4 border-brand-blue-500 p-4">
                 <div className="flex items-center gap-2 mb-2">
-                  <AlertTriangle className="w-5 h-5 text-blue-600" />
-                  <h3 className="font-bold text-blue-900 m-0">SEV-3: Minor</h3>
+                  <AlertTriangle className="w-5 h-5 text-brand-blue-600" />
+                  <h3 className="font-bold text-brand-blue-900 m-0">SEV-3: Minor</h3>
                 </div>
-                <p className="text-blue-800 m-0">
+                <p className="text-brand-blue-800 m-0">
                   Non-critical issue with limited impact or workaround available.
                 </p>
               </div>
@@ -99,7 +99,7 @@ export default function IncidentResponsePage() {
             
             <div className="space-y-4 mb-8">
               <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   1
                 </div>
                 <div>
@@ -111,7 +111,7 @@ export default function IncidentResponsePage() {
               </div>
 
               <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   2
                 </div>
                 <div>
@@ -123,19 +123,19 @@ export default function IncidentResponsePage() {
               </div>
 
               <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   3
                 </div>
                 <div>
                   <h3 className="font-bold text-black mb-1">Communicate</h3>
                   <p className="text-gray-700 m-0">
-                    Post status update to <Link href="/status" className="text-blue-600 hover:underline">status page</Link> and notify affected users.
+                    Post status update to <Link href="/status" className="text-brand-blue-600 hover:underline">status page</Link> and notify affected users.
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   4
                 </div>
                 <div>
@@ -147,7 +147,7 @@ export default function IncidentResponsePage() {
               </div>
 
               <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
-                <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                   5
                 </div>
                 <div>
@@ -161,16 +161,16 @@ export default function IncidentResponsePage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Communication Channels</h2>
             <ul className="list-disc pl-6 mb-6 text-black space-y-2">
-              <li><Link href="/status" className="text-blue-600 hover:underline">Status Page</Link> - Real-time system status</li>
+              <li><Link href="/status" className="text-brand-blue-600 hover:underline">Status Page</Link> - Real-time system status</li>
               <li>Email notifications for affected users (when applicable)</li>
-              <li><Link href="/contact" className="text-blue-600 hover:underline">Support Contact</Link> - For questions and assistance</li>
+              <li><Link href="/contact" className="text-brand-blue-600 hover:underline">Support Contact</Link> - For questions and assistance</li>
             </ul>
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Related Policies</h2>
             <ul className="list-disc pl-6 mb-6 text-black space-y-2">
-              <li><Link href="/policies/sla" className="text-blue-600 hover:underline">Service Level Agreement</Link></li>
-              <li><Link href="/policies/disaster-recovery" className="text-blue-600 hover:underline">Disaster Recovery Plan</Link></li>
-              <li><Link href="/governance/security" className="text-blue-600 hover:underline">Security Policy</Link></li>
+              <li><Link href="/policies/sla" className="text-brand-blue-600 hover:underline">Service Level Agreement</Link></li>
+              <li><Link href="/policies/disaster-recovery" className="text-brand-blue-600 hover:underline">Disaster Recovery Plan</Link></li>
+              <li><Link href="/governance/security" className="text-brand-blue-600 hover:underline">Security Policy</Link></li>
             </ul>
           </div>
         </article>

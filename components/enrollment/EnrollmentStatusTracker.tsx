@@ -63,7 +63,7 @@ export function EnrollmentStatusTracker({
         {/* Progress Line */}
         <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-slate-200" />
         <div 
-          className="absolute left-4 top-4 w-0.5 bg-blue-500 transition-all duration-500"
+          className="absolute left-4 top-4 w-0.5 bg-brand-blue-500 transition-all duration-500"
           style={{ height: `${(currentIndex / (STEPS.length - 1)) * 100}%` }}
         />
 
@@ -80,7 +80,7 @@ export function EnrollmentStatusTracker({
                 <div className={`
                   w-8 h-8 rounded-full flex items-center justify-center z-10
                   ${isComplete ? 'bg-green-500 text-white' : ''}
-                  ${isCurrent ? 'bg-blue-500 text-white ring-4 ring-blue-100' : ''}
+                  ${isCurrent ? 'bg-brand-blue-500 text-white ring-4 ring-blue-100' : ''}
                   ${isPending ? 'bg-slate-100 text-slate-400 border border-slate-200' : ''}
                 `}>
                   {isComplete && <CheckCircle className="w-5 h-5" />}
@@ -134,7 +134,7 @@ export function EnrollmentStatusTracker({
 
       {/* Help Text */}
       <p className="mt-4 text-xs text-slate-500">
-        Questions? Call <a href="/support" className="text-blue-600 hover:underline">Get Help</a>
+        Questions? Call <a href="/support" className="text-brand-blue-600 hover:underline">Get Help</a>
       </p>
     </div>
   );
@@ -149,7 +149,7 @@ export function EnrollmentStatusBadge({
   currentStep: EnrollmentStep 
 }) {
   const statusConfig: Record<EnrollmentStep, { label: string; color: string }> = {
-    applied: { label: 'Application Submitted', color: 'bg-blue-100 text-blue-700' },
+    applied: { label: 'Application Submitted', color: 'bg-brand-blue-100 text-brand-blue-700' },
     eligibility_review: { label: 'Eligibility Review', color: 'bg-amber-100 text-amber-700' },
     eligibility_confirmed: { label: 'Eligible', color: 'bg-green-100 text-green-700' },
     funding_approved: { label: 'Funding Approved', color: 'bg-green-100 text-green-700' },

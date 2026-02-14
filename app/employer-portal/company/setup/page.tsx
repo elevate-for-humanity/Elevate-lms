@@ -15,13 +15,13 @@ export default function CompanySetupPage() {
             <Breadcrumbs items={[{ label: "Employer Portal", href: "/employer-portal" }, { label: "Company" }]} />
 <div className="bg-white border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <Link href="/employer-portal/company" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-4">
+          <Link href="/employer-portal/company" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to Company Profile
           </Link>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-              <Building className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+              <Building className="w-6 h-6 text-brand-blue-600" />
             </div>
             <div>
               <h1 className="text-2xl font-bold text-gray-900">Company Setup</h1>
@@ -36,10 +36,10 @@ export default function CompanySetupPage() {
         <div className="bg-white rounded-xl shadow-sm p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <span className="text-sm font-medium text-gray-700">Profile Completion</span>
-            <span className="text-sm font-bold text-blue-600">75%</span>
+            <span className="text-sm font-bold text-brand-blue-600">75%</span>
           </div>
           <div className="w-full bg-gray-200 rounded-full h-2">
-            <div className="bg-blue-600 h-2 rounded-full" style={{ width: '75%' }} />
+            <div className="bg-brand-blue-600 h-2 rounded-full" style={{ width: '75%' }} />
           </div>
         </div>
 
@@ -51,7 +51,7 @@ export default function CompanySetupPage() {
             <div className="grid md:grid-cols-2 gap-8">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Company Logo</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition cursor-pointer">
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-brand-blue-400 transition cursor-pointer">
                   <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                   <p className="text-sm text-gray-600 mb-1">Click to upload or drag and drop</p>
                   <p className="text-xs text-gray-500">PNG, JPG up to 5MB (400x400 recommended)</p>
@@ -59,7 +59,7 @@ export default function CompanySetupPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3">Cover Image</label>
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-blue-400 transition cursor-pointer">
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-brand-blue-400 transition cursor-pointer">
                   <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
                   <p className="text-sm text-gray-600 mb-1">Click to upload or drag and drop</p>
                   <p className="text-xs text-gray-500">PNG, JPG up to 10MB (1920x400 recommended)</p>
@@ -78,14 +78,14 @@ export default function CompanySetupPage() {
                 <input
                   type="text"
                   defaultValue="ABC Healthcare Services"
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 />
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Industry *</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
                     <option>Healthcare</option>
                     <option>Technology</option>
                     <option>Manufacturing</option>
@@ -97,7 +97,7 @@ export default function CompanySetupPage() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Company Size *</label>
-                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <select className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
                     <option>1-10 employees</option>
                     <option>11-50 employees</option>
                     <option>50-200 employees</option>
@@ -112,7 +112,7 @@ export default function CompanySetupPage() {
                 <textarea
                   rows={4}
                   defaultValue="ABC Healthcare Services is a leading provider of home health and medical staffing solutions."
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 />
               </div>
 
@@ -121,7 +121,7 @@ export default function CompanySetupPage() {
                 <input
                   type="text"
                   placeholder="XX-XXXXXXX"
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 />
                 <p className="text-xs text-gray-500 mt-1">Required for WOTC tax credit processing</p>
               </div>
@@ -141,7 +141,7 @@ export default function CompanySetupPage() {
                     <input
                       type="url"
                       placeholder="www.yourcompany.com"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -152,7 +152,7 @@ export default function CompanySetupPage() {
                     <input
                       type="tel"
                       placeholder="(555) 123-4567"
-                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     />
                   </div>
                 </div>
@@ -165,7 +165,7 @@ export default function CompanySetupPage() {
                   <input
                     type="email"
                     placeholder="hr@yourcompany.com"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -177,7 +177,7 @@ export default function CompanySetupPage() {
                   <textarea
                     rows={2}
                     placeholder="Street address, City, State ZIP"
-                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -207,8 +207,8 @@ export default function CompanySetupPage() {
                 'Employee Discounts',
                 'Wellness Programs',
               ].map((benefit) => (
-                <label key={benefit} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-blue-300">
-                  <input type="checkbox" className="w-4 h-4 text-blue-600 rounded" />
+                <label key={benefit} className="flex items-center gap-2 p-3 border rounded-lg cursor-pointer hover:border-brand-blue-300">
+                  <input type="checkbox" className="w-4 h-4 text-brand-blue-600 rounded" />
                   <span className="text-sm text-gray-700">{benefit}</span>
                 </label>
               ))}
@@ -225,7 +225,7 @@ export default function CompanySetupPage() {
             </Link>
             <button
               type="submit"
-              className="px-8 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold flex items-center gap-2"
+              className="px-8 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold flex items-center gap-2"
             >
               <Save className="w-4 h-4" />
               Save Profile

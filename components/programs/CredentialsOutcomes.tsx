@@ -12,9 +12,9 @@ export function CredentialsOutcomes({
   employmentOutcomes = [],
 }: CredentialsOutcomesProps) {
   return (
-    <div className="bg-blue-50 rounded-xl p-8 border-2 border-blue-200">
+    <div className="bg-brand-blue-50 rounded-xl p-8 border-2 border-brand-blue-200">
       <h3 className="text-2xl font-bold text-black mb-6 flex items-center gap-3">
-        <Award className="w-7 h-7 text-blue-600" />
+        <Award className="w-7 h-7 text-brand-blue-600" />
         Credentials & Outcomes
       </h3>
       
@@ -55,7 +55,7 @@ export function CredentialsOutcomes({
         {/* Employment Outcomes */}
         {employmentOutcomes.length > 0 && (
           <div className="flex items-start gap-3">
-            <Building2 className="w-5 h-5 text-blue-600 mt-1 flex-shrink-0" />
+            <Building2 className="w-5 h-5 text-brand-blue-600 mt-1 flex-shrink-0" />
             <div>
               <p className="text-black font-medium">
                 Workforce-aligned training for employment pathways
@@ -71,7 +71,7 @@ export function CredentialsOutcomes({
       </div>
 
       {/* Disclaimer */}
-      <div className="mt-6 pt-4 border-t border-blue-200">
+      <div className="mt-6 pt-4 border-t border-brand-blue-200">
         <p className="text-xs text-gray-500">
           Note: Third-party certifications and state licenses are issued by external credentialing bodies, 
           not by Elevate for Humanity. Exam fees may apply separately.

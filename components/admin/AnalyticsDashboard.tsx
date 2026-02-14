@@ -45,7 +45,7 @@ export default function AnalyticsDashboard() {
 
         <div className="rounded-lg border bg-white p-4 shadow-sm">
           <p className="text-sm text-slate-500 mb-1">Courses in Progress</p>
-          <p className="text-3xl font-semibold text-blue-600">{data.coursesInProgress}</p>
+          <p className="text-3xl font-semibold text-brand-blue-600">{data.coursesInProgress}</p>
           <p className="text-xs text-slate-400 mt-1">Currently active</p>
         </div>
 

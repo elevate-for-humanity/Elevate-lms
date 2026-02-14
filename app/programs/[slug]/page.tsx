@@ -312,7 +312,7 @@ export default async function ProgramDetailPage({
 
             {/* Funding Badge */}
             {displayProgram.fundingEligible && (
-              <div className="mb-8 inline-block px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+              <div className="mb-8 inline-block px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium">
                 • Funding Available (WIOA Eligible)
               </div>
             )}
@@ -329,7 +329,7 @@ export default async function ProgramDetailPage({
           <div className="mt-10 flex gap-4">
             <Link
               href={program.ctaPrimary?.href || `/apply?program=${slug}`}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition font-semibold"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-xl transition font-semibold"
             >
               {program.ctaPrimary?.label || 'Apply Now'}
             </Link>

@@ -100,7 +100,7 @@ export function NotificationBell() {
   const getIcon = (type: string) => {
     switch (type) {
       case 'course':
-        return <BookOpen className="w-5 h-5 text-blue-600" />;
+        return <BookOpen className="w-5 h-5 text-brand-blue-600" />;
       case 'certificate':
         return <Award className="w-5 h-5 text-orange-600" />;
       case 'message':
@@ -142,7 +142,7 @@ export function NotificationBell() {
               {unreadCount > 0 && (
                 <button
                   onClick={markAllAsRead}
-                  className="text-sm text-blue-600 hover:text-blue-700 font-semibold"
+                  className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                 >
                   Mark all as read
                 </button>
@@ -156,7 +156,7 @@ export function NotificationBell() {
                   <div
                     key={notification.id}
                     className={`p-4 border-b border-slate-100 hover:bg-slate-50 transition ${
-                      !notification.read ? 'bg-blue-50' : ''
+                      !notification.read ? 'bg-brand-blue-50' : ''
                     }`}
                   >
                     <div className="flex gap-3">
@@ -185,7 +185,7 @@ export function NotificationBell() {
                           {!notification.read && (
                             <button
                               onClick={() => markAsRead(notification.id)}
-                              className="text-xs text-blue-600 hover:text-blue-700 font-semibold"
+                              className="text-xs text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                             >
                               Mark as read
                             </button>
@@ -206,7 +206,7 @@ export function NotificationBell() {
             {/* Footer */}
             {notifications.length > 0 && (
               <div className="p-3 border-t border-slate-200 text-center">
-                <button className="text-sm text-blue-600 hover:text-blue-700 font-semibold">
+                <button className="text-sm text-brand-blue-600 hover:text-brand-blue-700 font-semibold">
                   View All Notifications
                 </button>
               </div>

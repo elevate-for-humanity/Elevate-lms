@@ -101,7 +101,7 @@ export function CertificationTracker({ programId, userId }: CertificationTracker
     switch (status) {
       case 'completed': return 'text-green-600 bg-green-50 border-green-200';
       case 'pending_review': return 'text-amber-600 bg-amber-50 border-amber-200';
-      case 'in_progress': return 'text-blue-600 bg-blue-50 border-blue-200';
+      case 'in_progress': return 'text-brand-blue-600 bg-brand-blue-50 border-brand-blue-200';
       default: return 'text-slate-500 bg-slate-50 border-slate-200';
     }
   };
@@ -110,7 +110,7 @@ export function CertificationTracker({ programId, userId }: CertificationTracker
     switch (status) {
       case 'completed': return <CheckCircle className="w-5 h-5 text-green-600" />;
       case 'pending_review': return <Clock className="w-5 h-5 text-amber-600" />;
-      case 'in_progress': return <AlertCircle className="w-5 h-5 text-blue-600" />;
+      case 'in_progress': return <AlertCircle className="w-5 h-5 text-brand-blue-600" />;
       default: return <div className="w-5 h-5 rounded-full border-2 border-slate-300" />;
     }
   };
@@ -222,7 +222,7 @@ export function CertificationTracker({ programId, userId }: CertificationTracker
                       href={PARTNER_LINKS[cert.provider]}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
+                      className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-blue-700 transition-colors"
                     >
                       <ExternalLink className="w-4 h-4" />
                       Go to {cert.provider}

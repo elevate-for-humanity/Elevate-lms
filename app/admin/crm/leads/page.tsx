@@ -54,9 +54,9 @@ export default async function LeadsPage() {
   const getStageColor = (stage: string) => {
     switch (stage) {
       case 'Initial Contact': return 'bg-gray-100 text-gray-700';
-      case 'Discovery': return 'bg-blue-100 text-blue-700';
+      case 'Discovery': return 'bg-brand-blue-100 text-brand-blue-700';
       case 'Qualified': return 'bg-yellow-100 text-yellow-700';
-      case 'Proposal': return 'bg-blue-100 text-blue-700';
+      case 'Proposal': return 'bg-brand-blue-100 text-brand-blue-700';
       case 'Negotiation': return 'bg-orange-100 text-orange-700';
       case 'Closed Won': return 'bg-green-100 text-green-700';
       default: return 'bg-gray-100 text-gray-700';

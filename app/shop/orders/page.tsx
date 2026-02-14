@@ -99,8 +99,8 @@ export default async function OrderHistoryPage() {
   const getStatusConfig = (status: string) => {
     const configs: Record<string, { label: string; color: string; icon: typeof Circle }> = {
       pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-700', icon: Clock },
-      processing: { label: 'Processing', color: 'bg-blue-100 text-blue-700', icon: Package },
-      shipped: { label: 'Shipped', color: 'bg-blue-100 text-blue-700', icon: Truck },
+      processing: { label: 'Processing', color: 'bg-brand-blue-100 text-brand-blue-700', icon: Package },
+      shipped: { label: 'Shipped', color: 'bg-brand-blue-100 text-brand-blue-700', icon: Truck },
       delivered: { label: 'Delivered', color: 'bg-green-100 text-green-700', icon: Circle },
       cancelled: { label: 'Cancelled', color: 'bg-red-100 text-red-700', icon: Clock },
     };
@@ -189,7 +189,7 @@ export default async function OrderHistoryPage() {
                           href={`https://www.ups.com/track?tracknum=${order.tracking_number}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-4 py-2 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50"
+                          className="inline-flex items-center gap-2 px-4 py-2 text-sm text-brand-blue-600 border border-brand-blue-200 rounded-lg hover:bg-brand-blue-50"
                         >
                           <Truck className="w-4 h-4" />
                           Track Package
@@ -212,7 +212,7 @@ export default async function OrderHistoryPage() {
             <p className="text-gray-600 mb-6">When you place orders, they will appear here.</p>
             <Link
               href="/shop/products"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               Start Shopping
             </Link>

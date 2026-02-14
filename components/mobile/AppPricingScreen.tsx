@@ -104,7 +104,7 @@ export function AppPricingScreen() {
         </div>
 
         {/* Footer Note - REQUIRED FOR APP STORE COMPLIANCE */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 text-sm text-black">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-4 text-sm text-black">
           <p className="font-semibold mb-2">Important:</p>
           <p>
             Prices apply to platform access. Training and services may be paid separately through our website.

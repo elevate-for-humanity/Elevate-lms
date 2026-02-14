@@ -174,7 +174,7 @@ export default function AcceptInvitePage({
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <div className="max-w-md w-full bg-white shadow-lg rounded-lg p-8">
         <div className="text-center">
-          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100">
+          <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-brand-blue-100">
             <svg
               className="h-10 w-10 text-brand-blue-600"
               fill="none"

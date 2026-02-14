@@ -96,7 +96,7 @@ export function MiladyAccessCard({
             Complete
           </span>
         ) : isActive ? (
-          <span className="bg-blue-500 text-white text-xs font-bold px-3 py-2 rounded-full">
+          <span className="bg-brand-blue-500 text-white text-xs font-bold px-3 py-2 rounded-full">
             Active
           </span>
         ) : isPending ? (

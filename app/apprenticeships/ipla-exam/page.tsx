@@ -81,7 +81,7 @@ export default function IPLAExamSignup() {
             <Award className="w-12 h-12" />
             <div>
               <h1 className="text-3xl font-bold">IPLA Apprenticeship Exam</h1>
-              <p className="text-blue-100">
+              <p className="text-brand-blue-100">
                 Indiana Professional Licensing Agency
               </p>
             </div>
@@ -96,7 +96,7 @@ export default function IPLAExamSignup() {
         <div className="bg-white rounded-xl shadow-lg p-8 mb-8">
           <h2 className="text-2xl font-bold mb-6">Exam Information</h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-blue-50 rounded-lg p-6">
+            <div className="bg-brand-blue-50 rounded-lg p-6">
               <h3 className="font-bold text-lg mb-3">What's Included</h3>
               <ul className="space-y-2 text-black">
                 <li className="flex items-start gap-2">
@@ -221,8 +221,8 @@ export default function IPLAExamSignup() {
                     onClick={() => setSelectedDate(date)}
                     className={`w-full px-4 py-3 rounded-lg border-2 text-left font-semibold transition ${
                       selectedDate === date
-                        ? 'border-blue-600 bg-blue-50 text-blue-900'
-                        : 'border-gray-300 hover:border-blue-400'
+                        ? 'border-brand-blue-600 bg-brand-blue-50 text-brand-blue-900'
+                        : 'border-gray-300 hover:border-brand-blue-400'
                     }`}
                   >
                     {new Date(date).toLocaleDateString('en-US', {
@@ -277,8 +277,8 @@ export default function IPLAExamSignup() {
           </div>
 
           {selectedDate && selectedTime && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-              <p className="font-semibold text-blue-900">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
+              <p className="font-semibold text-brand-blue-900">
                 Selected: {new Date(selectedDate).toLocaleDateString()} at{' '}
                 {selectedTime}
               </p>

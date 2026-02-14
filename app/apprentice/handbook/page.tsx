@@ -94,11 +94,11 @@ export default async function ApprenticeHandbookPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-blue-600 text-white py-16">
+      <section className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <BookOpen className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Apprentice Handbook</h1>
-          <p className="text-xl text-blue-100">
+          <p className="text-xl text-brand-blue-100">
             Your complete guide to the apprenticeship program
           </p>
         </div>
@@ -112,13 +112,13 @@ export default async function ApprenticeHandbookPage() {
             <input
               type="text"
               placeholder="Search handbook..."
-              className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             />
           </div>
           <a
             href={handbookPdf?.url || '/downloads/apprentice-handbook.pdf'}
             download
-            className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition"
+            className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-blue-700 transition"
           >
             <Download className="w-5 h-5" />
             Download PDF
@@ -138,24 +138,24 @@ export default async function ApprenticeHandbookPage() {
                 className="flex items-center justify-between p-6 hover:bg-gray-50 transition group"
               >
                 <div className="flex items-center gap-4">
-                  <span className="w-8 h-8 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
+                  <span className="w-8 h-8 bg-brand-blue-100 text-brand-blue-600 rounded-full flex items-center justify-center font-bold">
                     {index + 1}
                   </span>
                   <div>
-                    <h3 className="font-semibold group-hover:text-blue-600 transition">
+                    <h3 className="font-semibold group-hover:text-brand-blue-600 transition">
                       {section.title}
                     </h3>
                     <p className="text-sm text-gray-600">{section.description}</p>
                   </div>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition" />
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-brand-blue-600 transition" />
               </Link>
             ))}
           </div>
         </div>
 
         {/* Quick Links */}
-        <div className="mt-8 bg-blue-50 rounded-xl p-6">
+        <div className="mt-8 bg-brand-blue-50 rounded-xl p-6">
           <h3 className="font-semibold mb-4">Quick Links</h3>
           <div className="grid md:grid-cols-3 gap-4">
             <Link
@@ -186,7 +186,7 @@ export default async function ApprenticeHandbookPage() {
         <div className="mt-8 text-center">
           <p className="text-gray-600">
             Have questions? Contact your program coordinator or{' '}
-            <Link href="/contact" className="text-blue-600 hover:underline">
+            <Link href="/contact" className="text-brand-blue-600 hover:underline">
               reach out to us
             </Link>
             .

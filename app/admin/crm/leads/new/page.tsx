@@ -52,7 +52,7 @@ export default async function NewLeadPage() {
                   type="text"
                   name="firstName"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   placeholder="Jane"
                 />
               </div>
@@ -64,7 +64,7 @@ export default async function NewLeadPage() {
                   type="text"
                   name="lastName"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   placeholder="Smith"
                 />
               </div>
@@ -86,7 +86,7 @@ export default async function NewLeadPage() {
                   type="email"
                   name="email"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   placeholder="jane@example.com"
                 />
               </div>
@@ -98,7 +98,7 @@ export default async function NewLeadPage() {
                   type="tel"
                   name="phone"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   placeholder="(317) 314-3757"
                 />
               </div>
@@ -119,7 +119,7 @@ export default async function NewLeadPage() {
                 <select
                   name="program"
                   required
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="">Select a program...</option>
                   <optgroup label="Healthcare">
@@ -150,7 +150,7 @@ export default async function NewLeadPage() {
                 </label>
                 <select
                   name="startDate"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="">Select preferred start...</option>
                   <option value="asap">As soon as possible</option>
@@ -175,7 +175,7 @@ export default async function NewLeadPage() {
                 </label>
                 <select
                   name="source"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="website">Website</option>
                   <option value="referral">Referral</option>
@@ -194,7 +194,7 @@ export default async function NewLeadPage() {
                 </label>
                 <select
                   name="status"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="new">New</option>
                   <option value="contacted">Contacted</option>
@@ -239,7 +239,7 @@ export default async function NewLeadPage() {
             <textarea
               name="notes"
               rows={4}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               placeholder="Add any additional notes about this lead..."
             />
           </div>
@@ -254,7 +254,7 @@ export default async function NewLeadPage() {
             </Link>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Create Lead
             </button>

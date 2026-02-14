@@ -121,8 +121,8 @@ export default async function QuizzesPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <FileQuestion className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <FileQuestion className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.available}</div>
@@ -132,8 +132,8 @@ export default async function QuizzesPage() {
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Circle className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Circle className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.completed}</div>
@@ -181,8 +181,8 @@ export default async function QuizzesPage() {
                   <Link key={quiz.id} href={`/lms/quizzes/${quiz.id}`} className="block p-6 hover:bg-slate-50 transition">
                     <div className="flex items-start justify-between">
                       <div className="flex items-start gap-4 flex-1 min-w-0">
-                        <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                          <FileQuestion className="w-6 h-6 text-blue-600" />
+                        <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                          <FileQuestion className="w-6 h-6 text-brand-blue-600" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center gap-3 mb-1">
@@ -203,15 +203,15 @@ export default async function QuizzesPage() {
                             {attemptCount > 0 && <div>{attemptCount} attempt{attemptCount > 1 ? 's' : ''}</div>}
                           </div>
                           {bestScore !== null && (
-                            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-lg">
-                              <span className="text-sm text-blue-700">Best Score: <strong>{bestScore}%</strong></span>
+                            <div className="mt-3 inline-flex items-center gap-2 px-3 py-1 bg-brand-blue-50 rounded-lg">
+                              <span className="text-sm text-brand-blue-700">Best Score: <strong>{bestScore}%</strong></span>
                             </div>
                           )}
                         </div>
                       </div>
                       <div className="flex items-center gap-3 ml-4">
                         {statusInfo.status === 'not_started' ? (
-                          <span className="flex items-center gap-1 text-blue-600 font-medium">
+                          <span className="flex items-center gap-1 text-brand-blue-600 font-medium">
                             <Play className="w-4 h-4" /> Start
                           </span>
                         ) : (
@@ -229,7 +229,7 @@ export default async function QuizzesPage() {
               <BookOpen className="w-16 h-16 text-slate-300 mx-auto mb-4" />
               <h3 className="text-xl font-bold text-slate-900 mb-2">No Quizzes Available</h3>
               <p className="text-slate-600 mb-6">Quizzes from your enrolled courses will appear here.</p>
-              <Link href="/lms/courses" className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition">
+              <Link href="/lms/courses" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition">
                 Browse Courses
               </Link>
             </div>

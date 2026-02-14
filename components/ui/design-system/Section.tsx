@@ -26,7 +26,7 @@ interface SectionProps {
 const variantClasses = {
   white: 'bg-white',
   slate: 'bg-slate-50',
-  blue: 'bg-blue-50',
+  blue: 'bg-brand-blue-50',
   green: 'bg-green-50',
   orange: 'bg-orange-50',
 };

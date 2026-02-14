@@ -95,7 +95,7 @@ export default function BarberHistoryPage() {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-4 animate-spin" />
+          <Loader2 className="w-12 h-12 text-brand-blue-500 mx-auto mb-4 animate-spin" />
           <p className="text-white">Loading history...</p>
         </div>
       </div>
@@ -111,7 +111,7 @@ export default function BarberHistoryPage() {
           <p className="text-slate-400 mb-6">{error}</p>
           <Link
             href="/login?redirect=/pwa/barber/history"
-            className="inline-block px-6 py-3 bg-blue-600 text-white rounded-xl font-medium"
+            className="inline-block px-6 py-3 bg-brand-blue-600 text-white rounded-xl font-medium"
           >
             Sign In
           </Link>
@@ -156,7 +156,7 @@ export default function BarberHistoryPage() {
               onClick={() => setFilter(status)}
               className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
                 filter === status 
-                  ? 'bg-blue-600 text-white' 
+                  ? 'bg-brand-blue-600 text-white' 
                   : 'bg-slate-800 text-slate-400 hover:text-white'
               }`}
             >

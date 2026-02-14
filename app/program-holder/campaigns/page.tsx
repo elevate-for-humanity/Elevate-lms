@@ -126,7 +126,7 @@ export default function ProgramOwnerCampaignsPage() {
                     onClick={() => handleTemplateSelect(template)}
                     className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${
                       selectedTemplate?.id === template.id
-                        ? 'border-blue-600 bg-blue-50'
+                        ? 'border-brand-blue-600 bg-brand-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -150,7 +150,7 @@ export default function ProgramOwnerCampaignsPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={selectAll}
-                    className="text-xs text-blue-600 hover:text-blue-700 font-semibold"
+                    className="text-xs text-brand-blue-600 hover:text-brand-blue-700 font-semibold"
                   >
                     All
                   </button>
@@ -172,7 +172,7 @@ export default function ProgramOwnerCampaignsPage() {
                       type="checkbox"
                       checked={selectedStudents.includes(student.id)}
                       onChange={() => toggleStudent(student.id)}
-                      className="w-4 h-4 text-blue-600 rounded"
+                      className="w-4 h-4 text-brand-blue-600 rounded"
                     />
                     <div className="flex-1 min-w-0">
                       <p className="font-semibold text-black text-sm truncate">
@@ -215,7 +215,7 @@ export default function ProgramOwnerCampaignsPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, subject: e.target.value })
                     }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent"
                     placeholder="e.g., Program Update"
                   />
                 </div>
@@ -231,7 +231,7 @@ export default function ProgramOwnerCampaignsPage() {
                       setFormData({ ...formData, html_content: e.target.value })
                     }
                     rows={16}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent font-mono text-sm"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent font-mono text-sm"
                     placeholder="Select a template or write your own..."
                   />
                   <p className="text-xs text-black mt-2">
@@ -244,7 +244,7 @@ export default function ProgramOwnerCampaignsPage() {
                   <button
                     onClick={handleSend}
                     disabled={loading || selectedStudents.length === 0}
-                    className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                    className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                   >
                     {loading ? (
                       <>

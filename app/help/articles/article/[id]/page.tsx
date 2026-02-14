@@ -60,7 +60,7 @@ export default function HelpArticlePage({ params }: { params: { id: string } }) 
       <div className="max-w-4xl mx-auto px-4 py-12">
         <div className="bg-white rounded-xl shadow-sm p-8">
           <div className="mb-6">
-            <span className="text-sm text-blue-600 font-medium">{article.category}</span>
+            <span className="text-sm text-brand-blue-600 font-medium">{article.category}</span>
             <h1 className="text-3xl font-bold text-gray-900 mt-2">{article.title}</h1>
             <div className="flex items-center gap-4 text-sm text-gray-500 mt-4">
               <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {article.readTime} read</span>
@@ -78,8 +78,8 @@ export default function HelpArticlePage({ params }: { params: { id: string } }) 
                 <ThumbsDown className="w-5 h-5" /> No
               </button>
               <div className="flex-1"></div>
-              <button className="p-2 text-gray-600 hover:text-blue-600"><Share2 className="w-5 h-5" /></button>
-              <button className="p-2 text-gray-600 hover:text-blue-600"><Printer className="w-5 h-5" /></button>
+              <button className="p-2 text-gray-600 hover:text-brand-blue-600"><Share2 className="w-5 h-5" /></button>
+              <button className="p-2 text-gray-600 hover:text-brand-blue-600"><Printer className="w-5 h-5" /></button>
             </div>
           </div>
         </div>
@@ -88,7 +88,7 @@ export default function HelpArticlePage({ params }: { params: { id: string } }) 
           <div className="bg-white rounded-xl shadow-sm divide-y">
             {relatedArticles.map((related) => (
               <Link key={related.id} href={`/help/articles/article/${related.id}`} className="block p-4 hover:bg-gray-50">
-                <span className="text-blue-600 hover:underline">{related.title}</span>
+                <span className="text-brand-blue-600 hover:underline">{related.title}</span>
               </Link>
             ))}
           </div>

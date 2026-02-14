@@ -90,7 +90,7 @@ export default async function CareerMessagesPage() {
             <p className="text-gray-600 mb-6">Reach out to our career services team for job placement assistance.</p>
             <Link 
               href="/lms/messages/new?type=career"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Send className="w-4 h-4" />
               Contact Career Services

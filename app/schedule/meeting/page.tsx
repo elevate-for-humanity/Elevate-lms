@@ -136,7 +136,7 @@ export default function ScheduleMeetingPage() {
           <div className="flex flex-col gap-3">
             <Link
               href="/"
-              className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="w-full bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               Return Home
             </Link>
@@ -176,19 +176,19 @@ export default function ScheduleMeetingPage() {
         <div className="flex items-center justify-center mb-12">
           <div className="flex items-center">
             <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-              step >= 1 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+              step >= 1 ? 'bg-brand-blue-600 text-white' : 'bg-gray-200 text-gray-500'
             }`}>
               1
             </div>
-            <div className={`w-20 h-1 ${step >= 2 ? 'bg-blue-600' : 'bg-gray-200'}`} />
+            <div className={`w-20 h-1 ${step >= 2 ? 'bg-brand-blue-600' : 'bg-gray-200'}`} />
             <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-              step >= 2 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+              step >= 2 ? 'bg-brand-blue-600 text-white' : 'bg-gray-200 text-gray-500'
             }`}>
               2
             </div>
-            <div className={`w-20 h-1 ${step >= 3 ? 'bg-blue-600' : 'bg-gray-200'}`} />
+            <div className={`w-20 h-1 ${step >= 3 ? 'bg-brand-blue-600' : 'bg-gray-200'}`} />
             <div className={`w-10 h-10 rounded-full flex items-center justify-center font-semibold ${
-              step >= 3 ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-500'
+              step >= 3 ? 'bg-brand-blue-600 text-white' : 'bg-gray-200 text-gray-500'
             }`}>
               3
             </div>
@@ -209,12 +209,12 @@ export default function ScheduleMeetingPage() {
                   setMeetingType('virtual');
                   setStep(2);
                 }}
-                className={`p-8 bg-white rounded-2xl border-2 hover:border-blue-500 hover:shadow-lg transition text-left ${
-                  meetingType === 'virtual' ? 'border-blue-500 shadow-lg' : 'border-gray-200'
+                className={`p-8 bg-white rounded-2xl border-2 hover:border-brand-blue-500 hover:shadow-lg transition text-left ${
+                  meetingType === 'virtual' ? 'border-brand-blue-500 shadow-lg' : 'border-gray-200'
                 }`}
               >
-                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <Video className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+                  <Video className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Virtual Meeting</h3>
                 <p className="text-gray-600 mb-4">
@@ -264,7 +264,7 @@ export default function ScheduleMeetingPage() {
             <div className="bg-white rounded-2xl shadow-sm border p-6 mb-6">
               {/* Date Selection */}
               <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-                <Calendar className="w-5 h-5 mr-2 text-blue-600" />
+                <Calendar className="w-5 h-5 mr-2 text-brand-blue-600" />
                 Select a Date
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mb-8">
@@ -274,7 +274,7 @@ export default function ScheduleMeetingPage() {
                     onClick={() => setSelectedDate(date)}
                     className={`p-3 rounded-xl text-center transition ${
                       selectedDate?.toDateString() === date.toDateString()
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-brand-blue-600 text-white'
                         : 'bg-gray-50 hover:bg-gray-100 text-gray-900'
                     }`}
                   >
@@ -295,7 +295,7 @@ export default function ScheduleMeetingPage() {
               {selectedDate && (
                 <>
                   <h3 className="font-semibold text-gray-900 mb-4 flex items-center">
-                    <Clock className="w-5 h-5 mr-2 text-blue-600" />
+                    <Clock className="w-5 h-5 mr-2 text-brand-blue-600" />
                     Select a Time (1 Hour Slots)
                   </h3>
                   <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -305,7 +305,7 @@ export default function ScheduleMeetingPage() {
                         onClick={() => setSelectedTime(slot.time)}
                         className={`p-3 rounded-xl text-center font-medium transition ${
                           selectedTime === slot.time
-                            ? 'bg-blue-600 text-white'
+                            ? 'bg-brand-blue-600 text-white'
                             : 'bg-gray-50 hover:bg-gray-100 text-gray-900'
                         }`}
                       >
@@ -329,7 +329,7 @@ export default function ScheduleMeetingPage() {
               <button
                 onClick={() => setStep(3)}
                 disabled={!selectedDate || !selectedTime}
-                className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center"
+                className="px-8 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center"
               >
                 Continue
                 <ArrowRight className="w-4 h-4 ml-2" />
@@ -361,7 +361,7 @@ export default function ScheduleMeetingPage() {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="Your full name"
                   />
                 </div>
@@ -377,7 +377,7 @@ export default function ScheduleMeetingPage() {
                     required
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="you@example.com"
                   />
                 </div>
@@ -393,7 +393,7 @@ export default function ScheduleMeetingPage() {
                     required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="(317) 555-1234"
                   />
                 </div>
@@ -408,7 +408,7 @@ export default function ScheduleMeetingPage() {
                     rows={3}
                     value={formData.notes}
                     onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="Tell us about your goals or questions..."
                   />
                 </div>
@@ -438,7 +438,7 @@ export default function ScheduleMeetingPage() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-8 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 flex items-center"
+                  className="px-8 py-3 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 transition disabled:bg-gray-400 flex items-center"
                 >
                   {isSubmitting ? (
                     <>

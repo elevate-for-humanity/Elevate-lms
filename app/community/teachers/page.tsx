@@ -83,7 +83,7 @@ export default async function TeachersPage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <Link href="/community/communityhub" className="text-blue-600 hover:underline mb-8 inline-block">
+        <Link href="/community/communityhub" className="text-brand-blue-600 hover:underline mb-8 inline-block">
           ← Back to Community Hub
         </Link>
 
@@ -140,7 +140,7 @@ export default async function TeachersPage() {
               ) : (
                 <div className="grid md:grid-cols-2 gap-4">
                   <Link href="/resources/instructor-training" className="bg-white rounded-xl p-6 border hover:shadow-lg transition">
-                    <Video className="w-10 h-10 text-blue-600 mb-3" />
+                    <Video className="w-10 h-10 text-brand-blue-600 mb-3" />
                     <h3 className="font-bold">Getting Started Guide</h3>
                     <p className="text-sm text-gray-500">15 min • Introduction to the platform</p>
                   </Link>

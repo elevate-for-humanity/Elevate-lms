@@ -166,7 +166,7 @@ export default function ReportsDashboard({
               Completion Rate
             </h3>
             <svg
-              className="w-8 h-8 text-blue-600"
+              className="w-8 h-8 text-brand-blue-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -330,7 +330,7 @@ export default function ReportsDashboard({
                           enrollment.status === 'active'
                             ? 'bg-brand-green-100 text-green-800'
                             : enrollment.status === 'completed'
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'bg-brand-blue-100 text-brand-blue-800'
                               : 'bg-yellow-100 text-yellow-800'
                         }`}
                       >

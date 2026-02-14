@@ -217,10 +217,10 @@ export default async function AchievementsPage() {
   const lockedMilestones = milestones.filter(m => m.current === 0);
 
   const colorMap: Record<string, { bg: string; text: string }> = {
-    blue: { bg: 'bg-blue-100', text: 'text-blue-600' },
+    blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600' },
     orange: { bg: 'bg-orange-100', text: 'text-orange-600' },
     yellow: { bg: 'bg-yellow-100', text: 'text-yellow-600' },
-    blue: { bg: 'bg-blue-100', text: 'text-blue-600' },
+    blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600' },
     green: { bg: 'bg-green-100', text: 'text-green-600' },
     amber: { bg: 'bg-amber-100', text: 'text-amber-600' },
     indigo: { bg: 'bg-indigo-100', text: 'text-indigo-600' },
@@ -245,23 +245,23 @@ export default async function AchievementsPage() {
         </div>
 
         {/* Stats Overview */}
-        <div className="bg-blue-600 rounded-2xl p-6 text-white mb-8">
+        <div className="bg-brand-blue-600 rounded-2xl p-6 text-white mb-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center">
               <div className="text-4xl font-black">{stats.totalPoints.toLocaleString()}</div>
-              <div className="text-blue-100 text-sm">Total Points</div>
+              <div className="text-brand-blue-100 text-sm">Total Points</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-black">{stats.coursesCompleted}</div>
-              <div className="text-blue-100 text-sm">Courses Completed</div>
+              <div className="text-brand-blue-100 text-sm">Courses Completed</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-black">{stats.lessonsCompleted}</div>
-              <div className="text-blue-100 text-sm">Lessons Completed</div>
+              <div className="text-brand-blue-100 text-sm">Lessons Completed</div>
             </div>
             <div className="text-center">
               <div className="text-4xl font-black">{completedMilestones.length}</div>
-              <div className="text-blue-100 text-sm">Milestones Achieved</div>
+              <div className="text-brand-blue-100 text-sm">Milestones Achieved</div>
             </div>
           </div>
         </div>
@@ -350,7 +350,7 @@ export default async function AchievementsPage() {
         {inProgressMilestones.length > 0 && (
           <div className="mb-8">
             <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-600" />
+              <TrendingUp className="w-5 h-5 text-brand-blue-600" />
               In Progress
             </h2>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -427,7 +427,7 @@ export default async function AchievementsPage() {
             </p>
             <Link
               href="/lms/courses"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
             >
               <BookOpen className="w-5 h-5" />
               Browse Courses
@@ -447,7 +447,7 @@ export default async function AchievementsPage() {
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href="/lms/dashboard" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="/lms/dashboard" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
             ← Back to Dashboard
           </Link>
         </div>

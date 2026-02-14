@@ -347,24 +347,24 @@ export default async function SystemStatusPage() {
 
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Globe className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Globe className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Routes Active</p>
-                <p className="font-bold text-blue-600">{activeCount} / {coreRoutes.length}</p>
+                <p className="font-bold text-brand-blue-600">{activeCount} / {coreRoutes.length}</p>
               </div>
             </div>
           </div>
 
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Lock className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Lock className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Env Configured</p>
-                <p className="font-bold text-blue-600">{envConfigured} / {envTotal}</p>
+                <p className="font-bold text-brand-blue-600">{envConfigured} / {envTotal}</p>
               </div>
             </div>
           </div>
@@ -398,9 +398,9 @@ export default async function SystemStatusPage() {
               </div>
               <div>
                 <h3 className="text-sm font-medium text-gray-500 mb-2">Sitemap URL</h3>
-                <div className="flex items-center gap-2 p-3 bg-blue-50 rounded-lg">
-                  <Globe className="w-5 h-5 text-blue-600" />
-                  <span className="font-mono text-blue-700 text-sm">{canonicalConfig.sitemapUrl}</span>
+                <div className="flex items-center gap-2 p-3 bg-brand-blue-50 rounded-lg">
+                  <Globe className="w-5 h-5 text-brand-blue-600" />
+                  <span className="font-mono text-brand-blue-700 text-sm">{canonicalConfig.sitemapUrl}</span>
                 </div>
               </div>
             </div>
@@ -480,7 +480,7 @@ export default async function SystemStatusPage() {
                       <code className="text-xs bg-gray-100 px-2 py-1 rounded">{cap.dbTable}</code>
                     </td>
                     <td className="px-5 py-4">
-                      <a href={cap.liveUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-xs">
+                      <a href={cap.liveUrl} target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 hover:underline text-xs">
                         {cap.liveUrl.replace('https://www.elevateforhumanity.org', '')}
                       </a>
                     </td>
@@ -492,7 +492,7 @@ export default async function SystemStatusPage() {
           <div className="p-5 border-t border-gray-200 bg-gray-50">
             <div className="grid md:grid-cols-5 gap-4 text-center">
               <div className="flex items-center gap-2 justify-center">
-                <Users className="w-4 h-4 text-blue-600" />
+                <Users className="w-4 h-4 text-brand-blue-600" />
                 <span className="text-sm text-gray-600">Creator Spaces</span>
               </div>
               <div className="flex items-center gap-2 justify-center">
@@ -500,7 +500,7 @@ export default async function SystemStatusPage() {
                 <span className="text-sm text-gray-600">Community Threads</span>
               </div>
               <div className="flex items-center gap-2 justify-center">
-                <Upload className="w-4 h-4 text-blue-600" />
+                <Upload className="w-4 h-4 text-brand-blue-600" />
                 <span className="text-sm text-gray-600">Media Uploads</span>
               </div>
               <div className="flex items-center gap-2 justify-center">
@@ -591,22 +591,22 @@ export default async function SystemStatusPage() {
                       </span>
                     </td>
                     <td className="px-5 py-4">
-                      <a href={route.path} className="text-blue-600 hover:underline font-mono text-sm">{route.path}</a>
+                      <a href={route.path} className="text-brand-blue-600 hover:underline font-mono text-sm">{route.path}</a>
                     </td>
                     <td className="px-5 py-4 text-sm text-gray-900">{route.name}</td>
                     <td className="px-5 py-4">
                       <span className={`text-xs font-medium px-2 py-1 rounded ${
                         route.category === 'Public' ? 'bg-gray-100 text-gray-700' :
                         route.category === 'Admin' ? 'bg-red-100 text-red-700' :
-                        route.category === 'Student' ? 'bg-blue-100 text-blue-700' :
-                        route.category === 'Partner' ? 'bg-blue-100 text-blue-700' :
+                        route.category === 'Student' ? 'bg-brand-blue-100 text-brand-blue-700' :
+                        route.category === 'Partner' ? 'bg-brand-blue-100 text-brand-blue-700' :
                         'bg-green-100 text-green-700'
                       }`}>{route.category}</span>
                     </td>
                     <td className="px-5 py-4">
                       <span className={`text-xs font-medium px-2 py-1 rounded ${
                         route.dataSource === 'supabase' ? 'bg-emerald-100 text-emerald-700' :
-                        route.dataSource === 'api' ? 'bg-blue-100 text-blue-700' :
+                        route.dataSource === 'api' ? 'bg-brand-blue-100 text-brand-blue-700' :
                         'bg-gray-100 text-gray-700'
                       }`}>{route.dataSource}</span>
                     </td>

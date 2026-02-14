@@ -95,10 +95,10 @@ export default function ApplicationStatusPage() {
         };
       case 'contacted':
         return {
-          icon: <Clock className="w-20 h-20 text-blue-500" />,
+          icon: <Clock className="w-20 h-20 text-brand-blue-500" />,
           title: 'Under Review',
-          bgColor: 'bg-blue-50',
-          borderColor: 'border-blue-200',
+          bgColor: 'bg-brand-blue-50',
+          borderColor: 'border-brand-blue-200',
           message: 'We\'ve reached out to you for additional information. Please check your email and phone.',
           showEnrollButton: false,
         };

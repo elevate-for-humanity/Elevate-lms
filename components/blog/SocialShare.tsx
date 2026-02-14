@@ -42,7 +42,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
         href={shareLinks.facebook}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-600 text-white hover:bg-blue-700 transition"
+        className="w-10 h-10 flex items-center justify-center rounded-full bg-brand-blue-600 text-white hover:bg-brand-blue-700 transition"
         aria-label="Share on Facebook"
       >
         <Facebook className="w-5 h-5" />
@@ -62,7 +62,7 @@ export function SocialShare({ url, title, description }: SocialShareProps) {
         href={shareLinks.linkedin}
         target="_blank"
         rel="noopener noreferrer"
-        className="w-10 h-10 flex items-center justify-center rounded-full bg-blue-700 text-white hover:bg-blue-800 transition"
+        className="w-10 h-10 flex items-center justify-center rounded-full bg-brand-blue-700 text-white hover:bg-brand-blue-800 transition"
         aria-label="Share on LinkedIn"
       >
         <Linkedin className="w-5 h-5" />

@@ -147,7 +147,7 @@ export default function ProgressCompliance({ userId }: { userId?: string }) {
         </div>
         <div className="h-3 bg-slate-100 rounded-full overflow-hidden">
           <div 
-            className="h-full bg-blue-500 rounded-full transition-all duration-500"
+            className="h-full bg-brand-blue-500 rounded-full transition-all duration-500"
             style={{ width: `${hoursPercent}%` }}
           />
         </div>

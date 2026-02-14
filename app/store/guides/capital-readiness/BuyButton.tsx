@@ -40,8 +40,8 @@ export function BuyButton({ productId, price, variant = "primary" }: BuyButtonPr
 
   const baseClasses = "inline-flex items-center gap-2 px-8 py-4 font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed";
   const variantClasses = variant === "white"
-    ? "bg-white text-blue-600 hover:bg-blue-50"
-    : "bg-blue-600 text-white hover:bg-blue-700";
+    ? "bg-white text-brand-blue-600 hover:bg-brand-blue-50"
+    : "bg-brand-blue-600 text-white hover:bg-brand-blue-700";
 
   return (
     <button

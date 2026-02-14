@@ -25,7 +25,7 @@ export default function TransparencyPage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Transparency" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-blue-50 py-16">
+      <section className="bg-brand-blue-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-semibold text-gray-900 mb-4">
             How Supersonic Fast Cash Operates
@@ -43,7 +43,7 @@ export default function TransparencyPage() {
           {/* Section 1 */}
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
-              <FileText className="w-6 h-6 text-blue-600" />
+              <FileText className="w-6 h-6 text-brand-blue-600" />
               <h2 className="text-2xl font-semibold text-gray-900">What We Provide</h2>
             </div>
             <p className="text-gray-700 mb-4">
@@ -60,24 +60,24 @@ export default function TransparencyPage() {
           {/* Section 2 */}
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
-              <Users className="w-6 h-6 text-blue-600" />
+              <Users className="w-6 h-6 text-brand-blue-600" />
               <h2 className="text-2xl font-semibold text-gray-900">How the Tax Filing Process Works</h2>
             </div>
             <ul className="space-y-3 text-gray-700">
               <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-medium">1.</span>
+                <span className="text-brand-blue-600 font-medium">1.</span>
                 Users complete a guided tax preparation flow
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-medium">2.</span>
+                <span className="text-brand-blue-600 font-medium">2.</span>
                 Returns are reviewed before submission
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-medium">3.</span>
+                <span className="text-brand-blue-600 font-medium">3.</span>
                 Federal (and applicable state) returns are electronically filed
               </li>
               <li className="flex items-start gap-2">
-                <span className="text-blue-600 font-medium">4.</span>
+                <span className="text-brand-blue-600 font-medium">4.</span>
                 Filers can track refund status after filing
               </li>
             </ul>
@@ -90,7 +90,7 @@ export default function TransparencyPage() {
           {/* Section 3 */}
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
-              <DollarSign className="w-6 h-6 text-blue-600" />
+              <DollarSign className="w-6 h-6 text-brand-blue-600" />
               <h2 className="text-2xl font-semibold text-gray-900">Refund-Based Cash Advance (Optional)</h2>
             </div>
             <p className="text-gray-700 mb-4">
@@ -114,7 +114,7 @@ export default function TransparencyPage() {
           {/* Section 4 */}
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
-              <Lock className="w-6 h-6 text-blue-600" />
+              <Lock className="w-6 h-6 text-brand-blue-600" />
               <h2 className="text-2xl font-semibold text-gray-900">Data Protection & Privacy</h2>
             </div>
             <p className="text-gray-700 mb-4">
@@ -137,7 +137,7 @@ export default function TransparencyPage() {
           {/* Section 5 */}
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
-              <Shield className="w-6 h-6 text-blue-600" />
+              <Shield className="w-6 h-6 text-brand-blue-600" />
               <h2 className="text-2xl font-semibold text-gray-900">Payments & Transparency</h2>
             </div>
             <p className="text-gray-700 mb-4">
@@ -154,7 +154,7 @@ export default function TransparencyPage() {
           {/* Section 6 */}
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-4">
-              <Users className="w-6 h-6 text-blue-600" />
+              <Users className="w-6 h-6 text-brand-blue-600" />
               <h2 className="text-2xl font-semibold text-gray-900">Support & Accountability</h2>
             </div>
             <p className="text-gray-700 mb-4">

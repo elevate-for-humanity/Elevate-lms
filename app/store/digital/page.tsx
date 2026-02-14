@@ -53,7 +53,7 @@ export default function StoreDigitalPage() {
 
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
                 Digital Resources
-                <span className="block text-blue-300">For Training Providers</span>
+                <span className="block text-brand-blue-300">For Training Providers</span>
               </h1>
 
               <p className="text-xl text-indigo-100 mb-8 leading-relaxed">
@@ -97,12 +97,12 @@ export default function StoreDigitalPage() {
             <div className="hidden lg:grid grid-cols-2 gap-4">
               <div className="space-y-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <Shield className="w-10 h-10 text-blue-400 mb-3" />
+                  <Shield className="w-10 h-10 text-brand-blue-400 mb-3" />
                   <h3 className="font-bold text-white mb-1">SAM.gov Assistant</h3>
                   <p className="text-sm text-indigo-200">Federal registration made easy</p>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <Sparkles className="w-10 h-10 text-blue-400 mb-3" />
+                  <Sparkles className="w-10 h-10 text-brand-blue-400 mb-3" />
                   <h3 className="font-bold text-white mb-1">AI Studio</h3>
                   <p className="text-sm text-indigo-200">Generate videos & content</p>
                 </div>
@@ -275,7 +275,7 @@ export default function StoreDigitalPage() {
       <section className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3 mb-12">
-            <Building2 className="w-8 h-8 text-blue-600" />
+            <Building2 className="w-8 h-8 text-brand-blue-600" />
             <h2 className="text-3xl font-black text-slate-900">Platform Add-Ons</h2>
           </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -293,17 +293,17 @@ export default function StoreDigitalPage() {
                     className="object-cover"
                   />
                   <div className="absolute bottom-4 left-4">
-                    <span className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-full">
+                    <span className="px-3 py-1 bg-brand-blue-600 text-white text-xs font-bold rounded-full">
                       {product.priceDisplay}
                     </span>
                   </div>
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
                     {product.name}
                   </h3>
                   <p className="text-slate-600 text-sm mb-4">{product.description}</p>
-                  <div className="flex items-center gap-2 text-blue-600 font-semibold">
+                  <div className="flex items-center gap-2 text-brand-blue-600 font-semibold">
                     Learn More <ArrowRight className="w-4 h-4" />
                   </div>
                 </div>

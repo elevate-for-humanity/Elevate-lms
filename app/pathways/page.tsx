@@ -28,10 +28,10 @@ export default function PathwaysPage() {
         </div>
       </div>
 
-      <section className="py-16 bg-blue-800 text-white">
+      <section className="py-16 bg-brand-blue-800 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-6">Find Your Career Pathway</h1>
-          <p className="text-xl text-blue-100 mb-8">Explore training programs designed to launch your career in high-demand industries</p>
+          <p className="text-xl text-brand-blue-100 mb-8">Explore training programs designed to launch your career in high-demand industries</p>
           <Link href="/apply" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition inline-flex items-center">
             Get Started <ArrowRight className="ml-2 w-5 h-5" />
           </Link>
@@ -54,7 +54,7 @@ export default function PathwaysPage() {
                 </div>
                 <div className="p-6">
                   <p className="text-gray-600 mb-4">{pathway.description}</p>
-                  <span className="text-blue-600 font-medium group-hover:text-blue-700 inline-flex items-center">
+                  <span className="text-brand-blue-600 font-medium group-hover:text-brand-blue-700 inline-flex items-center">
                     Explore Programs <ArrowRight className="ml-2 w-4 h-4" />
                   </span>
                 </div>
@@ -75,8 +75,8 @@ export default function PathwaysPage() {
               { icon: CheckCircle, title: 'Job Placement', desc: 'Career services and employer connections' },
             ].map((item, i) => (
               <div key={i} className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <item.icon className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <item.icon className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>
                 <p className="text-gray-600">{item.desc}</p>
@@ -86,10 +86,10 @@ export default function PathwaysPage() {
         </div>
       </section>
 
-      <section className="py-16 bg-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Have Questions?</h2>
-          <p className="text-xl text-blue-100 mb-8">Use our live chat or apply online - we respond within 24 hours.</p>
+          <p className="text-xl text-brand-blue-100 mb-8">Use our live chat or apply online - we respond within 24 hours.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/apply" className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-lg text-lg font-bold transition">Apply Now</Link>
             <Link href="/contact" className="bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-lg text-lg font-bold transition border-2 border-white/30">Contact Us</Link>

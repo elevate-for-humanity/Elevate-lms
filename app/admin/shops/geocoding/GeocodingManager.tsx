@@ -129,7 +129,7 @@ export default function GeocodingManager({ shops }: Props) {
           <button
             onClick={geocodeAll}
             disabled={processing}
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded hover:bg-brand-blue-700 disabled:opacity-50"
           >
             {processing ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -154,7 +154,7 @@ export default function GeocodingManager({ shops }: Props) {
           </thead>
           <tbody className="divide-y divide-gray-200">
             {filteredShops.map(shop => (
-              <tr key={shop.id} className={currentShop === shop.id ? 'bg-blue-50' : ''}>
+              <tr key={shop.id} className={currentShop === shop.id ? 'bg-brand-blue-50' : ''}>
                 <td className="px-4 py-3">
                   <div className="font-medium text-gray-900">{shop.name}</div>
                   {!shop.active && <span className="text-xs text-gray-400">Inactive</span>}
@@ -187,7 +187,7 @@ export default function GeocodingManager({ shops }: Props) {
                       Failed
                     </span>
                   ) : currentShop === shop.id ? (
-                    <Loader2 className="w-4 h-4 animate-spin text-blue-600" />
+                    <Loader2 className="w-4 h-4 animate-spin text-brand-blue-600" />
                   ) : (
                     <span className="text-gray-400 text-sm">Pending</span>
                   )}
@@ -196,7 +196,7 @@ export default function GeocodingManager({ shops }: Props) {
                   {shop.geocode_failed_at ? (
                     <button
                       onClick={() => retryFailed(shop.id)}
-                      className="text-blue-600 hover:text-blue-800 text-sm"
+                      className="text-brand-blue-600 hover:text-brand-blue-800 text-sm"
                     >
                       <RefreshCw className="w-4 h-4 inline" /> Retry
                     </button>
@@ -204,7 +204,7 @@ export default function GeocodingManager({ shops }: Props) {
                     <button
                       onClick={() => geocodeSingle(shop.id)}
                       disabled={processing}
-                      className="text-blue-600 hover:text-blue-800 text-sm disabled:opacity-50"
+                      className="text-brand-blue-600 hover:text-brand-blue-800 text-sm disabled:opacity-50"
                     >
                       Geocode
                     </button>

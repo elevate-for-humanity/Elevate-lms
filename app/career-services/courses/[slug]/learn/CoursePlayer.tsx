@@ -107,7 +107,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
               {currentModuleIndex < modules.length - 1 && (
                 <button
                   onClick={() => setCurrentModuleIndex(currentModuleIndex + 1)}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2"
+                  className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 flex items-center gap-2"
                 >
                   Next Lesson
                   <ChevronRight className="w-5 h-5" />
@@ -147,7 +147,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
                 onClick={() => setCurrentModuleIndex(index)}
                 className={`w-full text-left p-3 rounded-lg transition flex items-start gap-3 ${
                   currentModuleIndex === index
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'hover:bg-gray-700 text-gray-300'
                 }`}
               >
@@ -164,7 +164,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{module.title}</p>
-                  <p className={`text-xs ${currentModuleIndex === index ? 'text-blue-200' : 'text-gray-500'}`}>
+                  <p className={`text-xs ${currentModuleIndex === index ? 'text-brand-blue-200' : 'text-gray-500'}`}>
                     {module.duration_minutes} min
                   </p>
                 </div>

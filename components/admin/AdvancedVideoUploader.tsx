@@ -97,14 +97,14 @@ Apply today and start your journey.`;
           {/* Video Upload */}
           <div className="border-2 border-slate-200 rounded-lg p-6">
             <div className="flex items-center gap-3 mb-4">
-              <FileVideo className="h-10 w-10 text-blue-600" />
+              <FileVideo className="h-10 w-10 text-brand-blue-600" />
               <h3 className="text-lg font-bold text-black">1. Upload Video</h3>
             </div>
             <input
               type="file"
               accept="video/*"
               onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => setVideoFile(e.target.files?.[0] || null)}
-              className="w-full text-sm text-black file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+              className="w-full text-sm text-black file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-brand-blue-50 file:text-brand-blue-700 hover:file:bg-brand-blue-100"
             />
             {videoFile && (
               <p className="mt-2 text-sm text-green-600">
@@ -358,9 +358,9 @@ Apply today and start your journey.`;
 
       {/* Info Cards */}
       <div className="mt-8 grid md:grid-cols-3 gap-6">
-        <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
-          <h4 className="font-bold text-blue-900 mb-3">🎥 Video Enhancement</h4>
-          <ul className="text-sm text-blue-700 space-y-1">
+        <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200">
+          <h4 className="font-bold text-brand-blue-900 mb-3">🎥 Video Enhancement</h4>
+          <ul className="text-sm text-brand-blue-700 space-y-1">
             <li>• Upscale to 1080p HD</li>
             <li>• Remove noise & grain</li>
             <li>• Enhance colors</li>

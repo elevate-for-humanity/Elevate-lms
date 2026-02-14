@@ -93,7 +93,7 @@ export default async function NewWeeklyReportPage({
                   id="week_start"
                   name="week_start"
                   required
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
 
@@ -106,7 +106,7 @@ export default async function NewWeeklyReportPage({
                   id="week_end"
                   name="week_end"
                   required
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -123,7 +123,7 @@ export default async function NewWeeklyReportPage({
                   required
                   min="0"
                   step="0.5"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   placeholder="0"
                 />
               </div>
@@ -139,7 +139,7 @@ export default async function NewWeeklyReportPage({
                   required
                   min="0"
                   step="0.5"
-                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   placeholder="0"
                 />
               </div>
@@ -153,7 +153,7 @@ export default async function NewWeeklyReportPage({
                 id="notes"
                 name="notes"
                 rows={4}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 placeholder="Optional notes about this week's progress..."
               />
             </div>
@@ -167,7 +167,7 @@ export default async function NewWeeklyReportPage({
               </a>
               <button
                 type="submit"
-                className="flex-1 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                className="flex-1 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Submit Report
               </button>

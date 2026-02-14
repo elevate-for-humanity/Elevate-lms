@@ -25,7 +25,7 @@ export default function DrugTestingSuccessPage() {
           schedule your test.
         </p>
 
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-8">
+        <div className="bg-brand-blue-50 border-2 border-brand-blue-200 rounded-lg p-6 mb-8">
           <h2 className="text-lg font-bold mb-4">What Happens Next?</h2>
           <div className="text-left space-y-3">
             <div className="flex gap-3">

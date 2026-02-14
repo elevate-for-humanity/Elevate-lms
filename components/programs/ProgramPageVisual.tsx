@@ -88,7 +88,7 @@ export function ProgramPageVisual({ program }: Props) {
               <span className="text-white font-medium">{program.salary} Avg Salary</span>
             </div>
             <div className="flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full">
-              <TrendingUp className="w-5 h-5 text-blue-400" />
+              <TrendingUp className="w-5 h-5 text-brand-blue-400" />
               <span className="text-white font-medium">{program.demand} Demand</span>
             </div>
             {program.fundingType === 'funded' && (
@@ -144,8 +144,8 @@ export function ProgramPageVisual({ program }: Props) {
                 <div className="space-y-4">
                   {section.points.map((point, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <div className="w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <CheckCircle className="w-4 h-4 text-blue-600" />
+                      <div className="w-6 h-6 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <CheckCircle className="w-4 h-4 text-brand-blue-600" />
                       </div>
                       <span className="text-slate-700 text-lg">{point}</span>
                     </div>
@@ -173,10 +173,10 @@ export function ProgramPageVisual({ program }: Props) {
             {program.careers.map((career, index) => (
               <div 
                 key={index}
-                className="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-blue-500 transition"
+                className="bg-slate-800 rounded-xl p-6 border border-slate-700 hover:border-brand-blue-500 transition"
               >
-                <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center mb-4">
-                  <Briefcase className="w-6 h-6 text-blue-400" />
+                <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center mb-4">
+                  <Briefcase className="w-6 h-6 text-brand-blue-400" />
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">{career.title}</h3>
                 <p className="text-green-400 font-semibold">{career.salary}</p>
@@ -222,21 +222,21 @@ export function ProgramPageVisual({ program }: Props) {
           
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-brand-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-3xl font-black text-white">1</span>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Apply Online</h3>
               <p className="text-slate-600">Quick application takes 5 minutes</p>
             </div>
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-brand-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-3xl font-black text-white">2</span>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Complete Training</h3>
               <p className="text-slate-600">Hands-on learning with certification</p>
             </div>
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-brand-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <span className="text-3xl font-black text-white">3</span>
               </div>
               <h3 className="text-xl font-bold text-slate-900 mb-2">Get Hired</h3>
@@ -247,23 +247,23 @@ export function ProgramPageVisual({ program }: Props) {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-blue-600">
+      <section className="py-16 lg:py-24 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
             Ready to Start?
           </h2>
-          <p className="text-blue-100 text-lg mb-6">
+          <p className="text-brand-blue-100 text-lg mb-6">
             {program.fundingType === 'funded' 
               ? 'Free training for eligible Indiana residents through WIOA funding.'
               : 'Flexible payment options available.'}
           </p>
           
-          <PathwayDisclosure variant="compact" className="bg-blue-700 border-blue-500 mb-8 max-w-2xl mx-auto" />
+          <PathwayDisclosure variant="compact" className="bg-brand-blue-700 border-brand-blue-500 mb-8 max-w-2xl mx-auto" />
           
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/apply"
-              className="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition shadow-lg"
+              className="inline-flex items-center bg-white text-brand-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-brand-blue-50 transition shadow-lg"
             >
               Apply Now
               <ArrowRight className="w-5 h-5 ml-2" />

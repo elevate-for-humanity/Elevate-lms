@@ -23,7 +23,7 @@ export default async function QuizPage({ params }: { params: { courseId: string;
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8">
         <div className="mb-6">
-          <Link href={`/courses/${params.courseId}/lessons/${params.lessonId}`} className="text-blue-600 hover:text-blue-800 text-sm">← Back to Lesson</Link>
+          <Link href={`/courses/${params.courseId}/lessons/${params.lessonId}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">← Back to Lesson</Link>
           <h1 className="text-2xl font-bold text-gray-900 mt-2">{lesson?.title} - Quiz</h1>
           <p className="text-gray-600 mt-1">Test your understanding of this lesson</p>
         </div>
@@ -59,12 +59,12 @@ export default async function QuizPage({ params }: { params: { courseId: string;
                 </div>
               )) : <p className="text-gray-500 text-center py-4">No questions available</p>}
             </div>
-            <button className="w-full mt-6 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-medium">Submit Quiz</button>
+            <button className="w-full mt-6 bg-brand-blue-600 text-white px-4 py-3 rounded-lg hover:bg-brand-blue-700 font-medium">Submit Quiz</button>
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
             <p className="text-gray-500">No quiz available for this lesson</p>
-            <Link href={`/courses/${params.courseId}/lessons/${params.lessonId}`} className="text-blue-600 hover:text-blue-800 mt-2 inline-block">Return to Lesson</Link>
+            <Link href={`/courses/${params.courseId}/lessons/${params.lessonId}`} className="text-brand-blue-600 hover:text-brand-blue-800 mt-2 inline-block">Return to Lesson</Link>
           </div>
         )}
       </div>

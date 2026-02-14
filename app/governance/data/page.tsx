@@ -56,9 +56,9 @@ export default function DataGovernancePage() {
       <div className="max-w-4xl mx-auto px-4 py-12 space-y-8">
 
         {/* Overview */}
-        <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h2 className="font-semibold text-blue-900 mb-2">Governance Principle</h2>
-          <p className="text-blue-800">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
+          <h2 className="font-semibold text-brand-blue-900 mb-2">Governance Principle</h2>
+          <p className="text-brand-blue-800">
             The platform automates operations. Authority over data decisions remains with workforce administrators 
             and designated data stewards. All data handling follows federal and state workforce program requirements.
           </p>
@@ -157,7 +157,7 @@ export default function DataGovernancePage() {
             </p>
             <Link 
               href="/contact?topic=data-deletion" 
-              className="text-blue-600 text-sm font-medium hover:underline"
+              className="text-brand-blue-600 text-sm font-medium hover:underline"
             >
               Submit Deletion Request →
             </Link>

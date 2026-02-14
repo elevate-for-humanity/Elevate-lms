@@ -95,7 +95,7 @@ export default function NewCampaignPage() {
                     onClick={() => handleTemplateSelect(template)}
                     className={`w-full text-left px-4 py-3 rounded-lg border-2 transition-colors ${
                       selectedTemplate?.id === template.id
-                        ? 'border-blue-600 bg-blue-50'
+                        ? 'border-brand-blue-600 bg-brand-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -129,7 +129,7 @@ export default function NewCampaignPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent"
                   placeholder="e.g., Weekly Check-in - March 2025"
                 />
               </div>
@@ -147,7 +147,7 @@ export default function NewCampaignPage() {
                       target_audience: e.target.value,
                     })
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent"
                 >
                   <option value="all_students">All Students</option>
                   <option value="active_students">
@@ -175,7 +175,7 @@ export default function NewCampaignPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, subject: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent"
                   placeholder="e.g., Your Weekly Progress Update"
                 />
               </div>
@@ -192,7 +192,7 @@ export default function NewCampaignPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, from_name: e.target.value })
                     }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent"
                   />
                 </div>
                 <div>
@@ -205,7 +205,7 @@ export default function NewCampaignPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, from_email: e.target.value })
                     }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -222,7 +222,7 @@ export default function NewCampaignPage() {
                     setFormData({ ...formData, html_content: e.target.value })
                   }
                   rows={12}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 focus:border-transparent font-mono text-sm"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-600 focus:border-transparent font-mono text-sm"
                   placeholder="Paste HTML content or select a template..."
                 />
                 <p className="text-xs text-black mt-2">
@@ -241,7 +241,7 @@ export default function NewCampaignPage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>

@@ -108,7 +108,7 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
           onKeyDown={handleKeyDown}
           onFocus={() => query.length > 0 && setIsOpen(true)}
           placeholder={Content}
-          className="w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
           aria-label="Search"
           aria-autocomplete="list"
           aria-controls="search-results"
@@ -162,7 +162,7 @@ export const SearchAutocomplete: React.FC<SearchAutocompleteProps> = ({
                         )}
                       </div>
                       {result.category && (
-                        <span className="flex-shrink-0 text-xs px-2 py-2 bg-blue-100 text-blue-700 rounded-full">
+                        <span className="flex-shrink-0 text-xs px-2 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-full">
                           {result.category}
                         </span>
                       )}

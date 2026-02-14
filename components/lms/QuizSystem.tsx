@@ -162,7 +162,7 @@ export function QuizSystem({
         <div className="flex gap-3">
           <button
             onClick={retakeQuiz}
-            className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
+            className="flex-1 bg-brand-blue-600 hover:bg-brand-blue-700 text-white py-3 rounded-lg font-semibold transition"
           >
             Retake Quiz
           </button>
@@ -195,7 +195,7 @@ export function QuizSystem({
         </div>
         <div className="w-full bg-slate-200 rounded-full h-2">
           <div
-            className="bg-blue-600 h-2 rounded-full transition-all"
+            className="bg-brand-blue-600 h-2 rounded-full transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
@@ -211,7 +211,7 @@ export function QuizSystem({
               onClick={() => handleAnswer(index)}
               className={`w-full text-left p-4 rounded-lg border-2 transition ${
                 answers[currentQuestion] === index
-                  ? 'border-blue-600 bg-blue-50'
+                  ? 'border-brand-blue-600 bg-brand-blue-50'
                   : 'border-slate-200 hover:border-slate-300 hover:bg-slate-50'
               }`}
             >
@@ -219,7 +219,7 @@ export function QuizSystem({
                 <div
                   className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                     answers[currentQuestion] === index
-                      ? 'border-blue-600 bg-blue-600'
+                      ? 'border-brand-blue-600 bg-brand-blue-600'
                       : 'border-slate-300'
                   }`}
                 >
@@ -260,7 +260,7 @@ export function QuizSystem({
         ) : (
           <button
             onClick={goToNext}
-            className="px-6 py-3 rounded-lg font-semibold transition bg-blue-600 hover:bg-blue-700 text-white"
+            className="px-6 py-3 rounded-lg font-semibold transition bg-brand-blue-600 hover:bg-brand-blue-700 text-white"
           >
             Next
           </button>

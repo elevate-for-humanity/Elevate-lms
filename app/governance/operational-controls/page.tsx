@@ -65,7 +65,7 @@ export default function OperationalControlsPage() {
       <div className="bg-slate-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
-            <Settings className="w-8 h-8 text-blue-400" />
+            <Settings className="w-8 h-8 text-brand-blue-400" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Operational Controls
@@ -84,8 +84,8 @@ export default function OperationalControlsPage() {
         {/* Content Integrity */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Shield className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+              <Shield className="w-5 h-5 text-brand-blue-600" />
             </div>
             <h2 className="text-2xl font-bold text-slate-900">Content Integrity Controls</h2>
           </div>
@@ -102,8 +102,8 @@ export default function OperationalControlsPage() {
         {/* LMS Controls */}
         <section className="mb-12">
           <div className="flex items-center gap-3 mb-6">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-brand-blue-600" />
             </div>
             <h2 className="text-2xl font-bold text-slate-900">LMS Controls</h2>
           </div>
@@ -162,7 +162,7 @@ export default function OperationalControlsPage() {
         </section>
 
         {/* Audit Schedule */}
-        <section className="mb-12 bg-blue-50 rounded-xl p-6 border border-blue-100">
+        <section className="mb-12 bg-brand-blue-50 rounded-xl p-6 border border-brand-blue-100">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Audit Schedule</h2>
           <div className="space-y-4">
             <div>

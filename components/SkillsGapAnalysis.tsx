@@ -168,7 +168,7 @@ export default function SkillsGapAnalysis() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Training Needed</h3>
-            <p className="text-3xl font-bold text-blue-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {skillGaps.reduce((sum, g) => sum + g.trainingOptions.length, 0)}
             </p>
             <p className="text-sm text-black">Courses recommended</p>
@@ -186,7 +186,7 @@ export default function SkillsGapAnalysis() {
                     <span className={`inline-block mt-1 px-3 py-2 rounded text-xs font-medium ${
                       gap.priority === 'high' ? 'bg-red-100 text-red-700' :
                       gap.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-blue-100 text-blue-700'
+                      'bg-brand-blue-100 text-brand-blue-700'
                     }`}>
                       {gap.priority.toUpperCase()} PRIORITY
                     </span>
@@ -227,7 +227,7 @@ export default function SkillsGapAnalysis() {
                     {gap.trainingOptions.map((option) => (
                       <button
                         key={option}
-                        className="px-3 py-2 bg-blue-100 text-blue-700 text-sm rounded hover:bg-blue-200 transition-colors"
+                        className="px-3 py-2 bg-brand-blue-100 text-brand-blue-700 text-sm rounded hover:bg-brand-blue-200 transition-colors"
                       >
                         {option}
                       </button>
@@ -304,9 +304,9 @@ export default function SkillsGapAnalysis() {
                   <li>• Implement GraphQL in pilot project</li>
                 </ul>
               </div>
-              <div className="p-4 bg-blue-50 rounded">
-                <h4 className="font-semibold text-blue-900 mb-2">🔵 Long-term (6-12 months)</h4>
-                <ul className="text-sm text-blue-700 space-y-1">
+              <div className="p-4 bg-brand-blue-50 rounded">
+                <h4 className="font-semibold text-brand-blue-900 mb-2">🔵 Long-term (6-12 months)</h4>
+                <ul className="text-sm text-brand-blue-700 space-y-1">
                   <li>• Advanced testing certification</li>
                   <li>• Continuous skill assessment</li>
                 </ul>
@@ -339,9 +339,9 @@ export default function SkillsGapAnalysis() {
                 </ul>
               </div>
 
-              <div className="p-4 bg-blue-50 rounded">
-                <h4 className="font-semibold text-blue-900 mb-2">Investment Required</h4>
-                <ul className="text-sm text-blue-700 space-y-2">
+              <div className="p-4 bg-brand-blue-50 rounded">
+                <h4 className="font-semibold text-brand-blue-900 mb-2">Investment Required</h4>
+                <ul className="text-sm text-brand-blue-700 space-y-2">
                   <li className="flex justify-between">
                     <span>Training costs:</span>
                     <span className="font-bold">$12,000</span>
@@ -350,7 +350,7 @@ export default function SkillsGapAnalysis() {
                     <span>Time investment:</span>
                     <span className="font-bold">120 hours</span>
                   </li>
-                  <li className="flex justify-between border-t border-blue-200 pt-2 mt-2">
+                  <li className="flex justify-between border-t border-brand-blue-200 pt-2 mt-2">
                     <span className="font-bold">ROI Timeline:</span>
                     <span className="font-bold">6 months</span>
                   </li>

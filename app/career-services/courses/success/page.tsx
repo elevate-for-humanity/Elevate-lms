@@ -45,12 +45,12 @@ export default async function CourseSuccessPage({
             Thank you for your purchase. You now have lifetime access to your courses.
           </p>
 
-          <div className="bg-blue-50 rounded-xl p-6 mb-8 text-left">
-            <h3 className="font-semibold text-blue-900 mb-3 flex items-center gap-2">
+          <div className="bg-brand-blue-50 rounded-xl p-6 mb-8 text-left">
+            <h3 className="font-semibold text-brand-blue-900 mb-3 flex items-center gap-2">
               <Mail className="w-5 h-5" />
               Check Your Email
             </h3>
-            <p className="text-blue-700 text-sm">
+            <p className="text-brand-blue-700 text-sm">
               We&apos;ve sent a confirmation email with your receipt and course access instructions.
             </p>
           </div>
@@ -58,7 +58,7 @@ export default async function CourseSuccessPage({
           <div className="space-y-4">
             <Link
               href="/career-services/courses/my-courses"
-              className="w-full bg-blue-600 text-white px-6 py-4 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2"
+              className="w-full bg-brand-blue-600 text-white px-6 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition flex items-center justify-center gap-2"
             >
               <Play className="w-5 h-5" />
               Start Learning Now
@@ -76,7 +76,7 @@ export default async function CourseSuccessPage({
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Questions? Contact us at{' '}
-          <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">
+          <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">
             elevate4humanityedu@gmail.com
           </a>
         </p>

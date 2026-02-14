@@ -118,8 +118,8 @@ export default function BuyerProtectionPage() {
           <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">How Buyer Protection Works</h2>
           <div className="grid sm:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-xl font-bold text-blue-600">1</span>
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-xl font-bold text-brand-blue-600">1</span>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Make a Purchase</h3>
               <p className="text-sm text-gray-600">
@@ -127,8 +127,8 @@ export default function BuyerProtectionPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-xl font-bold text-blue-600">2</span>
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-xl font-bold text-brand-blue-600">2</span>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Access Content</h3>
               <p className="text-sm text-gray-600">
@@ -136,8 +136,8 @@ export default function BuyerProtectionPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-xl font-bold text-blue-600">3</span>
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-xl font-bold text-brand-blue-600">3</span>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Protected for 30 Days</h3>
               <p className="text-sm text-gray-600">
@@ -173,7 +173,7 @@ export default function BuyerProtectionPage() {
           <p className="text-gray-600 mb-4">Have questions about buyer protection?</p>
           <Link
             href="/support"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
           >
             <MessageCircle className="w-4 h-4" />
             Contact Support

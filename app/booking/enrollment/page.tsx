@@ -75,7 +75,7 @@ export default function EnrollmentBookingPage() {
 
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-blue-50 flex items-center justify-center px-4">
+      <div className="min-h-screen bg-brand-blue-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-10 h-10 text-green-600" />
@@ -97,7 +97,7 @@ export default function EnrollmentBookingPage() {
             A confirmation email has been sent to {formData.email}
           </p>
           <div className="flex gap-4 justify-center">
-            <Link href="/programs" className="text-blue-600 hover:text-blue-700 font-medium">
+            <Link href="/programs" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
               Browse Programs
             </Link>
             <Link href="/" className="text-gray-600 hover:text-gray-700 font-medium">
@@ -119,14 +119,14 @@ export default function EnrollmentBookingPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-blue-900 text-white py-8">
+      <div className="bg-brand-blue-900 text-white py-8">
         <div className="max-w-3xl mx-auto px-4">
-          <Link href="/booking" className="inline-flex items-center gap-2 text-blue-200 hover:text-white mb-4">
+          <Link href="/booking" className="inline-flex items-center gap-2 text-brand-blue-200 hover:text-white mb-4">
             <ArrowLeft className="w-4 h-4" />
             Back to Booking
           </Link>
           <h1 className="text-2xl md:text-3xl font-bold">Schedule Enrollment Consultation</h1>
-          <p className="text-blue-200 mt-2">30-minute session with an enrollment advisor</p>
+          <p className="text-brand-blue-200 mt-2">30-minute session with an enrollment advisor</p>
         </div>
       </div>
 
@@ -137,14 +137,14 @@ export default function EnrollmentBookingPage() {
             {[1, 2, 3].map((s) => (
               <div key={s} className="flex items-center">
                 <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                  step >= s ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+                  step >= s ? 'bg-brand-blue-600 text-white' : 'bg-gray-200 text-gray-600'
                 }`}>
                   {s}
                 </div>
-                <span className={`ml-2 text-sm hidden sm:inline ${step >= s ? 'text-blue-600 font-medium' : 'text-gray-500'}`}>
+                <span className={`ml-2 text-sm hidden sm:inline ${step >= s ? 'text-brand-blue-600 font-medium' : 'text-gray-500'}`}>
                   {s === 1 ? 'Select Date' : s === 2 ? 'Select Time' : 'Your Info'}
                 </span>
-                {s < 3 && <div className={`w-12 sm:w-24 h-1 mx-2 ${step > s ? 'bg-blue-600' : 'bg-gray-200'}`} />}
+                {s < 3 && <div className={`w-12 sm:w-24 h-1 mx-2 ${step > s ? 'bg-brand-blue-600' : 'bg-gray-200'}`} />}
               </div>
             ))}
           </div>
@@ -157,7 +157,7 @@ export default function EnrollmentBookingPage() {
         {step === 1 && (
           <div className="bg-white rounded-xl border p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-blue-600" />
+              <Calendar className="w-5 h-5 text-brand-blue-600" />
               Select a Date
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -168,7 +168,7 @@ export default function EnrollmentBookingPage() {
                     setSelectedDate(formatDate(date));
                     setStep(2);
                   }}
-                  className="p-4 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-center"
+                  className="p-4 border rounded-lg hover:border-brand-blue-500 hover:bg-brand-blue-50 transition-colors text-center"
                 >
                   <div className="text-sm text-gray-500">{date.toLocaleDateString('en-US', { weekday: 'short' })}</div>
                   <div className="text-lg font-semibold">{date.getDate()}</div>
@@ -182,11 +182,11 @@ export default function EnrollmentBookingPage() {
         {/* Step 2: Select Time */}
         {step === 2 && (
           <div className="bg-white rounded-xl border p-6">
-            <button onClick={() => setStep(1)} className="text-blue-600 hover:text-blue-700 text-sm mb-4 flex items-center gap-1">
+            <button onClick={() => setStep(1)} className="text-brand-blue-600 hover:text-brand-blue-700 text-sm mb-4 flex items-center gap-1">
               <ArrowLeft className="w-4 h-4" /> Change date
             </button>
             <h2 className="text-xl font-bold text-gray-900 mb-2 flex items-center gap-2">
-              <Clock className="w-5 h-5 text-blue-600" />
+              <Clock className="w-5 h-5 text-brand-blue-600" />
               Select a Time
             </h2>
             <p className="text-gray-600 mb-4">Available times for {selectedDate}</p>
@@ -198,7 +198,7 @@ export default function EnrollmentBookingPage() {
                     setSelectedTime(time);
                     setStep(3);
                   }}
-                  className="p-3 border rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-colors text-center font-medium"
+                  className="p-3 border rounded-lg hover:border-brand-blue-500 hover:bg-brand-blue-50 transition-colors text-center font-medium"
                 >
                   {time}
                 </button>
@@ -210,18 +210,18 @@ export default function EnrollmentBookingPage() {
         {/* Step 3: Your Information */}
         {step === 3 && (
           <div className="bg-white rounded-xl border p-6">
-            <button onClick={() => setStep(2)} className="text-blue-600 hover:text-blue-700 text-sm mb-4 flex items-center gap-1">
+            <button onClick={() => setStep(2)} className="text-brand-blue-600 hover:text-brand-blue-700 text-sm mb-4 flex items-center gap-1">
               <ArrowLeft className="w-4 h-4" /> Change time
             </button>
             
-            <div className="bg-blue-50 rounded-lg p-4 mb-6">
-              <p className="text-sm text-blue-800">
+            <div className="bg-brand-blue-50 rounded-lg p-4 mb-6">
+              <p className="text-sm text-brand-blue-800">
                 <strong>Appointment:</strong> {selectedDate} at {selectedTime}
               </p>
             </div>
 
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <User className="w-5 h-5 text-blue-600" />
+              <User className="w-5 h-5 text-brand-blue-600" />
               Your Information
             </h2>
 
@@ -234,7 +234,7 @@ export default function EnrollmentBookingPage() {
                     required
                     value={formData.firstName}
                     onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   />
                 </div>
                 <div>
@@ -244,7 +244,7 @@ export default function EnrollmentBookingPage() {
                     required
                     value={formData.lastName}
                     onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   />
                 </div>
               </div>
@@ -256,7 +256,7 @@ export default function EnrollmentBookingPage() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
 
@@ -267,7 +267,7 @@ export default function EnrollmentBookingPage() {
                   required
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   placeholder="(555) 555-5555"
                 />
               </div>
@@ -277,7 +277,7 @@ export default function EnrollmentBookingPage() {
                 <select
                   value={formData.program}
                   onChange={(e) => setFormData({ ...formData, program: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="">Select a program (optional)</option>
                   <option value="cna">CNA Certification</option>
@@ -297,7 +297,7 @@ export default function EnrollmentBookingPage() {
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   placeholder="Anything you'd like us to know before your appointment?"
                 />
               </div>
@@ -305,7 +305,7 @@ export default function EnrollmentBookingPage() {
               <button
                 onClick={handleSubmit}
                 disabled={isSubmitting || !formData.firstName || !formData.lastName || !formData.email || !formData.phone}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 rounded-lg font-bold text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white py-4 rounded-lg font-bold text-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? 'Booking...' : 'Confirm Appointment'}
               </button>
@@ -316,7 +316,7 @@ export default function EnrollmentBookingPage() {
         {/* Help CTA */}
         <div className="mt-8 bg-gray-100 rounded-xl p-6 text-center">
           <p className="text-gray-600 mb-2">Need help with your enrollment?</p>
-          <a href="/faq" className="inline-flex items-center gap-2 text-xl font-bold text-blue-600 hover:text-blue-700">
+          <a href="/faq" className="inline-flex items-center gap-2 text-xl font-bold text-brand-blue-600 hover:text-brand-blue-700">
             Visit our FAQ & Help Center →
           </a>
         </div>

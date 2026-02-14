@@ -104,7 +104,7 @@ export default function SurveyModal({
             type="text"
             value={answer || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => handleAnswer(currentQuestion.id, e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             placeholder="Your answer..."
           />
         );
@@ -115,7 +115,7 @@ export default function SurveyModal({
             value={answer || ''}
             onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => handleAnswer(currentQuestion.id, e.target.value)}
             rows={4}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             placeholder="Your answer..."
           />
         );
@@ -134,7 +134,7 @@ export default function SurveyModal({
                   value={option}
                   checked={answer === option}
                   onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => handleAnswer(currentQuestion.id, e.target.value)}
-                  className="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-500"
+                  className="w-5 h-5 text-brand-blue-600 border-gray-300 focus:ring-brand-blue-500"
                 />
                 <span className="text-black">{option}</span>
               </label>
@@ -161,7 +161,7 @@ export default function SurveyModal({
                       : currentAnswers.filter((a: string) => a !== option);
                     handleAnswer(currentQuestion.id, newAnswers);
                   }}
-                  className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                  className="w-5 h-5 text-brand-blue-600 border-gray-300 rounded focus:ring-brand-blue-500"
                 />
                 <span className="text-black">{option}</span>
               </label>
@@ -179,7 +179,7 @@ export default function SurveyModal({
                 onClick={() => handleAnswer(currentQuestion.id, rating)}
                 className={`w-12 h-12 rounded-full font-bold transition-all ${
                   answer === rating
-                    ? 'bg-blue-600 text-white scale-110'
+                    ? 'bg-brand-blue-600 text-white scale-110'
                     : 'bg-gray-200 text-black hover:bg-gray-300'
                 }`}
               >
@@ -202,7 +202,7 @@ export default function SurveyModal({
             />
             <div className="flex justify-between text-sm text-black">
               <span>0</span>
-              <span className="text-2xl font-bold text-blue-600">{answer || 5}</span>
+              <span className="text-2xl font-bold text-brand-blue-600">{answer || 5}</span>
               <span>10</span>
             </div>
           </div>
@@ -240,7 +240,7 @@ export default function SurveyModal({
           <div className="relative">
             <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-blue-600 transition-all duration-300"
+                className="h-full bg-brand-blue-600 transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -285,9 +285,9 @@ export default function SurveyModal({
                 key={index}
                 className={`w-2 h-2 rounded-full transition-colors ${
                   index === currentQuestionIndex
-                    ? 'bg-blue-600 w-6'
+                    ? 'bg-brand-blue-600 w-6'
                     : answers[survey.questions[index].id]
-                    ? 'bg-blue-400'
+                    ? 'bg-brand-blue-400'
                     : 'bg-gray-300'
                 }`}
               />
@@ -297,7 +297,7 @@ export default function SurveyModal({
           <button
             onClick={handleNext}
             disabled={isSubmitting}
-            className="flex items-center gap-2 px-6 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-2 text-white bg-brand-blue-600 rounded-lg hover:bg-brand-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {isSubmitting ? (
               <>

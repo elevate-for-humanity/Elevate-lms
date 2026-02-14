@@ -78,7 +78,7 @@ export function ProgramPaymentButton({
           <button
             onClick={() => handlePayment('plan')}
             disabled={loading}
-            className="w-full py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition flex items-center justify-center gap-2"
+            className="w-full py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition flex items-center justify-center gap-2"
           >
             <Calendar className="w-5 h-5" />
             4 Payments of ${Math.ceil(price / 4).toLocaleString()}
@@ -102,7 +102,7 @@ export function ProgramPaymentButton({
           </div>
           {partnerUrl && (
             <div className="flex items-center gap-2 mt-3 pt-3 border-t border-slate-200">
-              <span className="text-blue-600">→</span>
+              <span className="text-brand-blue-600">→</span>
               <span className="font-medium">Redirects to partner platform to start program</span>
             </div>
           )}
@@ -112,7 +112,7 @@ export function ProgramPaymentButton({
       <div className="mt-4 text-center">
         <a
           href="/contact"
-          className="text-sm text-blue-600 hover:underline"
+          className="text-sm text-brand-blue-600 hover:underline"
         >
           Questions? Contact us
         </a>

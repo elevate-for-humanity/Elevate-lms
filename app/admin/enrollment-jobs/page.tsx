@@ -198,7 +198,7 @@ export default async function EnrollmentJobsPage() {
                         <input type="hidden" name="job_id" value={job.id} />
                         <button
                           type="submit"
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                          className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
                         >
                           <RefreshCw className="h-4 w-4" />
                           Retry

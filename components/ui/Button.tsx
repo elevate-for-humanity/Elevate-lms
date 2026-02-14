@@ -39,19 +39,19 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       'inline-flex items-center justify-center font-semibold transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
 
     const variantStyles = {
-      default: 'bg-brand-orange-600 text-white hover:bg-brand-orange-700 focus:ring-blue-500',
-      primary: 'bg-brand-orange-600 text-white hover:bg-brand-orange-700 focus:ring-blue-500',
+      default: 'bg-brand-orange-600 text-white hover:bg-brand-orange-700 focus:ring-brand-blue-500',
+      primary: 'bg-brand-orange-600 text-white hover:bg-brand-orange-700 focus:ring-brand-blue-500',
       secondary:
         'bg-white text-black border-2 border-slate-300 hover:bg-slate-50 hover:border-slate-400 focus:ring-slate-500',
       tertiary:
-        'bg-transparent text-brand-orange-600 hover:bg-gray-50 focus:ring-blue-500',
+        'bg-transparent text-brand-orange-600 hover:bg-gray-50 focus:ring-brand-blue-500',
       danger: 'bg-brand-orange-600 text-white hover:bg-brand-orange-700 focus:ring-red-500',
       destructive: 'bg-brand-orange-600 text-white hover:bg-brand-orange-700 focus:ring-red-500',
       outline:
         'bg-white text-black border-2 border-slate-300 hover:bg-slate-50 hover:border-slate-400 focus:ring-slate-500',
       ghost:
         'bg-transparent text-black hover:bg-slate-100 focus:ring-slate-500',
-      link: 'text-brand-orange-600 underline-offset-4 hover:underline focus:ring-blue-500',
+      link: 'text-brand-orange-600 underline-offset-4 hover:underline focus:ring-brand-blue-500',
     };
 
     const sizeStyles = {

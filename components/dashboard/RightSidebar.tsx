@@ -263,7 +263,7 @@ export function RightSidebar() {
       {/* Calendar Widget */}
       <div className="bg-white rounded-lg border border-slate-200 p-4">
         <h3 className="font-semibold text-black mb-3 flex items-center gap-2">
-          <Calendar className="w-4 h-4 text-blue-600" />
+          <Calendar className="w-4 h-4 text-brand-blue-600" />
           Calendar
         </h3>
         <div className="text-center">
@@ -302,7 +302,7 @@ export function RightSidebar() {
                     activity.type === 'completed'
                       ? 'bg-green-500'
                       : activity.type === 'graded'
-                        ? 'bg-blue-500'
+                        ? 'bg-brand-blue-500'
                         : activity.type === 'enrolled'
                           ? 'bg-purple-500'
                           : 'bg-yellow-500'

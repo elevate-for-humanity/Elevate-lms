@@ -46,7 +46,7 @@ export default function HoursSummaryWidget({
         <div className="progress-bar h-4">
           {/* Transferred Hours (Blue) */}
           <div
-            className="absolute h-full bg-blue-500 rounded-l-lg transition-all"
+            className="absolute h-full bg-brand-blue-500 rounded-l-lg transition-all"
             style={{ width: `${transferredPercent}%` }}
           />
           {/* Earned Hours (Green) */}
@@ -67,7 +67,7 @@ export default function HoursSummaryWidget({
         {/* Legend */}
         <div className="flex justify-center gap-6 mt-3 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-blue-500 rounded" />
+            <div className="w-3 h-3 bg-brand-blue-500 rounded" />
             <span className="text-slate-400">Transferred</span>
           </div>
           <div className="flex items-center gap-2">
@@ -95,15 +95,15 @@ export default function HoursSummaryWidget({
         </div>
 
         {/* Transferred */}
-        <div className="text-center p-4 bg-blue-500/10 border border-blue-500/30 rounded-lg">
-          <div className="text-3xl font-bold text-blue-400 mb-1">
+        <div className="text-center p-4 bg-brand-blue-500/10 border border-brand-blue-500/30 rounded-lg">
+          <div className="text-3xl font-bold text-brand-blue-400 mb-1">
             {transferred.toLocaleString()}
           </div>
           <div className="text-xs text-slate-400 uppercase tracking-wide">
             Transferred
           </div>
           {transferredPercent > 0 && (
-            <div className="text-xs text-blue-400 mt-1">
+            <div className="text-xs text-brand-blue-400 mt-1">
               {transferredPercent.toFixed(1)}%
             </div>
           )}
@@ -155,8 +155,8 @@ export default function HoursSummaryWidget({
           </div>
         ) : remaining < required * 0.25 ? (
           <div className="text-center">
-            <div className="text-blue-400 text-2xl mb-2">🎯</div>
-            <div className="text-blue-400 font-semibold">
+            <div className="text-brand-blue-400 text-2xl mb-2">🎯</div>
+            <div className="text-brand-blue-400 font-semibold">
               Almost there!
             </div>
             <div className="text-slate-400 text-sm mt-1">
@@ -169,7 +169,7 @@ export default function HoursSummaryWidget({
               <strong className="text-white">{remaining}</strong> hours remaining to complete program
             </div>
             {transferred > 0 && (
-              <div className="text-xs text-blue-400 mt-2">
+              <div className="text-xs text-brand-blue-400 mt-2">
                 ✓ {transferred} hours credited from transfer
               </div>
             )}
@@ -187,7 +187,7 @@ export default function HoursSummaryWidget({
             <span className="text-slate-400">Total Required Hours:</span>
             <span className="text-white font-mono">{required}</span>
           </div>
-          <div className="flex justify-between text-blue-400">
+          <div className="flex justify-between text-brand-blue-400">
             <span>− Transferred Hours:</span>
             <span className="font-mono">−{transferred}</span>
           </div>

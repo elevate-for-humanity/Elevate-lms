@@ -145,7 +145,7 @@ export default function MicroCredentialsBadges() {
           </Card>
           <Card className="p-6 text-center">
             <div className="text-4xl mb-2 text-2xl md:text-3xl lg:text-4xl">🎯</div>
-            <p className="text-3xl font-bold text-blue-600">{availableBadges.length}</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{availableBadges.length}</p>
             <p className="text-black">Available</p>
           </Card>
         </div>
@@ -231,7 +231,7 @@ export default function MicroCredentialsBadges() {
                         href={badge.verificationUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block text-center text-sm text-blue-600 hover:underline"
+                        className="block text-center text-sm text-brand-blue-600 hover:underline"
                       >
                         Verify Badge
                       </a>

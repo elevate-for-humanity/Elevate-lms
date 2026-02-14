@@ -37,7 +37,7 @@ export function StudentEngagementChart() {
   if (loading) {
     return (
       <div className="h-48 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-blue-600"></div>
       </div>
     );
   }
@@ -48,7 +48,7 @@ export function StudentEngagementChart() {
     <div>
       <div className="flex gap-4 mb-3 text-xs">
         <div className="flex items-center gap-1">
-          <div className="w-3 h-3 bg-blue-500 rounded"></div>
+          <div className="w-3 h-3 bg-brand-blue-500 rounded"></div>
           <span>Views</span>
         </div>
         <div className="flex items-center gap-1">
@@ -61,7 +61,7 @@ export function StudentEngagementChart() {
           <div key={idx} className="flex-1 flex flex-col items-center">
             <div className="w-full flex gap-1 items-end" style={{ height: 100 }}>
               <div
-                className="flex-1 bg-blue-500 rounded-t"
+                className="flex-1 bg-brand-blue-500 rounded-t"
                 style={{ height: `${(item.views / maxViews) * 100}%` }}
                 title={`${item.views} views`}
               ></div>
@@ -102,7 +102,7 @@ export function CoursePerformanceChart() {
   if (loading) {
     return (
       <div className="h-48 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-blue-600"></div>
       </div>
     );
   }

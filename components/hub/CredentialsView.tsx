@@ -85,7 +85,7 @@ export default function CredentialsView({ userId }: { userId?: string }) {
         <p className="text-slate-600 mb-4">Complete your program to earn credentials</p>
         <Link 
           href="/programs"
-          className="text-blue-600 font-medium hover:underline"
+          className="text-brand-blue-600 font-medium hover:underline"
         >
           Browse Programs →
         </Link>
@@ -133,7 +133,7 @@ export default function CredentialsView({ userId }: { userId?: string }) {
                 {credential.verificationUrl && (
                   <Link
                     href={credential.verificationUrl}
-                    className="inline-flex items-center gap-1 text-sm text-blue-600 hover:text-blue-700"
+                    className="inline-flex items-center gap-1 text-sm text-brand-blue-600 hover:text-brand-blue-700"
                   >
                     <Shield className="w-4 h-4" />
                     Verify

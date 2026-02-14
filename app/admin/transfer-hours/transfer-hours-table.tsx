@@ -125,7 +125,7 @@ export function TransferHoursTable({
                   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                 >
               ) => setSearchTerm(e.target.value)}
-              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             />
             <select
               value={filterStatus}
@@ -134,7 +134,7 @@ export function TransferHoursTable({
                   e.target.value as 'all' | 'pending' | 'approved' | 'denied'
                 )
               }
-              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             >
               <option value="all">All Statuses</option>
               <option value="pending">Pending</option>
@@ -225,7 +225,7 @@ export function TransferHoursTable({
                     <td className="px-6 py-4 text-right text-sm font-medium">
                       <button
                         onClick={() => setSelectedRequest(request)}
-                        className="text-brand-blue-600 hover:text-blue-900"
+                        className="text-brand-blue-600 hover:text-brand-blue-900"
                       >
                         Review
                       </button>
@@ -340,7 +340,7 @@ export function TransferHoursTable({
                       value={approvalHours}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setApprovalHours(e.target.value)}
                       placeholder={`Max: ${selectedRequest.hours_requested}`}
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                     />
                     <p className="text-sm text-black mt-1">
                       Leave empty to approve full amount
@@ -361,7 +361,7 @@ export function TransferHoursTable({
                         >
                       ) => setApprovalNotes(e.target.value)}
                       rows={3}
-                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                       placeholder="Add notes about your decision..."
                     />
                   </div>

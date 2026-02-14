@@ -124,7 +124,7 @@ export default function AnnouncementsList() {
       case 'event':
         return 'bg-green-100 text-green-700';
       default:
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-brand-blue-100 text-brand-blue-700';
     }
   };
 

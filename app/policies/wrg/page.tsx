@@ -71,8 +71,8 @@ export default function WRGPage() {
                 ))}
               </ul>
             </div>
-            <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
-              <h3 className="font-bold text-blue-800 mb-4">What Is Covered</h3>
+            <div className="bg-brand-blue-50 rounded-xl p-6 border border-brand-blue-200">
+              <h3 className="font-bold text-brand-blue-800 mb-4">What Is Covered</h3>
               <ul className="space-y-3">
                 {[
                   'Tuition costs up to $7,500 per academic year',
@@ -82,7 +82,7 @@ export default function WRGPage() {
                   'Stackable credentials toward further education',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}
@@ -105,7 +105,7 @@ export default function WRGPage() {
             <h2>Application Process</h2>
             <ol>
               <li>Complete the FAFSA (Free Application for Federal Student Aid)</li>
-              <li>Apply to Elevate for Humanity at <Link href="/apply" className="text-blue-600">elevateforhumanity.org/apply</Link></li>
+              <li>Apply to Elevate for Humanity at <Link href="/apply" className="text-brand-blue-600">elevateforhumanity.org/apply</Link></li>
               <li>Select an eligible certificate program</li>
               <li>Meet with a financial aid counselor to confirm WRG eligibility</li>
               <li>Enroll and begin training</li>
@@ -132,7 +132,7 @@ export default function WRGPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Questions About WRG?</h2>
             <p className="text-gray-600 mb-6">Our financial aid team can help determine your eligibility and guide you through the application process.</p>
             <div className="flex flex-wrap gap-4">
-              <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition">
+              <a href="mailto:elevate4humanityedu@gmail.com" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition">
                 <Mail className="w-4 h-4" /> Email Us
               </a>
               <a href="/support" className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">

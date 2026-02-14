@@ -73,7 +73,7 @@ export default async function DevelopersPage() {
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <Link href="/community/communityhub" className="text-blue-600 hover:underline mb-8 inline-block">
+        <Link href="/community/communityhub" className="text-brand-blue-600 hover:underline mb-8 inline-block">
           ← Back to Community Hub
         </Link>
 
@@ -126,7 +126,7 @@ const client = new ElevateClient({
                 </div>
                 <Link
                   href="/docs/quickstart"
-                  className="text-blue-600 font-medium hover:underline"
+                  className="text-brand-blue-600 font-medium hover:underline"
                 >
                   View full documentation →
                 </Link>
@@ -166,7 +166,7 @@ const client = new ElevateClient({
               <h3 className="font-bold text-lg mb-4">Resources</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/docs/api" className="flex items-center gap-2 text-blue-600 hover:underline">
+                  <Link href="/docs/api" className="flex items-center gap-2 text-brand-blue-600 hover:underline">
                     <BookOpen className="w-4 h-4" />
                     API Documentation
                   </Link>
@@ -176,7 +176,7 @@ const client = new ElevateClient({
                     href="https://github.com/elevateforhumanity" 
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-blue-600 hover:underline"
+                    className="flex items-center gap-2 text-brand-blue-600 hover:underline"
                   >
                     <Github className="w-4 h-4" />
                     GitHub
@@ -184,7 +184,7 @@ const client = new ElevateClient({
                   </a>
                 </li>
                 <li>
-                  <Link href="/docs/changelog" className="flex items-center gap-2 text-blue-600 hover:underline">
+                  <Link href="/docs/changelog" className="flex items-center gap-2 text-brand-blue-600 hover:underline">
                     <FileCode className="w-4 h-4" />
                     Changelog
                   </Link>
@@ -203,7 +203,7 @@ const client = new ElevateClient({
                 href="https://status.elevateforhumanity.org" 
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-brand-blue-600 hover:underline"
               >
                 View status page
               </a>

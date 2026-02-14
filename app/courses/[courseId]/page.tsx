@@ -104,7 +104,7 @@ export default async function CourseDetailPage({
             priority
           />
         ) : (
-          <div className="absolute inset-0 bg-blue-700" />
+          <div className="absolute inset-0 bg-brand-blue-700" />
         )}
 
         <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
@@ -182,11 +182,11 @@ export default async function CourseDetailPage({
                 lessons.map((lesson, index) => (
                   <div
                     key={lesson.id}
-                    className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-blue-500 transition-colors"
+                    className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors"
                   >
                     <div className="flex items-start gap-4">
-                      <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <span className="text-blue-600 font-bold">
+                      <div className="flex-shrink-0 w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                        <span className="text-brand-blue-600 font-bold">
                           {index + 1}
                         </span>
                       </div>
@@ -221,7 +221,7 @@ export default async function CourseDetailPage({
 
               <div className="space-y-4 mb-8">
                 <div className="flex items-center gap-3">
-                  <Award className="h-10 w-10 text-blue-600" />
+                  <Award className="h-10 w-10 text-brand-blue-600" />
                   <div>
                     <div className="font-bold text-black">Certificate</div>
                     <div className="text-sm text-black">Upon completion</div>
@@ -229,7 +229,7 @@ export default async function CourseDetailPage({
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Clock className="h-10 w-10 text-blue-600" />
+                  <Clock className="h-10 w-10 text-brand-blue-600" />
                   <div>
                     <div className="font-bold text-black">Duration</div>
                     <div className="text-sm text-black">
@@ -239,7 +239,7 @@ export default async function CourseDetailPage({
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <BookOpen className="h-10 w-10 text-blue-600" />
+                  <BookOpen className="h-10 w-10 text-brand-blue-600" />
                   <div>
                     <div className="font-bold text-black">Lessons</div>
                     <div className="text-sm text-black">
@@ -249,7 +249,7 @@ export default async function CourseDetailPage({
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <Users className="h-10 w-10 text-blue-600" />
+                  <Users className="h-10 w-10 text-brand-blue-600" />
                   <div>
                     <div className="font-bold text-black">Access</div>
                     <div className="text-sm text-black">Lifetime access</div>

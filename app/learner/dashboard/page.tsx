@@ -165,8 +165,8 @@ export default async function LearnerDashboardPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Active Programs</p>
@@ -201,8 +201,8 @@ export default async function LearnerDashboardPage() {
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <BarChart3 className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-gray-500">Avg Progress</p>
@@ -304,7 +304,7 @@ export default async function LearnerDashboardPage() {
                   href="/lms"
                   className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
                 >
-                  <Video className="w-8 h-8 text-blue-600 mb-2" />
+                  <Video className="w-8 h-8 text-brand-blue-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">My Courses</span>
                 </Link>
                 <Link
@@ -325,7 +325,7 @@ export default async function LearnerDashboardPage() {
                   href="/contact"
                   className="flex flex-col items-center p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition"
                 >
-                  <HelpCircle className="w-8 h-8 text-blue-600 mb-2" />
+                  <HelpCircle className="w-8 h-8 text-brand-blue-600 mb-2" />
                   <span className="text-sm font-medium text-gray-700">Get Help</span>
                 </Link>
               </div>

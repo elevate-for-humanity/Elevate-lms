@@ -113,7 +113,7 @@ export default function HVACTechnicianPage() {
         />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <Thermometer className="w-4 h-4" /> WIOA Funding Available
             </div>
             <h1 className="text-4xl md:text-6xl font-black text-white mb-4">
@@ -139,7 +139,7 @@ export default function HVACTechnicianPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <Clock className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+              <Clock className="w-8 h-8 text-brand-blue-400 mx-auto mb-2" />
               <div className="text-2xl font-bold text-white">{programDetails.duration}</div>
               <div className="text-slate-400 text-sm">Program Length</div>
             </div>
@@ -154,7 +154,7 @@ export default function HVACTechnicianPage() {
               <div className="text-slate-400 text-sm">Certification</div>
             </div>
             <div>
-              <Users className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+              <Users className="w-8 h-8 text-brand-blue-400 mx-auto mb-2" />
               <div className="text-2xl font-bold text-white">$45K+</div>
               <div className="text-slate-400 text-sm">Starting Salary</div>
             </div>
@@ -170,7 +170,7 @@ export default function HVACTechnicianPage() {
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">Why Choose HVAC?</h2>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <CheckCircle className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -179,7 +179,7 @@ export default function HVACTechnicianPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <CheckCircle className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -188,7 +188,7 @@ export default function HVACTechnicianPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <CheckCircle className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -197,7 +197,7 @@ export default function HVACTechnicianPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <CheckCircle className="w-5 h-5 text-white" />
                   </div>
                   <div>
@@ -230,8 +230,8 @@ export default function HVACTechnicianPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {curriculum.map((item, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-lg border border-slate-200 hover:shadow-xl transition-shadow">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <item.icon className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+                  <item.icon className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-lg text-slate-900 mb-2">{item.title}</h3>
                 <p className="text-slate-600">{item.desc}</p>
@@ -315,7 +315,7 @@ export default function HVACTechnicianPage() {
               { num: 4, title: 'Start Training', desc: 'Begin your HVAC career' },
             ].map((step, i) => (
               <div key={i} className="text-center">
-                <div className="w-14 h-14 bg-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                <div className="w-14 h-14 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                   {step.num}
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2">{step.title}</h3>

@@ -17,8 +17,8 @@ export function TrustBadges() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 items-center justify-items-center">
           {/* FERPA Compliant */}
           <div className="flex flex-col items-center text-center p-4">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-              <Shield className="w-8 h-8 text-blue-600" />
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mb-3">
+              <Shield className="w-8 h-8 text-brand-blue-600" />
             </div>
             <div className="text-sm font-semibold text-black">FERPA</div>
             <div className="text-xs text-black">Compliant</div>
@@ -71,9 +71,9 @@ export function SecurityBadge() {
 
 export function AccreditationBadge() {
   return (
-    <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
-      <Award className="w-4 h-4 text-blue-600" />
-      <span className="text-sm font-medium text-blue-900">
+    <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
+      <Award className="w-4 h-4 text-brand-blue-600" />
+      <span className="text-sm font-medium text-brand-blue-900">
         WIOA Approved Provider
       </span>
     </div>

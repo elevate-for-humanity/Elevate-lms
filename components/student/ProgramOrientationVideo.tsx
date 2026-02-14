@@ -87,11 +87,11 @@ export default function ProgramOrientationVideo({
       <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6 hover:shadow-md transition">
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
-            <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center">
               {hasWatched ? (
                 <CheckCircle className="w-8 h-8 text-green-600" />
               ) : (
-                <Play className="w-8 h-8 text-blue-600" />
+                <Play className="w-8 h-8 text-brand-blue-600" />
               )}
             </div>
           </div>
@@ -100,7 +100,7 @@ export default function ProgramOrientationVideo({
             <p className="text-sm text-black mb-4">{description}</p>
             <button
               onClick={() => setShowModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-medium"
             >
               <Play className="w-4 h-4" />
               {hasWatched ? 'Watch Again' : 'Watch Orientation'}

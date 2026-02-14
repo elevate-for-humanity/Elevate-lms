@@ -178,7 +178,7 @@ export function Leaderboard() {
 // Achievement Badges
 export function AchievementBadges({ badges }: { badges: string[] }) {
   const badgeIcons: Record<string, { icon: any; color: string; label: string }> = {
-    'first-day': { icon: Star, color: 'bg-blue-500', label: 'First Day Complete' },
+    'first-day': { icon: Star, color: 'bg-brand-blue-500', label: 'First Day Complete' },
     'week-one': { icon: Target, color: 'bg-green-500', label: 'Week 1 Champion' },
     'perfect-attendance': { icon: Award, color: 'bg-purple-500', label: 'Perfect Attendance' },
     'skills-master': { icon: Trophy, color: 'bg-yellow-500', label: 'Skills Master' },

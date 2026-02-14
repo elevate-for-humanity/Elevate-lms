@@ -82,8 +82,8 @@ export default function SupersonicPage() {
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {features.map((feature, index) => (
             <div key={index} className="bg-gray-800 rounded-xl p-6 text-center">
-              <div className="w-14 h-14 bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                <feature.icon className="w-7 h-7 text-blue-400" />
+              <div className="w-14 h-14 bg-brand-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                <feature.icon className="w-7 h-7 text-brand-blue-400" />
               </div>
               <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
               <p className="text-gray-400 text-sm">{feature.description}</p>
@@ -95,11 +95,11 @@ export default function SupersonicPage() {
         <h2 className="text-3xl font-bold text-white text-center mb-12">Available Programs</h2>
         <div className="grid md:grid-cols-2 gap-6">
           {programs.map((program, index) => (
-            <div key={index} className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-colors">
+            <div key={index} className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <div>
                   <h3 className="text-xl font-bold text-white">{program.name}</h3>
-                  <p className="text-blue-400 font-semibold">{program.duration} intensive</p>
+                  <p className="text-brand-blue-400 font-semibold">{program.duration} intensive</p>
                 </div>
                 <span className="text-2xl font-bold text-red-500">{program.price}</span>
               </div>
@@ -118,27 +118,27 @@ export default function SupersonicPage() {
                   <CheckCircle className="w-4 h-4 text-green-400" /> Job placement assistance
                 </li>
               </ul>
-              <Link href={`/supersonic/programs/${program.name.toLowerCase().replace(' ', '-')}`} className="block text-center bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition-colors">
+              <Link href={`/supersonic/programs/${program.name.toLowerCase().replace(' ', '-')}`} className="block text-center bg-brand-blue-600 text-white py-3 rounded-lg hover:bg-brand-blue-700 transition-colors">
                 Learn More
               </Link>
             </div>
           ))}
         </div>
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-blue-100 mb-6">Apply today for free career training programs.</p>
+          <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
               Get Help Online

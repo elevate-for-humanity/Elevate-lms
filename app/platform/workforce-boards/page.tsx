@@ -50,18 +50,18 @@ export default function WorkforceBoardsPage() {
       {/* Hero */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
         <Image src="/hero-images/wioa-hero.jpg" alt="Workforce Board Solutions" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-blue-900/75" />
+        <div className="absolute inset-0 bg-brand-blue-900/75" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
-          <span className="text-blue-200 font-medium text-sm uppercase tracking-wider">Platform Solutions</span>
+          <span className="text-brand-blue-200 font-medium text-sm uppercase tracking-wider">Platform Solutions</span>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 mt-2">Workforce Board Solutions</h1>
-          <p className="text-xl text-blue-100 max-w-2xl mb-8">
+          <p className="text-xl text-brand-blue-100 max-w-2xl mb-8">
             Streamline WIOA compliance, maximize participant outcomes, and simplify DOL reporting.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/contact" className="px-8 py-4 bg-white text-blue-700 font-bold rounded-lg hover:bg-blue-50 transition">
+            <Link href="/contact" className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-brand-blue-50 transition">
               Request Demo
             </Link>
-            <Link href="/store/compliance/wioa" className="px-8 py-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition">
+            <Link href="/store/compliance/wioa" className="px-8 py-4 bg-brand-blue-500 text-white font-bold rounded-lg hover:bg-brand-blue-400 transition">
               View WIOA Tools
             </Link>
           </div>
@@ -69,11 +69,11 @@ export default function WorkforceBoardsPage() {
       </section>
 
       {/* Trust Badges */}
-      <section className="py-8 bg-blue-50">
+      <section className="py-8 bg-brand-blue-50">
         <div className="max-w-6xl mx-auto px-4">
           <div className="flex flex-wrap gap-4 justify-center">
             {['WIOA Compliant', 'DOL Reporting', 'FERPA Secure', 'Real-time Analytics', 'Audit-Ready'].map((item, i) => (
-              <span key={i} className="flex items-center gap-2 px-4 py-2 bg-white rounded-full text-blue-700 text-sm font-medium shadow-sm">
+              <span key={i} className="flex items-center gap-2 px-4 py-2 bg-white rounded-full text-brand-blue-700 text-sm font-medium shadow-sm">
                 <CheckCircle className="w-4 h-4" /> {item}
               </span>
             ))}
@@ -94,7 +94,7 @@ export default function WorkforceBoardsPage() {
             {features.map((f, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition">
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <f.icon className="w-6 h-6 text-blue-600" />
+                  <f.icon className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
                 <p className="text-gray-600 text-sm">{f.description}</p>
@@ -118,7 +118,7 @@ export default function WorkforceBoardsPage() {
                 <div className="space-y-2">
                   {area.items.map((item, j) => (
                     <div key={j} className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                      <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
                       <span className="text-gray-700 text-sm">{item}</span>
                     </div>
                   ))}
@@ -148,7 +148,7 @@ export default function WorkforceBoardsPage() {
                   'Budget monitoring and fiscal reporting',
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">{item}</span>
                   </div>
                 ))}
@@ -162,12 +162,12 @@ export default function WorkforceBoardsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-blue-800 text-white">
+      <section className="py-20 bg-brand-blue-800 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Modernize Your Workforce Operations</h2>
-          <p className="text-blue-100 text-lg mb-8">See how our platform can streamline your WIOA compliance and improve participant outcomes.</p>
+          <p className="text-brand-blue-100 text-lg mb-8">See how our platform can streamline your WIOA compliance and improve participant outcomes.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/contact" className="px-8 py-4 bg-white text-blue-800 font-bold rounded-lg hover:bg-blue-50 transition inline-flex items-center gap-2">
+            <Link href="/contact" className="px-8 py-4 bg-white text-brand-blue-800 font-bold rounded-lg hover:bg-brand-blue-50 transition inline-flex items-center gap-2">
               Schedule Demo <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/store/compliance/wioa" className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition">

@@ -46,7 +46,7 @@ export default async function EnrollmentReportPage() {
   });
 
   const statusColors: Record<string, string> = {
-    enrolled: 'bg-blue-100 text-blue-700',
+    enrolled: 'bg-brand-blue-100 text-brand-blue-700',
     in_progress: 'bg-yellow-100 text-yellow-700',
     completed: 'bg-green-100 text-green-700',
     dropped: 'bg-red-100 text-red-700',
@@ -70,8 +70,8 @@ export default async function EnrollmentReportPage() {
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <GraduationCap className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <GraduationCap className="w-5 h-5 text-brand-blue-600" />
               </div>
               <span className="text-sm text-gray-600">Total Enrollments</span>
             </div>
@@ -90,8 +90,8 @@ export default async function EnrollmentReportPage() {
           
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Circle className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <Circle className="w-5 h-5 text-brand-blue-600" />
               </div>
               <span className="text-sm text-gray-600">Completion Rate</span>
             </div>
@@ -171,7 +171,7 @@ export default async function EnrollmentReportPage() {
                       </div>
                       <div className="w-full bg-gray-100 rounded-full h-2">
                         <div 
-                          className="bg-blue-600 h-2 rounded-full" 
+                          className="bg-brand-blue-600 h-2 rounded-full" 
                           style={{ width: `${(count / (totalEnrollments || 1)) * 100}%` }}
                         />
                       </div>

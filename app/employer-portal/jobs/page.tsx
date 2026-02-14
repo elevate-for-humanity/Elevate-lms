@@ -94,7 +94,7 @@ export default async function JobPostingsPage() {
             </div>
             <Link
               href="/employer-portal/jobs/new"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               <Plus className="w-5 h-5" />
               Post New Job
@@ -112,11 +112,11 @@ export default async function JobPostingsPage() {
               <input
                 type="text"
                 placeholder="Search jobs..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
             <div className="flex gap-3">
-              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <select className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500">
                 <option>All Status</option>
                 <option>Active</option>
                 <option>Paused</option>
@@ -183,7 +183,7 @@ export default async function JobPostingsPage() {
 
                     <div className="flex items-center gap-6 mt-6">
                       <div className="flex items-center gap-2">
-                        <Users className="w-5 h-5 text-blue-600" />
+                        <Users className="w-5 h-5 text-brand-blue-600" />
                         <span className="font-semibold text-gray-900">{job.applications}</span>
                         <span className="text-gray-500">applications</span>
                       </div>
@@ -197,7 +197,7 @@ export default async function JobPostingsPage() {
                     <div className="flex items-center gap-3 mt-6">
                       <Link
                         href={`/employer-portal/jobs/${job.id}/applications`}
-                        className="px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                        className="px-4 py-2 bg-brand-blue-600 text-white font-medium rounded-lg hover:bg-brand-blue-700 transition-colors"
                       >
                         View Applications
                       </Link>
@@ -226,7 +226,7 @@ export default async function JobPostingsPage() {
               <p className="text-gray-600 mb-6">Create your first job posting to start receiving applications.</p>
               <Link
                 href="/employer-portal/jobs/new"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 Post Your First Job

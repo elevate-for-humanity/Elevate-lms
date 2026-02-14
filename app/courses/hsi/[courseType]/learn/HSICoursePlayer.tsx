@@ -95,7 +95,7 @@ export function HSICoursePlayer({
             />
 
             {/* Overlay Instructions */}
-            <div className="absolute top-4 left-4 right-4 bg-blue-50 border border-blue-200 rounded-lg p-4 shadow-lg">
+            <div className="absolute top-4 left-4 right-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 shadow-lg">
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center">
                   <span className="text-white font-bold">i</span>
@@ -122,7 +122,7 @@ export function HSICoursePlayer({
           /* Redirect Option */
           <div className="flex items-center justify-center h-full p-8">
             <div className="max-w-2xl w-full bg-white rounded-2xl shadow-xl p-8 text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-20 h-20 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <ExternalLink className="w-10 h-10 text-brand-blue-600" />
               </div>
               <h2 className="text-2xl font-bold text-black mb-4">

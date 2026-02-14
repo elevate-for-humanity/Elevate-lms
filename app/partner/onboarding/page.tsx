@@ -176,7 +176,7 @@ export default function PartnerOnboardingPage() {
 
       <div className="max-w-3xl mx-auto py-12 px-4">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center gap-2 bg-blue-600/20 text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-4">
+          <div className="inline-flex items-center gap-2 bg-brand-blue-600/20 text-brand-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-4">
             <Building2 className="w-4 h-4" />
             Partner Shop Onboarding
           </div>
@@ -191,7 +191,7 @@ export default function PartnerOnboardingPage() {
           {[1, 2, 3, 4, 5].map((s) => (
             <div key={s} className="flex items-center">
               <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                s < step ? 'bg-green-500 text-white' : s === step ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-400'
+                s < step ? 'bg-green-500 text-white' : s === step ? 'bg-brand-blue-600 text-white' : 'bg-slate-700 text-slate-400'
               }`}>
                 {s < step ? <CheckCircle className="w-5 h-5" /> : s}
               </div>
@@ -217,25 +217,25 @@ export default function PartnerOnboardingPage() {
           {step === 1 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Building2 className="w-5 h-5 text-blue-600" />
+                <Building2 className="w-5 h-5 text-brand-blue-600" />
                 Business Information
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">Legal Business Name *</label>
                   <input type="text" value={formData.shopName} onChange={(e) => updateField('shopName', e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="ABC Barbershop LLC" />
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="ABC Barbershop LLC" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">DBA (if different)</label>
                   <input type="text" value={formData.dba} onChange={(e) => updateField('dba', e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="ABC Cuts" />
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="ABC Cuts" />
                 </div>
               </div>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">FEIN</label>
                 <input type="text" value={formData.fein} onChange={(e) => updateField('fein', e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="XX-XXXXXXX" />
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="XX-XXXXXXX" />
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -243,7 +243,7 @@ export default function PartnerOnboardingPage() {
                   <div className="relative">
                     <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input type="text" value={formData.ownerName} onChange={(e) => updateField('ownerName', e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="John Smith" />
+                      className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="John Smith" />
                   </div>
                 </div>
                 <div>
@@ -251,7 +251,7 @@ export default function PartnerOnboardingPage() {
                   <div className="relative">
                     <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                     <input type="email" value={formData.email} onChange={(e) => updateField('email', e.target.value)}
-                      className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="owner@shop.com" />
+                      className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="owner@shop.com" />
                   </div>
                 </div>
               </div>
@@ -260,7 +260,7 @@ export default function PartnerOnboardingPage() {
                 <div className="relative">
                   <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
                   <input type="tel" value={formData.phone} onChange={(e) => updateField('phone', e.target.value)}
-                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="(317) 314-3757" />
+                    className="w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="(317) 314-3757" />
                 </div>
               </div>
             </div>
@@ -270,31 +270,31 @@ export default function PartnerOnboardingPage() {
           {step === 2 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-blue-600" />
+                <MapPin className="w-5 h-5 text-brand-blue-600" />
                 Shop Location
               </h2>
               <div>
                 <label className="block text-sm font-medium text-slate-700 mb-1">Street Address *</label>
                 <input type="text" value={formData.addressLine1} onChange={(e) => updateField('addressLine1', e.target.value)}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="123 Main Street" />
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="123 Main Street" />
               </div>
               <div className="grid md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">City *</label>
                   <input type="text" value={formData.city} onChange={(e) => updateField('city', e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="Indianapolis" />
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="Indianapolis" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">State *</label>
                   <select value={formData.state} onChange={(e) => updateField('state', e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500">
                     {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-slate-700 mb-1">ZIP *</label>
                   <input type="text" value={formData.zip} onChange={(e) => updateField('zip', e.target.value)}
-                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500" placeholder="46204" />
+                    className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500" placeholder="46204" />
                 </div>
               </div>
             </div>
@@ -304,17 +304,17 @@ export default function PartnerOnboardingPage() {
           {step === 3 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Users className="w-5 h-5 text-blue-600" />
+                <Users className="w-5 h-5 text-brand-blue-600" />
                 Program Selection
               </h2>
               <p className="text-slate-600 text-sm">Select the programs you want to host apprentices for.</p>
               <div className="space-y-3">
                 {AVAILABLE_PROGRAMS.map(program => (
                   <label key={program.id} className={`flex items-start gap-4 p-4 border-2 rounded-lg cursor-pointer ${
-                    formData.programsRequested.includes(program.id) ? 'border-blue-500 bg-blue-50' : 'border-slate-200 hover:border-slate-300'
+                    formData.programsRequested.includes(program.id) ? 'border-brand-blue-500 bg-brand-blue-50' : 'border-slate-200 hover:border-slate-300'
                   }`}>
                     <input type="checkbox" checked={formData.programsRequested.includes(program.id)}
-                      onChange={() => toggleProgram(program.id)} className="mt-1 w-5 h-5 text-blue-600 rounded" />
+                      onChange={() => toggleProgram(program.id)} className="mt-1 w-5 h-5 text-brand-blue-600 rounded" />
                     <div>
                       <p className="font-medium text-slate-900">{program.name}</p>
                       <p className="text-sm text-slate-500">{program.description}</p>
@@ -329,7 +329,7 @@ export default function PartnerOnboardingPage() {
           {step === 4 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <Upload className="w-5 h-5 text-blue-600" />
+                <Upload className="w-5 h-5 text-brand-blue-600" />
                 Required Documents
               </h2>
               <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
@@ -352,7 +352,7 @@ export default function PartnerOnboardingPage() {
                             <X className="w-5 h-5" />
                           </button>
                         ) : (
-                          <label className="cursor-pointer bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
+                          <label className="cursor-pointer bg-brand-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-blue-700">
                             Upload
                             <input type="file" className="hidden" accept=".pdf,.jpg,.jpeg,.png"
                               onChange={(e) => e.target.files?.[0] && handleFileUpload(docType, e.target.files[0])} />
@@ -370,7 +370,7 @@ export default function PartnerOnboardingPage() {
           {step === 5 && (
             <div className="space-y-6">
               <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-                <FileText className="w-5 h-5 text-blue-600" />
+                <FileText className="w-5 h-5 text-brand-blue-600" />
                 Review & Submit
               </h2>
               <div className="bg-slate-50 rounded-lg p-6 space-y-4">
@@ -384,7 +384,7 @@ export default function PartnerOnboardingPage() {
                 <div><p className="text-sm text-slate-500">Programs</p>
                   <div className="flex flex-wrap gap-2 mt-1">
                     {formData.programsRequested.map(p => (
-                      <span key={p} className="bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-sm">{AVAILABLE_PROGRAMS.find(prog => prog.id === p)?.name}</span>
+                      <span key={p} className="bg-brand-blue-100 text-brand-blue-700 px-3 py-1 rounded-full text-sm">{AVAILABLE_PROGRAMS.find(prog => prog.id === p)?.name}</span>
                     ))}
                   </div>
                 </div>
@@ -393,11 +393,11 @@ export default function PartnerOnboardingPage() {
               <div className="bg-green-50 border border-green-200 rounded-lg p-4">
                 <p className="text-green-800 text-sm"><strong>No admin approval required.</strong> Your account will be activated automatically once documents are verified (typically within 24-48 hours).</p>
               </div>
-              <label className="flex items-start gap-3 p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-blue-300">
+              <label className="flex items-start gap-3 p-4 border-2 border-slate-200 rounded-lg cursor-pointer hover:border-brand-blue-300">
                 <input type="checkbox" checked={formData.agreedToTerms} onChange={(e) => updateField('agreedToTerms', e.target.checked)}
-                  className="mt-1 w-5 h-5 text-blue-600 rounded" />
+                  className="mt-1 w-5 h-5 text-brand-blue-600 rounded" />
                 <div className="text-sm text-slate-600">
-                  I agree to the <Link href="/terms-of-service" className="text-blue-600 hover:underline">Terms of Service</Link> and <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link>.
+                  I agree to the <Link href="/terms-of-service" className="text-brand-blue-600 hover:underline">Terms of Service</Link> and <Link href="/privacy-policy" className="text-brand-blue-600 hover:underline">Privacy Policy</Link>.
                 </div>
               </label>
             </div>
@@ -419,7 +419,7 @@ export default function PartnerOnboardingPage() {
               <button onClick={() => {
                 if (validateStep(step)) { setStep(step + 1); setError(''); }
                 else { setError('Please complete all required fields.'); }
-              }} className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700">
+              }} className="flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700">
                 Continue <ArrowRight className="w-5 h-5" />
               </button>
             ) : (

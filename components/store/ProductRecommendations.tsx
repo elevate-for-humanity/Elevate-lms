@@ -28,7 +28,7 @@ const typeLabels = {
 const typeColors = {
   upgrade: 'bg-green-600',
   upsell: 'bg-orange-600',
-  'cross-sell': 'bg-blue-600',
+  'cross-sell': 'bg-brand-blue-600',
   bundle: 'bg-purple-600',
 };
 

@@ -117,7 +117,7 @@ export default function AvatarVideoOverlay({
     return (
       <button
         onClick={handleOpen}
-        className={`${positionClasses[position]} z-[60] flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-full shadow-lg transition-all hover:scale-105`}
+        className={`${positionClasses[position]} z-[60] flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-3 sm:px-4 py-2 sm:py-3 rounded-full shadow-lg transition-all hover:scale-105`}
         aria-label="Open AI Guide"
       >
         <User className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -196,7 +196,7 @@ export default function AvatarVideoOverlay({
             onClick={togglePlay}
           >
             <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-              <Play className="w-8 h-8 text-blue-600 ml-1" />
+              <Play className="w-8 h-8 text-brand-blue-600 ml-1" />
             </div>
           </div>
         )}
@@ -209,7 +209,7 @@ export default function AvatarVideoOverlay({
           >
             <div className="text-center">
               <div className="w-14 h-14 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform mx-auto mb-2">
-                <RotateCcw className="w-6 h-6 text-blue-600" />
+                <RotateCcw className="w-6 h-6 text-brand-blue-600" />
               </div>
               <span className="text-white text-sm font-medium">Watch Again</span>
             </div>

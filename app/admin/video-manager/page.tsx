@@ -55,7 +55,7 @@ export default function VideoManagerPage() {
                 {uploadedVideos.map((url, index) => (
                   <div
                     key={index}
-                    className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition-colors"
+                    className="border border-slate-200 rounded-lg p-4 hover:border-brand-blue-300 transition-colors"
                   >
                     <div className="flex items-center justify-between gap-4">
                       <div className="flex-1">
@@ -94,7 +94,7 @@ export default function VideoManagerPage() {
           )}
 
           {/* Instructions */}
-          <div className="mt-12    rounded-lg p-6 border border-blue-200">
+          <div className="mt-12    rounded-lg p-6 border border-brand-blue-200">
             <h3 className="text-lg font-bold text-black mb-4">
               <FileText className="w-5 h-5 inline-block" /> How to Use Your
               Enhanced Video

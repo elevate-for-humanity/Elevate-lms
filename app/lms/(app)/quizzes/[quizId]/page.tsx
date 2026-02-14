@@ -161,7 +161,7 @@ export default async function QuizPage({ params }: Props) {
               {quiz.courses && (
                 <Link 
                   href={`/lms/courses/${quiz.course_id}`}
-                  className="text-blue-600 hover:underline text-sm"
+                  className="text-brand-blue-600 hover:underline text-sm"
                 >
                   {(quiz.courses as { id: string; title: string }).title}
                 </Link>
@@ -218,13 +218,13 @@ export default async function QuizPage({ params }: Props) {
             <div className={`rounded-xl p-4 mb-6 ${
               attemptsRemaining === 0 
                 ? 'bg-red-50 border border-red-200' 
-                : 'bg-blue-50 border border-blue-200'
+                : 'bg-brand-blue-50 border border-brand-blue-200'
             }`}>
               <div className="flex items-center gap-2">
                 <AlertCircle className={`w-5 h-5 ${
-                  attemptsRemaining === 0 ? 'text-red-600' : 'text-blue-600'
+                  attemptsRemaining === 0 ? 'text-red-600' : 'text-brand-blue-600'
                 }`} />
-                <span className={attemptsRemaining === 0 ? 'text-red-800' : 'text-blue-800'}>
+                <span className={attemptsRemaining === 0 ? 'text-red-800' : 'text-brand-blue-800'}>
                   {attemptsRemaining === 0 
                     ? 'You have used all available attempts for this quiz.'
                     : `You have ${attemptsRemaining} attempt${attemptsRemaining !== 1 ? 's' : ''} remaining.`
@@ -239,7 +239,7 @@ export default async function QuizPage({ params }: Props) {
             <form action={`/api/lms/quizzes/${quizId}/start`} method="POST">
               <button
                 type="submit"
-                className="w-full md:w-auto flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition"
+                className="w-full md:w-auto flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-brand-blue-700 transition"
               >
                 <Play className="w-5 h-5" />
                 {completedAttempts.length > 0 ? 'Retake Quiz' : 'Start Quiz'}

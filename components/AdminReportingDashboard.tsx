@@ -213,8 +213,8 @@ export function AdminReportingDashboard() {
       change: `+${metrics.studentChange}%`,
       trend: 'up',
       icon: Users,
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-100',
+      color: 'text-brand-blue-600',
+      bgColor: 'bg-brand-blue-100',
     },
     {
       title: 'Active Enrollments',
@@ -248,7 +248,7 @@ export function AdminReportingDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     );
   }
@@ -265,7 +265,7 @@ export function AdminReportingDashboard() {
           <select
             value={dateRange}
             onChange={(e) => setDateRange(e.target.value)}
-            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+            className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
           >
             <option value="7days">Last 7 Days</option>
             <option value="30days">Last 30 Days</option>
@@ -320,7 +320,7 @@ export function AdminReportingDashboard() {
               {monthlyData.map((value, index) => (
                 <div key={index} className="flex-1 flex flex-col items-center">
                   <div
-                    className="w-full bg-blue-500 rounded-t transition-all hover:bg-blue-600"
+                    className="w-full bg-brand-blue-500 rounded-t transition-all hover:bg-brand-blue-600"
                     style={{ height: `${(value / 115) * 100}%` }}
                   />
                   <div className="text-xs text-gray-500 mt-2">
@@ -342,7 +342,7 @@ export function AdminReportingDashboard() {
           <CardContent>
             <div className="space-y-3">
               {programPerformance.slice(0, 5).map((program, index) => {
-                const colors = ['bg-blue-600', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-orange-500'];
+                const colors = ['bg-brand-blue-600', 'bg-green-500', 'bg-yellow-500', 'bg-purple-500', 'bg-orange-500'];
                 const totalRevenue = programPerformance.reduce((sum, p) => sum + p.revenue, 0);
                 const percentage = ((program.revenue / totalRevenue) * 100).toFixed(1);
                 return (
@@ -402,7 +402,7 @@ export function AdminReportingDashboard() {
                       ${program.revenue.toLocaleString()}
                     </td>
                     <td className="py-3 px-4 text-right">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-sm font-semibold">
+                      <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-800 rounded text-sm font-semibold">
                         {program.placement}%
                       </span>
                     </td>
@@ -424,7 +424,7 @@ export function AdminReportingDashboard() {
             {recentActivity.map((activity) => (
               <div key={activity.id} className="flex items-center gap-4 p-3 border rounded-lg hover:bg-gray-50 transition">
                 <div className={`w-2 h-2 rounded-full ${
-                  activity.type === 'enrollment' ? 'bg-blue-600' :
+                  activity.type === 'enrollment' ? 'bg-brand-blue-600' :
                   activity.type === 'completion' ? 'bg-green-600' :
                   'bg-orange-600'
                 }`} />

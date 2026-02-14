@@ -20,9 +20,9 @@ export default function SAMGovEligibilityPage() {
       <h1>SAM.gov Eligibility Criteria</h1>
       <p className="text-xl text-gray-600 mb-8">Last Updated: December 22, 2024</p>
 
-      <div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
-        <p className="text-lg font-semibold text-blue-900 mb-2">Federal Funding Opportunities</p>
-        <p className="text-blue-800">
+      <div className="bg-brand-blue-50 border-l-4 border-brand-blue-500 p-6 mb-8">
+        <p className="text-lg font-semibold text-brand-blue-900 mb-2">Federal Funding Opportunities</p>
+        <p className="text-brand-blue-800">
           Elevate for Humanity maintains active registration in the System for Award Management (SAM.gov) 
           to pursue federal grant and contract opportunities that support our mission to provide accessible 
           workforce education.
@@ -368,13 +368,13 @@ export default function SAMGovEligibilityPage() {
           <h3 className="mt-0">Grants Office</h3>
           <p className="mb-2">
             <strong>Email:</strong>{' '}
-            <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:text-blue-800">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:text-brand-blue-800">
               elevate4humanityedu@gmail.com
             </a>
           </p>
           <p className="mb-2">
             <strong>Phone:</strong>{' '}
-            <a href="/support" className="text-blue-600 hover:text-blue-800">
+            <a href="/support" className="text-brand-blue-600 hover:text-brand-blue-800">
               Get Help Online
             </a>
           </p>
@@ -384,19 +384,19 @@ export default function SAMGovEligibilityPage() {
         <ul>
           <li>
             <strong>SAM.gov Website:</strong>{' '}
-            <a href="https://sam.gov" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+            <a href="https://sam.gov" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 hover:text-brand-blue-800">
               sam.gov
             </a>
           </li>
           <li>
             <strong>SAM.gov Help:</strong>{' '}
-            <a href="https://fsd.gov/gsafsd_sp" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+            <a href="https://fsd.gov/gsafsd_sp" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 hover:text-brand-blue-800">
               Federal Service Desk
             </a>
           </li>
           <li>
             <strong>Grants.gov:</strong>{' '}
-            <a href="https://grants.gov" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:text-blue-800">
+            <a href="https://grants.gov" target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 hover:text-brand-blue-800">
               grants.gov
             </a>
           </li>
@@ -406,21 +406,21 @@ export default function SAMGovEligibilityPage() {
       <section className="mb-12">
         <h2>Related Policies</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link href="/policies/grant-application" className="block p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-            <h3 className="text-lg font-semibold text-blue-900 mt-0 mb-2">Grant Application Policy</h3>
-            <p className="text-blue-800 text-sm mb-0">Grant application and management procedures</p>
+          <Link href="/policies/grant-application" className="block p-4 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100 transition-colors">
+            <h3 className="text-lg font-semibold text-brand-blue-900 mt-0 mb-2">Grant Application Policy</h3>
+            <p className="text-brand-blue-800 text-sm mb-0">Grant application and management procedures</p>
           </Link>
-          <Link href="/policies/federal-compliance" className="block p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-            <h3 className="text-lg font-semibold text-blue-900 mt-0 mb-2">Federal Compliance Policy</h3>
-            <p className="text-blue-800 text-sm mb-0">Federal regulations and compliance requirements</p>
+          <Link href="/policies/federal-compliance" className="block p-4 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100 transition-colors">
+            <h3 className="text-lg font-semibold text-brand-blue-900 mt-0 mb-2">Federal Compliance Policy</h3>
+            <p className="text-brand-blue-800 text-sm mb-0">Federal regulations and compliance requirements</p>
           </Link>
-          <Link href="/policies/wioa" className="block p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-            <h3 className="text-lg font-semibold text-blue-900 mt-0 mb-2">WIOA Compliance</h3>
-            <p className="text-blue-800 text-sm mb-0">Workforce Innovation and Opportunity Act compliance</p>
+          <Link href="/policies/wioa" className="block p-4 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100 transition-colors">
+            <h3 className="text-lg font-semibold text-brand-blue-900 mt-0 mb-2">WIOA Compliance</h3>
+            <p className="text-brand-blue-800 text-sm mb-0">Workforce Innovation and Opportunity Act compliance</p>
           </Link>
-          <Link href="/policies/funding-verification" className="block p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-            <h3 className="text-lg font-semibold text-blue-900 mt-0 mb-2">Funding Verification</h3>
-            <p className="text-blue-800 text-sm mb-0">Verification of funding eligibility and status</p>
+          <Link href="/policies/funding-verification" className="block p-4 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100 transition-colors">
+            <h3 className="text-lg font-semibold text-brand-blue-900 mt-0 mb-2">Funding Verification</h3>
+            <p className="text-brand-blue-800 text-sm mb-0">Verification of funding eligibility and status</p>
           </Link>
         </div>
       </section>

@@ -159,15 +159,15 @@ export default function IdentityVerificationFlow({
             Your documents have been submitted and are under review. Our team
             will verify your identity within 24-48 hours.
           </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-brand-blue-800">
               You'll receive an email at <strong>{email}</strong> once your
               verification is complete.
             </p>
           </div>
           <button
             onClick={() => router.push('/program-holder/dashboard')}
-            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+            className="w-full px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700"
           >
             Go to Dashboard
           </button>
@@ -198,7 +198,7 @@ export default function IdentityVerificationFlow({
           )}
           <button
             onClick={() => setVerificationMethod(null)}
-            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+            className="w-full px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700"
           >
             Try Again
           </button>
@@ -213,7 +213,7 @@ export default function IdentityVerificationFlow({
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-2xl w-full">
           <div className="text-center mb-8">
-            <Shield className="w-16 h-16 mx-auto mb-4 text-blue-600" />
+            <Shield className="w-16 h-16 mx-auto mb-4 text-brand-blue-600" />
             <h1 className="text-3xl font-bold text-black mb-4">
               Identity Verification
             </h1>
@@ -225,9 +225,9 @@ export default function IdentityVerificationFlow({
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Stripe Identity - Instant */}
-            <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-blue-500">
+            <div className="bg-white rounded-lg shadow-lg p-6 border-2 border-brand-blue-500">
               <div className="flex items-center gap-3 mb-4">
-                <Camera className="w-8 h-8 text-blue-600" />
+                <Camera className="w-8 h-8 text-brand-blue-600" />
                 <div>
                   <h3 className="text-lg font-bold text-black">
                     Instant Verification
@@ -257,7 +257,7 @@ export default function IdentityVerificationFlow({
               </ul>
               <button
                 onClick={() => setVerificationMethod('stripe')}
-                className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700"
+                className="w-full px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700"
               >
                 Start Instant Verification
               </button>
@@ -319,7 +319,7 @@ export default function IdentityVerificationFlow({
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-          <Camera className="w-16 h-16 mx-auto mb-4 text-blue-600" />
+          <Camera className="w-16 h-16 mx-auto mb-4 text-brand-blue-600" />
           <h1 className="text-2xl font-bold text-black mb-4 text-center">
             Instant Identity Verification
           </h1>
@@ -334,11 +334,11 @@ export default function IdentityVerificationFlow({
             </div>
           )}
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h3 className="font-semibold text-blue-900 mb-2">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
+            <h3 className="font-semibold text-brand-blue-900 mb-2">
               What you'll need:
             </h3>
-            <ul className="text-sm text-blue-800 space-y-1">
+            <ul className="text-sm text-brand-blue-800 space-y-1">
               <li>• Government-issued photo ID</li>
               <li>• Camera or smartphone</li>
               <li>• 2-3 minutes</li>
@@ -348,7 +348,7 @@ export default function IdentityVerificationFlow({
           <button
             onClick={handleStripeVerification}
             disabled={loading}
-            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed mb-3"
+            className="w-full px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed mb-3"
           >
             {loading ? 'Starting verification...' : 'Continue to Verification'}
           </button>
@@ -406,7 +406,7 @@ export default function IdentityVerificationFlow({
                 />
                 <label
                   htmlFor="id-upload"
-                  className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700"
+                  className="inline-block bg-brand-blue-600 text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-brand-blue-700"
                 >
                   Choose File
                 </label>
@@ -440,7 +440,7 @@ export default function IdentityVerificationFlow({
                 />
                 <label
                   htmlFor="ssn-upload"
-                  className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700"
+                  className="inline-block bg-brand-blue-600 text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-brand-blue-700"
                 >
                   Choose File
                 </label>
@@ -465,7 +465,7 @@ export default function IdentityVerificationFlow({
           <button
             onClick={handleManualUpload}
             disabled={loading || !uploadedDocs.id || !uploadedDocs.ssn}
-            className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed mb-3"
+            className="w-full px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed mb-3"
           >
             {loading ? 'Uploading...' : 'Submit for Review'}
           </button>

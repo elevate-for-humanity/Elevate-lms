@@ -53,7 +53,7 @@ export default async function TransferRequestPage() {
         <div className="mb-8">
           <a
             href="/apprentice/transfer-hours"
-            className="text-blue-600 hover:text-blue-700 text-sm mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-700 text-sm mb-4 inline-block"
           >
             ← Back to Transfer Hours
           </a>

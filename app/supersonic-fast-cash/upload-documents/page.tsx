@@ -226,7 +226,7 @@ export default function UploadDocumentsPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 placeholder="your@email.com"
                 required
               />
@@ -239,7 +239,7 @@ export default function UploadDocumentsPage() {
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 placeholder="(317) 555-0123"
                 required
               />
@@ -260,7 +260,7 @@ export default function UploadDocumentsPage() {
             <select
               value={selectedDocType}
               onChange={(e) => setSelectedDocType(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-black bg-white"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent text-black bg-white"
             >
               <option value="">-- Select Document Type --</option>
               {TAX_DOCUMENT_CATEGORIES.map((category) => (
@@ -277,9 +277,9 @@ export default function UploadDocumentsPage() {
 
           {/* Show description for selected document */}
           {selectedDocType && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
               <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <Info className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   {TAX_DOCUMENT_CATEGORIES.flatMap(c => c.documents).find(d => d.id === selectedDocType)?.description}
                 </div>
@@ -287,7 +287,7 @@ export default function UploadDocumentsPage() {
             </div>
           )}
 
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-blue-500 transition-colors">
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-brand-blue-500 transition-colors">
             <Upload className="w-16 h-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-semibold text-black mb-2">
               Drop files here or click to browse
@@ -309,7 +309,7 @@ export default function UploadDocumentsPage() {
               className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg font-semibold transition-colors cursor-pointer ${
                 !email || !phone || !selectedDocType || uploading
                   ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                  : 'bg-brand-blue-600 text-white hover:bg-brand-blue-700'
               }`}
             >
               <Upload className="w-5 h-5" />
@@ -340,7 +340,7 @@ export default function UploadDocumentsPage() {
                   className="flex items-center justify-between p-4 border border-gray-200 rounded-lg"
                 >
                   <div className="flex items-center gap-4 flex-1">
-                    <FileText className="w-8 h-8 text-blue-600 flex-shrink-0" />
+                    <FileText className="w-8 h-8 text-brand-blue-600 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-black truncate">
                         {file.name}
@@ -357,7 +357,7 @@ export default function UploadDocumentsPage() {
                   </div>
                   <div className="flex items-center gap-3">
                     {file.status === 'uploading' && (
-                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600" />
+                      <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-blue-600" />
                     )}
                     {file.status === 'success' && (
                       <CheckCircle className="w-6 h-6 text-green-600" />
@@ -382,7 +382,7 @@ export default function UploadDocumentsPage() {
         {/* IRS Document Checklist */}
         <div className="bg-white rounded-xl shadow-sm p-8 mt-8">
           <div className="flex items-center gap-3 mb-6">
-            <FileText className="w-8 h-8 text-blue-600" />
+            <FileText className="w-8 h-8 text-brand-blue-600" />
             <div>
               <h3 className="text-xl font-bold text-black">
                 IRS Tax Document Checklist

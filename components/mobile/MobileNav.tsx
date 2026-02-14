@@ -49,7 +49,7 @@ export default function MobileNav() {
                     onClick={() => setIsOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg mb-1 ${
                       isActive(item.href)
-                        ? 'bg-blue-50 text-brand-orange-600'
+                        ? 'bg-brand-blue-50 text-brand-orange-600'
                         : 'text-black hover:bg-gray-50'
                     }`}
                   >

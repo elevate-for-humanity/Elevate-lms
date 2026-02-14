@@ -75,14 +75,14 @@ export default function AppHubPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-blue-600 text-white py-20">
+      <section className="bg-brand-blue-600 text-white py-20">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h1 className="text-4xl md:text-5xl font-bold mb-6">
                 Learn Anywhere, Anytime
               </h1>
-              <p className="text-xl text-blue-100 mb-8">
+              <p className="text-xl text-brand-blue-100 mb-8">
                 Download our mobile apps and take your learning with you. 
                 Access courses, track progress, and achieve your goals on the go.
               </p>
@@ -114,7 +114,7 @@ export default function AppHubPage() {
             <div className="flex justify-center">
               <div className="relative">
                 <div className="w-64 h-[500px] bg-gray-900 rounded-[3rem] p-3 shadow-2xl">
-                  <div className="w-full h-full bg-blue-500 rounded-[2.5rem] flex items-center justify-center">
+                  <div className="w-full h-full bg-brand-blue-500 rounded-[2.5rem] flex items-center justify-center">
                     <Smartphone className="w-24 h-24 text-white/50" />
                   </div>
                 </div>
@@ -131,8 +131,8 @@ export default function AppHubPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {appFeatures.map((feature, index) => (
               <div key={index} className="bg-white rounded-xl p-6 shadow-sm border text-center">
-                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <feature.icon className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <feature.icon className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">{feature.title}</h3>
                 <p className="text-gray-600 text-sm">{feature.description}</p>
@@ -186,7 +186,7 @@ export default function AppHubPage() {
           </p>
           <Link
             href="/programs"
-            className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
+            className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
           >
             Browse Programs
           </Link>

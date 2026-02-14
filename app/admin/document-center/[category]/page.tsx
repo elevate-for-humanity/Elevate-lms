@@ -110,7 +110,7 @@ export default async function DocumentCategoryPage({ params }: Props) {
               {documents?.length || 0} document{documents?.length !== 1 ? 's' : ''} in this category
             </p>
           </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
             <Upload className="w-4 h-4" />
             Upload Document
           </button>
@@ -125,7 +125,7 @@ export default async function DocumentCategoryPage({ params }: Props) {
             <input
               type="text"
               placeholder="Search documents..."
-              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
           <button className="flex items-center gap-2 px-4 py-2 border border-slate-200 rounded-lg hover:bg-slate-50">
@@ -162,8 +162,8 @@ export default async function DocumentCategoryPage({ params }: Props) {
                       <tr key={doc.id} className="border-t border-slate-100 hover:bg-slate-50">
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                              <FileText className="w-5 h-5 text-blue-600" />
+                            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                              <FileText className="w-5 h-5 text-brand-blue-600" />
                             </div>
                             <div>
                               <p className="font-medium text-slate-900">{doc.name}</p>
@@ -194,7 +194,7 @@ export default async function DocumentCategoryPage({ params }: Props) {
                               href={doc.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="p-2 text-slate-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
+                              className="p-2 text-slate-600 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded-lg"
                               title="View"
                             >
                               <Eye className="w-4 h-4" />
@@ -230,7 +230,7 @@ export default async function DocumentCategoryPage({ params }: Props) {
           <p className="text-slate-600 mb-6">
             There are no documents in this category yet.
           </p>
-          <button className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <button className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
             <Upload className="w-4 h-4" />
             Upload First Document
           </button>

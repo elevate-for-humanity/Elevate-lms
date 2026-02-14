@@ -63,20 +63,20 @@ export default async function LowIncomePage() {
         </div>
       </div>
 
-      <section className="bg-blue-600 text-white py-16">
+      <section className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <DollarSign className="w-16 h-16 mx-auto mb-4" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Low Income Guidelines
           </h1>
-          <p className="text-xl text-blue-100">
+          <p className="text-xl text-brand-blue-100">
             Check if your household income qualifies you for free training
           </p>
         </div>
       </section>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <Link href="/wioa-eligibility" className="text-blue-600 hover:underline mb-6 inline-block">
+        <Link href="/wioa-eligibility" className="text-brand-blue-600 hover:underline mb-6 inline-block">
           ← Back to WIOA Eligibility
         </Link>
 
@@ -190,21 +190,21 @@ export default async function LowIncomePage() {
         )}
 
         {/* CTA */}
-        <div className="bg-blue-600 rounded-lg p-8 text-center text-white">
+        <div className="bg-brand-blue-600 rounded-lg p-8 text-center text-white">
           <h3 className="text-2xl font-bold mb-4">Not Sure If You Qualify?</h3>
-          <p className="text-blue-100 mb-6">
+          <p className="text-brand-blue-100 mb-6">
             Apply anyway! We'll help determine your eligibility and find funding options.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-white text-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="bg-white text-brand-blue-600 px-8 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-blue-700 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-3 rounded-lg font-bold hover:bg-brand-blue-700 transition"
             >
               <Phone className="w-5 h-5" />
               Get Help Online

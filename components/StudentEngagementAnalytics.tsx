@@ -71,7 +71,7 @@ export default function StudentEngagementAnalytics() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Avg Session Time</h3>
-            <p className="text-3xl font-bold text-blue-600">{metrics.avgSessionTime} min</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{metrics.avgSessionTime} min</p>
             <p className="text-sm text-black">Per student</p>
           </Card>
 
@@ -127,12 +127,12 @@ export default function StudentEngagementAnalytics() {
                     </div>
                     <div className="w-full bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full"
+                        className="bg-brand-blue-600 h-2 rounded-full"
                         style={{ width: `${activity.percentage}%` }}
                       />
                     </div>
                   </div>
-                  <span className="ml-4 text-sm font-semibold text-blue-600">{activity.percentage}%</span>
+                  <span className="ml-4 text-sm font-semibold text-brand-blue-600">{activity.percentage}%</span>
                 </div>
               ))}
             </div>

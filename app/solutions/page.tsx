@@ -114,7 +114,7 @@ export default function SolutionsPage() {
               <h1 className="text-5xl md:text-6xl font-bold mb-6">
                 Workforce Training for Agencies, Providers & Employers
               </h1>
-              <p className="text-base md:text-lg mb-8 text-blue-50">
+              <p className="text-base md:text-lg mb-8 text-brand-blue-50">
                 We partner with workforce boards, training providers, and employers 
                 to deliver WIOA-compliant programs. Our platform handles enrollment, 
                 tracking, and reporting so you can focus on outcomes.
@@ -122,7 +122,7 @@ export default function SolutionsPage() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Link
                   href="/demo/admin"
-                  className="inline-flex items-center justify-center bg-white text-blue-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-50 transition shadow-xl"
+                  className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-50 transition shadow-xl"
                 >
                   Get Interactive Demo
                   <ArrowRight className="ml-2 w-5 h-5" />
@@ -141,17 +141,17 @@ export default function SolutionsPage() {
                   <GraduationCap className="w-5 h-5 inline-block" />
                 </div>
                 <div className="text-2xl font-bold mb-2">30+ Programs</div>
-                <div className="text-blue-100 mb-6">
+                <div className="text-brand-blue-100 mb-6">
                   Healthcare • Trades • Technology
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div className="bg-white/20 rounded-lg p-4">
                     <div className="text-3xl font-bold">10K+</div>
-                    <div className="text-blue-100">Students Trained</div>
+                    <div className="text-brand-blue-100">Students Trained</div>
                   </div>
                   <div className="bg-white/20 rounded-lg p-4">
                     <div className="text-3xl font-bold">95%</div>
-                    <div className="text-blue-100">Completion Rate</div>
+                    <div className="text-brand-blue-100">Completion Rate</div>
                   </div>
                 </div>
               </div>
@@ -181,7 +181,7 @@ export default function SolutionsPage() {
                   key={solution.title}
                   className="bg-white rounded-2xl shadow-lg p-8 hover:shadow-xl transition"
                 >
-                  <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mb-6">
+                  <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-6">
                     <Icon className="w-8 h-8 text-brand-blue-600" />
                   </div>
                   <h3 className="text-lg md:text-lg font-bold text-black mb-4">
@@ -270,20 +270,20 @@ export default function SolutionsPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-blue-100 mb-6">Apply today for free career training programs.</p>
+          <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
               Get Help Online

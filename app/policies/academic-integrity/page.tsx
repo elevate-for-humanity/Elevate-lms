@@ -161,15 +161,15 @@ export default function AcademicIntegrityPage() {
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/student-code" className="text-blue-600 hover:underline">Student Code of Conduct</a></li>
-                <li><a href="/policies/ai-usage" className="text-blue-600 hover:underline">AI Usage Policy</a></li>
-                <li><a href="/policies/progress" className="text-blue-600 hover:underline">Progress Policy</a></li>
-                <li><a href="/policies/revocation" className="text-blue-600 hover:underline">Credential Revocation Policy</a></li>
+                <li><a href="/policies/student-code" className="text-brand-blue-600 hover:underline">Student Code of Conduct</a></li>
+                <li><a href="/policies/ai-usage" className="text-brand-blue-600 hover:underline">AI Usage Policy</a></li>
+                <li><a href="/policies/progress" className="text-brand-blue-600 hover:underline">Progress Policy</a></li>
+                <li><a href="/policies/revocation" className="text-brand-blue-600 hover:underline">Credential Revocation Policy</a></li>
               </ul>
             </div>
           </div>

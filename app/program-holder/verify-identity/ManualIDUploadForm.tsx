@@ -109,8 +109,8 @@ export default function ManualIDUploadForm({
             Your identity documents have been submitted for review. Our team
             will verify your documents within 1-2 business days.
           </p>
-          <div className="bg-blue-50 border-l-4 border-blue-400 p-4 text-left">
-            <p className="text-sm text-blue-900">
+          <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-4 text-left">
+            <p className="text-sm text-brand-blue-900">
               <strong>What happens next:</strong>
               <br />
               1. Admin reviews your documents (1-2 business days)
@@ -165,7 +165,7 @@ export default function ManualIDUploadForm({
           <label className="block text-sm font-medium text-black mb-2">
             ID Front <span className="text-red-600">*</span>
           </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition">
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-brand-blue-400 transition">
             <input
               type="file"
               accept="image/*"
@@ -206,7 +206,7 @@ export default function ManualIDUploadForm({
           <label className="block text-sm font-medium text-black mb-2">
             ID Back <span className="text-black">(Optional)</span>
           </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition">
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-brand-blue-400 transition">
             <input
               type="file"
               accept="image/*"
@@ -246,7 +246,7 @@ export default function ManualIDUploadForm({
           <label className="block text-sm font-medium text-black mb-2">
             Selfie Holding ID <span className="text-red-600">*</span>
           </label>
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition">
+          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-brand-blue-400 transition">
             <input
               type="file"
               accept="image/*"
@@ -302,7 +302,7 @@ export default function ManualIDUploadForm({
           <button
             type="submit"
             disabled={loading || !idFrontFile || !selfieFile}
-            className="w-full bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2"
+            className="w-full bg-brand-blue-600 text-white px-6 py-3 rounded-lg hover:bg-brand-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed font-semibold flex items-center justify-center gap-2"
           >
             {loading && <Loader2 className="animate-spin" size={20} />}
             {loading ? 'Uploading...' : 'Submit for Review (FREE)'}

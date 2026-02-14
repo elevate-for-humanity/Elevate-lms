@@ -238,7 +238,7 @@ export default async function CoursesPage() {
       <section id="micro-classes" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-bold mb-4">
               <Clock className="w-4 h-4" />
               Quick Certifications
             </div>
@@ -257,7 +257,7 @@ export default async function CoursesPage() {
                 className="bg-slate-50 rounded-xl p-6 hover:shadow-lg transition-all border border-slate-100"
               >
                 <div className="flex items-start justify-between mb-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-700 text-xs font-bold rounded-full">
+                  <span className="px-3 py-1 bg-brand-blue-100 text-brand-blue-700 text-xs font-bold rounded-full">
                     {course.category}
                   </span>
                   <span className="text-green-600 font-bold">{course.price}</span>
@@ -271,7 +271,7 @@ export default async function CoursesPage() {
                   </div>
                   <Link
                     href="/apply"
-                    className="text-blue-600 font-semibold text-sm hover:text-blue-700"
+                    className="text-brand-blue-600 font-semibold text-sm hover:text-brand-blue-700"
                   >
                     Enroll Now →
                   </Link>
@@ -283,7 +283,7 @@ export default async function CoursesPage() {
           <div className="text-center mt-10">
             <Link
               href="/apply"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-700 transition-all"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-700 transition-all"
             >
               Apply for Free Training <ArrowRight className="w-5 h-5" />
             </Link>

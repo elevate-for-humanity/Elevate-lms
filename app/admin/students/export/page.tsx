@@ -75,7 +75,7 @@ export default function ExportStudentsPage() {
         <div className="mb-8">
           <Link
             href="/admin/students"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Students
           </Link>
@@ -109,7 +109,7 @@ export default function ExportStudentsPage() {
                 Select Export Format
               </label>
               <div className="grid md:grid-cols-3 gap-4">
-                <label className="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500">
+                <label className="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-brand-blue-500">
                   <input
                     type="radio"
                     name="format"
@@ -125,7 +125,7 @@ export default function ExportStudentsPage() {
                     </div>
                   </div>
                 </label>
-                <label className="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 opacity-50">
+                <label className="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-brand-blue-500 opacity-50">
                   <input
                     type="radio"
                     name="format"
@@ -138,7 +138,7 @@ export default function ExportStudentsPage() {
                     <div className="text-xs text-black">Available now</div>
                   </div>
                 </label>
-                <label className="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-blue-500 opacity-50">
+                <label className="flex items-center p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-brand-blue-500 opacity-50">
                   <input
                     type="radio"
                     name="format"
@@ -251,7 +251,7 @@ export default function ExportStudentsPage() {
                   <select
                     value={program}
                     onChange={(e) => setProgram(e.target.value)}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                   >
                     <option value="">All Programs</option>
                     <option value="barber-apprenticeship">
@@ -269,7 +269,7 @@ export default function ExportStudentsPage() {
                   <select
                     value={status}
                     onChange={(e) => setStatus(e.target.value)}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                   >
                     <option value="">All Statuses</option>
                     <option value="active">Active</option>
@@ -286,7 +286,7 @@ export default function ExportStudentsPage() {
                     type="date"
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                   />
                 </div>
                 <div>
@@ -297,7 +297,7 @@ export default function ExportStudentsPage() {
                     type="date"
                     value={endDate}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                    className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>

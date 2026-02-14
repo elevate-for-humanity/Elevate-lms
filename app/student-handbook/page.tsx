@@ -63,7 +63,7 @@ export default async function StudentHandbookPage() {
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 text-white">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Student Handbook</h1>
-          <p className="text-xl text-blue-100 max-w-2xl">
+          <p className="text-xl text-brand-blue-100 max-w-2xl">
             Your complete guide to policies, procedures, and expectations during your training program.
           </p>
         </div>
@@ -74,8 +74,8 @@ export default async function StudentHandbookPage() {
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center">
-                <BookOpen className="w-7 h-7 text-blue-600" />
+              <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                <BookOpen className="w-7 h-7 text-brand-blue-600" />
               </div>
               <div>
                 <h2 className="font-semibold text-lg">Student Handbook 2024</h2>
@@ -87,12 +87,12 @@ export default async function StudentHandbookPage() {
             {handbook?.file_url ? (
               <a
                 href={handbook.file_url}
-                className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-blue-700"
+                className="flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-brand-blue-700"
               >
                 <Download className="w-4 h-4" /> Download PDF
               </a>
             ) : (
-              <button className="flex items-center gap-2 bg-blue-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-blue-700">
+              <button className="flex items-center gap-2 bg-brand-blue-600 text-white px-5 py-2.5 rounded-lg font-medium hover:bg-brand-blue-700">
                 <Download className="w-4 h-4" /> Download PDF
               </button>
             )}
@@ -109,14 +109,14 @@ export default async function StudentHandbookPage() {
                 href={`#section-${index + 1}`}
                 className="flex items-center gap-4 p-4 rounded-lg hover:bg-gray-50 transition group"
               >
-                <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100">
-                  <section.icon className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-50 rounded-lg flex items-center justify-center group-hover:bg-brand-blue-100">
+                  <section.icon className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <div className="flex-1">
                   <h3 className="font-medium">{section.title}</h3>
                   <p className="text-sm text-gray-500">{section.description}</p>
                 </div>
-                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600" />
+                <ChevronRight className="w-5 h-5 text-gray-400 group-hover:text-brand-blue-600" />
               </Link>
             ))}
           </div>
@@ -142,23 +142,23 @@ export default async function StudentHandbookPage() {
             <h2 className="text-xl font-bold mb-4">Program Expectations</h2>
             <ul className="space-y-3 text-gray-600">
               <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-blue-600 rounded-full mt-2"></span>
+                <span className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2"></span>
                 Attend all scheduled classes and training sessions
               </li>
               <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-blue-600 rounded-full mt-2"></span>
+                <span className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2"></span>
                 Participate actively in discussions and activities
               </li>
               <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-blue-600 rounded-full mt-2"></span>
+                <span className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2"></span>
                 Complete all assignments and assessments on time
               </li>
               <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-blue-600 rounded-full mt-2"></span>
+                <span className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2"></span>
                 Maintain professional conduct at all times
               </li>
               <li className="flex items-start gap-2">
-                <span className="w-2 h-2 bg-blue-600 rounded-full mt-2"></span>
+                <span className="w-2 h-2 bg-brand-blue-600 rounded-full mt-2"></span>
                 Communicate proactively with instructors and staff
               </li>
             </ul>
@@ -235,7 +235,7 @@ export default async function StudentHandbookPage() {
 
         {/* Acknowledgment */}
         {user && !acknowledgment && (
-          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
+          <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
             <h3 className="font-semibold mb-4">Acknowledge Handbook</h3>
             <form action="/api/handbook/acknowledge" method="POST">
               <input type="hidden" name="type" value="student" />
@@ -247,7 +247,7 @@ export default async function StudentHandbookPage() {
               </label>
               <button
                 type="submit"
-                className="bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700"
+                className="bg-brand-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-brand-blue-700"
               >
                 Acknowledge
               </button>

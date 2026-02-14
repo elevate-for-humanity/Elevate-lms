@@ -45,7 +45,7 @@ export default function InquirySuccessPage() {
             </Link>
             <Link
               href="/programs"
-              className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              className="flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700"
             >
               Browse Programs
             </Link>
@@ -59,7 +59,7 @@ export default function InquirySuccessPage() {
             </a>
             <a
               href="mailto:elevate4humanityedu@gmail.com"
-              className="flex items-center gap-1 text-blue-600 hover:underline text-sm"
+              className="flex items-center gap-1 text-brand-blue-600 hover:underline text-sm"
             >
               <Mail className="w-3 h-3" />
               Email Us

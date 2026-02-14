@@ -17,7 +17,7 @@ export default function MiladyAppDownload() {
           />
         </div>
         <h3 className="text-lg font-bold mb-2">📱 Learn on the Go</h3>
-        <p className="text-blue-100 text-sm">
+        <p className="text-brand-blue-100 text-sm">
           Download the Milady mobile app for iOS or Android
         </p>
       </div>
@@ -27,7 +27,7 @@ export default function MiladyAppDownload() {
           href="https://apps.apple.com/us/app/thinkific/id1471012001"
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full px-4 py-3 bg-white text-blue-600 rounded-lg hover:bg-gray-50 font-semibold transition-all text-center shadow-md group"
+          className="block w-full px-4 py-3 bg-white text-brand-blue-600 rounded-lg hover:bg-gray-50 font-semibold transition-all text-center shadow-md group"
         >
           <Download className="w-4 h-4 inline mr-2 group-hover:animate-bounce" />
           Download for iPhone/iPad
@@ -36,7 +36,7 @@ export default function MiladyAppDownload() {
           href="https://play.google.com/store/apps/details?id=com.thinkific.mobile"
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full px-4 py-3 bg-white text-blue-600 rounded-lg hover:bg-gray-50 font-semibold transition-all text-center shadow-md group"
+          className="block w-full px-4 py-3 bg-white text-brand-blue-600 rounded-lg hover:bg-gray-50 font-semibold transition-all text-center shadow-md group"
         >
           <Download className="w-4 h-4 inline mr-2 group-hover:animate-bounce" />
           Download for Android
@@ -48,7 +48,7 @@ export default function MiladyAppDownload() {
           <Smartphone className="w-4 h-4" />
           How to Access:
         </h4>
-        <ol className="text-blue-100 text-xs space-y-1 list-decimal list-inside">
+        <ol className="text-brand-blue-100 text-xs space-y-1 list-decimal list-inside">
           <li>Download the Thinkific app</li>
           <li>Open the app and tap "Login"</li>
           <li>
@@ -61,7 +61,7 @@ export default function MiladyAppDownload() {
       </div>
 
       <div className="pt-4 border-t border-white/20">
-        <p className="text-blue-100 text-xs text-center mb-3">
+        <p className="text-brand-blue-100 text-xs text-center mb-3">
           Access your courses anywhere, anytime
         </p>
         <a

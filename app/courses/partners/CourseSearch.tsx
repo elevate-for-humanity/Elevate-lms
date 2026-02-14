@@ -108,7 +108,7 @@ export default function CourseSearch({ courses }: CourseSearchProps) {
                   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                 >
               ) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             />
           </div>
 
@@ -124,7 +124,7 @@ export default function CourseSearch({ courses }: CourseSearchProps) {
                   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                 >
               ) => setSelectedProvider(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             >
               <option value="all">All Providers</option>
               {providers.map((provider) => (
@@ -147,7 +147,7 @@ export default function CourseSearch({ courses }: CourseSearchProps) {
                   HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                 >
               ) => setSelectedCategory(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
             >
               <option value="all">All Categories</option>
               {categories.map((category) => (
@@ -221,10 +221,10 @@ export default function CourseSearch({ courses }: CourseSearchProps) {
           {filteredCourses.map((course: any) => (
             <div
               key={course.id}
-              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-blue-500 transition-all"
+              className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-brand-blue-500 transition-all"
             >
               <div className="mb-3">
-                <span className="inline-block px-3 py-2 bg-blue-100 text-blue-800 text-xs font-semibold rounded-full">
+                <span className="inline-block px-3 py-2 bg-brand-blue-100 text-brand-blue-800 text-xs font-semibold rounded-full">
                   {course.category}
                 </span>
               </div>

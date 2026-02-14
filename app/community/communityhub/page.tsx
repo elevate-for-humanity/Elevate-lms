@@ -68,11 +68,11 @@ export default async function CommunityHubPage() {
         ]}
       />
       {/* Hero */}
-      <section className="bg-blue-600 text-white py-16">
+      <section className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Users className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Community Hub</h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-blue-100 max-w-2xl mx-auto">
             Connect with fellow learners, instructors, and industry professionals
           </p>
         </div>
@@ -81,11 +81,11 @@ export default async function CommunityHubPage() {
       <div className="max-w-7xl mx-auto px-4 py-12">
         {/* Quick Actions */}
         {!user && (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-12 text-center">
-            <p className="text-blue-800 mb-4">Sign in to join discussions and connect with the community</p>
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-12 text-center">
+            <p className="text-brand-blue-800 mb-4">Sign in to join discussions and connect with the community</p>
             <Link
               href="/login?redirect=/community/communityhub"
-              className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+              className="inline-block bg-brand-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-brand-blue-700 transition"
             >
               Sign In
             </Link>
@@ -99,7 +99,7 @@ export default async function CommunityHubPage() {
             <section>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">Community Groups</h2>
-                <Link href="/community/groups" className="text-blue-600 font-medium hover:underline">
+                <Link href="/community/groups" className="text-brand-blue-600 font-medium hover:underline">
                   View All
                 </Link>
               </div>
@@ -125,7 +125,7 @@ export default async function CommunityHubPage() {
             <section>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-bold">Recent Discussions</h2>
-                <Link href="/community/discussions" className="text-blue-600 font-medium hover:underline">
+                <Link href="/community/discussions" className="text-brand-blue-600 font-medium hover:underline">
                   View All
                 </Link>
               </div>
@@ -159,7 +159,7 @@ export default async function CommunityHubPage() {
             {/* Upcoming Events */}
             <section className="bg-white rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-blue-600" />
+                <Calendar className="w-5 h-5 text-brand-blue-600" />
                 Upcoming Events
               </h3>
               {events && events.length > 0 ? (
@@ -170,7 +170,7 @@ export default async function CommunityHubPage() {
                       href={`/events/${event.id}`}
                       className="block hover:bg-gray-50 p-2 -mx-2 rounded transition"
                     >
-                      <div className="text-sm text-blue-600 font-medium">
+                      <div className="text-sm text-brand-blue-600 font-medium">
                         {new Date(event.date).toLocaleDateString()}
                       </div>
                       <div className="font-medium">{event.title}</div>
@@ -182,7 +182,7 @@ export default async function CommunityHubPage() {
               )}
               <Link
                 href="/events"
-                className="inline-flex items-center gap-1 text-blue-600 text-sm font-medium mt-4 hover:underline"
+                className="inline-flex items-center gap-1 text-brand-blue-600 text-sm font-medium mt-4 hover:underline"
               >
                 View all events <ArrowRight className="w-4 h-4" />
               </Link>
@@ -191,22 +191,22 @@ export default async function CommunityHubPage() {
             {/* Resources */}
             <section className="bg-white rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-blue-600" />
+                <BookOpen className="w-5 h-5 text-brand-blue-600" />
                 Resources
               </h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/community/teachers" className="text-blue-600 hover:underline">
+                  <Link href="/community/teachers" className="text-brand-blue-600 hover:underline">
                     For Teachers
                   </Link>
                 </li>
                 <li>
-                  <Link href="/community/admins" className="text-blue-600 hover:underline">
+                  <Link href="/community/admins" className="text-brand-blue-600 hover:underline">
                     For Administrators
                   </Link>
                 </li>
                 <li>
-                  <Link href="/community/developers" className="text-blue-600 hover:underline">
+                  <Link href="/community/developers" className="text-brand-blue-600 hover:underline">
                     For Developers
                   </Link>
                 </li>

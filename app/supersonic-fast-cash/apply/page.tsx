@@ -104,7 +104,7 @@ export default function RefundApplyPage() {
               <span className="text-sm font-medium">15 Min Approval</span>
             </div>
             <div className="flex items-center justify-center gap-2">
-              <Shield className="w-5 h-5 text-blue-600" />
+              <Shield className="w-5 h-5 text-brand-blue-600" />
               <span className="text-sm font-medium">0% Interest</span>
             </div>
             <div className="flex items-center justify-center gap-2">

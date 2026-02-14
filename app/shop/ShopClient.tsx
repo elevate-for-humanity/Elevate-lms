@@ -58,7 +58,7 @@ export function ShopClient({ products, categories }: ShopClientProps) {
               <button 
                 key={cat}
                 onClick={() => setActiveCategory(cat)}
-                className={`px-4 py-2 rounded-lg text-sm ${activeCategory === cat ? 'bg-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
+                className={`px-4 py-2 rounded-lg text-sm ${activeCategory === cat ? 'bg-brand-blue-600 text-white' : 'bg-white text-gray-700 hover:bg-gray-100'}`}
               >
                 {cat}
               </button>
@@ -77,9 +77,9 @@ export function ShopClient({ products, categories }: ShopClientProps) {
               aria-label="Search products"
             />
           </form>
-          <Link href="/shop/cart" className="relative p-2 text-gray-600 hover:text-blue-600" aria-label="Shopping cart" data-tour="shop-cart">
+          <Link href="/shop/cart" className="relative p-2 text-gray-600 hover:text-brand-blue-600" aria-label="Shopping cart" data-tour="shop-cart">
             <ShoppingCart className="w-6 h-6" />
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-blue-600 text-white text-xs rounded-full flex items-center justify-center">0</span>
+            <span className="absolute -top-1 -right-1 w-5 h-5 bg-brand-blue-600 text-white text-xs rounded-full flex items-center justify-center">0</span>
           </Link>
         </div>
       </div>
@@ -102,7 +102,7 @@ export function ShopClient({ products, categories }: ShopClientProps) {
               />
             </div>
             <div className="p-6">
-              <span className="text-xs text-blue-600 font-medium">{product.category}</span>
+              <span className="text-xs text-brand-blue-600 font-medium">{product.category}</span>
               <h2 className="font-semibold text-gray-900 mt-1">{product.name}</h2>
               <div className="flex items-center gap-2 mt-2">
                 <div className="flex items-center gap-1">
@@ -115,7 +115,7 @@ export function ShopClient({ products, categories }: ShopClientProps) {
                 <span className="text-xl font-bold text-gray-900">${product.price}</span>
                 <button 
                   onClick={(e) => handleAddToCart(e, product)}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
+                  className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-brand-blue-700"
                 >
                   Add to Cart
                 </button>

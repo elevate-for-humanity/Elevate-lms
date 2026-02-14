@@ -44,7 +44,7 @@ export function Section({
   const backgrounds = {
     white: 'bg-white',
     gray: 'bg-gray-50',
-    blue: 'bg-blue-50'
+    blue: 'bg-brand-blue-50'
   };
 
   return (

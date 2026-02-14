@@ -133,7 +133,7 @@ export default function AlumniProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     );
   }
@@ -176,7 +176,7 @@ export default function AlumniProfilePage() {
                 </div>
                 <button
                   type="button"
-                  className="absolute bottom-0 right-0 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700"
+                  className="absolute bottom-0 right-0 w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center hover:bg-brand-blue-700"
                 >
                   <Camera className="w-4 h-4" />
                 </button>
@@ -204,7 +204,7 @@ export default function AlumniProfilePage() {
                   id="full_name"
                   value={profile.full_name}
                   onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
@@ -234,7 +234,7 @@ export default function AlumniProfilePage() {
                       id="phone"
                       value={profile.phone}
                       onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     />
                   </div>
                 </div>
@@ -249,7 +249,7 @@ export default function AlumniProfilePage() {
                     id="city"
                     value={profile.city}
                     onChange={(e) => setProfile({ ...profile, city: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
                 <div>
@@ -261,7 +261,7 @@ export default function AlumniProfilePage() {
                     id="state"
                     value={profile.state}
                     onChange={(e) => setProfile({ ...profile, state: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>
@@ -285,7 +285,7 @@ export default function AlumniProfilePage() {
                     id="job_title"
                     value={profile.job_title}
                     onChange={(e) => setProfile({ ...profile, job_title: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
                 <div>
@@ -297,7 +297,7 @@ export default function AlumniProfilePage() {
                     id="company"
                     value={profile.company}
                     onChange={(e) => setProfile({ ...profile, company: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>
@@ -313,7 +313,7 @@ export default function AlumniProfilePage() {
                     value={profile.linkedin_url}
                     onChange={(e) => setProfile({ ...profile, linkedin_url: e.target.value })}
                     placeholder="https://linkedin.com/in/yourprofile"
-                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>
@@ -327,7 +327,7 @@ export default function AlumniProfilePage() {
                   onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
                   rows={4}
                   placeholder="Tell us about yourself and your career journey..."
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
             </div>
@@ -375,7 +375,7 @@ export default function AlumniProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+              className="inline-flex items-center gap-2 px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50"
             >
               {saving ? (
                 <>

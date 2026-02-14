@@ -165,7 +165,7 @@ export default function MobileVideoPlayer({
               onClick={handleProgressClick}
             >
               <div
-                className="h-full bg-blue-500 rounded-full transition-all"
+                className="h-full bg-brand-blue-500 rounded-full transition-all"
                 style={{ width: `${progress}%` }}
               />
             </div>

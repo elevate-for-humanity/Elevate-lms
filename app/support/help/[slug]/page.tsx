@@ -89,7 +89,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
             Back to Help Center
           </Link>
           <div className="flex items-center gap-3 mb-4">
-            <span className="px-3 py-2 bg-blue-100 text-blue-600 text-sm font-medium rounded-full">
+            <span className="px-3 py-2 bg-brand-blue-100 text-brand-blue-600 text-sm font-medium rounded-full">
               {article.category}
             </span>
             <span className="flex items-center gap-1 text-sm text-gray-500">
@@ -106,7 +106,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
         <div className="max-w-4xl mx-auto px-6">
           <div className="bg-white rounded-2xl p-8 shadow-sm">
             <div 
-              className="prose prose-lg max-w-none prose-headings:text-black prose-p:text-gray-700 prose-a:text-blue-600 prose-strong:text-black prose-li:text-gray-700"
+              className="prose prose-lg max-w-none prose-headings:text-black prose-p:text-gray-700 prose-a:text-brand-blue-600 prose-strong:text-black prose-li:text-gray-700"
               dangerouslySetInnerHTML={{ __html: formatContent(article.content) }}
             />
             
@@ -152,9 +152,9 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
                   <Link
                     key={related.slug}
                     href={`/support/help/${related.slug}`}
-                    className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md hover:border-blue-300 transition group"
+                    className="p-4 bg-white rounded-lg border border-gray-200 hover:shadow-md hover:border-brand-blue-300 transition group"
                   >
-                    <h3 className="font-semibold text-black group-hover:text-blue-600 transition line-clamp-2">
+                    <h3 className="font-semibold text-black group-hover:text-brand-blue-600 transition line-clamp-2">
                       {related.title}
                     </h3>
                   </Link>
@@ -164,7 +164,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
           )}
 
           {/* Still need help */}
-          <div className="mt-12 p-8 bg-blue-50 rounded-2xl text-center">
+          <div className="mt-12 p-8 bg-brand-blue-50 rounded-2xl text-center">
             <h2 className="text-xl font-bold text-black mb-2">Still need help?</h2>
             <p className="text-gray-600 mb-6">
               Our support team is ready to assist you.
@@ -172,7 +172,7 @@ export default async function HelpArticlePage({ params }: { params: Params }) {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/support/ticket"
-                className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Submit a Ticket
               </Link>
@@ -199,7 +199,7 @@ function formatContent(content: string): string {
     .replace(/^# (.*$)/gim, '<h1 class="text-3xl font-bold mt-12 mb-6">$1</h1>')
     .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
     .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-blue-600 hover:underline">$1</a>')
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" class="text-brand-blue-600 hover:underline">$1</a>')
     .replace(/^- (.*$)/gim, '<li class="ml-4 mb-1">$1</li>')
     .replace(/^\d+\. (.*$)/gim, '<li class="ml-4 mb-1">$1</li>')
     .replace(/\n\n/g, '</p><p class="mb-4">');

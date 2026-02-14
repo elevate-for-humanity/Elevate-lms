@@ -113,8 +113,8 @@ export default async function EmployerCompliancePage() {
             <div key={i} className="bg-white rounded-xl shadow-sm border p-6">
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <area.icon className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <area.icon className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <h3 className="font-bold text-gray-900">{area.title}</h3>
                 </div>
@@ -123,7 +123,7 @@ export default async function EmployerCompliancePage() {
               <p className="text-gray-600 text-sm mb-4">{area.description}</p>
               <div className="flex flex-wrap gap-2">
                 {area.actions.map((action, j) => (
-                  <Link key={j} href={action.href} className="text-sm px-4 py-2 bg-gray-50 rounded-lg hover:bg-blue-50 hover:text-blue-600 transition font-medium">
+                  <Link key={j} href={action.href} className="text-sm px-4 py-2 bg-gray-50 rounded-lg hover:bg-brand-blue-50 hover:text-brand-blue-600 transition font-medium">
                     {action.label}
                   </Link>
                 ))}
@@ -171,11 +171,11 @@ export default async function EmployerCompliancePage() {
         </div>
 
         {/* Help */}
-        <div className="mt-8 bg-blue-50 rounded-xl p-6 border border-blue-200">
+        <div className="mt-8 bg-brand-blue-50 rounded-xl p-6 border border-brand-blue-200">
           <h2 className="font-bold text-gray-900 mb-2">Need Compliance Help?</h2>
           <p className="text-gray-600 text-sm mb-4">Our compliance team can help you understand requirements and prepare documentation.</p>
           <div className="flex flex-wrap gap-3">
-            <Link href="/contact" className="text-sm px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium">
+            <Link href="/contact" className="text-sm px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-medium">
               Contact Compliance Team
             </Link>
             <Link href="/store/compliance" className="text-sm px-4 py-2 bg-white border rounded-lg hover:bg-gray-50 transition font-medium">

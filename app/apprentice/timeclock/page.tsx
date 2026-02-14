@@ -336,7 +336,7 @@ export default function TimeclockPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mx-auto mb-4" />
+          <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600 mx-auto mb-4" />
           <p className="text-gray-600">Loading timeclock...</p>
         </div>
       </div>
@@ -362,7 +362,7 @@ export default function TimeclockPage() {
               <p className="text-gray-600 mb-4">{contextError || 'Unable to load timeclock context'}</p>
               <button
                 onClick={() => window.location.reload()}
-                className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="inline-flex items-center px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
               >
                 <RefreshCw className="w-4 h-4 mr-2" />
                 Try Again
@@ -387,20 +387,20 @@ export default function TimeclockPage() {
 
         <div className="bg-white rounded-xl shadow-lg p-6">
           <h1 className="text-2xl font-bold text-gray-900 mb-2 flex items-center">
-            <Clock className="w-6 h-6 mr-2 text-blue-600" />
+            <Clock className="w-6 h-6 mr-2 text-brand-blue-600" />
             Timeclock
           </h1>
           <p className="text-sm text-gray-600 mb-6">{context.programName}</p>
           
           {/* Hours Progress */}
-          <div className="mb-6 p-3 bg-blue-50 rounded-lg">
+          <div className="mb-6 p-3 bg-brand-blue-50 rounded-lg">
             <div className="flex justify-between text-sm mb-1">
-              <span className="text-blue-700 font-medium">Hours Progress</span>
-              <span className="text-blue-700">{context.hoursCompleted} / {context.hoursRequired}</span>
+              <span className="text-brand-blue-700 font-medium">Hours Progress</span>
+              <span className="text-brand-blue-700">{context.hoursCompleted} / {context.hoursRequired}</span>
             </div>
-            <div className="w-full bg-blue-200 rounded-full h-2">
+            <div className="w-full bg-brand-blue-200 rounded-full h-2">
               <div 
-                className="bg-blue-600 h-2 rounded-full transition-all"
+                className="bg-brand-blue-600 h-2 rounded-full transition-all"
                 style={{ width: `${Math.min(100, (context.hoursCompleted / context.hoursRequired) * 100)}%` }}
               />
             </div>
@@ -420,7 +420,7 @@ export default function TimeclockPage() {
                 <select
                   value={selectedSiteId || ''}
                   onChange={(e) => setSelectedSiteId(e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 >
                   <option value="">Select a site...</option>
                   {context.allowedSites.map((site) => (
@@ -501,17 +501,17 @@ export default function TimeclockPage() {
 
           {/* Shift Status */}
           {isClockedIn && (
-            <div className="mb-6 p-4 bg-blue-50 rounded-lg">
-              <p className="text-sm text-blue-700">
+            <div className="mb-6 p-4 bg-brand-blue-50 rounded-lg">
+              <p className="text-sm text-brand-blue-700">
                 <strong>Clocked in:</strong> {new Date(shift.clockInAt!).toLocaleTimeString()}
               </p>
               {shift.lunchStartAt && (
-                <p className="text-sm text-blue-700 mt-1">
+                <p className="text-sm text-brand-blue-700 mt-1">
                   <strong>Lunch started:</strong> {new Date(shift.lunchStartAt).toLocaleTimeString()}
                 </p>
               )}
               {shift.lunchEndAt && (
-                <p className="text-sm text-blue-700 mt-1">
+                <p className="text-sm text-brand-blue-700 mt-1">
                   <strong>Lunch ended:</strong> {new Date(shift.lunchEndAt).toLocaleTimeString()}
                 </p>
               )}

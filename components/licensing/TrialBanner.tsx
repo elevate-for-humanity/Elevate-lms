@@ -53,25 +53,25 @@ export function TrialBanner({
     ? 'bg-red-50 border-red-200'
     : isExpiringSoon
     ? 'bg-amber-50 border-amber-200'
-    : 'bg-blue-50 border-blue-200';
+    : 'bg-brand-blue-50 border-brand-blue-200';
 
   const textColor = isExpired
     ? 'text-red-900'
     : isExpiringSoon
     ? 'text-amber-900'
-    : 'text-blue-900';
+    : 'text-brand-blue-900';
 
   const accentColor = isExpired
     ? 'text-red-600'
     : isExpiringSoon
     ? 'text-amber-600'
-    : 'text-blue-600';
+    : 'text-brand-blue-600';
 
   const buttonColor = isExpired
     ? 'bg-red-600 hover:bg-red-700'
     : isExpiringSoon
     ? 'bg-amber-600 hover:bg-amber-700'
-    : 'bg-blue-600 hover:bg-blue-700';
+    : 'bg-brand-blue-600 hover:bg-brand-blue-700';
 
   return (
     <div className={`${bannerColor} border-b`}>
@@ -205,7 +205,7 @@ export function TrialBadge({
     ? 'bg-red-100 text-red-800 border-red-200'
     : isExpiringSoon
     ? 'bg-amber-100 text-amber-800 border-amber-200'
-    : 'bg-blue-100 text-blue-800 border-blue-200';
+    : 'bg-brand-blue-100 text-brand-blue-800 border-brand-blue-200';
 
   return (
     <Link

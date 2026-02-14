@@ -188,7 +188,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
             {fundingTags.map((tag) => (
               <span
                 key={tag}
-                className="inline-flex items-center rounded-full bg-blue-50 px-3 py-2 text-[11px] font-semibold text-blue-700 border border-blue-100"
+                className="inline-flex items-center rounded-full bg-brand-blue-50 px-3 py-2 text-[11px] font-semibold text-brand-blue-700 border border-brand-blue-100"
               >
                 {tag}
               </span>

@@ -82,7 +82,7 @@ export default function FounderPage() {
           priority
         />
         <div className="relative z-10 w-full max-w-7xl mx-auto px-6 pb-12">
-          <p className="text-blue-400 font-semibold mb-2">Founder & Chief Executive Officer</p>
+          <p className="text-brand-blue-400 font-semibold mb-2">Founder & Chief Executive Officer</p>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-4">
             Elizabeth Greene
           </h1>
@@ -99,7 +99,7 @@ export default function FounderPage() {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {credentials.map((cred, i) => (
               <div key={i} className="bg-slate-800 rounded-lg p-4 text-center">
-                <cred.icon className="w-8 h-8 text-blue-400 mx-auto mb-2" />
+                <cred.icon className="w-8 h-8 text-brand-blue-400 mx-auto mb-2" />
                 <div className="font-bold text-white text-sm">{cred.title}</div>
                 <div className="text-slate-400 text-xs">{cred.desc}</div>
               </div>
@@ -123,10 +123,10 @@ export default function FounderPage() {
                     className="object-cover"
                   />
                 </div>
-                <div className="bg-blue-50 rounded-xl p-6">
+                <div className="bg-brand-blue-50 rounded-xl p-6">
                   <h3 className="font-bold text-slate-900 mb-3">Contact</h3>
                   <p className="text-slate-600 text-sm mb-2">elizabeth@elevateforhumanity.org</p>
-                  <Link href="/contact" className="text-blue-600 text-sm font-semibold hover:text-blue-700">
+                  <Link href="/contact" className="text-brand-blue-600 text-sm font-semibold hover:text-brand-blue-700">
                     Schedule a Meeting →
                   </Link>
                 </div>
@@ -189,7 +189,7 @@ export default function FounderPage() {
         <div className="max-w-4xl mx-auto px-6">
           <h2 className="text-3xl font-bold text-slate-900 text-center mb-8">Leadership Philosophy</h2>
           
-          <blockquote className="bg-white rounded-2xl p-8 shadow-lg border-l-4 border-blue-600 mb-8">
+          <blockquote className="bg-white rounded-2xl p-8 shadow-lg border-l-4 border-brand-blue-600 mb-8">
             <p className="text-xl text-slate-700 italic mb-4">
               "Every person—regardless of their past—deserves access to quality education, living-wage 
               employment, and the opportunity to build a better future. When you invest in people, 
@@ -201,7 +201,7 @@ export default function FounderPage() {
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Heart className="w-6 h-6 text-blue-600" />
+                <Heart className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Equity & Empowerment</h3>
               <p className="text-slate-600 text-sm">
@@ -219,7 +219,7 @@ export default function FounderPage() {
             </div>
             <div className="bg-white rounded-xl p-6 shadow-sm">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Award className="w-6 h-6 text-blue-600" />
+                <Award className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="font-bold text-slate-900 mb-2">Excellence & Accountability</h3>
               <p className="text-slate-600 text-sm">
@@ -250,7 +250,7 @@ export default function FounderPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {organizations.map((org, i) => (
               <div key={i} className="bg-slate-50 rounded-2xl p-8 border border-slate-200">
-                <div className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full mb-4">
+                <div className="inline-block px-3 py-1 bg-brand-blue-100 text-brand-blue-700 text-xs font-semibold rounded-full mb-4">
                   {org.type}
                 </div>
                 <h3 className="text-xl font-bold text-slate-900 mb-3">{org.name}</h3>
@@ -266,18 +266,18 @@ export default function FounderPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">
             Ready to Improve Your Future?
           </h2>
-          <p className="text-blue-100 text-lg mb-8">
+          <p className="text-brand-blue-100 text-lg mb-8">
             Join the thousands of individuals who have found their pathway to prosperity through Elevate.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/programs"
-              className="inline-flex items-center bg-white text-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-blue-50 transition"
+              className="inline-flex items-center bg-white text-brand-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-brand-blue-50 transition"
             >
               Explore Programs
             </Link>

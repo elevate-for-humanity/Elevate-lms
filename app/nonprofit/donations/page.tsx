@@ -94,9 +94,9 @@ export default async function DonationsPage() {
       </div>
 
       {/* Hero */}
-      <section className="py-20 px-4 bg-blue-50 text-center">
+      <section className="py-20 px-4 bg-brand-blue-50 text-center">
         <div className="max-w-4xl mx-auto">
-          <Heart className="w-16 h-16 text-blue-600 mx-auto mb-6" />
+          <Heart className="w-16 h-16 text-brand-blue-600 mx-auto mb-6" />
           <h1 className="text-5xl md:text-6xl font-black text-black mb-6">
             Support Our Mission
           </h1>
@@ -107,7 +107,7 @@ export default async function DonationsPage() {
           <Link
             href="https://donate.stripe.com/5kA5kn7EsfrD08w4gg"
             target="_blank"
-            className="inline-block bg-blue-600 text-white px-12 py-4 rounded-lg text-lg font-bold hover:bg-blue-700 transition-colors shadow-lg"
+            className="inline-block bg-brand-blue-600 text-white px-12 py-4 rounded-lg text-lg font-bold hover:bg-brand-blue-700 transition-colors shadow-lg"
           >
             Donate Now
           </Link>
@@ -120,7 +120,7 @@ export default async function DonationsPage() {
           <div className="grid grid-cols-3 gap-8">
             {displayStats.map((stat: any, index: number) => (
               <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-1">
+                <div className="text-3xl md:text-4xl font-bold text-brand-blue-600 mb-1">
                   {stat.value}
                 </div>
                 <div className="text-gray-600">{stat.label}</div>
@@ -141,11 +141,11 @@ export default async function DonationsPage() {
               const IconComponent = tier.icon || Heart;
               return (
                 <div key={index} className="bg-white rounded-xl p-6 text-center shadow-sm hover:shadow-md transition">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <IconComponent className="w-8 h-8 text-blue-600" />
+                  <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <IconComponent className="w-8 h-8 text-brand-blue-600" />
                   </div>
                   <h3 className="text-2xl font-bold text-black mb-2">${tier.amount}</h3>
-                  <p className="text-blue-600 font-medium mb-2">{tier.title}</p>
+                  <p className="text-brand-blue-600 font-medium mb-2">{tier.title}</p>
                   <p className="text-gray-600 text-sm">{tier.description}</p>
                 </div>
               );
@@ -159,7 +159,7 @@ export default async function DonationsPage() {
         <div className="max-w-4xl mx-auto">
           <h2 className="text-3xl font-bold text-center mb-12">Ways to Give</h2>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-blue-50 rounded-xl p-8">
+            <div className="bg-brand-blue-50 rounded-xl p-8">
               <h3 className="text-xl font-bold mb-4">One-Time Donation</h3>
               <p className="text-gray-600 mb-6">
                 Make a single contribution to support our programs and services.
@@ -167,12 +167,12 @@ export default async function DonationsPage() {
               <Link
                 href="https://donate.stripe.com/5kA5kn7EsfrD08w4gg"
                 target="_blank"
-                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="inline-block bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Donate Once
               </Link>
             </div>
-            <div className="bg-blue-50 rounded-xl p-8">
+            <div className="bg-brand-blue-50 rounded-xl p-8">
               <h3 className="text-xl font-bold mb-4">Monthly Giving</h3>
               <p className="text-gray-600 mb-6">
                 Become a sustaining supporter with a recurring monthly donation.
@@ -180,7 +180,7 @@ export default async function DonationsPage() {
               <Link
                 href="https://donate.stripe.com/5kA5kn7EsfrD08w4gg"
                 target="_blank"
-                className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="inline-block bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Give Monthly
               </Link>
@@ -198,12 +198,12 @@ export default async function DonationsPage() {
               {recentDonors.map((donor: any, index: number) => (
                 <div key={index} className="bg-white rounded-lg p-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Heart className="w-5 h-5 text-blue-500" />
+                    <Heart className="w-5 h-5 text-brand-blue-500" />
                     <span className="font-medium">
                       {donor.is_anonymous ? 'Anonymous' : donor.donor_name || 'Anonymous'}
                     </span>
                   </div>
-                  <span className="text-blue-600 font-semibold">${donor.amount}</span>
+                  <span className="text-brand-blue-600 font-semibold">${donor.amount}</span>
                 </div>
               ))}
             </div>
@@ -235,16 +235,16 @@ export default async function DonationsPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 px-4 bg-blue-600 text-white">
+      <section className="py-16 px-4 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl font-bold mb-4">Every Gift Makes a Difference</h2>
-          <p className="text-blue-100 mb-8">
+          <p className="text-brand-blue-100 mb-8">
             Join us in supporting mental wellness and holistic healing for all.
           </p>
           <Link
             href="https://donate.stripe.com/5kA5kn7EsfrD08w4gg"
             target="_blank"
-            className="inline-block bg-white text-blue-600 px-12 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition"
+            className="inline-block bg-white text-brand-blue-600 px-12 py-4 rounded-lg text-lg font-bold hover:bg-gray-100 transition"
           >
             Donate Now
           </Link>

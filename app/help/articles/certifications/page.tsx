@@ -45,7 +45,7 @@ export default function CertificationsHelpPage() {
 
         <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
           <div className="flex items-center gap-3 mb-6">
-            <Award className="w-10 h-10 text-blue-600" />
+            <Award className="w-10 h-10 text-brand-blue-600" />
             <h1 className="text-3xl font-bold">Certifications</h1>
           </div>
           
@@ -54,8 +54,8 @@ export default function CertificationsHelpPage() {
           </p>
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <div className="bg-blue-50 rounded-lg p-6">
-              <CheckCircle className="w-8 h-8 text-blue-600 mb-3" />
+            <div className="bg-brand-blue-50 rounded-lg p-6">
+              <CheckCircle className="w-8 h-8 text-brand-blue-600 mb-3" />
               <h3 className="font-semibold mb-2">Earn Certificates</h3>
               <p className="text-sm text-gray-600">Complete courses and pass assessments to earn industry-recognized credentials.</p>
             </div>
@@ -64,8 +64,8 @@ export default function CertificationsHelpPage() {
               <h3 className="font-semibold mb-2">Access Anytime</h3>
               <p className="text-sm text-gray-600">View and download your certificates from your dashboard 24/7.</p>
             </div>
-            <div className="bg-blue-50 rounded-lg p-6">
-              <Download className="w-8 h-8 text-blue-600 mb-3" />
+            <div className="bg-brand-blue-50 rounded-lg p-6">
+              <Download className="w-8 h-8 text-brand-blue-600 mb-3" />
               <h3 className="font-semibold mb-2">Share & Verify</h3>
               <p className="text-sm text-gray-600">Share certificates with employers who can verify them online.</p>
             </div>
@@ -88,7 +88,7 @@ export default function CertificationsHelpPage() {
           <p className="text-gray-600 mb-4">Still have questions?</p>
           <Link
             href="/contact"
-            className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700"
+            className="inline-block px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700"
           >
             Contact Support
           </Link>

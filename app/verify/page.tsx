@@ -241,9 +241,9 @@ export default async function VerifyPage({
 
         {/* Info Section */}
         {!searched && (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-            <h3 className="font-semibold text-blue-900 mb-2">How to Verify</h3>
-            <ul className="text-blue-800 space-y-2 text-sm">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
+            <h3 className="font-semibold text-brand-blue-900 mb-2">How to Verify</h3>
+            <ul className="text-brand-blue-800 space-y-2 text-sm">
               <li>• Enter the certificate ID found on the bottom of the certificate</li>
               <li>• Or scan the QR code on the certificate to auto-fill the verification code</li>
               <li>• Click "Verify" to check the certificate's authenticity</li>

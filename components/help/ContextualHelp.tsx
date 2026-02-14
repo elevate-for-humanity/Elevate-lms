@@ -28,7 +28,7 @@ export function ContextualHelp({ title, content, position = 'top' }: ContextualH
         className="p-1 hover:bg-slate-100 rounded-full transition"
         aria-label="Help"
       >
-        <HelpCircle className="w-4 h-4 text-slate-400 hover:text-blue-600 transition" />
+        <HelpCircle className="w-4 h-4 text-slate-400 hover:text-brand-blue-600 transition" />
       </button>
 
       {isOpen && (
@@ -95,7 +95,7 @@ export function HelpBanner({
   type?: 'info' | 'warning' | 'success';
 }) {
   const styles = {
-    info: 'bg-blue-50 border-blue-200 text-blue-900',
+    info: 'bg-brand-blue-50 border-brand-blue-200 text-brand-blue-900',
     warning: 'bg-orange-50 border-orange-200 text-orange-900',
     success: 'bg-green-50 border-green-200 text-green-900',
   };

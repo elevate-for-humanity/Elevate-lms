@@ -185,7 +185,7 @@ export default function ContentLibrary() {
             </p>
           </div>
           <div className="flex gap-3">
-            <label className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer">
+            <label className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 cursor-pointer">
               <Upload className="w-4 h-4" />
               Upload Content
               <input
@@ -285,7 +285,7 @@ export default function ContentLibrary() {
                 <div
                   key={item.id}
                   className={`bg-white rounded-lg border p-4 hover:shadow-lg transition-shadow cursor-pointer ${
-                    selectedItems.has(item.id) ? 'ring-2 ring-blue-500' : ''
+                    selectedItems.has(item.id) ? 'ring-2 ring-brand-blue-500' : ''
                   }`}
                   onClick={() => toggleSelection(item.id)}
                 >

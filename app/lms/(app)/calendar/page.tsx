@@ -145,7 +145,7 @@ export default async function CalendarPage() {
               <Bell className="w-4 h-4" />
               Reminders
             </button>
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition">
               <Plus className="w-4 h-4" />
               Add Event
             </button>
@@ -190,7 +190,7 @@ export default async function CalendarPage() {
                       {day && (
                         <>
                           <div className={`w-8 h-8 flex items-center justify-center rounded-full text-sm font-medium ${
-                            isToday ? 'bg-blue-600 text-white' : 'text-slate-700'
+                            isToday ? 'bg-brand-blue-600 text-white' : 'text-slate-700'
                           }`}>
                             {day}
                           </div>
@@ -199,7 +199,7 @@ export default async function CalendarPage() {
                               <div 
                                 key={i}
                                 className={`text-xs px-2 py-1 rounded truncate ${
-                                  event.event_type === 'class' ? 'bg-blue-100 text-blue-700' :
+                                  event.event_type === 'class' ? 'bg-brand-blue-100 text-brand-blue-700' :
                                   event.event_type === 'assignment' ? 'bg-orange-100 text-orange-700' :
                                   event.event_type === 'exam' ? 'bg-red-100 text-red-700' :
                                   'bg-green-100 text-green-700'
@@ -222,7 +222,7 @@ export default async function CalendarPage() {
 
             <div className="mt-4 flex flex-wrap gap-4 text-sm">
               <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded bg-blue-500"></div>
+                <div className="w-3 h-3 rounded bg-brand-blue-500"></div>
                 <span className="text-slate-600">Classes</span>
               </div>
               <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ export default async function CalendarPage() {
           <div className="space-y-6">
             <div className="bg-white rounded-2xl border border-slate-200 p-6">
               <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                <CalendarIcon className="w-5 h-5 text-blue-600" />
+                <CalendarIcon className="w-5 h-5 text-brand-blue-600" />
                 Today&apos;s Schedule
               </h3>
               
@@ -251,10 +251,10 @@ export default async function CalendarPage() {
                 <div className="space-y-3">
                   {events.filter(e => new Date(e.start_time).toDateString() === now.toDateString()).map((event, i) => (
                     <div key={i} className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                        {event.event_type === 'class' ? <BookOpen className="w-5 h-5 text-blue-600" /> :
-                         event.is_virtual ? <Video className="w-5 h-5 text-blue-600" /> :
-                         <MapPin className="w-5 h-5 text-blue-600" />}
+                      <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        {event.event_type === 'class' ? <BookOpen className="w-5 h-5 text-brand-blue-600" /> :
+                         event.is_virtual ? <Video className="w-5 h-5 text-brand-blue-600" /> :
+                         <MapPin className="w-5 h-5 text-brand-blue-600" />}
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="font-medium text-slate-900 truncate">{event.title}</div>
@@ -298,7 +298,7 @@ export default async function CalendarPage() {
               )}
             </div>
 
-            <div className="bg-blue-600 rounded-2xl p-6 text-white">
+            <div className="bg-brand-blue-600 rounded-2xl p-6 text-white">
               <h3 className="font-bold mb-4">Quick Actions</h3>
               <div className="space-y-2">
                 <Link href="/lms/assignments" className="block w-full text-center bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition">

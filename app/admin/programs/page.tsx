@@ -116,7 +116,7 @@ export default async function ProgramsPage() {
               <h3 className="text-sm font-medium text-black mb-1">
                 Featured
               </h3>
-              <p className="text-base md:text-lg font-bold text-blue-600">
+              <p className="text-base md:text-lg font-bold text-brand-blue-600">
                 {featuredPrograms || 0}
               </p>
             </div>

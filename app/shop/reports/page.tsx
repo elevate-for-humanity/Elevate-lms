@@ -88,7 +88,7 @@ export default function ShopReportsPage() {
         <div className="mb-8">
           <Link
             href="/shop/dashboard"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Dashboard
           </Link>
@@ -137,10 +137,10 @@ export default function ShopReportsPage() {
           </div>
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Clock className="w-6 h-6 text-blue-600" />
+              <Clock className="w-6 h-6 text-brand-blue-600" />
               <h3 className="text-sm font-medium text-black">Total Hours</h3>
             </div>
-            <p className="text-3xl font-bold text-blue-600">
+            <p className="text-3xl font-bold text-brand-blue-600">
               {reports.reduce((sum, r) => sum + r.hours, 0)}
             </p>
           </div>
@@ -231,7 +231,7 @@ export default function ShopReportsPage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 py-2 text-xs rounded bg-blue-100 text-blue-800">
+                      <span className="px-2 py-2 text-xs rounded bg-brand-blue-100 text-brand-blue-800">
                         {report.report_type}
                       </span>
                     </td>
@@ -260,7 +260,7 @@ export default function ShopReportsPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm">
                       <button
                         onClick={() => downloadReport(report.id)}
-                        className="text-brand-blue-600 hover:text-blue-900 mr-3"
+                        className="text-brand-blue-600 hover:text-brand-blue-900 mr-3"
                       >
                         <Download className="w-4 h-4 inline mr-1" />
                         Download

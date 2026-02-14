@@ -47,7 +47,7 @@ export default function CertificationsPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid grid-cols-3 gap-6 text-center">
             <div>
-              <Clock className="w-6 h-6 text-blue-400 mx-auto mb-2" />
+              <Clock className="w-6 h-6 text-brand-blue-400 mx-auto mb-2" />
               <p className="text-2xl font-bold text-white">2-12</p>
               <p className="text-sm text-slate-400">Weeks to certify</p>
             </div>
@@ -77,7 +77,7 @@ export default function CertificationsPage() {
                   <Image src={prog.image} alt={prog.name} fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="(max-width: 640px) 50vw, 25vw" />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-bold text-slate-900 text-sm mb-2 group-hover:text-blue-600 transition-colors">{prog.name}</h3>
+                  <h3 className="font-bold text-slate-900 text-sm mb-2 group-hover:text-brand-blue-600 transition-colors">{prog.name}</h3>
                   <p className="text-xs text-slate-500 mb-1">{prog.duration}</p>
                   <p className="text-xs font-semibold text-green-700">{prog.cost}</p>
                 </div>

@@ -85,8 +85,8 @@ export default async function SponsorLicensingPage() {
             {/* Starter */}
             <div className="bg-white rounded-3xl shadow-lg border-2 border-slate-200 p-8 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Image src="/images/icons/shield.png" alt="Starter" width={24} height={24} className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                  <Image src="/images/icons/shield.png" alt="Starter" width={24} height={24} className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black">Starter</h3>
@@ -109,38 +109,38 @@ export default async function SponsorLicensingPage() {
 
               <div className="space-y-3 mb-8">
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Sponsor dashboard (referrals, employers, apprentices)
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     RAPIDS lifecycle tracking
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     WIOA/WRG compatibility
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Employer onboarding + MOU workflow
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Audit logs + exports
                   </span>
                 </div>
               </div>
 
-              <div className="bg-blue-50 rounded-xl p-4 mb-6">
+              <div className="bg-brand-blue-50 rounded-xl p-4 mb-6">
                 <p className="text-sm font-bold text-black mb-2">
                   Includes:
                 </p>
@@ -152,7 +152,7 @@ export default async function SponsorLicensingPage() {
 
               <Link
                 href="/store/licenses"
-                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-4 rounded-xl font-bold transition"
+                className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-4 rounded-xl font-bold transition"
               >
                 Get Started
               </Link>
@@ -250,8 +250,8 @@ export default async function SponsorLicensingPage() {
             {/* Enterprise */}
             <div className="bg-white rounded-3xl shadow-lg border-2 border-slate-200 p-8 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Image src="/images/icons/trending-up.png" alt="Enterprise" width={24} height={24} className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                  <Image src="/images/icons/trending-up.png" alt="Enterprise" width={24} height={24} className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black">
@@ -282,44 +282,44 @@ export default async function SponsorLicensingPage() {
 
               <div className="space-y-3 mb-8">
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Everything in Professional
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Multi-state rules engine
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Tenant licensing enforcement
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     SOC-style audit controls
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Monitoring response bundles
                   </span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Image src="/images/icons/check-circle.png" alt="Check" width={20} height={20} className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm text-black">
                     Dedicated onboarding + training
                   </span>
                 </div>
               </div>
 
-              <div className="bg-blue-50 rounded-xl p-4 mb-6">
+              <div className="bg-brand-blue-50 rounded-xl p-4 mb-6">
                 <p className="text-sm font-bold text-black mb-2">
                   Includes:
                 </p>
@@ -331,7 +331,7 @@ export default async function SponsorLicensingPage() {
 
               <Link
                 href="/contact?topic=licensing-enterprise"
-                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-4 rounded-xl font-bold transition"
+                className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-4 rounded-xl font-bold transition"
               >
                 Contact Sales
               </Link>
@@ -378,7 +378,7 @@ export default async function SponsorLicensingPage() {
                 className="bg-slate-50 rounded-2xl p-6 border border-slate-200"
               >
                 <h3 className="font-bold text-black mb-2">{addon.title}</h3>
-                <div className="text-2xl font-bold text-blue-600 mb-2">
+                <div className="text-2xl font-bold text-brand-blue-600 mb-2">
                   {addon.price}
                 </div>
                 <p className="text-sm text-black">{addon.description}</p>
@@ -499,8 +499,8 @@ export default async function SponsorLicensingPage() {
               },
             ].map((feature, i) => (
               <div key={i} className="bg-slate-50 rounded-2xl p-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-                  <feature.icon className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+                  <feature.icon className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <h3 className="text-xl font-bold text-black mb-2">
                   {feature.title}
@@ -534,7 +534,7 @@ export default async function SponsorLicensingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/store/licenses"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 hover:bg-slate-100 px-10 py-5 rounded-xl font-bold text-lg transition shadow-2xl"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 hover:bg-slate-100 px-10 py-5 rounded-xl font-bold text-lg transition shadow-2xl"
             >
               Get Started <ArrowRight className="w-5 h-5" />
             </Link>

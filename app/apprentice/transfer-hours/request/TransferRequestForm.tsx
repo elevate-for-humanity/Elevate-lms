@@ -232,7 +232,7 @@ export default function TransferRequestForm({
                 setFormData({ ...formData, source: e.target.value })
               }
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             >
               <option value="">Select source...</option>
               <option value="barber_school">Barber School</option>
@@ -258,7 +258,7 @@ export default function TransferRequestForm({
               required
               min="1"
               max={maxTransferHours}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               placeholder={`Maximum: ${maxTransferHours} hours`}
             />
             <p className="text-sm text-gray-500 mt-1">
@@ -277,7 +277,7 @@ export default function TransferRequestForm({
               onChange={(e) =>
                 setFormData({ ...formData, previousEmployer: e.target.value })
               }
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               placeholder="Name of school or employer"
             />
           </div>
@@ -292,7 +292,7 @@ export default function TransferRequestForm({
               onChange={(e) =>
                 setFormData({ ...formData, employmentDates: e.target.value })
               }
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               placeholder="e.g., January 2022 - December 2023"
             />
           </div>
@@ -307,7 +307,7 @@ export default function TransferRequestForm({
                 setFormData({ ...formData, description: e.target.value })
               }
               rows={4}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               placeholder="Describe your previous training or experience..."
             />
           </div>
@@ -427,7 +427,7 @@ export default function TransferRequestForm({
         <button
           type="submit"
           disabled={loading || uploadedDocs.length === 0}
-          className="px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+          className="px-6 py-3 bg-brand-blue-600 text-white font-medium rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
         >
           {loading ? (
             <>

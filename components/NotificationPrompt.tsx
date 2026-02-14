@@ -86,7 +86,7 @@ export default function NotificationPrompt() {
     <div className="fixed bottom-20 left-4 right-4 z-40 lg:bottom-4 lg:left-auto lg:right-4 lg:max-w-sm">
       <div className="bg-white rounded-lg shadow-xl border border-gray-200 p-4">
         <div className="flex items-start gap-3">
-          <div className="flex-shrink-0 w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+          <div className="flex-shrink-0 w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
             <Bell size={20} className="text-brand-orange-600" />
           </div>
           <div className="flex-1">

@@ -85,7 +85,7 @@ export default async function ApprenticeSkillsPage() {
       case 'completed':
         return <CheckCircle className="w-5 h-5 text-green-500" />;
       case 'in-progress':
-        return <TrendingUp className="w-5 h-5 text-blue-500" />;
+        return <TrendingUp className="w-5 h-5 text-brand-blue-500" />;
       default:
         return <Circle className="w-5 h-5 text-gray-300" />;
     }
@@ -96,7 +96,7 @@ export default async function ApprenticeSkillsPage() {
       case 'completed':
         return 'bg-green-100 text-green-700';
       case 'in-progress':
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-brand-blue-100 text-brand-blue-700';
       default:
         return 'bg-gray-100 text-gray-600';
     }
@@ -120,7 +120,7 @@ export default async function ApprenticeSkillsPage() {
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-8">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold">Overall Progress</h2>
-            <span className="text-2xl font-bold text-blue-600">
+            <span className="text-2xl font-bold text-brand-blue-600">
               {completedSkills} / {totalSkills || displayCategories.reduce((sum: number, cat: any) => sum + (cat.skills?.length || 0), 0)} skills
             </span>
           </div>
@@ -141,7 +141,7 @@ export default async function ApprenticeSkillsPage() {
             <div key={index} className="bg-white rounded-xl shadow-sm border">
               <div className="p-6 border-b">
                 <h2 className="text-lg font-semibold flex items-center gap-2">
-                  <Target className="w-5 h-5 text-blue-600" />
+                  <Target className="w-5 h-5 text-brand-blue-600" />
                   {category.name}
                 </h2>
               </div>
@@ -171,7 +171,7 @@ export default async function ApprenticeSkillsPage() {
               <span>Completed</span>
             </div>
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-blue-500" />
+              <TrendingUp className="w-5 h-5 text-brand-blue-500" />
               <span>In Progress</span>
             </div>
             <div className="flex items-center gap-2">

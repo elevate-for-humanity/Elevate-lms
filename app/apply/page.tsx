@@ -98,7 +98,7 @@ export default async function ApplyPage({
               />
             </div>
             <div className="flex-1 bg-white p-6 sm:p-8">
-              <span className="inline-block bg-blue-600 text-white text-xs font-bold uppercase tracking-wider px-3 py-0.5 rounded-full mb-3">
+              <span className="inline-block bg-brand-blue-600 text-white text-xs font-bold uppercase tracking-wider px-3 py-0.5 rounded-full mb-3">
                 Most Popular
               </span>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-2">
@@ -115,7 +115,7 @@ export default async function ApplyPage({
                 <li>Payment plans and BNPL options for paid programs</li>
                 <li>Response within 1-2 business days</li>
               </ul>
-              <span className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg group-hover:gap-3 transition-all text-sm">
+              <span className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg group-hover:gap-3 transition-all text-sm">
                 Apply Now <ArrowRight className="w-4 h-4" />
               </span>
             </div>
@@ -146,20 +146,20 @@ export default async function ApplyPage({
               </p>
               <p className="text-slate-700 text-sm font-semibold mb-2">Available grants and tax credits:</p>
               <div className="space-y-1.5 mb-3">
-                <Link href="/employer" className="block text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                <Link href="/employer" className="block text-sm text-brand-blue-600 hover:text-brand-blue-800 hover:underline">
                   <strong>WOTC</strong> — Work Opportunity Tax Credit up to $9,600 per hire
                 </Link>
-                <Link href="/ojt-and-funding" className="block text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                <Link href="/ojt-and-funding" className="block text-sm text-brand-blue-600 hover:text-brand-blue-800 hover:underline">
                   <strong>OJT</strong> — On-the-Job Training reimbursement covers 50-75% of wages
                 </Link>
-                <Link href="/funding" className="block text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                <Link href="/funding" className="block text-sm text-brand-blue-600 hover:text-brand-blue-800 hover:underline">
                   <strong>WIOA</strong> — Workforce Innovation and Opportunity Act funds upskilling
                 </Link>
-                <Link href="/funding" className="block text-sm text-blue-600 hover:text-blue-800 hover:underline">
+                <Link href="/funding" className="block text-sm text-brand-blue-600 hover:text-brand-blue-800 hover:underline">
                   <strong>WRG</strong> — Workforce Ready Grant covers high-demand certifications
                 </Link>
               </div>
-              <Link href="/employer" className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-blue-700 transition-colors">
+              <Link href="/employer" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm hover:bg-brand-blue-700 transition-colors">
                 Partner With Us <ArrowRight className="w-4 h-4" />
               </Link>
             </div>
@@ -184,7 +184,7 @@ export default async function ApplyPage({
                   Launch your own workforce training program on Elevate&apos;s platform.
                   We provide the LMS, curriculum, and compliance infrastructure.
                 </p>
-                <span className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm group-hover:gap-3 transition-all">
+                <span className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold px-5 py-2.5 rounded-lg text-sm group-hover:gap-3 transition-all">
                   Get Started <ArrowRight className="w-4 h-4" />
                 </span>
               </div>
@@ -262,14 +262,14 @@ export default async function ApplyPage({
                         href={item.link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm mt-3 hover:bg-blue-700 transition-colors"
+                        className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm mt-3 hover:bg-brand-blue-700 transition-colors"
                       >
                         {('linkLabel' in item && item.linkLabel) || 'Learn More'} <ArrowRight className="w-4 h-4" />
                       </a>
                     ) : (
                       <Link
                         href={item.link}
-                        className="inline-flex items-center gap-2 bg-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm mt-3 hover:bg-blue-700 transition-colors"
+                        className="inline-flex items-center gap-2 bg-brand-blue-600 text-white font-semibold px-4 py-2 rounded-lg text-sm mt-3 hover:bg-brand-blue-700 transition-colors"
                       >
                         {('linkLabel' in item && item.linkLabel) || 'Learn More'} <ArrowRight className="w-4 h-4" />
                       </Link>
@@ -285,7 +285,7 @@ export default async function ApplyPage({
         <div className="text-center pt-2">
           <p className="text-slate-500 text-sm">
             Already applied?{' '}
-            <Link href="/apply/track" className="text-blue-600 hover:underline font-medium">
+            <Link href="/apply/track" className="text-brand-blue-600 hover:underline font-medium">
               Track your application status
             </Link>
           </p>

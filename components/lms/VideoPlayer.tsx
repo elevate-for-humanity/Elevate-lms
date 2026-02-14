@@ -128,7 +128,7 @@ export default function VideoPlayer({
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-blue-400 hover:text-blue-300 text-sm underline"
+          className="text-brand-blue-400 hover:text-brand-blue-300 text-sm underline"
         >
           Open video in new tab
         </a>

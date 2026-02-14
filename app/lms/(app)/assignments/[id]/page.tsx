@@ -103,7 +103,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
                   {course && (
                     <Link
                       href={`/lms/courses/${course.id}`}
-                      className="text-blue-600 hover:underline text-sm"
+                      className="text-brand-blue-600 hover:underline text-sm"
                     >
                       {course.title}
                     </Link>
@@ -116,7 +116,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
                       Graded
                     </span>
                   ) : (
-                    <span className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">
+                    <span className="flex items-center gap-1 px-3 py-1 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium">
                       <Clock className="w-4 h-4" />
                       Submitted
                     </span>
@@ -218,11 +218,11 @@ export default async function AssignmentDetailPage({ params }: Props) {
                         href={submission.file_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg hover:bg-blue-100"
+                        className="flex items-center gap-3 p-3 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100"
                       >
-                        <FileText className="w-5 h-5 text-blue-600" />
-                        <span className="flex-1 text-blue-700">View Submission</span>
-                        <Download className="w-4 h-4 text-blue-500" />
+                        <FileText className="w-5 h-5 text-brand-blue-600" />
+                        <span className="flex-1 text-brand-blue-700">View Submission</span>
+                        <Download className="w-4 h-4 text-brand-blue-500" />
                       </a>
                     </div>
                   )}

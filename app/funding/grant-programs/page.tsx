@@ -78,7 +78,7 @@ export default function GrantProgramsPage() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="text-lg font-bold mb-3 text-blue-900">WIOA</h3>
+              <h3 className="text-lg font-bold mb-3 text-brand-blue-900">WIOA</h3>
               <p className="text-sm text-black mb-2">
                 Workforce Innovation and Opportunity Act
               </p>
@@ -89,7 +89,7 @@ export default function GrantProgramsPage() {
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="text-lg font-bold mb-3 text-blue-900">WRG</h3>
+              <h3 className="text-lg font-bold mb-3 text-brand-blue-900">WRG</h3>
               <p className="text-sm text-black mb-2">
                 Workforce Ready Grant (Indiana)
               </p>
@@ -100,7 +100,7 @@ export default function GrantProgramsPage() {
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="text-lg font-bold mb-3 text-blue-900">JRI</h3>
+              <h3 className="text-lg font-bold mb-3 text-brand-blue-900">JRI</h3>
               <p className="text-sm text-black mb-2">
                 Justice Reinvestment Initiative
               </p>

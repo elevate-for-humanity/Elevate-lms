@@ -97,7 +97,7 @@ export default async function CopyrightPage() {
           </ul>
         </div>
 
-        <div className="bg-blue-50 border-l-4 border-brand-blue-600 p-6 mb-8">
+        <div className="bg-brand-blue-50 border-l-4 border-brand-blue-600 p-6 mb-8">
           <h3 className="text-xl font-bold text-black mb-3">
             Partner & Program Content
           </h3>
@@ -217,7 +217,7 @@ export default async function CopyrightPage() {
         <div className="grid md:grid-cols-2 gap-6">
           <Link
             href="/platform/licensing"
-            className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-2 border-gray-200 hover:border-blue-500"
+            className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-2 border-gray-200 hover:border-brand-blue-500"
           >
             <Shield className="w-8 h-8 text-brand-blue-600 mb-3" />
             <h3 className="text-lg font-bold text-black mb-2">
@@ -230,7 +230,7 @@ export default async function CopyrightPage() {
 
           <Link
             href="/contact"
-            className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-2 border-gray-200 hover:border-blue-500"
+            className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow border-2 border-gray-200 hover:border-brand-blue-500"
           >
             <FileText className="w-8 h-8 text-brand-blue-600 mb-3" />
             <h3 className="text-lg font-bold text-black mb-2">Contact Us</h3>

@@ -59,7 +59,7 @@ export default function NotificationSettings() {
         <div className="flex items-center gap-3">
           <div
             className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-              enabled ? 'bg-blue-100' : 'bg-gray-100'
+              enabled ? 'bg-brand-blue-100' : 'bg-gray-100'
             }`}
           >
             {enabled ? (

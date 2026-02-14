@@ -116,11 +116,11 @@ const iconMap: Record<string, any> = {
 };
 
 const colorMap: Record<string, { bg: string; text: string; border: string }> = {
-  blue: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' },
+  blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600', border: 'border-brand-blue-200' },
   yellow: { bg: 'bg-yellow-100', text: 'text-yellow-600', border: 'border-yellow-200' },
   green: { bg: 'bg-green-100', text: 'text-green-600', border: 'border-green-200' },
   orange: { bg: 'bg-orange-100', text: 'text-orange-600', border: 'border-orange-200' },
-  blue: { bg: 'bg-blue-100', text: 'text-blue-600', border: 'border-blue-200' },
+  blue: { bg: 'bg-brand-blue-100', text: 'text-brand-blue-600', border: 'border-brand-blue-200' },
   pink: { bg: 'bg-pink-100', text: 'text-pink-600', border: 'border-pink-200' },
   cyan: { bg: 'bg-cyan-100', text: 'text-cyan-600', border: 'border-cyan-200' },
   amber: { bg: 'bg-amber-100', text: 'text-amber-600', border: 'border-amber-200' },
@@ -233,7 +233,7 @@ export default async function BadgesPage() {
             <div className="text-sm text-slate-600">Badges Remaining</div>
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-4 text-center">
-            <div className="text-3xl font-bold text-blue-600">
+            <div className="text-3xl font-bold text-brand-blue-600">
               {totalBadges > 0 ? Math.round((earnedCount / totalBadges) * 100) : 0}%
             </div>
             <div className="text-sm text-slate-600">Completion</div>
@@ -331,7 +331,7 @@ export default async function BadgesPage() {
             </p>
             <Link
               href="/lms/courses"
-              className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
             >
               <BookOpen className="w-5 h-5" />
               Browse Courses
@@ -341,7 +341,7 @@ export default async function BadgesPage() {
 
         {/* Back Link */}
         <div className="mt-8 text-center">
-          <Link href="/lms/dashboard" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="/lms/dashboard" className="text-brand-blue-600 hover:text-brand-blue-700 font-medium">
             ← Back to Dashboard
           </Link>
         </div>

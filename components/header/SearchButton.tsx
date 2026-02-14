@@ -70,7 +70,7 @@ export function SearchButton() {
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="p-2 text-black hover:text-blue-600 transition"
+        className="p-2 text-black hover:text-brand-blue-600 transition"
         aria-label="Search"
       >
         <Search className="w-5 h-5" />
@@ -96,7 +96,7 @@ export function SearchButton() {
                 <h2 className="text-xl font-bold text-black">Search</h2>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="p-2 text-black hover:text-blue-600 transition"
+                  className="p-2 text-black hover:text-brand-blue-600 transition"
                   aria-label="Close search"
                 >
                   <X className="w-5 h-5" />
@@ -110,13 +110,13 @@ export function SearchButton() {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search programs, courses, FAQs..."
-                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:border-blue-600 focus:outline-none text-black"
+                    className="w-full pl-12 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:border-brand-blue-600 focus:outline-none text-black"
                     autoFocus
                   />
                 </div>
                 <button
                   type="submit"
-                  className="mt-4 w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition"
+                  className="mt-4 w-full bg-brand-blue-600 text-white py-3 rounded-lg font-bold hover:bg-brand-blue-700 transition"
                 >
                   Search
                 </button>

@@ -33,8 +33,8 @@ export default function PartnerOnboardingSuccessPage() {
 
           <div className="bg-slate-50 rounded-lg p-6 text-left space-y-4 mb-8">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Mail className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Mail className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="font-medium text-slate-900">Check Your Email</p>
@@ -45,8 +45,8 @@ export default function PartnerOnboardingSuccessPage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                <Clock className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                <Clock className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="font-medium text-slate-900">Review Process</p>
@@ -72,7 +72,7 @@ export default function PartnerOnboardingSuccessPage() {
           <div className="space-y-3">
             <Link
               href="/programs/barber-apprenticeship"
-              className="block w-full py-3 px-6 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+              className="block w-full py-3 px-6 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition-colors"
             >
               Back to Barber Program
             </Link>
@@ -86,7 +86,7 @@ export default function PartnerOnboardingSuccessPage() {
 
           <p className="mt-8 text-sm text-slate-500">
             Questions? Contact us at{' '}
-            <a href="/support" className="text-blue-600 hover:underline">
+            <a href="/support" className="text-brand-blue-600 hover:underline">
               Get Help Online
             </a>
           </p>

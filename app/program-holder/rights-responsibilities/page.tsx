@@ -56,7 +56,7 @@ export default async function ProgramHolderRightsPage() {
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Rights Responsibilities" }]} />
         </div>
       {/* Header */}
-      <div className="bg-blue-900 text-white py-12">
+      <div className="bg-brand-blue-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex items-center gap-4 mb-4">
             <Shield size={48} />
@@ -64,7 +64,7 @@ export default async function ProgramHolderRightsPage() {
               <h1 className="text-4xl font-bold">
                 Program Holder Rights & Responsibilities
               </h1>
-              <p className="text-blue-200 mt-2">
+              <p className="text-brand-blue-200 mt-2">
                 Required Reading - Please Review Carefully
               </p>
             </div>
@@ -282,9 +282,9 @@ export default async function ProgramHolderRightsPage() {
         </div>
 
         {/* Acknowledgement Form */}
-        <div className="bg-blue-50 rounded-xl p-8 border-2 border-blue-200">
+        <div className="bg-brand-blue-50 rounded-xl p-8 border-2 border-brand-blue-200">
           <div className="flex items-start gap-4 mb-6">
-            <CheckCircle className="text-blue-600 flex-shrink-0" size={32} />
+            <CheckCircle className="text-brand-blue-600 flex-shrink-0" size={32} />
             <div>
               <h3 className="text-2xl font-bold text-black mb-2">
                 Acknowledgement Required

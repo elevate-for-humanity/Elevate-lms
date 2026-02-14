@@ -187,7 +187,7 @@ export default function AutomationPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-2">
-              <Mail className="w-8 h-8 text-blue-600" />
+              <Mail className="w-8 h-8 text-brand-blue-600" />
             </div>
             <div className="text-2xl font-bold text-black">
               {workflows.reduce((sum, w) => sum + w.emails, 0)}
@@ -355,7 +355,7 @@ export default function AutomationPage() {
                             `/admin/email-marketing/automation/${workflow.id}/edit`
                           )
                         }
-                        className="p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                        className="p-2 bg-brand-blue-100 text-brand-blue-700 rounded-lg hover:bg-brand-blue-200 transition-colors"
                         title="Edit"
                       >
                         <Edit className="w-4 h-4" />
@@ -502,9 +502,9 @@ function WorkflowTemplate({
   onClick,
 }: WorkflowTemplateProps) {
   const colorClasses = {
-    blue: 'bg-blue-50 text-brand-blue-600 hover:bg-gray-100',
+    blue: 'bg-brand-blue-50 text-brand-blue-600 hover:bg-gray-100',
     orange: 'bg-orange-50 text-brand-orange-600 hover:bg-orange-100',
-    blue: 'bg-blue-50 text-blue-600 hover:bg-blue-100',
+    blue: 'bg-brand-blue-50 text-brand-blue-600 hover:bg-brand-blue-100',
   };
 
   return (

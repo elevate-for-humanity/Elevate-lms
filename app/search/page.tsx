@@ -137,7 +137,7 @@ export default function SearchPage() {
                   />
                 </div>
                 <div className="p-5">
-                  <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-blue-600 transition-colors">
+                  <h3 className="font-bold text-lg text-slate-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
                     {prog.name}
                   </h3>
                   <div className="flex flex-wrap gap-1.5 mb-3">
@@ -173,9 +173,9 @@ export default function SearchPage() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="block p-5 bg-white rounded-xl border border-slate-200 hover:border-blue-300 hover:shadow-sm transition group"
+                className="block p-5 bg-white rounded-xl border border-slate-200 hover:border-brand-blue-300 hover:shadow-sm transition group"
               >
-                <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-blue-600 transition-colors">{link.label}</h3>
+                <h3 className="font-semibold text-slate-900 mb-1 group-hover:text-brand-blue-600 transition-colors">{link.label}</h3>
                 <p className="text-sm text-slate-500">{link.desc}</p>
               </Link>
             ))}

@@ -77,17 +77,17 @@ export function SponsorshipInfoPanel({ programId, partnerId, variant = 'full' }:
 
   if (loading) {
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 flex items-center justify-center">
-        <Loader2 className="w-5 h-5 animate-spin text-blue-600" />
+      <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 flex items-center justify-center">
+        <Loader2 className="w-5 h-5 animate-spin text-brand-blue-600" />
       </div>
     );
   }
 
   if (variant === 'compact') {
     return (
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <div className="flex items-center gap-2 text-sm text-blue-800">
-          <Info className="w-4 h-4 text-blue-600" />
+      <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+        <div className="flex items-center gap-2 text-sm text-brand-blue-800">
+          <Info className="w-4 h-4 text-brand-blue-600" />
           <span>Sponsored by <strong>{info.sponsor_name}</strong></span>
         </div>
       </div>
@@ -99,58 +99,58 @@ export function SponsorshipInfoPanel({ programId, partnerId, variant = 'full' }:
   }
 
   return (
-    <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+    <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
       <div className="flex items-start gap-3">
-        <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+        <Info className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
         <div className="flex-1">
-          <h3 className="text-lg font-semibold text-blue-900 mb-3">
+          <h3 className="text-lg font-semibold text-brand-blue-900 mb-3">
             Program Sponsorship
           </h3>
-          <div className="space-y-3 text-sm text-blue-800">
+          <div className="space-y-3 text-sm text-brand-blue-800">
             <div className="grid grid-cols-2 gap-4">
               <div className="flex items-start gap-2">
-                <Building2 className="w-4 h-4 text-blue-600 mt-0.5" />
+                <Building2 className="w-4 h-4 text-brand-blue-600 mt-0.5" />
                 <div>
-                  <div className="font-medium text-blue-900">Sponsor</div>
+                  <div className="font-medium text-brand-blue-900">Sponsor</div>
                   <div>{info.sponsor_name}</div>
                 </div>
               </div>
               <div className="flex items-start gap-2">
-                <FileCheck className="w-4 h-4 text-blue-600 mt-0.5" />
+                <FileCheck className="w-4 h-4 text-brand-blue-600 mt-0.5" />
                 <div>
-                  <div className="font-medium text-blue-900">Curriculum</div>
+                  <div className="font-medium text-brand-blue-900">Curriculum</div>
                   <div>{info.curriculum_type}</div>
                 </div>
               </div>
               <div className="flex items-start gap-2">
-                <Users className="w-4 h-4 text-blue-600 mt-0.5" />
+                <Users className="w-4 h-4 text-brand-blue-600 mt-0.5" />
                 <div>
-                  <div className="font-medium text-blue-900">Enrollment</div>
+                  <div className="font-medium text-brand-blue-900">Enrollment</div>
                   <div>{info.enrollment_manager}</div>
                 </div>
               </div>
               <div className="flex items-start gap-2">
-                <DollarSign className="w-4 h-4 text-blue-600 mt-0.5" />
+                <DollarSign className="w-4 h-4 text-brand-blue-600 mt-0.5" />
                 <div>
-                  <div className="font-medium text-blue-900">Funding</div>
+                  <div className="font-medium text-brand-blue-900">Funding</div>
                   <div>{info.funding_source}</div>
                 </div>
               </div>
             </div>
-            <div className="pt-3 border-t border-blue-200">
-              <p className="text-xs text-blue-700">
+            <div className="pt-3 border-t border-brand-blue-200">
+              <p className="text-xs text-brand-blue-700">
                 {info.compliance_notes}
               </p>
             </div>
             {(info.contact_email || info.contact_phone) && (
-              <div className="pt-3 border-t border-blue-200 flex gap-4 text-xs">
+              <div className="pt-3 border-t border-brand-blue-200 flex gap-4 text-xs">
                 {info.contact_email && (
-                  <a href={`mailto:${info.contact_email}`} className="text-blue-600 hover:underline">
+                  <a href={`mailto:${info.contact_email}`} className="text-brand-blue-600 hover:underline">
                     {info.contact_email}
                   </a>
                 )}
                 {info.contact_phone && (
-                  <a href={`tel:${info.contact_phone}`} className="text-blue-600 hover:underline">
+                  <a href={`tel:${info.contact_phone}`} className="text-brand-blue-600 hover:underline">
                     {info.contact_phone}
                   </a>
                 )}

@@ -79,18 +79,18 @@ export default async function AdminsPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-blue-600 text-white py-16">
+      <section className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 text-center">
           <Settings className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Administrator Resources</h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-blue-100 max-w-2xl mx-auto">
             Tools, guides, and support for platform administrators
           </p>
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 py-12">
-        <Link href="/community/communityhub" className="text-blue-600 hover:underline mb-8 inline-block">
+        <Link href="/community/communityhub" className="text-brand-blue-600 hover:underline mb-8 inline-block">
           ← Back to Community Hub
         </Link>
 
@@ -106,7 +106,7 @@ export default async function AdminsPage() {
                   href={tool.href}
                   className="bg-white rounded-xl p-6 border hover:shadow-md transition text-center"
                 >
-                  <Icon className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+                  <Icon className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
                   <h3 className="font-bold mb-1">{tool.name}</h3>
                   <p className="text-gray-600 text-sm">{tool.description}</p>
                 </Link>
@@ -121,7 +121,7 @@ export default async function AdminsPage() {
             {/* Resources */}
             <section>
               <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-                <FileText className="w-6 h-6 text-blue-600" />
+                <FileText className="w-6 h-6 text-brand-blue-600" />
                 Admin Resources
               </h2>
               <div className="grid md:grid-cols-2 gap-4">
@@ -131,7 +131,7 @@ export default async function AdminsPage() {
                     <p className="text-gray-600 text-sm mb-4">{resource.description}</p>
                     <a
                       href={resource.url || '#'}
-                      className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
+                      className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
                     >
                       <Download className="w-4 h-4" />
                       Download
@@ -168,22 +168,22 @@ export default async function AdminsPage() {
               <h3 className="font-bold text-lg mb-4">Quick Links</h3>
               <ul className="space-y-3">
                 <li>
-                  <Link href="/admin/dashboard" className="text-blue-600 hover:underline">
+                  <Link href="/admin/dashboard" className="text-brand-blue-600 hover:underline">
                     Admin Dashboard
                   </Link>
                 </li>
                 <li>
-                  <Link href="/admin/users" className="text-blue-600 hover:underline">
+                  <Link href="/admin/users" className="text-brand-blue-600 hover:underline">
                     User Management
                   </Link>
                 </li>
                 <li>
-                  <Link href="/admin/reports" className="text-blue-600 hover:underline">
+                  <Link href="/admin/reports" className="text-brand-blue-600 hover:underline">
                     Reports & Analytics
                   </Link>
                 </li>
                 <li>
-                  <Link href="/help/admin" className="text-blue-600 hover:underline">
+                  <Link href="/help/admin" className="text-brand-blue-600 hover:underline">
                     Help Center
                   </Link>
                 </li>
@@ -193,7 +193,7 @@ export default async function AdminsPage() {
             {/* Discussions */}
             <section className="bg-white rounded-xl border p-6">
               <h3 className="font-bold text-lg mb-4 flex items-center gap-2">
-                <Users className="w-5 h-5 text-blue-600" />
+                <Users className="w-5 h-5 text-brand-blue-600" />
                 Admin Discussions
               </h3>
               {discussions && discussions.length > 0 ? (
@@ -215,14 +215,14 @@ export default async function AdminsPage() {
             </section>
 
             {/* Support */}
-            <section className="bg-blue-50 rounded-xl p-6">
+            <section className="bg-brand-blue-50 rounded-xl p-6">
               <h3 className="font-bold text-lg mb-4">Need Help?</h3>
               <p className="text-gray-600 text-sm mb-4">
                 Our support team is available to help with admin questions.
               </p>
               <Link
                 href="/contact?type=admin"
-                className="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+                className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-blue-700 transition"
               >
                 Contact Support
               </Link>

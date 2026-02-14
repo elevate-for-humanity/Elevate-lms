@@ -175,7 +175,7 @@ Preferred Contact: ${form.preferredContact}`,
           </div>
 
           {/* What's Next */}
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-6 mb-6 text-left max-w-2xl mx-auto">
+          <div className="bg-brand-blue-50 border-2 border-brand-blue-200 rounded-xl p-6 mb-6 text-left max-w-2xl mx-auto">
             <h3 className="text-xl font-bold text-black mb-4">
               What Happens Next?
             </h3>

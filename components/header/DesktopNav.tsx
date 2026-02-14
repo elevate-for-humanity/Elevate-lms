@@ -189,7 +189,7 @@ export function DesktopNav({ items: initialItems }: DesktopNavProps) {
                   }
                 }}
                 onKeyDown={(e) => handleKeyDown(e, item.name, true, item.children?.length || 0)}
-                className="flex items-center gap-1 text-black hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 rounded px-3 py-2"
+                className="flex items-center gap-1 text-black hover:text-brand-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-brand-blue-600 focus:ring-offset-2 rounded px-3 py-2"
                 aria-haspopup="true"
                 aria-expanded={isOpen}
                 aria-controls={`dropdown-${item.name}`}
@@ -212,7 +212,7 @@ export function DesktopNav({ items: initialItems }: DesktopNavProps) {
                     <Link
                       key={child.name}
                       href={child.href}
-                      className="block px-4 py-2 text-sm text-black hover:bg-gray-100 transition focus:outline-none focus:bg-blue-50 focus:text-blue-600"
+                      className="block px-4 py-2 text-sm text-black hover:bg-gray-100 transition focus:outline-none focus:bg-brand-blue-50 focus:text-brand-blue-600"
                       role="menuitem"
                       onClick={() => {
                         setOpenDropdown(null);
@@ -233,8 +233,8 @@ export function DesktopNav({ items: initialItems }: DesktopNavProps) {
           <Link
             key={item.name}
             href={item.href}
-            className={`text-black hover:text-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 rounded px-2 py-2 ${
-              isActive ? 'text-blue-600' : ''
+            className={`text-black hover:text-brand-blue-600 font-medium transition focus:outline-none focus:ring-2 focus:ring-brand-blue-600 focus:ring-offset-2 rounded px-2 py-2 ${
+              isActive ? 'text-brand-blue-600' : ''
             }`}
             aria-current={isActive ? 'page' : undefined}
           >

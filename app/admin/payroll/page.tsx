@@ -265,7 +265,7 @@ export default function AdminPayroll() {
                       {payroll.status === 'pending' && (
                         <button
                           onClick={() => markPaid(payroll.id)}
-                          className="text-brand-blue-600 hover:text-blue-800 font-medium"
+                          className="text-brand-blue-600 hover:text-brand-blue-800 font-medium"
                         >
                           Mark Paid
                         </button>

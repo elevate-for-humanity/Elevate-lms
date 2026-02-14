@@ -92,13 +92,13 @@ export default function Header() {
           </Link>
           <Link
             href="/inquiry"
-            className="border border-blue-600 text-blue-600 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-blue-50 transition-colors"
+            className="border border-brand-blue-600 text-brand-blue-600 px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-50 transition-colors"
           >
             Get Info
           </Link>
           <Link
             href="/programs"
-            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-blue-700 transition-colors"
+            className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm hover:bg-brand-blue-700 transition-colors"
           >
             View Programs
           </Link>

@@ -72,7 +72,7 @@ export default async function PublicAssistancePage() {
       </section>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <Link href="/wioa-eligibility" className="text-blue-600 hover:underline mb-6 inline-block">
+        <Link href="/wioa-eligibility" className="text-brand-blue-600 hover:underline mb-6 inline-block">
           ← Back to WIOA Eligibility
         </Link>
 
@@ -111,19 +111,19 @@ export default async function PublicAssistancePage() {
           <h2 className="text-2xl font-bold mb-6">Required Documents</h2>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Proof of public assistance (award letter, benefit statement, or EBT card)</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Valid government-issued ID</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Proof of Indiana residency</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Social Security card</span>
             </li>
           </ul>

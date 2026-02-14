@@ -54,7 +54,7 @@ export default function MonitoringSetupPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <Loader2 className="h-12 w-12 animate-spin text-brand-blue-600 mx-auto mb-4" />
           <p className="text-black">Verifying monitoring setup...</p>
         </div>
       </div>
@@ -70,7 +70,7 @@ export default function MonitoringSetupPage() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-black flex items-center gap-3">
-            <Database className="h-11 w-11 text-blue-600" />
+            <Database className="h-11 w-11 text-brand-blue-600" />
             Monitoring Setup
           </h1>
           <p className="text-black mt-2">Verify and configure monitoring system</p>
@@ -199,7 +199,7 @@ export default function MonitoringSetupPage() {
             <div className="space-y-3">
               {result.recommendations.map((rec, index) => (
                 <div key={index} className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">
+                  <div className="flex-shrink-0 w-6 h-6 bg-brand-blue-100 rounded-full flex items-center justify-center text-brand-blue-600 font-bold text-sm">
                     {index + 1}
                   </div>
                   <p className="text-black">{rec}</p>
@@ -272,7 +272,7 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_ip_address ON audit_logs(ip_address);`
                 navigator.clipboard.writeText(document.querySelector('pre')?.textContent || '');
                 alert('SQL copied to clipboard!');
               }}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="mt-4 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Copy SQL to Clipboard
             </button>

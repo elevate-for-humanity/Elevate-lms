@@ -105,7 +105,7 @@ export default function ApprenticeshipsPage() {
             <p className="text-sm text-white/70 max-w-xl mb-6">
               Tuition and funding eligibility vary by program. See individual program pages for details.
             </p>
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/apply" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
           </div>
@@ -120,8 +120,8 @@ export default function ApprenticeshipsPage() {
               <div key={i} className="flex items-center gap-3 justify-center">
                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
                   b.color === 'green' ? 'bg-green-500' : 
-                  b.color === 'blue' ? 'bg-blue-500' : 
-                  b.color === 'blue' ? 'bg-blue-500' : 'bg-orange-500'
+                  b.color === 'blue' ? 'bg-brand-blue-500' : 
+                  b.color === 'blue' ? 'bg-brand-blue-500' : 'bg-orange-500'
                 }`}>
                   <b.icon className="w-6 h-6 text-white" />
                 </div>
@@ -133,7 +133,7 @@ export default function ApprenticeshipsPage() {
       </section>
 
       {/* What is an Apprenticeship */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-white">
@@ -145,7 +145,7 @@ export default function ApprenticeshipsPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Earn While You Learn</h3>
-                    <p className="text-blue-100">Get paid from day one while training on the job with experienced mentors.</p>
+                    <p className="text-brand-blue-100">Get paid from day one while training on the job with experienced mentors.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -154,7 +154,7 @@ export default function ApprenticeshipsPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Industry Credentials</h3>
-                    <p className="text-blue-100">Earn state licenses and nationally recognized certifications.</p>
+                    <p className="text-brand-blue-100">Earn state licenses and nationally recognized certifications.</p>
                   </div>
                 </div>
                 <div className="flex gap-4">
@@ -163,7 +163,7 @@ export default function ApprenticeshipsPage() {
                   </div>
                   <div>
                     <h3 className="font-bold text-lg">Job Guarantee</h3>
-                    <p className="text-blue-100">You&apos;re already employed - training leads directly to your career.</p>
+                    <p className="text-brand-blue-100">You&apos;re already employed - training leads directly to your career.</p>
                   </div>
                 </div>
               </div>
@@ -220,7 +220,7 @@ export default function ApprenticeshipsPage() {
               <div key={i} className="group">
                 <div className="relative h-48 rounded-2xl overflow-hidden mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
                   <Image src={step.image} alt={step.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
-                  <div className="absolute top-4 left-4 w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
+                  <div className="absolute top-4 left-4 w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                     {step.num}
                   </div>
                   <div className="absolute bottom-4 left-4 right-4">
@@ -272,7 +272,7 @@ export default function ApprenticeshipsPage() {
             Real pay. Industry credentials. Funding options available.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/apply" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
+            <Link href="/apply" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-10 py-5 rounded-full font-bold text-lg transition-all hover:scale-105">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
             <a href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-10 py-5 rounded-full font-bold text-lg transition-all border border-white/30">

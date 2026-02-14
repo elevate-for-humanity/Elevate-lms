@@ -104,16 +104,16 @@ export default async function StartPage() {
   const displayStats = stats && stats.length > 0 ? stats : defaultStats;
 
   const colorClasses: Record<string, string> = {
-    blue: 'bg-blue-50 border-blue-200 hover:border-blue-400',
+    blue: 'bg-brand-blue-50 border-brand-blue-200 hover:border-brand-blue-400',
     green: 'bg-green-50 border-green-200 hover:border-green-400',
-    blue: 'bg-blue-50 border-blue-200 hover:border-blue-400',
+    blue: 'bg-brand-blue-50 border-brand-blue-200 hover:border-brand-blue-400',
     amber: 'bg-amber-50 border-amber-200 hover:border-amber-400',
   };
 
   const iconColorClasses: Record<string, string> = {
-    blue: 'text-blue-600',
+    blue: 'text-brand-blue-600',
     green: 'text-green-600',
-    blue: 'text-blue-600',
+    blue: 'text-brand-blue-600',
     amber: 'text-amber-600',
   };
 
@@ -132,7 +132,7 @@ export default async function StartPage() {
           <h1 className="text-3xl md:text-5xl font-black mb-4">
             Find Your Pathway
           </h1>
-          <p className="text-xl md:text-2xl text-blue-100 mb-8">
+          <p className="text-xl md:text-2xl text-brand-blue-100 mb-8">
             Call Get Help Online or apply online for a new career. We'll help you find the right program and funding.
           </p>
         </div>
@@ -182,7 +182,7 @@ export default async function StartPage() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {displayStats.map((stat: any, index: number) => (
               <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-blue-600 mb-1">
+                <div className="text-3xl md:text-4xl font-bold text-brand-blue-600 mb-1">
                   {stat.value}
                 </div>
                 <div className="text-gray-600">{stat.label}</div>
@@ -204,7 +204,7 @@ export default async function StartPage() {
                   href={`/programs/${program.slug || program.id}`}
                   className="bg-white rounded-xl p-6 border hover:shadow-md transition group"
                 >
-                  <h3 className="font-bold text-lg mb-2 group-hover:text-blue-600 transition">
+                  <h3 className="font-bold text-lg mb-2 group-hover:text-brand-blue-600 transition">
                     {program.name}
                   </h3>
                   {program.description && (
@@ -224,7 +224,7 @@ export default async function StartPage() {
             <div className="text-center mt-8">
               <Link
                 href="/programs"
-                className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:underline"
+                className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold hover:underline"
               >
                 View All Programs <ArrowRight className="w-4 h-4" />
               </Link>
@@ -239,8 +239,8 @@ export default async function StartPage() {
           <h2 className="text-2xl font-bold text-center mb-8">How It Works</h2>
           <div className="grid md:grid-cols-3 gap-8">
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-blue-600 font-bold text-xl">1</span>
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-brand-blue-600 font-bold text-xl">1</span>
               </div>
               <h3 className="font-bold mb-2">Apply</h3>
               <p className="text-gray-600 text-sm">
@@ -248,8 +248,8 @@ export default async function StartPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-blue-600 font-bold text-xl">2</span>
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-brand-blue-600 font-bold text-xl">2</span>
               </div>
               <h3 className="font-bold mb-2">Train</h3>
               <p className="text-gray-600 text-sm">
@@ -257,8 +257,8 @@ export default async function StartPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-blue-600 font-bold text-xl">3</span>
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-brand-blue-600 font-bold text-xl">3</span>
               </div>
               <h3 className="font-bold mb-2">Work</h3>
               <p className="text-gray-600 text-sm">
@@ -270,24 +270,24 @@ export default async function StartPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-12 md:py-16 bg-blue-600">
+      <section className="py-12 md:py-16 bg-brand-blue-600">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-blue-100 mb-8">
+          <p className="text-brand-blue-100 mb-8">
             Apply today and take the first step toward your new career.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-700 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition"
             >
               <Phone className="w-5 h-5" />
               Get Help Online

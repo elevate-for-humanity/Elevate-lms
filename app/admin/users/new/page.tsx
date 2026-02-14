@@ -44,7 +44,7 @@ export default async function NewUserPage() {
         <div className="mb-8">
           <Link
             href="/admin/users"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Users
           </Link>
@@ -73,7 +73,7 @@ export default async function NewUserPage() {
                   type="text"
                   required
                   placeholder="First name"
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                 />
               </div>
               <div>
@@ -84,7 +84,7 @@ export default async function NewUserPage() {
                   type="text"
                   required
                   placeholder="Doe"
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                 />
               </div>
             </div>
@@ -97,7 +97,7 @@ export default async function NewUserPage() {
                 type="email"
                 required
                 placeholder="user@organization.org"
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
               />
               <p className="mt-1 text-xs text-black">
                 User will receive a verification email at this address
@@ -112,7 +112,7 @@ export default async function NewUserPage() {
                 <input
                   type="tel"
                   placeholder="(317) 314-3757"
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                 />
               </div>
               <div>
@@ -121,7 +121,7 @@ export default async function NewUserPage() {
                 </label>
                 <input
                   type="date"
-                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                 />
               </div>
             </div>
@@ -133,7 +133,7 @@ export default async function NewUserPage() {
               </label>
               <select
                 required
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
               >
                 <option value="">Select a role</option>
                 <option value="student">Student</option>
@@ -157,7 +157,7 @@ export default async function NewUserPage() {
                 type="password"
                 required
                 placeholder="Enter temporary password"
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
               />
               <p className="mt-1 text-xs text-black">
                 User will be required to change password on first login
@@ -203,7 +203,7 @@ export default async function NewUserPage() {
               <label className="block text-sm font-medium text-black mb-2">
                 Assign to Program (Optional)
               </label>
-              <select className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+              <select className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500">
                 <option value="">No program assignment</option>
                 <option value="barber">Barber Training</option>
                 <option value="cna">CNA</option>
@@ -221,7 +221,7 @@ export default async function NewUserPage() {
               <textarea
                 rows={3}
                 placeholder="Add any notes about this user..."
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
               />
             </div>
 
@@ -241,11 +241,11 @@ export default async function NewUserPage() {
         </div>
 
         {/* Help Text */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="text-sm font-semibold text-blue-900 mb-2">
+        <div className="mt-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+          <h3 className="text-sm font-semibold text-brand-blue-900 mb-2">
             Creating User Accounts
           </h3>
-          <ul className="text-sm text-blue-800 space-y-1">
+          <ul className="text-sm text-brand-blue-800 space-y-1">
             <li>
               • Users will receive a verification email to activate their
               account

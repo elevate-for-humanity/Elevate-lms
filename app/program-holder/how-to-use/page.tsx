@@ -40,10 +40,10 @@ export default async function HowToUsePage() {
             </div>
           ))}
         </div>
-        <div className="mt-8 bg-blue-50 rounded-lg p-6">
+        <div className="mt-8 bg-brand-blue-50 rounded-lg p-6">
           <h2 className="font-semibold mb-2">Need Help?</h2>
           <p className="text-sm text-gray-600 mb-4">Contact our support team for assistance with your program.</p>
-          <Link href="/support" className="text-blue-600 hover:text-blue-800 text-sm font-medium">Contact Support →</Link>
+          <Link href="/support" className="text-brand-blue-600 hover:text-brand-blue-800 text-sm font-medium">Contact Support →</Link>
         </div>
       </div>
     </div>

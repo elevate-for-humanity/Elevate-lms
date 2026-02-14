@@ -60,9 +60,9 @@ export default function DisasterRecoveryTestPage() {
         </div>
 
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Backup Source</h2>
-        <div className="bg-blue-50 rounded-lg p-6 mb-6 border border-blue-200">
+        <div className="bg-brand-blue-50 rounded-lg p-6 mb-6 border border-brand-blue-200">
           <div className="flex items-start gap-3">
-            <Database className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+            <Database className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
             <div>
               <p className="text-black m-0 mb-2">
                 <strong>Backup Provider:</strong> Supabase Automated Backups
@@ -93,12 +93,12 @@ export default function DisasterRecoveryTestPage() {
 
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Observed Recovery Metrics</h2>
         <div className="grid md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+          <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200">
             <div className="flex items-center gap-2 mb-2">
-              <Clock className="w-5 h-5 text-blue-600" />
+              <Clock className="w-5 h-5 text-brand-blue-600" />
               <h3 className="text-lg font-bold text-black m-0">Recovery Time Objective (RTO)</h3>
             </div>
-            <p className="text-3xl font-black text-blue-600 mb-1">18 minutes</p>
+            <p className="text-3xl font-black text-brand-blue-600 mb-1">18 minutes</p>
             <p className="text-sm text-gray-600 m-0">Target: &lt; 4 hours</p>
           </div>
 
@@ -175,7 +175,7 @@ export default function DisasterRecoveryTestPage() {
         </div>
 
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Production Impact Statement</h2>
-        <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mb-6">
+        <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mb-6">
           <p className="text-black m-0">
             This disaster recovery test was conducted in an isolated environment. 
             <strong> No production systems, data, or services were affected.</strong> The 
@@ -195,17 +195,17 @@ export default function DisasterRecoveryTestPage() {
           </p>
           <ul className="list-disc pl-6 text-black space-y-1 m-0">
             <li>
-              <Link href="/policies/disaster-recovery" className="text-blue-600 hover:underline">
+              <Link href="/policies/disaster-recovery" className="text-brand-blue-600 hover:underline">
                 Disaster Recovery Policy
               </Link>
             </li>
             <li>
-              <Link href="/policies/incident-response" className="text-blue-600 hover:underline">
+              <Link href="/policies/incident-response" className="text-brand-blue-600 hover:underline">
                 Incident Response Policy
               </Link>
             </li>
             <li>
-              <Link href="/policies/sla" className="text-blue-600 hover:underline">
+              <Link href="/policies/sla" className="text-brand-blue-600 hover:underline">
                 Service Level Agreement
               </Link>
             </li>

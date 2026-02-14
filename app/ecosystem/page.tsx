@@ -48,17 +48,17 @@ export default function EcosystemPage() {
       {/* Hero */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
         <Image src="/hero-images/pathways-hero.jpg" alt="Elevate Ecosystem" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-blue-900/70" />
+        <div className="absolute inset-0 bg-brand-blue-900/70" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">The Elevate Ecosystem</h1>
-          <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
             A connected network of learners, employers, training providers, and workforce boards working together to transform careers and communities.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/partners/join" className="px-8 py-4 bg-white text-blue-700 font-bold rounded-lg hover:bg-blue-50 transition">
+            <Link href="/partners/join" className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-brand-blue-50 transition">
               Join the Network
             </Link>
-            <Link href="/programs" className="px-8 py-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition">
+            <Link href="/programs" className="px-8 py-4 bg-brand-blue-500 text-white font-bold rounded-lg hover:bg-brand-blue-400 transition">
               Explore Programs
             </Link>
           </div>
@@ -70,7 +70,7 @@ export default function EcosystemPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {partners.map((p, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border text-center">
-                <p.icon className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                <p.icon className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
                 <div className="text-3xl font-bold text-gray-900 mb-1">{p.count}</div>
                 <h3 className="font-semibold text-gray-900 mb-2">{p.title}</h3>
                 <p className="text-gray-600 text-sm">{p.description}</p>
@@ -92,8 +92,8 @@ export default function EcosystemPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {howItConnects.map((item, i) => (
               <div key={i} className="bg-gray-50 rounded-xl p-6 text-center border">
-                <div className="w-14 h-14 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <item.icon className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <item.icon className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{item.title}</h3>
                 <p className="text-gray-600 text-sm">{item.description}</p>
@@ -107,26 +107,26 @@ export default function EcosystemPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl font-bold mb-4">Join Our Network</h2>
           <p className="text-gray-600 mb-8">Whether you are a training provider, employer, or community organization, there is a place for you in our ecosystem.</p>
-          <Link href="/partners/join" className="inline-flex items-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700">
+          <Link href="/partners/join" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700">
             Become a Partner <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-blue-100 mb-6">Apply today for free career training programs.</p>
+          <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
               Get Help Online

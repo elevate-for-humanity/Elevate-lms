@@ -154,7 +154,7 @@ export function IDVerificationForm() {
               value={formData.firstName}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
           <div>
@@ -166,7 +166,7 @@ export function IDVerificationForm() {
               name="middleName"
               value={formData.middleName}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
           <div>
@@ -179,7 +179,7 @@ export function IDVerificationForm() {
               value={formData.lastName}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
         </div>
@@ -194,7 +194,7 @@ export function IDVerificationForm() {
               value={formData.dateOfBirth}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
           <div>
@@ -209,7 +209,7 @@ export function IDVerificationForm() {
               maxLength={4}
               pattern="[0-9]{4}"
               placeholder="1234"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
         </div>
@@ -229,7 +229,7 @@ export function IDVerificationForm() {
               value={formData.streetAddress}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
           <div>
@@ -242,7 +242,7 @@ export function IDVerificationForm() {
               value={formData.addressLine2}
               onChange={handleInputChange}
               placeholder="Apt, Suite, Unit, etc."
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
           <div className="grid md:grid-cols-3 gap-4">
@@ -254,7 +254,7 @@ export function IDVerificationForm() {
                 value={formData.city}
                 onChange={handleInputChange}
                 required
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
             <div>
@@ -269,7 +269,7 @@ export function IDVerificationForm() {
                 required
                 maxLength={2}
                 placeholder="IN"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
             <div>
@@ -284,7 +284,7 @@ export function IDVerificationForm() {
                 required
                 pattern="[0-9]{5}"
                 placeholder="46201"
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
           </div>
@@ -304,7 +304,7 @@ export function IDVerificationForm() {
               value={formData.idType}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             >
               <option value="drivers_license">Driver's License</option>
               <option value="state_id">State ID</option>
@@ -322,7 +322,7 @@ export function IDVerificationForm() {
               value={formData.idNumber}
               onChange={handleInputChange}
               required
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
           <div>
@@ -336,7 +336,7 @@ export function IDVerificationForm() {
               onChange={handleInputChange}
               maxLength={2}
               placeholder="IN"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
           <div>
@@ -348,7 +348,7 @@ export function IDVerificationForm() {
               name="idExpiration"
               value={formData.idExpiration}
               onChange={handleInputChange}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
         </div>
@@ -363,7 +363,7 @@ export function IDVerificationForm() {
             <label className="block text-sm font-semibold mb-2">
               ID Front Photo *
             </label>
-            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-blue-500 transition">
+            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-brand-blue-500 transition">
               <Upload className="w-12 h-12 text-slate-400 mx-auto mb-2" />
               <input
                 type="file"
@@ -374,7 +374,7 @@ export function IDVerificationForm() {
                 id="idFront"
               />
               <label htmlFor="idFront" className="cursor-pointer">
-                <span className="text-blue-600 font-semibold">
+                <span className="text-brand-blue-600 font-semibold">
                   Click to upload
                 </span>
                 <span className="text-black"> or drag and drop</span>
@@ -392,7 +392,7 @@ export function IDVerificationForm() {
             <label className="block text-sm font-semibold mb-2">
               ID Back Photo (Optional for Passport)
             </label>
-            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-blue-500 transition">
+            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-brand-blue-500 transition">
               <Upload className="w-12 h-12 text-slate-400 mx-auto mb-2" />
               <input
                 type="file"
@@ -402,7 +402,7 @@ export function IDVerificationForm() {
                 id="idBack"
               />
               <label htmlFor="idBack" className="cursor-pointer">
-                <span className="text-blue-600 font-semibold">
+                <span className="text-brand-blue-600 font-semibold">
                   Click to upload
                 </span>
                 <span className="text-black"> or drag and drop</span>
@@ -420,7 +420,7 @@ export function IDVerificationForm() {
             <label className="block text-sm font-semibold mb-2">
               Selfie Photo *
             </label>
-            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-blue-500 transition">
+            <div className="border-2 border-dashed border-slate-300 rounded-lg p-6 text-center hover:border-brand-blue-500 transition">
               <Camera className="w-12 h-12 text-slate-400 mx-auto mb-2" />
               <input
                 type="file"
@@ -432,7 +432,7 @@ export function IDVerificationForm() {
                 id="selfie"
               />
               <label htmlFor="selfie" className="cursor-pointer">
-                <span className="text-blue-600 font-semibold">
+                <span className="text-brand-blue-600 font-semibold">
                   Take a selfie
                 </span>
                 <span className="text-black"> or upload photo</span>
@@ -463,7 +463,7 @@ export function IDVerificationForm() {
         <button
           type="submit"
           disabled={loading}
-          className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="px-8 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading ? 'Submitting...' : 'Submit Verification'}
         </button>

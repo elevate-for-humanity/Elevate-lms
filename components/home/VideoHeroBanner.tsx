@@ -90,7 +90,7 @@ export default function VideoHeroBanner({
 
   return (
     <section
-      className="relative w-full bg-blue-900"
+      className="relative w-full bg-brand-blue-900"
       onClick={handleUserInteraction}
     >
       {/* Video Container - Full viewport height */}

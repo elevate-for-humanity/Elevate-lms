@@ -121,12 +121,12 @@ export default async function HelpPage() {
       </div>
 
       {/* Hero */}
-      <section className="bg-blue-600 text-white py-16">
+      <section className="bg-brand-blue-600 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             How Can We Help?
           </h1>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Find answers, tutorials, and support for your learning journey.
           </p>
           
@@ -136,7 +136,7 @@ export default async function HelpPage() {
             <input
               type="text"
               placeholder="Search for help articles..."
-              className="w-full pl-12 pr-4 py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-300"
+              className="w-full pl-12 pr-4 py-4 rounded-xl text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-300"
             />
           </div>
         </div>
@@ -156,8 +156,8 @@ export default async function HelpPage() {
               </div>
             </a>
             <a href="mailto:support@elevateforhumanity.org" className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <Mail className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                <Mail className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <div className="font-semibold text-gray-900">Email Support</div>
@@ -165,8 +165,8 @@ export default async function HelpPage() {
               </div>
             </a>
             <Link href="/lms/messages/new" className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <MessageCircle className="w-6 h-6 text-blue-600" />
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                <MessageCircle className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <div className="font-semibold text-gray-900">Send Message</div>
@@ -185,8 +185,8 @@ export default async function HelpPage() {
             {helpCategories.map((category, index) => (
               <div key={index} className="bg-white rounded-xl p-6 shadow-sm border">
                 <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <category.icon className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center flex-shrink-0">
+                    <category.icon className="w-6 h-6 text-brand-blue-600" />
                   </div>
                   <div>
                     <h3 className="font-bold text-gray-900 text-lg">{category.title}</h3>
@@ -198,7 +198,7 @@ export default async function HelpPage() {
                     <li key={i}>
                       <Link 
                         href={link.href}
-                        className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-700 hover:text-blue-600 transition-colors"
+                        className="flex items-center justify-between py-2 px-3 rounded-lg hover:bg-gray-50 text-gray-700 hover:text-brand-blue-600 transition-colors"
                       >
                         <span>{link.label}</span>
                         <ChevronRight className="w-4 h-4" />
@@ -246,7 +246,7 @@ export default async function HelpPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/contact"
-              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-semibold transition-colors"
             >
               Contact Support
             </Link>

@@ -89,17 +89,17 @@ export default function TestimonialsPage() {
           <div className="max-w-7xl mx-auto px-4">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6 text-center">
               <div>
-                <div className="text-3xl font-bold text-blue-600">{testimonials.length}</div>
+                <div className="text-3xl font-bold text-brand-blue-600">{testimonials.length}</div>
                 <div className="text-gray-600">Success Stories</div>
               </div>
               {avgIncrease > 0 && (
                 <div>
-                  <div className="text-3xl font-bold text-blue-600">{avgIncrease}%</div>
+                  <div className="text-3xl font-bold text-brand-blue-600">{avgIncrease}%</div>
                   <div className="text-gray-600">Avg Salary Increase</div>
                 </div>
               )}
               <div>
-                <div className="text-3xl font-bold text-blue-600">Free</div>
+                <div className="text-3xl font-bold text-brand-blue-600">Free</div>
                 <div className="text-gray-600">Training Available</div>
               </div>
             </div>
@@ -142,7 +142,7 @@ export default function TestimonialsPage() {
             </p>
             <Link
               href="/apply"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
             >
               Start Your Journey
               <ArrowRight className="w-5 h-5" />
@@ -175,7 +175,7 @@ export default function TestimonialsPage() {
                   </div>
                   <div className="p-6">
                     <h3 className="text-xl font-bold text-gray-900 mb-1">{story.name}</h3>
-                    <p className="text-blue-600 font-medium mb-3">{story.program_completed}</p>
+                    <p className="text-brand-blue-600 font-medium mb-3">{story.program_completed}</p>
                     
                     {story.current_job_title && story.current_employer && (
                       <p className="text-gray-600 text-sm mb-3">
@@ -185,7 +185,7 @@ export default function TestimonialsPage() {
 
                     {story.quote && (
                       <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                        <Quote className="w-5 h-5 text-blue-500 mb-2" />
+                        <Quote className="w-5 h-5 text-brand-blue-500 mb-2" />
                         <p className="text-gray-700 text-sm italic line-clamp-3">
                           &ldquo;{story.quote}&rdquo;
                         </p>

@@ -109,7 +109,7 @@ export default async function PartnerCoursesPage() {
             <h1 className="text-5xl font-bold mb-6 text-3xl md:text-4xl lg:text-5xl">
               Partner Course Catalog
             </h1>
-            <p className="text-base md:text-lg mb-8 text-blue-100">
+            <p className="text-base md:text-lg mb-8 text-brand-blue-100">
               Access 1200+ professional courses from industry-standard-leading
               partners
             </p>
@@ -198,7 +198,7 @@ export default async function PartnerCoursesPage() {
 
                           {course.category && (
                             <div className="mb-4">
-                              <span className="px-2 py-2 bg-blue-100 text-blue-700 rounded text-xs">
+                              <span className="px-2 py-2 bg-brand-blue-100 text-brand-blue-700 rounded text-xs">
                                 {course.category}
                               </span>
                             </div>

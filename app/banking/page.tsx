@@ -84,7 +84,7 @@ export default async function BankingPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex flex-wrap justify-center items-center gap-8">
             <div className="flex items-center">
-              <Shield className="w-8 h-8 text-blue-600 mr-2" />
+              <Shield className="w-8 h-8 text-brand-blue-600 mr-2" />
               <span className="font-semibold">FDIC Insured</span>
             </div>
             <div className="flex items-center">
@@ -108,9 +108,9 @@ export default async function BankingPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             {/* Refund Advance */}
-            <div className="bg-white border-2 border-blue-200 rounded-lg p-8 hover:shadow-xl transition-all">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <DollarSign className="w-8 h-8 text-blue-600" />
+            <div className="bg-white border-2 border-brand-blue-200 rounded-lg p-8 hover:shadow-xl transition-all">
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <DollarSign className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4 text-center">
                 Refund Advance
@@ -139,7 +139,7 @@ export default async function BankingPage() {
               </ul>
               <Link
                 href="/banking/refund-advance"
-                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-all"
+                className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-all"
               >
                 Learn More
               </Link>
@@ -183,9 +183,9 @@ export default async function BankingPage() {
             </div>
 
             {/* Prepaid Card */}
-            <div className="bg-white border-2 border-blue-200 rounded-lg p-8 hover:shadow-xl transition-all">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CreditCard className="w-8 h-8 text-blue-600" />
+            <div className="bg-white border-2 border-brand-blue-200 rounded-lg p-8 hover:shadow-xl transition-all">
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <CreditCard className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="text-2xl font-bold text-black mb-4 text-center">
                 Prepaid Card
@@ -214,7 +214,7 @@ export default async function BankingPage() {
               </ul>
               <Link
                 href="/banking/prepaid-card"
-                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-all"
+                className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-3 rounded-lg font-bold transition-all"
               >
                 Learn More
               </Link>
@@ -232,7 +232,7 @@ export default async function BankingPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-20 h-20 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 1
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
@@ -244,7 +244,7 @@ export default async function BankingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-20 h-20 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
@@ -256,7 +256,7 @@ export default async function BankingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-20 h-20 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 3
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
@@ -268,7 +268,7 @@ export default async function BankingPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-20 h-20 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 4
               </div>
               <h3 className="text-xl font-bold text-black mb-3">
@@ -285,7 +285,7 @@ export default async function BankingPage() {
       {/* Partner Info */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-8">
+          <div className="bg-brand-blue-50 border-2 border-brand-blue-200 rounded-lg p-8">
             <h2 className="text-2xl font-bold text-black mb-4 text-center">
               Powered by EPS Financial
             </h2>
@@ -295,7 +295,7 @@ export default async function BankingPage() {
             </p>
             <div className="grid md:grid-cols-3 gap-6 text-center">
               <div>
-                <Shield className="w-12 h-12 text-blue-600 mx-auto mb-2" />
+                <Shield className="w-12 h-12 text-brand-blue-600 mx-auto mb-2" />
                 <p className="font-semibold">FDIC Insured</p>
                 <p className="text-sm text-black">
                   Your deposits are protected
@@ -319,7 +319,7 @@ export default async function BankingPage() {
                 href="https://www.epstax.net/"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 font-semibold underline"
+                className="text-brand-blue-600 hover:text-brand-blue-800 font-semibold underline"
               >
                 Learn more about EPS Financial →
               </a>
@@ -377,7 +377,7 @@ export default async function BankingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold mb-6">
             Ready to Get Started?
@@ -395,7 +395,7 @@ export default async function BankingPage() {
             </Link>
             <Link
               href="/contact"
-              className="bg-white hover:bg-gray-100 text-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition-all"
+              className="bg-white hover:bg-gray-100 text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition-all"
             >
               Contact Us
             </Link>

@@ -92,26 +92,26 @@ export default function FERPACompliancePage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative bg-blue-700 text-white py-20 overflow-hidden">
+      <section className="relative bg-brand-blue-700 text-white py-20 overflow-hidden">
         <div className="absolute inset-0">
           <Image src="/images/technology/hero-program-cybersecurity.jpg" alt="FERPA" fill className="object-cover opacity-30" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <span className="inline-block bg-blue-600 text-white text-sm font-bold px-4 py-1 rounded-full mb-4">
+              <span className="inline-block bg-brand-blue-600 text-white text-sm font-bold px-4 py-1 rounded-full mb-4">
                 Data Privacy
               </span>
               <h1 className="text-4xl sm:text-5xl font-black mb-6">FERPA Data Protection</h1>
-              <p className="text-xl text-blue-100 mb-8">
+              <p className="text-xl text-brand-blue-100 mb-8">
                 Enterprise-grade student data protection with encryption, access controls, and complete audit trails.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link href="#pricing" className="inline-flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-blue-50 transition">
+                <Link href="#pricing" className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-50 transition">
                   View Pricing
                   <ArrowRight className="w-5 h-5" />
                 </Link>
-                <Link href="/store/demo" className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-500 transition border border-blue-500">
+                <Link href="/store/demo" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-500 transition border border-brand-blue-500">
                   Request Demo
                 </Link>
               </div>
@@ -124,7 +124,7 @@ export default function FERPACompliancePage() {
                 { icon: Key, label: 'MFA Required' },
               ].map((item) => (
                 <div key={item.label} className="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
-                  <item.icon className="w-8 h-8 mx-auto mb-2 text-blue-300" />
+                  <item.icon className="w-8 h-8 mx-auto mb-2 text-brand-blue-300" />
                   <p className="text-sm font-medium">{item.label}</p>
                 </div>
               ))}
@@ -143,7 +143,7 @@ export default function FERPACompliancePage() {
 
           <div className="grid md:grid-cols-2 gap-8">
             {features.map((feature) => (
-              <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-blue-500 hover:shadow-xl transition-all group">
+              <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-brand-blue-500 hover:shadow-xl transition-all group">
                 <div className="relative h-48">
                   <Image src={feature.image} alt={feature.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
                   <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white">{feature.title}</h3>
@@ -153,7 +153,7 @@ export default function FERPACompliancePage() {
                   <ul className="space-y-2">
                     {feature.items.map((item) => (
                       <li key={item} className="flex items-center gap-2 text-sm text-black">
-                        <CheckCircle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                        <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
                         {item}
                       </li>
                     ))}
@@ -175,19 +175,19 @@ export default function FERPACompliancePage() {
               { name: 'Professional', price: '$999', features: ['Everything in Basic', 'MFA enforcement', 'Real-time audit logs', 'Consent management'], popular: true },
               { name: 'Enterprise', price: '$2,499', features: ['Everything in Pro', 'Custom integrations', 'Dedicated support', 'Compliance certification'] },
             ].map((plan) => (
-              <div key={plan.name} className={`bg-white rounded-2xl p-8 border-2 ${plan.popular ? 'border-blue-500 shadow-xl' : 'border-gray-200'}`}>
-                {plan.popular && <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</span>}
+              <div key={plan.name} className={`bg-white rounded-2xl p-8 border-2 ${plan.popular ? 'border-brand-blue-500 shadow-xl' : 'border-gray-200'}`}>
+                {plan.popular && <span className="bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Most Popular</span>}
                 <h3 className="text-xl font-bold text-black mt-4">{plan.name}</h3>
                 <p className="text-4xl font-black text-black my-4">{plan.price}</p>
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-black">
-                      <CheckCircle className="w-4 h-4 text-blue-600" />
+                      <CheckCircle className="w-4 h-4 text-brand-blue-600" />
                       {f}
                     </li>
                   ))}
                 </ul>
-                <Link href="/store/checkout" className={`block text-center py-3 rounded-lg font-bold ${plan.popular ? 'bg-blue-600 text-white' : 'bg-gray-100 text-black'}`}>
+                <Link href="/store/checkout" className={`block text-center py-3 rounded-lg font-bold ${plan.popular ? 'bg-brand-blue-600 text-white' : 'bg-gray-100 text-black'}`}>
                   Get Started
                 </Link>
               </div>
@@ -197,11 +197,11 @@ export default function FERPACompliancePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-700 text-white">
+      <section className="py-16 bg-brand-blue-700 text-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-black mb-4">Protect Student Data Today</h2>
-          <p className="text-blue-100 mb-8">Schedule a demo to see our FERPA compliance tools in action.</p>
-          <Link href="/store/demo" className="inline-flex items-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-blue-50 transition">
+          <p className="text-brand-blue-100 mb-8">Schedule a demo to see our FERPA compliance tools in action.</p>
+          <Link href="/store/demo" className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-50 transition">
             Schedule Demo
           </Link>
         </div>

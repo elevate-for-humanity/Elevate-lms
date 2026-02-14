@@ -227,7 +227,7 @@ export default function NewSocialCampaignPage() {
                       >
                     ) => setCampaign({ ...campaign, name: e.target.value })}
                     placeholder="e.g., Barber Program Promotion"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -242,7 +242,7 @@ export default function NewSocialCampaignPage() {
                       }
                       className={`p-4 border-2 rounded-lg text-left transition-colors ${
                         campaign.contentSource === 'blog'
-                          ? 'border-brand-blue-600 bg-blue-50'
+                          ? 'border-brand-blue-600 bg-brand-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
@@ -259,7 +259,7 @@ export default function NewSocialCampaignPage() {
                       }
                       className={`p-4 border-2 rounded-lg text-left transition-colors ${
                         campaign.contentSource === 'ai'
-                          ? 'border-brand-blue-600 bg-blue-50'
+                          ? 'border-brand-blue-600 bg-brand-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
@@ -277,7 +277,7 @@ export default function NewSocialCampaignPage() {
                       }
                       className={`p-4 border-2 rounded-lg text-left transition-colors ${
                         campaign.contentSource === 'manual'
-                          ? 'border-brand-blue-600 bg-blue-50'
+                          ? 'border-brand-blue-600 bg-brand-blue-50'
                           : 'border-gray-200 hover:border-gray-300'
                       }`}
                     >
@@ -302,7 +302,7 @@ export default function NewSocialCampaignPage() {
                         | HTMLTextAreaElement
                       >
                     ) => setCampaign({ ...campaign, program: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   >
                     <option value="all">All Programs</option>
                     <option value="barber">Barber Program</option>
@@ -372,7 +372,7 @@ export default function NewSocialCampaignPage() {
                           | 'weekly',
                       })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   >
                     <option value="3x-daily">
                       3x Daily (9 AM, 1 PM, 5 PM EST)
@@ -383,11 +383,11 @@ export default function NewSocialCampaignPage() {
                 </div>
 
                 {campaign.frequency === '3x-daily' && (
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h3 className="font-medium text-blue-900 mb-2">
+                  <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+                    <h3 className="font-medium text-brand-blue-900 mb-2">
                       Daily Posting Times (EST)
                     </h3>
-                    <ul className="space-y-1 text-sm text-blue-800">
+                    <ul className="space-y-1 text-sm text-brand-blue-800">
                       <li>• Morning: 9:00 AM</li>
                       <li>• Afternoon: 1:00 PM</li>
                       <li>• Evening: 5:00 PM</li>
@@ -411,7 +411,7 @@ export default function NewSocialCampaignPage() {
                     ) => setCampaign({ ...campaign, duration: e.target.value })}
                     min="1"
                     max="365"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                   <p className="text-sm text-black mt-1">
                     Total posts:{' '}
@@ -433,7 +433,7 @@ export default function NewSocialCampaignPage() {
                     !campaign.name ||
                     campaign.platforms.length === 0
                   }
-                  className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center space-x-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Sparkles className="w-4 h-4" />
                   <span>{generating ? 'Generating...' : 'Generate Posts'}</span>
@@ -493,7 +493,7 @@ export default function NewSocialCampaignPage() {
                       campaign.platforms.map((platform) => (
                         <span
                           key={platform}
-                          className="inline-flex items-center px-2 py-2 rounded-md text-xs font-medium bg-blue-100 text-blue-800"
+                          className="inline-flex items-center px-2 py-2 rounded-md text-xs font-medium bg-brand-blue-100 text-brand-blue-800"
                         >
                           {platform.charAt(0).toUpperCase() + platform.slice(1)}
                         </span>
@@ -608,7 +608,7 @@ function PlatformButton({
       onClick={onClick}
       className={`p-4 border-2 rounded-lg transition-colors ${
         selected
-          ? 'border-brand-blue-600 bg-blue-50'
+          ? 'border-brand-blue-600 bg-brand-blue-50'
           : 'border-gray-200 hover:border-gray-300'
       }`}
     >

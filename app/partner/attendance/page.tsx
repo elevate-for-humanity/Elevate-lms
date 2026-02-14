@@ -66,7 +66,7 @@ export default async function PartnerAttendancePage() {
             <h1 className="text-3xl font-bold text-gray-900">Attendance Tracking</h1>
             <p className="text-gray-600 mt-1">Manage attendance for your training sessions</p>
           </div>
-          <Link href="/partner/attendance/record" className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <Link href="/partner/attendance/record" className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
             <Plus className="w-5 h-5" /> Record Attendance
           </Link>
         </div>
@@ -74,7 +74,7 @@ export default async function PartnerAttendancePage() {
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Calendar className="w-6 h-6 text-blue-600" />
+              <Calendar className="w-6 h-6 text-brand-blue-600" />
               <span className="text-sm text-gray-600">Total Sessions</span>
             </div>
             <p className="text-3xl font-bold text-gray-900">{sessions.length}</p>
@@ -92,7 +92,7 @@ export default async function PartnerAttendancePage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <Users className="w-6 h-6 text-blue-600" />
+              <Users className="w-6 h-6 text-brand-blue-600" />
               <span className="text-sm text-gray-600">Total Students</span>
             </div>
             <p className="text-3xl font-bold text-gray-900">
@@ -137,7 +137,7 @@ export default async function PartnerAttendancePage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-center">
-                    <Link href={`/partner/attendance/${session.id}`} className="text-blue-600 hover:underline text-sm">
+                    <Link href={`/partner/attendance/${session.id}`} className="text-brand-blue-600 hover:underline text-sm">
                       View Details
                     </Link>
                   </td>

@@ -106,7 +106,7 @@ export default async function ProgramHolderDocumentsPage() {
             </h2>
             <Link
               href="/program-holder/documents/upload"
-              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+              className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
             >
               <Upload className="w-5 h-5" />
               Upload Document
@@ -207,7 +207,7 @@ export default async function ProgramHolderDocumentsPage() {
                       href={doc.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline text-sm font-semibold"
+                      className="text-brand-blue-600 hover:underline text-sm font-semibold"
                     >
                       View
                     </a>
@@ -221,7 +221,7 @@ export default async function ProgramHolderDocumentsPage() {
               <p className="text-black mb-4">No documents uploaded yet</p>
               <Link
                 href="/program-holder/documents/upload"
-                className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                className="inline-block px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Upload Your First Document
               </Link>

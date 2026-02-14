@@ -101,7 +101,7 @@ export function AITutorWidget({ courseId, courseName }: { courseId: string; cour
       {!isOpen && (
         <button
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white rounded-full p-4 shadow-lg transition-all z-50"
+          className="fixed bottom-6 right-6 bg-brand-blue-600 hover:bg-brand-blue-700 text-white rounded-full p-4 shadow-lg transition-all z-50"
         >
           <MessageCircle className="w-6 h-6" />
         </button>
@@ -111,7 +111,7 @@ export function AITutorWidget({ courseId, courseName }: { courseId: string; cour
       {isOpen && (
         <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-white rounded-lg shadow-2xl flex flex-col z-50">
           {/* Header */}
-          <div className="bg-blue-600 text-white p-4 rounded-t-lg flex justify-between items-center">
+          <div className="bg-brand-blue-600 text-white p-4 rounded-t-lg flex justify-between items-center">
             <div>
               <h3 className="font-bold">AI Tutor</h3>
               <p className="text-xs opacity-90">{courseName}</p>
@@ -131,7 +131,7 @@ export function AITutorWidget({ courseId, courseName }: { courseId: string; cour
                 <div
                   className={`max-w-[80%] rounded-lg p-3 ${
                     msg.role === 'user'
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-brand-blue-600 text-white'
                       : 'bg-gray-100 text-black'
                   }`}
                 >
@@ -161,12 +161,12 @@ export function AITutorWidget({ courseId, courseName }: { courseId: string; cour
                 onChange={(e) => setInput(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                 placeholder="Ask a question..."
-                className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-brand-blue-600"
               />
               <button
                 onClick={sendMessage}
                 disabled={loading || !input.trim()}
-                className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 disabled:opacity-50"
+                className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white rounded-lg px-4 py-2 disabled:opacity-50"
               >
                 <Send className="w-5 h-5" />
               </button>

@@ -283,7 +283,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
               <div className="flex gap-4 justify-center">
                 <button
                   onClick={() => router.push('/ferpa/training/certificate/' + existingTraining.id)}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
                 >
                   View Certificate
                 </button>
@@ -316,7 +316,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
           </div>
           <div className="w-full bg-slate-200 rounded-full h-2">
             <div
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-brand-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${(step / totalSteps) * 100}%` }}
             />
           </div>
@@ -326,7 +326,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
         {step === 1 && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
             <div className="flex items-center gap-3 mb-6">
-              <FileText className="w-8 h-8 text-blue-600" />
+              <FileText className="w-8 h-8 text-brand-blue-600" />
               <h1 className="text-3xl font-bold text-black">
                 FERPA Training Course
               </h1>
@@ -359,30 +359,30 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                 <li>Renew annually</li>
               </ul>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 my-6">
-                <h4 className="text-blue-900 font-semibold mb-2">📚 Training Materials</h4>
-                <p className="text-blue-800 mb-4">
+              <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 my-6">
+                <h4 className="text-brand-blue-900 font-semibold mb-2">📚 Training Materials</h4>
+                <p className="text-brand-blue-800 mb-4">
                   Please review the following materials before proceeding to the assessment:
                 </p>
                 <div className="space-y-2">
                   <a
                     href="/docs/compliance/ferpa/FERPA_Policy_Manual.md"
                     target="_blank"
-                    className="block px-4 py-2 bg-white border border-blue-300 rounded hover:bg-gray-50 transition"
+                    className="block px-4 py-2 bg-white border border-brand-blue-300 rounded hover:bg-gray-50 transition"
                   >
                     📄 FERPA Policy & Procedures Manual
                   </a>
                   <a
                     href="/docs/compliance/ferpa/FERPA_Training_Course.md"
                     target="_blank"
-                    className="block px-4 py-2 bg-white border border-blue-300 rounded hover:bg-gray-50 transition"
+                    className="block px-4 py-2 bg-white border border-brand-blue-300 rounded hover:bg-gray-50 transition"
                   >
                     📖 Complete Training Course
                   </a>
                   <a
                     href="/docs/compliance/lms/LMS_Policies_Manual.md"
                     target="_blank"
-                    className="block px-4 py-2 bg-white border border-blue-300 rounded hover:bg-gray-50 transition"
+                    className="block px-4 py-2 bg-white border border-brand-blue-300 rounded hover:bg-gray-50 transition"
                   >
                     💻 LMS Policies & Procedures
                   </a>
@@ -396,7 +396,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                 id="training-reviewed"
                 checked={trainingAcknowledged}
                 onChange={(e) => setTrainingAcknowledged(e.target.checked)}
-                className="mt-1 w-5 h-5 text-blue-600 rounded"
+                className="mt-1 w-5 h-5 text-brand-blue-600 rounded"
               />
               <label htmlFor="training-reviewed" className="text-black">
                 I have reviewed all training materials and understand my responsibilities under FERPA
@@ -406,7 +406,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
             <button
               onClick={() => setStep(2)}
               disabled={!trainingAcknowledged}
-              className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed"
+              className="w-full px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed"
             >
               Proceed to Assessment
             </button>
@@ -473,7 +473,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                           value={optIdx}
                           checked={answers[q.id] === optIdx}
                           onChange={() => setAnswers({ ...answers, [q.id]: optIdx })}
-                          className="mt-1 w-4 h-4 text-blue-600"
+                          className="mt-1 w-4 h-4 text-brand-blue-600"
                         />
                         <span className="text-black">{option}</span>
                       </label>
@@ -550,7 +550,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                   <p className="text-sm text-black">Sign above</p>
                   <button
                     onClick={clearSignature}
-                    className="text-sm text-blue-600 hover:text-blue-700"
+                    className="text-sm text-brand-blue-600 hover:text-brand-blue-700"
                   >
                     Clear
                   </button>
@@ -619,7 +619,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                   id="confidentiality-acknowledged"
                   checked={confidentialityAcknowledged}
                   onChange={(e) => setConfidentialityAcknowledged(e.target.checked)}
-                  className="mt-1 w-5 h-5 text-blue-600 rounded"
+                  className="mt-1 w-5 h-5 text-brand-blue-600 rounded"
                 />
                 <label htmlFor="confidentiality-acknowledged" className="text-black">
                   I have read and agree to the FERPA Confidentiality Agreement and understand the consequences of violations
@@ -643,7 +643,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                   <p className="text-sm text-black">Sign above</p>
                   <button
                     onClick={clearConfidentialitySignature}
-                    className="text-sm text-blue-600 hover:text-blue-700"
+                    className="text-sm text-brand-blue-600 hover:text-brand-blue-700"
                   >
                     Clear
                   </button>
@@ -706,7 +706,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
               <button
                 onClick={handleFinalSubmit}
                 disabled={loading || !signature || !confidentialitySignature || !confidentialityAcknowledged}
-                className="flex-1 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed"
+                className="flex-1 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition disabled:bg-slate-300 disabled:cursor-not-allowed"
               >
                 {loading ? 'Submitting...' : 'Complete Training & Get Certificate'}
               </button>
@@ -726,7 +726,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
                 Your FERPA training has been successfully completed and recorded.
                 Your certificate is being generated...
               </p>
-              <div className="animate-pulse text-blue-600">
+              <div className="animate-pulse text-brand-blue-600">
                 Redirecting to your certificate...
               </div>
             </div>

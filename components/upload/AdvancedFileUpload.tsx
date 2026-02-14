@@ -236,8 +236,8 @@ export function AdvancedFileUpload({
           border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition
           ${
             isDragging
-              ? 'border-blue-500 bg-blue-50'
-              : 'border-slate-300 hover:border-blue-400 hover:bg-slate-50'
+              ? 'border-brand-blue-500 bg-brand-blue-50'
+              : 'border-slate-300 hover:border-brand-blue-400 hover:bg-slate-50'
           }
         `}
       >
@@ -268,7 +268,7 @@ export function AdvancedFileUpload({
             <span className="text-green-600">✓ {successCount} uploaded</span>
           )}
           {uploadingCount > 0 && (
-            <span className="text-blue-600">↑ {uploadingCount} uploading</span>
+            <span className="text-brand-blue-600">↑ {uploadingCount} uploading</span>
           )}
           {errorCount > 0 && (
             <span className="text-red-600">✗ {errorCount} failed</span>
@@ -318,7 +318,7 @@ export function AdvancedFileUpload({
                     <div className="mt-2">
                       <div className="h-1.5 bg-slate-200 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-blue-500 transition-all duration-300"
+                          className="h-full bg-brand-blue-500 transition-all duration-300"
                           style={{ width: `${uploadFile.progress}%` }}
                         />
                       </div>
@@ -339,7 +339,7 @@ export function AdvancedFileUpload({
                 {/* Status Icon */}
                 <div className="flex-shrink-0">
                   {uploadFile.status === 'uploading' && (
-                    <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
+                    <Loader2 className="h-5 w-5 text-brand-blue-500 animate-spin" />
                   )}
                   {uploadFile.status === 'success' && (
                     <CheckCircle className="h-5 w-5 text-green-500" />

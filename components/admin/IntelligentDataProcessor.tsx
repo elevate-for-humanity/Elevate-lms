@@ -369,8 +369,8 @@ export function IntelligentDataProcessor() {
       </div>
       {/* Copilot Messages */}
       {copilotMessages.length > 0 && (
-        <div className="copilot-messages mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <h3 className="font-semibold text-blue-900 mb-2">
+        <div className="copilot-messages mb-6 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+          <h3 className="font-semibold text-brand-blue-900 mb-2">
             🤖 Copilot Status:
           </h3>
           <div className="space-y-1">
@@ -464,8 +464,8 @@ Sarah Johnson IT Support         2025-01-22    sarah@email.com"
           </div>
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <button className="p-4 bg-blue-50 border border-blue-200 rounded-lg hover:bg-brand-surface text-left">
-              <div className="font-medium text-blue-900">
+            <button className="p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg hover:bg-brand-surface text-left">
+              <div className="font-medium text-brand-blue-900">
                 📊 View Flow Charts
               </div>
               <div className="text-sm text-brand-info mt-1">

@@ -146,20 +146,20 @@ export default async function DrugTestingTrainingPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Drug Testing Training Courses
             </h1>
-            <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+            <p className="text-xl text-brand-blue-100 mb-8 max-w-3xl mx-auto">
               Professional training for DOT and non-DOT drug testing. Collector
               training, supervisor training, DER training, and more.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <a
                 href="/support"
-                className="inline-block px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-blue-50"
+                className="inline-block px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-brand-blue-50"
               >
                 Call Visit Support Center
               </a>
               <Link
                 href="/contact"
-                className="inline-block px-8 py-4 bg-blue-700 text-white rounded-lg font-bold hover:bg-blue-600 border-2 border-white"
+                className="inline-block px-8 py-4 bg-brand-blue-700 text-white rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white"
               >
                 Request Information
               </Link>
@@ -176,8 +176,8 @@ export default async function DrugTestingTrainingPage() {
           </h2>
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Award className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Award className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="font-bold mb-2">Certified Training</h3>
               <p className="text-sm text-black">
@@ -185,7 +185,7 @@ export default async function DrugTestingTrainingPage() {
               </p>
             </div>
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="font-bold mb-2">Expert Instructors</h3>
@@ -229,16 +229,16 @@ export default async function DrugTestingTrainingPage() {
             {trainingCourses.collector.map((course: any) => (
               <div
                 key={course.name}
-                className={`bg-white border-2 rounded-lg p-6 ${course.popular ? 'border-blue-500' : course.new ? 'border-blue-500' : 'border-gray-200'}`}
+                className={`bg-white border-2 rounded-lg p-6 ${course.popular ? 'border-brand-blue-500' : course.new ? 'border-brand-blue-500' : 'border-gray-200'}`}
               >
                 <div className="flex gap-2 mb-3">
                   {course.popular && (
-                    <div className="bg-blue-500 text-white text-xs font-bold px-3 py-2 rounded-full">
+                    <div className="bg-brand-blue-500 text-white text-xs font-bold px-3 py-2 rounded-full">
                       MOST POPULAR
                     </div>
                   )}
                   {course.new && (
-                    <div className="bg-blue-500 text-white text-xs font-bold px-3 py-2 rounded-full">
+                    <div className="bg-brand-blue-500 text-white text-xs font-bold px-3 py-2 rounded-full">
                       NEW
                     </div>
                   )}
@@ -251,12 +251,12 @@ export default async function DrugTestingTrainingPage() {
                   <span>⏱️ {course.duration}</span>
                   {course.certificate && <span>📜 Certificate</span>}
                 </div>
-                <div className="text-3xl font-bold text-blue-600 mb-4">
+                <div className="text-3xl font-bold text-brand-blue-600 mb-4">
                   ${course.price}
                 </div>
                 <a
                   href="/support"
-                  className="block w-full text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700"
+                  className="block w-full text-center px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-bold hover:bg-brand-blue-700"
                 >
                   Enroll Now
                 </a>
@@ -278,10 +278,10 @@ export default async function DrugTestingTrainingPage() {
             {trainingCourses.supervisor.map((course: any) => (
               <div
                 key={course.name}
-                className={`bg-white border-2 rounded-lg p-6 ${course.popular ? 'border-blue-500' : 'border-gray-200'}`}
+                className={`bg-white border-2 rounded-lg p-6 ${course.popular ? 'border-brand-blue-500' : 'border-gray-200'}`}
               >
                 {course.popular && (
-                  <div className="bg-blue-500 text-white text-xs font-bold px-3 py-2 rounded-full inline-block mb-3">
+                  <div className="bg-brand-blue-500 text-white text-xs font-bold px-3 py-2 rounded-full inline-block mb-3">
                     MOST POPULAR
                   </div>
                 )}
@@ -293,12 +293,12 @@ export default async function DrugTestingTrainingPage() {
                   <span>⏱️ {course.duration}</span>
                   {course.certificate && <span>📜 Certificate</span>}
                 </div>
-                <div className="text-3xl font-bold text-blue-600 mb-4">
+                <div className="text-3xl font-bold text-brand-blue-600 mb-4">
                   ${course.price}
                 </div>
                 <a
                   href="/support"
-                  className="block w-full text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700"
+                  className="block w-full text-center px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-bold hover:bg-brand-blue-700"
                 >
                   Enroll Now
                 </a>
@@ -332,12 +332,12 @@ export default async function DrugTestingTrainingPage() {
                   <span>⏱️ {course.duration}</span>
                   {course.certificate && <span>📜 Certificate</span>}
                 </div>
-                <div className="text-2xl font-bold text-blue-600 mb-4">
+                <div className="text-2xl font-bold text-brand-blue-600 mb-4">
                   ${course.price}
                 </div>
                 <a
                   href="/support"
-                  className="block w-full text-center px-4 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 text-sm"
+                  className="block w-full text-center px-4 py-2 bg-brand-blue-600 text-white rounded-lg font-bold hover:bg-brand-blue-700 text-sm"
                 >
                   Enroll Now
                 </a>
@@ -348,14 +348,14 @@ export default async function DrugTestingTrainingPage() {
       </section>
 
       {/* Employee Training */}
-      <section className="py-16 bg-blue-50">
+      <section className="py-16 bg-brand-blue-50">
         <div className="mx-auto max-w-4xl px-4">
           <h2 className="text-3xl font-bold mb-8">Employee Training</h2>
           <p className="text-black mb-8">
             Educate employees on drug-free workplace policies, testing
             procedures, and their rights and responsibilities.
           </p>
-          <div className="bg-white border-2 border-blue-200 rounded-lg p-6 max-w-2xl">
+          <div className="bg-white border-2 border-brand-blue-200 rounded-lg p-6 max-w-2xl">
             {trainingCourses.employee.map((course: any) => (
               <div key={course.name}>
                 <h3 className="text-xl font-bold mb-2">{course.name}</h3>
@@ -364,12 +364,12 @@ export default async function DrugTestingTrainingPage() {
                   <span>⏱️ {course.duration}</span>
                   {course.certificate && <span>📜 Certificate</span>}
                 </div>
-                <div className="text-3xl font-bold text-blue-600 mb-4">
+                <div className="text-3xl font-bold text-brand-blue-600 mb-4">
                   ${course.price}
                 </div>
                 <a
                   href="/support"
-                  className="block w-full text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700"
+                  className="block w-full text-center px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-bold hover:bg-brand-blue-700"
                 >
                   Enroll Now
                 </a>
@@ -399,12 +399,12 @@ export default async function DrugTestingTrainingPage() {
                   <span>⏱️ {course.duration}</span>
                   {course.certificate && <span>📜 Certificate</span>}
                 </div>
-                <div className="text-3xl font-bold text-blue-600 mb-4">
+                <div className="text-3xl font-bold text-brand-blue-600 mb-4">
                   ${course.price}
                 </div>
                 <a
                   href="/support"
-                  className="block w-full text-center px-6 py-3 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700"
+                  className="block w-full text-center px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-bold hover:bg-brand-blue-700"
                 >
                   Enroll Now
                 </a>
@@ -422,7 +422,7 @@ export default async function DrugTestingTrainingPage() {
           </h2>
           <div className="space-y-6">
             <div className="flex gap-4">
-              <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                 1
               </div>
               <div>
@@ -434,7 +434,7 @@ export default async function DrugTestingTrainingPage() {
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                 2
               </div>
               <div>
@@ -446,7 +446,7 @@ export default async function DrugTestingTrainingPage() {
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                 3
               </div>
               <div>
@@ -458,7 +458,7 @@ export default async function DrugTestingTrainingPage() {
               </div>
             </div>
             <div className="flex gap-4">
-              <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
+              <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold flex-shrink-0">
                 4
               </div>
               <div>
@@ -488,28 +488,28 @@ export default async function DrugTestingTrainingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="mx-auto max-w-4xl px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">Ready to Get Certified?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Contact us to enroll in training or get answers to your questions.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-blue-600 rounded-lg font-bold hover:bg-blue-50"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-brand-blue-50"
             >
               <Phone className="w-5 h-5" />
               Call Visit Support Center
             </a>
             <Link
               href="/contact"
-              className="inline-block px-8 py-4 bg-blue-700 text-white rounded-lg font-bold hover:bg-blue-600 border-2 border-white"
+              className="inline-block px-8 py-4 bg-brand-blue-700 text-white rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white"
             >
               Email Us
             </Link>
           </div>
-          <p className="mt-8 text-blue-100">
+          <p className="mt-8 text-brand-blue-100">
             <strong>Address:</strong> 8888 Keystone Xing, Suite 1300,
             Indianapolis, IN 46240
           </p>

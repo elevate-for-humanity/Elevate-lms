@@ -88,7 +88,7 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
                           key={subItem.name}
                           href={subItem.href}
                           onClick={() => setIsOpen(false)}
-                          className="block py-2 text-slate-600 hover:text-blue-600"
+                          className="block py-2 text-slate-600 hover:text-brand-blue-600"
                         >
                           {subItem.name}
                         </Link>
@@ -100,7 +100,7 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
                 <Link
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className="block py-3 text-slate-900 font-medium hover:text-blue-600"
+                  className="block py-3 text-slate-900 font-medium hover:text-brand-blue-600"
                 >
                   {item.name}
                 </Link>
@@ -120,14 +120,14 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
             <Link
               href="/inquiry"
               onClick={() => setIsOpen(false)}
-              className="block w-full text-center py-3 border border-blue-600 text-blue-600 rounded-lg font-semibold"
+              className="block w-full text-center py-3 border border-brand-blue-600 text-brand-blue-600 rounded-lg font-semibold"
             >
               Get Info
             </Link>
             <Link
               href="/programs"
               onClick={() => setIsOpen(false)}
-              className="block w-full text-center py-3 bg-blue-600 text-white rounded-lg font-semibold"
+              className="block w-full text-center py-3 bg-brand-blue-600 text-white rounded-lg font-semibold"
             >
               View Programs
             </Link>

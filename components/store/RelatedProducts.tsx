@@ -33,7 +33,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
                 />
               </div>
               <div className="p-6">
-                <span className="text-xs font-semibold text-blue-700 uppercase">
+                <span className="text-xs font-semibold text-brand-blue-700 uppercase">
                   {product.category.replace('-', ' ')}
                 </span>
                 <h3 className="text-xl font-bold mt-2 mb-2 text-black">
@@ -46,7 +46,7 @@ export default function RelatedProducts({ products }: RelatedProductsProps) {
                   <span className="text-2xl font-bold text-black">
                     ${product.salePrice || product.price}
                   </span>
-                  <span className="text-blue-600 font-semibold group-hover:text-blue-700">
+                  <span className="text-brand-blue-600 font-semibold group-hover:text-brand-blue-700">
                     View Details →
                   </span>
                 </div>

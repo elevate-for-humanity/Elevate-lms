@@ -20,7 +20,7 @@ export function CourseRecommendations({ recommendations }: CourseRecommendations
   const getRecommendationIcon = (type: string) => {
     switch (type) {
       case "based_on_progress":
-        return <Target className="w-5 h-5 text-blue-400" />;
+        return <Target className="w-5 h-5 text-brand-blue-400" />;
       case "similar_students":
         return <Users className="w-5 h-5 text-green-400" />;
       case "trending":

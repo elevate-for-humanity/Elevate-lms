@@ -54,10 +54,10 @@ export default async function IntegrationsPage() {
         <div className="max-w-7xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Featured Integrations</h2>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-white rounded-xl p-8 shadow-lg border-2 border-blue-200">
+            <div className="bg-white rounded-xl p-8 shadow-lg border-2 border-brand-blue-200">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Users className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                  <Users className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">Salesforce</h3>
@@ -91,7 +91,7 @@ export default async function IntegrationsPage() {
                   <span>Webhook triggers for workflows</span>
                 </li>
               </ul>
-              <div className="bg-blue-50 rounded-lg p-4">
+              <div className="bg-brand-blue-50 rounded-lg p-4">
                 <div className="font-bold mb-2">Setup Time</div>
                 <div className="text-gray-700">15-30 minutes with guided wizard</div>
               </div>
@@ -99,12 +99,12 @@ export default async function IntegrationsPage() {
 
             <div className="bg-white rounded-xl p-8 shadow-lg">
               <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Zap className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                  <Zap className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold">Zapier</h3>
-                  <span className="px-3 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-bold">
+                  <span className="px-3 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-bold">
                     1000+ Apps
                   </span>
                 </div>
@@ -114,27 +114,27 @@ export default async function IntegrationsPage() {
               </p>
               <ul className="space-y-3 mb-6">
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Google Sheets for reporting</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Slack notifications</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>Mailchimp email campaigns</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>HubSpot CRM sync</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <Circle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <span>QuickBooks accounting</span>
                 </li>
               </ul>
-              <div className="bg-blue-50 rounded-lg p-4">
+              <div className="bg-brand-blue-50 rounded-lg p-4">
                 <div className="font-bold mb-2">Setup Time</div>
                 <div className="text-gray-700">5-10 minutes per integration</div>
               </div>

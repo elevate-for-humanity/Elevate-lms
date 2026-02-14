@@ -198,8 +198,8 @@ export default function TrustStrip({ variant = 'default', showAnimation = true, 
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Trusted by Thousands</h2>
           <div className="grid gap-8 md:grid-cols-3 lg:grid-cols-6 max-w-6xl mx-auto">
-            <div className="text-center p-6 rounded-xl bg-blue-50 hover:bg-blue-100 transition">
-              <Users className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+            <div className="text-center p-6 rounded-xl bg-brand-blue-50 hover:bg-brand-blue-100 transition">
+              <Users className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <div className="text-3xl font-bold text-gray-900">{formatNumber(animatedStats.studentsEnrolled)}+</div>
               <div className="text-sm text-gray-600">Students Enrolled</div>
             </div>
@@ -248,7 +248,7 @@ export default function TrustStrip({ variant = 'default', showAnimation = true, 
             <div className="text-gray-600">Funded Programs</div>
           </div>
           <div>
-            <div className="text-3xl font-extrabold text-blue-600">{formatNumber(animatedStats.studentsEnrolled)}+</div>
+            <div className="text-3xl font-extrabold text-brand-blue-600">{formatNumber(animatedStats.studentsEnrolled)}+</div>
             <div className="text-gray-600">Students Trained</div>
           </div>
           <div>

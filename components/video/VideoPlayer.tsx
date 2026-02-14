@@ -220,7 +220,7 @@ export default function VideoPlayer({
             {/* Play/Pause */}
             <button
               onClick={togglePlay}
-              className="hover:text-blue-400 transition"
+              className="hover:text-brand-blue-400 transition"
               aria-label={isPlaying ? 'Pause' : 'Play'}
             >
               {isPlaying ? (
@@ -237,14 +237,14 @@ export default function VideoPlayer({
             {/* Skip Buttons */}
             <button
               onClick={() => skip(-10)}
-              className="hover:text-blue-400 transition text-sm"
+              className="hover:text-brand-blue-400 transition text-sm"
               aria-label="Rewind 10 seconds"
             >
               ⏪ 10s
             </button>
             <button
               onClick={() => skip(10)}
-              className="hover:text-blue-400 transition text-sm"
+              className="hover:text-brand-blue-400 transition text-sm"
               aria-label="Forward 10 seconds"
             >
               10s ⏩
@@ -280,7 +280,7 @@ export default function VideoPlayer({
                   setVolume(newVol);
                   if (videoRef.current) videoRef.current.volume = newVol;
                 }}
-                className="hover:text-blue-400 transition"
+                className="hover:text-brand-blue-400 transition"
               >
                 {volume === 0 ? '🔇' : volume < 0.5 ? '🔉' : '🔊'}
               </button>
@@ -298,7 +298,7 @@ export default function VideoPlayer({
             {/* Fullscreen */}
             <button
               onClick={toggleFullscreen}
-              className="hover:text-blue-400 transition"
+              className="hover:text-brand-blue-400 transition"
               aria-label="Toggle fullscreen"
             >
               {isFullscreen ? (

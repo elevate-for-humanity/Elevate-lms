@@ -25,12 +25,12 @@ export default function CheckEligibilityPage() {
         <Breadcrumbs items={[{ label: "Check Eligibility" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-blue-800 text-white py-16 px-4">
+      <section className="bg-brand-blue-800 text-white py-16 px-4">
         <div className="max-w-3xl mx-auto text-center">
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             Check Eligibility (Before WorkOne)
           </h1>
-          <p className="text-blue-100 text-lg">
+          <p className="text-brand-blue-100 text-lg">
             A quick pre-screen to help you understand if our programs are a good fit
           </p>
         </div>
@@ -104,12 +104,12 @@ export default function CheckEligibilityPage() {
           </div>
 
           {/* About Funding */}
-          <div className="mb-10 bg-blue-50 rounded-xl p-6 border border-blue-100">
-            <h2 className="text-xl font-bold text-blue-900 mb-3">About funding:</h2>
-            <p className="text-blue-800 mb-3">
+          <div className="mb-10 bg-brand-blue-50 rounded-xl p-6 border border-brand-blue-100">
+            <h2 className="text-xl font-bold text-brand-blue-900 mb-3">About funding:</h2>
+            <p className="text-brand-blue-800 mb-3">
               Training is made possible through workforce funding programs such as WIOA, Workforce Ready Grants, and other state or partner funding sources.
             </p>
-            <p className="text-blue-700 text-sm">
+            <p className="text-brand-blue-700 text-sm">
               Each funding source has specific requirements. WorkOne / Indiana Career Connect verifies eligibility and documentation as part of the official process.
             </p>
           </div>
@@ -125,7 +125,7 @@ export default function CheckEligibilityPage() {
                 { step: 4, text: 'Begin training and career support' },
               ].map((item) => (
                 <div key={item.step} className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-brand-blue-600 text-white flex items-center justify-center font-bold flex-shrink-0">
                     {item.step}
                   </div>
                   <p className="text-gray-700">{item.text}</p>
@@ -143,7 +143,7 @@ export default function CheckEligibilityPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="/apply"
-                className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition"
+                className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
               >
                 Start Eligibility Review
                 <ArrowRight className="w-5 h-5" />
@@ -165,7 +165,7 @@ export default function CheckEligibilityPage() {
             <p className="text-gray-600 mb-2">Questions about eligibility?</p>
             <a
               href="/support"
-              className="inline-flex items-center gap-2 text-blue-600 font-semibold hover:underline"
+              className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold hover:underline"
             >
               <Phone className="w-5 h-5" />
               Call Get Help Online

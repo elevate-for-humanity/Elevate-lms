@@ -80,10 +80,10 @@ export function FAQAccordion({ categories, searchQuery = '', activeCategory = 'a
       {filteredCategories.map((category) => (
         <div key={category.id}>
           <h2 className="text-2xl font-bold text-black mb-6 flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
               {(() => {
                 const Icon = iconMap[category.iconName];
-                return Icon ? <Icon className="w-6 h-6 text-blue-600" /> : null;
+                return Icon ? <Icon className="w-6 h-6 text-brand-blue-600" /> : null;
               })()}
             </div>
             {category.name}
@@ -94,7 +94,7 @@ export function FAQAccordion({ categories, searchQuery = '', activeCategory = 'a
               return (
                 <div
                   key={index}
-                  className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-blue-600 transition"
+                  className="bg-white border-2 border-gray-200 rounded-xl overflow-hidden hover:border-brand-blue-600 transition"
                 >
                   <button
                     onClick={() => toggleQuestion(category.id, index)}

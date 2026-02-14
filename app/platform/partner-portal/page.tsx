@@ -50,18 +50,18 @@ export default function PartnerPortalPage() {
       {/* Hero */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
         <Image src="/hero-images/pathways-hero.jpg" alt="Partner Portal" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-blue-900/70" />
+        <div className="absolute inset-0 bg-brand-blue-900/70" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
-          <span className="text-blue-200 font-medium text-sm uppercase tracking-wider">Platform Solutions</span>
+          <span className="text-brand-blue-200 font-medium text-sm uppercase tracking-wider">Platform Solutions</span>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 mt-2">Partner Portal</h1>
-          <p className="text-xl text-blue-100 max-w-2xl mb-8">
+          <p className="text-xl text-brand-blue-100 max-w-2xl mb-8">
             Everything you need to manage your training programs, track student outcomes, and stay compliant.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Link href="/partners/login" className="px-8 py-4 bg-white text-blue-700 font-bold rounded-lg hover:bg-blue-50 transition">
+            <Link href="/partners/login" className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-brand-blue-50 transition">
               Access Portal
             </Link>
-            <Link href="/partners/join" className="px-8 py-4 bg-blue-500 text-white font-bold rounded-lg hover:bg-blue-400 transition">
+            <Link href="/partners/join" className="px-8 py-4 bg-brand-blue-500 text-white font-bold rounded-lg hover:bg-brand-blue-400 transition">
               Become a Partner
             </Link>
           </div>
@@ -81,7 +81,7 @@ export default function PartnerPortalPage() {
             {features.map((f, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition">
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <f.icon className="w-6 h-6 text-blue-600" />
+                  <f.icon className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
                 <p className="text-gray-600 text-sm">{f.description}</p>
@@ -101,11 +101,11 @@ export default function PartnerPortalPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {partnerTypes.map((p, i) => (
               <Link key={i} href={p.href} className="bg-white rounded-xl p-6 border hover:shadow-md transition flex items-start gap-4 group">
-                <div className="w-10 h-10 bg-blue-600 text-white rounded-lg flex items-center justify-center font-bold flex-shrink-0">
+                <div className="w-10 h-10 bg-brand-blue-600 text-white rounded-lg flex items-center justify-center font-bold flex-shrink-0">
                   {i + 1}
                 </div>
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1 group-hover:text-blue-600 transition">{p.title}</h3>
+                  <h3 className="font-bold text-gray-900 mb-1 group-hover:text-brand-blue-600 transition">{p.title}</h3>
                   <p className="text-gray-600 text-sm">{p.description}</p>
                 </div>
               </Link>
@@ -135,7 +135,7 @@ export default function PartnerPortalPage() {
                   'Priority support from our partner success team',
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">{item}</span>
                   </div>
                 ))}
@@ -146,12 +146,12 @@ export default function PartnerPortalPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-20 bg-blue-700 text-white">
+      <section className="py-20 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Become a Partner</h2>
-          <p className="text-blue-100 text-lg mb-8">Join our network of training providers and community organizations.</p>
+          <p className="text-brand-blue-100 text-lg mb-8">Join our network of training providers and community organizations.</p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/partners/join" className="px-8 py-4 bg-white text-blue-700 font-bold rounded-lg hover:bg-blue-50 transition inline-flex items-center gap-2">
+            <Link href="/partners/join" className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-brand-blue-50 transition inline-flex items-center gap-2">
               Apply Now <ArrowRight className="w-5 h-5" />
             </Link>
             <Link href="/partners/login" className="px-8 py-4 border-2 border-white text-white font-bold rounded-lg hover:bg-white/10 transition">

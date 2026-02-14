@@ -49,12 +49,12 @@ export default async function PaymentCancelPage() {
             Your payment was cancelled. No charges were made to your account.
           </p>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-            <h2 className="font-bold text-blue-900 mb-2">Need Help?</h2>
-            <p className="text-blue-800 mb-4">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-8">
+            <h2 className="font-bold text-brand-blue-900 mb-2">Need Help?</h2>
+            <p className="text-brand-blue-800 mb-4">
               We're here to help you get started. Here are some options:
             </p>
-            <ul className="text-left text-blue-800 space-y-2">
+            <ul className="text-left text-brand-blue-800 space-y-2">
               <li>
                 <DollarSign className="w-5 h-5 inline-block" /> Check if you
                 qualify for 100% FREE funding (WIOA, WRG, JRI)

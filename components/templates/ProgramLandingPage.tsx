@@ -71,7 +71,7 @@ export default function ProgramLandingPage({
               {fundingTags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="rounded-full bg-blue-100 px-3 py-2 font-medium text-blue-800"
+                  className="rounded-full bg-brand-blue-100 px-3 py-2 font-medium text-brand-blue-800"
                 >
                   {tag}
                 </span>

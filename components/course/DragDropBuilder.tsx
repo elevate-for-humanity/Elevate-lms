@@ -112,7 +112,7 @@ d="M4 8h16M4 16h16" />
         </button>
 
         {/* Icon */}
-        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-blue-600">
+        <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center text-brand-blue-600">
           {getIcon(module.type)}
         </div>
 
@@ -129,7 +129,7 @@ d="M4 8h16M4 16h16" />
         <div className="flex items-center gap-2">
           <button
             onClick={() => onEdit(module.id)}
-            className="p-2 text-black hover:text-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
+            className="p-2 text-black hover:text-brand-blue-600 hover:bg-gray-50 rounded-lg transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
@@ -255,7 +255,7 @@ export default function DragDropBuilder({ courseId, initialModules = [], onSave 
         <div className="flex gap-3">
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             + Add Module
           </button>
@@ -280,7 +280,7 @@ d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           <p className="text-black mb-4">Get started by adding your first module</p>
           <button
             onClick={() => setShowAddModal(true)}
-            className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             Add First Module
           </button>
@@ -314,7 +314,7 @@ onDelete={handleDeleteModule} />
                   type="text"
                   value={newModule.title}
                   onChange={(e) => setNewModule({ ...newModule, title: e.target.value })}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                   placeholder="e.g., Introduction to HVAC Systems"
                 />
               </div>
@@ -325,7 +325,7 @@ onDelete={handleDeleteModule} />
                 <select
                   value={newModule.type}
                   onChange={(e) => setNewModule({ ...newModule, type: e.target.value as CourseModule['type'] })}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 >
                   <option value="video">Video Lesson</option>
                   <option value="quiz">Quiz/Assessment</option>
@@ -342,7 +342,7 @@ onDelete={handleDeleteModule} />
                   type="number"
                   value={newModule.duration || ''}
                   onChange={(e) => setNewModule({ ...newModule, duration: parseInt(e.target.value) || 0 })}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                   placeholder="30"
                 />
               </div>
@@ -354,7 +354,7 @@ onDelete={handleDeleteModule} />
                   value={newModule.content}
                   onChange={(e) => setNewModule({ ...newModule, content: e.target.value })}
                   rows={6}
-                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                   placeholder="Add module description, learning objectives, or content..."
                 />
               </div>
@@ -373,7 +373,7 @@ onDelete={handleDeleteModule} />
               </button>
               <button
                 onClick={editingModule ? handleUpdateModule : handleAddModule}
-                className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 {editingModule ? 'Update Module' : 'Add Module'}
               </button>

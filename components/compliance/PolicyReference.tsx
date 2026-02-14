@@ -19,16 +19,16 @@ export function PolicyReference({
   if (variant === 'banner') {
     return (
       <div
-        className={`bg-blue-50 border border-blue-200 rounded-lg p-4 ${className}`}
+        className={`bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 ${className}`}
       >
         <div className="flex items-start gap-3">
-          <Info className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+          <Info className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
           <div className="flex-1">
-            <p className="text-sm text-blue-900">
+            <p className="text-sm text-brand-blue-900">
               {description || `This feature is governed by our ${policyName}.`}{' '}
               <Link
                 href={policyUrl}
-                className="font-medium underline hover:text-blue-700"
+                className="font-medium underline hover:text-brand-blue-700"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -50,7 +50,7 @@ export function PolicyReference({
           {description || `Subject to our ${policyName}.`}{' '}
           <Link
             href={policyUrl}
-            className="text-blue-600 hover:text-blue-800 underline"
+            className="text-brand-blue-600 hover:text-brand-blue-800 underline"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -66,7 +66,7 @@ export function PolicyReference({
       {description || `See our `}
       <Link
         href={policyUrl}
-        className="text-blue-600 hover:text-blue-800 underline"
+        className="text-brand-blue-600 hover:text-brand-blue-800 underline"
         target="_blank"
         rel="noopener noreferrer"
       >

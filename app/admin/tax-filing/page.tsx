@@ -160,7 +160,7 @@ export default async function TaxFilingAdminPage() {
           </Link>
           <Link
             href="/admin/tax-filing/training"
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+            className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
           >
             Training Management
           </Link>
@@ -246,7 +246,7 @@ export default async function TaxFilingAdminPage() {
                           app.status === 'completed'
                             ? 'bg-brand-green-100 text-green-800'
                             : app.status === 'filed'
-                              ? 'bg-blue-100 text-blue-800'
+                              ? 'bg-brand-blue-100 text-brand-blue-800'
                               : app.status === 'in_progress'
                                 ? 'bg-yellow-100 text-yellow-800'
                                 : app.status === 'pending'
@@ -266,7 +266,7 @@ export default async function TaxFilingAdminPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <Link
                         href={`/admin/tax-filing/applications/${app.id}`}
-                        className="text-brand-blue-600 hover:text-blue-900 mr-4"
+                        className="text-brand-blue-600 hover:text-brand-blue-900 mr-4"
                       >
                         View
                       </Link>
@@ -285,17 +285,17 @@ export default async function TaxFilingAdminPage() {
       </div>
 
       {/* Tax Software Integration Status */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="text-lg font-semibold text-blue-900 mb-2">
+      <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+        <h3 className="text-lg font-semibold text-brand-blue-900 mb-2">
           📋 Tax Software Integration
         </h3>
-        <p className="text-blue-800 mb-4">
+        <p className="text-brand-blue-800 mb-4">
           Professional tax preparation powered by professional tax software.
           Industry-leading tax software with IRS e-file integration.
         </p>
         <div className="grid md:grid-cols-2 gap-4 mt-4">
           <div>
-            <h4 className="font-semibold text-blue-900 mb-2">Features:</h4>
+            <h4 className="font-semibold text-brand-blue-900 mb-2">Features:</h4>
             <ul className="list-disc list-inside text-sm text-brand-blue-700">
               <li>professional tax software integration</li>
               <li>All IRS forms supported</li>
@@ -306,7 +306,7 @@ export default async function TaxFilingAdminPage() {
             </ul>
           </div>
           <div>
-            <h4 className="font-semibold text-blue-900 mb-2">
+            <h4 className="font-semibold text-brand-blue-900 mb-2">
               Setup Required:
             </h4>
             <ul className="list-disc list-inside text-sm text-brand-blue-700">

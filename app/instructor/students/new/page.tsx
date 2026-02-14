@@ -46,7 +46,7 @@ export default async function InstructorAddStudentPage() {
             </label>
             <input
               type="email"
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               placeholder="student.email@gmail.com"
             />
           </div>
@@ -54,14 +54,14 @@ export default async function InstructorAddStudentPage() {
             <label className="block text-sm font-medium text-black mb-2">
               Course
             </label>
-            <select className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <select className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
               <option>Select a course...</option>
             </select>
           </div>
           <div className="flex gap-4">
             <button
               type="submit"
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+              className="bg-brand-blue-600 text-white px-6 py-2 rounded-lg hover:bg-brand-blue-700"
             >
               Add Student
             </button>
@@ -73,12 +73,12 @@ export default async function InstructorAddStudentPage() {
             </button>
           </div>
         </form>
-        <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h3 className="font-semibold text-blue-900 mb-2">Bulk Enrollment</h3>
-          <p className="text-sm text-blue-800 mb-3">
+        <div className="mt-6 p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
+          <h3 className="font-semibold text-brand-blue-900 mb-2">Bulk Enrollment</h3>
+          <p className="text-sm text-brand-blue-800 mb-3">
             Need to enroll multiple students? Upload a CSV file with student emails.
           </p>
-          <button className="text-sm bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700" aria-label="Action button">
+          <button className="text-sm bg-brand-blue-600 text-white px-4 py-2 rounded hover:bg-brand-blue-700" aria-label="Action button">
             Upload CSV
           </button>
         </div>
@@ -86,7 +86,7 @@ export default async function InstructorAddStudentPage() {
         <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-lg">
           <h3 className="font-semibold text-black mb-2">Need Help?</h3>
           <p className="text-sm text-black">
-            Contact support at <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">elevate4humanityedu@gmail.com</a> for assistance with student enrollment.
+            Contact support at <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">elevate4humanityedu@gmail.com</a> for assistance with student enrollment.
           </p>
         </div>
       </div>

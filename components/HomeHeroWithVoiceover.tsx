@@ -202,7 +202,7 @@ export function HomeHeroWithVoiceover({
                   <Link
                     href={config.cta_link}
                     onClick={() => trackInteraction('cta_click')}
-                    className="px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl"
+                    className="px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition-all shadow-lg hover:shadow-xl"
                   >
                     {config.cta_text}
                   </Link>

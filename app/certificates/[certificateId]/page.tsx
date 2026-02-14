@@ -72,7 +72,7 @@ export default async function CertificateViewPage({ params }: Props) {
   const recipientName = recipient ? `${recipient.first_name} ${recipient.last_name}` : certificate.recipient_name || 'Student';
 
   return (
-    <div className="min-h-screen bg-blue-50 py-12">
+    <div className="min-h-screen bg-brand-blue-50 py-12">
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Certificates", href: "/certificates" }, { label: "[Certificateid]" }]} />
       </div>
@@ -86,12 +86,12 @@ export default async function CertificateViewPage({ params }: Props) {
         </div>
 
         {/* Certificate Card */}
-        <div className="bg-white rounded-3xl shadow-xl border-4 border-blue-100 overflow-hidden">
+        <div className="bg-white rounded-3xl shadow-xl border-4 border-brand-blue-100 overflow-hidden">
           {/* Header */}
           <div className="bg-slate-700 text-white p-8 text-center">
             <Award className="w-16 h-16 mx-auto mb-4 text-yellow-400" />
             <h1 className="text-3xl font-bold mb-2">Certificate of Completion</h1>
-            <p className="text-blue-200">Elevate for Humanity</p>
+            <p className="text-brand-blue-200">Elevate for Humanity</p>
           </div>
 
           {/* Body */}
@@ -104,7 +104,7 @@ export default async function CertificateViewPage({ params }: Props) {
             
             <p className="text-slate-600 text-lg mb-4">has successfully completed</p>
             
-            <h3 className="text-2xl font-bold text-blue-900 mb-8">
+            <h3 className="text-2xl font-bold text-brand-blue-900 mb-8">
               {certificate.title || course?.title || 'Course'}
             </h3>
 
@@ -145,7 +145,7 @@ export default async function CertificateViewPage({ params }: Props) {
                 <p>Verify at: elevateforhumanity.org/verify/{certificate.id}</p>
               </div>
               <div className="flex gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
                   <Download className="w-4 h-4" />
                   Download PDF
                 </button>
@@ -162,7 +162,7 @@ export default async function CertificateViewPage({ params }: Props) {
         <div className="mt-8 grid md:grid-cols-2 gap-6">
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <BookOpen className="w-5 h-5 text-blue-600" />
+              <BookOpen className="w-5 h-5 text-brand-blue-600" />
               About This Certificate
             </h3>
             <p className="text-slate-600 text-sm">
@@ -182,7 +182,7 @@ export default async function CertificateViewPage({ params }: Props) {
             </p>
             <Link
               href={`/verify/${certificateId}`}
-              className="text-blue-600 hover:underline text-sm flex items-center gap-1"
+              className="text-brand-blue-600 hover:underline text-sm flex items-center gap-1"
             >
               Verify this certificate
               <ExternalLink className="w-3 h-3" />

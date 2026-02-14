@@ -95,7 +95,7 @@ export default async function LicenseeOnboardingPage() {
                     step.completed 
                       ? 'bg-green-100 text-green-600' 
                       : index === currentStep 
-                        ? 'bg-blue-100 text-blue-600' 
+                        ? 'bg-brand-blue-100 text-brand-blue-600' 
                         : 'bg-gray-100 text-gray-400'
                   }`}>
                     {step.completed ? (
@@ -105,7 +105,7 @@ export default async function LicenseeOnboardingPage() {
                     )}
                   </div>
                   <div className="ml-3">
-                    <p className={`font-medium ${step.completed ? 'text-green-600' : index === currentStep ? 'text-blue-600' : 'text-gray-500'}`}>
+                    <p className={`font-medium ${step.completed ? 'text-green-600' : index === currentStep ? 'text-brand-blue-600' : 'text-gray-500'}`}>
                       {step.title}
                     </p>
                     <p className="text-sm text-gray-500">{step.description}</p>
@@ -158,7 +158,7 @@ export default async function LicenseeOnboardingPage() {
                     <Link 
                       href={urls[type]} 
                       target="_blank"
-                      className="text-blue-600 hover:underline text-sm"
+                      className="text-brand-blue-600 hover:underline text-sm"
                     >
                       Read Agreement
                     </Link>

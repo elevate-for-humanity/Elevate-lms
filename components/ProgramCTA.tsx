@@ -229,34 +229,34 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
       </section>
 
       {/* Final CTA - Contact */}
-      <section className="py-16 sm:py-20 bg-blue-700 text-white">
+      <section className="py-16 sm:py-20 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold mb-6">
             Questions? We're Here to Help
           </h2>
-          <p className="text-xl mb-8 text-blue-100">
+          <p className="text-xl mb-8 text-brand-blue-100">
             Our team is ready to answer your questions and guide you through the enrollment process.
           </p>
 
           <div className="grid sm:grid-cols-3 gap-6 mb-8">
-            <div className="bg-blue-800 rounded-lg p-6">
+            <div className="bg-brand-blue-800 rounded-lg p-6">
               <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">📞</div>
               <h3 className="font-bold mb-2">Call Us</h3>
-              <a href="/support" className="text-blue-100 hover:text-white">
+              <a href="/support" className="text-brand-blue-100 hover:text-white">
                 317-314-3757
               </a>
             </div>
-            <div className="bg-blue-800 rounded-lg p-6">
+            <div className="bg-brand-blue-800 rounded-lg p-6">
               <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">✉️</div>
               <h3 className="font-bold mb-2">Email Us</h3>
-              <a href="mailto:info@www.elevateforhumanity.org" className="text-blue-100 hover:text-white">
+              <a href="mailto:info@www.elevateforhumanity.org" className="text-brand-blue-100 hover:text-white">
                 info@www.elevateforhumanity.org
               </a>
             </div>
-            <div className="bg-blue-800 rounded-lg p-6">
+            <div className="bg-brand-blue-800 rounded-lg p-6">
               <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">📍</div>
               <h3 className="font-bold mb-2">Visit Us</h3>
-              <p className="text-blue-100 text-sm">
+              <p className="text-brand-blue-100 text-sm">
                 8888 Keystone Crossing<br/>Suite 1300<br/>Indianapolis, IN 46240
               </p>
             </div>
@@ -264,7 +264,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
 
           <Link
             href="/contact"
-            className="inline-block px-8 py-4 bg-white text-blue-700 font-bold rounded-full hover:bg-gray-50 transition-all shadow-xl text-lg"
+            className="inline-block px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-full hover:bg-gray-50 transition-all shadow-xl text-lg"
           >
             Contact Us Today
           </Link>

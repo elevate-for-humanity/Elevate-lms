@@ -59,7 +59,7 @@ export default async function MenteesPage() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
-            <Link href="/mentor/dashboard" className="hover:text-blue-600">Mentor Dashboard</Link>
+            <Link href="/mentor/dashboard" className="hover:text-brand-blue-600">Mentor Dashboard</Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900 font-medium">Mentees</span>
           </nav>
@@ -101,7 +101,7 @@ export default async function MenteesPage() {
                     </td>
                     <td className="px-6 py-4 text-center">
                       <div className="flex items-center justify-center gap-2">
-                        <button className="p-2 text-blue-600 hover:bg-blue-50 rounded"><MessageSquare className="w-4 h-4" /></button>
+                        <button className="p-2 text-brand-blue-600 hover:bg-brand-blue-50 rounded"><MessageSquare className="w-4 h-4" /></button>
                         <button className="p-2 text-green-600 hover:bg-green-50 rounded"><Calendar className="w-4 h-4" /></button>
                       </div>
                     </td>

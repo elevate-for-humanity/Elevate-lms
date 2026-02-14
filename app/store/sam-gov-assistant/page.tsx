@@ -243,12 +243,12 @@ Come back anytime if you need help!`,
             </div>
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black leading-tight mb-4">
               SAM.gov Registration
-              <span className="block text-blue-300">Step-by-Step Guide</span>
+              <span className="block text-brand-blue-300">Step-by-Step Guide</span>
             </h1>
-            <p className="text-lg text-blue-100 mb-6">
+            <p className="text-lg text-brand-blue-100 mb-6">
               I'll walk you through every step of registering your organization in SAM.gov for federal grants and contracts.
             </p>
-            <div className="flex flex-wrap gap-4 text-sm text-blue-200">
+            <div className="flex flex-wrap gap-4 text-sm text-brand-blue-200">
               <div className="flex items-center gap-2">
                 <CheckCircle className="w-5 h-5 text-green-400" />
                 Interactive walkthrough
@@ -278,8 +278,8 @@ Come back anytime if you need help!`,
             </summary>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
               <div className="bg-gray-50 rounded-xl p-4 text-center">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <FileText className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <FileText className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 text-sm mb-1">EIN Number</h3>
                 <p className="text-xs text-gray-600">
@@ -296,8 +296,8 @@ Come back anytime if you need help!`,
                 </p>
               </div>
               <div className="bg-gray-50 rounded-xl p-4 text-center">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <CreditCard className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <CreditCard className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-gray-900 text-sm mb-1">Bank Account</h3>
                 <p className="text-xs text-gray-600">
@@ -323,7 +323,7 @@ Come back anytime if you need help!`,
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
             {/* Chat Header */}
-            <div className="bg-blue-600 text-white px-4 sm:px-6 py-4">
+            <div className="bg-brand-blue-600 text-white px-4 sm:px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
@@ -331,7 +331,7 @@ Come back anytime if you need help!`,
                   </div>
                   <div>
                     <h3 className="font-bold">SAM.gov Assistant</h3>
-                    <p className="text-sm text-blue-200">
+                    <p className="text-sm text-brand-blue-200">
                       Here to help you register
                     </p>
                   </div>
@@ -346,11 +346,11 @@ Come back anytime if you need help!`,
               </div>
               {/* Progress bar */}
               <div className="mt-4">
-                <div className="flex items-center justify-between text-xs text-blue-200 mb-1">
+                <div className="flex items-center justify-between text-xs text-brand-blue-200 mb-1">
                   <span>Progress</span>
                   <span>{progress}%</span>
                 </div>
-                <div className="h-2 bg-blue-800 rounded-full overflow-hidden">
+                <div className="h-2 bg-brand-blue-800 rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-green-400 transition-all duration-500"
                     style={{ width: `${progress}%` }}
@@ -369,7 +369,7 @@ Come back anytime if you need help!`,
                   <div
                     className={`max-w-[90%] sm:max-w-[85%] rounded-2xl px-4 py-3 ${
                       message.type === 'user'
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-brand-blue-600 text-white'
                         : 'bg-white text-gray-900 shadow-sm'
                     }`}
                   >
@@ -396,10 +396,10 @@ Come back anytime if you need help!`,
                             key={idx}
                             onClick={() => handleOptionClick(option)}
                             disabled={isTyping}
-                            className="w-full text-left px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl hover:bg-blue-100 hover:border-blue-300 transition-colors text-sm font-medium text-blue-900 flex items-center justify-between group disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full text-left px-4 py-3 bg-brand-blue-50 border border-brand-blue-200 rounded-xl hover:bg-brand-blue-100 hover:border-brand-blue-300 transition-colors text-sm font-medium text-brand-blue-900 flex items-center justify-between group disabled:opacity-50 disabled:cursor-not-allowed"
                           >
                             <span>{option}</span>
-                            <ArrowRight className="w-4 h-4 text-blue-400 group-hover:text-blue-600 transition-colors flex-shrink-0 ml-2" />
+                            <ArrowRight className="w-4 h-4 text-brand-blue-400 group-hover:text-brand-blue-600 transition-colors flex-shrink-0 ml-2" />
                           </button>
                         ))}
                       </div>
@@ -475,7 +475,7 @@ Come back anytime if you need help!`,
               <p className="text-gray-600 text-sm mb-3">
                 Prepare winning grant applications with our compliance checklist.
               </p>
-              <span className="text-blue-600 font-semibold text-sm">
+              <span className="text-brand-blue-600 font-semibold text-sm">
                 Learn More →
               </span>
             </Link>
@@ -489,7 +489,7 @@ Come back anytime if you need help!`,
               <p className="text-gray-600 text-sm mb-3">
                 Learn about grant opportunities and funding for your programs.
               </p>
-              <span className="text-blue-600 font-semibold text-sm">
+              <span className="text-brand-blue-600 font-semibold text-sm">
                 Explore →
               </span>
             </Link>

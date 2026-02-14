@@ -224,9 +224,9 @@ export default function EROQueuePage() {
       </div>
 
       {/* Info Card */}
-      <Card className="bg-blue-50 dark:bg-blue-950 border-blue-200">
+      <Card className="bg-brand-blue-50 dark:bg-blue-950 border-brand-blue-200">
         <CardContent className="flex items-start gap-3 py-4">
-          <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5" />
+          <AlertCircle className="h-5 w-5 text-brand-blue-500 mt-0.5" />
           <div>
             <p className="font-medium">ERO Signature Required</p>
             <p className="text-sm text-muted-foreground">

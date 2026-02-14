@@ -105,7 +105,7 @@ export function HeroSection({
         <div className="relative z-10 w-full">
           <div className={`${colors.bg} max-w-2xl mx-4 md:mx-8 lg:mx-16 mb-8 p-8 rounded-t-2xl shadow-lg`}>
             {badge && (
-              <span className="inline-block px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full mb-4">
+              <span className="inline-block px-3 py-1 bg-brand-blue-600 text-white text-sm font-medium rounded-full mb-4">
                 {badge}
               </span>
             )}
@@ -122,7 +122,7 @@ export function HeroSection({
                 {ctaPrimary && (
                   <Link
                     href={ctaPrimary.href}
-                    className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                    className="inline-flex items-center px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
                   >
                     {ctaPrimary.label}
                   </Link>
@@ -160,7 +160,7 @@ export function HeroSection({
         <div className="relative z-10 w-full">
           <div className={`${colors.bg} max-w-3xl mx-4 md:mx-8 lg:mx-16 mb-8 p-8 rounded-t-2xl`}>
             {badge && (
-              <span className="inline-block px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full mb-4">
+              <span className="inline-block px-3 py-1 bg-brand-blue-600 text-white text-sm font-medium rounded-full mb-4">
                 {badge}
               </span>
             )}
@@ -177,7 +177,7 @@ export function HeroSection({
                 {ctaPrimary && (
                   <Link
                     href={ctaPrimary.href}
-                    className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                    className="inline-flex items-center px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
                   >
                     {ctaPrimary.label}
                   </Link>
@@ -207,7 +207,7 @@ export function HeroSection({
             {/* Content */}
             <div>
               {badge && (
-                <span className="inline-block px-3 py-1 bg-blue-100 text-blue-700 text-sm font-medium rounded-full mb-4">
+                <span className="inline-block px-3 py-1 bg-brand-blue-100 text-brand-blue-700 text-sm font-medium rounded-full mb-4">
                   {badge}
                 </span>
               )}
@@ -234,7 +234,7 @@ export function HeroSection({
                   {ctaPrimary && (
                     <Link
                       href={ctaPrimary.href}
-                      className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                      className="inline-flex items-center px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
                     >
                       {ctaPrimary.label}
                     </Link>
@@ -242,7 +242,7 @@ export function HeroSection({
                   {ctaSecondary && (
                     <Link
                       href={ctaSecondary.href}
-                      className="inline-flex items-center px-6 py-3 border-2 border-blue-600 text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition"
+                      className="inline-flex items-center px-6 py-3 border-2 border-brand-blue-600 text-brand-blue-600 font-semibold rounded-lg hover:bg-brand-blue-50 transition"
                     >
                       {ctaSecondary.label}
                     </Link>
@@ -274,7 +274,7 @@ export function HeroSection({
         <div className={`${colors.bg} flex items-center`}>
           <div className="max-w-xl mx-auto px-6 lg:px-12 py-12 lg:py-16">
             {badge && (
-              <span className="inline-block px-3 py-1 bg-blue-600 text-white text-sm font-medium rounded-full mb-4">
+              <span className="inline-block px-3 py-1 bg-brand-blue-600 text-white text-sm font-medium rounded-full mb-4">
                 {badge}
               </span>
             )}
@@ -301,7 +301,7 @@ export function HeroSection({
                 {ctaPrimary && (
                   <Link
                     href={ctaPrimary.href}
-                    className="inline-flex items-center px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                    className="inline-flex items-center px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
                   >
                     {ctaPrimary.label}
                   </Link>
@@ -309,7 +309,7 @@ export function HeroSection({
                 {ctaSecondary && (
                   <Link
                     href={ctaSecondary.href}
-                    className="inline-flex items-center px-6 py-3 border-2 border-blue-600 text-blue-600 font-semibold rounded-lg hover:bg-blue-50 transition"
+                    className="inline-flex items-center px-6 py-3 border-2 border-brand-blue-600 text-brand-blue-600 font-semibold rounded-lg hover:bg-brand-blue-50 transition"
                   >
                     {ctaSecondary.label}
                   </Link>

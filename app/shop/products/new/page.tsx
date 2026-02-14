@@ -92,7 +92,7 @@ export default async function AddProductPage() {
                 <input
                   type="text"
                   id="name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   placeholder="Enter product name"
                   required
                 />
@@ -104,7 +104,7 @@ export default async function AddProductPage() {
                 <textarea
                   id="description"
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   placeholder="Describe the product..."
                   required
                 />
@@ -115,7 +115,7 @@ export default async function AddProductPage() {
                 </label>
                 <select
                   id="category"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   required
                 >
                   <option value="">Select a category</option>
@@ -145,7 +145,7 @@ export default async function AddProductPage() {
                     id="price"
                     step="0.01"
                     min="0"
-                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="0.00"
                     required
                   />
@@ -162,7 +162,7 @@ export default async function AddProductPage() {
                     id="original_price"
                     step="0.01"
                     min="0"
-                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     placeholder="0.00"
                   />
                 </div>
@@ -184,7 +184,7 @@ export default async function AddProductPage() {
                 <input
                   type="text"
                   id="sku"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   placeholder="Product SKU"
                 />
               </div>
@@ -196,7 +196,7 @@ export default async function AddProductPage() {
                   type="number"
                   id="stock"
                   min="0"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   placeholder="0"
                 />
               </div>
@@ -243,7 +243,7 @@ export default async function AddProductPage() {
                 <textarea
                   id="features"
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   placeholder="Professional grade&#10;Cordless design&#10;Includes carrying case"
                 />
               </div>
@@ -254,7 +254,7 @@ export default async function AddProductPage() {
                 <input
                   type="text"
                   id="tags"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   placeholder="barbering, clippers, professional"
                 />
               </div>
@@ -277,7 +277,7 @@ export default async function AddProductPage() {
             </button>
             <button
               type="submit"
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               Publish Product
             </button>

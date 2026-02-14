@@ -78,7 +78,7 @@ export default function RevenueShareCalculator() {
                     type="number"
                     value={clientPayment}
                     onChange={(e) => setClientPayment(Number(e.target.value))}
-                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
                 <p className="text-xs text-black mt-1">
@@ -96,7 +96,7 @@ export default function RevenueShareCalculator() {
                     type="number"
                     value={addOnFees}
                     onChange={(e) => setAddOnFees(Number(e.target.value))}
-                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
                 <p className="text-xs text-black mt-1">
@@ -104,11 +104,11 @@ export default function RevenueShareCalculator() {
                 </p>
               </div>
 
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
-                <h3 className="font-bold text-blue-900 mb-2">
+              <div className="bg-brand-blue-50 border-2 border-brand-blue-200 rounded-lg p-4">
+                <h3 className="font-bold text-brand-blue-900 mb-2">
                   What's Included (No Extra Cost)
                 </h3>
-                <ul className="text-sm text-blue-800 space-y-1">
+                <ul className="text-sm text-brand-blue-800 space-y-1">
                   <li>
                     <CheckCircle className="w-5 h-5 inline-block" /> Professional Tax Software
                     Software (unlimited)
@@ -140,7 +140,7 @@ export default function RevenueShareCalculator() {
                   type="number"
                   value={numberOfReturns}
                   onChange={(e) => setNumberOfReturns(Number(e.target.value))}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 />
                 <p className="text-xs text-black mt-1">
                   Average: 50-200 per month
@@ -259,7 +259,7 @@ export default function RevenueShareCalculator() {
               <h3 className="font-bold text-black mb-4">Quick Stats</h3>
               <div className="grid grid-cols-2 gap-4 text-center">
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-brand-blue-600">
                     {numberOfReturns * 4}
                   </div>
                   <div className="text-xs text-black">
@@ -273,7 +273,7 @@ export default function RevenueShareCalculator() {
                   <div className="text-xs text-black">Avg per Return</div>
                 </div>
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-brand-blue-600">
                     {((subofficeShare / clientPayment) * 100).toFixed(0)}%
                   </div>
                   <div className="text-xs text-black">Your Margin</div>
@@ -311,8 +311,8 @@ export default function RevenueShareCalculator() {
               </div>
             </div>
 
-            <div className="border-2 border-blue-500 rounded-lg p-6 bg-blue-50">
-              <div className="inline-block bg-blue-600 text-white text-xs px-2 py-2 rounded mb-2">
+            <div className="border-2 border-brand-blue-500 rounded-lg p-6 bg-brand-blue-50">
+              <div className="inline-block bg-brand-blue-600 text-white text-xs px-2 py-2 rounded mb-2">
                 POPULAR
               </div>
               <h3 className="font-bold text-lg mb-4">Full-Time Office</h3>
@@ -382,7 +382,7 @@ export default function RevenueShareCalculator() {
         </div>
 
         {/* CTA */}
-        <div className="mt-8 bg-blue-900 text-white rounded-lg p-8 text-center">
+        <div className="mt-8 bg-brand-blue-900 text-white rounded-lg p-8 text-center">
           <h2 className="text-2xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-lg mb-6">
             Complete onboarding and start earning revenue share today.
@@ -396,7 +396,7 @@ export default function RevenueShareCalculator() {
             </Link>
             <Link
               href="/docs/revenue-sharing-policy.md"
-              className="bg-white hover:bg-gray-100 text-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition-all flex items-center justify-center"
+              className="bg-white hover:bg-gray-100 text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition-all flex items-center justify-center"
             >
               <FileText className="w-5 h-5 mr-2" />
               View Full Policy

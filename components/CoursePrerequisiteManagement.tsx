@@ -92,7 +92,7 @@ export function CoursePrerequisiteManagement() {
                     <h3 className="text-xl font-bold">{course.title}</h3>
                     <span className={`px-3 py-2 rounded text-xs font-medium ${
                       course.status === 'completed' ? 'bg-green-100 text-green-700' :
-                      course.status === 'available' ? 'bg-blue-100 text-blue-700' :
+                      course.status === 'available' ? 'bg-brand-blue-100 text-brand-blue-700' :
                       'bg-gray-100 text-black'
                     }`}>
                       {course.status.toUpperCase()}

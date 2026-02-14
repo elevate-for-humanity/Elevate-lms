@@ -56,8 +56,8 @@ export default async function CareerDiscussionsPage() {
       <div className="max-w-4xl mx-auto px-4">
 
         <div className="flex items-center gap-4 mb-6">
-          <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-            <Briefcase className="w-6 h-6 text-blue-600" />
+          <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+            <Briefcase className="w-6 h-6 text-brand-blue-600" />
           </div>
           <div className="flex-1">
             <h1 className="text-2xl font-bold text-gray-900">Career Discussions</h1>

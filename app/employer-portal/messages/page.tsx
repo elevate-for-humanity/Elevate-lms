@@ -94,7 +94,7 @@ export default function EmployerMessagesPage() {
               <h1 className="text-2xl font-bold text-gray-900">Messages</h1>
               <p className="text-gray-600">Communicate with candidates and support</p>
             </div>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+            <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2">
               <MessageSquare className="w-4 h-4" />
               New Message
             </button>
@@ -112,7 +112,7 @@ export default function EmployerMessagesPage() {
                   <input
                     type="text"
                     placeholder="Search messages..."
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
               </div>
@@ -121,7 +121,7 @@ export default function EmployerMessagesPage() {
                 {conversations.map((conv, index) => (
                   <div
                     key={conv.id}
-                    className={`p-4 border-b hover:bg-gray-50 cursor-pointer ${index === 0 ? 'bg-blue-50' : ''}`}
+                    className={`p-4 border-b hover:bg-gray-50 cursor-pointer ${index === 0 ? 'bg-brand-blue-50' : ''}`}
                   >
                     <div className="flex items-start gap-3">
                       <div className="relative">
@@ -147,7 +147,7 @@ export default function EmployerMessagesPage() {
                       <div className="flex flex-col items-end gap-1">
                         {conv.starred && <Star className="w-4 h-4 text-yellow-500 fill-current" />}
                         {conv.unread > 0 && (
-                          <span className="px-2 py-0.5 bg-blue-600 text-white text-xs rounded-full">
+                          <span className="px-2 py-0.5 bg-brand-blue-600 text-white text-xs rounded-full">
                             {conv.unread}
                           </span>
                         )}
@@ -193,7 +193,7 @@ export default function EmployerMessagesPage() {
                       <div
                         className={`px-4 py-3 rounded-2xl ${
                           msg.isMe
-                            ? 'bg-blue-600 text-white rounded-br-md'
+                            ? 'bg-brand-blue-600 text-white rounded-br-md'
                             : 'bg-gray-100 text-gray-900 rounded-bl-md'
                         }`}
                       >
@@ -201,7 +201,7 @@ export default function EmployerMessagesPage() {
                       </div>
                       <div className={`flex items-center gap-1 mt-1 ${msg.isMe ? 'justify-end' : ''}`}>
                         <span className="text-xs text-gray-500">{msg.time}</span>
-                        {msg.isMe && <CheckCheck className="w-4 h-4 text-blue-500" />}
+                        {msg.isMe && <CheckCheck className="w-4 h-4 text-brand-blue-500" />}
                       </div>
                     </div>
                   </div>
@@ -216,9 +216,9 @@ export default function EmployerMessagesPage() {
                   <input
                     type="text"
                     placeholder="Type a message..."
-                    className="flex-1 px-4 py-2 border rounded-full focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="flex-1 px-4 py-2 border rounded-full focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
-                  <button className="p-3 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition">
+                  <button className="p-3 bg-brand-blue-600 text-white rounded-full hover:bg-brand-blue-700 transition">
                     <Send className="w-5 h-5" />
                   </button>
                 </div>

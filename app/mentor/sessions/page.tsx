@@ -86,7 +86,7 @@ export default async function MentorSessionsPage() {
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
-            <Link href="/mentor/dashboard" className="hover:text-blue-600">Mentor Dashboard</Link>
+            <Link href="/mentor/dashboard" className="hover:text-brand-blue-600">Mentor Dashboard</Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900 font-medium">Sessions</span>
           </nav>
@@ -95,7 +95,7 @@ export default async function MentorSessionsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Mentoring Sessions</h1>
-          <button className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <button className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
             <Plus className="w-5 h-5" /> Schedule Session
           </button>
         </div>
@@ -110,14 +110,14 @@ export default async function MentorSessionsPage() {
                       <p className="font-semibold text-gray-900">{session.mentee}</p>
                       <p className="text-sm text-gray-600">{session.topic}</p>
                     </div>
-                    {session.type === 'video' ? <Video className="w-5 h-5 text-blue-600" /> : <MapPin className="w-5 h-5 text-green-600" />}
+                    {session.type === 'video' ? <Video className="w-5 h-5 text-brand-blue-600" /> : <MapPin className="w-5 h-5 text-green-600" />}
                   </div>
                   <div className="flex items-center gap-4 text-sm text-gray-600">
                     <span className="flex items-center gap-1"><Calendar className="w-4 h-4" /> {session.date}</span>
                     <span className="flex items-center gap-1"><Clock className="w-4 h-4" /> {session.time}</span>
                   </div>
                   <div className="mt-4 flex gap-2">
-                    <button className="flex-1 bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">Join</button>
+                    <button className="flex-1 bg-brand-blue-600 text-white py-2 rounded-lg hover:bg-brand-blue-700">Join</button>
                     <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">Reschedule</button>
                   </div>
                 </div>

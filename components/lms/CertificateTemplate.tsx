@@ -24,14 +24,14 @@ export function CertificateTemplate({
       style={{ width: '1056px', height: '816px' }}
     >
       {/* Border */}
-      <div className="absolute inset-8 border-8 border-blue-600 rounded-lg">
-        <div className="absolute inset-2 border-2 border-blue-400 rounded-lg" />
+      <div className="absolute inset-8 border-8 border-brand-blue-600 rounded-lg">
+        <div className="absolute inset-2 border-2 border-brand-blue-400 rounded-lg" />
       </div>
 
       {/* Content */}
       <div className="relative h-full flex flex-col items-center justify-center text-center px-16">
         {/* Logo/Icon */}
-        <div className="w-24 h-24 bg-blue-600 rounded-full flex items-center justify-center mb-6">
+        <div className="w-24 h-24 bg-brand-blue-600 rounded-full flex items-center justify-center mb-6">
           <Award className="w-12 h-12 text-white" />
         </div>
 
@@ -44,7 +44,7 @@ export function CertificateTemplate({
         <p className="text-xl text-black mb-8">This certifies that</p>
 
         {/* Student Name */}
-        <h2 className="text-6xl font-bold text-blue-600 mb-8 border-b-4 border-blue-600 pb-4 px-8">
+        <h2 className="text-6xl font-bold text-brand-blue-600 mb-8 border-b-4 border-brand-blue-600 pb-4 px-8">
           {studentName}
         </h2>
 
@@ -154,7 +154,7 @@ export function CertificatePreview({
       <div className="flex flex-wrap gap-3">
         <button
           onClick={downloadPDF}
-          className="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
+          className="flex-1 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
         >
           <svg
             className="w-5 h-5"

@@ -122,9 +122,9 @@ export function FinancialAidCalculator() {
                   </p>
                 </div>
 
-                <div className="p-4 bg-blue-50 rounded">
-                  <p className="text-sm text-blue-700">Student Loans</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                <div className="p-4 bg-brand-blue-50 rounded">
+                  <p className="text-sm text-brand-blue-700">Student Loans</p>
+                  <p className="text-2xl font-bold text-brand-blue-600">
                     ${results.loans.toLocaleString()}
                   </p>
                 </div>

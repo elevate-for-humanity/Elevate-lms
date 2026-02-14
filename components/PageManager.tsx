@@ -189,7 +189,7 @@ export default function PageManager() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
       </div>
     );
   }
@@ -221,7 +221,7 @@ export default function PageManager() {
                   <div
                     key={page.id}
                     className={`p-4 cursor-pointer hover:bg-brand-surface transition-colors ${
-                      selectedPage?.id === page.id ? 'bg-blue-50' : ''
+                      selectedPage?.id === page.id ? 'bg-brand-blue-50' : ''
                     }`}
                     onClick={() => setSelectedPage(page)}
                   >

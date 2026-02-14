@@ -313,17 +313,17 @@ export default async function AtRiskStudentsPage() {
             </div>
 
             {/* Support Resources */}
-            <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-blue-900 mb-2">
+            <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+              <h3 className="text-lg font-semibold text-brand-blue-900 mb-2">
                 Need Help Supporting At-Risk Students?
               </h3>
-              <p className="text-blue-800 mb-4">
+              <p className="text-brand-blue-800 mb-4">
                 Our team can provide guidance on intervention strategies and
                 additional resources.
               </p>
               <Link
                 href="/program-holder/support"
-                className="text-blue-900 hover:text-blue-700 font-medium"
+                className="text-brand-blue-900 hover:text-brand-blue-700 font-medium"
               >
                 Contact Support →
               </Link>

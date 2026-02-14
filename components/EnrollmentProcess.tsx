@@ -65,7 +65,7 @@ d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               <p className="text-black mb-4 leading-relaxed">
                 Fill out your profile with your work history, education, and career goals. This helps us match you with the right training program and funding options.
               </p>
-              <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
+              <div className="bg-brand-blue-50 border-l-4 border-brand-blue-600 p-4 rounded">
                 <p className="text-sm text-black">
                   <strong>What you'll need:</strong> Social Security Number, proof of residency, income documentation (if applicable), and high school diploma or GED.
                 </p>

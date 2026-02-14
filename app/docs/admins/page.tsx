@@ -34,10 +34,10 @@ export default function AdminDocsPage() {
             </Link>
           ))}
         </div>
-        <div className="mt-8 p-6 bg-blue-50 rounded-xl">
+        <div className="mt-8 p-6 bg-brand-blue-50 rounded-xl">
           <h3 className="font-semibold text-gray-900 mb-2">Need Help?</h3>
           <p className="text-gray-600 text-sm mb-4">Contact support for assistance.</p>
-          <Link href="/contact" className="text-blue-600 hover:underline font-medium">Contact Support →</Link>
+          <Link href="/contact" className="text-brand-blue-600 hover:underline font-medium">Contact Support →</Link>
         </div>
       </div>
     </div>

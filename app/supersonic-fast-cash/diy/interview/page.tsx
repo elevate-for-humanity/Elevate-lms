@@ -134,10 +134,10 @@ export default async function DIYInterviewPage() {
             </div>
           </form>
 
-          <div className="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <div className="mt-8 p-4 bg-brand-blue-50 border border-brand-blue-200 rounded-lg">
             <p className="text-sm text-black">
               <strong>Need help?</strong> Our tax professionals are available to assist you.{' '}
-              <Link href="/supersonic-fast-cash/book-appointment" className="text-blue-600 hover:underline">
+              <Link href="/supersonic-fast-cash/book-appointment" className="text-brand-blue-600 hover:underline">
                 Book an appointment
               </Link>
             </p>

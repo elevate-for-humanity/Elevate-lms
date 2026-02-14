@@ -42,7 +42,7 @@ export function Accordion({
         aria-controls={accordionId}
         className={cn(
           'w-full flex items-center justify-between py-4 text-left',
-          'hover:text-blue-600 transition-colors',
+          'hover:text-brand-blue-600 transition-colors',
           alwaysOpenOnDesktop && 'md:cursor-default md:hover:text-black'
         )}
         disabled={alwaysOpenOnDesktop}
@@ -108,7 +108,7 @@ export function AccordionGroup({
             onClick={() => setOpenIndex(isOpen ? -1 : index)}
             aria-expanded={isOpen}
             aria-controls={itemId}
-            className="w-full flex items-center justify-between py-4 text-left hover:text-blue-600 transition-colors"
+            className="w-full flex items-center justify-between py-4 text-left hover:text-brand-blue-600 transition-colors"
           >
             <span className="font-semibold text-lg">{item.title}</span>
             <ChevronDown

@@ -40,8 +40,8 @@ export default function AboutPage() {
         {/* Values */}
         <div className="grid md:grid-cols-2 gap-6 mb-8">
           <div className="bg-white rounded-2xl border border-slate-200 p-6">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-              <Users className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+              <Users className="w-6 h-6 text-brand-blue-600" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Community First</h3>
             <p className="text-slate-600">
@@ -62,8 +62,8 @@ export default function AboutPage() {
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-200 p-6">
-            <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4">
-              <Target className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mb-4">
+              <Target className="w-6 h-6 text-brand-blue-600" />
             </div>
             <h3 className="text-lg font-bold text-slate-900 mb-2">Outcome Focused</h3>
             <p className="text-slate-600">

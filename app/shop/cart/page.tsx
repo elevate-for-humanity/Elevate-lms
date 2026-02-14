@@ -140,7 +140,7 @@ export default function ShoppingCartPage() {
 
               <Link
                 href="/shop/products"
-                className="inline-flex items-center gap-2 mt-4 text-blue-600 hover:text-blue-700"
+                className="inline-flex items-center gap-2 mt-4 text-brand-blue-600 hover:text-brand-blue-700"
               >
                 <ShoppingCart className="w-4 h-4" />
                 Continue Shopping
@@ -165,7 +165,7 @@ export default function ShoppingCartPage() {
                         value={promoCode}
                         onChange={(e) => setPromoCode(e.target.value)}
                         placeholder="Enter code"
-                        className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                         disabled={promoApplied}
                       />
                     </div>
@@ -211,7 +211,7 @@ export default function ShoppingCartPage() {
 
                 <Link
                   href="/checkout"
-                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 font-medium"
                 >
                   <CreditCard className="w-5 h-5" />
                   Proceed to Checkout
@@ -231,7 +231,7 @@ export default function ShoppingCartPage() {
             <p className="text-gray-600 mb-6">Browse our products and add items to your cart.</p>
             <Link
               href="/shop/products"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               Browse Products
             </Link>

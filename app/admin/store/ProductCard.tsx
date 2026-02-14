@@ -96,7 +96,7 @@ export default function ProductCard() {
           <button
             onClick={() => cloneCodebase(p.id)}
             disabled={cloning === p.id}
-            className="w-full p-2 bg-brand-blue-600 text-white rounded hover:bg-brand-blue-700 disabled:bg-blue-300 disabled:cursor-not-allowed transition-colors font-medium"
+            className="w-full p-2 bg-brand-blue-600 text-white rounded hover:bg-brand-blue-700 disabled:bg-brand-blue-300 disabled:cursor-not-allowed transition-colors font-medium"
           >
             {cloning === p.id ? 'Cloning...' : 'Clone Codebase'}
           </button>

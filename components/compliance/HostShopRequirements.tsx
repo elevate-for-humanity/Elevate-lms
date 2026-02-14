@@ -142,7 +142,7 @@ export function HostShopRequirements({
         {/* Section Header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-xl flex items-center justify-center">
+            <div className="w-12 h-12 bg-brand-blue-600 rounded-xl flex items-center justify-center">
               <Building2 className="w-6 h-6 text-white" />
             </div>
             <div>
@@ -153,8 +153,8 @@ export function HostShopRequirements({
             </div>
           </div>
           
-          <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded-r-lg">
-            <p className="text-blue-900">
+          <div className="bg-brand-blue-50 border-l-4 border-brand-blue-600 p-4 rounded-r-lg">
+            <p className="text-brand-blue-900">
               The shop/salon you choose must meet state/local licensing and workplace standards based on 
               your training region. Host sites must be approved before apprenticeship placement is confirmed.
             </p>
@@ -164,7 +164,7 @@ export function HostShopRequirements({
         {/* Universal Requirements */}
         <div className="bg-white rounded-xl border border-slate-200 p-6 mb-6">
           <h3 className="text-lg font-bold text-black mb-4 flex items-center gap-2">
-            <Shield className="w-5 h-5 text-blue-600" />
+            <Shield className="w-5 h-5 text-brand-blue-600" />
             Universal Host Site Requirements
           </h3>
           <p className="text-slate-600 text-sm mb-4">

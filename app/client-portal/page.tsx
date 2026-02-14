@@ -63,7 +63,7 @@ export default function ClientPortalPage() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
               >
                 Sign In
                 <ArrowRight className="w-4 h-4" />
@@ -86,7 +86,7 @@ export default function ClientPortalPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {features.map((feature) => (
               <div key={feature.title} className="bg-white border rounded-xl p-6 hover:shadow-lg transition-shadow">
-                <feature.icon className="w-10 h-10 text-blue-600 mb-4" />
+                <feature.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
                 <p className="text-gray-600 text-sm">{feature.description}</p>
               </div>
@@ -120,7 +120,7 @@ export default function ClientPortalPage() {
               </p>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors w-full justify-center"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors w-full justify-center"
               >
                 Contact Us
                 <ArrowRight className="w-4 h-4" />
@@ -131,15 +131,15 @@ export default function ClientPortalPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-blue-600 text-white">
+      <section className="py-16 lg:py-24 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Already Have an Account?</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Sign in to access your organization's training dashboard and reports.
           </p>
           <Link
             href="/login"
-            className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
           >
             Sign In to Portal
             <ArrowRight className="w-4 h-4" />

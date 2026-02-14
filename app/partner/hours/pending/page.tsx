@@ -262,8 +262,8 @@ export default function PartnerHoursPendingPage() {
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                        <User className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                        <User className="w-5 h-5 text-brand-blue-600" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900">{hour.student_name}</h3>
@@ -290,8 +290,8 @@ export default function PartnerHoursPendingPage() {
                       <div className="flex items-center gap-2">
                         <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                           hour.hour_type === 'ojt' 
-                            ? 'bg-blue-100 text-blue-700' 
-                            : 'bg-blue-100 text-blue-700'
+                            ? 'bg-brand-blue-100 text-brand-blue-700' 
+                            : 'bg-brand-blue-100 text-brand-blue-700'
                         }`}>
                           {hour.hour_type === 'ojt' ? 'OJT' : 'RTI'}
                         </span>

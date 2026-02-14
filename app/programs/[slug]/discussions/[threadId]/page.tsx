@@ -168,7 +168,7 @@ export default function ThreadDetailPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
       </div>
     );
   }
@@ -185,7 +185,7 @@ export default function ThreadDetailPage() {
         <div className="mb-8">
           <Link 
             href={`/programs/${slug}/discussions`}
-            className="inline-flex items-center text-blue-600 hover:text-blue-700 mb-4"
+            className="inline-flex items-center text-brand-blue-600 hover:text-brand-blue-700 mb-4"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Discussions
@@ -195,8 +195,8 @@ export default function ThreadDetailPage() {
         {/* Thread */}
         <div className="bg-white rounded-xl border p-6 mb-6">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <User className="w-6 h-6 text-blue-600" />
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <User className="w-6 h-6 text-brand-blue-600" />
             </div>
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
@@ -221,7 +221,7 @@ export default function ThreadDetailPage() {
                 <button
                   onClick={likeThread}
                   disabled={!user}
-                  className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition disabled:opacity-50"
+                  className="flex items-center gap-2 text-gray-500 hover:text-brand-blue-600 transition disabled:opacity-50"
                 >
                   <ThumbsUp className="w-5 h-5" />
                   <span>{thread.likes || 0}</span>
@@ -254,7 +254,7 @@ export default function ThreadDetailPage() {
                   <button
                     onClick={() => likeReply(reply.id, reply.likes || 0)}
                     disabled={!user}
-                    className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition mt-3 disabled:opacity-50"
+                    className="flex items-center gap-2 text-gray-500 hover:text-brand-blue-600 transition mt-3 disabled:opacity-50"
                   >
                     <ThumbsUp className="w-4 h-4" />
                     <span>{reply.likes || 0}</span>
@@ -281,13 +281,13 @@ export default function ThreadDetailPage() {
                 onChange={(e) => setReplyContent(e.target.value)}
                 placeholder="Share your thoughts..."
                 rows={4}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 required
               />
               <button
                 type="submit"
                 disabled={posting}
-                className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                className="inline-flex items-center gap-2 px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50"
               >
                 <Send className="w-4 h-4" />
                 {posting ? 'Posting...' : 'Post Reply'}
@@ -298,11 +298,11 @@ export default function ThreadDetailPage() {
           <div className="bg-gray-50 rounded-xl border p-6 text-center">
             {!user ? (
               <p className="text-gray-600">
-                <Link href="/login" className="text-blue-600 font-semibold">Sign in</Link> to reply to this discussion.
+                <Link href="/login" className="text-brand-blue-600 font-semibold">Sign in</Link> to reply to this discussion.
               </p>
             ) : (
               <p className="text-gray-600">
-                <Link href={`/enroll/${program?.id}`} className="text-blue-600 font-semibold">Enroll in this program</Link> to participate in discussions.
+                <Link href={`/enroll/${program?.id}`} className="text-brand-blue-600 font-semibold">Enroll in this program</Link> to participate in discussions.
               </p>
             )}
           </div>

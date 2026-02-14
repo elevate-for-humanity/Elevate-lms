@@ -111,12 +111,12 @@ export default function CapitalReadinessSlidesPage() {
             Back to Guide
           </Link>
           <div className="flex items-center gap-4">
-            <Presentation className="w-5 h-5 text-blue-400" />
+            <Presentation className="w-5 h-5 text-brand-blue-400" />
             <span className="font-semibold">Capital Readiness Slide Deck</span>
           </div>
           <Link 
             href="/contact"
-            className="flex items-center gap-2 px-4 py-2 bg-blue-600 rounded-lg text-sm font-medium hover:bg-blue-700"
+            className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 rounded-lg text-sm font-medium hover:bg-brand-blue-700"
           >
             <Download className="w-4 h-4" />
             Request PPTX
@@ -163,7 +163,7 @@ export default function CapitalReadinessSlidesPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/store/guides/capital-readiness"
-              className="px-6 py-3 bg-blue-600 rounded-lg font-semibold hover:bg-blue-700"
+              className="px-6 py-3 bg-brand-blue-600 rounded-lg font-semibold hover:bg-brand-blue-700"
             >
               Get the Full Guide — $39
             </Link>

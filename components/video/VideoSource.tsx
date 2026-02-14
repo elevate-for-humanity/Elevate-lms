@@ -89,7 +89,7 @@ export default function Video({
           aria-label="Play video"
         >
           <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-            <Play className="w-8 h-8 text-blue-600 ml-1" />
+            <Play className="w-8 h-8 text-brand-blue-600 ml-1" />
           </div>
         </button>
       )}

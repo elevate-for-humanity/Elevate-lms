@@ -414,7 +414,7 @@ export default function WIOAComplianceDashboard() {
       case 'medium':
         return 'text-yellow-600 bg-yellow-100 border-yellow-200';
       case 'low':
-        return 'text-brand-info bg-brand-surface border-blue-200';
+        return 'text-brand-info bg-brand-surface border-brand-blue-200';
       default:
         return 'text-brand-text-muted bg-brand-surface-dark border-brand-border';
     }
@@ -423,7 +423,7 @@ export default function WIOAComplianceDashboard() {
   if (!metrics) {
     return (
       <div className="text-center py-8">
-        <div className="inline-block animate-spin rounded-full h-11 w-11 border-b-2 border-blue-600" />
+        <div className="inline-block animate-spin rounded-full h-11 w-11 border-b-2 border-brand-blue-600" />
         <p className="mt-4 text-brand-text-muted">
           Loading WIOA compliance data...
         </p>
@@ -721,7 +721,7 @@ export default function WIOAComplianceDashboard() {
                     )}
                   </td>
                   <td className="px-6 py-4">
-                    <button className="text-xs bg-brand-surface text-brand-info px-3 py-2 rounded hover:bg-blue-200">
+                    <button className="text-xs bg-brand-surface text-brand-info px-3 py-2 rounded hover:bg-brand-blue-200">
                       {report.status === 'completed' ? 'View' : 'Generate'}
                     </button>
                   </td>

@@ -117,7 +117,7 @@ export default async function AdminDocumentReviewPage() {
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-2">
-              <FileText className="w-8 h-8 text-blue-600" />
+              <FileText className="w-8 h-8 text-brand-blue-600" />
               <span className="text-3xl font-bold text-black">
                 {documents?.length || 0}
               </span>
@@ -189,7 +189,7 @@ export default async function AdminDocumentReviewPage() {
                   <div className="flex items-center gap-3">
                     <Link
                       href={`/admin/documents/review/${doc.id}`}
-                      className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition flex items-center gap-2"
+                      className="px-4 py-2 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2"
                     >
                       <Eye className="w-4 h-4" />
                       Review
@@ -209,7 +209,7 @@ export default async function AdminDocumentReviewPage() {
 
           {/* Filter Tabs */}
           <div className="flex gap-2 mb-6 border-b">
-            <button className="px-4 py-2 font-semibold text-blue-600 border-b-2 border-blue-600" aria-label="Action button">
+            <button className="px-4 py-2 font-semibold text-brand-blue-600 border-b-2 border-brand-blue-600" aria-label="Action button">
               All ({documents?.length || 0})
             </button>
             <button className="px-4 py-2 font-semibold text-black hover:text-black" aria-label="Action button">
@@ -261,7 +261,7 @@ export default async function AdminDocumentReviewPage() {
                       href={doc.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline text-sm font-semibold"
+                      className="text-brand-blue-600 hover:underline text-sm font-semibold"
                     >
                       View
                     </a>

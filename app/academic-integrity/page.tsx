@@ -92,8 +92,8 @@ export default async function AcademicIntegrityPage() {
             principles and contribute to a culture of honesty, trust, and
             ethical behavior.
           </p>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-            <p className="text-blue-900 font-semibold">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+            <p className="text-brand-blue-900 font-semibold">
               Academic integrity means doing your own work, giving credit where
               credit is due, and being honest in all academic endeavors.
             </p>
@@ -194,17 +194,17 @@ export default async function AcademicIntegrityPage() {
             </div>
 
             {/* Falsification */}
-            <div className="border-l-4 border-blue-500 pl-6">
+            <div className="border-l-4 border-brand-blue-500 pl-6">
               <h3 className="text-base sm:text-lg font-bold text-black mb-3 flex items-center gap-2">
-                <FileText className="w-6 h-6 text-blue-600" />
+                <FileText className="w-6 h-6 text-brand-blue-600" />
                 Falsification of Records
               </h3>
               <p className="text-black mb-3">
                 Altering or fabricating academic records or documentation.
               </p>
-              <div className="bg-blue-50 rounded-lg p-4">
-                <p className="font-semibold text-blue-900 mb-2">Examples:</p>
-                <ul className="space-y-2 text-blue-800 text-sm">
+              <div className="bg-brand-blue-50 rounded-lg p-4">
+                <p className="font-semibold text-brand-blue-900 mb-2">Examples:</p>
+                <ul className="space-y-2 text-brand-blue-800 text-sm">
                   <li>• Forging signatures on documents</li>
                   <li>• Altering grades or transcripts</li>
                   <li>• Fabricating data or research results</li>
@@ -216,7 +216,7 @@ export default async function AcademicIntegrityPage() {
             </div>
 
             {/* Multiple Submissions */}
-            <div className="border-l-4 border-blue-500 pl-6">
+            <div className="border-l-4 border-brand-blue-500 pl-6">
               <h3 className="text-base sm:text-lg font-bold text-black mb-3 flex items-center gap-2">
                 <BookOpen className="w-6 h-6 text-brand-blue-600" />
                 Multiple Submissions
@@ -225,8 +225,8 @@ export default async function AcademicIntegrityPage() {
                 Submitting the same work for multiple courses without
                 permission.
               </p>
-              <div className="bg-blue-50 rounded-lg p-4">
-                <p className="text-blue-800 text-sm">
+              <div className="bg-brand-blue-50 rounded-lg p-4">
+                <p className="text-brand-blue-800 text-sm">
                   Students must obtain explicit permission from all instructors
                   involved before submitting the same or substantially similar
                   work for credit in more than one course.
@@ -410,16 +410,16 @@ export default async function AcademicIntegrityPage() {
             handled confidentially.
           </p>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 sm:p-6">
-            <h3 className="font-semibold text-blue-900 mb-3">How to Report:</h3>
-            <ul className="space-y-2 text-blue-800 text-sm">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 sm:p-6">
+            <h3 className="font-semibold text-brand-blue-900 mb-3">How to Report:</h3>
+            <ul className="space-y-2 text-brand-blue-800 text-sm">
               <li>• Speak directly with the course instructor</li>
               <li>• Contact the Dean of Students</li>
               <li>• Submit an anonymous report through the student portal</li>
               <li>• Email: elevate4humanityedu@gmail.com</li>
               <li>• Phone: 317-314-3757</li>
             </ul>
-            <p className="text-blue-900 text-sm mt-4">
+            <p className="text-brand-blue-900 text-sm mt-4">
               <strong>Protection:</strong> Students who report violations in
               good faith will not face retaliation. The institution prohibits
               any form of retaliation against those who report academic
@@ -432,7 +432,7 @@ export default async function AcademicIntegrityPage() {
         <div className="bg-white rounded-xl p-4 sm:p-4 sm:p-6 md:p-8 text-white mb-8">
           <h2 className="text-xl sm:text-2xl font-bold mb-4">Academic Integrity Pledge</h2>
           <div className="bg-white/10 rounded-lg p-4 sm:p-6">
-            <p className="text-blue-100 italic mb-4">
+            <p className="text-brand-blue-100 italic mb-4">
               "I pledge to uphold the highest standards of academic integrity. I
               will do my own work, give credit where credit is due, and be
               honest in all my academic endeavors. I understand that academic
@@ -440,7 +440,7 @@ export default async function AcademicIntegrityPage() {
               credentials. I commit to maintaining these standards throughout my
               time at Elevate for Humanity."
             </p>
-            <p className="text-blue-200 text-sm">
+            <p className="text-brand-blue-200 text-sm">
               All students acknowledge this pledge upon enrollment and are
               expected to uphold it throughout their academic career.
             </p>
@@ -496,20 +496,20 @@ export default async function AcademicIntegrityPage() {
           </div>
         </div>
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-blue-100 mb-6">Apply today for free career training programs.</p>
+          <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
               Visit Support Center

@@ -65,7 +65,7 @@ export default function CoursePartnersPage() {
             <h1 className="text-2xl font-bold text-gray-900">Course Partners</h1>
             <p className="text-gray-600">Manage certification and training provider partnerships</p>
           </div>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-2">
+          <button className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition flex items-center gap-2">
             <Plus className="w-4 h-4" />
             Add Partner
           </button>
@@ -78,10 +78,10 @@ export default function CoursePartnersPage() {
               <input
                 type="text"
                 placeholder="Search partners..."
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               />
             </div>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
               <option>All Types</option>
               <option>Certification Provider</option>
               <option>IT Certification</option>
@@ -135,7 +135,7 @@ export default function CoursePartnersPage() {
               <div className="px-6 py-3 bg-gray-50 border-t flex items-center justify-between">
                 <Link
                   href={`/admin/courses/partners/${partner.id}`}
-                  className="text-blue-600 hover:text-blue-700 text-sm font-medium flex items-center gap-1"
+                  className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium flex items-center gap-1"
                 >
                   View Details <ExternalLink className="w-3 h-3" />
                 </Link>

@@ -42,7 +42,7 @@ export default async function MobileSyncPage() {
               <label className="flex items-center justify-between"><span>Background sync</span><input type="checkbox" className="w-4 h-4 rounded" /></label>
             </div>
           </div>
-          <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Force Sync Now</button>
+          <button className="w-full bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Force Sync Now</button>
         </div>
       </div>
     </div>

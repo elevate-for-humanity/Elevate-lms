@@ -304,7 +304,7 @@ export default function AutomatedEnrollmentWorkflow({
   const getStatusIcon = (status: WorkflowStep['status']) => {
     switch (status) {
       case 'completed': return <CheckCircle className="w-5 h-5 text-green-500" />;
-      case 'in_progress': return <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />;
+      case 'in_progress': return <Loader2 className="w-5 h-5 text-brand-blue-500 animate-spin" />;
       case 'failed': return <AlertCircle className="w-5 h-5 text-red-500" />;
       case 'skipped': return <Circle className="w-5 h-5 text-gray-400" />;
       default: return <Circle className="w-5 h-5 text-gray-300" />;
@@ -314,7 +314,7 @@ export default function AutomatedEnrollmentWorkflow({
   const getStatusBg = (status: WorkflowStep['status']) => {
     switch (status) {
       case 'completed': return 'bg-green-50 border-green-200';
-      case 'in_progress': return 'bg-blue-50 border-blue-200';
+      case 'in_progress': return 'bg-brand-blue-50 border-brand-blue-200';
       case 'failed': return 'bg-red-50 border-red-200';
       default: return 'bg-gray-50 border-gray-200';
     }
@@ -340,7 +340,7 @@ export default function AutomatedEnrollmentWorkflow({
   return (
     <div className="space-y-6">
       {enrollment && (
-        <Card className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+        <Card className="p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border-brand-blue-200">
           <div className="flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-gray-900">
@@ -380,7 +380,7 @@ export default function AutomatedEnrollmentWorkflow({
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 mt-0.5">
                   {processingStep === step.step_number ? (
-                    <Loader2 className="w-5 h-5 text-blue-500 animate-spin" />
+                    <Loader2 className="w-5 h-5 text-brand-blue-500 animate-spin" />
                   ) : (
                     getStatusIcon(step.status)
                   )}
@@ -428,8 +428,8 @@ export default function AutomatedEnrollmentWorkflow({
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="p-4">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Users className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <Users className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.enrollmentsToday}</p>

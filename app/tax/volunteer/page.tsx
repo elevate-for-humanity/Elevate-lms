@@ -47,7 +47,7 @@ export default function VolunteerPage() {
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <BookOpen className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
+                  <BookOpen className="w-6 h-6 text-brand-blue-600 mt-1 flex-shrink-0" />
                   <div>
                     <h3 className="font-semibold mb-1">Learn Skills</h3>
                     <p className="text-black">Gain valuable tax preparation knowledge</p>
@@ -69,29 +69,29 @@ export default function VolunteerPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-blue-50 rounded-lg p-8 border border-blue-200">
+            <div className="bg-brand-blue-50 rounded-lg p-8 border border-brand-blue-200">
               <h3 className="text-2xl font-bold mb-4">Volunteer Roles</h3>
               <ul className="space-y-3 text-black mb-6">
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span><strong>Tax Preparer:</strong> Prepare returns with taxpayers</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span><strong>Greeter:</strong> Welcome and assist clients</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span><strong>Interpreter:</strong> Provide language assistance</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span><strong>Quality Reviewer:</strong> Review completed returns</span>
                 </li>
               </ul>
               <Link
                 href="/tax/rise-up-foundation/volunteer"
-                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-8 py-3 rounded-lg font-semibold transition-colors"
+                className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-8 py-3 rounded-lg font-semibold transition-colors"
               >
                 Apply to Volunteer
               </Link>

@@ -129,7 +129,7 @@ export default async function FerpaDocumentationPage() {
               <input
                 type="text"
                 placeholder="Search documents..."
-                className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 w-64"
+                className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 w-64"
               />
             </div>
           </div>
@@ -143,7 +143,7 @@ export default async function FerpaDocumentationPage() {
             {Object.entries(groupedDocs).map(([type, docs]) => (
               <div key={type} className="bg-white rounded-xl shadow-sm border border-gray-200">
                 <div className="px-6 py-4 border-b border-gray-200 flex items-center gap-3">
-                  <FolderOpen className="w-5 h-5 text-blue-600" />
+                  <FolderOpen className="w-5 h-5 text-brand-blue-600" />
                   <h2 className="text-lg font-semibold text-gray-900">
                     {DOCUMENT_TYPE_LABELS[type] || type}
                   </h2>
@@ -169,7 +169,7 @@ export default async function FerpaDocumentationPage() {
                           href={doc.file_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-blue-600 hover:text-blue-700 border border-blue-200 rounded-lg hover:bg-blue-50"
+                          className="inline-flex items-center gap-2 px-3 py-1.5 text-sm text-brand-blue-600 hover:text-brand-blue-700 border border-brand-blue-200 rounded-lg hover:bg-brand-blue-50"
                         >
                           <Download className="w-4 h-4" />
                           Download

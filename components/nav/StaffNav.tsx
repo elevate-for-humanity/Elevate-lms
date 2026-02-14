@@ -131,7 +131,7 @@ export default function StaffNav() {
       {/* Logo/Brand */}
       <div className="mb-8">
         <Link href="/" aria-label="Link" className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-blue-600">
             <svg
               className="w-6 h-6 text-white"
               fill="none"
@@ -166,7 +166,7 @@ export default function StaffNav() {
                   onClick={() => toggleGroup(item.name)}
                   className={`w-full flex items-center justify-between px-3 py-2 text-sm font-semibold rounded-lg transition ${
                     hasActiveChild
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-brand-blue-600 text-white'
                       : 'text-gray-300 hover:bg-gray-800'
                   }`}
                 >
@@ -191,7 +191,7 @@ export default function StaffNav() {
                           href={child.href}
                           className={`flex items-center gap-2 px-3 py-2 text-sm rounded-lg transition ${
                             active
-                              ? 'bg-blue-600 text-white'
+                              ? 'bg-brand-blue-600 text-white'
                               : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                           }`}
                         >
@@ -212,7 +212,7 @@ export default function StaffNav() {
                 href={item.href}
                 className={`flex items-center gap-2 px-3 py-2 text-sm font-semibold rounded-lg transition ${
                   active
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'text-gray-300 hover:bg-gray-800 hover:text-white'
                 }`}
               >

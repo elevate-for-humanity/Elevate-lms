@@ -39,7 +39,7 @@ export function CookieBanner() {
           {/* Icon */}
           <div className="flex-shrink-0">
             <svg
-              className="w-8 h-8 text-blue-400"
+              className="w-8 h-8 text-brand-blue-400"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -82,7 +82,7 @@ export function CookieBanner() {
             </button>
             <button
               onClick={acceptCookies}
-              className="px-4 py-2 text-sm font-semibold bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-lg"
+              className="px-4 py-2 text-sm font-semibold bg-brand-blue-600 hover:bg-brand-blue-700 rounded-lg transition shadow-lg"
             >
               Accept All
             </button>

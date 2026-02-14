@@ -38,7 +38,7 @@ export default async function PostJobPage() {
             </div>
             <div><label className="block text-sm font-medium text-gray-700 mb-2">Requirements</label><textarea className="w-full border rounded-lg px-3 py-2" rows={3} placeholder="Required skills and qualifications" /></div>
             <div className="flex gap-4 pt-4 border-t">
-              <button type="submit" className="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Post Job</button>
+              <button type="submit" className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Post Job</button>
               <Link href="/employer/opportunities" className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</Link>
             </div>
           </form>

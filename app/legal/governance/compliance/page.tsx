@@ -35,12 +35,12 @@ export default function ComplianceFrameworkPage() {
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-12">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-8 flex items-center justify-between">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-8 flex items-center justify-between">
           <div>
-            <p className="font-medium text-blue-900">Official Compliance Document</p>
-            <p className="text-sm text-blue-700">Authoritative reference for regulatory compliance and required disclosures.</p>
+            <p className="font-medium text-brand-blue-900">Official Compliance Document</p>
+            <p className="text-sm text-brand-blue-700">Authoritative reference for regulatory compliance and required disclosures.</p>
           </div>
-          <a href="/docs/Compliance_and_Disclosure_Framework.pdf" download className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+          <a href="/docs/Compliance_and_Disclosure_Framework.pdf" download className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
             <Download className="w-4 h-4" /> PDF
           </a>
         </div>
@@ -48,21 +48,21 @@ export default function ComplianceFrameworkPage() {
         <nav className="bg-gray-50 rounded-lg p-6 mb-10">
           <h2 className="font-semibold mb-4">Contents</h2>
           <ol className="space-y-2 text-sm">
-            <li><a href="#purpose" className="text-blue-600 hover:underline">1. Purpose & Scope</a></li>
-            <li><a href="#entity" className="text-blue-600 hover:underline">2. Entity Structure & Registration</a></li>
-            <li><a href="#regulatory" className="text-blue-600 hover:underline">3. Regulatory Framework</a></li>
-            <li><a href="#disclosures" className="text-blue-600 hover:underline">4. Required Disclosures</a></li>
-            <li><a href="#consumer" className="text-blue-600 hover:underline">5. Consumer Protection</a></li>
-            <li><a href="#accessibility" className="text-blue-600 hover:underline">6. Accessibility Compliance</a></li>
-            <li><a href="#responsibilities" className="text-blue-600 hover:underline">7. Compliance Responsibilities</a></li>
-            <li><a href="#monitoring" className="text-blue-600 hover:underline">8. Monitoring & Reporting</a></li>
-            <li><a href="#versioning" className="text-blue-600 hover:underline">9. Versioning & Review</a></li>
+            <li><a href="#purpose" className="text-brand-blue-600 hover:underline">1. Purpose & Scope</a></li>
+            <li><a href="#entity" className="text-brand-blue-600 hover:underline">2. Entity Structure & Registration</a></li>
+            <li><a href="#regulatory" className="text-brand-blue-600 hover:underline">3. Regulatory Framework</a></li>
+            <li><a href="#disclosures" className="text-brand-blue-600 hover:underline">4. Required Disclosures</a></li>
+            <li><a href="#consumer" className="text-brand-blue-600 hover:underline">5. Consumer Protection</a></li>
+            <li><a href="#accessibility" className="text-brand-blue-600 hover:underline">6. Accessibility Compliance</a></li>
+            <li><a href="#responsibilities" className="text-brand-blue-600 hover:underline">7. Compliance Responsibilities</a></li>
+            <li><a href="#monitoring" className="text-brand-blue-600 hover:underline">8. Monitoring & Reporting</a></li>
+            <li><a href="#versioning" className="text-brand-blue-600 hover:underline">9. Versioning & Review</a></li>
           </ol>
         </nav>
 
         <section id="purpose" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Scale className="w-6 h-6 text-blue-600" />
+            <Scale className="w-6 h-6 text-brand-blue-600" />
             1. Purpose & Scope
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">1.1 Purpose</h3>
@@ -80,7 +80,7 @@ export default function ComplianceFrameworkPage() {
 
         <section id="entity" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Building className="w-6 h-6 text-blue-600" />
+            <Building className="w-6 h-6 text-brand-blue-600" />
             2. Entity Structure & Registration
           </h2>
           <h3 className="text-lg font-semibold mt-6 mb-3">2.1 Legal Entities</h3>
@@ -111,7 +111,7 @@ export default function ComplianceFrameworkPage() {
 
         <section id="regulatory" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <FileCheck className="w-6 h-6 text-blue-600" />
+            <FileCheck className="w-6 h-6 text-brand-blue-600" />
             3. Regulatory Framework
           </h2>
           
@@ -158,7 +158,7 @@ export default function ComplianceFrameworkPage() {
 
         <section id="disclosures" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <AlertCircle className="w-6 h-6 text-blue-600" />
+            <AlertCircle className="w-6 h-6 text-brand-blue-600" />
             4. Required Disclosures
           </h2>
           
@@ -188,7 +188,7 @@ export default function ComplianceFrameworkPage() {
 
         <section id="consumer" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Users className="w-6 h-6 text-blue-600" />
+            <Users className="w-6 h-6 text-brand-blue-600" />
             5. Consumer Protection
           </h2>
           
@@ -214,7 +214,7 @@ export default function ComplianceFrameworkPage() {
 
         <section id="accessibility" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <Globe className="w-6 h-6 text-blue-600" />
+            <Globe className="w-6 h-6 text-brand-blue-600" />
             6. Accessibility Compliance
           </h2>
           

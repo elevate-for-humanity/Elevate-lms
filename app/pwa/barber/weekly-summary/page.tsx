@@ -71,7 +71,7 @@ export default function WeeklySummaryPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <Loader2 className="w-12 h-12 text-blue-500 animate-spin" />
+        <Loader2 className="w-12 h-12 text-brand-blue-500 animate-spin" />
       </div>
     );
   }
@@ -88,7 +88,7 @@ export default function WeeklySummaryPage() {
             </Link>
             <div>
               <h1 className="text-xl font-bold text-white">Weekly Summary</h1>
-              <p className="text-blue-200 text-sm">
+              <p className="text-brand-blue-200 text-sm">
                 Week ending {new Date(summary.weekEnding).toLocaleDateString()}
               </p>
             </div>
@@ -105,9 +105,9 @@ export default function WeeklySummaryPage() {
 
         {/* Week Total */}
         <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 text-center">
-          <p className="text-blue-200 text-sm mb-1">Hours This Week</p>
+          <p className="text-brand-blue-200 text-sm mb-1">Hours This Week</p>
           <p className="text-5xl font-bold text-white mb-2">{summary.totalHours}</p>
-          <p className="text-blue-200 text-sm">
+          <p className="text-brand-blue-200 text-sm">
             {summary.daysWorked} days worked • {summary.avgHoursPerDay.toFixed(1)} hrs/day avg
           </p>
         </div>
@@ -120,14 +120,14 @@ export default function WeeklySummaryPage() {
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-blue-500" />
+                <div className="w-3 h-3 rounded-full bg-brand-blue-500" />
                 <span className="text-slate-300">Practical Training</span>
               </div>
               <span className="text-white font-medium">{summary.practicalHours} hrs</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-3 h-3 rounded-full bg-blue-500" />
+                <div className="w-3 h-3 rounded-full bg-brand-blue-500" />
                 <span className="text-slate-300">Theory/Classroom</span>
               </div>
               <span className="text-white font-medium">{summary.theoryHours} hrs</span>
@@ -144,11 +144,11 @@ export default function WeeklySummaryPage() {
           {/* Visual Bar */}
           <div className="mt-4 h-4 bg-slate-700 rounded-full overflow-hidden flex">
             <div 
-              className="bg-blue-500 h-full"
+              className="bg-brand-blue-500 h-full"
               style={{ width: `${(summary.practicalHours / summary.totalHours) * 100}%` }}
             />
             <div 
-              className="bg-blue-500 h-full"
+              className="bg-brand-blue-500 h-full"
               style={{ width: `${(summary.theoryHours / summary.totalHours) * 100}%` }}
             />
             <div 
@@ -176,17 +176,17 @@ export default function WeeklySummaryPage() {
         </div>
 
         {/* Cumulative Progress */}
-        <div className="bg-blue-500/20 border border-blue-500/30 rounded-xl p-4">
+        <div className="bg-brand-blue-500/20 border border-brand-blue-500/30 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-3">
-            <TrendingUp className="w-5 h-5 text-blue-400" />
-            <span className="text-blue-300 font-medium">Overall Progress</span>
+            <TrendingUp className="w-5 h-5 text-brand-blue-400" />
+            <span className="text-brand-blue-300 font-medium">Overall Progress</span>
           </div>
           <div className="flex items-end justify-between mb-3">
             <div>
               <p className="text-3xl font-bold text-white">{summary.cumulativeHours}</p>
-              <p className="text-blue-200 text-sm">of 2,000 hours</p>
+              <p className="text-brand-blue-200 text-sm">of 2,000 hours</p>
             </div>
-            <p className="text-2xl font-bold text-blue-300">{summary.progressPercent}%</p>
+            <p className="text-2xl font-bold text-brand-blue-300">{summary.progressPercent}%</p>
           </div>
           <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
             <div 
@@ -194,7 +194,7 @@ export default function WeeklySummaryPage() {
               style={{ width: `${summary.progressPercent}%` }}
             />
           </div>
-          <p className="text-blue-200 text-sm mt-2">
+          <p className="text-brand-blue-200 text-sm mt-2">
             {2000 - summary.cumulativeHours} hours remaining
           </p>
         </div>
@@ -203,8 +203,8 @@ export default function WeeklySummaryPage() {
         <div className="bg-slate-800 rounded-xl p-4">
           <h2 className="text-white font-medium mb-3">Training Location</h2>
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-xl flex items-center justify-center">
-              <Scissors className="w-6 h-6 text-blue-400" />
+            <div className="w-12 h-12 bg-brand-blue-500/20 rounded-xl flex items-center justify-center">
+              <Scissors className="w-6 h-6 text-brand-blue-400" />
             </div>
             <div>
               <p className="text-white font-medium">{summary.shopName}</p>

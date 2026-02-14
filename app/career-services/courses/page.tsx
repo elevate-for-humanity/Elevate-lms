@@ -54,7 +54,7 @@ export default async function CareerCoursesPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-blue-800 text-white py-20">
+      <section className="relative bg-brand-blue-800 text-white py-20">
         <div className="max-w-7xl mx-auto px-4">
           <div className="max-w-3xl">
             <span className="inline-flex items-center gap-2 bg-white/20 text-white text-sm font-semibold px-4 py-1 rounded-full mb-4">
@@ -64,7 +64,7 @@ export default async function CareerCoursesPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
               Career Success Courses
             </h1>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-brand-blue-100 mb-8">
               Professional video training to help you land your dream job. Learn at your own pace with lifetime access.
             </p>
             <div className="flex flex-wrap gap-6 text-sm">
@@ -97,8 +97,8 @@ export default async function CareerCoursesPage() {
           <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">What&apos;s Included in Every Course</h2>
           <div className="grid md:grid-cols-4 gap-6">
             <div className="text-center">
-              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Video className="w-7 h-7 text-blue-600" />
+              <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Video className="w-7 h-7 text-brand-blue-600" />
               </div>
               <h3 className="font-semibold mb-2">HD Video Lessons</h3>
               <p className="text-sm text-gray-600">Professional quality videos you can watch anytime</p>
@@ -111,8 +111,8 @@ export default async function CareerCoursesPage() {
               <p className="text-sm text-gray-600">Templates, worksheets, and checklists</p>
             </div>
             <div className="text-center">
-              <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                <Award className="w-7 h-7 text-blue-600" />
+              <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                <Award className="w-7 h-7 text-brand-blue-600" />
               </div>
               <h3 className="font-semibold mb-2">Certificate</h3>
               <p className="text-sm text-gray-600">Earn a certificate upon completion</p>

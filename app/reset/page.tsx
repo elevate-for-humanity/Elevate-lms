@@ -86,7 +86,7 @@ export default function ResetPage() {
         <Breadcrumbs items={[{ label: "Reset" }]} />
       </div>
 <div className="max-w-md w-full bg-white p-8 rounded-lg shadow-lg text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600 mx-auto mb-4"></div>
         <h1 className="text-2xl font-bold text-black mb-2">
           Resetting Browser
         </h1>

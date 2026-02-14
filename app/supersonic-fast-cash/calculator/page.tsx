@@ -623,9 +623,9 @@ export default function TaxCalculatorPage() {
               </div>
 
               {/* Disclaimer */}
-              <div className="bg-blue-50 rounded-xl p-4 text-xs text-black">
+              <div className="bg-brand-blue-50 rounded-xl p-4 text-xs text-black">
                 <div className="flex gap-2">
-                  <Info className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <Info className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   <p>
                     This is an estimate only. Actual refund may vary based on
                     additional factors. For accurate filing, use our DIY service

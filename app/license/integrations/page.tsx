@@ -23,9 +23,9 @@ const iconMap: Record<string, typeof Zap> = {
 };
 
 const statusColors: Record<string, { bg: string; text: string }> = {
-  'Integration-ready': { bg: 'bg-blue-100', text: 'text-blue-700' },
+  'Integration-ready': { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700' },
   'Included': { bg: 'bg-green-100', text: 'text-green-700' },
-  'Configurable': { bg: 'bg-blue-100', text: 'text-blue-700' },
+  'Configurable': { bg: 'bg-brand-blue-100', text: 'text-brand-blue-700' },
 };
 
 export default async function IntegrationsPage() {
@@ -121,7 +121,7 @@ export default async function IntegrationsPage() {
                 <h3 className="font-semibold text-slate-900 mb-4">Data Flow</h3>
                 
                 <div className="flex items-center gap-4">
-                  <div className="w-32 bg-blue-100 text-blue-700 px-4 py-2 rounded-lg text-center text-sm font-medium">
+                  <div className="w-32 bg-brand-blue-100 text-brand-blue-700 px-4 py-2 rounded-lg text-center text-sm font-medium">
                     Elevate LMS
                   </div>
                   <ArrowRightLeft className="w-6 h-6 text-slate-400" />

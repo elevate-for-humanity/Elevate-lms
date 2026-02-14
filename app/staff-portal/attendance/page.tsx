@@ -56,7 +56,7 @@ export default async function StaffPortalAttendancePage() {
       
         {/* Quick Actions */}
         <div className="flex flex-wrap gap-4 mb-6">
-          <Link href="/staff-portal/attendance/take" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <Link href="/staff-portal/attendance/take" className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
             Take Attendance
           </Link>
           <Link href="/staff-portal/attendance/export" className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50">
@@ -125,7 +125,7 @@ export default async function StaffPortalAttendancePage() {
             <span><span className="text-green-600">●</span> Present</span>
             <span><span className="text-red-600">✗</span> Absent</span>
             <span><span className="text-yellow-600">L</span> Late</span>
-            <span><span className="text-blue-600">E</span> Excused</span>
+            <span><span className="text-brand-blue-600">E</span> Excused</span>
           </div>
         </section>
       </div>

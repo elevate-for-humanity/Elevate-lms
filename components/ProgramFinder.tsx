@@ -284,7 +284,7 @@ export default function ProgramFinder() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className="text-3xl font-bold text-blue-600 mb-1">
+                        <div className="text-3xl font-bold text-brand-blue-600 mb-1">
                           {program.matchScore}%
                         </div>
                         <div className="text-sm text-gray-500">Match</div>
@@ -293,7 +293,7 @@ export default function ProgramFinder() {
 
                     <div className="grid md:grid-cols-3 gap-4 mb-6">
                       <div className="flex items-center gap-2 text-black">
-                        <Clock className="w-5 h-5 text-blue-600" />
+                        <Clock className="w-5 h-5 text-brand-blue-600" />
                         <div>
                           <div className="text-xs text-gray-500">Duration</div>
                           <div className="font-semibold">{program.duration}</div>
@@ -344,7 +344,7 @@ export default function ProgramFinder() {
               Start Over
             </button>
             <p className="text-black">
-              Not sure yet? <a href="/programs" className="text-blue-600 hover:underline">Browse all programs</a>
+              Not sure yet? <a href="/programs" className="text-brand-blue-600 hover:underline">Browse all programs</a>
             </p>
           </div>
         </div>
@@ -363,7 +363,7 @@ export default function ProgramFinder() {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-full text-sm font-semibold mb-4">
             <Sparkles className="w-4 h-4" />
             Find Your Perfect Program
           </div>
@@ -419,16 +419,16 @@ export default function ProgramFinder() {
                     onClick={() => handleAnswer(question.id, option.value)}
                     className={`p-6 rounded-xl border-2 transition-all text-left flex items-center gap-4 group ${
                       isSelected
-                        ? 'border-blue-600 bg-blue-50'
-                        : 'border-gray-200 hover:border-blue-400 hover:bg-gray-50'
+                        ? 'border-brand-blue-600 bg-brand-blue-50'
+                        : 'border-gray-200 hover:border-brand-blue-400 hover:bg-gray-50'
                     }`}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     <div className={`w-12 h-12 rounded-lg flex items-center justify-center flex-shrink-0 ${
                       isSelected
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-black group-hover:bg-blue-600 group-hover:text-white'
+                        ? 'bg-brand-blue-600 text-white'
+                        : 'bg-gray-100 text-black group-hover:bg-brand-blue-600 group-hover:text-white'
                     }`}>
                       <Icon className="w-6 h-6" />
                     </div>
@@ -436,7 +436,7 @@ export default function ProgramFinder() {
                       {option.text}
                     </span>
                     {isSelected && (
-                      <CheckCircle className="w-6 h-6 text-blue-600" />
+                      <CheckCircle className="w-6 h-6 text-brand-blue-600" />
                     )}
                   </motion.button>
                 );

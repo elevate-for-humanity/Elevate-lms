@@ -148,7 +148,7 @@ export default function CreateCourseContentPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-brand-blue-600" />
       </div>
     );
   }
@@ -172,7 +172,7 @@ export default function CreateCourseContentPage() {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1 text-sm text-blue-600">
+              <span className="flex items-center gap-1 text-sm text-brand-blue-600">
                 <Sparkles className="w-4 h-4" />
                 AI-Powered
               </span>
@@ -205,7 +205,7 @@ export default function CreateCourseContentPage() {
                         }}
                         className={`w-full text-left p-3 rounded-lg transition ${
                           selectedCourse?.id === course.id
-                            ? 'bg-blue-100 border-blue-300 border'
+                            ? 'bg-brand-blue-100 border-brand-blue-300 border'
                             : 'bg-gray-50 hover:bg-gray-100'
                         }`}
                       >
@@ -226,7 +226,7 @@ export default function CreateCourseContentPage() {
                                 }}
                                 className={`w-full text-left p-2 rounded text-sm flex items-center gap-2 ${
                                   selectedModule?.id === module.id
-                                    ? 'bg-blue-600 text-white'
+                                    ? 'bg-brand-blue-600 text-white'
                                     : 'hover:bg-gray-100'
                                 }`}
                               >
@@ -293,7 +293,7 @@ export default function CreateCourseContentPage() {
                 {/* Step 1: Generate Script */}
                 <div className="bg-white rounded-xl shadow-sm border p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
                       1
                     </div>
                     <h3 className="text-lg font-semibold">Generate or Write Script</h3>
@@ -303,7 +303,7 @@ export default function CreateCourseContentPage() {
                     <button
                       onClick={generateScript}
                       disabled={generating}
-                      className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+                      className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700 disabled:bg-gray-400"
                     >
                       {generating ? (
                         <Loader2 className="w-4 h-4 animate-spin" />
@@ -319,7 +319,7 @@ export default function CreateCourseContentPage() {
                     onChange={(e) => setScript(e.target.value)}
                     placeholder="Write or generate your video script here..."
                     rows={12}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent font-mono text-sm"
                   />
 
                   <div className="flex justify-between mt-4">
@@ -328,7 +328,7 @@ export default function CreateCourseContentPage() {
                     </p>
                     <button
                       onClick={saveScript}
-                      className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium"
+                      className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 font-medium"
                     >
                       <Save className="w-4 h-4" />
                       Save Script
@@ -339,7 +339,7 @@ export default function CreateCourseContentPage() {
                 {/* Step 2: Configure Video */}
                 <div className="bg-white rounded-xl shadow-sm border p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
                       2
                     </div>
                     <h3 className="text-lg font-semibold">Configure Video Settings</h3>
@@ -353,7 +353,7 @@ export default function CreateCourseContentPage() {
                       <select
                         value={avatarStyle}
                         onChange={(e) => setAvatarStyle(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       >
                         <option value="professional">Professional Instructor</option>
                         <option value="casual">Casual Presenter</option>
@@ -369,7 +369,7 @@ export default function CreateCourseContentPage() {
                       <select
                         value={voiceStyle}
                         onChange={(e) => setVoiceStyle(e.target.value)}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       >
                         <option value="alloy">Alloy (Neutral)</option>
                         <option value="echo">Echo (Male)</option>
@@ -385,7 +385,7 @@ export default function CreateCourseContentPage() {
                 {/* Step 3: Generate Video */}
                 <div className="bg-white rounded-xl shadow-sm border p-6">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold">
+                    <div className="w-8 h-8 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold">
                       3
                     </div>
                     <h3 className="text-lg font-semibold">Generate Video</h3>
@@ -398,7 +398,7 @@ export default function CreateCourseContentPage() {
                   <button
                     onClick={generateVideo}
                     disabled={generating || !script.trim()}
-                    className="w-full bg-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-brand-blue-600 text-white py-4 rounded-lg font-semibold hover:bg-brand-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {generating ? (
                       <>

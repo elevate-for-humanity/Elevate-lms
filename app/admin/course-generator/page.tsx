@@ -117,8 +117,8 @@ Include Assignments: ${formData.includeAssignments}
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <Sparkles className="w-6 h-6 text-blue-600" />
+            <div className="p-2 bg-brand-blue-100 rounded-lg">
+              <Sparkles className="w-6 h-6 text-brand-blue-600" />
             </div>
             <h1 className="text-3xl font-bold text-gray-900">AI Course Generator</h1>
           </div>
@@ -168,23 +168,23 @@ Include Assignments: ${formData.includeAssignments}
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-2">Course Topic *</label>
-                <input type="text" required value={formData.topic} onChange={(e) => setFormData({ ...formData, topic: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., HVAC Fundamentals, Medical Billing Basics, CDL Test Preparation" />
+                <input type="text" required value={formData.topic} onChange={(e) => setFormData({ ...formData, topic: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent" placeholder="e.g., HVAC Fundamentals, Medical Billing Basics, CDL Test Preparation" />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-2">Course Description</label>
-                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="Describe what students will learn and achieve..." />
+                <textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent" placeholder="Describe what students will learn and achieve..." />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-2">Target Audience</label>
-                <input type="text" value={formData.targetAudience} onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" placeholder="e.g., Career changers, Entry-level workers, Experienced professionals" />
+                <input type="text" value={formData.targetAudience} onChange={(e) => setFormData({ ...formData, targetAudience: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent" placeholder="e.g., Career changers, Entry-level workers, Experienced professionals" />
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2"><Target className="w-4 h-4 inline mr-1" />Difficulty Level</label>
-                  <select value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                  <select value={formData.difficulty} onChange={(e) => setFormData({ ...formData, difficulty: e.target.value })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent">
                     <option value="beginner">Beginner</option>
                     <option value="intermediate">Intermediate</option>
                     <option value="advanced">Advanced</option>
@@ -193,30 +193,30 @@ Include Assignments: ${formData.includeAssignments}
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2"><Clock className="w-4 h-4 inline mr-1" />Duration (hours)</label>
-                  <input type="number" min={1} max={100} value={formData.duration} onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 10 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  <input type="number" min={1} max={100} value={formData.duration} onChange={(e) => setFormData({ ...formData, duration: parseInt(e.target.value) || 10 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent" />
                 </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-900 mb-2"><BookOpen className="w-4 h-4 inline mr-1" />Number of Modules</label>
-                  <input type="number" min={1} max={20} value={formData.moduleCount} onChange={(e) => setFormData({ ...formData, moduleCount: parseInt(e.target.value) || 5 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent" />
+                  <input type="number" min={1} max={20} value={formData.moduleCount} onChange={(e) => setFormData({ ...formData, moduleCount: parseInt(e.target.value) || 5 })} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent" />
                 </div>
               </div>
 
               <div className="flex flex-wrap gap-6">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={formData.includeQuizzes} onChange={(e) => setFormData({ ...formData, includeQuizzes: e.target.checked })} className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  <input type="checkbox" checked={formData.includeQuizzes} onChange={(e) => setFormData({ ...formData, includeQuizzes: e.target.checked })} className="w-5 h-5 rounded border-gray-300 text-brand-blue-600 focus:ring-brand-blue-500" />
                   <HelpCircle className="w-4 h-4 text-gray-500" />
                   <span className="text-gray-700">Include Quizzes</span>
                 </label>
 
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={formData.includeAssignments} onChange={(e) => setFormData({ ...formData, includeAssignments: e.target.checked })} className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+                  <input type="checkbox" checked={formData.includeAssignments} onChange={(e) => setFormData({ ...formData, includeAssignments: e.target.checked })} className="w-5 h-5 rounded border-gray-300 text-brand-blue-600 focus:ring-brand-blue-500" />
                   <FileText className="w-4 h-4 text-gray-500" />
                   <span className="text-gray-700">Include Assignments</span>
                 </label>
               </div>
 
-              <button type="submit" disabled={loading || !formData.topic} className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+              <button type="submit" disabled={loading || !formData.topic} className="w-full flex items-center justify-center gap-3 px-6 py-4 bg-brand-blue-600 text-white rounded-lg font-semibold hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
                 {loading ? (
                   <>
                     <Loader2 className="w-5 h-5 animate-spin" />
@@ -233,12 +233,12 @@ Include Assignments: ${formData.includeAssignments}
           </form>
         )}
 
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="font-semibold text-blue-900 mb-2 flex items-center gap-2">
+        <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
+          <h3 className="font-semibold text-brand-blue-900 mb-2 flex items-center gap-2">
             <GraduationCap className="w-5 h-5" />
             What Gets Generated
           </h3>
-          <ul className="text-blue-800 space-y-1 text-sm">
+          <ul className="text-brand-blue-800 space-y-1 text-sm">
             <li>• Complete course structure with modules and lessons</li>
             <li>• Detailed lesson content in markdown format</li>
             <li>• Learning objectives for each module</li>

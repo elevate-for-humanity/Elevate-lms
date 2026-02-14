@@ -44,10 +44,10 @@ export default function DocsPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {docCategories.map((cat, i) => (
               <Link key={i} href={cat.href} className="bg-white rounded-xl p-6 shadow-sm border hover:shadow-md transition-all">
-                <cat.icon className="w-10 h-10 text-blue-600 mb-4" />
+                <cat.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <h3 className="font-bold text-gray-900 mb-2">{cat.title}</h3>
                 <p className="text-gray-600 text-sm mb-4">{cat.description}</p>
-                <span className="text-blue-600 font-medium flex items-center gap-1 text-sm">
+                <span className="text-brand-blue-600 font-medium flex items-center gap-1 text-sm">
                   Read Guide <ArrowRight className="w-4 h-4" />
                 </span>
               </Link>
@@ -56,20 +56,20 @@ export default function DocsPage() {
         </div>
       </section>
       {/* CTA Section */}
-      <section className="bg-blue-700 text-white py-12">
+      <section className="bg-brand-blue-700 text-white py-12">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-3">Ready to Start Your Career?</h2>
-          <p className="text-blue-100 mb-6">Apply today for free career training programs.</p>
+          <p className="text-brand-blue-100 mb-6">Apply today for free career training programs.</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-white text-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               Apply Now
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-blue-800 transition"
+              className="inline-flex items-center justify-center gap-2 border-2 border-white text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-800 transition"
             >
               <Phone className="w-4 h-4" />
               Get Help Online

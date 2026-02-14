@@ -26,7 +26,7 @@ export default function CashAdvancePage() {
         <Breadcrumbs items={[{ label: "Supersonic Fast Cash", href: "/supersonic-fast-cash" }, { label: "Cash Advance" }]} />
       </div>
 {/* Hero */}
-      <section className="bg-blue-50 py-16">
+      <section className="bg-brand-blue-50 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-semibold text-gray-900 mb-4">
             Tax Refund Cash Advance
@@ -49,9 +49,9 @@ export default function CashAdvancePage() {
             through our banking partners and is repaid automatically when your refund arrives.
           </p>
           
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-8">
             <div className="flex items-start gap-3">
-              <AlertCircle className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+              <AlertCircle className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-medium text-gray-900 mb-1">This is not a loan</p>
                 <p className="text-gray-600 text-sm">
@@ -64,23 +64,23 @@ export default function CashAdvancePage() {
 
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
-              <DollarSign className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+              <DollarSign className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Advance Amounts</h3>
-              <p className="text-2xl font-bold text-blue-600 mb-1">$250 – $7,500</p>
+              <p className="text-2xl font-bold text-brand-blue-600 mb-1">$250 – $7,500</p>
               <p className="text-sm text-gray-500">Based on expected refund</p>
             </div>
 
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
-              <Clock className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+              <Clock className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Timing</h3>
-              <p className="text-2xl font-bold text-blue-600 mb-1">Same Day</p>
+              <p className="text-2xl font-bold text-brand-blue-600 mb-1">Same Day</p>
               <p className="text-sm text-gray-500">If approved</p>
             </div>
 
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
-              <CheckCircle className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+              <CheckCircle className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
               <h3 className="font-semibold text-gray-900 mb-2">Repayment</h3>
-              <p className="text-2xl font-bold text-blue-600 mb-1">Automatic</p>
+              <p className="text-2xl font-bold text-brand-blue-600 mb-1">Automatic</p>
               <p className="text-sm text-gray-500">From your refund</p>
             </div>
           </div>
@@ -96,7 +96,7 @@ export default function CashAdvancePage() {
 
           <div className="space-y-6">
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold">1</span>
               </div>
               <div>
@@ -109,7 +109,7 @@ export default function CashAdvancePage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold">2</span>
               </div>
               <div>
@@ -122,7 +122,7 @@ export default function CashAdvancePage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold">3</span>
               </div>
               <div>
@@ -135,7 +135,7 @@ export default function CashAdvancePage() {
             </div>
 
             <div className="flex items-start gap-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                 <span className="text-white font-bold">4</span>
               </div>
               <div>
@@ -220,7 +220,7 @@ export default function CashAdvancePage() {
           <div className="space-y-6">
             <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-start gap-3">
-                <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">Is this a loan?</h3>
                   <p className="text-gray-600 text-sm">
@@ -233,7 +233,7 @@ export default function CashAdvancePage() {
 
             <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-start gap-3">
-                <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">What if my refund is less than expected?</h3>
                   <p className="text-gray-600 text-sm">
@@ -246,7 +246,7 @@ export default function CashAdvancePage() {
 
             <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-start gap-3">
-                <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">Do I have to take the advance?</h3>
                   <p className="text-gray-600 text-sm">
@@ -259,7 +259,7 @@ export default function CashAdvancePage() {
 
             <div className="bg-white border border-gray-200 rounded-xl p-6">
               <div className="flex items-start gap-3">
-                <HelpCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <HelpCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                 <div>
                   <h3 className="font-medium text-gray-900 mb-2">What are the fees?</h3>
                   <p className="text-gray-600 text-sm">
@@ -284,7 +284,7 @@ export default function CashAdvancePage() {
           </p>
           <a
             href="/support"
-            className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
           >
             <Phone className="w-5 h-5" />
             Get Help Online
@@ -293,12 +293,12 @@ export default function CashAdvancePage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-900">
+      <section className="py-16 bg-brand-blue-900">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-semibold text-white mb-4">
             Ready to file your taxes?
           </h2>
-          <p className="text-blue-200 mb-8">
+          <p className="text-brand-blue-200 mb-8">
             Start your return first. Advance options are available after filing.
           </p>
           <Link

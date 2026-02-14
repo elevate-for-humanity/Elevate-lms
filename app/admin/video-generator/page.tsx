@@ -110,7 +110,7 @@ export default function VideoGeneratorPage() {
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-xl shadow-sm border p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
-            <Video className="w-8 h-8 text-blue-600" />
+            <Video className="w-8 h-8 text-brand-blue-600" />
             <h1 className="text-2xl font-bold">Lesson Video Generator</h1>
           </div>
 
@@ -129,8 +129,8 @@ export default function VideoGeneratorPage() {
                 <div className="text-3xl font-bold text-orange-600">{status.withoutVideos}</div>
                 <div className="text-sm text-gray-500">Need Videos</div>
               </div>
-              <div className="bg-blue-50 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold text-blue-600">{status.percentComplete}%</div>
+              <div className="bg-brand-blue-50 rounded-lg p-4 text-center">
+                <div className="text-3xl font-bold text-brand-blue-600">{status.percentComplete}%</div>
                 <div className="text-sm text-gray-500">Complete</div>
               </div>
             </div>
@@ -141,7 +141,7 @@ export default function VideoGeneratorPage() {
             <div className="mb-6">
               <div className="h-4 bg-gray-200 rounded-full overflow-hidden">
                 <div 
-                  className="h-full bg-blue-500 transition-all duration-500"
+                  className="h-full bg-brand-blue-500 transition-all duration-500"
                   style={{ width: `${status.percentComplete}%` }}
                 />
               </div>
@@ -168,7 +168,7 @@ export default function VideoGeneratorPage() {
             <button
               onClick={generateVideos}
               disabled={generating || (status?.withoutVideos === 0)}
-              className="flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {generating ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -230,7 +230,7 @@ export default function VideoGeneratorPage() {
                         href={result.videoUrl} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:underline text-sm"
+                        className="text-brand-blue-600 hover:underline text-sm"
                       >
                         View Video
                       </a>
@@ -255,8 +255,8 @@ export default function VideoGeneratorPage() {
             <li>The lesson record is updated with the video URL</li>
           </ol>
           
-          <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800">
+          <div className="mt-4 p-4 bg-brand-blue-50 rounded-lg">
+            <p className="text-sm text-brand-blue-800">
               <strong>Note:</strong> Video generation takes 30-60 seconds per lesson. 
               For 540 lessons, full generation will take several hours. 
               You can generate in batches and the system will track progress.

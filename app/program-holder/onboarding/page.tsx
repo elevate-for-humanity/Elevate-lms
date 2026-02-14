@@ -79,7 +79,7 @@ export default async function ProgramHolderOnboarding() {
           <div className="flex flex-wrap gap-4">
             <Link
               href="/program-holder/dashboard"
-              className="bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-800 text-lg transition-all"
+              className="bg-brand-blue-700 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-800 text-lg transition-all"
             >
               Go to Dashboard
             </Link>
@@ -170,7 +170,7 @@ export default async function ProgramHolderOnboarding() {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-blue-700">1</span>
+                <span className="text-2xl font-bold text-brand-blue-700">1</span>
               </div>
               <h3 className="text-lg font-bold mb-3">Apply</h3>
               <p className="text-black mb-4">
@@ -179,7 +179,7 @@ export default async function ProgramHolderOnboarding() {
               </p>
               <Link
                 href="/program-holder/apply"
-                className="text-blue-700 font-semibold hover:underline"
+                className="text-brand-blue-700 font-semibold hover:underline"
               >
                 Apply Now →
               </Link>
@@ -187,7 +187,7 @@ export default async function ProgramHolderOnboarding() {
 
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-blue-700">2</span>
+                <span className="text-2xl font-bold text-brand-blue-700">2</span>
               </div>
               <h3 className="text-lg font-bold mb-3">Get Approved</h3>
               <p className="text-black mb-4">
@@ -201,7 +201,7 @@ export default async function ProgramHolderOnboarding() {
 
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <span className="text-2xl font-bold text-blue-700">3</span>
+                <span className="text-2xl font-bold text-brand-blue-700">3</span>
               </div>
               <h3 className="text-lg font-bold mb-3">Access Dashboard</h3>
               <p className="text-black mb-4">
@@ -210,7 +210,7 @@ export default async function ProgramHolderOnboarding() {
               </p>
               <Link
                 href="/login"
-                className="text-blue-700 font-semibold hover:underline"
+                className="text-brand-blue-700 font-semibold hover:underline"
               >
                 Log In →
               </Link>
@@ -229,7 +229,7 @@ export default async function ProgramHolderOnboarding() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                  <Users className="text-blue-700" size={24} />
+                  <Users className="text-brand-blue-700" size={24} />
                 </div>
                 <h3 className="text-lg font-bold">Student Management</h3>
               </div>
@@ -249,7 +249,7 @@ export default async function ProgramHolderOnboarding() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                  <BarChart className="text-blue-700" size={24} />
+                  <BarChart className="text-brand-blue-700" size={24} />
                 </div>
                 <h3 className="text-lg font-bold">Reports & Analytics</h3>
               </div>
@@ -269,7 +269,7 @@ export default async function ProgramHolderOnboarding() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                  <MessageSquare className="text-blue-700" size={24} />
+                  <MessageSquare className="text-brand-blue-700" size={24} />
                 </div>
                 <h3 className="text-lg font-bold">Communication</h3>
               </div>
@@ -288,7 +288,7 @@ export default async function ProgramHolderOnboarding() {
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
-                  <BookOpen className="text-blue-700" size={24} />
+                  <BookOpen className="text-brand-blue-700" size={24} />
                 </div>
                 <h3 className="text-lg font-bold">Program Access</h3>
               </div>
@@ -379,14 +379,14 @@ export default async function ProgramHolderOnboarding() {
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-all"
             >
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <FileText className="text-blue-700" size={24} />
+                <FileText className="text-brand-blue-700" size={24} />
               </div>
               <h3 className="text-lg font-bold mb-2">User Guide</h3>
               <p className="text-black mb-4">
                 Complete documentation on using the platform, managing students,
                 and accessing features.
               </p>
-              <span className="text-blue-700 font-semibold">View Guide →</span>
+              <span className="text-brand-blue-700 font-semibold">View Guide →</span>
             </Link>
 
             <Link
@@ -394,14 +394,14 @@ export default async function ProgramHolderOnboarding() {
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-all"
             >
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex-items-center justify-center mb-4">
-                <Video className="text-blue-700" size={24} />
+                <Video className="text-brand-blue-700" size={24} />
               </div>
               <h3 className="text-lg font-bold mb-2">Video Tutorials</h3>
               <p className="text-black mb-4">
                 Step-by-step video guides showing how to use key features and
                 manage students.
               </p>
-              <span className="text-blue-700 font-semibold">
+              <span className="text-brand-blue-700 font-semibold">
                 Watch Videos →
               </span>
             </Link>
@@ -411,14 +411,14 @@ export default async function ProgramHolderOnboarding() {
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-all"
             >
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <HelpCircle className="text-blue-700" size={24} />
+                <HelpCircle className="text-brand-blue-700" size={24} />
               </div>
               <h3 className="text-lg font-bold mb-2">Get Support</h3>
               <p className="text-black mb-4">
                 Contact our support team for help with technical issues,
                 questions, or concerns.
               </p>
-              <span className="text-blue-700 font-semibold">
+              <span className="text-brand-blue-700 font-semibold">
                 Contact Support →
               </span>
             </Link>
@@ -475,14 +475,14 @@ export default async function ProgramHolderOnboarding() {
                 Email{' '}
                 <a
                   href="mailto:elevate4humanityedu@gmail.com"
-                  className="text-blue-700 font-semibold hover:underline"
+                  className="text-brand-blue-700 font-semibold hover:underline"
                 >
                   elevate4humanityedu@gmail.com
                 </a>{' '}
                 or call{' '}
                 <a
                   href="/support"
-                  className="text-blue-700 font-semibold hover:underline"
+                  className="text-brand-blue-700 font-semibold hover:underline"
                 >
                   support center
                 </a>{' '}
@@ -510,7 +510,7 @@ export default async function ProgramHolderOnboarding() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Need Help?
           </h2>
-          <p className="text-base md:text-lg text-blue-100 mb-8">
+          <p className="text-base md:text-lg text-brand-blue-100 mb-8">
             Apply now to become a program holder and start enrolling students in
             life-changing training programs or need assistance.
           </p>
@@ -523,7 +523,7 @@ export default async function ProgramHolderOnboarding() {
             </Link>
             <Link
               href="/support"
-              className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg transition-all"
+              className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg transition-all"
             >
               Contact Us
             </Link>

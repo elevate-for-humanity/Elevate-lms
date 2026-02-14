@@ -65,7 +65,7 @@ export default async function PartnersPage() {
         <section className="py-16">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center gap-3 mb-8">
-              <Building2 className="w-8 h-8 text-blue-600" />
+              <Building2 className="w-8 h-8 text-brand-blue-600" />
               <h2 className="text-3xl font-bold text-slate-900">Government & Workforce Partners</h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -131,7 +131,7 @@ export default async function PartnersPage() {
         <section className="py-16">
           <div className="max-w-6xl mx-auto px-4">
             <div className="flex items-center gap-3 mb-8">
-              <GraduationCap className="w-8 h-8 text-blue-600" />
+              <GraduationCap className="w-8 h-8 text-brand-blue-600" />
               <h2 className="text-3xl font-bold text-slate-900">Training Partners</h2>
             </div>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -142,7 +142,7 @@ export default async function PartnersPage() {
                     <p className="text-sm text-slate-600 mb-3">{partner.description}</p>
                   )}
                   {partner.website_url && (
-                    <a href={partner.website_url} target="_blank" rel="noopener noreferrer" className="text-blue-600 text-sm hover:underline">
+                    <a href={partner.website_url} target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 text-sm hover:underline">
                       Visit Website
                     </a>
                   )}
@@ -176,16 +176,16 @@ export default async function PartnersPage() {
       )}
 
       {/* CTA */}
-      <section className="py-16 bg-blue-600 text-white">
+      <section className="py-16 bg-brand-blue-600 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <Handshake className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h2 className="text-3xl font-bold mb-4">Become a Partner</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Join our network of employers, training providers, and workforce organizations.
           </p>
           <Link
             href="/contact?subject=Partnership%20Inquiry"
-            className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition"
+            className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-50 transition"
           >
             Contact Us
           </Link>

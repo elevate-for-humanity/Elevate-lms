@@ -154,7 +154,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
             href={document.file_url}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 hover:underline font-semibold"
+            className="text-brand-blue-600 hover:underline font-semibold"
           >
             Open in New Tab →
           </a>
@@ -234,7 +234,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
                 required
                 rows={4}
                 placeholder="Explain why this document is being rejected..."
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
           )}
@@ -252,7 +252,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
               disabled={
                 loading || !action || (action === 'reject' && !rejectionReason)
               }
-              className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-8 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Submitting...' : 'Submit Review'}
             </button>

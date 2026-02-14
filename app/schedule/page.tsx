@@ -180,8 +180,8 @@ export default function SchedulePage() {
             <h3 className="text-lg font-semibold text-slate-900 mb-6 text-center">What to expect in your demo</h3>
             <div className="grid sm:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-blue-600 font-bold">1</span>
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-brand-blue-600 font-bold">1</span>
                 </div>
                 <h4 className="font-medium text-slate-900 mb-1">Learner Experience</h4>
                 <p className="text-sm text-slate-600">See how participants navigate programs and track progress</p>
@@ -194,8 +194,8 @@ export default function SchedulePage() {
                 <p className="text-sm text-slate-600">Manage programs, enrollments, and reporting</p>
               </div>
               <div className="text-center">
-                <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-blue-600 font-bold">3</span>
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                  <span className="text-brand-blue-600 font-bold">3</span>
                 </div>
                 <h4 className="font-medium text-slate-900 mb-1">Employer Portal</h4>
                 <p className="text-sm text-slate-600">Connect with candidates and manage hiring pipelines</p>

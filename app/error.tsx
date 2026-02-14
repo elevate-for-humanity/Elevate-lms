@@ -37,7 +37,7 @@ export default function Error({
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
           <button
             onClick={reset}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold"
           >
             <RefreshCw className="h-5 w-5" />
             Try Again
@@ -55,7 +55,7 @@ export default function Error({
           <p>If this problem persists, please contact support:</p>
           <a 
             href="mailto:elevate4humanityedu@gmail.com" 
-            className="text-blue-600 hover:underline"
+            className="text-brand-blue-600 hover:underline"
           >
             elevate4humanityedu@gmail.com
           </a>

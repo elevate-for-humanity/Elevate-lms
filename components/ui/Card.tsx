@@ -11,7 +11,7 @@ export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ children, className = '', hover = false, ...props }, ref) => {
-    const hoverStyles = hover ? 'hover:border-blue-600 hover:-translate-y-1 hover:shadow-lg' : '';
+    const hoverStyles = hover ? 'hover:border-brand-blue-600 hover:-translate-y-1 hover:shadow-lg' : '';
     return (
       <div
         ref={ref}
@@ -99,7 +99,7 @@ export const ProgramCard: React.FC<ProgramCardProps> = ({
         </div>
         <div className="p-6">
           <div className="flex items-center gap-2 mb-3">
-            <span className="px-2 py-2 bg-blue-100 text-blue-700 text-xs font-semibold rounded">
+            <span className="px-2 py-2 bg-brand-blue-100 text-brand-blue-700 text-xs font-semibold rounded">
               {category}
             </span>
             {funding && (

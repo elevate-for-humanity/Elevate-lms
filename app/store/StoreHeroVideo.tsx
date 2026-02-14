@@ -70,7 +70,7 @@ export default function StoreHeroVideo() {
             onClick={playVideo}
           >
             <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform">
-              <Play className="w-10 h-10 text-blue-600 ml-1" />
+              <Play className="w-10 h-10 text-brand-blue-600 ml-1" />
             </div>
           </div>
         )}
@@ -83,7 +83,7 @@ export default function StoreHeroVideo() {
           >
             <div className="text-center">
               <div className="w-16 h-16 bg-white/90 rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform mx-auto mb-2">
-                <RotateCcw className="w-8 h-8 text-blue-600" />
+                <RotateCcw className="w-8 h-8 text-brand-blue-600" />
               </div>
               <span className="text-white text-sm font-medium">Watch Again</span>
             </div>

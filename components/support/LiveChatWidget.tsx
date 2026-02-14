@@ -93,7 +93,7 @@ function FallbackChatWidget() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 transition-all hover:scale-110 flex items-center justify-center z-50"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-brand-blue-600 text-white rounded-full shadow-lg hover:bg-brand-blue-700 transition-all hover:scale-110 flex items-center justify-center z-50"
         aria-label="Open chat"
       >
         <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
@@ -108,14 +108,14 @@ function FallbackChatWidget() {
       }`}
     >
       {/* Header */}
-      <div className="bg-blue-600 text-white p-4 flex items-center justify-between">
+      <div className="bg-brand-blue-600 text-white p-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
             <Bot className="w-6 h-6" />
           </div>
           <div>
             <h3 className="font-bold">Elevate Support</h3>
-            <p className="text-xs text-blue-100">We typically reply instantly</p>
+            <p className="text-xs text-brand-blue-100">We typically reply instantly</p>
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -148,14 +148,14 @@ function FallbackChatWidget() {
                 <div
                   className={`max-w-[80%] p-3 rounded-2xl ${
                     message.sender === 'user'
-                      ? 'bg-blue-600 text-white rounded-br-md'
+                      ? 'bg-brand-blue-600 text-white rounded-br-md'
                       : 'bg-white text-black shadow-sm rounded-bl-md'
                   }`}
                 >
                   <p className="text-sm">{message.text}</p>
                   <p
                     className={`text-xs mt-1 ${
-                      message.sender === 'user' ? 'text-blue-100' : 'text-gray-400'
+                      message.sender === 'user' ? 'text-brand-blue-100' : 'text-gray-400'
                     }`}
                   >
                     {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -173,7 +173,7 @@ function FallbackChatWidget() {
                 <button
                   key={reply}
                   onClick={() => handleSend(reply)}
-                  className="px-3 py-2 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-blue-100 hover:text-blue-700 transition"
+                  className="px-3 py-2 text-xs bg-gray-100 text-gray-700 rounded-full hover:bg-brand-blue-100 hover:text-brand-blue-700 transition"
                 >
                   {reply}
                 </button>
@@ -195,13 +195,13 @@ function FallbackChatWidget() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type a message..."
-                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 text-black text-sm"
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-brand-blue-500 text-black text-sm"
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={!input.trim() || isLoading}
-                className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center hover:bg-brand-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
               </button>

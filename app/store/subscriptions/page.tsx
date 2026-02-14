@@ -214,20 +214,20 @@ function SubscriptionsContent() {
 
         {/* Active Subscription Banner */}
         {activeSubscription && (
-          <div className="mb-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+          <div className="mb-8 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                <h3 className="text-lg font-semibold text-brand-blue-900 mb-2">
                   Active Subscription: {activeSubscription.store_products.name}
                 </h3>
-                <p className="text-blue-700 mb-2">
+                <p className="text-brand-blue-700 mb-2">
                   Status:{' '}
                   <span className="font-medium capitalize">
                     {activeSubscription.status}
                   </span>
                 </p>
                 {activeSubscription.trial_end && (
-                  <p className="text-blue-700 mb-2">
+                  <p className="text-brand-blue-700 mb-2">
                     <Calendar className="inline h-4 w-4 mr-1" />
                     Trial ends:{' '}
                     {new Date(
@@ -235,7 +235,7 @@ function SubscriptionsContent() {
                     ).toLocaleDateString()}
                   </p>
                 )}
-                <p className="text-blue-700">
+                <p className="text-brand-blue-700">
                   <Calendar className="inline h-4 w-4 mr-1" />
                   {activeSubscription.cancel_at_period_end
                     ? 'Cancels'
@@ -276,7 +276,7 @@ function SubscriptionsContent() {
               <div
                 key={plan.price_id}
                 className={`bg-white rounded-lg shadow-lg overflow-hidden ${
-                  isCurrentPlan ? 'ring-2 ring-blue-600' : ''
+                  isCurrentPlan ? 'ring-2 ring-brand-blue-600' : ''
                 }`}
               >
                 {/* Plan Header */}
@@ -284,24 +284,24 @@ function SubscriptionsContent() {
                   <h3 className="text-2xl font-bold mb-2">
                     {plan.product_name}
                   </h3>
-                  <p className="text-blue-100 text-sm mb-4">
+                  <p className="text-brand-blue-100 text-sm mb-4">
                     {plan.description}
                   </p>
                   <div className="flex items-baseline">
                     <span className="text-4xl font-bold">
                       ${plan.amount_dollars}
                     </span>
-                    <span className="text-blue-100 ml-2">
+                    <span className="text-brand-blue-100 ml-2">
                       / {plan.billing_period.toLowerCase()}
                     </span>
                   </div>
                   {!isMonthly && (
-                    <p className="text-blue-100 text-sm mt-2">
+                    <p className="text-brand-blue-100 text-sm mt-2">
                       ${plan.effective_monthly_price}/month effective
                     </p>
                   )}
                   {plan.trial_period_days && (
-                    <p className="text-blue-100 text-sm mt-2">
+                    <p className="text-brand-blue-100 text-sm mt-2">
                       {plan.trial_period_days}-day free trial
                     </p>
                   )}

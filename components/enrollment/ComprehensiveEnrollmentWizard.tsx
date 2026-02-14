@@ -371,7 +371,7 @@ export default function ComprehensiveEnrollmentWizard({
               <span>Step {currentStep} of {STEPS.length}</span>
               <span>{Math.round(progress)}% Complete</span>
               {saving && (
-                <span className="flex items-center gap-1 text-blue-600">
+                <span className="flex items-center gap-1 text-brand-blue-600">
                   <Save className="w-4 h-4" />
                   Saving...
                 </span>
@@ -379,7 +379,7 @@ export default function ComprehensiveEnrollmentWizard({
             </div>
             <div className="w-full bg-gray-200 rounded-full h-3">
               <div
-                className="bg-blue-600 h-3 rounded-full transition-all duration-300"
+                className="bg-brand-blue-600 h-3 rounded-full transition-all duration-300"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -396,7 +396,7 @@ export default function ComprehensiveEnrollmentWizard({
                   <div className="flex flex-col items-center">
                     <div className={`w-12 h-12 rounded-full flex items-center justify-center ${
                       currentStep > step.id ? 'bg-green-600 text-white' :
-                      currentStep === step.id ? 'bg-blue-600 text-white' :
+                      currentStep === step.id ? 'bg-brand-blue-600 text-white' :
                       'bg-gray-200 text-gray-500'
                     }`}>
                       {currentStep > step.id ? (
@@ -436,7 +436,7 @@ export default function ComprehensiveEnrollmentWizard({
                     type="text"
                     value={formData.firstName}
                     onChange={(e) => updateField('firstName', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     required
                   />
                 </div>
@@ -449,7 +449,7 @@ export default function ComprehensiveEnrollmentWizard({
                     type="text"
                     value={formData.middleName}
                     onChange={(e) => updateField('middleName', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
 
@@ -461,7 +461,7 @@ export default function ComprehensiveEnrollmentWizard({
                     type="text"
                     value={formData.lastName}
                     onChange={(e) => updateField('lastName', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     required
                   />
                 </div>
@@ -476,7 +476,7 @@ export default function ComprehensiveEnrollmentWizard({
                     type="date"
                     value={formData.dateOfBirth}
                     onChange={(e) => updateField('dateOfBirth', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     required
                   />
                 </div>
@@ -491,7 +491,7 @@ export default function ComprehensiveEnrollmentWizard({
                       value={formData.ssn}
                       onChange={(e) => updateField('ssn', e.target.value)}
                       placeholder="XXX-XX-XXXX"
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                       required
                     />
                     <button
@@ -515,7 +515,7 @@ export default function ComprehensiveEnrollmentWizard({
                 <select
                   value={formData.gender}
                   onChange={(e) => updateField('gender', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   required
                 >
                   <option value="">Select Gender</option>
@@ -542,7 +542,7 @@ export default function ComprehensiveEnrollmentWizard({
                     type="email"
                     value={formData.email}
                     onChange={(e) => updateField('email', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     required
                   />
                 </div>
@@ -556,7 +556,7 @@ export default function ComprehensiveEnrollmentWizard({
                     value={formData.phone}
                     onChange={(e) => updateField('phone', e.target.value)}
                     placeholder="(XXX) XXX-XXXX"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     required
                   />
                 </div>
@@ -571,7 +571,7 @@ export default function ComprehensiveEnrollmentWizard({
                   value={formData.alternatePhone}
                   onChange={(e) => updateField('alternatePhone', e.target.value)}
                   placeholder="(XXX) XXX-XXXX"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
 
@@ -583,7 +583,7 @@ export default function ComprehensiveEnrollmentWizard({
                   type="text"
                   value={formData.address}
                   onChange={(e) => updateField('address', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   required
                 />
               </div>
@@ -596,7 +596,7 @@ export default function ComprehensiveEnrollmentWizard({
                   type="text"
                   value={formData.address2}
                   onChange={(e) => updateField('address2', e.target.value)}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
 
@@ -609,7 +609,7 @@ export default function ComprehensiveEnrollmentWizard({
                     type="text"
                     value={formData.city}
                     onChange={(e) => updateField('city', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     required
                   />
                 </div>
@@ -621,7 +621,7 @@ export default function ComprehensiveEnrollmentWizard({
                   <select
                     value={formData.state}
                     onChange={(e) => updateField('state', e.target.value)}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     required
                   >
                     <option value="">Select State</option>
@@ -643,7 +643,7 @@ export default function ComprehensiveEnrollmentWizard({
                     value={formData.zip}
                     onChange={(e) => updateField('zip', e.target.value)}
                     placeholder="XXXXX"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                     required
                   />
                 </div>
@@ -681,7 +681,7 @@ export default function ComprehensiveEnrollmentWizard({
 
           <button
             onClick={saveProgress}
-            className="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg hover:bg-gray-50 flex items-center gap-2"
+            className="px-6 py-3 border border-brand-blue-600 text-brand-blue-600 rounded-lg hover:bg-gray-50 flex items-center gap-2"
           >
             <Save className="w-5 h-5" />
             Save Progress
@@ -690,7 +690,7 @@ export default function ComprehensiveEnrollmentWizard({
           {currentStep < STEPS.length ? (
             <button
               onClick={nextStep}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2"
+              className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 flex items-center gap-2"
             >
               Next
               <ChevronRight className="w-5 h-5" />

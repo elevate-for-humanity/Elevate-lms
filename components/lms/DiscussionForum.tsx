@@ -139,13 +139,13 @@ export function DiscussionForum({
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           placeholder="Ask a question or share your thoughts..."
-          className="w-full p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[100px]"
+          className="w-full p-4 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 min-h-[100px]"
         />
         <div className="flex justify-end mt-3">
           <button
             onClick={addComment}
             disabled={!newComment.trim()}
-            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="w-4 h-4" />
             Post Comment
@@ -160,7 +160,7 @@ export function DiscussionForum({
             <div key={comment.id} className="bg-white rounded-lg p-6 shadow-sm">
               {/* Comment Header */}
               <div className="flex items-start gap-4 mb-4">
-                <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
+                <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0">
                   {comment.avatar}
                 </div>
                 <div className="flex-1">
@@ -178,14 +178,14 @@ export function DiscussionForum({
               <div className="flex items-center gap-4 ml-14">
                 <button
                   onClick={() => likeComment(comment.id)}
-                  className="flex items-center gap-2 text-sm text-black hover:text-blue-600 transition"
+                  className="flex items-center gap-2 text-sm text-black hover:text-brand-blue-600 transition"
                 >
                   <ThumbsUp className="w-4 h-4" />
                   <span>{comment.likes > 0 ? comment.likes : 'Like'}</span>
                 </button>
                 <button
                   onClick={() => setReplyingTo(comment.id)}
-                  className="flex items-center gap-2 text-sm text-black hover:text-blue-600 transition"
+                  className="flex items-center gap-2 text-sm text-black hover:text-brand-blue-600 transition"
                 >
                   <Reply className="w-4 h-4" />
                   Reply
@@ -199,7 +199,7 @@ export function DiscussionForum({
                     value={replyText}
                     onChange={(e) => setReplyText(e.target.value)}
                     placeholder="Write a reply..."
-                    className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 min-h-[80px]"
+                    className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 min-h-[80px]"
                     autoFocus
                   />
                   <div className="flex justify-end gap-2 mt-2">
@@ -215,7 +215,7 @@ export function DiscussionForum({
                     <button
                       onClick={() => addReply(comment.id)}
                       disabled={!replyText.trim()}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition disabled:opacity-50"
+                      className="px-4 py-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white rounded-lg font-semibold transition disabled:opacity-50"
                     >
                       Reply
                     </button>

@@ -105,28 +105,28 @@ export default function DemosPage() {
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 w-full">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-blue-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-6">
+            <div className="inline-flex items-center gap-2 bg-brand-blue-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-6">
               <Monitor className="w-4 h-4" />
               Platform Demos
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-white mb-6">
               See Elevate in Action
             </h1>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-brand-blue-100 mb-8">
               Watch demos of our training platform or schedule a personalized walkthrough 
               with our team. See how we help organizations train their workforce.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/contact?type=demo"
-                className="inline-flex items-center gap-2 bg-white text-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+                className="inline-flex items-center gap-2 bg-white text-brand-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
               >
                 <Calendar className="w-5 h-5" />
                 Schedule Live Demo
               </Link>
               <Link
                 href="/store/demo"
-                className="inline-flex items-center gap-2 bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors border border-blue-500"
+                className="inline-flex items-center gap-2 bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-600 transition-colors border border-brand-blue-500"
               >
                 Request Trial Access
               </Link>
@@ -142,13 +142,13 @@ export default function DemosPage() {
             <Link href="/videos" className="px-4 py-2 bg-orange-100 text-orange-800 rounded-full text-sm font-medium hover:bg-orange-200 transition-colors">
               Training Videos
             </Link>
-            <Link href="/webinars" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+            <Link href="/webinars" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               Webinars
             </Link>
             <Link href="/success-stories" className="px-4 py-2 bg-green-100 text-green-800 rounded-full text-sm font-medium hover:bg-green-200 transition-colors">
               Success Stories
             </Link>
-            <Link href="/store" className="px-4 py-2 bg-blue-100 text-blue-800 rounded-full text-sm font-medium hover:bg-blue-200 transition-colors">
+            <Link href="/store" className="px-4 py-2 bg-brand-blue-100 text-brand-blue-800 rounded-full text-sm font-medium hover:bg-brand-blue-200 transition-colors">
               Platform Store
             </Link>
           </div>
@@ -171,7 +171,7 @@ export default function DemosPage() {
             {demos.map((demo) => (
               <div 
                 key={demo.id} 
-                className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-blue-300 hover:shadow-xl transition-all"
+                className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-blue-300 hover:shadow-xl transition-all"
               >
                 {/* Thumbnail */}
                 <div className="relative h-56">
@@ -181,12 +181,12 @@ export default function DemosPage() {
                     fill
                     className="object-cover"
                   />
-                  <div className="absolute inset-0 bg-blue-900/40 flex items-center justify-center">
+                  <div className="absolute inset-0 bg-brand-blue-900/40 flex items-center justify-center">
                     <Link 
                       href={demo.demoUrl}
                       className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center hover:scale-110 transition-transform"
                     >
-                      <Play className="w-10 h-10 text-blue-600 ml-1" />
+                      <Play className="w-10 h-10 text-brand-blue-600 ml-1" />
                     </Link>
                   </div>
                   <div className="absolute top-4 right-4 bg-slate-800 text-white px-3 py-1 rounded-full text-sm flex items-center gap-1">
@@ -216,7 +216,7 @@ export default function DemosPage() {
 
                   <Link
                     href={demo.demoUrl}
-                    className="block w-full py-3 bg-blue-600 hover:bg-blue-700 text-white text-center rounded-lg font-semibold transition-colors"
+                    className="block w-full py-3 bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center rounded-lg font-semibold transition-colors"
                   >
                     Try Demo
                   </Link>
@@ -228,27 +228,27 @@ export default function DemosPage() {
       </section>
 
       {/* Live Demo CTA */}
-      <section className="py-20 bg-blue-700 text-white">
+      <section className="py-20 bg-brand-blue-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <Users className="w-16 h-16 mx-auto mb-6 text-blue-300" />
+          <Users className="w-16 h-16 mx-auto mb-6 text-brand-blue-300" />
           <h2 className="text-3xl md:text-4xl font-black mb-4">
             Want a Personalized Demo?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Schedule a live walkthrough with our team to see how Elevate can work 
             for your organization. We&apos;ll customize the demo to your specific needs.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/contact?type=demo"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-blue-50 transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-50 transition-colors"
             >
               <Calendar className="w-5 h-5" />
               Schedule Demo
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 bg-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-600 transition-colors border border-blue-500"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 transition-colors border border-brand-blue-500"
             >
               Call Get Help Online
             </a>
@@ -271,7 +271,7 @@ export default function DemosPage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Monitor className="w-6 h-6 text-blue-600" />
+                <Monitor className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Student Experience</h3>
               <p className="text-gray-600 text-sm">
@@ -291,7 +291,7 @@ export default function DemosPage() {
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <ArrowRight className="w-6 h-6 text-blue-600" />
+                <ArrowRight className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Integration Options</h3>
               <p className="text-gray-600 text-sm">

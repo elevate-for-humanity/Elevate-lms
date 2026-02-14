@@ -29,7 +29,7 @@ export function PathwayBlock({ variant = 'light', className = '' }: PathwayBlock
                 className="object-cover"
               />
             </div>
-            <div className={`text-sm font-bold mb-2 ${isDark ? 'text-blue-400' : 'text-blue-600'}`}>Step 1</div>
+            <div className={`text-sm font-bold mb-2 ${isDark ? 'text-brand-blue-400' : 'text-brand-blue-600'}`}>Step 1</div>
             <h3 className={`text-lg font-bold mb-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Check Eligibility
             </h3>

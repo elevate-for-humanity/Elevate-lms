@@ -62,7 +62,7 @@ export default async function TaxFilingApplicationsPage() {
         <div className="mb-8">
           <Link
             href="/admin/tax-filing"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Tax Filing
           </Link>
@@ -100,7 +100,7 @@ export default async function TaxFilingApplicationsPage() {
               aria-label="Link"
               className="block"
             >
-              <div className="text-lg font-bold text-blue-600">+ New</div>
+              <div className="text-lg font-bold text-brand-blue-600">+ New</div>
               <div className="text-black text-sm">Add Application</div>
             </Link>
           </div>
@@ -112,16 +112,16 @@ export default async function TaxFilingApplicationsPage() {
             <input
               type="search"
               placeholder="Search by name or email..."
-              className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+              className="rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
             />
-            <select className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <select className="rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500">
               <option value="">All Statuses</option>
               <option value="pending">Pending</option>
               <option value="in_progress">In Progress</option>
               <option value="completed">Completed</option>
               <option value="cancelled">Cancelled</option>
             </select>
-            <select className="rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
+            <select className="rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500">
               <option value="">All Tax Years</option>
               <option value="2024">2024</option>
               <option value="2023">2023</option>
@@ -190,7 +190,7 @@ export default async function TaxFilingApplicationsPage() {
                               ? 'bg-brand-green-100 text-green-800'
                               : item.status === 'pending'
                                 ? 'bg-orange-100 text-orange-800'
-                                : 'bg-blue-100 text-blue-800'
+                                : 'bg-brand-blue-100 text-brand-blue-800'
                           }`}
                         >
                           {item.status || 'pending'}
@@ -202,7 +202,7 @@ export default async function TaxFilingApplicationsPage() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <Link
                           href={`/admin/tax-filing/applications/${item.id}`}
-                          className="text-brand-blue-600 hover:text-blue-900"
+                          className="text-brand-blue-600 hover:text-brand-blue-900"
                         >
                           View
                         </Link>

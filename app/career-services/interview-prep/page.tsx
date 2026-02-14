@@ -111,7 +111,7 @@ export default function InterviewPrepPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {interviewTypes.map((type, index) => (
               <div key={index} className="bg-gray-50 rounded-xl p-6 hover:shadow-lg transition">
-                <type.icon className="w-10 h-10 text-blue-600 mb-4" />
+                <type.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{type.title}</h3>
                 <p className="text-gray-600 text-sm">{type.description}</p>
               </div>
@@ -129,7 +129,7 @@ export default function InterviewPrepPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 1
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Schedule</h3>
@@ -137,7 +137,7 @@ export default function InterviewPrepPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 2
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Prepare</h3>
@@ -145,7 +145,7 @@ export default function InterviewPrepPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 3
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Practice</h3>
@@ -153,7 +153,7 @@ export default function InterviewPrepPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-2xl font-bold">
                 4
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Feedback</h3>
@@ -170,7 +170,7 @@ export default function InterviewPrepPage() {
             Master the STAR Method
           </h2>
 
-          <div className="bg-blue-50 rounded-xl p-8 border-2 border-blue-200">
+          <div className="bg-brand-blue-50 rounded-xl p-8 border-2 border-brand-blue-200">
             <p className="text-gray-700 mb-6 text-center">
               The STAR method is a structured way to answer behavioral interview questions by describing a specific Situation, Task, Action, and Result.
             </p>
@@ -178,7 +178,7 @@ export default function InterviewPrepPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg p-6">
                 <div className="flex items-center mb-3">
-                  <span className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">S</span>
+                  <span className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">S</span>
                   <h3 className="text-lg font-bold text-gray-900">Situation</h3>
                 </div>
                 <p className="text-gray-600 text-sm">Describe the context and background. Set the scene for your story.</p>
@@ -186,7 +186,7 @@ export default function InterviewPrepPage() {
 
               <div className="bg-white rounded-lg p-6">
                 <div className="flex items-center mb-3">
-                  <span className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">T</span>
+                  <span className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">T</span>
                   <h3 className="text-lg font-bold text-gray-900">Task</h3>
                 </div>
                 <p className="text-gray-600 text-sm">Explain your responsibility or the challenge you faced.</p>
@@ -194,7 +194,7 @@ export default function InterviewPrepPage() {
 
               <div className="bg-white rounded-lg p-6">
                 <div className="flex items-center mb-3">
-                  <span className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">A</span>
+                  <span className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">A</span>
                   <h3 className="text-lg font-bold text-gray-900">Action</h3>
                 </div>
                 <p className="text-gray-600 text-sm">Describe the specific steps you took to address the situation.</p>
@@ -202,7 +202,7 @@ export default function InterviewPrepPage() {
 
               <div className="bg-white rounded-lg p-6">
                 <div className="flex items-center mb-3">
-                  <span className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">R</span>
+                  <span className="w-10 h-10 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold mr-3">R</span>
                   <h3 className="text-lg font-bold text-gray-900">Result</h3>
                 </div>
                 <p className="text-gray-600 text-sm">Share the outcome and what you learned. Quantify when possible.</p>
@@ -270,24 +270,24 @@ export default function InterviewPrepPage() {
       </section>
 
       {/* Success Stats */}
-      <section className="py-16 bg-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-white">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div>
               <p className="text-4xl font-bold mb-2">Full</p>
-              <p className="text-blue-200">Interview Prep</p>
+              <p className="text-brand-blue-200">Interview Prep</p>
             </div>
             <div>
               <p className="text-4xl font-bold mb-2">1-on-1</p>
-              <p className="text-blue-200">Mock Interviews</p>
+              <p className="text-brand-blue-200">Mock Interviews</p>
             </div>
             <div>
               <p className="text-4xl font-bold mb-2">Expert</p>
-              <p className="text-blue-200">Coaching</p>
+              <p className="text-brand-blue-200">Coaching</p>
             </div>
             <div>
               <p className="text-4xl font-bold mb-2">Free</p>
-              <p className="text-blue-200">For Program Participants</p>
+              <p className="text-brand-blue-200">For Program Participants</p>
             </div>
           </div>
         </div>
@@ -305,7 +305,7 @@ export default function InterviewPrepPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/career-services/contact"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               Schedule Mock Interview <ArrowRight className="ml-2 w-5 h-5" />
             </Link>

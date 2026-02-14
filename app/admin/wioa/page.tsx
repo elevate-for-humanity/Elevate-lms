@@ -107,12 +107,12 @@ export default async function WIOAPage() {
         {stats.map((stat) => (
           <div key={stat.label} className="bg-white rounded-xl shadow-sm border p-6">
             <div className={`w-12 h-12 rounded-lg flex items-center justify-center mb-4 ${
-              stat.color === 'blue' ? 'bg-blue-100' :
+              stat.color === 'blue' ? 'bg-brand-blue-100' :
               stat.color === 'yellow' ? 'bg-yellow-100' :
               stat.color === 'green' ? 'bg-green-100' : 'bg-red-100'
             }`}>
               <stat.icon className={`w-6 h-6 ${
-                stat.color === 'blue' ? 'text-blue-600' :
+                stat.color === 'blue' ? 'text-brand-blue-600' :
                 stat.color === 'yellow' ? 'text-yellow-600' :
                 stat.color === 'green' ? 'text-green-600' : 'text-red-600'
               }`} />

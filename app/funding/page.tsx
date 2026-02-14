@@ -46,7 +46,7 @@ export default function FundingPage() {
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
                 <Image src="/images/heroes/workforce-partner-1.jpg" alt="WIOA funding" fill className="object-cover" />
-                <div className="absolute top-3 left-3 bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Federal</div>
+                <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Federal</div>
               </div>
               <div className="p-5">
                 <h3 className="font-bold text-slate-900 text-lg mb-2">WIOA — Workforce Innovation & Opportunity Act</h3>
@@ -56,12 +56,12 @@ export default function FundingPage() {
                 <div className="space-y-2 mb-4">
                   {['Covers tuition and training costs', 'Books and supplies included', 'Certification exam fees', 'Support services (childcare, transportation)'].map((item) => (
                     <div key={item} className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-blue-600 rounded-full flex-shrink-0" />
+                      <span className="w-1.5 h-1.5 bg-brand-blue-600 rounded-full flex-shrink-0" />
                       <span className="text-slate-700 text-sm">{item}</span>
                     </div>
                   ))}
                 </div>
-                <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm hover:underline">
+                <Link href="/wioa-eligibility" className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline">
                   Learn about WIOA eligibility <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -86,7 +86,7 @@ export default function FundingPage() {
                     </div>
                   ))}
                 </div>
-                <a href="https://www.nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm hover:underline">
+                <a href="https://www.nextleveljobs.org" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline">
                   Learn about WRG at Next Level Jobs <ArrowRight className="w-4 h-4" />
                 </a>
               </div>
@@ -111,7 +111,7 @@ export default function FundingPage() {
                     </div>
                   ))}
                 </div>
-                <Link href="/programs/jri" className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm hover:underline">
+                <Link href="/programs/jri" className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline">
                   Learn about JRI <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -136,7 +136,7 @@ export default function FundingPage() {
                     </div>
                   ))}
                 </div>
-                <Link href="/ojt-and-funding" className="inline-flex items-center gap-2 text-blue-600 font-semibold text-sm hover:underline">
+                <Link href="/ojt-and-funding" className="inline-flex items-center gap-2 text-brand-blue-600 font-semibold text-sm hover:underline">
                   Learn about OJT <ArrowRight className="w-4 h-4" />
                 </Link>
               </div>
@@ -157,7 +157,7 @@ export default function FundingPage() {
               { title: 'Sezzle / Affirm', desc: 'Buy now, pay later. Break payments into 4-6 installments with Sezzle or Affirm.', tag: 'BNPL' },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl border border-slate-200 p-5">
-                <span className="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full">{item.tag}</span>
+                <span className="text-xs font-bold text-brand-blue-600 bg-brand-blue-50 px-2 py-1 rounded-full">{item.tag}</span>
                 <h3 className="font-bold text-slate-900 mt-3 mb-2">{item.title}</h3>
                 <p className="text-slate-600 text-sm leading-relaxed">{item.desc}</p>
               </div>
@@ -179,17 +179,17 @@ export default function FundingPage() {
               { step: '5', title: 'Start Training', desc: 'Begin your program with funding in place.' },
             ].map((item) => (
               <div key={item.step} className="flex items-start gap-4 bg-white rounded-lg border border-slate-200 p-4">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
+                <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{item.step}</div>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
                   <p className="text-slate-600 text-sm">{item.desc}</p>
                   {item.link && (
                     item.link.startsWith('http') ? (
-                      <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 text-sm font-semibold hover:underline mt-1 inline-block">
+                      <a href={item.link} target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 text-sm font-semibold hover:underline mt-1 inline-block">
                         {item.linkText}
                       </a>
                     ) : (
-                      <Link href={item.link} className="text-blue-600 text-sm font-semibold hover:underline mt-1 inline-block">
+                      <Link href={item.link} className="text-brand-blue-600 text-sm font-semibold hover:underline mt-1 inline-block">
                         {item.linkText}
                       </Link>
                     )
@@ -202,13 +202,13 @@ export default function FundingPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14 bg-blue-600">
+      <section className="py-8 sm:py-14 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Find Out What You Qualify For</h2>
           <p className="text-white/90 mb-6 text-sm">Register at Indiana Career Connect and schedule a WorkOne appointment to explore your funding options.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
-              className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
+              className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">
               Register at Indiana Career Connect <ArrowRight className="w-4 h-4 inline ml-1" />
             </a>
             <Link href="/apply" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

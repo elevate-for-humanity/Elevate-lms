@@ -112,91 +112,91 @@ export default function JRIPage() {
             Available Courses
           </h2>
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   Introduction to Job Ready Indy
                 </h3>
-                <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
+                <div className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
                   Badge 1
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   Professional Communication
                 </h3>
-                <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
+                <div className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
                   Badge 2
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   Workplace Professionalism
                 </h3>
-                <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
+                <div className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
                   Badge 3
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   Problem Solving & Critical Thinking
                 </h3>
-                <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
+                <div className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
                   Badge 4
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   Teamwork & Collaboration
                 </h3>
-                <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
+                <div className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
                   Badge 5
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   Career Planning
                 </h3>
-                <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
+                <div className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
                   Badge 6
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   Financial Literacy
                 </h3>
 
-                <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
+                <div className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
                   Bonus
                 </div>
               </div>
             </div>
 
-            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-blue-500 transition-colors">
+            <div className="bg-white border-2 border-slate-200 rounded-xl p-6 hover:border-brand-blue-500 transition-colors">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-lg font-bold text-black">
                   Digital Literacy
                 </h3>
 
-                <div className="bg-blue-100 text-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
+                <div className="bg-brand-blue-100 text-brand-blue-700 px-3 py-2 rounded-full text-sm font-semibold">
                   Bonus
                 </div>
               </div>

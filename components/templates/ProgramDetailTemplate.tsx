@@ -114,7 +114,7 @@ export function ProgramDetailTemplate({ data }: ProgramDetailTemplateProps) {
         <section className="bg-white py-16">
           <div className="mx-auto max-w-4xl px-6">
             <div className="flex items-center gap-3 mb-6">
-              <Award className="w-8 h-8 text-blue-600" />
+              <Award className="w-8 h-8 text-brand-blue-600" />
               <h2 className="text-3xl font-bold text-black">
                 What You'll Learn
               </h2>
@@ -123,7 +123,7 @@ export function ProgramDetailTemplate({ data }: ProgramDetailTemplateProps) {
               <ul className="space-y-4">
                 {data.whatYouLearn.map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-black">{item}</span>
                   </li>
                 ))}
@@ -167,11 +167,11 @@ export function ProgramDetailTemplate({ data }: ProgramDetailTemplateProps) {
             <h2 className="text-3xl font-bold text-black mb-6">
               Funding Options
             </h2>
-            <div className="bg-blue-50 rounded-xl p-8 border border-blue-200">
+            <div className="bg-brand-blue-50 rounded-xl p-8 border border-brand-blue-200">
               <ul className="space-y-4">
                 {data.fundingOptions.map((option, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-black">{option}</span>
                   </li>
                 ))}

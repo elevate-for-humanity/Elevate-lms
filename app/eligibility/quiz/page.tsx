@@ -14,12 +14,12 @@ export default function EligibilityQuizPage() {
         <Breadcrumbs items={[{ label: "Eligibility", href: "/eligibility" }, { label: "Quiz" }]} />
       </div>
 {/* Hero */}
-      <div className="bg-blue-600 text-white py-12 px-4">
+      <div className="bg-brand-blue-600 text-white py-12 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl font-bold mb-4">
             Could You Qualify for FREE Training?
           </h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl text-brand-blue-100 max-w-2xl mx-auto">
             Take this 2-minute quiz to see if you're eligible for government-funded workforce training programs
           </p>
         </div>

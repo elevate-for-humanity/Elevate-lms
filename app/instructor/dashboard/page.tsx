@@ -103,7 +103,7 @@ export default async function ProgramHolderDashboard() {
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-full bg-brand-blue-100 flex items-center justify-center">
                 <Users className="text-brand-blue-600" size={24} />
               </div>
               <div>
@@ -131,8 +131,8 @@ export default async function ProgramHolderDashboard() {
 
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                <Award className="text-blue-600" size={24} />
+              <div className="w-12 h-12 rounded-full bg-brand-blue-100 flex items-center justify-center">
+                <Award className="text-brand-blue-600" size={24} />
               </div>
               <div>
                 <p className="text-base md:text-lg font-bold text-black">
@@ -179,7 +179,7 @@ export default async function ProgramHolderDashboard() {
                   {students.slice(0, 5).map((student: Record<string, any>) => (
                     <div
                       key={student.id}
-                      className="border border-slate-200 rounded-lg p-4 hover:border-blue-300 transition"
+                      className="border border-slate-200 rounded-lg p-4 hover:border-brand-blue-300 transition"
                     >
                       <div className="flex items-center justify-between">
                         <div>
@@ -199,7 +199,7 @@ export default async function ProgramHolderDashboard() {
                               student.status === 'active'
                                 ? 'bg-brand-green-100 text-green-700'
                                 : student.status === 'completed'
-                                  ? 'bg-blue-100 text-blue-700'
+                                  ? 'bg-brand-blue-100 text-brand-blue-700'
                                   : 'bg-gray-100 text-black'
                             }`}
                           >
@@ -266,12 +266,12 @@ export default async function ProgramHolderDashboard() {
               <div className="mt-8">
                 <h3 className="text-lg font-semibold text-black mb-4">Instructor Tools</h3>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                  <Link href="/instructor/courses" aria-label="Courses" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Courses</Link>
-                  <Link href="/instructor/students" aria-label="Students" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Students</Link>
-                  <Link href="/instructor/programs" aria-label="Programs" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Programs</Link>
-                  <Link href="/instructor/campaigns" aria-label="Campaigns" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Campaigns</Link>
-                  <Link href="/instructor/analytics" aria-label="Analytics" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Analytics</Link>
-                  <Link href="/instructor/settings" aria-label="Settings" className="p-3 bg-white border rounded-lg hover:border-blue-500 hover:shadow text-sm">Settings</Link>
+                  <Link href="/instructor/courses" aria-label="Courses" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Courses</Link>
+                  <Link href="/instructor/students" aria-label="Students" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Students</Link>
+                  <Link href="/instructor/programs" aria-label="Programs" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Programs</Link>
+                  <Link href="/instructor/campaigns" aria-label="Campaigns" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Campaigns</Link>
+                  <Link href="/instructor/analytics" aria-label="Analytics" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Analytics</Link>
+                  <Link href="/instructor/settings" aria-label="Settings" className="p-3 bg-white border rounded-lg hover:border-brand-blue-500 hover:shadow text-sm">Settings</Link>
                 </div>
               </div>
 
@@ -281,17 +281,17 @@ export default async function ProgramHolderDashboard() {
                 <div className="space-y-2">
                   <Link 
                     href="/community" 
-                    className="block w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition border border-blue-200"
+                    className="block w-full text-left px-4 py-3 bg-brand-blue-50 hover:bg-brand-blue-100 rounded-lg transition border border-brand-blue-200"
                   >
-                    <p className="font-medium text-blue-900">Community Hub</p>
-                    <p className="text-xs text-blue-700">Connect with students and instructors</p>
+                    <p className="font-medium text-brand-blue-900">Community Hub</p>
+                    <p className="text-xs text-brand-blue-700">Connect with students and instructors</p>
                   </Link>
                   <Link 
                     href="/lms/forums" 
-                    className="block w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition border border-blue-200"
+                    className="block w-full text-left px-4 py-3 bg-brand-blue-50 hover:bg-brand-blue-100 rounded-lg transition border border-brand-blue-200"
                   >
-                    <p className="font-medium text-blue-900">Discussion Forums</p>
-                    <p className="text-xs text-blue-700">View and moderate discussions</p>
+                    <p className="font-medium text-brand-blue-900">Discussion Forums</p>
+                    <p className="text-xs text-brand-blue-700">View and moderate discussions</p>
                   </Link>
                 </div>
               </div>

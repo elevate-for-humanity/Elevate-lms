@@ -48,7 +48,7 @@ export default function SalesforceIntegrationPage() {
           </div>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center">
                 <svg className="w-10 h-10" viewBox="0 0 24 24" fill="#00A1E0">
                   <path d="M10.006 5.415a3.724 3.724 0 0 1 2.942-1.415c1.397 0 2.61.778 3.243 1.923a4.143 4.143 0 0 1 1.558-.305c2.29 0 4.147 1.857 4.147 4.147 0 2.29-1.857 4.147-4.147 4.147-.233 0-.46-.02-.682-.057a3.46 3.46 0 0 1-3.063 1.857 3.46 3.46 0 0 1-2.032-.657 3.926 3.926 0 0 1-3.37 1.927c-1.862 0-3.443-1.293-3.856-3.03a3.598 3.598 0 0 1-.537.04c-1.988 0-3.6-1.612-3.6-3.6 0-1.574 1.01-2.912 2.418-3.398a4.153 4.153 0 0 1-.127-1.01c0-2.29 1.857-4.147 4.147-4.147 1.41 0 2.657.704 3.406 1.78z"/>
                 </svg>
@@ -80,7 +80,7 @@ export default function SalesforceIntegrationPage() {
         <div className="grid md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3 mb-2">
-              <Users className="w-5 h-5 text-blue-600" />
+              <Users className="w-5 h-5 text-brand-blue-600" />
               <span className="font-medium text-gray-900">Contacts Synced</span>
             </div>
             <p className="text-3xl font-bold text-gray-900">{isConfigured ? '—' : '0'}</p>
@@ -88,7 +88,7 @@ export default function SalesforceIntegrationPage() {
           </div>
           <div className="bg-white rounded-xl border border-gray-200 p-5">
             <div className="flex items-center gap-3 mb-2">
-              <Building2 className="w-5 h-5 text-blue-600" />
+              <Building2 className="w-5 h-5 text-brand-blue-600" />
               <span className="font-medium text-gray-900">Accounts</span>
             </div>
             <p className="text-3xl font-bold text-gray-900">{isConfigured ? '—' : '0'}</p>
@@ -113,28 +113,28 @@ export default function SalesforceIntegrationPage() {
           
           {!isConfigured ? (
             <div className="p-6">
-              <div className="bg-blue-50 rounded-lg p-6 mb-6">
-                <h3 className="font-bold text-blue-900 mb-2">Quick Setup Guide</h3>
-                <p className="text-blue-800 mb-4">No IT team required! Follow these steps to connect Salesforce:</p>
-                <ol className="space-y-3 text-blue-800">
+              <div className="bg-brand-blue-50 rounded-lg p-6 mb-6">
+                <h3 className="font-bold text-brand-blue-900 mb-2">Quick Setup Guide</h3>
+                <p className="text-brand-blue-800 mb-4">No IT team required! Follow these steps to connect Salesforce:</p>
+                <ol className="space-y-3 text-brand-blue-800">
                   <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                    <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">1</span>
                     <span>Log into Salesforce and go to <strong>Setup → Apps → App Manager</strong></span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                    <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">2</span>
                     <span>Click <strong>New Connected App</strong> and fill in the details</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
-                    <span>Enable OAuth and select scopes: <code className="bg-blue-100 px-1 rounded">api</code>, <code className="bg-blue-100 px-1 rounded">refresh_token</code></span>
+                    <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">3</span>
+                    <span>Enable OAuth and select scopes: <code className="bg-brand-blue-100 px-1 rounded">api</code>, <code className="bg-brand-blue-100 px-1 rounded">refresh_token</code></span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">4</span>
+                    <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">4</span>
                     <span>Copy the <strong>Consumer Key</strong> and <strong>Consumer Secret</strong></span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">5</span>
+                    <span className="flex-shrink-0 w-6 h-6 bg-brand-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">5</span>
                     <span>Add them to your environment variables (see below)</span>
                   </li>
                 </ol>
@@ -190,7 +190,7 @@ export default function SalesforceIntegrationPage() {
               </div>
               
               <div className="grid md:grid-cols-2 gap-4">
-                <button className="flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
+                <button className="flex items-center justify-center gap-2 px-4 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition">
                   <RefreshCw className="w-5 h-5" />
                   Sync Now
                 </button>
@@ -224,7 +224,7 @@ export default function SalesforceIntegrationPage() {
                     <p className="text-sm text-gray-500">{setting.description}</p>
                   </div>
                   <div className={`w-12 h-6 rounded-full relative cursor-pointer transition ${
-                    setting.enabled ? 'bg-blue-600' : 'bg-gray-300'
+                    setting.enabled ? 'bg-brand-blue-600' : 'bg-gray-300'
                   }`}>
                     <div className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition ${
                       setting.enabled ? 'right-1' : 'left-1'
@@ -244,8 +244,8 @@ export default function SalesforceIntegrationPage() {
           <div className="p-6">
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Zap className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Zap className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900">Real-time Sync</h3>
@@ -262,8 +262,8 @@ export default function SalesforceIntegrationPage() {
                 </div>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <Users className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <Users className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900">Custom Field Mapping</h3>
@@ -289,7 +289,7 @@ export default function SalesforceIntegrationPage() {
             href="https://help.salesforce.com/s/articleView?id=sf.connected_app_create.htm" 
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700"
+            className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700"
           >
             Salesforce Connected App Documentation
             <ExternalLink className="w-4 h-4" />

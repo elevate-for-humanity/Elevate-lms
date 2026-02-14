@@ -85,7 +85,7 @@ export default function HoursExportPage() {
         <div className="mb-8">
           <Link
             href="/admin/dashboard"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Dashboard
           </Link>
@@ -101,11 +101,11 @@ export default function HoursExportPage() {
         </div>
 
         {/* Info Box */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-blue-900 mb-2">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
+          <h3 className="font-semibold text-brand-blue-900 mb-2">
             WorkOne/DWD Compliance
           </h3>
-          <p className="text-sm text-blue-800">
+          <p className="text-sm text-brand-blue-800">
             This export generates a CSV file formatted for WorkOne and Indiana
             Department of Workforce Development (DWD) reporting requirements.
             The file includes all apprenticeship hours for the selected date
@@ -129,7 +129,7 @@ export default function HoursExportPage() {
           <div className="flex gap-3 mb-6">
             <button
               onClick={setCurrentWeek}
-              className="px-4 py-2 bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 font-medium"
+              className="px-4 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-md hover:bg-brand-blue-200 font-medium"
             >
               Current Week
             </button>
@@ -152,7 +152,7 @@ export default function HoursExportPage() {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
             <div>
@@ -164,7 +164,7 @@ export default function HoursExportPage() {
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
           </div>

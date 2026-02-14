@@ -169,7 +169,7 @@ export default function HeroAvatarGuide({
   if (isDismissed) return null;
 
   return (
-    <div className="bg-gradient-to-r from-blue-50 to-white border-b border-blue-100">
+    <div className="bg-gradient-to-r from-blue-50 to-white border-b border-brand-blue-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         <div className="flex flex-col lg:flex-row gap-6 items-start">
           {/* Avatar Video - Large */}
@@ -224,15 +224,15 @@ export default function HeroAvatarGuide({
               /* Initial Message View */
               <div className="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
                 <div className="flex items-start gap-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <MessageCircle className="w-6 h-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <MessageCircle className="w-6 h-6 text-brand-blue-600" />
                   </div>
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900 text-lg">{avatarName}</p>
                     <p className="text-gray-600 mt-1">{message}</p>
                     <button
                       onClick={() => setShowChat(true)}
-                      className="mt-4 inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
+                      className="mt-4 inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors"
                     >
                       <MessageCircle className="w-5 h-5" />
                       Ask a Question
@@ -251,14 +251,14 @@ export default function HeroAvatarGuide({
               /* Chat View */
               <div className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
                 {/* Chat Header */}
-                <div className="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
+                <div className="bg-brand-blue-600 text-white px-4 py-3 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                       <MessageCircle className="w-4 h-4" />
                     </div>
                     <div>
                       <p className="font-semibold">{avatarName}</p>
-                      <p className="text-xs text-blue-200">Online</p>
+                      <p className="text-xs text-brand-blue-200">Online</p>
                     </div>
                   </div>
                   <button
@@ -279,7 +279,7 @@ export default function HeroAvatarGuide({
                       <div
                         className={`max-w-[85%] px-4 py-2 rounded-2xl ${
                           msg.role === 'user'
-                            ? 'bg-blue-600 text-white rounded-br-md'
+                            ? 'bg-brand-blue-600 text-white rounded-br-md'
                             : 'bg-white text-gray-800 border border-gray-200 rounded-bl-md shadow-sm'
                         }`}
                       >
@@ -315,13 +315,13 @@ export default function HeroAvatarGuide({
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder="Type your question..."
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="flex-1 px-4 py-3 border border-gray-300 rounded-xl text-base focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       disabled={isLoading}
                     />
                     <button
                       type="submit"
                       disabled={isLoading || !input.trim()}
-                      className="px-5 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="px-5 py-3 bg-brand-blue-600 text-white rounded-xl hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Send className="w-5 h-5" />
                     </button>

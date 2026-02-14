@@ -257,7 +257,7 @@ export default async function AccreditationPage() {
               <h2 className="text-2xl font-bold mb-2">
                 Overall Readiness Score
               </h2>
-              <p className="text-blue-100">
+              <p className="text-brand-blue-100">
                 {completeItems} of {totalItems} items complete
                 {warningItems > 0 && ` • ${warningItems} items need attention`}
               </p>
@@ -266,7 +266,7 @@ export default async function AccreditationPage() {
               <div className="text-6xl font-bold text-4xl md:text-5xl lg:text-6xl">
                 {readinessScore}%
               </div>
-              <div className="text-blue-100 mt-2">
+              <div className="text-brand-blue-100 mt-2">
                 {readinessScore >= 95
                   ? '<CheckCircle className="w-5 h-5 inline-block" /> Ready'
                   : readinessScore >= 85
@@ -309,7 +309,7 @@ export default async function AccreditationPage() {
 
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center justify-between mb-4">
-              <Award className="w-8 h-8 text-blue-600" />
+              <Award className="w-8 h-8 text-brand-blue-600" />
               <span className="text-2xl font-bold text-black">
                 {completionRate}%
               </span>
@@ -441,7 +441,7 @@ export default async function AccreditationPage() {
             href="/student-handbook"
             className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-shadow"
           >
-            <FileText className="w-8 h-8 text-blue-600 mb-3" />
+            <FileText className="w-8 h-8 text-brand-blue-600 mb-3" />
             <h3 className="text-lg font-semibold text-black mb-2">
               Student Handbook
             </h3>
@@ -452,11 +452,11 @@ export default async function AccreditationPage() {
         </div>
 
         {/* COE Contact */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-3">
+        <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+          <h3 className="text-lg font-semibold text-brand-blue-900 mb-3">
             Council on Occupational Education (COE)
           </h3>
-          <div className="grid md:grid-cols-2 gap-4 text-sm text-blue-800">
+          <div className="grid md:grid-cols-2 gap-4 text-sm text-brand-blue-800">
             <div>
               <p className="font-medium mb-1">Address:</p>
               <p>7840 Roswell Road, Building 300, Suite 325</p>

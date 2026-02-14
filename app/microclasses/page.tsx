@@ -71,7 +71,7 @@ export default function MicroclassesPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="bg-blue-600 text-white py-16 lg:py-24">
+      <section className="bg-brand-blue-600 text-white py-16 lg:py-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center">
             <span className="inline-block bg-white/20 text-white px-4 py-1 rounded-full text-sm font-medium mb-4">
@@ -80,7 +80,7 @@ export default function MicroclassesPage() {
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Microclasses
             </h1>
-            <p className="text-xl text-blue-100 max-w-2xl mx-auto mb-8">
+            <p className="text-xl text-brand-blue-100 max-w-2xl mx-auto mb-8">
               Short, focused courses that give you job-ready certifications in hours or days, not months.
             </p>
             <div className="flex flex-wrap justify-center gap-6 text-sm">
@@ -107,7 +107,7 @@ export default function MicroclassesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {microclasses.map((course, index) => (
               <div key={index} className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition group">
-                <div className="h-48 bg-blue-500 flex items-center justify-center">
+                <div className="h-48 bg-brand-blue-500 flex items-center justify-center">
                   <Award className="w-16 h-16 text-white/80" />
                 </div>
                 <div className="p-6">
@@ -131,7 +131,7 @@ export default function MicroclassesPage() {
 
                   <Link 
                     href={course.href}
-                    className="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700 group-hover:gap-3 transition-all"
+                    className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:text-brand-blue-700 group-hover:gap-3 transition-all"
                   >
                     Learn More <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -154,7 +154,7 @@ export default function MicroclassesPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/wioa-eligibility"
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="bg-brand-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               Check Eligibility
             </Link>

@@ -90,18 +90,18 @@ export default function ResourcesPage() {
               return (
                 <div key={section.title}>
                   <div className="flex items-center gap-3 mb-4">
-                    <Icon className="w-5 h-5 text-blue-600" />
+                    <Icon className="w-5 h-5 text-brand-blue-600" />
                     <h2 className="font-bold text-slate-900 text-lg">{section.title}</h2>
                   </div>
                   <ul className="space-y-2">
                     {section.links.map((link) => (
                       <li key={link.label}>
                         {link.external ? (
-                          <a href={link.href} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm flex items-center gap-1">
+                          <a href={link.href} target="_blank" rel="noopener noreferrer" className="text-brand-blue-600 hover:underline text-sm flex items-center gap-1">
                             {link.label} <ExternalLink className="w-3 h-3" />
                           </a>
                         ) : (
-                          <Link href={link.href} className="text-blue-600 hover:underline text-sm">{link.label}</Link>
+                          <Link href={link.href} className="text-brand-blue-600 hover:underline text-sm">{link.label}</Link>
                         )}
                       </li>
                     ))}

@@ -416,7 +416,7 @@ export function AutoAttritionTracker() {
   if (!metrics) {
     return (
       <div className="text-center py-8">
-        <div className="inline-block animate-spin rounded-full h-11 w-11 border-b-2 border-blue-600" />
+        <div className="inline-block animate-spin rounded-full h-11 w-11 border-b-2 border-brand-blue-600" />
         <p className="mt-4 text-brand-text-muted">
           Loading attrition tracking data...
         </p>
@@ -591,7 +591,7 @@ export function AutoAttritionTracker() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <button className="text-xs bg-brand-surface text-brand-info px-2 py-2 rounded hover:bg-blue-200">
+                    <button className="text-xs bg-brand-surface text-brand-info px-2 py-2 rounded hover:bg-brand-blue-200">
                       📊 View Details
                     </button>
                   </td>
@@ -665,7 +665,7 @@ export function AutoAttritionTracker() {
                   {student.autoActions.map((action, index) => (
                     <div
                       key={index}
-                      className="text-xs bg-blue-50 text-brand-info px-2 py-2 rounded"
+                      className="text-xs bg-brand-blue-50 text-brand-info px-2 py-2 rounded"
                     >
                       ✅ {action}
                     </div>
@@ -676,7 +676,7 @@ export function AutoAttritionTracker() {
                 <button className="text-xs bg-brand-success text-white px-3 py-2 rounded hover:bg-brand-success-hover">
                   📞 Contact Student
                 </button>
-                <button className="text-xs bg-brand-surface text-brand-info px-3 py-2 rounded hover:bg-blue-200">
+                <button className="text-xs bg-brand-surface text-brand-info px-3 py-2 rounded hover:bg-brand-blue-200">
                   📝 Add Note
                 </button>
               </div>

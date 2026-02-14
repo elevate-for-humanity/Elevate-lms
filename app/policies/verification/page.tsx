@@ -33,7 +33,7 @@ export default function VerificationPage() {
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Types of Verification</h2>
             
             <div className="grid md:grid-cols-2 gap-6 mb-8">
-              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+              <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200">
                 <h3 className="text-xl font-bold text-black mb-3">Identity Verification</h3>
                 <p className="text-black">
                   Confirming student identity during enrollment and throughout program participation.
@@ -47,7 +47,7 @@ export default function VerificationPage() {
                 </p>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200">
+              <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200">
                 <h3 className="text-xl font-bold text-black mb-3">Credential Verification</h3>
                 <p className="text-black">
                   Confirming authenticity of certificates and credentials for employers.
@@ -131,7 +131,7 @@ export default function VerificationPage() {
               Employers may verify credentials through:
             </p>
             
-            <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+            <div className="bg-brand-blue-50 rounded-xl p-6 border-2 border-brand-blue-200 mb-6">
               <h4 className="text-lg font-bold text-black mb-3">Online Verification Portal</h4>
               <ol className="list-decimal pl-6 text-black space-y-2">
                 <li>Visit: www.elevateforhumanity.org/verify</li>
@@ -291,15 +291,15 @@ export default function VerificationPage() {
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/credentials" className="text-blue-600 hover:underline">Credentials Policy</a></li>
-                <li><a href="/policies/ferpa" className="text-blue-600 hover:underline">FERPA Policy</a></li>
-                <li><a href="/policies/privacy" className="text-blue-600 hover:underline">Privacy Policy</a></li>
-                <li><a href="/policies/admissions" className="text-blue-600 hover:underline">Admissions Policy</a></li>
+                <li><a href="/policies/credentials" className="text-brand-blue-600 hover:underline">Credentials Policy</a></li>
+                <li><a href="/policies/ferpa" className="text-brand-blue-600 hover:underline">FERPA Policy</a></li>
+                <li><a href="/policies/privacy" className="text-brand-blue-600 hover:underline">Privacy Policy</a></li>
+                <li><a href="/policies/admissions" className="text-brand-blue-600 hover:underline">Admissions Policy</a></li>
               </ul>
             </div>
           </div>

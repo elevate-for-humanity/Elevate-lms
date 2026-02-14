@@ -12,7 +12,7 @@ const CALENDLY_URL = 'https://calendly.com/elevate-for-humanity/advisor-call';
 export default function RequestMeeting({ context }: RequestMeetingProps) {
   return (
     <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 sm:p-8 text-center">
-      <Calendar className="w-10 h-10 text-blue-600 mx-auto mb-3" />
+      <Calendar className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
       <h3 className="text-lg sm:text-xl font-bold text-slate-900 mb-2">Need More Information?</h3>
       <p className="text-slate-600 text-sm mb-4 max-w-md mx-auto">
         {context || 'Have questions before applying? Schedule a free meeting with an advisor. No commitment required.'}
@@ -22,7 +22,7 @@ export default function RequestMeeting({ context }: RequestMeetingProps) {
           href={CALENDLY_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors"
+          className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-6 py-3 rounded-lg transition-colors"
         >
           <Calendar className="w-4 h-4" />
           Schedule a Meeting

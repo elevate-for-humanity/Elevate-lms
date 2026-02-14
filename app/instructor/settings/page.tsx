@@ -66,7 +66,7 @@ export default async function InstructorSettingsPage() {
         {/* Profile */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="flex items-center gap-3 mb-6">
-            <User className="w-6 h-6 text-blue-600" />
+            <User className="w-6 h-6 text-brand-blue-600" />
             <h2 className="text-lg font-semibold">Profile Information</h2>
           </div>
           
@@ -77,7 +77,7 @@ export default async function InstructorSettingsPage() {
                 <input
                   type="text"
                   defaultValue={profile.full_name || ''}
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
               <div>
@@ -85,7 +85,7 @@ export default async function InstructorSettingsPage() {
                 <input
                   type="text"
                   placeholder="e.g., Senior Instructor"
-                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 />
               </div>
             </div>
@@ -98,7 +98,7 @@ export default async function InstructorSettingsPage() {
                   <input
                     type="email"
                     defaultValue={profile.email || user.email || ''}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>
@@ -109,7 +109,7 @@ export default async function InstructorSettingsPage() {
                   <input
                     type="tel"
                     defaultValue={profile.phone || ''}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
               </div>
@@ -119,12 +119,12 @@ export default async function InstructorSettingsPage() {
               <label className="block text-sm font-medium text-gray-700 mb-1">Bio</label>
               <textarea
                 rows={3}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 placeholder="Brief bio for your instructor profile..."
               />
             </div>
 
-            <button type="submit" className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button type="submit" className="px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
               Save Profile
             </button>
           </form>
@@ -143,7 +143,7 @@ export default async function InstructorSettingsPage() {
                 <div className="font-medium">New Enrollments</div>
                 <div className="text-sm text-gray-600">Get notified when students enroll in your courses</div>
               </div>
-              <input type="checkbox" defaultChecked className="w-5 h-5 text-blue-600 rounded" />
+              <input type="checkbox" defaultChecked className="w-5 h-5 text-brand-blue-600 rounded" />
             </label>
             
             <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
@@ -151,7 +151,7 @@ export default async function InstructorSettingsPage() {
                 <div className="font-medium">Student Messages</div>
                 <div className="text-sm text-gray-600">Get notified when students send you messages</div>
               </div>
-              <input type="checkbox" defaultChecked className="w-5 h-5 text-blue-600 rounded" />
+              <input type="checkbox" defaultChecked className="w-5 h-5 text-brand-blue-600 rounded" />
             </label>
             
             <label className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
@@ -159,7 +159,7 @@ export default async function InstructorSettingsPage() {
                 <div className="font-medium">Course Completions</div>
                 <div className="text-sm text-gray-600">Get notified when students complete your courses</div>
               </div>
-              <input type="checkbox" defaultChecked className="w-5 h-5 text-blue-600 rounded" />
+              <input type="checkbox" defaultChecked className="w-5 h-5 text-brand-blue-600 rounded" />
             </label>
           </div>
         </div>

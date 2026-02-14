@@ -250,13 +250,13 @@ export default function MediaStudioPage() {
               <div className="flex gap-1 border rounded-lg p-1">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-blue-100 text-brand-blue-600' : 'text-black'}`}
+                  className={`p-2 rounded ${viewMode === 'grid' ? 'bg-brand-blue-100 text-brand-blue-600' : 'text-black'}`}
                 >
                   <Grid className="w-4 h-4" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-blue-100 text-brand-blue-600' : 'text-black'}`}
+                  className={`p-2 rounded ${viewMode === 'list' ? 'bg-brand-blue-100 text-brand-blue-600' : 'text-black'}`}
                 >
                   <List className="w-4 h-4" />
                 </button>
@@ -273,7 +273,7 @@ export default function MediaStudioPage() {
               <button
                 onClick={optimizeImages}
                 disabled={selectedFiles.size === 0}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50"
               >
                 <Sparkles className="w-4 h-4" />
                 Optimize
@@ -335,7 +335,7 @@ export default function MediaStudioPage() {
                   <div className="flex gap-2 mt-3">
                     <button
                       onClick={() => window.open(file.url, '_blank')}
-                      className="flex-1 text-xs py-2 px-2 bg-blue-50 text-brand-blue-600 rounded hover:bg-gray-100"
+                      className="flex-1 text-xs py-2 px-2 bg-brand-blue-50 text-brand-blue-600 rounded hover:bg-gray-100"
                     >
                       View
                     </button>

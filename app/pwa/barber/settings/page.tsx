@@ -63,8 +63,8 @@ export default function BarberSettingsPage() {
         {user && (
           <div className="bg-slate-800 rounded-xl p-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-blue-500/20 rounded-full flex items-center justify-center">
-                <User className="w-7 h-7 text-blue-400" />
+              <div className="w-14 h-14 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                <User className="w-7 h-7 text-brand-blue-400" />
               </div>
               <div>
                 <p className="text-white font-medium text-lg">{user.name}</p>
@@ -86,7 +86,7 @@ export default function BarberSettingsPage() {
               >
                 <div className="flex items-center gap-4">
                   {subscribed ? (
-                    <Bell className="w-5 h-5 text-blue-400" />
+                    <Bell className="w-5 h-5 text-brand-blue-400" />
                   ) : (
                     <BellOff className="w-5 h-5 text-slate-400" />
                   )}
@@ -105,7 +105,7 @@ export default function BarberSettingsPage() {
                   <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
                 ) : (
                   <div className={`w-12 h-7 rounded-full p-1 transition-colors ${
-                    subscribed ? 'bg-blue-600' : 'bg-slate-600'
+                    subscribed ? 'bg-brand-blue-600' : 'bg-slate-600'
                   }`}>
                     <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
                       subscribed ? 'translate-x-5' : 'translate-x-0'
@@ -131,7 +131,7 @@ export default function BarberSettingsPage() {
             >
               <div className="flex items-center gap-4">
                 {darkMode ? (
-                  <Moon className="w-5 h-5 text-blue-400" />
+                  <Moon className="w-5 h-5 text-brand-blue-400" />
                 ) : (
                   <Sun className="w-5 h-5 text-amber-400" />
                 )}
@@ -141,7 +141,7 @@ export default function BarberSettingsPage() {
                 </div>
               </div>
               <div className={`w-12 h-7 rounded-full p-1 transition-colors ${
-                darkMode ? 'bg-blue-600' : 'bg-slate-600'
+                darkMode ? 'bg-brand-blue-600' : 'bg-slate-600'
               }`}>
                 <div className={`w-5 h-5 bg-white rounded-full transition-transform ${
                   darkMode ? 'translate-x-5' : 'translate-x-0'

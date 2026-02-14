@@ -32,7 +32,7 @@ export default function PerformanceChart() {
   if (loading) {
     return (
       <div className="h-64 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-blue-600"></div>
       </div>
     );
   }
@@ -52,7 +52,7 @@ export default function PerformanceChart() {
             <span>Employment Rate</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-4 h-4 bg-blue-500 rounded"></div>
+            <div className="w-4 h-4 bg-brand-blue-500 rounded"></div>
             <span>Credential Rate</span>
           </div>
           <div className="flex items-center gap-2">
@@ -83,7 +83,7 @@ export default function PerformanceChart() {
                     title={`Employment: ${item.employmentRate}%`}
                   ></div>
                   <div
-                    className="w-4 bg-blue-500 rounded-t transition-all duration-500"
+                    className="w-4 bg-brand-blue-500 rounded-t transition-all duration-500"
                     style={{ height: `${(item.credentialRate / maxValue) * chartHeight}px` }}
                     title={`Credential: ${item.credentialRate}%`}
                   ></div>

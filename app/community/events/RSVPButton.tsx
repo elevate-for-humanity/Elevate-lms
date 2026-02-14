@@ -36,7 +36,7 @@ export default function RSVPButton({ eventId, eventTitle }: RSVPButtonProps) {
     <button
       onClick={handleRSVP}
       disabled={loading}
-      className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors disabled:opacity-50"
+      className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-blue-700 transition-colors disabled:opacity-50"
     >
       {loading ? (
         <Loader2 className="w-4 h-4 animate-spin" />

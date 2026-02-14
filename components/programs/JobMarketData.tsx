@@ -20,7 +20,7 @@ export function JobMarketData({ averageSalary, salaryRange, jobGrowth }: JobMark
           </div>
 
           <div className="bg-white p-6 rounded-lg shadow-sm">
-            <TrendingUp className="w-8 h-8 text-blue-600 mb-3" />
+            <TrendingUp className="w-8 h-8 text-brand-blue-600 mb-3" />
             <div className="text-2xl font-bold text-black mb-1">{jobGrowth}</div>
             <div className="text-sm text-black">Job Growth Through 2030</div>
           </div>

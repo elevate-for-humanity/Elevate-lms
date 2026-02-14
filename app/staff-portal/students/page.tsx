@@ -25,7 +25,7 @@ export default async function StudentsPage() {
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/staff-portal" className="hover:text-primary">Staff Portal</Link></li><li>/</li><li className="text-gray-900 font-medium">Students</li></ol></nav>
           <div className="flex justify-between items-center">
             <div><h1 className="text-3xl font-bold text-gray-900">Student Management</h1><p className="text-gray-600 mt-2">{count || 0} students enrolled</p></div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Add Student</button>
+            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Add Student</button>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
@@ -34,10 +34,10 @@ export default async function StudentsPage() {
             {students && students.length > 0 ? students.map((student: any) => (
               <div key={student.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center"><span className="text-blue-600 font-medium">{(student.full_name || 'S')[0]}</span></div>
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center"><span className="text-brand-blue-600 font-medium">{(student.full_name || 'S')[0]}</span></div>
                   <div><p className="font-medium">{student.full_name || 'Student'}</p><p className="text-sm text-gray-500">{student.email}</p></div>
                 </div>
-                <Link href={`/staff-portal/students/${student.id}`} className="text-blue-600 hover:text-blue-800 text-sm">View Profile</Link>
+                <Link href={`/staff-portal/students/${student.id}`} className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">View Profile</Link>
               </div>
             )) : <div className="p-8 text-center text-gray-500">No students found</div>}
           </div>

@@ -58,7 +58,7 @@ export default async function EmployeeDocumentsPage() {
             <h1 className="text-2xl font-bold">My Documents</h1>
             <p className="text-gray-600">Access and manage your employee documents</p>
           </div>
-          <button className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition">
+          <button className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-blue-700 transition">
             <Upload className="w-5 h-5" />
             Upload Document
           </button>
@@ -72,7 +72,7 @@ export default async function EmployeeDocumentsPage() {
               <nav className="space-y-2">
                 <Link
                   href="/employee/documents"
-                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-blue-50 text-blue-600"
+                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-brand-blue-50 text-brand-blue-600"
                 >
                   <span className="flex items-center gap-2">
                     <Folder className="w-4 h-4" />
@@ -106,7 +106,7 @@ export default async function EmployeeDocumentsPage() {
                 <input
                   type="text"
                   placeholder="Search documents..."
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -118,7 +118,7 @@ export default async function EmployeeDocumentsPage() {
                   {documents.map((doc: any) => (
                     <div key={doc.id} className="p-4 hover:bg-gray-50 flex items-center justify-between">
                       <div className="flex items-center gap-4">
-                        <FileText className="w-10 h-10 text-blue-500" />
+                        <FileText className="w-10 h-10 text-brand-blue-500" />
                         <div>
                           <h3 className="font-medium">{doc.name}</h3>
                           <p className="text-sm text-gray-500">
@@ -129,7 +129,7 @@ export default async function EmployeeDocumentsPage() {
                       <a
                         href={doc.url}
                         download
-                        className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700"
+                        className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700"
                       >
                         <Download className="w-5 h-5" />
                         Download

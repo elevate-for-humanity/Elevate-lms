@@ -166,9 +166,9 @@ export default async function EnrollmentSuccessPage({
             </div>
 
             {/* Next Steps */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-              <h3 className="font-bold text-blue-900 mb-4">What's Next?</h3>
-              <ul className="space-y-3 text-blue-800">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-6">
+              <h3 className="font-bold text-brand-blue-900 mb-4">What's Next?</h3>
+              <ul className="space-y-3 text-brand-blue-800">
                 <li className="flex items-start">
                   <svg
                     className="w-5 h-5 mr-3 mt-0.5 flex-shrink-0"

@@ -71,7 +71,7 @@ export default function SeoIndexingPage() {
       <div className="bg-slate-900 text-white py-12">
         <div className="max-w-4xl mx-auto px-4">
           <div className="flex items-center gap-3 mb-4">
-            <Search className="w-8 h-8 text-blue-400" />
+            <Search className="w-8 h-8 text-brand-blue-400" />
           </div>
           <h1 className="text-3xl md:text-4xl font-bold mb-4">
             SEO & Indexing Governance
@@ -88,7 +88,7 @@ export default function SeoIndexingPage() {
 
       <div className="max-w-4xl mx-auto px-4 py-12">
         {/* Core Rule */}
-        <section className="mb-12 bg-blue-50 rounded-xl p-6 border border-blue-100">
+        <section className="mb-12 bg-brand-blue-50 rounded-xl p-6 border border-brand-blue-100">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Core Rule</h2>
           <p className="text-lg text-slate-800 font-medium mb-4">
             Publishing is not the same as indexing.
@@ -135,8 +135,8 @@ export default function SeoIndexingPage() {
             {enforcementMethods.map((method, index) => (
               <div key={index} className="bg-slate-50 rounded-xl p-5 border border-slate-200">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Code className="w-4 h-4 text-blue-600" />
+                  <div className="w-8 h-8 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                    <Code className="w-4 h-4 text-brand-blue-600" />
                   </div>
                   <h3 className="font-semibold text-slate-900">{method.title}</h3>
                 </div>

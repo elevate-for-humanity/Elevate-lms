@@ -32,9 +32,9 @@ export default function DirectDepositPage() {
       <div className="bg-gray-50 border-b">
         <div className="max-w-7xl mx-auto px-4 py-3">
           <nav className="flex items-center text-sm text-gray-600">
-            <Link href="/" className="hover:text-blue-600">Home</Link>
+            <Link href="/" className="hover:text-brand-blue-600">Home</Link>
             <span className="mx-2">/</span>
-            <Link href="/banking" className="hover:text-blue-600">Banking</Link>
+            <Link href="/banking" className="hover:text-brand-blue-600">Banking</Link>
             <span className="mx-2">/</span>
             <span className="text-gray-900 font-medium">Direct Deposit</span>
           </nav>
@@ -234,7 +234,7 @@ export default function DirectDepositPage() {
       {/* Split Refund Option */}
       <section className="py-16 bg-white">
         <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-8">
+          <div className="bg-brand-blue-50 border-2 border-brand-blue-200 rounded-xl p-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               Split Your Refund
             </h2>
@@ -244,7 +244,7 @@ export default function DirectDepositPage() {
             </p>
             <div className="grid md:grid-cols-3 gap-4">
               <div className="bg-white rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-blue-600">50%</p>
+                <p className="text-2xl font-bold text-brand-blue-600">50%</p>
                 <p className="text-sm text-gray-600">Checking Account</p>
               </div>
               <div className="bg-white rounded-lg p-4 text-center">
@@ -252,7 +252,7 @@ export default function DirectDepositPage() {
                 <p className="text-sm text-gray-600">Savings Account</p>
               </div>
               <div className="bg-white rounded-lg p-4 text-center">
-                <p className="text-2xl font-bold text-blue-600">20%</p>
+                <p className="text-2xl font-bold text-brand-blue-600">20%</p>
                 <p className="text-sm text-gray-600">IRA or Investment</p>
               </div>
             </div>

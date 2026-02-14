@@ -122,7 +122,7 @@ export default async function MembersPage() {
               {members.map((member: any) => (
                 <div key={member.id} className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-lg transition-shadow">
                   <div className="flex items-start gap-4">
-                    <div className="w-16 h-16 rounded-full bg-blue-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
+                    <div className="w-16 h-16 rounded-full bg-brand-blue-500 flex items-center justify-center text-white text-xl font-bold flex-shrink-0">
                       {getInitial(member.full_name)}
                     </div>
                     <div className="flex-1 min-w-0">

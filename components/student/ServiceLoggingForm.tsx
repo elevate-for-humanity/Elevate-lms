@@ -150,7 +150,7 @@ export default function ServiceLoggingForm({
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold shadow-md"
+        className="flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors font-semibold shadow-md"
       >
         <Plus className="w-5 h-5" />
         Log Today's Hours & Services
@@ -185,7 +185,7 @@ export default function ServiceLoggingForm({
               onChange={(e) => setDate(e.target.value)}
               max={new Date().toISOString().split('T')[0]}
               required
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             />
           </div>
           <div>
@@ -200,7 +200,7 @@ export default function ServiceLoggingForm({
               value={hours}
               onChange={(e) => setHours(e.target.value)}
               required
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             />
           </div>
         </div>
@@ -213,7 +213,7 @@ export default function ServiceLoggingForm({
             </label>
             <span className="text-sm text-black">
               Total:{' '}
-              <span className="font-bold text-blue-600">{totalServices}</span>{' '}
+              <span className="font-bold text-brand-blue-600">{totalServices}</span>{' '}
               services
             </span>
           </div>
@@ -247,7 +247,7 @@ export default function ServiceLoggingForm({
                         e.target.value
                       )
                     }
-                    className="flex-1 text-center px-2 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-bold text-lg"
+                    className="flex-1 text-center px-2 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500 font-bold text-lg"
                   />
                   <button
                     type="button"
@@ -272,7 +272,7 @@ export default function ServiceLoggingForm({
             onChange={(e) => setNotes(e.target.value)}
             rows={3}
             placeholder="What did you learn today? Any challenges or achievements?"
-            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
           />
         </div>
 
@@ -281,7 +281,7 @@ export default function ServiceLoggingForm({
           <button
             type="submit"
             disabled={loading}
-            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Save className="w-5 h-5" />
             {loading ? 'Saving...' : 'Save Entry'}

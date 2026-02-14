@@ -100,7 +100,7 @@ export default async function AlumniDirectoryPage() {
                 <input
                   type="text"
                   placeholder="Search alumni..."
-                  className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 w-64"
+                  className="pl-9 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 w-64"
                 />
               </div>
               <button className="inline-flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
@@ -117,8 +117,8 @@ export default async function AlumniDirectoryPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <GraduationCap className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{alumni?.length || 0}</p>
@@ -139,8 +139,8 @@ export default async function AlumniDirectoryPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Briefcase className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Briefcase className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">85%</p>
@@ -200,7 +200,7 @@ export default async function AlumniDirectoryPage() {
                       href={person.linkedin_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center px-3 py-2 text-sm text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50"
+                      className="inline-flex items-center justify-center px-3 py-2 text-sm text-brand-blue-600 border border-brand-blue-200 rounded-lg hover:bg-brand-blue-50"
                     >
                       <Linkedin className="w-4 h-4" />
                     </a>
@@ -218,14 +218,14 @@ export default async function AlumniDirectoryPage() {
         )}
 
         {/* CTA */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-xl p-6 text-center">
-          <h2 className="text-lg font-semibold text-blue-900 mb-2">Become a Mentor</h2>
-          <p className="text-blue-700 mb-4">
+        <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 text-center">
+          <h2 className="text-lg font-semibold text-brand-blue-900 mb-2">Become a Mentor</h2>
+          <p className="text-brand-blue-700 mb-4">
             Share your experience and help current students succeed in their careers.
           </p>
           <Link
             href="/lms/alumni/mentorship"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
           >
             Learn About Mentorship
           </Link>

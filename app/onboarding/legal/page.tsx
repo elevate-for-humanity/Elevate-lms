@@ -170,7 +170,7 @@ export default function LegalOnboardingPage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600"></div>
       </div>
     );
   }
@@ -180,8 +180,8 @@ export default function LegalOnboardingPage() {
       <div className="max-w-2xl mx-auto px-4">
         {/* Header */}
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Shield className="w-8 h-8 text-blue-600" />
+          <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <Shield className="w-8 h-8 text-brand-blue-600" />
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-2">
             Review & Accept Agreements
@@ -199,7 +199,7 @@ export default function LegalOnboardingPage() {
           </div>
           <div className="w-full bg-slate-200 rounded-full h-2">
             <div 
-              className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+              className="bg-brand-blue-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${(signedCount / agreements.length) * 100}%` }}
             />
           </div>
@@ -239,7 +239,7 @@ export default function LegalOnboardingPage() {
                     <Link 
                       href={agreement.documentUrl}
                       target="_blank"
-                      className="text-sm text-blue-600 hover:underline"
+                      className="text-sm text-brand-blue-600 hover:underline"
                     >
                       Read full document →
                     </Link>
@@ -250,7 +250,7 @@ export default function LegalOnboardingPage() {
                   <button
                     onClick={() => signAgreement(agreement)}
                     disabled={signing}
-                    className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-4 py-2 bg-brand-blue-600 text-white text-sm font-medium rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {signing ? 'Signing...' : 'I Accept'}
                   </button>

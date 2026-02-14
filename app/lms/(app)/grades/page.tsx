@@ -206,7 +206,7 @@ export default async function GradesPage() {
 
   const getGradeColor = (grade: number) => {
     if (grade >= 90) return 'text-green-600 bg-green-100';
-    if (grade >= 80) return 'text-blue-600 bg-blue-100';
+    if (grade >= 80) return 'text-brand-blue-600 bg-brand-blue-100';
     if (grade >= 70) return 'text-yellow-600 bg-yellow-100';
     if (grade >= 60) return 'text-orange-600 bg-orange-100';
     return 'text-red-600 bg-red-100';
@@ -256,8 +256,8 @@ export default async function GradesPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">
@@ -284,8 +284,8 @@ export default async function GradesPage() {
 
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Circle className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Circle className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">
@@ -322,8 +322,8 @@ export default async function GradesPage() {
                 <div className="p-6 border-b border-slate-200">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                        <BookOpen className="w-6 h-6 text-blue-600" />
+                      <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                        <BookOpen className="w-6 h-6 text-brand-blue-600" />
                       </div>
                       <div>
                         <h2 className="text-xl font-bold text-slate-900">
@@ -427,15 +427,15 @@ export default async function GradesPage() {
                     Based on {stats.totalAssignments} graded assignments
                   </p>
                 </div>
-                <div className="p-4 bg-blue-50 rounded-xl">
+                <div className="p-4 bg-brand-blue-50 rounded-xl">
                   <div className="flex items-center gap-3 mb-2">
-                    <Circle className="w-5 h-5 text-blue-600" />
-                    <span className="font-semibold text-blue-900">Quiz Average</span>
+                    <Circle className="w-5 h-5 text-brand-blue-600" />
+                    <span className="font-semibold text-brand-blue-900">Quiz Average</span>
                   </div>
-                  <div className="text-3xl font-bold text-blue-600">
+                  <div className="text-3xl font-bold text-brand-blue-600">
                     {stats.avgQuizScore}%
                   </div>
-                  <p className="text-sm text-blue-700 mt-1">
+                  <p className="text-sm text-brand-blue-700 mt-1">
                     Based on {stats.totalQuizzes} completed quizzes
                   </p>
                 </div>
@@ -452,7 +452,7 @@ export default async function GradesPage() {
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 href="/lms/assignments"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
               >
                 <FileText className="w-5 h-5" />
                 View Assignments

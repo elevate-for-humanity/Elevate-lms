@@ -104,13 +104,13 @@ function FeaturesSection({ section }: { section: MarketingSection }) {
 
 function CTASection({ section }: { section: MarketingSection }) {
   return (
-    <section className="py-16 bg-blue-600">
+    <section className="py-16 bg-brand-blue-600">
       <div className="max-w-4xl mx-auto px-6 text-center">
         <h2 className="text-3xl font-bold text-white mb-4">{section.heading}</h2>
-        <p className="text-xl text-blue-100 mb-8">{section.body}</p>
+        <p className="text-xl text-brand-blue-100 mb-8">{section.body}</p>
         <Link
           href="/apply"
-          className="inline-flex items-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-blue-50 transition"
+          className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-50 transition"
         >
           Get Started
           <ArrowRight className="w-5 h-5" />
@@ -136,7 +136,7 @@ function StatsSection({ section }: { section: MarketingSection }) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           {stats.map((stat, idx) => (
             <div key={idx} className="text-center">
-              <div className="text-4xl font-bold text-blue-400 mb-2">{stat.value}</div>
+              <div className="text-4xl font-bold text-brand-blue-400 mb-2">{stat.value}</div>
               <div className="text-gray-400">{stat.label}</div>
             </div>
           ))}

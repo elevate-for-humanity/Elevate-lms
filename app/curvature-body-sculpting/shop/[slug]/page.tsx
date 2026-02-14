@@ -106,10 +106,10 @@ export default async function ProductDetailPage({ params }: Props) {
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="text-center">
-                    <div className="w-24 h-24 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <ShoppingCart className="w-12 h-12 text-blue-400" />
+                    <div className="w-24 h-24 bg-brand-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <ShoppingCart className="w-12 h-12 text-brand-blue-400" />
                     </div>
-                    <p className="text-blue-400 font-medium">Meri-Go-Round</p>
+                    <p className="text-brand-blue-400 font-medium">Meri-Go-Round</p>
                   </div>
                 </div>
               )}
@@ -119,14 +119,14 @@ export default async function ProductDetailPage({ params }: Props) {
           {/* Product Info */}
           <div>
             <div className="mb-2">
-              <span className="text-sm font-medium text-blue-600 uppercase tracking-wide">
+              <span className="text-sm font-medium text-brand-blue-600 uppercase tracking-wide">
                 {categoryLabels[product.category] || product.category}
               </span>
             </div>
             
             <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
             
-            <div className="text-3xl font-bold text-blue-600 mb-6">
+            <div className="text-3xl font-bold text-brand-blue-600 mb-6">
               ${parseFloat(product.price).toFixed(2)}
             </div>
 
@@ -187,14 +187,14 @@ export default async function ProductDetailPage({ params }: Props) {
                       />
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <ShoppingCart className="w-8 h-8 text-blue-300" />
+                        <ShoppingCart className="w-8 h-8 text-brand-blue-300" />
                       </div>
                     )}
                   </div>
-                  <h3 className="font-medium text-gray-900 group-hover:text-blue-600 transition text-sm">
+                  <h3 className="font-medium text-gray-900 group-hover:text-brand-blue-600 transition text-sm">
                     {related.name.replace('Meri-Go-Round ', '')}
                   </h3>
-                  <p className="text-blue-600 font-bold">${parseFloat(related.price).toFixed(2)}</p>
+                  <p className="text-brand-blue-600 font-bold">${parseFloat(related.price).toFixed(2)}</p>
                 </Link>
               ))}
             </div>

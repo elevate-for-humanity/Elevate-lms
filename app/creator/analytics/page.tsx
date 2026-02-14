@@ -80,13 +80,13 @@ export default async function CreatorAnalyticsPage() {
 {!user ? (
         <>
           <h1 className="text-3xl font-bold mb-6">Analytics & Insights</h1>
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-            <p className="text-blue-900 mb-4">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+            <p className="text-brand-blue-900 mb-4">
               Please log in to view your analytics.
             </p>
             <a
               href="/login"
-              className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-block bg-brand-blue-600 text-white px-6 py-2 rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Log In
             </a>
@@ -99,7 +99,7 @@ export default async function CreatorAnalyticsPage() {
           <div className="grid md:grid-cols-4 gap-6 mb-8">
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="text-sm text-black mb-2">Total Courses</div>
-              <div className="text-3xl font-bold text-blue-600">0</div>
+              <div className="text-3xl font-bold text-brand-blue-600">0</div>
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="text-sm text-black mb-2">Total Enrollments</div>
@@ -107,7 +107,7 @@ export default async function CreatorAnalyticsPage() {
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="text-sm text-black mb-2">Active Students</div>
-              <div className="text-3xl font-bold text-blue-600">{activeEnrollments}</div>
+              <div className="text-3xl font-bold text-brand-blue-600">{activeEnrollments}</div>
             </div>
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="text-sm text-black mb-2">Completion Rate</div>
@@ -156,7 +156,7 @@ export default async function CreatorAnalyticsPage() {
                 </div>
                 <div className="pt-4 border-t">
                   <div className="text-sm text-slate-500">
-                    Engagement Score: <span className="text-blue-600 font-semibold">8.5/10</span>
+                    Engagement Score: <span className="text-brand-blue-600 font-semibold">8.5/10</span>
                   </div>
                 </div>
               </div>
@@ -177,7 +177,7 @@ export default async function CreatorAnalyticsPage() {
                   </div>
                   <div className="flex justify-between items-center p-2 bg-slate-50 rounded">
                     <span className="text-sm">Course 3</span>
-                    <span className="text-sm font-semibold text-blue-600">82% completion</span>
+                    <span className="text-sm font-semibold text-brand-blue-600">82% completion</span>
                   </div>
                 </div>
               </div>

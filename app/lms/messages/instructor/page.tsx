@@ -67,8 +67,8 @@ export default async function InstructorMessagesPage() {
               return (
                 <div key={msg.id} className="p-4 hover:bg-gray-50">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
-                      <User className="w-5 h-5 text-blue-600" />
+                    <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                      <User className="w-5 h-5 text-brand-blue-600" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center justify-between">
@@ -93,7 +93,7 @@ export default async function InstructorMessagesPage() {
             <p className="text-gray-600 mb-6">Start a conversation with your instructor.</p>
             <Link 
               href="/lms/messages/new?type=instructor"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
             >
               <Send className="w-4 h-4" />
               New Message

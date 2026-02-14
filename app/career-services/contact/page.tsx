@@ -31,12 +31,12 @@ export default function CareerServicesContactPage() {
       </div>
 
       {/* Header */}
-      <section className="py-16 bg-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             Contact Career Services
           </h1>
-          <p className="text-xl text-blue-100">
+          <p className="text-xl text-brand-blue-100">
             We are here to help you succeed in your career journey
           </p>
         </div>
@@ -48,14 +48,14 @@ export default function CareerServicesContactPage() {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Phone */}
             <div className="bg-gray-50 rounded-xl p-8 text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Phone className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Phone className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Contact Us</h2>
               <p className="text-gray-600 mb-4">Speak directly with a career advisor</p>
               <a
                 href="/support"
-                className="text-2xl font-bold text-blue-600 hover:text-blue-700"
+                className="text-2xl font-bold text-brand-blue-600 hover:text-brand-blue-700"
               >
                 Get Help Online
               </a>
@@ -80,14 +80,14 @@ export default function CareerServicesContactPage() {
 
             {/* Schedule */}
             <div className="bg-gray-50 rounded-xl p-8 text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Calendar className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h2 className="text-xl font-bold text-gray-900 mb-2">Schedule Appointment</h2>
               <p className="text-gray-600 mb-4">Book a one-on-one session</p>
               <Link
                 href="/schedule"
-                className="inline-flex items-center text-lg font-bold text-blue-600 hover:text-blue-700"
+                className="inline-flex items-center text-lg font-bold text-brand-blue-600 hover:text-brand-blue-700"
               >
                 Book Now <ArrowRight className="ml-2 w-5 h-5" />
               </Link>
@@ -108,7 +108,7 @@ export default function CareerServicesContactPage() {
             <div className="md:flex">
               <div className="md:w-1/2 p-8">
                 <div className="flex items-start mb-6">
-                  <MapPin className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0 mt-1" />
+                  <MapPin className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">Career Services Center</h3>
                     <p className="text-gray-600">
@@ -119,7 +119,7 @@ export default function CareerServicesContactPage() {
                 </div>
 
                 <div className="flex items-start mb-6">
-                  <Clock className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0 mt-1" />
+                  <Clock className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">Office Hours</h3>
                     <p className="text-gray-600">
@@ -131,7 +131,7 @@ export default function CareerServicesContactPage() {
                 </div>
 
                 <div className="flex items-start">
-                  <MessageSquare className="w-6 h-6 text-blue-600 mr-3 flex-shrink-0 mt-1" />
+                  <MessageSquare className="w-6 h-6 text-brand-blue-600 mr-3 flex-shrink-0 mt-1" />
                   <div>
                     <h3 className="font-bold text-gray-900 mb-1">Walk-ins Welcome</h3>
                     <p className="text-gray-600">
@@ -149,7 +149,7 @@ export default function CareerServicesContactPage() {
                       href="https://maps.google.com/?q=8888+Keystone+Xing+Suite+1300+Indianapolis+IN+46240"
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline font-medium"
+                      className="text-brand-blue-600 hover:underline font-medium"
                     >
                       View on Google Maps
                     </a>
@@ -187,7 +187,7 @@ export default function CareerServicesContactPage() {
               href="/career-services/interview-prep"
               className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition flex items-center"
             >
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mr-4">
                 <span className="text-2xl">🎯</span>
               </div>
               <div>
@@ -201,7 +201,7 @@ export default function CareerServicesContactPage() {
               href="/career-services/career-counseling"
               className="bg-gray-50 rounded-lg p-6 hover:bg-gray-100 transition flex items-center"
             >
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mr-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center mr-4">
                 <span className="text-2xl">🧭</span>
               </div>
               <div>
@@ -268,25 +268,25 @@ export default function CareerServicesContactPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 bg-blue-900 text-white">
+      <section className="py-16 bg-brand-blue-900 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Ready to Take the Next Step?
           </h2>
-          <p className="text-xl mb-8 text-blue-100">
+          <p className="text-xl mb-8 text-brand-blue-100">
             Our career services team is here to support your success.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/schedule"
-              className="bg-white hover:bg-gray-100 text-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
+              className="bg-white hover:bg-gray-100 text-brand-blue-900 px-8 py-4 rounded-lg text-lg font-bold transition-all inline-flex items-center justify-center"
             >
               <Calendar className="mr-2 w-5 h-5" />
               Schedule Appointment
             </Link>
             <Link
               href="/career-services"
-              className="bg-blue-800 hover:bg-blue-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all border-2 border-white"
+              className="bg-brand-blue-800 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-lg text-lg font-bold transition-all border-2 border-white"
             >
               View All Services
             </Link>

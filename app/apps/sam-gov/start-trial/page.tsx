@@ -95,14 +95,14 @@ export default async function StartTrialPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-blue-800 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-brand-blue-800 flex items-center justify-center p-4">
       <div className="max-w-lg w-full">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <Building2 className="w-10 h-10 text-blue-900" />
+            <Building2 className="w-10 h-10 text-brand-blue-900" />
           </div>
           <h1 className="text-3xl font-black text-white mb-2">SAM.gov Assistant</h1>
-          <p className="text-blue-200">Federal Contractor Registration Made Simple</p>
+          <p className="text-brand-blue-200">Federal Contractor Registration Made Simple</p>
         </div>
 
         <div className="bg-white rounded-2xl p-8 shadow-2xl">
@@ -127,7 +127,7 @@ export default async function StartTrialPage() {
           <form action={startTrial}>
             <button
               type="submit"
-              className="w-full bg-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-blue-700 transition"
+              className="w-full bg-brand-blue-600 text-white py-4 rounded-xl font-bold text-lg hover:bg-brand-blue-700 transition"
             >
               Start Free Trial
             </button>
@@ -135,11 +135,11 @@ export default async function StartTrialPage() {
 
           <p className="text-center text-sm text-gray-500 mt-4">
             By starting a trial, you agree to our{' '}
-            <Link href="/terms" className="text-blue-600 hover:underline">Terms of Service</Link>
+            <Link href="/terms" className="text-brand-blue-600 hover:underline">Terms of Service</Link>
           </p>
         </div>
 
-        <div className="mt-6 flex items-center justify-center gap-6 text-blue-200 text-sm">
+        <div className="mt-6 flex items-center justify-center gap-6 text-brand-blue-200 text-sm">
           <div className="flex items-center gap-2">
             <Shield className="w-4 h-4" />
             <span>Secure & Private</span>

@@ -167,7 +167,7 @@ export default function BillingPage() {
           <div className="bg-white rounded-xl shadow-sm p-8 text-center">
             <AlertTriangle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
             <h1 className="text-xl font-bold text-gray-900 mb-2">{error}</h1>
-            <Link href="/auth/login" className="text-blue-600 hover:underline">
+            <Link href="/auth/login" className="text-brand-blue-600 hover:underline">
               Sign in to continue
             </Link>
           </div>
@@ -246,18 +246,18 @@ export default function BillingPage() {
           </div>
 
           {license.status === 'trial' && license.trialEndsAt && (
-            <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+            <div className="mt-4 p-4 bg-brand-blue-50 rounded-lg">
               <div className="flex items-center gap-3">
-                <Calendar className="w-5 h-5 text-blue-600" />
+                <Calendar className="w-5 h-5 text-brand-blue-600" />
                 <div>
-                  <p className="font-medium text-blue-900">
+                  <p className="font-medium text-brand-blue-900">
                     Trial ends {license.trialEndsAt.toLocaleDateString('en-US', {
                       weekday: 'long',
                       month: 'long',
                       day: 'numeric',
                     })}
                   </p>
-                  <p className="text-sm text-blue-700">
+                  <p className="text-sm text-brand-blue-700">
                     Your card will be charged ${plan.price}/{plan.interval} automatically.
                   </p>
                 </div>
@@ -287,7 +287,7 @@ export default function BillingPage() {
             <button
               onClick={handleManageBilling}
               disabled={isLoading || !license.stripeCustomerId}
-              className="text-blue-600 font-medium hover:underline disabled:opacity-50"
+              className="text-brand-blue-600 font-medium hover:underline disabled:opacity-50"
             >
               Change Plan
             </button>
@@ -323,7 +323,7 @@ export default function BillingPage() {
               <button
                 onClick={handleManageBilling}
                 disabled={isLoading}
-                className="text-blue-600 font-medium hover:underline disabled:opacity-50"
+                className="text-brand-blue-600 font-medium hover:underline disabled:opacity-50"
               >
                 Update
               </button>

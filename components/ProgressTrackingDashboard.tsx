@@ -131,7 +131,7 @@ export function ProgressTrackingDashboard() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Courses In Progress</h3>
-            <p className="text-3xl font-bold text-blue-600">{overallProgress.coursesInProgress}</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{overallProgress.coursesInProgress}</p>
             <p className="text-sm text-black mt-2">{overallProgress.coursesCompleted} completed</p>
           </Card>
 
@@ -209,7 +209,7 @@ export function ProgressTrackingDashboard() {
                     <span className={`inline-block mt-1 px-2 py-2 rounded text-xs font-medium ${
                       course.status === 'on-track' ? 'bg-green-100 text-green-700' :
                       course.status === 'behind' ? 'bg-yellow-100 text-yellow-700' :
-                      'bg-blue-100 text-blue-700'
+                      'bg-brand-blue-100 text-brand-blue-700'
                     }`}>
                       {course.status.replace('-', ' ')}
                     </span>

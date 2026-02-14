@@ -51,7 +51,7 @@ export default async function PendingCashAdvancesPage() {
         <div className="mb-8">
           <Link
             href="/admin/cash-advances"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Cash Advances
           </Link>
@@ -104,7 +104,7 @@ export default async function PendingCashAdvancesPage() {
                       </div>
                       <Link
                         href={`/admin/cash-advances/${advance.id}`}
-                        className="text-sm text-brand-blue-600 hover:text-blue-800"
+                        className="text-sm text-brand-blue-600 hover:text-brand-blue-800"
                       >
                         Review →
                       </Link>

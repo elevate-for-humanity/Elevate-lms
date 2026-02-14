@@ -97,7 +97,7 @@ export function VideoShell({
               <span className="px-2 py-0.5 rounded-full bg-orange-500/90 font-semibold uppercase tracking-wide text-[0.65rem]">
                 Innovate • Elevate • Reset
               </span>
-              <span className="px-2 py-0.5 rounded-full bg-blue-600/80 border border-blue-400/40 text-slate-100">
+              <span className="px-2 py-0.5 rounded-full bg-brand-blue-600/80 border border-brand-blue-400/40 text-slate-100">
                 Workforce Ready
               </span>
             </div>

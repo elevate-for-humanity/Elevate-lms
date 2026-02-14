@@ -123,7 +123,7 @@ export default async function OnboardingPage() {
                 </li>
               </ul>
               <div className="text-center">
-                <span className="inline-flex items-center text-blue-700 font-semibold">
+                <span className="inline-flex items-center text-brand-blue-700 font-semibold">
                   Get Started <ArrowRight className="ml-2" size={20} />
                 </span>
               </div>
@@ -167,7 +167,7 @@ export default async function OnboardingPage() {
                 </li>
               </ul>
               <div className="text-center">
-                <span className="inline-flex items-center text-blue-700 font-semibold">
+                <span className="inline-flex items-center text-brand-blue-700 font-semibold">
                   Learn More <ArrowRight className="ml-2" size={20} />
                 </span>
               </div>

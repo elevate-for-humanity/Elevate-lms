@@ -14,7 +14,7 @@ export default function WorkforcePage() {
       hero: {
         image: '/images/heroes-hq/employer-hero.jpg',
         tag: 'Partnership',
-        tagColor: 'text-blue-300',
+        tagColor: 'text-brand-blue-300',
         title: 'Workforce Development Partnership',
         subtitle: 'Connect your workforce board or agency with ETPL-approved training programs and a pipeline of certified candidates.',
       },

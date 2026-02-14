@@ -52,7 +52,7 @@ export default function LicensingRequestPage() {
           </p>
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
+            className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
           >
             <ArrowLeft className="w-4 h-4" />
             Return to homepage
@@ -90,7 +90,7 @@ export default function LicensingRequestPage() {
                 type="text"
                 name="organization"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 placeholder="Your organization"
               />
             </div>
@@ -104,7 +104,7 @@ export default function LicensingRequestPage() {
                   type="text"
                   name="name"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
               <div>
@@ -115,7 +115,7 @@ export default function LicensingRequestPage() {
                   type="email"
                   name="email"
                   required
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -127,7 +127,7 @@ export default function LicensingRequestPage() {
               <input
                 type="tel"
                 name="phone"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
 
@@ -138,7 +138,7 @@ export default function LicensingRequestPage() {
               <select
                 name="type"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select type...</option>
                 <option value="training_provider">Training Provider / Career School</option>
@@ -158,7 +158,7 @@ export default function LicensingRequestPage() {
               <select
                 name="students"
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select volume...</option>
                 <option value="under_100">Under 100</option>
@@ -175,7 +175,7 @@ export default function LicensingRequestPage() {
               </label>
               <select
                 name="timeline"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select timeline...</option>
                 <option value="immediate">Immediate (within 30 days)</option>
@@ -192,7 +192,7 @@ export default function LicensingRequestPage() {
               <textarea
                 name="details"
                 rows={4}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 placeholder="Tell us about your current systems, compliance requirements, or specific needs..."
               />
             </div>
@@ -200,7 +200,7 @@ export default function LicensingRequestPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-blue-600 text-white py-4 rounded-lg font-bold hover:bg-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
+              className="w-full bg-brand-blue-600 text-white py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition disabled:opacity-50 flex items-center justify-center gap-2"
             >
               {isSubmitting ? (
                 <>

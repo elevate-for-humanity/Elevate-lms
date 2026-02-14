@@ -209,7 +209,7 @@ export default function AutomaticCourseBuilder() {
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             rows={6}
-            className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg"
+            className="w-full px-4 py-3 border-2 border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent text-lg"
             placeholder="Example: Create a comprehensive HVAC technician training course that covers system basics, installation, maintenance, troubleshooting, and EPA 608 certification preparation. Include hands-on exercises and real-world scenarios."
           />
 
@@ -220,7 +220,7 @@ export default function AutomaticCourseBuilder() {
             <button
               onClick={generateCourse}
               disabled={!prompt.trim()}
-              className="px-8 py-4 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg"
+              className="px-8 py-4 bg-brand-blue-600 text-white font-bold rounded-lg hover:bg-brand-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-lg"
             >
               Generate Course with AI
             </button>
@@ -237,10 +237,10 @@ export default function AutomaticCourseBuilder() {
               <button
                 key={index}
                 onClick={() => setPrompt(example)}
-                className="w-full text-left p-4 bg-white rounded-lg hover:bg-gray-50 hover:border-blue-300 border-2 border-slate-200 transition-all"
+                className="w-full text-left p-4 bg-white rounded-lg hover:bg-gray-50 hover:border-brand-blue-300 border-2 border-slate-200 transition-all"
               >
                 <div className="flex items-start gap-3">
-                  <svg className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <svg className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                   </svg>
                   <span className="text-black">{example}</span>
@@ -255,8 +255,8 @@ export default function AutomaticCourseBuilder() {
       {generating && (
         <div className="bg-white rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-100 rounded-full mb-4">
-              <svg className="w-10 h-10 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-brand-blue-100 rounded-full mb-4">
+              <svg className="w-10 h-10 text-brand-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
@@ -275,7 +275,7 @@ export default function AutomaticCourseBuilder() {
             </div>
             <div className="w-full h-4 bg-slate-200 rounded-full overflow-hidden">
               <div
-                className="h-full bg-blue-600 transition-all duration-500 ease-out"
+                className="h-full bg-brand-blue-600 transition-all duration-500 ease-out"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -296,7 +296,7 @@ export default function AutomaticCourseBuilder() {
                     progress >= item.progress
                       ? 'bg-green-500 text-white'
                       : progress >= item.progress - 20
-                      ? 'bg-blue-500 text-white'
+                      ? 'bg-brand-blue-500 text-white'
                       : 'bg-slate-200 text-black'
                   }`}
                 >
@@ -369,8 +369,8 @@ export default function AutomaticCourseBuilder() {
             {outline.modules.map((module, index) => (
               <div key={module.id} className="border-2 border-slate-200 rounded-lg p-4">
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="font-bold text-blue-600">{index + 1}</span>
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="font-bold text-brand-blue-600">{index + 1}</span>
                   </div>
                   <div className="flex-1">
                     <h4 className="font-bold text-black mb-1">{module.title}</h4>
@@ -390,8 +390,8 @@ export default function AutomaticCourseBuilder() {
       {!generating && !showPreview && (
         <div className="grid md:grid-cols-3 gap-6 mt-8">
           <div className="bg-white rounded-lg shadow-lg p-6">
-            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-              <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <svg className="w-6 h-6 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>

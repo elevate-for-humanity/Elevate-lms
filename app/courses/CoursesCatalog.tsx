@@ -64,7 +64,7 @@ export default function CoursesCatalog({
             <h1 className="text-5xl font-bold mb-6 text-3xl md:text-4xl lg:text-5xl">
               Course Catalog
             </h1>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-brand-blue-100 mb-8">
               Explore our complete catalog of workforce development courses. All
               programs are Funded through WIOA funding.
             </p>
@@ -137,7 +137,7 @@ export default function CoursesCatalog({
                         | HTMLTextAreaElement
                       >
                     ) => setSearchQuery(e.target.value)}
-                    className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 pl-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                   <svg
                     className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-black"
@@ -164,7 +164,7 @@ export default function CoursesCatalog({
                       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                     >
                   ) => setSelectedCategory(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 >
                   <option value="all">All Categories</option>
                   {categories.map((category) => (
@@ -184,7 +184,7 @@ export default function CoursesCatalog({
                       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                     >
                   ) => setSelectedLevel(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 >
                   <option value="all">All Levels</option>
                   {levels.map((level) => (
@@ -212,7 +212,7 @@ export default function CoursesCatalog({
                       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
                     >
                   ) => setSortBy(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 >
                   <option value="title">A-Z</option>
                   <option value="duration">Duration</option>
@@ -266,7 +266,7 @@ export default function CoursesCatalog({
 
                     <div className="p-6">
                       {course.category && (
-                        <span className="inline-block px-3 py-2 bg-blue-100 text-brand-blue-600 text-xs font-semibold rounded-full mb-3">
+                        <span className="inline-block px-3 py-2 bg-brand-blue-100 text-brand-blue-600 text-xs font-semibold rounded-full mb-3">
                           {course.category}
                         </span>
                       )}
@@ -358,7 +358,7 @@ export default function CoursesCatalog({
             <h2 className="text-3xl font-bold mb-4">
               Ready to Start Learning?
             </h2>
-            <p className="text-xl text-blue-100 mb-8">
+            <p className="text-xl text-brand-blue-100 mb-8">
               All courses are Funded through WIOA funding. No cost to you.
             </p>
             <Link

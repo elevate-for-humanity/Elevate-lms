@@ -26,7 +26,7 @@ export function ProgramGlance({
       <div className="space-y-4">
         {/* Duration */}
         <div className="flex items-start gap-3">
-          <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
+          <Clock className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-1" />
           <div>
             <div className="font-semibold text-black">Duration</div>
             <div className="text-black">{duration}</div>
@@ -35,7 +35,7 @@ export function ProgramGlance({
 
         {/* Location */}
         <div className="flex items-start gap-3">
-          <MapPin className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
+          <MapPin className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-1" />
           <div>
             <div className="font-semibold text-black">Location</div>
             <div className="text-black">{location}</div>
@@ -44,7 +44,7 @@ export function ProgramGlance({
 
         {/* Modality */}
         <div className="flex items-start gap-3">
-          <Monitor className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
+          <Monitor className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-1" />
           <div>
             <div className="font-semibold text-black">Format</div>
             <div className="mt-1">
@@ -55,7 +55,7 @@ export function ProgramGlance({
 
         {/* Prerequisites */}
         <div className="flex items-start gap-3">
-          <Users className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
+          <Users className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-1" />
           <div>
             <div className="font-semibold text-black">Prerequisites</div>
             <div className="text-black">{prerequisites}</div>
@@ -64,7 +64,7 @@ export function ProgramGlance({
 
         {/* Funding */}
         <div className="flex items-start gap-3">
-          <DollarSign className="w-5 h-5 text-blue-600 flex-shrink-0 mt-1" />
+          <DollarSign className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-1" />
           <div>
             <div className="font-semibold text-black">Funding Options</div>
             <div className="flex flex-wrap gap-2 mt-1">
@@ -82,14 +82,14 @@ export function ProgramGlance({
           <div className="flex flex-col gap-2">
             <a
               href="/apply"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               Apply Now
               <ArrowRight className="w-4 h-4" />
             </a>
             <a
               href="/contact"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-blue-600 border-2 border-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-white text-brand-blue-600 border-2 border-brand-blue-600 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
             >
               Talk to an Advisor
             </a>

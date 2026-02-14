@@ -126,13 +126,13 @@ export default async function TuitionPage() {
             </div>
 
             {/* Pathway 2: Employer-Sponsored */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 sm:p-8">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 sm:p-8">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                  <Building2 className="w-5 h-5 sm:w-6 sm:h-6 text-brand-blue-600" />
                 </div>
                 <div>
-                  <p className="text-xs sm:text-sm font-medium text-blue-600">Funding Pathway 2</p>
+                  <p className="text-xs sm:text-sm font-medium text-brand-blue-600">Funding Pathway 2</p>
                   <h2 className="text-lg sm:text-xl font-bold text-slate-900">Employer-Sponsored Training</h2>
                 </div>
               </div>
@@ -145,21 +145,21 @@ export default async function TuitionPage() {
                 <p className="font-medium text-slate-900 mb-2">This may include:</p>
                 <ul className="space-y-1 text-sm text-slate-600">
                   <li className="flex items-center gap-2">
-                    <Circle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
                     Employer-paid cohort training
                   </li>
                   <li className="flex items-center gap-2">
-                    <Circle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
                     Tuition reimbursement after hire
                   </li>
                   <li className="flex items-center gap-2">
-                    <Circle className="w-4 h-4 text-blue-600 flex-shrink-0" />
+                    <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
                     Payroll-based reimbursement agreements
                   </li>
                 </ul>
               </div>
               
-              <p className="text-sm text-blue-800 font-medium">
+              <p className="text-sm text-brand-blue-800 font-medium">
                 Employer sponsorship is coordinated directly with admissions and hiring partners.
               </p>
             </div>

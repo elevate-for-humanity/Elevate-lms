@@ -127,7 +127,7 @@ export default function SubmitHoursPage() {
                   location: '',
                 });
               }}
-              className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700"
+              className="w-full bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700"
             >
               Submit More Hours
             </button>
@@ -176,7 +176,7 @@ export default function SubmitHoursPage() {
             value={submission.date}
             onChange={(e) => setSubmission(prev => ({ ...prev, date: e.target.value }))}
             max={new Date().toISOString().split('T')[0]}
-            className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           />
         </div>
 
@@ -195,7 +195,7 @@ export default function SubmitHoursPage() {
                   max="12"
                   value={submission.hours}
                   onChange={(e) => setSubmission(prev => ({ ...prev, hours: parseInt(e.target.value) || 0 }))}
-                  className="w-full bg-slate-700 text-white text-center text-2xl font-bold rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-slate-700 text-white text-center text-2xl font-bold rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 />
                 <span className="text-slate-400">hrs</span>
               </div>
@@ -209,7 +209,7 @@ export default function SubmitHoursPage() {
                   step="15"
                   value={submission.minutes}
                   onChange={(e) => setSubmission(prev => ({ ...prev, minutes: parseInt(e.target.value) || 0 }))}
-                  className="w-full bg-slate-700 text-white text-center text-2xl font-bold rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full bg-slate-700 text-white text-center text-2xl font-bold rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                 />
                 <span className="text-slate-400">min</span>
               </div>
@@ -227,12 +227,12 @@ export default function SubmitHoursPage() {
                 onClick={() => setSubmission(prev => ({ ...prev, category: cat.value }))}
                 className={`w-full text-left p-3 rounded-xl transition-colors ${
                   submission.category === cat.value
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-slate-700 text-slate-300 hover:bg-slate-600'
                 }`}
               >
                 <div className="font-medium">{cat.label}</div>
-                <div className={`text-sm ${submission.category === cat.value ? 'text-blue-200' : 'text-slate-500'}`}>
+                <div className={`text-sm ${submission.category === cat.value ? 'text-brand-blue-200' : 'text-slate-500'}`}>
                   {cat.description}
                 </div>
               </button>
@@ -251,7 +251,7 @@ export default function SubmitHoursPage() {
             value={submission.location}
             onChange={(e) => setSubmission(prev => ({ ...prev, location: e.target.value }))}
             placeholder="Shop name or training location"
-            className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           />
         </div>
 
@@ -266,7 +266,7 @@ export default function SubmitHoursPage() {
             onChange={(e) => setSubmission(prev => ({ ...prev, description: e.target.value }))}
             placeholder="What did you work on?"
             rows={3}
-            className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+            className="w-full bg-slate-700 text-white rounded-xl px-4 py-3 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-brand-blue-500 resize-none"
           />
         </div>
 
@@ -303,7 +303,7 @@ export default function SubmitHoursPage() {
           ) : (
             <button
               onClick={handlePhotoCapture}
-              className="w-full h-32 border-2 border-dashed border-slate-600 rounded-xl flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-blue-500 hover:text-blue-400 transition-colors"
+              className="w-full h-32 border-2 border-dashed border-slate-600 rounded-xl flex flex-col items-center justify-center gap-2 text-slate-400 hover:border-brand-blue-500 hover:text-brand-blue-400 transition-colors"
             >
               <div className="w-12 h-12 bg-slate-700 rounded-full flex items-center justify-center">
                 <Image className="w-6 h-6" />
@@ -320,7 +320,7 @@ export default function SubmitHoursPage() {
         <button
           onClick={handleSubmit}
           disabled={loading || (submission.hours === 0 && submission.minutes === 0)}
-          className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {loading ? (
             <>

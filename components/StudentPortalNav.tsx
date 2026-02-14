@@ -94,7 +94,7 @@ export default function StudentPortalNav() {
         <div className="flex items-center justify-between h-16">
           {/* Logo and Main Nav */}
           <div className="flex items-center gap-6">
-            <Link href="/portal/student/dashboard" aria-label="Link" className="text-xl font-bold text-blue-600 whitespace-nowrap">
+            <Link href="/portal/student/dashboard" aria-label="Link" className="text-xl font-bold text-brand-blue-600 whitespace-nowrap">
               Student Portal
             </Link>
 
@@ -109,7 +109,7 @@ export default function StudentPortalNav() {
                     href={item.href}
                     className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition ${
                       isActive
-                        ? 'bg-blue-50 text-blue-600'
+                        ? 'bg-brand-blue-50 text-brand-blue-600'
                         : 'text-black hover:bg-gray-50 hover:text-black'
                     }`}
                   >
@@ -145,7 +145,7 @@ export default function StudentPortalNav() {
                             href={item.href}
                             onClick={() => setMoreMenuOpen(false)}
                             className={`flex items-center gap-3 px-4 py-2 text-sm hover:bg-gray-50 ${
-                              isActive ? 'text-blue-600 bg-blue-50' : 'text-black'
+                              isActive ? 'text-brand-blue-600 bg-brand-blue-50' : 'text-black'
                             }`}
                           >
                             <Icon size={16} />
@@ -205,7 +205,7 @@ export default function StudentPortalNav() {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium ${
                       isActive
-                        ? 'bg-blue-50 text-blue-600'
+                        ? 'bg-brand-blue-50 text-brand-blue-600'
                         : 'text-black hover:bg-gray-50'
                     }`}
                   >

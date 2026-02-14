@@ -156,7 +156,7 @@ export function NotificationBell() {
             {unreadCount > 0 && (
               <button
                 onClick={markAllRead}
-                className="text-xs text-brand-orange-600 hover:text-blue-700 font-medium"
+                className="text-xs text-brand-orange-600 hover:text-brand-blue-700 font-medium"
               >
                 Mark all read
               </button>
@@ -176,7 +176,7 @@ export function NotificationBell() {
                   <div
                     key={notif.id}
                     className={`px-4 py-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer ${
-                      notif.unread ? 'bg-blue-50' : ''
+                      notif.unread ? 'bg-brand-blue-50' : ''
                     }`}
                   >
                     <div className="flex items-start gap-3">
@@ -205,7 +205,7 @@ export function NotificationBell() {
           </div>
           {/* Footer */}
           <div className="px-4 py-3 border-t border-gray-100 text-center">
-            <button className="text-sm text-brand-orange-600 hover:text-blue-700 font-medium">
+            <button className="text-sm text-brand-orange-600 hover:text-brand-blue-700 font-medium">
               View All Notifications
             </button>
           </div>

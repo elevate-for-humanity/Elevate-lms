@@ -44,7 +44,7 @@ export default async function CashAdvanceSettingsPage() {
         <div className="mb-8">
           <Link
             href="/admin/cash-advances"
-            className="text-brand-blue-600 hover:text-blue-800 mb-4 inline-block"
+            className="text-brand-blue-600 hover:text-brand-blue-800 mb-4 inline-block"
           >
             ← Back to Cash Advances
           </Link>
@@ -75,7 +75,7 @@ export default async function CashAdvanceSettingsPage() {
                 <input
                   type="number"
                   defaultValue="6000"
-                  className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                 />
               </div>
               <p className="mt-1 text-sm text-black">
@@ -93,7 +93,7 @@ export default async function CashAdvanceSettingsPage() {
                 <input
                   type="number"
                   defaultValue="100"
-                  className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                 />
               </div>
             </div>
@@ -107,7 +107,7 @@ export default async function CashAdvanceSettingsPage() {
                 type="number"
                 step="0.1"
                 defaultValue="2.5"
-                className="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                className="w-full rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
               />
             </div>
 
@@ -121,7 +121,7 @@ export default async function CashAdvanceSettingsPage() {
                 <input
                   type="number"
                   defaultValue="500"
-                  className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-brand-blue-500 focus:ring-brand-blue-500"
                 />
               </div>
               <p className="mt-1 text-sm text-black">
@@ -141,7 +141,7 @@ export default async function CashAdvanceSettingsPage() {
               </div>
               <button
                 type="button"
-                className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-brand-green-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-brand-green-600 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:ring-offset-2"
               >
                 <span className="translate-x-5 inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out" />
               </button>

@@ -51,7 +51,7 @@ export default function ServicesPage() {
       </div>
 
       <section className="rounded-2xl border bg-white p-8 shadow-sm">
-        <div className="inline-block px-3 py-2 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold mb-4">
+        <div className="inline-block px-3 py-2 rounded-full bg-brand-blue-100 text-brand-blue-800 text-xs font-semibold mb-4">
           PAID SERVICES
         </div>
         <h1 className="text-4xl font-bold tracking-tight">
@@ -90,8 +90,8 @@ export default function ServicesPage() {
       </section>
 
       <section className="mt-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <div className="rounded-2xl border-2 border-blue-200 bg-white p-6 hover:shadow-lg transition">
-          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+        <div className="rounded-2xl border-2 border-brand-blue-200 bg-white p-6 hover:shadow-lg transition">
+          <div className="w-12 h-12 rounded-full bg-brand-blue-100 flex items-center justify-center mb-4">
             <FileText className="w-6 h-6 text-brand-blue-600" />
           </div>
           <h2 className="text-xl font-bold text-black mb-2">
@@ -154,9 +154,9 @@ export default function ServicesPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border-2 border-blue-200 bg-white p-6 hover:shadow-lg transition">
-          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-            <Briefcase className="w-6 h-6 text-blue-600" />
+        <div className="rounded-2xl border-2 border-brand-blue-200 bg-white p-6 hover:shadow-lg transition">
+          <div className="w-12 h-12 rounded-full bg-brand-blue-100 flex items-center justify-center mb-4">
+            <Briefcase className="w-6 h-6 text-brand-blue-600" />
           </div>
           <h2 className="text-xl font-bold text-black mb-2">
             Business Tax Services
@@ -167,21 +167,21 @@ export default function ServicesPage() {
           </p>
           <ul className="space-y-2 text-sm">
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>All business entity types</span>
             </li>
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Quarterly tax planning</span>
             </li>
             <li className="flex items-start gap-2">
-              <Circle className="w-4 h-4 text-blue-600 flex-shrink-0 mt-0.5" />
+              <Circle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Audit support included</span>
             </li>
           </ul>
           <div className="mt-4 pt-4 border-t">
             <div className="text-sm text-black">Starting at</div>
-            <div className="text-2xl font-bold text-blue-600">$299</div>
+            <div className="text-2xl font-bold text-brand-blue-600">$299</div>
           </div>
         </div>
 
@@ -345,7 +345,7 @@ export default function ServicesPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-blue-50 border-l-4 border-brand-blue-600 p-6">
+      <section className="mt-8 rounded-2xl bg-brand-blue-50 border-l-4 border-brand-blue-600 p-6">
         <h2 className="text-xl font-bold mb-3">Ready to Get Started?</h2>
         <p className="text-black mb-6">
           Upload your documents online or visit us in person. Same-day service

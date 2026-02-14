@@ -21,7 +21,7 @@ function QuickTemplate({
   return (
     <button
       onClick={onClick}
-      className="p-4 border border-gray-200 rounded-lg hover:border-blue-500 hover:bg-gray-50 transition text-left"
+      className="p-4 border border-gray-200 rounded-lg hover:border-brand-blue-500 hover:bg-gray-50 transition text-left"
     >
       <h3 className="font-semibold text-black mb-1">{title}</h3>
       <p className="text-sm text-black">{body}</p>
@@ -150,7 +150,7 @@ export default function NotificationsPage() {
                       })
                     }
                     placeholder="e.g., Class Reminder"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -171,7 +171,7 @@ export default function NotificationsPage() {
                     }
                     placeholder="e.g., Your class starts in 30 minutes"
                     rows={4}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -193,7 +193,7 @@ export default function NotificationsPage() {
                         targetAudience: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   >
                     <option value="all-students">All Students</option>
                     <option value="active-students">Active Students</option>
@@ -223,7 +223,7 @@ export default function NotificationsPage() {
                       setNotification({ ...notification, url: e.target.value })
                     }
                     placeholder="/student/courses"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                   <p className="text-sm text-black mt-1">
                     Where users go when they click the notification

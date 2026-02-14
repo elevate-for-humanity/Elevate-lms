@@ -42,7 +42,7 @@ export default async function EmployerReportsPage() {
         </p>
         <div className="grid md:grid-cols-3 gap-4">
           <div className="border rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-blue-600 mb-2">0</div>
+            <div className="text-3xl font-bold text-brand-blue-600 mb-2">0</div>
             <div className="text-sm text-black">Active Postings</div>
           </div>
           <div className="border rounded-lg p-4 text-center">
@@ -50,7 +50,7 @@ export default async function EmployerReportsPage() {
             <div className="text-sm text-black">Applications</div>
           </div>
           <div className="border rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-blue-600 mb-2">0</div>
+            <div className="text-3xl font-bold text-brand-blue-600 mb-2">0</div>
             <div className="text-sm text-black">Hires</div>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default async function EmployerReportsPage() {
         </div>
 
         <div className="mt-6 flex gap-4">
-          <button className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700" aria-label="Action button">
+          <button className="bg-brand-blue-600 text-white px-6 py-2 rounded-lg hover:bg-brand-blue-700" aria-label="Action button">
             Export Report
           </button>
           <button className="border border-slate-300 px-6 py-2 rounded-lg hover:bg-slate-50" aria-label="Action button">

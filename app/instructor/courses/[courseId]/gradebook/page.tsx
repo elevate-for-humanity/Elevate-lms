@@ -25,7 +25,7 @@ export default async function GradebookPage({ params }: { params: { courseId: st
           <nav className="text-sm mb-4"><ol className="flex items-center space-x-2 text-gray-500"><li><Link href="/instructor" className="hover:text-primary">Instructor</Link></li><li>/</li><li><Link href="/instructor/courses" className="hover:text-primary">Courses</Link></li><li>/</li><li className="text-gray-900 font-medium">Gradebook</li></ol></nav>
           <div className="flex justify-between items-center">
             <div><h1 className="text-3xl font-bold text-gray-900">{course?.title} - Gradebook</h1><p className="text-gray-600 mt-2">Manage student grades</p></div>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Export Grades</button>
+            <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Export Grades</button>
           </div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
@@ -44,11 +44,11 @@ export default async function GradebookPage({ params }: { params: { courseId: st
               {enrollments && enrollments.length > 0 ? enrollments.map((e: any) => (
                 <tr key={e.id} className="hover:bg-gray-50">
                   <td className="px-4 py-3"><p className="font-medium">{e.profiles?.full_name || 'Student'}</p><p className="text-sm text-gray-500">{e.profiles?.email}</p></td>
-                  <td className="px-4 py-3"><div className="w-24 bg-gray-200 rounded-full h-2"><div className="bg-blue-600 h-2 rounded-full" style={{ width: `${e.progress || 0}%` }}></div></div><span className="text-sm text-gray-500">{e.progress || 0}%</span></td>
+                  <td className="px-4 py-3"><div className="w-24 bg-gray-200 rounded-full h-2"><div className="bg-brand-blue-600 h-2 rounded-full" style={{ width: `${e.progress || 0}%` }}></div></div><span className="text-sm text-gray-500">{e.progress || 0}%</span></td>
                   <td className="px-4 py-3">{e.quiz_average || '-'}%</td>
                   <td className="px-4 py-3">{e.assignment_score || '-'}%</td>
                   <td className="px-4 py-3 font-medium">{e.final_grade || '-'}</td>
-                  <td className="px-4 py-3"><button className="text-blue-600 hover:text-blue-800 text-sm">Edit</button></td>
+                  <td className="px-4 py-3"><button className="text-brand-blue-600 hover:text-brand-blue-800 text-sm">Edit</button></td>
                 </tr>
               )) : <tr><td colSpan={6} className="px-4 py-8 text-center text-gray-500">No students enrolled</td></tr>}
             </tbody>

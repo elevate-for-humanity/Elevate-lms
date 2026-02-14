@@ -138,12 +138,12 @@ export default function TrainingPage() {
             </div>
           </div>
 
-          <div className="rounded-lg border-2 border-blue-200 p-6">
+          <div className="rounded-lg border-2 border-brand-blue-200 p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-lg">
                 Intermediate Certification
               </h3>
-              <span className="px-3 py-2 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold">
+              <span className="px-3 py-2 rounded-full bg-brand-blue-100 text-brand-blue-800 text-xs font-semibold">
                 MOST COMMON
               </span>
             </div>
@@ -159,10 +159,10 @@ export default function TrainingPage() {
             </div>
           </div>
 
-          <div className="rounded-lg border-2 border-blue-200 p-6">
+          <div className="rounded-lg border-2 border-brand-blue-200 p-6">
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold text-lg">Advanced Certification</h3>
-              <span className="px-3 py-2 rounded-full bg-blue-100 text-blue-800 text-xs font-semibold">
+              <span className="px-3 py-2 rounded-full bg-brand-blue-100 text-brand-blue-800 text-xs font-semibold">
                 FOR EXPERIENCED VOLUNTEERS
               </span>
             </div>
@@ -316,7 +316,7 @@ export default function TrainingPage() {
         </div>
       </section>
 
-      <section className="mt-8 rounded-2xl bg-blue-50 border-l-4 border-blue-400 p-6">
+      <section className="mt-8 rounded-2xl bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6">
         <h3 className="font-semibold text-black">Reference</h3>
         <p className="mt-2 text-sm text-black">
           Official IRS training portal:{' '}

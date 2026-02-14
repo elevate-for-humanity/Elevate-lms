@@ -42,7 +42,7 @@ export default function CompliancePage() {
             Back to Governance
           </Link>
           <div className="flex items-center gap-4 mb-4">
-            <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-12 h-12 bg-brand-blue-600 rounded-lg flex items-center justify-center">
               <Scale className="w-6 h-6 text-white" />
             </div>
             <div>

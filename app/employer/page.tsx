@@ -51,7 +51,7 @@ export default function EmployerPage() {
               <div key={item.step} className="flex sm:flex-col gap-4 sm:gap-0 rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-28 h-28 sm:w-full sm:h-[140px] flex-shrink-0 sm:flex-shrink">
                   <Image src={item.image} alt={item.title} fill className="object-cover" />
-                  <div className="absolute top-2 left-2 w-7 h-7 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">{item.step}</div>
+                  <div className="absolute top-2 left-2 w-7 h-7 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">{item.step}</div>
                 </div>
                 <div className="py-3 pr-3 sm:p-4 flex-1">
                   <h3 className="font-bold text-slate-900 text-sm mb-1">{item.title}</h3>
@@ -81,7 +81,7 @@ export default function EmployerPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
-                  <p className="text-blue-600 font-semibold text-sm mb-1">{item.amount}</p>
+                  <p className="text-brand-blue-600 font-semibold text-sm mb-1">{item.amount}</p>
                   <p className="text-slate-600 text-xs sm:text-sm leading-relaxed">{item.desc}</p>
                 </div>
               </Link>
@@ -97,7 +97,7 @@ export default function EmployerPage() {
           <div className="space-y-2 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-3">
             {['Pre-screened candidates', 'Skills-matched to your roles', 'No recruiting fees', 'Background checks included', 'Onboarding support', 'Ongoing retention help', 'Tax credit filing assistance', 'Dedicated account manager', 'Custom training programs'].map((item) => (
               <div key={item} className="flex items-center gap-3 bg-slate-50 rounded-lg px-4 py-3">
-                <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0" />
+                <span className="w-2 h-2 bg-brand-blue-600 rounded-full flex-shrink-0" />
                 <span className="text-slate-700 text-sm">{item}</span>
               </div>
             ))}
@@ -106,12 +106,12 @@ export default function EmployerPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-8 sm:py-14 bg-blue-600">
+      <section className="py-8 sm:py-14 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Hiring Today</h2>
           <p className="text-white/90 mb-6 text-sm">Submit your hiring needs and we will match you with trained candidates.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply/employer" className="bg-white text-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-blue-50 transition-colors text-center">
+            <Link href="/apply/employer" className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">
               Submit Hiring Needs <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
             <Link href="/programs" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

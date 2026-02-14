@@ -125,7 +125,7 @@ export default function BookAppointmentPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, service: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                 >
                   <option value="">Select a service...</option>
                   <optgroup label="Free VITA Services">
@@ -162,7 +162,7 @@ export default function BookAppointmentPage() {
                     }
                     className={`p-4 rounded-lg border-2 text-left transition ${
                       formData.appointmentType === 'in-person'
-                        ? 'border-brand-blue-600 bg-blue-50'
+                        ? 'border-brand-blue-600 bg-brand-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -182,7 +182,7 @@ export default function BookAppointmentPage() {
                     }
                     className={`p-4 rounded-lg border-2 text-left transition ${
                       formData.appointmentType === 'virtual'
-                        ? 'border-brand-blue-600 bg-blue-50'
+                        ? 'border-brand-blue-600 bg-brand-blue-50'
                         : 'border-gray-200 hover:border-gray-300'
                     }`}
                   >
@@ -210,7 +210,7 @@ export default function BookAppointmentPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, name: e.target.value })
                     }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     placeholder="Your full name"
                   />
                 </div>
@@ -226,7 +226,7 @@ export default function BookAppointmentPage() {
                     onChange={(e) =>
                       setFormData({ ...formData, phone: e.target.value })
                     }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                     placeholder="Get Help Online"
                   />
                 </div>
@@ -243,7 +243,7 @@ export default function BookAppointmentPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="your.email@gmail.com"
                 />
               </div>
@@ -265,7 +265,7 @@ export default function BookAppointmentPage() {
                       })
                     }
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   />
                 </div>
 
@@ -282,7 +282,7 @@ export default function BookAppointmentPage() {
                         preferredTime: e.target.value,
                       })
                     }
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   >
                     <option value="">Select time...</option>
                     <option value="09:00">9:00 AM</option>
@@ -308,7 +308,7 @@ export default function BookAppointmentPage() {
                   onChange={(e) =>
                     setFormData({ ...formData, message: e.target.value })
                   }
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   placeholder="Any specific questions or concerns?"
                 />
               </div>
@@ -405,7 +405,7 @@ export default function BookAppointmentPage() {
           </div>
 
           {/* Virtual Appointment Info */}
-          <div className="rounded-2xl border-2 border-blue-200 bg-blue-50 p-6">
+          <div className="rounded-2xl border-2 border-brand-blue-200 bg-brand-blue-50 p-6">
             <div className="flex items-center gap-2 mb-3">
               <Video className="w-5 h-5 text-brand-blue-600" />
               <h2 className="font-bold text-lg">Virtual Appointments</h2>

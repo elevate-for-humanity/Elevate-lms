@@ -16,7 +16,7 @@ export const Spinner: React.FC<SpinnerProps> = ({
   };
 
   const colorClasses = {
-    primary: 'border-blue-600 border-t-transparent',
+    primary: 'border-brand-blue-600 border-t-transparent',
     white: 'border-white border-t-transparent',
     slate: 'border-slate-600 border-t-transparent',
   };

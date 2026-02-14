@@ -66,7 +66,7 @@ export function FAQClient({ categories }: FAQClientProps) {
               onClick={() => setActiveCategory('all')}
               className={`px-6 py-3 rounded-xl font-bold transition ${
                 activeCategory === 'all'
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-brand-blue-600 text-white'
                   : 'bg-white text-black hover:bg-gray-100'
               }`}
               aria-pressed={activeCategory === 'all'}
@@ -79,7 +79,7 @@ export function FAQClient({ categories }: FAQClientProps) {
                 onClick={() => setActiveCategory(category.id)}
                 className={`px-6 py-3 rounded-xl font-bold transition ${
                   activeCategory === category.id
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-white text-black hover:bg-gray-100'
                 }`}
                 aria-pressed={activeCategory === category.id}

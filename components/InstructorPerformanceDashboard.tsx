@@ -62,7 +62,7 @@ export default function InstructorPerformanceDashboard() {
 
           <Card className="p-6">
             <h3 className="text-sm text-black mb-2">Courses Teaching</h3>
-            <p className="text-3xl font-bold text-blue-600">{metrics.coursesTeaching}</p>
+            <p className="text-3xl font-bold text-brand-blue-600">{metrics.coursesTeaching}</p>
             <p className="text-sm text-black">Active courses</p>
           </Card>
 

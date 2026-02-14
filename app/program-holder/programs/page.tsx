@@ -53,7 +53,7 @@ export default function ProgramHolderProgramsPage() {
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Manage Programs</h1>
-          <Link href="/program-holder/programs/new" className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <Link href="/program-holder/programs/new" className="flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
             <Plus className="w-5 h-5" /> Add Program
           </Link>
         </div>
@@ -74,8 +74,8 @@ export default function ProgramHolderProgramsPage() {
                 <tr key={program.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <BookOpen className="w-5 h-5 text-blue-600" />
+                      <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                        <BookOpen className="w-5 h-5 text-brand-blue-600" />
                       </div>
                       <span className="font-medium text-gray-900">{program.name}</span>
                     </div>
@@ -97,8 +97,8 @@ export default function ProgramHolderProgramsPage() {
                   <td className="px-6 py-4 text-gray-600">{program.created}</td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-center gap-2">
-                      <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded"><Eye className="w-4 h-4" /></button>
-                      <button className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded"><Edit className="w-4 h-4" /></button>
+                      <button className="p-2 text-gray-600 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded"><Eye className="w-4 h-4" /></button>
+                      <button className="p-2 text-gray-600 hover:text-brand-blue-600 hover:bg-brand-blue-50 rounded"><Edit className="w-4 h-4" /></button>
                       <button className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded"><Trash2 className="w-4 h-4" /></button>
                     </div>
                   </td>

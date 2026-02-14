@@ -170,8 +170,8 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
           
           <div className="grid lg:grid-cols-3 gap-8">
             {/* Step 1: Apply Online */}
-            <div className="relative bg-gradient-to-br from-blue-50 to-white rounded-2xl p-8 border border-blue-100 shadow-sm">
-              <div className="absolute -top-4 -left-4 w-12 h-12 bg-blue-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
+            <div className="relative bg-gradient-to-br from-blue-50 to-white rounded-2xl p-8 border border-brand-blue-100 shadow-sm">
+              <div className="absolute -top-4 -left-4 w-12 h-12 bg-brand-blue-600 text-white rounded-xl flex items-center justify-center text-xl font-bold shadow-lg">
                 1
               </div>
               <div className="pt-4">
@@ -181,24 +181,24 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">Fill out basic information and career goals</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">Upload ID and proof of residency</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">Schedule your enrollment appointment</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                     <span className="text-gray-700">Get approved within 24-48 hours</span>
                   </li>
                 </ul>
-                <div className="mt-6 pt-6 border-t border-blue-100">
-                  <div className="flex items-center gap-2 text-blue-600">
+                <div className="mt-6 pt-6 border-t border-brand-blue-100">
+                  <div className="flex items-center gap-2 text-brand-blue-600">
                     <Clock className="w-4 h-4" />
                     <span className="text-sm font-medium">Takes about 15 minutes</span>
                   </div>
@@ -298,7 +298,7 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
       <section className="py-16 lg:py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block bg-blue-100 text-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
+            <span className="inline-block bg-brand-blue-100 text-brand-blue-700 text-sm font-semibold px-4 py-1 rounded-full mb-4">
               Career Paths
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -335,13 +335,13 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                     </div>
                   )}
                   <div className="p-6">
-                    <h3 className="font-bold text-gray-900 text-xl mb-3 group-hover:text-blue-600 transition-colors">
+                    <h3 className="font-bold text-gray-900 text-xl mb-3 group-hover:text-brand-blue-600 transition-colors">
                       {title}
                     </h3>
                     {description && (
                       <p className="text-gray-600 leading-relaxed mb-4">{description}</p>
                     )}
-                    <div className="flex items-center text-blue-600 font-medium text-sm">
+                    <div className="flex items-center text-brand-blue-600 font-medium text-sm">
                       <TrendingUp className="w-4 h-4 mr-2" />
                       High Demand
                     </div>

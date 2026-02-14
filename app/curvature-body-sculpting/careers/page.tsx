@@ -136,7 +136,7 @@ export default function CurvatureCareersPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <a
               href="#positions"
-              className="px-8 py-4 bg-white text-blue-700 font-bold rounded-lg hover:bg-pink-50 transition"
+              className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-pink-50 transition"
             >
               View Open Positions
             </a>
@@ -163,8 +163,8 @@ export default function CurvatureCareersPage() {
               <p className="text-gray-600 text-sm">Learn on the job with full pay and mentorship</p>
             </div>
             <div className="text-center p-6">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <DollarSign className="w-8 h-8 text-blue-600" />
+              <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <DollarSign className="w-8 h-8 text-brand-blue-600" />
               </div>
               <h3 className="font-bold mb-2">Competitive Pay</h3>
               <p className="text-gray-600 text-sm">Base salary plus commission on services and sales</p>
@@ -188,11 +188,11 @@ export default function CurvatureCareersPage() {
       </section>
 
       {/* Elevate Partnership */}
-      <section className="py-16 bg-blue-50">
+      <section className="py-16 bg-brand-blue-50">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-2xl p-8 shadow-sm">
             <div className="flex items-start gap-6">
-              <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
+              <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center flex-shrink-0">
                 <GraduationCap className="w-8 h-8 text-white" />
               </div>
               <div>
@@ -205,13 +205,13 @@ export default function CurvatureCareersPage() {
                 <div className="flex flex-wrap gap-3">
                   <Link
                     href="/programs/esthetician-apprenticeship"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white font-medium rounded-lg hover:bg-brand-blue-700 transition"
                   >
                     Esthetician Program <ArrowRight className="w-4 h-4" />
                   </Link>
                   <Link
                     href="/programs/cosmetology-apprenticeship"
-                    className="inline-flex items-center gap-2 px-4 py-2 border border-blue-600 text-blue-600 font-medium rounded-lg hover:bg-blue-50 transition"
+                    className="inline-flex items-center gap-2 px-4 py-2 border border-brand-blue-600 text-brand-blue-600 font-medium rounded-lg hover:bg-brand-blue-50 transition"
                   >
                     Cosmetology Program <ArrowRight className="w-4 h-4" />
                   </Link>
@@ -303,7 +303,7 @@ export default function CurvatureCareersPage() {
           <div className="flex flex-wrap justify-center gap-4">
             <Link
               href="/curvature-body-sculpting/apply"
-              className="px-8 py-4 bg-white text-blue-700 font-bold rounded-lg hover:bg-pink-50 transition"
+              className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-pink-50 transition"
             >
               Apply Now
             </Link>

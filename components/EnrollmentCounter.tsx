@@ -145,7 +145,7 @@ export default function EnrollmentCounter() {
               {formatNumber(monthCount.get())}
             </motion.div>
             <div className="text-white/80 font-semibold">New Students</div>
-            <div className="mt-4 flex items-center gap-2 text-blue-300 text-sm">
+            <div className="mt-4 flex items-center gap-2 text-brand-blue-300 text-sm">
               <Clock className="w-4 h-4" />
               <span>December 2024</span>
             </div>
@@ -264,7 +264,7 @@ export default function EnrollmentCounter() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="/apply"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-all shadow-lg text-lg group"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-all shadow-lg text-lg group"
             >
               Enroll Now
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

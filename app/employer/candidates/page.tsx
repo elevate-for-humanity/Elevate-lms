@@ -77,11 +77,11 @@ export default async function CandidatesPage() {
                 <input
                   type="text"
                   placeholder="Search by name, skill, or certification..."
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
-            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <select className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500">
               <option value="">All Programs</option>
               <option value="healthcare">Healthcare</option>
               <option value="skilled-trades">Skilled Trades</option>
@@ -94,7 +94,7 @@ export default async function CandidatesPage() {
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center gap-3">
-              <Users className="w-8 h-8 text-blue-600" />
+              <Users className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <div className="text-2xl font-bold">{candidates?.length || 0}</div>
                 <div className="text-sm text-gray-600">Available Candidates</div>
@@ -112,7 +112,7 @@ export default async function CandidatesPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center gap-3">
-              <GraduationCap className="w-8 h-8 text-blue-600" />
+              <GraduationCap className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <div className="text-2xl font-bold">0</div>
                 <div className="text-sm text-gray-600">Program Graduates</div>
@@ -128,8 +128,8 @@ export default async function CandidatesPage() {
               <div key={candidate.id} className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-start justify-between">
                   <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                      <Users className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                      <Users className="w-6 h-6 text-brand-blue-600" />
                     </div>
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900">
@@ -150,7 +150,7 @@ export default async function CandidatesPage() {
                         {candidate.email && (
                           <a
                             href={`mailto:${candidate.email}`}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
                           >
                             <Mail className="w-4 h-4" />
                             Contact
@@ -187,7 +187,7 @@ export default async function CandidatesPage() {
               </p>
               <Link
                 href="/employer/dashboard"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Back to Dashboard
               </Link>

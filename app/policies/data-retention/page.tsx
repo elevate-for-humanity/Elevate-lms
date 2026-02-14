@@ -44,7 +44,7 @@ export default function DataRetentionPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Student Records Retention</h2>
             
-            <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+            <div className="bg-brand-blue-50 rounded-xl p-6 border-2 border-brand-blue-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Academic Records</h3>
               <div className="space-y-4">
                 <div>
@@ -121,7 +121,7 @@ export default function DataRetentionPage() {
 
             <h2 className="text-2xl font-bold text-black mt-8 mb-4">Employment and HR Records</h2>
             
-            <div className="bg-blue-50 rounded-xl p-6 border-2 border-blue-200 mb-6">
+            <div className="bg-brand-blue-50 rounded-xl p-6 border-2 border-brand-blue-200 mb-6">
               <h3 className="text-xl font-bold text-black mb-4">Employee Records</h3>
               <ul className="space-y-3 text-black">
                 <li><strong>Personnel Files:</strong> 7 years after employment ends</li>
@@ -286,14 +286,14 @@ export default function DataRetentionPage() {
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>
             </ul>
 
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+            <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
               <p className="text-black mb-2">
                 <strong>Related Policies:</strong>
               </p>
               <ul className="list-disc pl-6 text-black space-y-1">
-                <li><a href="/policies/privacy" className="text-blue-600 hover:underline">Privacy Policy</a></li>
-                <li><a href="/policies/ferpa" className="text-blue-600 hover:underline">FERPA Policy</a></li>
-                <li><a href="/policies/verification" className="text-blue-600 hover:underline">Verification Policy</a></li>
+                <li><a href="/policies/privacy" className="text-brand-blue-600 hover:underline">Privacy Policy</a></li>
+                <li><a href="/policies/ferpa" className="text-brand-blue-600 hover:underline">FERPA Policy</a></li>
+                <li><a href="/policies/verification" className="text-brand-blue-600 hover:underline">Verification Policy</a></li>
               </ul>
             </div>
           </div>

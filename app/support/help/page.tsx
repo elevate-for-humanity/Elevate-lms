@@ -15,9 +15,9 @@ export const metadata: Metadata = {
 export const dynamic = 'force-dynamic';
 
 const categories = [
-  { name: 'Enrollment', slug: 'Enrollment', color: 'bg-blue-100 text-blue-600' },
+  { name: 'Enrollment', slug: 'Enrollment', color: 'bg-brand-blue-100 text-brand-blue-600' },
   { name: 'Programs', slug: 'Programs', color: 'bg-green-100 text-green-600' },
-  { name: 'Financial Aid', slug: 'Financial Aid', color: 'bg-blue-100 text-blue-600' },
+  { name: 'Financial Aid', slug: 'Financial Aid', color: 'bg-brand-blue-100 text-brand-blue-600' },
   { name: 'Account', slug: 'Account', color: 'bg-orange-100 text-orange-600' },
   { name: 'Career Services', slug: 'Career Services', color: 'bg-teal-100 text-teal-600' },
   { name: 'General', slug: 'General', color: 'bg-gray-100 text-gray-600' },
@@ -64,7 +64,7 @@ export default async function HelpCenterPage({
       <section className="bg-slate-700 text-white py-16">
         <div className="max-w-7xl mx-auto px-6 text-center">
           <h1 className="text-4xl font-bold mb-4">Help Center</h1>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Find answers to your questions
           </p>
           <form className="max-w-2xl mx-auto relative">
@@ -73,11 +73,11 @@ export default async function HelpCenterPage({
               name="q"
               defaultValue={searchQuery}
               placeholder="Search help articles..."
-              className="w-full px-6 py-4 rounded-full text-black text-lg focus:outline-none focus:ring-4 focus:ring-blue-300"
+              className="w-full px-6 py-4 rounded-full text-black text-lg focus:outline-none focus:ring-4 focus:ring-brand-blue-300"
             />
             <button
               type="submit"
-              className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition"
+              className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-brand-blue-600 text-white rounded-full hover:bg-brand-blue-700 transition"
             >
               <Search className="w-5 h-5" />
             </button>
@@ -93,7 +93,7 @@ export default async function HelpCenterPage({
               href="/support/help"
               className={`px-4 py-2 rounded-full font-medium transition ${
                 !activeCategory
-                  ? 'bg-blue-600 text-white'
+                  ? 'bg-brand-blue-600 text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
@@ -105,7 +105,7 @@ export default async function HelpCenterPage({
                 href={`/support/help?category=${encodeURIComponent(cat.slug)}`}
                 className={`px-4 py-2 rounded-full font-medium transition ${
                   activeCategory === cat.slug
-                    ? 'bg-blue-600 text-white'
+                    ? 'bg-brand-blue-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
@@ -136,7 +136,7 @@ export default async function HelpCenterPage({
               </p>
               <Link
                 href="/support/ticket"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
               >
                 Submit a Support Ticket
               </Link>
@@ -147,7 +147,7 @@ export default async function HelpCenterPage({
                 <Link
                   key={article.id}
                   href={`/support/help/${article.slug}`}
-                  className="block p-6 bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:border-blue-300 transition group"
+                  className="block p-6 bg-white rounded-xl border border-gray-200 hover:shadow-lg hover:border-brand-blue-300 transition group"
                 >
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1">
@@ -158,14 +158,14 @@ export default async function HelpCenterPage({
                           {article.category}
                         </span>
                       </div>
-                      <h3 className="text-lg font-bold text-black group-hover:text-blue-600 transition mb-2">
+                      <h3 className="text-lg font-bold text-black group-hover:text-brand-blue-600 transition mb-2">
                         {article.title}
                       </h3>
                       <p className="text-gray-600 text-sm line-clamp-2">
                         {article.excerpt}
                       </p>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition flex-shrink-0 mt-1" />
+                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-brand-blue-600 transition flex-shrink-0 mt-1" />
                   </div>
                 </Link>
               ))}
@@ -184,7 +184,7 @@ export default async function HelpCenterPage({
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/support/ticket"
-              className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+              className="px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition"
             >
               Submit a Ticket
             </Link>

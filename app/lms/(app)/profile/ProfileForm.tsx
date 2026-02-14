@@ -50,7 +50,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             id="first_name"
             name="first_name"
             defaultValue={profile?.first_name || ''}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             placeholder="Enter your first name"
           />
         </div>
@@ -64,7 +64,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
             id="last_name"
             name="last_name"
             defaultValue={profile?.last_name || ''}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
             placeholder="Enter your last name"
           />
         </div>
@@ -79,7 +79,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           id="phone"
           name="phone"
           defaultValue={profile?.phone || ''}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
           placeholder="(317) 555-0123"
         />
       </div>
@@ -93,7 +93,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
           name="bio"
           rows={4}
           defaultValue={profile?.bio || ''}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
           placeholder="Tell us about yourself..."
         />
       </div>
@@ -101,7 +101,7 @@ export function ProfileForm({ profile }: ProfileFormProps) {
       <button
         type="submit"
         disabled={saving}
-        className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-medium rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {saving ? (
           <>

@@ -179,7 +179,7 @@ export default function SocialMediaPage() {
 
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center justify-between mb-2">
-              <Clock className="w-8 h-8 text-blue-600" />
+              <Clock className="w-8 h-8 text-brand-blue-600" />
             </div>
             <div className="text-2xl font-bold text-black">3x Daily</div>
             <div className="text-sm text-black">Post Frequency</div>
@@ -327,7 +327,7 @@ export default function SocialMediaPage() {
                       {campaign.platforms.map((platform) => (
                         <span
                           key={platform}
-                          className="inline-flex items-center px-2 py-2 rounded-md text-xs font-medium bg-blue-100 text-blue-800"
+                          className="inline-flex items-center px-2 py-2 rounded-md text-xs font-medium bg-brand-blue-100 text-brand-blue-800"
                         >
                           {platform === 'facebook' && (
                             <Facebook className="w-3 h-3 mr-1" />
@@ -369,7 +369,7 @@ export default function SocialMediaPage() {
                           `/admin/social-media/campaigns/${campaign.id}/edit`
                         )
                       }
-                      className="p-2 bg-blue-100 text-brand-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                      className="p-2 bg-brand-blue-100 text-brand-blue-700 rounded-lg hover:bg-brand-blue-200 transition-colors"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4" />
@@ -574,7 +574,7 @@ interface ScheduleSlotProps {
 function ScheduleSlot({ time, status, campaign }: ScheduleSlotProps) {
   const statusColors = {
     completed: 'bg-brand-green-100 text-green-800',
-    upcoming: 'bg-blue-100 text-blue-800',
+    upcoming: 'bg-brand-blue-100 text-brand-blue-800',
     scheduled: 'bg-gray-100 text-black',
   };
 

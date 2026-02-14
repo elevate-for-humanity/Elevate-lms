@@ -200,7 +200,7 @@ export default function SiteHeader() {
           {/* Logo */}
           <Link 
             href="/" 
-            className="flex items-center gap-2 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg"
+            className="flex items-center gap-2 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2 rounded-lg"
             aria-label="Elevate for Humanity - Home"
           >
             <Image
@@ -232,10 +232,10 @@ export default function SiteHeader() {
                   href={link.href} 
                   className={`
                     px-3 py-2 text-sm font-medium rounded-md transition-colors inline-flex items-center gap-1
-                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
+                    focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2
                     ${isActive(link.href) 
-                      ? 'text-blue-600 bg-blue-50' 
-                      : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                      ? 'text-brand-blue-600 bg-brand-blue-50' 
+                      : 'text-gray-700 hover:text-brand-blue-600 hover:bg-gray-50'
                     }
                   `}
                   aria-current={isActive(link.href) ? 'page' : undefined}
@@ -251,8 +251,8 @@ export default function SiteHeader() {
                         href={subItem.href}
                         className={`block px-4 py-2 text-sm ${
                           isActive(subItem.href)
-                            ? 'text-blue-600 bg-blue-50'
-                            : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                            ? 'text-brand-blue-600 bg-brand-blue-50'
+                            : 'text-gray-700 hover:text-brand-blue-600 hover:bg-gray-50'
                         }`}
                       >
                         {subItem.name}
@@ -272,7 +272,7 @@ export default function SiteHeader() {
             ) : (
               <Link
                 href="/login"
-                className="hidden lg:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-blue-600 hover:bg-gray-50 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="hidden lg:inline-flex px-3 py-2 text-sm font-medium text-gray-700 hover:text-brand-blue-600 hover:bg-gray-50 rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2"
               >
                 Sign In
               </Link>
@@ -281,7 +281,7 @@ export default function SiteHeader() {
             {/* Apply Now CTA */}
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center bg-blue-600 !text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-blue-700 active:bg-blue-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 min-h-[44px]"
+              className="inline-flex items-center justify-center bg-brand-blue-600 !text-white px-4 py-2 rounded-full text-sm font-semibold hover:bg-brand-blue-700 active:bg-brand-blue-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2 min-h-[44px]"
               style={{ color: 'white' }}
             >
               Apply Now
@@ -291,7 +291,7 @@ export default function SiteHeader() {
             <button
               ref={menuButtonRef}
               onClick={openMobileMenu}
-              className="lg:hidden flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] bg-gray-100 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-200 active:bg-gray-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+              className="lg:hidden flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] bg-gray-100 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-200 active:bg-gray-300 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2"
               aria-label="Open navigation menu"
               aria-expanded={mobileMenuOpen}
               aria-controls="mobile-menu"
@@ -327,7 +327,7 @@ export default function SiteHeader() {
             <Link 
               href="/" 
               onClick={closeMobileMenu} 
-              className="flex items-center gap-2 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg"
+              className="flex items-center gap-2 no-underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2 rounded-lg"
             >
               <Image src="/logo.png" alt="" width={32} height={32} aria-hidden="true" />
               <span className="font-bold text-gray-900">Elevate</span>
@@ -335,7 +335,7 @@ export default function SiteHeader() {
             <button
               ref={closeButtonRef}
               onClick={closeMobileMenu}
-              className="flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] bg-transparent border-none cursor-pointer hover:bg-gray-100 active:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 rounded-lg"
+              className="flex items-center justify-center w-11 h-11 min-w-[44px] min-h-[44px] bg-transparent border-none cursor-pointer hover:bg-gray-100 active:bg-gray-200 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2 rounded-lg"
               aria-label="Close navigation menu"
             >
               <X className="w-6 h-6 text-gray-700" aria-hidden="true" />
@@ -352,8 +352,8 @@ export default function SiteHeader() {
                       onClick={() => toggleDropdown(item.name)}
                       className={`
                         flex items-center justify-between w-full px-4 py-3 text-base font-semibold rounded-lg cursor-pointer text-left border-none transition-colors
-                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
-                        ${openDropdown === item.name ? 'bg-gray-100 text-blue-600' : 'bg-transparent text-gray-900 hover:bg-gray-50'}
+                        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2
+                        ${openDropdown === item.name ? 'bg-gray-100 text-brand-blue-600' : 'bg-transparent text-gray-900 hover:bg-gray-50'}
                       `}
                       aria-expanded={openDropdown === item.name}
                       aria-controls={`submenu-${item.name.replace(/\s+/g, '-').toLowerCase()}`}
@@ -377,8 +377,8 @@ export default function SiteHeader() {
                           onClick={closeMobileMenu}
                           className={`
                             block px-4 py-2 text-sm font-medium no-underline transition-colors
-                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
-                            ${isActive(item.href) ? 'text-blue-600 bg-blue-50' : 'text-blue-600 hover:bg-gray-50'}
+                            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2
+                            ${isActive(item.href) ? 'text-brand-blue-600 bg-brand-blue-50' : 'text-brand-blue-600 hover:bg-gray-50'}
                           `}
                           role="menuitem"
                           aria-current={isActive(item.href) ? 'page' : undefined}
@@ -392,8 +392,8 @@ export default function SiteHeader() {
                             onClick={closeMobileMenu}
                             className={`
                               block px-4 py-2 text-sm no-underline transition-colors
-                              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
-                              ${isActive(subItem.href) ? 'text-blue-600 bg-blue-50' : 'text-gray-600 hover:bg-gray-50 hover:text-blue-600'}
+                              focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2
+                              ${isActive(subItem.href) ? 'text-brand-blue-600 bg-brand-blue-50' : 'text-gray-600 hover:bg-gray-50 hover:text-brand-blue-600'}
                             `}
                             role="menuitem"
                             aria-current={isActive(subItem.href) ? 'page' : undefined}
@@ -410,8 +410,8 @@ export default function SiteHeader() {
                     onClick={closeMobileMenu}
                     className={`
                       block px-4 py-3 text-base font-semibold no-underline rounded-lg transition-colors
-                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2
-                      ${isActive(item.href) ? 'text-blue-600 bg-blue-50' : 'text-gray-900 hover:bg-gray-50'}
+                      focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2
+                      ${isActive(item.href) ? 'text-brand-blue-600 bg-brand-blue-50' : 'text-gray-900 hover:bg-gray-50'}
                     `}
                     role="menuitem"
                     aria-current={isActive(item.href) ? 'page' : undefined}
@@ -427,7 +427,7 @@ export default function SiteHeader() {
               <Link
                 href={user ? "/lms/dashboard" : "/login"}
                 onClick={closeMobileMenu}
-                className="block w-full p-3 text-center text-base font-medium text-gray-700 border border-gray-300 rounded-full no-underline mb-3 hover:bg-gray-50 active:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="block w-full p-3 text-center text-base font-medium text-gray-700 border border-gray-300 rounded-full no-underline mb-3 hover:bg-gray-50 active:bg-gray-100 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2"
                 role="menuitem"
               >
                 {user ? 'Dashboard' : 'Sign In'}
@@ -435,7 +435,7 @@ export default function SiteHeader() {
               <Link
                 href="/apply"
                 onClick={closeMobileMenu}
-                className="block w-full p-3 text-center text-base font-semibold !text-white bg-blue-600 rounded-full no-underline hover:bg-blue-700 active:bg-blue-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                className="block w-full p-3 text-center text-base font-semibold !text-white bg-brand-blue-600 rounded-full no-underline hover:bg-brand-blue-700 active:bg-brand-blue-800 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-blue-500 focus-visible:ring-offset-2"
                 style={{ color: 'white' }}
                 role="menuitem"
               >

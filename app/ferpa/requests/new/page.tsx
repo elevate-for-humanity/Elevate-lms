@@ -149,7 +149,7 @@ export default function NewFerpaRequestPage() {
                   key={type.value}
                   className={`flex items-start gap-3 p-4 border rounded-lg cursor-pointer transition-colors ${
                     formData.request_type === type.value
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-brand-blue-500 bg-brand-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
@@ -188,7 +188,7 @@ export default function NewFerpaRequestPage() {
                     id="requester_name"
                     value={formData.requester_name}
                     onChange={(e) => setFormData({ ...formData, requester_name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     required
                   />
                 </div>
@@ -200,7 +200,7 @@ export default function NewFerpaRequestPage() {
                     id="requester_relationship"
                     value={formData.requester_relationship}
                     onChange={(e) => setFormData({ ...formData, requester_relationship: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     required
                   >
                     <option value="">Select relationship</option>
@@ -220,7 +220,7 @@ export default function NewFerpaRequestPage() {
                     id="requester_email"
                     value={formData.requester_email}
                     onChange={(e) => setFormData({ ...formData, requester_email: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     required
                   />
                 </div>
@@ -233,7 +233,7 @@ export default function NewFerpaRequestPage() {
                     id="requester_phone"
                     value={formData.requester_phone}
                     onChange={(e) => setFormData({ ...formData, requester_phone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   />
                 </div>
               </div>
@@ -256,7 +256,7 @@ export default function NewFerpaRequestPage() {
                   id="student_name"
                   value={formData.student_name}
                   onChange={(e) => setFormData({ ...formData, student_name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   required
                 />
               </div>
@@ -269,7 +269,7 @@ export default function NewFerpaRequestPage() {
                   id="student_email"
                   value={formData.student_email}
                   onChange={(e) => setFormData({ ...formData, student_email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -288,7 +288,7 @@ export default function NewFerpaRequestPage() {
                   key={record}
                   className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${
                     formData.records_requested.includes(record)
-                      ? 'border-blue-500 bg-blue-50'
+                      ? 'border-brand-blue-500 bg-brand-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
                   }`}
                 >
@@ -317,7 +317,7 @@ export default function NewFerpaRequestPage() {
                   value={formData.purpose}
                   onChange={(e) => setFormData({ ...formData, purpose: e.target.value })}
                   rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                   placeholder="Describe why these records are being requested..."
                   required
                 />
@@ -330,7 +330,7 @@ export default function NewFerpaRequestPage() {
                   id="priority"
                   value={formData.priority}
                   onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="low">Low</option>
                   <option value="normal">Normal</option>
@@ -367,7 +367,7 @@ export default function NewFerpaRequestPage() {
             <button
               type="submit"
               disabled={loading}
-              className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="inline-flex items-center gap-2 px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <>

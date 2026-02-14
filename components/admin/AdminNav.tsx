@@ -235,7 +235,7 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
                     href={item.href}
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                       active
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-brand-blue-600 text-white'
                         : 'text-gray-300 hover:bg-slate-800 hover:text-white'
                     }`}
                   >
@@ -256,7 +256,7 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
                   <button
                     className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
                       active
-                        ? 'bg-blue-600 text-white'
+                        ? 'bg-brand-blue-600 text-white'
                         : 'text-gray-300 hover:bg-slate-800 hover:text-white'
                     }`}
                   >
@@ -274,7 +274,7 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
                           href={subItem.href}
                           className={`block px-4 py-2 text-sm transition-colors ${
                             pathname?.startsWith(subItem.href)
-                              ? 'bg-blue-600 text-white'
+                              ? 'bg-brand-blue-600 text-white'
                               : 'text-gray-300 hover:bg-slate-700 hover:text-white'
                           }`}
                         >

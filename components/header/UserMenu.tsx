@@ -86,13 +86,13 @@ export function UserMenu({ user, isLoading }: UserMenuProps) {
       <div className="hidden lg:flex items-center gap-4">
         <Link
           href="/login"
-          className="text-black hover:text-blue-600 font-medium transition"
+          className="text-black hover:text-brand-blue-600 font-medium transition"
         >
           Sign In
         </Link>
         <Link
           href="/apply"
-          className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition"
+          className="bg-brand-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-brand-blue-700 transition"
         >
           Apply Now
         </Link>
@@ -112,12 +112,12 @@ export function UserMenu({ user, isLoading }: UserMenuProps) {
         <button
           onClick={() => setIsOpen(!isOpen)}
           onKeyDown={handleKeyDown}
-          className="flex items-center gap-2 text-black hover:text-blue-600 font-medium transition"
+          className="flex items-center gap-2 text-black hover:text-brand-blue-600 font-medium transition"
           aria-haspopup="true"
           aria-expanded={isOpen}
           aria-controls="user-menu"
         >
-          <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
+          <div className="w-8 h-8 bg-brand-blue-600 rounded-full flex items-center justify-center text-white text-sm font-bold">
             {initials.toUpperCase()}
           </div>
           <span className="hidden xl:inline">{displayName}</span>

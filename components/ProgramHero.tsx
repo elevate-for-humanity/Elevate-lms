@@ -86,7 +86,7 @@ export default function ProgramHero({
                 <div className="text-black">100% Funded</div>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6 text-center">
-                <div className="text-3xl font-bold text-blue-600 mb-2">{placement}</div>
+                <div className="text-3xl font-bold text-brand-blue-600 mb-2">{placement}</div>
                 <div className="text-black">Job Placement</div>
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6 text-center">

@@ -22,7 +22,7 @@ export default function CallTextButton({
       <div className={`flex flex-wrap gap-3 ${className}`}>
         <a
           href={`tel:${CONTACT_INFO.phone.tel}`}
-          className={`inline-flex items-center gap-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold ${sizeClasses[size]}`}
+          className={`inline-flex items-center gap-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold ${sizeClasses[size]}`}
         >
           <svg className="h-4 w-4" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">
@@ -50,7 +50,7 @@ d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 
     return (
       <a
         href={`tel:${CONTACT_INFO.phone.tel}`}
-        className={`inline-flex items-center gap-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold ${sizeClasses[size]} ${className}`}
+        className={`inline-flex items-center gap-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold ${sizeClasses[size]} ${className}`}
       >
         <svg className="h-4 w-4" fill="none" stroke="currentColor"
 viewBox="0 0 24 24">

@@ -81,7 +81,7 @@ export function ModuleForm({ programs, module }: ModuleFormProps) {
             name="program_id"
             required
             defaultValue={module?.program_id}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           >
             <option value="">-- Select a program --</option>
             {programs.map((program: any) => (
@@ -105,7 +105,7 @@ export function ModuleForm({ programs, module }: ModuleFormProps) {
             name="title"
             required
             defaultValue={module?.title}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             placeholder="e.g., Introduction to Barbering"
           />
         </div>
@@ -122,7 +122,7 @@ export function ModuleForm({ programs, module }: ModuleFormProps) {
             name="description"
             rows={3}
             defaultValue={module?.description}
-            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             placeholder="Brief description of the module..."
           />
         </div>
@@ -145,7 +145,7 @@ export function ModuleForm({ programs, module }: ModuleFormProps) {
               name="module_type"
               required
               defaultValue={module?.module_type || 'lesson'}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
             >
               <option value="lesson">Lesson</option>
               <option value="scorm">SCORM Package</option>
@@ -169,7 +169,7 @@ export function ModuleForm({ programs, module }: ModuleFormProps) {
               min="0"
               step="1"
               defaultValue={module?.order_index ?? 0}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               placeholder="0"
             />
             <p className="text-sm text-black mt-1">
@@ -191,7 +191,7 @@ export function ModuleForm({ programs, module }: ModuleFormProps) {
               min="0"
               step="0.5"
               defaultValue={module?.duration_hours}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               placeholder="e.g., 2.5"
             />
           </div>
@@ -203,7 +203,7 @@ export function ModuleForm({ programs, module }: ModuleFormProps) {
             id="is_required"
             name="is_required"
             defaultChecked={module?.is_required ?? true}
-            className="w-4 h-4 text-brand-blue-600 border-gray-300 rounded focus:ring-blue-500"
+            className="w-4 h-4 text-brand-blue-600 border-gray-300 rounded focus:ring-brand-blue-500"
           />
           <label
             htmlFor="is_required"
@@ -217,8 +217,8 @@ export function ModuleForm({ programs, module }: ModuleFormProps) {
       {/* SCORM Upload Section */}
       <div className="space-y-4 pt-6 border-t">
         <h2 className="text-xl font-semibold text-black">Content</h2>
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-800">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+          <p className="text-sm text-brand-blue-800">
             <strong>Note:</strong> After creating the module, you can upload
             SCORM packages or add lesson content from the module edit page.
           </p>

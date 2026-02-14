@@ -176,7 +176,7 @@ export default async function VerifyIdentityPage() {
               <h1 className="text-4xl md:text-5xl font-bold mb-2">
                 Verify Your Identity
               </h1>
-              <p className="text-xl text-blue-100">
+              <p className="text-xl text-brand-blue-100">
                 Complete this one-time verification to access all platform
                 features
               </p>
@@ -187,25 +187,25 @@ export default async function VerifyIdentityPage() {
 
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Why Verification */}
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-8">
-          <h2 className="text-xl font-bold text-blue-900 mb-3">
+        <div className="bg-brand-blue-50 border-2 border-brand-blue-200 rounded-lg p-6 mb-8">
+          <h2 className="text-xl font-bold text-brand-blue-900 mb-3">
             Why do we need this?
           </h2>
-          <ul className="space-y-2 text-blue-800">
+          <ul className="space-y-2 text-brand-blue-800">
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Comply with federal workforce development regulations</span>
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Protect your account and personal information</span>
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Enable access to training programs and certifications</span>
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
               <span>Verify eligibility for funded programs</span>
             </li>
           </ul>

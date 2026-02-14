@@ -22,9 +22,9 @@ export default function PrivacyNoticePage() {
       <h1>Privacy Notice</h1>
       <p className="text-xl text-gray-600 mb-8">Last Updated: December 22, 2024</p>
 
-      <div className="bg-blue-50 border-l-4 border-blue-500 p-6 mb-8">
-        <p className="text-lg font-semibold text-blue-900 mb-2">Your Privacy Matters</p>
-        <p className="text-blue-800">
+      <div className="bg-brand-blue-50 border-l-4 border-brand-blue-500 p-6 mb-8">
+        <p className="text-lg font-semibold text-brand-blue-900 mb-2">Your Privacy Matters</p>
+        <p className="text-brand-blue-800">
           Elevate for Humanity is committed to protecting your privacy and handling your personal information 
           with care and transparency. This notice explains what information we collect, how we use it, and your rights.
         </p>
@@ -43,7 +43,7 @@ export default function PrivacyNoticePage() {
           <li><strong>Visitors:</strong> Users of our website and platforms</li>
         </ul>
         <p>
-          This notice supplements our comprehensive <Link href="/policies/privacy" className="text-blue-600 hover:text-blue-800">Privacy Policy</Link> and 
+          This notice supplements our comprehensive <Link href="/policies/privacy" className="text-brand-blue-600 hover:text-brand-blue-800">Privacy Policy</Link> and 
           provides specific information about data practices.
         </p>
       </section>
@@ -293,7 +293,7 @@ export default function PrivacyNoticePage() {
           <li>Resolve disputes and enforce agreements</li>
         </ul>
         <p>
-          See our <Link href="/policies/data-retention" className="text-blue-600 hover:text-blue-800">Data Retention Policy</Link> for 
+          See our <Link href="/policies/data-retention" className="text-brand-blue-600 hover:text-brand-blue-800">Data Retention Policy</Link> for 
           specific retention periods.
         </p>
 
@@ -318,7 +318,7 @@ export default function PrivacyNoticePage() {
           <li>File complaints with the Department of Education</li>
         </ul>
         <p>
-          See our <Link href="/policies/ferpa" className="text-blue-600 hover:text-blue-800">FERPA Policy</Link> for details.
+          See our <Link href="/policies/ferpa" className="text-brand-blue-600 hover:text-brand-blue-800">FERPA Policy</Link> for details.
         </p>
 
         <h3>General Privacy Rights</h3>
@@ -431,13 +431,13 @@ export default function PrivacyNoticePage() {
           <h3 className="mt-0">Privacy Office</h3>
           <p className="mb-2">
             <strong>Email:</strong>{' '}
-            <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:text-blue-800">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:text-brand-blue-800">
               elevate4humanityedu@gmail.com
             </a>
           </p>
           <p className="mb-2">
             <strong>Phone:</strong>{' '}
-            <a href="/support" className="text-blue-600 hover:text-blue-800">
+            <a href="/support" className="text-brand-blue-600 hover:text-brand-blue-800">
               Get Help Online
             </a>
           </p>
@@ -453,7 +453,7 @@ export default function PrivacyNoticePage() {
         <h3>Data Protection Officer</h3>
         <p>
           For questions about data protection and privacy compliance, contact our Data Protection Officer at{' '}
-          <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:text-blue-800">
+          <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:text-brand-blue-800">
             elevate4humanityedu@gmail.com
           </a>
         </p>
@@ -478,21 +478,21 @@ export default function PrivacyNoticePage() {
       <section className="mb-12">
         <h2>Related Policies</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Link href="/policies/privacy" className="block p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-            <h3 className="text-lg font-semibold text-blue-900 mt-0 mb-2">Privacy Policy</h3>
-            <p className="text-blue-800 text-sm mb-0">Comprehensive privacy policy and practices</p>
+          <Link href="/policies/privacy" className="block p-4 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100 transition-colors">
+            <h3 className="text-lg font-semibold text-brand-blue-900 mt-0 mb-2">Privacy Policy</h3>
+            <p className="text-brand-blue-800 text-sm mb-0">Comprehensive privacy policy and practices</p>
           </Link>
-          <Link href="/policies/ferpa" className="block p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-            <h3 className="text-lg font-semibold text-blue-900 mt-0 mb-2">FERPA Policy</h3>
-            <p className="text-blue-800 text-sm mb-0">Student education records privacy rights</p>
+          <Link href="/policies/ferpa" className="block p-4 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100 transition-colors">
+            <h3 className="text-lg font-semibold text-brand-blue-900 mt-0 mb-2">FERPA Policy</h3>
+            <p className="text-brand-blue-800 text-sm mb-0">Student education records privacy rights</p>
           </Link>
-          <Link href="/policies/data-retention" className="block p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-            <h3 className="text-lg font-semibold text-blue-900 mt-0 mb-2">Data Retention Policy</h3>
-            <p className="text-blue-800 text-sm mb-0">How long we keep your information</p>
+          <Link href="/policies/data-retention" className="block p-4 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100 transition-colors">
+            <h3 className="text-lg font-semibold text-brand-blue-900 mt-0 mb-2">Data Retention Policy</h3>
+            <p className="text-brand-blue-800 text-sm mb-0">How long we keep your information</p>
           </Link>
-          <Link href="/policies/acceptable-use" className="block p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
-            <h3 className="text-lg font-semibold text-blue-900 mt-0 mb-2">Acceptable Use Policy</h3>
-            <p className="text-blue-800 text-sm mb-0">Guidelines for using our platforms</p>
+          <Link href="/policies/acceptable-use" className="block p-4 bg-brand-blue-50 rounded-lg hover:bg-brand-blue-100 transition-colors">
+            <h3 className="text-lg font-semibold text-brand-blue-900 mt-0 mb-2">Acceptable Use Policy</h3>
+            <p className="text-brand-blue-800 text-sm mb-0">Guidelines for using our platforms</p>
           </Link>
         </div>
       </section>

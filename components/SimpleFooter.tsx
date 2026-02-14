@@ -11,7 +11,7 @@ export default function SimpleFooter() {
               <li>
                 <Link
                   href="/about"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   About
                 </Link>
@@ -19,7 +19,7 @@ export default function SimpleFooter() {
               <li>
                 <Link
                   href="/programs"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Programs
                 </Link>
@@ -27,7 +27,7 @@ export default function SimpleFooter() {
               <li>
                 <Link
                   href="/courses"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Courses
                 </Link>
@@ -40,7 +40,7 @@ export default function SimpleFooter() {
               <li>
                 <Link
                   href="/student/dashboard"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Learners
                 </Link>
@@ -48,7 +48,7 @@ export default function SimpleFooter() {
               <li>
                 <Link
                   href="/employers"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Employers
                 </Link>
@@ -61,7 +61,7 @@ export default function SimpleFooter() {
               <li>
                 <Link
                   href="/contact"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Contact
                 </Link>
@@ -69,7 +69,7 @@ export default function SimpleFooter() {
               <li>
                 <Link
                   href="/faq"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Help Center
                 </Link>
@@ -82,7 +82,7 @@ export default function SimpleFooter() {
               <li>
                 <Link
                   href="/privacy-policy"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Privacy
                 </Link>
@@ -90,7 +90,7 @@ export default function SimpleFooter() {
               <li>
                 <Link
                   href="/terms-of-service"
-                  className="text-sm text-black hover:text-blue-600"
+                  className="text-sm text-black hover:text-brand-blue-600"
                 >
                   Terms
                 </Link>
@@ -99,7 +99,7 @@ export default function SimpleFooter() {
           </div>
         </div>
         <div className="pt-8 border-t border-gray-200 text-center space-y-2">
-          <p className="text-sm font-medium text-blue-600">
+          <p className="text-sm font-medium text-brand-blue-600">
             Currently serving Indiana residents.
           </p>
           <p className="text-sm text-gray-500">

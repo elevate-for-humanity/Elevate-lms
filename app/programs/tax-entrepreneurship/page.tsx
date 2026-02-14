@@ -78,7 +78,7 @@ export default async function TaxEntrepreneurshipPage() {
             </Link>
             <Link
               href="/contact"
-              className="px-8 py-4 bg-white hover:bg-gray-100 text-blue-900 font-bold rounded-lg transition-all text-center"
+              className="px-8 py-4 bg-white hover:bg-gray-100 text-brand-blue-900 font-bold rounded-lg transition-all text-center"
             >
               Get Free Info
             </Link>

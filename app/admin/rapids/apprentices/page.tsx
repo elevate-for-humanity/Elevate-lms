@@ -35,9 +35,9 @@ interface Apprentice {
 
 const STATUS_COLORS: Record<string, string> = {
   pending: 'bg-yellow-100 text-yellow-800',
-  registered: 'bg-blue-100 text-blue-800',
+  registered: 'bg-brand-blue-100 text-brand-blue-800',
   active: 'bg-green-100 text-green-800',
-  completed: 'bg-blue-100 text-blue-800',
+  completed: 'bg-brand-blue-100 text-brand-blue-800',
   cancelled: 'bg-red-100 text-red-800',
   exited: 'bg-gray-100 text-gray-800',
 };
@@ -142,7 +142,7 @@ export default function RAPIDSApprenticesPage() {
             href="https://entbpmp.dol.gov/suite/sites/oa/page/home"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             <ExternalLink className="w-4 h-4" />
             Open RAPIDS Portal
@@ -175,8 +175,8 @@ export default function RAPIDSApprenticesPage() {
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <FileSpreadsheet className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <FileSpreadsheet className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.registered}</p>
@@ -197,8 +197,8 @@ export default function RAPIDSApprenticesPage() {
           </div>
           <div className="bg-white rounded-xl p-4 border border-gray-200">
             <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 rounded-lg">
-                <Circle className="w-5 h-5 text-blue-600" />
+              <div className="p-2 bg-brand-blue-100 rounded-lg">
+                <Circle className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{stats.completed}</p>
@@ -226,7 +226,7 @@ export default function RAPIDSApprenticesPage() {
                 <button
                   onClick={() => handleExport('registration', 'csv')}
                   disabled={exporting}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-brand-blue-600 text-white text-sm rounded-lg hover:bg-brand-blue-700 disabled:opacity-50"
                 >
                   <Download className="w-4 h-4" />
                   CSV
@@ -276,7 +276,7 @@ export default function RAPIDSApprenticesPage() {
                 <button
                   onClick={() => handleExport('completion', 'csv')}
                   disabled={exporting}
-                  className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="flex-1 inline-flex items-center justify-center gap-2 px-3 py-2 bg-brand-blue-600 text-white text-sm rounded-lg hover:bg-brand-blue-700 disabled:opacity-50"
                 >
                   <Download className="w-4 h-4" />
                   CSV
@@ -304,7 +304,7 @@ export default function RAPIDSApprenticesPage() {
                   placeholder="Search apprentices..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
               <div className="flex items-center gap-2">
@@ -312,7 +312,7 @@ export default function RAPIDSApprenticesPage() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 >
                   <option value="all">All Status</option>
                   <option value="pending">Pending</option>
@@ -338,14 +338,14 @@ export default function RAPIDSApprenticesPage() {
               <p className="text-gray-600">{error}</p>
               <button
                 onClick={fetchApprentices}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                className="mt-4 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700"
               >
                 Retry
               </button>
             </div>
           ) : loading ? (
             <div className="p-8 text-center">
-              <RefreshCw className="w-8 h-8 text-blue-600 animate-spin mx-auto mb-4" />
+              <RefreshCw className="w-8 h-8 text-brand-blue-600 animate-spin mx-auto mb-4" />
               <p className="text-gray-600">Loading apprentices...</p>
             </div>
           ) : filteredApprentices.length === 0 ? (
@@ -415,7 +415,7 @@ export default function RAPIDSApprenticesPage() {
                         </div>
                         <div className="w-full bg-gray-200 rounded-full h-1.5 mt-1">
                           <div 
-                            className="bg-blue-600 h-1.5 rounded-full" 
+                            className="bg-brand-blue-600 h-1.5 rounded-full" 
                             style={{ 
                               width: `${Math.min(100, ((apprentice.ojtHoursCompleted || 0) / (apprentice.totalHoursRequired || 1500)) * 100)}%` 
                             }}
@@ -438,9 +438,9 @@ export default function RAPIDSApprenticesPage() {
         </div>
 
         {/* Instructions */}
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-xl p-6">
-          <h3 className="font-semibold text-blue-900 mb-3">How to Submit to RAPIDS</h3>
-          <ol className="list-decimal list-inside space-y-2 text-sm text-blue-800">
+        <div className="mt-6 bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
+          <h3 className="font-semibold text-brand-blue-900 mb-3">How to Submit to RAPIDS</h3>
+          <ol className="list-decimal list-inside space-y-2 text-sm text-brand-blue-800">
             <li>Click "Export" above to download the CSV file for the report type you need</li>
             <li>Click "Open RAPIDS Portal" to go to the DOL RAPIDS system</li>
             <li>Log in with your Login.gov credentials (complete MFA if prompted)</li>

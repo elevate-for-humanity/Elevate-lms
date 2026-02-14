@@ -93,13 +93,13 @@ export default function AIInstructor({
   };
 
   return (
-    <div className="bg-blue-50 rounded-xl p-6 shadow-lg border-2 border-blue-200">
+    <div className="bg-brand-blue-50 rounded-xl p-6 shadow-lg border-2 border-brand-blue-200">
       <div className="flex items-start gap-4">
         {/* Avatar */}
         <div className="flex-shrink-0">
           <div
             className={`relative w-20 h-20 rounded-full overflow-hidden border-4 ${
-              isSpeaking ? 'border-blue-500 animate-pulse' : 'border-gray-300'
+              isSpeaking ? 'border-brand-blue-500 animate-pulse' : 'border-gray-300'
             }`}
           >
             <Image loading="lazy"
@@ -115,8 +115,8 @@ export default function AIInstructor({
               }}
             />
             {isSpeaking && (
-              <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
-                <div className="w-3 h-3 bg-blue-500 rounded-full animate-ping" />
+              <div className="absolute inset-0 bg-brand-blue-500 bg-opacity-20 flex items-center justify-center">
+                <div className="w-3 h-3 bg-brand-blue-500 rounded-full animate-ping" />
               </div>
             )}
           </div>

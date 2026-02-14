@@ -122,7 +122,7 @@ export default async function FERPAPortal() {
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
+              <div className="p-3 bg-brand-blue-100 rounded-lg">
                 <Users className="w-6 h-6 text-brand-blue-600" />
               </div>
               <span className="text-sm text-slate-500">Total</span>
@@ -161,8 +161,8 @@ export default async function FERPAPortal() {
 
           <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
             <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Shield className="w-6 h-6 text-blue-600" />
+              <div className="p-3 bg-brand-blue-100 rounded-lg">
+                <Shield className="w-6 h-6 text-brand-blue-600" />
               </div>
               <span className="text-sm text-slate-500">Status</span>
             </div>
@@ -175,9 +175,9 @@ export default async function FERPAPortal() {
         <div className="grid md:grid-cols-3 gap-6">
           {/* Student Records */}
           <Link href="/ferpa/records" aria-label="Link" className="group">
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-blue-300 transition">
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-brand-blue-300 transition">
               <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition">
+                <div className="p-3 bg-brand-blue-100 rounded-lg group-hover:bg-brand-blue-200 transition">
                   <FileText className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <div>
@@ -245,10 +245,10 @@ export default async function FERPAPortal() {
             className="group"
             aria-label="FERPA Compliance and Standards"
           >
-            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-blue-300 transition">
+            <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200 hover:shadow-lg hover:border-brand-blue-300 transition">
               <div className="flex items-center gap-4 mb-4">
-                <div className="p-3 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition">
-                  <Shield className="w-8 h-8 text-blue-600" />
+                <div className="p-3 bg-brand-blue-100 rounded-lg group-hover:bg-brand-blue-200 transition">
+                  <Shield className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-lg font-bold text-black">
@@ -404,7 +404,7 @@ export default async function FERPAPortal() {
             </Link>
             <Link
               href="/ferpa/reports/generate"
-              className="px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-center font-medium"
+              className="px-4 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition text-center font-medium"
               aria-label="Generate FERPA Report"
             >
               Generate Report

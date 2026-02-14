@@ -256,14 +256,14 @@ export default async function StudentPortalPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/lms"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition"
             >
               <GraduationCap className="w-5 h-5" />
               Sign In to My Dashboard
             </Link>
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center gap-2 bg-blue-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-800 transition border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-800 transition border-2 border-white"
             >
               Not Enrolled? Apply Now
               <ArrowRight className="w-5 h-5" />
@@ -298,17 +298,17 @@ export default async function StudentPortalPage() {
               <Link
                 key={index}
                 href={link.href}
-                className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-blue-600 hover:shadow-lg transition group"
+                className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-blue-600 hover:shadow-lg transition group"
               >
                 <div className="relative h-36">
                   <Image src={link.image} alt={link.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
                 <div className="p-6">
-                  <h3 className="text-xl font-bold text-black mb-2 group-hover:text-blue-600 transition">
+                  <h3 className="text-xl font-bold text-black mb-2 group-hover:text-brand-blue-600 transition">
                     {link.title}
                   </h3>
                   <p className="text-gray-600 mb-4">{link.description}</p>
-                  <span className="text-blue-600 font-semibold text-sm flex items-center gap-1">
+                  <span className="text-brand-blue-600 font-semibold text-sm flex items-center gap-1">
                     Access Now <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
@@ -373,7 +373,7 @@ export default async function StudentPortalPage() {
                 href={resource.href}
                 className="bg-white rounded-xl p-6 hover:shadow-lg transition"
               >
-                <resource.icon className="w-10 h-10 text-blue-600 mb-4" />
+                <resource.icon className="w-10 h-10 text-brand-blue-600 mb-4" />
                 <h3 className="text-lg font-bold text-black mb-2">
                   {resource.title}
                 </h3>
@@ -398,9 +398,9 @@ export default async function StudentPortalPage() {
               <Link
                 key={index}
                 href={option.href}
-                className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-blue-600 transition text-center"
+                className="bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-brand-blue-600 transition text-center"
               >
-                <option.icon className="w-12 h-12 text-blue-600 mx-auto mb-4" />
+                <option.icon className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
                 <h3 className="text-lg font-bold text-black mb-2">
                   {option.title}
                 </h3>
@@ -445,14 +445,14 @@ export default async function StudentPortalPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/apply"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100 transition"
             >
               Apply Now
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/pathways"
-              className="inline-flex items-center justify-center gap-2 bg-blue-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-800 transition border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-700 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-800 transition border-2 border-white"
             >
               Browse Pathways
               <BookOpen className="w-5 h-5" />

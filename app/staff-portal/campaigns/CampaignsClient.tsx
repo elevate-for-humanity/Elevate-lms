@@ -100,8 +100,8 @@ export default function CampaignsClient({
                 onClick={() => handleTemplateSelect(template)}
                 className={`w-full text-left p-3 rounded border ${
                   selectedTemplate?.id === template.id
-                    ? 'border-blue-500 bg-blue-50'
-                    : 'border-gray-200 hover:border-blue-300'
+                    ? 'border-brand-blue-500 bg-brand-blue-50'
+                    : 'border-gray-200 hover:border-brand-blue-300'
                 }`}
               >
                 <div className="font-medium">{template.subject}</div>
@@ -168,7 +168,7 @@ export default function CampaignsClient({
             <button
               onClick={handleSend}
               disabled={loading}
-              className="px-6 py-3 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
+              className="px-6 py-3 bg-brand-blue-600 text-white rounded hover:bg-brand-blue-700 disabled:opacity-50 flex items-center gap-2"
             >
               {loading ? (
                 <>

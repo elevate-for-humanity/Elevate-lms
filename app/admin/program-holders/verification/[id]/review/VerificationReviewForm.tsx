@@ -142,7 +142,7 @@ export default function VerificationReviewForm({
         <div className="max-w-7xl mx-auto px-6 py-6">
           <Link
             href="/admin/program-holders/verification"
-            className="inline-flex items-center gap-2 text-blue-600 hover:text-blue-700 mb-4"
+            className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-brand-blue-700 mb-4"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Verifications
@@ -237,7 +237,7 @@ export default function VerificationReviewForm({
                         <a
                           href={`/api/admin/documents/${doc.id}/view`}
                           target="_blank"
-                          className="p-2 text-blue-600 hover:bg-gray-50 rounded"
+                          className="p-2 text-brand-blue-600 hover:bg-gray-50 rounded"
                           rel="noreferrer"
                         >
                           <Eye className="w-5 h-5" />
@@ -392,7 +392,7 @@ export default function VerificationReviewForm({
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
                     rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                     placeholder="Add any notes about this verification..."
                   />
                 </div>
@@ -401,7 +401,7 @@ export default function VerificationReviewForm({
                 <button
                   onClick={handleSubmit}
                   disabled={!decision || loading}
-                  className="w-full px-4 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full px-4 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? 'Processing...' : 'Submit Decision'}
                 </button>

@@ -140,7 +140,7 @@ export default function DocumentUploadPage() {
               onChange={(e) =>
                 setContactInfo({ ...contactInfo, name: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="Your full name"
             />
           </div>
@@ -155,7 +155,7 @@ export default function DocumentUploadPage() {
               onChange={(e) =>
                 setContactInfo({ ...contactInfo, email: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="your.email@gmail.com"
             />
           </div>
@@ -170,7 +170,7 @@ export default function DocumentUploadPage() {
               onChange={(e) =>
                 setContactInfo({ ...contactInfo, phone: e.target.value })
               }
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               placeholder="Get Help Online"
             />
           </div>
@@ -317,7 +317,7 @@ export default function DocumentUploadPage() {
       </section>
 
       {/* Security Notice */}
-      <section className="mt-6 rounded-2xl bg-blue-50 border-l-4 border-brand-blue-600 p-6">
+      <section className="mt-6 rounded-2xl bg-brand-blue-50 border-l-4 border-brand-blue-600 p-6">
         <h3 className="font-semibold text-black mb-2">Secure Upload</h3>
         <p className="text-sm text-black">
           Your documents are encrypted during upload and stored securely. We use

@@ -92,7 +92,7 @@ export default async function InstructorStudentsPage() {
         <div className="grid grid-cols-3 gap-4 mb-6">
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center gap-3">
-              <Users className="w-8 h-8 text-blue-600" />
+              <Users className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <div className="text-2xl font-bold">{enrollments?.length || 0}</div>
                 <div className="text-sm text-gray-600">Total Students</div>
@@ -126,7 +126,7 @@ export default async function InstructorStudentsPage() {
             <input
               type="text"
               placeholder="Search students..."
-              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
             />
           </div>
         </div>
@@ -150,8 +150,8 @@ export default async function InstructorStudentsPage() {
                   <tr key={enrollment.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                          <Users className="w-4 h-4 text-blue-600" />
+                        <div className="w-8 h-8 bg-brand-blue-100 rounded-full flex items-center justify-center">
+                          <Users className="w-4 h-4 text-brand-blue-600" />
                         </div>
                         <div>
                           <div className="font-medium text-gray-900">
@@ -170,7 +170,7 @@ export default async function InstructorStudentsPage() {
                       <div className="flex items-center gap-2">
                         <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div 
-                            className="h-full bg-blue-600 rounded-full"
+                            className="h-full bg-brand-blue-600 rounded-full"
                             style={{ width: `${enrollment.progress || 0}%` }}
                           />
                         </div>
@@ -182,7 +182,7 @@ export default async function InstructorStudentsPage() {
                         enrollment.status === 'completed' 
                           ? 'bg-green-100 text-green-800'
                           : enrollment.status === 'active'
-                          ? 'bg-blue-100 text-blue-800'
+                          ? 'bg-brand-blue-100 text-brand-blue-800'
                           : 'bg-gray-100 text-gray-800'
                       }`}>
                         {enrollment.status}
@@ -195,7 +195,7 @@ export default async function InstructorStudentsPage() {
                       {enrollment.profiles?.email && (
                         <a
                           href={`mailto:${enrollment.profiles.email}`}
-                          className="text-blue-600 hover:text-blue-800"
+                          className="text-brand-blue-600 hover:text-brand-blue-800"
                         >
                           <Mail className="w-5 h-5" />
                         </a>

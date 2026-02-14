@@ -38,7 +38,7 @@ export default function WIOAVerifyPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="max-w-5xl mx-auto">
-        <Link href="/admin/wioa/eligibility" className="flex items-center gap-2 text-gray-600 hover:text-blue-600 mb-6">
+        <Link href="/admin/wioa/eligibility" className="flex items-center gap-2 text-gray-600 hover:text-brand-blue-600 mb-6">
           <ArrowLeft className="w-4 h-4" />
           Back to Eligibility List
         </Link>
@@ -131,7 +131,7 @@ export default function WIOAVerifyPage() {
               <textarea
                 rows={4}
                 placeholder="Add verification notes..."
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
               />
             </div>
           </div>
@@ -155,7 +155,7 @@ export default function WIOAVerifyPage() {
                       </button>
                     ) : (
                       <button className="p-2 hover:bg-gray-100 rounded-lg">
-                        <Upload className="w-4 h-4 text-blue-600" />
+                        <Upload className="w-4 h-4 text-brand-blue-600" />
                       </button>
                     )}
                   </div>

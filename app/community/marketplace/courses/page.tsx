@@ -77,10 +77,10 @@ export default function CommunityCoursesPage() {
       </div>
 
       {/* Header */}
-      <div className="bg-blue-900 text-white py-12">
+      <div className="bg-brand-blue-900 text-white py-12">
         <div className="max-w-7xl mx-auto px-4">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">Community Courses</h1>
-          <p className="text-blue-100">Learn from peers and industry experts</p>
+          <p className="text-brand-blue-100">Learn from peers and industry experts</p>
         </div>
       </div>
 
@@ -93,7 +93,7 @@ export default function CommunityCoursesPage() {
               <input
                 type="text"
                 placeholder="Search courses..."
-                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
             <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
@@ -102,7 +102,7 @@ export default function CommunityCoursesPage() {
                   key={index}
                   className={`px-4 py-2 rounded-lg whitespace-nowrap transition ${
                     index === 0
-                      ? 'bg-blue-600 text-white'
+                      ? 'bg-brand-blue-600 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -165,7 +165,7 @@ export default function CommunityCoursesPage() {
                     <Users className="w-4 h-4 mr-1" />
                     {course.students} students
                   </span>
-                  <button className="flex items-center text-blue-600 font-medium hover:text-blue-700">
+                  <button className="flex items-center text-brand-blue-600 font-medium hover:text-brand-blue-700">
                     <Play className="w-4 h-4 mr-1" />
                     Preview
                   </button>
@@ -183,15 +183,15 @@ export default function CommunityCoursesPage() {
         </div>
 
         {/* Become Instructor CTA */}
-        <div className="mt-12 bg-blue-600 rounded-xl p-8 text-white text-center">
+        <div className="mt-12 bg-brand-blue-600 rounded-xl p-8 text-white text-center">
           <BookOpen className="w-12 h-12 mx-auto mb-4 opacity-80" />
           <h2 className="text-2xl font-bold mb-2">Share Your Knowledge</h2>
-          <p className="text-blue-100 mb-6 max-w-xl mx-auto">
+          <p className="text-brand-blue-100 mb-6 max-w-xl mx-auto">
             Have expertise to share? Create a course and help others succeed while earning income.
           </p>
           <Link
             href="/creator"
-            className="bg-white text-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition inline-block"
+            className="bg-white text-brand-blue-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition inline-block"
           >
             Become an Instructor
           </Link>

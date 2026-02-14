@@ -92,7 +92,7 @@ export default async function PlatformLicensingPage() {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 href="#license-types"
-                className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+                className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
               >
                 Compare License Types
               </Link>
@@ -334,7 +334,7 @@ export default async function PlatformLicensingPage() {
 
               <Link
                 href="/pricing/program-holder"
-                className="block w-full bg-white text-blue-600 hover:bg-slate-100 text-center px-6 py-4 rounded-lg font-bold transition text-lg"
+                className="block w-full bg-white text-brand-blue-600 hover:bg-slate-100 text-center px-6 py-4 rounded-lg font-bold transition text-lg"
               >
                 Learn More & Apply →
               </Link>
@@ -414,8 +414,8 @@ export default async function PlatformLicensingPage() {
             {/* License Type 3: Apprenticeship Only */}
             <div className="bg-white rounded-2xl shadow-lg border-2 border-slate-200 p-8 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Shield className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                  <Shield className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-2xl font-bold text-black">
@@ -434,9 +434,9 @@ export default async function PlatformLicensingPage() {
                 </div>
               </div>
 
-              <div className="bg-blue-50 rounded-xl p-4 mb-6">
-                <div className="font-bold text-blue-900 mb-2">Includes:</div>
-                <div className="space-y-1 text-sm text-blue-800">
+              <div className="bg-brand-blue-50 rounded-xl p-4 mb-6">
+                <div className="font-bold text-brand-blue-900 mb-2">Includes:</div>
+                <div className="space-y-1 text-sm text-brand-blue-800">
                   <div>• RAPIDS lifecycle tracking</div>
                   <div>• Sponsor dashboard</div>
                   <div>• Employer onboarding</div>
@@ -463,18 +463,18 @@ export default async function PlatformLicensingPage() {
                 </div>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-4 mb-6 text-sm">
-                <div className="font-bold text-blue-900 mb-1">
+              <div className="bg-brand-blue-50 rounded-lg p-4 mb-6 text-sm">
+                <div className="font-bold text-brand-blue-900 mb-1">
                   <CheckCircle className="w-5 h-5 inline-block" /> Best For:
                 </div>
-                <div className="text-blue-800">
+                <div className="text-brand-blue-800">
                   Organizations focused only on apprenticeships.
                 </div>
               </div>
 
               <Link
                 href="/pricing/sponsor-licensing"
-                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-6 py-4 rounded-lg font-bold transition text-lg"
+                className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-6 py-4 rounded-lg font-bold transition text-lg"
               >
                 View Details →
               </Link>
@@ -679,7 +679,7 @@ export default async function PlatformLicensingPage() {
 
               <Link
                 href="/contact?tier=government"
-                className="block w-full bg-white text-blue-600 hover:bg-slate-100 text-center px-4 py-3 rounded-lg font-bold transition"
+                className="block w-full bg-white text-brand-blue-600 hover:bg-slate-100 text-center px-4 py-3 rounded-lg font-bold transition"
               >
                 Get Started
               </Link>
@@ -688,8 +688,8 @@ export default async function PlatformLicensingPage() {
             {/* Tier 3: Federal Contractor */}
             <div className="bg-white rounded-2xl shadow-lg border-2 border-slate-200 p-6 hover:shadow-2xl transition">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                  <Users className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
+                  <Users className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <div>
                   <h3 className="text-xl font-bold text-black">
@@ -727,7 +727,7 @@ export default async function PlatformLicensingPage() {
                 </div>
               </div>
 
-              <div className="bg-blue-50 rounded-lg p-3 mb-4 text-xs">
+              <div className="bg-brand-blue-50 rounded-lg p-3 mb-4 text-xs">
                 <div className="font-semibold mb-1">$285K-$575K Value</div>
                 <div className="text-black">
                   All Gov + DOL + Multi-State
@@ -736,7 +736,7 @@ export default async function PlatformLicensingPage() {
 
               <Link
                 href="/contact?tier=federal"
-                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-4 py-3 rounded-lg font-bold transition"
+                className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-4 py-3 rounded-lg font-bold transition"
               >
                 Get Started
               </Link>
@@ -918,7 +918,7 @@ export default async function PlatformLicensingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/demos"
-              className="inline-block bg-white text-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
+              className="inline-block bg-white text-brand-blue-600 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition"
             >
               View Live Demos
             </Link>

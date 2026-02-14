@@ -149,8 +149,8 @@ export default async function OrientationPage() {
               </h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-sm font-bold text-blue-600">1</span>
+                  <div className="w-8 h-8 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <span className="text-sm font-bold text-brand-blue-600">1</span>
                   </div>
                   <div>
                     <p className="font-medium text-black">
@@ -209,7 +209,7 @@ export default async function OrientationPage() {
                   href="/programs"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition"
                 >
-                  <Book className="w-5 h-5 text-blue-600" />
+                  <Book className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-sm font-medium text-black">
                     Browse Programs
                   </span>
@@ -218,7 +218,7 @@ export default async function OrientationPage() {
                   href="/how-it-works"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition"
                 >
-                  <Users className="w-5 h-5 text-blue-600" />
+                  <Users className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-sm font-medium text-black">
                     How It Works
                   </span>
@@ -227,7 +227,7 @@ export default async function OrientationPage() {
                   href="/financial-aid"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition"
                 >
-                  <Award className="w-5 h-5 text-blue-600" />
+                  <Award className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-sm font-medium text-black">
                     Funding Options
                   </span>
@@ -236,7 +236,7 @@ export default async function OrientationPage() {
                   href="/career-services"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 transition"
                 >
-                  <Briefcase className="w-5 h-5 text-blue-600" />
+                  <Briefcase className="w-5 h-5 text-brand-blue-600" />
                   <span className="text-sm font-medium text-black">
                     Career Services
                   </span>
@@ -245,16 +245,16 @@ export default async function OrientationPage() {
             </div>
 
             {/* Support */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-blue-900 mb-2">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
+              <h3 className="text-lg font-bold text-brand-blue-900 mb-2">
                 Need Help?
               </h3>
-              <p className="text-sm text-blue-700 mb-4">
+              <p className="text-sm text-brand-blue-700 mb-4">
                 Our team is here to support you every step of the way.
               </p>
               <Link
                 href="/contact"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium text-sm"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-medium text-sm"
               >
                 Contact Support
               </Link>
@@ -276,7 +276,7 @@ export default async function OrientationPage() {
               </div>
               <Link
                 href="/apply"
-                className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-medium whitespace-nowrap"
+                className="px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-medium whitespace-nowrap"
               >
                 Verify Eligibility →
               </Link>

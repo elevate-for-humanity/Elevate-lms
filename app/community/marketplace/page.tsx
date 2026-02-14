@@ -54,7 +54,7 @@ const FEATURED_CATEGORIES = [
     name: 'Skilled Trades',
     description: 'HVAC manuals, electrical code books, welding equipment, tool kits',
     icon: Wrench,
-    color: 'bg-blue-100 text-blue-600',
+    color: 'bg-brand-blue-100 text-brand-blue-600',
   },
   {
     id: 'beauty',
@@ -75,7 +75,7 @@ const FEATURED_CATEGORIES = [
     name: 'Technology & IT',
     description: 'CompTIA study guides, lab equipment, practice exams, software tools',
     icon: Monitor,
-    color: 'bg-blue-100 text-blue-600',
+    color: 'bg-brand-blue-100 text-brand-blue-600',
   },
 ];
 
@@ -315,7 +315,7 @@ export default async function CommunityMarketplacePage() {
                           {course.category || 'Course'}
                         </span>
                         {course.creator_profiles?.verified && (
-                          <span className="text-blue-600 text-xs font-medium">• Verified</span>
+                          <span className="text-brand-blue-600 text-xs font-medium">• Verified</span>
                         )}
                       </div>
                       <h3 className="text-xl font-bold text-slate-900 mb-2 group-hover:text-green-600 transition line-clamp-2">
@@ -430,7 +430,7 @@ export default async function CommunityMarketplacePage() {
                         <div className="flex items-center justify-between text-xs text-slate-500">
                           <span>{product.shop_profiles?.shop_name}</span>
                           {product.shop_profiles?.verified && (
-                            <span className="text-blue-600 font-medium">• Verified</span>
+                            <span className="text-brand-blue-600 font-medium">• Verified</span>
                           )}
                         </div>
                       </div>
@@ -499,15 +499,15 @@ export default async function CommunityMarketplacePage() {
                 <p className="text-sm text-slate-600 mt-1">All sellers are vetted and verified</p>
               </div>
               <div>
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Tag className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Tag className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-slate-900">Best Prices</h3>
                 <p className="text-sm text-slate-600 mt-1">Competitive pricing from the community</p>
               </div>
               <div>
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
-                  <Star className="w-6 h-6 text-blue-600" />
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center mx-auto mb-3">
+                  <Star className="w-6 h-6 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-slate-900">Quality Guaranteed</h3>
                 <p className="text-sm text-slate-600 mt-1">Ratings and reviews from real buyers</p>

@@ -121,7 +121,7 @@ export default async function LeaderboardPage() {
                 <div className="w-8 text-center font-bold text-slate-500">
                   {index + 4}
                 </div>
-                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-medium">
+                <div className="w-10 h-10 rounded-full bg-brand-blue-500 flex items-center justify-center text-white font-medium">
                   {learner.full_name?.charAt(0) || 'U'}
                 </div>
                 <div className="flex-1">

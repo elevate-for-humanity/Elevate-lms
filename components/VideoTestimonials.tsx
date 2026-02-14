@@ -129,7 +129,7 @@ export default function VideoTestimonials() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-semibold mb-4">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-full text-sm font-semibold mb-4">
             <Quote className="w-4 h-4" />
             Real Stories, Real Success
           </div>
@@ -187,7 +187,7 @@ export default function VideoTestimonials() {
                           onClick={() => setSelectedVideo(testimonial)}
                           className="w-16 h-16 bg-white rounded-full flex items-center justify-center hover:scale-110 transition-transform"
                         >
-                          <Play className="w-8 h-8 text-blue-600 ml-1" />
+                          <Play className="w-8 h-8 text-brand-blue-600 ml-1" />
                         </button>
                       </div>
 
@@ -201,7 +201,7 @@ export default function VideoTestimonials() {
                         onClick={() => setSelectedVideo(testimonial)}
                         className="absolute top-3 left-3 w-10 h-10 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors"
                       >
-                        <Play className="w-5 h-5 text-blue-600 ml-0.5" />
+                        <Play className="w-5 h-5 text-brand-blue-600 ml-0.5" />
                       </button>
                     </div>
 
@@ -212,7 +212,7 @@ export default function VideoTestimonials() {
                           <h3 className="text-xl font-bold text-black mb-1">
                             {testimonial.name}
                           </h3>
-                          <p className="text-sm text-blue-600 font-semibold">
+                          <p className="text-sm text-brand-blue-600 font-semibold">
                             {testimonial.program}
                           </p>
                         </div>
@@ -224,7 +224,7 @@ export default function VideoTestimonials() {
 
                       {/* Quote */}
                       <div className="mb-4">
-                        <Quote className="w-5 h-5 text-blue-600 mb-2" />
+                        <Quote className="w-5 h-5 text-brand-blue-600 mb-2" />
                         <p className="text-black text-sm italic line-clamp-3">
                           "{testimonial.quote}"
                         </p>
@@ -273,7 +273,7 @@ export default function VideoTestimonials() {
                 onClick={() => setCurrentIndex(index)}
                 className={`w-2 h-2 rounded-full transition-all ${
                   index === currentIndex
-                    ? 'bg-blue-600 w-8'
+                    ? 'bg-brand-blue-600 w-8'
                     : 'bg-gray-300 hover:bg-gray-400'
                 }`}
               />
@@ -289,7 +289,7 @@ export default function VideoTestimonials() {
           className="mt-16 grid md:grid-cols-4 gap-8"
         >
           <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2 text-2xl md:text-3xl lg:text-4xl">94%</div>
+            <div className="text-4xl font-bold text-brand-blue-600 mb-2 text-2xl md:text-3xl lg:text-4xl">94%</div>
             <div className="text-black">Graduate Employment Rate</div>
           </div>
           <div className="text-center">
@@ -368,7 +368,7 @@ export default function VideoTestimonials() {
                     <h3 className="text-2xl font-bold text-black mb-2">
                       {selectedVideo.name}
                     </h3>
-                    <p className="text-blue-600 font-semibold mb-2">
+                    <p className="text-brand-blue-600 font-semibold mb-2">
                       {selectedVideo.program} • Class of {selectedVideo.graduationYear}
                     </p>
                   </div>
@@ -389,8 +389,8 @@ export default function VideoTestimonials() {
                   </div>
                 </div>
 
-                <div className="bg-blue-50 rounded-lg p-4">
-                  <Quote className="w-5 h-5 text-blue-600 mb-2" />
+                <div className="bg-brand-blue-50 rounded-lg p-4">
+                  <Quote className="w-5 h-5 text-brand-blue-600 mb-2" />
                   <p className="text-black italic">"{selectedVideo.quote}"</p>
                 </div>
 

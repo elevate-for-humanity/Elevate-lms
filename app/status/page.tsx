@@ -108,12 +108,12 @@ export default function StatusPage() {
         </section>
 
         {/* Monitoring Notice */}
-        <section className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
+        <section className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-8">
           <div className="flex items-start gap-4">
-            <Activity className="w-6 h-6 text-blue-600 flex-shrink-0 mt-1" />
+            <Activity className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-1" />
             <div>
-              <h3 className="font-bold text-blue-900 mb-2">Active Monitoring</h3>
-              <p className="text-blue-800">
+              <h3 className="font-bold text-brand-blue-900 mb-2">Active Monitoring</h3>
+              <p className="text-brand-blue-800">
                 Our systems are continuously monitored for performance and availability. 
                 Automated alerts notify our team immediately when issues are detected.
               </p>
@@ -136,13 +136,13 @@ export default function StatusPage() {
         <section className="text-center">
           <p className="text-gray-600 mb-4">
             For support inquiries, please visit our{' '}
-            <Link href="/contact" className="text-blue-600 hover:underline">contact page</Link>.
+            <Link href="/contact" className="text-brand-blue-600 hover:underline">contact page</Link>.
           </p>
           <p className="text-sm text-gray-500">
             View our{' '}
-            <Link href="/policies/sla" className="text-blue-600 hover:underline">Service Level Agreement</Link>
+            <Link href="/policies/sla" className="text-brand-blue-600 hover:underline">Service Level Agreement</Link>
             {' '}and{' '}
-            <Link href="/policies/incident-response" className="text-blue-600 hover:underline">Incident Response Policy</Link>.
+            <Link href="/policies/incident-response" className="text-brand-blue-600 hover:underline">Incident Response Policy</Link>.
           </p>
         </section>
       </div>

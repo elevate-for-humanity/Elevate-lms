@@ -208,7 +208,7 @@ export function SocialLearningCommunity() {
                       </div>
                       <div className="flex gap-4 text-sm text-black">
                         <button className="hover:text-brand-orange-600">❤️ {post.likes}</button>
-                        <button className="hover:text-blue-600">💬 {post.comments}</button>
+                        <button className="hover:text-brand-blue-600">💬 {post.comments}</button>
                         <button className="hover:text-green-600">🔗 Share</button>
                       </div>
                     </div>
@@ -223,7 +223,7 @@ export function SocialLearningCommunity() {
                 <div className="space-y-2">
                   {['#React', '#JavaScript', '#WebDevelopment', '#NodeJS', '#TypeScript'].map((tag) => (
                     <div key={tag} className="flex justify-between items-center">
-                      <span className="text-blue-600 hover:underline cursor-pointer">{tag}</span>
+                      <span className="text-brand-blue-600 hover:underline cursor-pointer">{tag}</span>
                       <span className="text-sm text-gray-500">245 posts</span>
                     </div>
                   ))}
@@ -283,7 +283,7 @@ export function SocialLearningCommunity() {
               <h3 className="text-lg font-bold mb-2">How to handle state in large React apps?</h3>
               <p className="text-sm text-black mb-3">Posted by Alex Chen • 24 replies • Last activity 1 hour ago</p>
               <div className="flex gap-2">
-                <span className="px-2 py-2 bg-blue-100 text-blue-700 text-xs rounded">#React</span>
+                <span className="px-2 py-2 bg-brand-blue-100 text-brand-blue-700 text-xs rounded">#React</span>
                 <span className="px-2 py-2 bg-purple-100 text-purple-700 text-xs rounded">#StateManagement</span>
               </div>
             </Card>

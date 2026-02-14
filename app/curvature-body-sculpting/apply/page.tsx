@@ -61,7 +61,7 @@ function ApplyPageContent() {
           </p>
           <Link
             href="/curvature-body-sculpting/careers"
-            className="inline-flex items-center gap-2 text-blue-600 font-medium hover:text-blue-700"
+            className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:text-brand-blue-700"
           >
             <ArrowLeft className="w-4 h-4" />
             Back to Careers
@@ -98,7 +98,7 @@ function ApplyPageContent() {
                 required
                 value={formData.position}
                 onChange={(e) => setFormData({ ...formData, position: e.target.value })}
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select a position</option>
                 {positions.map((pos) => (
@@ -120,7 +120,7 @@ function ApplyPageContent() {
                   required
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
               <div>
@@ -132,7 +132,7 @@ function ApplyPageContent() {
                   required
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -148,7 +148,7 @@ function ApplyPageContent() {
                   required
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
               <div>
@@ -160,7 +160,7 @@ function ApplyPageContent() {
                   required
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
                 />
               </div>
             </div>
@@ -173,7 +173,7 @@ function ApplyPageContent() {
               <select
                 value={formData.experience}
                 onChange={(e) => setFormData({ ...formData, experience: e.target.value })}
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select experience level</option>
                 <option value="none">No experience (willing to learn)</option>
@@ -192,7 +192,7 @@ function ApplyPageContent() {
               <select
                 value={formData.license}
                 onChange={(e) => setFormData({ ...formData, license: e.target.value })}
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select</option>
                 <option value="yes">Yes, I have a valid license</option>
@@ -209,7 +209,7 @@ function ApplyPageContent() {
               <select
                 value={formData.elevateGraduate}
                 onChange={(e) => setFormData({ ...formData, elevateGraduate: e.target.value })}
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select</option>
                 <option value="graduate">Yes, I'm a graduate</option>
@@ -228,7 +228,7 @@ function ApplyPageContent() {
                 required
                 value={formData.availability}
                 onChange={(e) => setFormData({ ...formData, availability: e.target.value })}
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               >
                 <option value="">Select availability</option>
                 <option value="full-time">Full-time</option>
@@ -247,7 +247,7 @@ function ApplyPageContent() {
                 value={formData.coverLetter}
                 onChange={(e) => setFormData({ ...formData, coverLetter: e.target.value })}
                 placeholder="Why are you interested in this position? What makes you a great fit?"
-                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
               />
             </div>
 
@@ -260,7 +260,7 @@ function ApplyPageContent() {
                 <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
                 <p className="text-sm text-gray-600">
                   Drag and drop your resume or{' '}
-                  <span className="text-blue-600 font-medium">browse</span>
+                  <span className="text-brand-blue-600 font-medium">browse</span>
                 </p>
                 <p className="text-xs text-gray-500 mt-1">PDF, DOC, or DOCX up to 5MB</p>
               </div>
@@ -268,8 +268,8 @@ function ApplyPageContent() {
 
             {/* Elevate Training CTA */}
             {formData.license === 'no' && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-blue-800 text-sm">
+              <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+                <p className="text-brand-blue-800 text-sm">
                   <strong>Need training?</strong> Elevate for Humanity offers FREE esthetician 
                   training through WIOA funding.{' '}
                   <Link href="/programs/esthetician-apprenticeship" className="underline font-medium">
@@ -303,7 +303,7 @@ function LoadingFallback() {
             <div className="max-w-7xl mx-auto px-4 py-4">
         <Breadcrumbs items={[{ label: "Curvature Body Sculpting", href: "/curvature-body-sculpting" }, { label: "Apply" }]} />
       </div>
-<Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+<Loader2 className="w-10 h-10 text-brand-blue-500 animate-spin" />
     </div>
   );
 }

@@ -377,11 +377,11 @@ export function CopilotDeployment() {
       </div>
       {/* Deployment Status */}
       {deploymentStatus === 'deploying' && (
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6 mb-6">
           <div className="flex items-center">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mr-4" />
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-brand-blue-600 mr-4" />
             <div>
-              <h3 className="font-semibold text-blue-900">
+              <h3 className="font-semibold text-brand-blue-900">
                 🤖 Deploying Copilot Features...
               </h3>
               <div className="text-sm text-brand-info mt-1">
@@ -419,7 +419,7 @@ export function CopilotDeployment() {
                 </div>
                 <div className="w-full bg-brand-border rounded-full h-2">
                   <div
-                    className="bg-blue-500 h-2 rounded-full"
+                    className="bg-brand-blue-500 h-2 rounded-full"
                     style={{ width: `${feature.usage}%` }}
                   />
                 </div>
@@ -463,7 +463,7 @@ export function CopilotDeployment() {
               </div>
               <button
                 onClick={() => setSelectedGuide(guide)}
-                className="w-full bg-brand-surface text-brand-info py-2 rounded hover:bg-blue-200 font-medium"
+                className="w-full bg-brand-surface text-brand-info py-2 rounded hover:bg-brand-blue-200 font-medium"
               >
                 📖 View Guide
               </button>
@@ -488,7 +488,7 @@ export function CopilotDeployment() {
               {selectedGuide.steps.map((step, index) => (
                 <div key={index} className="border-l-4 border-orange-500 pl-4">
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
+                    <div className="w-8 h-8 bg-brand-blue-500 text-white rounded-full flex items-center justify-center text-sm font-bold mr-3">
                       {step.stepNumber}
                     </div>
                     <h4 className="font-semibold text-brand-text">
@@ -496,8 +496,8 @@ export function CopilotDeployment() {
                     </h4>
                   </div>
                   <p className="text-brand-text mb-2">{step.description}</p>
-                  <div className="bg-blue-50 border border-blue-200 rounded p-3 mb-3">
-                    <div className="font-medium text-blue-900 mb-1">
+                  <div className="bg-brand-blue-50 border border-brand-blue-200 rounded p-3 mb-3">
+                    <div className="font-medium text-brand-blue-900 mb-1">
                       🎯 Action:
                     </div>
                     <div className="text-brand-info">{step.action}</div>

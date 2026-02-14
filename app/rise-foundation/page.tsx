@@ -129,7 +129,7 @@ export default async function RiseFoundationPage() {
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
             Community Support Starts Here
           </h1>
-          <p className="text-xl text-blue-100 max-w-2xl mb-8">
+          <p className="text-xl text-brand-blue-100 max-w-2xl mb-8">
             Free VITA tax preparation, mental wellness support, trauma recovery, and community education. 
             Serving Indiana families with compassion and dignity.
           </p>
@@ -142,7 +142,7 @@ export default async function RiseFoundationPage() {
             </Link>
             <Link
               href="/donate"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-700 px-8 py-4 rounded-xl font-bold hover:bg-gray-100"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-xl font-bold hover:bg-gray-100"
             >
               <Heart className="w-5 h-5" /> Donate
             </Link>
@@ -155,19 +155,19 @@ export default async function RiseFoundationPage() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             <div>
-              <div className="text-4xl font-bold text-blue-600">{peopleHelped || 500}+</div>
+              <div className="text-4xl font-bold text-brand-blue-600">{peopleHelped || 500}+</div>
               <div className="text-gray-600">People Helped</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600">4</div>
+              <div className="text-4xl font-bold text-brand-blue-600">4</div>
               <div className="text-gray-600">Core Programs</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600">24/7</div>
+              <div className="text-4xl font-bold text-brand-blue-600">24/7</div>
               <div className="text-gray-600">Crisis Support</div>
             </div>
             <div>
-              <div className="text-4xl font-bold text-blue-600">100%</div>
+              <div className="text-4xl font-bold text-brand-blue-600">100%</div>
               <div className="text-gray-600">Confidential</div>
             </div>
           </div>
@@ -207,7 +207,7 @@ export default async function RiseFoundationPage() {
                 </div>
                 <div className="p-6">
                   <p className="text-gray-600 mb-4">{program.description}</p>
-                  <span className="inline-flex items-center gap-1 text-blue-600 font-medium group-hover:underline">
+                  <span className="inline-flex items-center gap-1 text-brand-blue-600 font-medium group-hover:underline">
                     Learn More <ArrowRight className="w-4 h-4" />
                   </span>
                 </div>
@@ -219,7 +219,7 @@ export default async function RiseFoundationPage() {
 
       {/* Testimonials */}
       {testimonials && testimonials.length > 0 && (
-        <section className="py-16 bg-blue-50">
+        <section className="py-16 bg-brand-blue-50">
           <div className="max-w-7xl mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-12">Stories of Hope</h2>
             <div className="grid md:grid-cols-3 gap-6">
@@ -242,7 +242,7 @@ export default async function RiseFoundationPage() {
             <div className="grid md:grid-cols-3 gap-6">
               {events.map((event: any) => (
                 <div key={event.id} className="bg-white rounded-xl shadow-sm border p-6">
-                  <div className="flex items-center gap-2 text-blue-600 text-sm mb-2">
+                  <div className="flex items-center gap-2 text-brand-blue-600 text-sm mb-2">
                     <Calendar className="w-4 h-4" />
                     {new Date(event.start_date).toLocaleDateString()}
                   </div>
@@ -259,24 +259,24 @@ export default async function RiseFoundationPage() {
       <section className="py-16 bg-slate-700 text-white">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Need Help? We're Here</h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-brand-blue-100 mb-8">
             Our compassionate team is here to support you. All services are confidential.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
             <Link
               href="/rise-foundation/get-involved"
-              className="inline-flex items-center justify-center gap-2 bg-white text-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100"
+              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-xl font-bold hover:bg-gray-100"
             >
               Get Started
             </Link>
             <a
               href="/support"
-              className="inline-flex items-center justify-center gap-2 bg-blue-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-blue-400 border-2 border-white"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-brand-blue-400 border-2 border-white"
             >
               <Phone className="w-5 h-5" /> Get Help
             </a>
           </div>
-          <p className="text-blue-200 text-sm">
+          <p className="text-brand-blue-200 text-sm">
             Crisis Line Available 24/7 • All Services Confidential
           </p>
         </div>

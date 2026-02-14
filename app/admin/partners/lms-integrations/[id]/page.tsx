@@ -111,11 +111,11 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
 
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-xl flex items-center justify-center">
               {provider.logo_url ? (
                 <img src={provider.logo_url} alt={`${provider.provider_name} logo`} className="w-12 h-12 object-contain" />
               ) : (
-                <Globe className="w-8 h-8 text-blue-600" />
+                <Globe className="w-8 h-8 text-brand-blue-600" />
               )}
             </div>
             <div>
@@ -136,7 +136,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
             </div>
           </div>
           <div className="flex gap-2">
-            <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+            <button className="flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700">
               <RefreshCw className="w-4 h-4" />
               Sync Now
             </button>
@@ -155,8 +155,8 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
       <div className="grid grid-cols-4 gap-4 mb-8">
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <BookOpen className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+              <BookOpen className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-900">{courseCount || 0}</p>
@@ -177,8 +177,8 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
         </div>
         <div className="bg-white rounded-xl border border-slate-200 p-4">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Activity className="w-5 h-5 text-blue-600" />
+            <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+              <Activity className="w-5 h-5 text-brand-blue-600" />
             </div>
             <div>
               <p className="text-2xl font-bold text-slate-900">
@@ -212,7 +212,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
               <h2 className="text-lg font-semibold text-slate-900">Courses</h2>
               <Link
                 href={`/admin/partners/lms-integrations/${id}/courses`}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-brand-blue-600 hover:underline"
               >
                 View All
               </Link>
@@ -241,7 +241,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
                           href={course.course_url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1 text-slate-500 hover:text-blue-600"
+                          className="p-1 text-slate-500 hover:text-brand-blue-600"
                         >
                           <ExternalLink className="w-4 h-4" />
                         </a>
@@ -345,7 +345,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
                 <input
                   type="checkbox"
                   defaultChecked={provider.auto_sync}
-                  className="w-4 h-4 text-blue-600 rounded"
+                  className="w-4 h-4 text-brand-blue-600 rounded"
                 />
               </label>
               <label className="flex items-center justify-between">
@@ -353,7 +353,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
                 <input
                   type="checkbox"
                   defaultChecked={provider.send_notifications}
-                  className="w-4 h-4 text-blue-600 rounded"
+                  className="w-4 h-4 text-brand-blue-600 rounded"
                 />
               </label>
               <label className="flex items-center justify-between">
@@ -361,7 +361,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
                 <input
                   type="checkbox"
                   defaultChecked={provider.track_progress !== false}
-                  className="w-4 h-4 text-blue-600 rounded"
+                  className="w-4 h-4 text-brand-blue-600 rounded"
                 />
               </label>
             </div>

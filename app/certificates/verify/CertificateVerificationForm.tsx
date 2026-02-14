@@ -42,7 +42,7 @@ export default function CertificateVerificationForm() {
   return (
     <div className="bg-white rounded-lg shadow-sm border p-8">
       <div className="text-center mb-6">
-        <div className="inline-block p-4 bg-blue-100 rounded-full mb-4">
+        <div className="inline-block p-4 bg-brand-blue-100 rounded-full mb-4">
           <svg
             className="w-12 h-12 text-brand-blue-600"
             fill="none"
@@ -90,7 +90,7 @@ export default function CertificateVerificationForm() {
             ) => setCertificateNumber(e.target.value.toUpperCase())}
             placeholder="EFH-2024-XXXXXXXX"
             required
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-center text-lg font-mono"
+            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent text-center text-lg font-mono"
             maxLength={20}
           />
           <p className="mt-2 text-xs text-black text-center">

@@ -41,7 +41,7 @@ export function SupportForm() {
         <select
           id="category"
           name="category"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
         >
           <option value="general">General Question</option>
           <option value="technical">Technical Issue</option>
@@ -61,7 +61,7 @@ export function SupportForm() {
           id="subject"
           name="subject"
           required
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
           placeholder="Brief description of your issue"
         />
       </div>
@@ -75,7 +75,7 @@ export function SupportForm() {
           name="message"
           rows={6}
           required
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
           placeholder="Please describe your issue in detail..."
         />
       </div>
@@ -87,7 +87,7 @@ export function SupportForm() {
         <select
           id="priority"
           name="priority"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500"
         >
           <option value="low">Low - General question</option>
           <option value="normal" selected>Normal - Need help soon</option>
@@ -99,7 +99,7 @@ export function SupportForm() {
       <button
         type="submit"
         disabled={submitting}
-        className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-medium rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {submitting ? (
           <>

@@ -208,12 +208,12 @@ export default function AvatarChatBar() {
           <div className="flex-1 w-full">
             <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
               {/* Chat Header */}
-              <div className="bg-blue-600 text-white px-4 py-3 flex items-center justify-between">
+              <div className="bg-brand-blue-600 text-white px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <MessageCircle className="w-5 h-5" />
                   <div>
                     <p className="font-semibold text-sm">{name}</p>
-                    <p className="text-xs text-blue-200">Ask me anything!</p>
+                    <p className="text-xs text-brand-blue-200">Ask me anything!</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ export default function AvatarChatBar() {
                       <div
                         className={`max-w-[85%] px-3 py-2 rounded-xl text-sm ${
                           msg.role === 'user'
-                            ? 'bg-blue-600 text-white'
+                            ? 'bg-brand-blue-600 text-white'
                             : 'bg-white text-slate-800 border border-slate-200 shadow-sm'
                         }`}
                       >
@@ -279,13 +279,13 @@ export default function AvatarChatBar() {
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       placeholder="Type your question..."
-                      className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="flex-1 px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                       disabled={isLoading}
                     />
                     <button
                       type="submit"
                       disabled={isLoading || !input.trim()}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                      className="px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                     >
                       <Send className="w-4 h-4" />
                     </button>
@@ -297,7 +297,7 @@ export default function AvatarChatBar() {
               <div className={`${isChatExpanded ? 'hidden' : 'block'} lg:hidden p-3 border-t border-slate-200 bg-white`}>
                 <button
                   onClick={() => setIsChatExpanded(true)}
-                  className="w-full py-2 text-blue-600 text-sm font-medium flex items-center justify-center gap-2"
+                  className="w-full py-2 text-brand-blue-600 text-sm font-medium flex items-center justify-center gap-2"
                 >
                   <MessageCircle className="w-4 h-4" />
                   Tap to chat with {name}

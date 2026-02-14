@@ -53,9 +53,9 @@ export default function LicensingArchitecturePage() {
             Tenant Isolation Model
           </h2>
           <div className="space-y-4">
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <h3 className="font-semibold text-blue-800">Database Level (RLS)</h3>
-              <ul className="mt-2 text-blue-700 list-disc list-inside">
+            <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
+              <h3 className="font-semibold text-brand-blue-800">Database Level (RLS)</h3>
+              <ul className="mt-2 text-brand-blue-700 list-disc list-inside">
                 <li>Row Level Security enabled on all tenant tables</li>
                 <li>tenant_id extracted from JWT user_metadata</li>
                 <li>Automatic filtering on SELECT queries</li>

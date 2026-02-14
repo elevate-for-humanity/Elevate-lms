@@ -71,7 +71,7 @@ export default function CreatorNewCoursePage() {
               required
               value={formData.title}
               onChange={(e) => setFormData({...formData, title: e.target.value})}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               placeholder="Introduction to Web Development"
             />
           </div>
@@ -85,7 +85,7 @@ export default function CreatorNewCoursePage() {
               rows={4}
               value={formData.description}
               onChange={(e) => setFormData({...formData, description: e.target.value})}
-              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               placeholder="Describe what students will learn..."
             />
           </div>
@@ -101,7 +101,7 @@ export default function CreatorNewCoursePage() {
                 required
                 value={formData.duration}
                 onChange={(e) => setFormData({...formData, duration: e.target.value})}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 placeholder="40"
               />
             </div>
@@ -115,7 +115,7 @@ export default function CreatorNewCoursePage() {
                 required
                 value={formData.price}
                 onChange={(e) => setFormData({...formData, price: e.target.value})}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
                 placeholder="299.00"
               />
             </div>
@@ -130,7 +130,7 @@ export default function CreatorNewCoursePage() {
                 required
                 value={formData.category}
                 onChange={(e) => setFormData({...formData, category: e.target.value})}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               >
                 <option value="">Select category</option>
                 <option value="healthcare">Healthcare</option>
@@ -147,7 +147,7 @@ export default function CreatorNewCoursePage() {
                 required
                 value={formData.level}
                 onChange={(e) => setFormData({...formData, level: e.target.value})}
-                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-brand-blue-500"
               >
                 <option value="beginner">Beginner</option>
                 <option value="intermediate">Intermediate</option>
@@ -160,7 +160,7 @@ export default function CreatorNewCoursePage() {
             <button
               type="submit"
               disabled={submitting}
-              className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 font-semibold transition"
+              className="bg-brand-blue-600 text-white px-6 py-3 rounded-lg hover:bg-brand-blue-700 disabled:bg-gray-400 font-semibold transition"
             >
               {submitting ? 'Creating...' : 'Create Course'}
             </button>

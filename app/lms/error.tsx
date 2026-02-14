@@ -40,7 +40,7 @@ export default function LMSError({
         <div className="flex flex-col gap-3">
           <button
             onClick={reset}
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition font-semibold"
           >
             <RefreshCw className="h-5 w-5" />
             Reload Course
@@ -66,7 +66,7 @@ export default function LMSError({
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-sm text-black">
             Technical issues?{' '}
-            <a href="mailto:elevate4humanityedu@gmail.com" className="text-blue-600 hover:underline">
+            <a href="mailto:elevate4humanityedu@gmail.com" className="text-brand-blue-600 hover:underline">
               Contact Support
             </a>
           </p>

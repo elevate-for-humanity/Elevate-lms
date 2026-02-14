@@ -153,7 +153,7 @@ export default function ProgramDiscussionsPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600" />
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-blue-600" />
       </div>
     );
   }
@@ -178,7 +178,7 @@ export default function ProgramDiscussionsPage() {
             {user && isEnrolled && (
               <button
                 onClick={() => setShowForm(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
               >
                 <Plus className="w-4 h-4" />
                 Start Discussion
@@ -189,8 +189,8 @@ export default function ProgramDiscussionsPage() {
 
         {/* Login/Enroll prompt */}
         {!user && (
-          <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 mb-8">
-            <p className="text-blue-800">
+          <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6 mb-8">
+            <p className="text-brand-blue-800">
               <Link href="/login" className="font-semibold underline">Sign in</Link> to participate in discussions.
             </p>
           </div>
@@ -218,7 +218,7 @@ export default function ProgramDiscussionsPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="What would you like to discuss?"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -231,7 +231,7 @@ export default function ProgramDiscussionsPage() {
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="Share your thoughts, questions, or experiences..."
                   rows={5}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-transparent"
                   required
                 />
               </div>
@@ -239,7 +239,7 @@ export default function ProgramDiscussionsPage() {
                 <button
                   type="submit"
                   disabled={posting}
-                  className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                  className="inline-flex items-center gap-2 px-6 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition disabled:opacity-50"
                 >
                   <MessageSquare className="w-4 h-4" />
                   {posting ? 'Posting...' : 'Post Discussion'}
@@ -266,8 +266,8 @@ export default function ProgramDiscussionsPage() {
                 className="block bg-white rounded-xl border p-6 hover:shadow-md transition"
               >
                 <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                    <User className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                    <User className="w-5 h-5 text-brand-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
@@ -309,7 +309,7 @@ export default function ProgramDiscussionsPage() {
               {user && isEnrolled && (
                 <button
                   onClick={() => setShowForm(true)}
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-brand-blue-600 text-white rounded-lg hover:bg-brand-blue-700 transition"
                 >
                   <Plus className="w-4 h-4" />
                   Start First Discussion

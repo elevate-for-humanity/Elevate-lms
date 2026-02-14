@@ -262,7 +262,7 @@ export default function ProgramHolderSetup() {
                 />
                 <label
                   htmlFor="syllabus-upload"
-                  className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg cursor-pointer hover:bg-blue-700"
+                  className="inline-block bg-brand-blue-600 text-white px-6 py-3 rounded-lg cursor-pointer hover:bg-brand-blue-700"
                 >
                   Choose File
                 </label>
@@ -274,14 +274,14 @@ export default function ProgramHolderSetup() {
                 )}
               </div>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+              <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="text-blue-600 flex-shrink-0 mt-1" />
+                  <AlertCircle className="text-brand-blue-600 flex-shrink-0 mt-1" />
                   <div>
-                    <p className="font-semibold text-blue-900 mb-2">
+                    <p className="font-semibold text-brand-blue-900 mb-2">
                       Our system will analyze your syllabus to:
                     </p>
-                    <ul className="text-sm text-blue-800 space-y-1">
+                    <ul className="text-sm text-brand-blue-800 space-y-1">
                       <li>
                         • Match your program to compatible course templates
                       </li>
@@ -445,7 +445,7 @@ export default function ProgramHolderSetup() {
                   />
                   <label
                     htmlFor="bank-document-upload"
-                    className="inline-block bg-blue-600 text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700"
+                    className="inline-block bg-brand-blue-600 text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-brand-blue-700"
                   >
                     Choose File
                   </label>

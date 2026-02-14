@@ -98,7 +98,7 @@ export default function CookieConsent() {
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 mt-1">
                   <svg
-                    className="w-6 h-6 text-blue-600"
+                    className="w-6 h-6 text-brand-blue-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -121,7 +121,7 @@ export default function CookieConsent() {
                     "Accept All", you consent to our use of cookies.{' '}
                     <a
                       href="/privacy-policy"
-                      className="text-blue-600 hover:text-blue-700 underline"
+                      className="text-brand-blue-600 hover:text-brand-blue-700 underline"
                     >
                       Learn more
                     </a>

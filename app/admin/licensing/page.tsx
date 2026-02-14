@@ -78,7 +78,7 @@ export default function LicensingPage() {
                   }`}>
                     {license.status}
                   </span>
-                  <span className="px-3 py-2 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+                  <span className="px-3 py-2 rounded-full text-sm font-medium bg-brand-blue-100 text-brand-blue-800">
                     {license.plan}
                   </span>
                 </div>

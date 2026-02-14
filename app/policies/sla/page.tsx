@@ -34,10 +34,10 @@ export default function SLAPage() {
         </p>
 
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Platform Availability</h2>
-        <div className="bg-blue-50 rounded-lg p-6 border-2 border-blue-200 mb-6">
+        <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200 mb-6">
           <div className="flex items-center gap-3 mb-3">
-            <Clock className="w-6 h-6 text-blue-600" />
-            <h3 className="text-2xl font-bold text-blue-800 m-0">99.5% Monthly Uptime Target</h3>
+            <Clock className="w-6 h-6 text-brand-blue-600" />
+            <h3 className="text-2xl font-bold text-brand-blue-800 m-0">99.5% Monthly Uptime Target</h3>
           </div>
           <p className="text-black m-0">
             We target 99.5% availability for the Elevate platform during each calendar month, 
@@ -191,28 +191,28 @@ export default function SLAPage() {
           <li><strong>Phone:</strong> (317) 314-3757</li>
         </ul>
 
-        <div className="bg-blue-50 border-l-4 border-blue-400 p-6 mt-8">
+        <div className="bg-brand-blue-50 border-l-4 border-brand-blue-400 p-6 mt-8">
           <p className="text-black mb-2">
             <strong>Related Policies:</strong>
           </p>
           <ul className="list-disc pl-6 text-black space-y-1 m-0">
             <li>
-              <Link href="/policies/response-sla" className="text-blue-600 hover:underline">
+              <Link href="/policies/response-sla" className="text-brand-blue-600 hover:underline">
                 Response Time SLA
               </Link>
             </li>
             <li>
-              <Link href="/policies/disaster-recovery" className="text-blue-600 hover:underline">
+              <Link href="/policies/disaster-recovery" className="text-brand-blue-600 hover:underline">
                 Disaster Recovery Policy
               </Link>
             </li>
             <li>
-              <Link href="/policies/incident-response" className="text-blue-600 hover:underline">
+              <Link href="/policies/incident-response" className="text-brand-blue-600 hover:underline">
                 Incident Response Policy
               </Link>
             </li>
             <li>
-              <Link href="/policies/terms" className="text-blue-600 hover:underline">
+              <Link href="/policies/terms" className="text-brand-blue-600 hover:underline">
                 Terms of Service
               </Link>
             </li>

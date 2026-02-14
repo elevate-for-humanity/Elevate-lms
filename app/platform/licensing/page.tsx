@@ -26,7 +26,7 @@ export default function PlatformLicensingPage() {
       {/* Hero - Above the fold */}
       <section className="bg-slate-900 text-white py-24 lg:py-32">
         <div className="max-w-4xl mx-auto px-6 text-center">
-          <div className="inline-block px-4 py-1.5 bg-blue-600/20 border border-blue-500/30 rounded-full text-blue-300 text-sm font-medium mb-6">
+          <div className="inline-block px-4 py-1.5 bg-brand-blue-600/20 border border-brand-blue-500/30 rounded-full text-brand-blue-300 text-sm font-medium mb-6">
             White-Label Workforce Platform
           </div>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight">
@@ -39,7 +39,7 @@ export default function PlatformLicensingPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
               href="/platform/licensing/request"
-              className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-blue-700 transition"
+              className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-brand-blue-700 transition"
             >
               Request Licensing Brief
               <ArrowRight className="w-5 h-5" />
@@ -68,7 +68,7 @@ export default function PlatformLicensingPage() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-slate-50 rounded-xl p-8 border border-slate-200">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                <Building2 className="w-6 h-6 text-blue-600" />
+                <Building2 className="w-6 h-6 text-brand-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Training Providers</h3>
               <ul className="space-y-2 text-gray-600">
@@ -122,7 +122,7 @@ export default function PlatformLicensingPage() {
             ].map((feature, idx) => (
               <div key={idx} className="bg-white rounded-xl p-6 border border-slate-200">
                 <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <feature.icon className="w-5 h-5 text-blue-600" />
+                  <feature.icon className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">{feature.title}</h3>
                 <ul className="space-y-1.5 text-sm text-gray-600">
@@ -154,7 +154,7 @@ export default function PlatformLicensingPage() {
             ].map((feature, idx) => (
               <div key={idx} className="bg-white rounded-xl p-6 border border-slate-200">
                 <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <feature.icon className="w-5 h-5 text-blue-600" />
+                  <feature.icon className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">{feature.title}</h3>
                 <ul className="space-y-1.5 text-sm text-gray-600">
@@ -194,7 +194,7 @@ export default function PlatformLicensingPage() {
               },
             ].map((item, idx) => (
               <div key={idx} className="flex gap-6">
-                <div className="flex-shrink-0 w-12 h-12 bg-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
+                <div className="flex-shrink-0 w-12 h-12 bg-brand-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg">
                   {item.step}
                 </div>
                 <div>
@@ -218,7 +218,7 @@ export default function PlatformLicensingPage() {
           </p>
           <Link
             href="/platform/licensing/request"
-            className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-blue-700 transition"
+            className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg text-lg font-bold hover:bg-brand-blue-700 transition"
           >
             Request Licensing Brief
             <ArrowRight className="w-5 h-5" />

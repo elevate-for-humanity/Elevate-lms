@@ -71,7 +71,7 @@ export function EligibilityModal({ isOpen, onClose, onContinue }: EligibilityMod
           <div className="flex flex-col gap-3">
             <button
               onClick={onContinue}
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-blue-700 transition"
+              className="w-full bg-brand-blue-600 text-white py-3 px-4 rounded-lg font-semibold hover:bg-brand-blue-700 transition"
             >
               Continue to Apply
             </button>

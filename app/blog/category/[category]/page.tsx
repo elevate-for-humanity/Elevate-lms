@@ -173,7 +173,7 @@ export default async function CategoryPage({
                       href={`/blog/category/${cat.toLowerCase().replace(/\s+/g, '-')}`}
                       className={`block px-3 py-2 rounded hover:bg-white transition-colors ${
                         cat.toLowerCase() === categoryName.toLowerCase()
-                          ? 'bg-blue-100 text-blue-800 font-semibold'
+                          ? 'bg-brand-blue-100 text-brand-blue-800 font-semibold'
                           : 'text-black'
                       }`}
                     >

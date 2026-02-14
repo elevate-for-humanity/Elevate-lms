@@ -59,10 +59,10 @@ function CheckoutSuccessContent() {
 
         {/* Trial Info Card */}
         <div className="bg-white rounded-2xl p-8 shadow-sm mb-8">
-          <div className="flex items-center gap-4 p-4 bg-blue-50 rounded-xl mb-6">
-            <Calendar className="w-6 h-6 text-blue-600" />
+          <div className="flex items-center gap-4 p-4 bg-brand-blue-50 rounded-xl mb-6">
+            <Calendar className="w-6 h-6 text-brand-blue-600" />
             <div>
-              <p className="font-bold text-blue-900">
+              <p className="font-bold text-brand-blue-900">
                 Trial ends {sessionData?.trialEnd.toLocaleDateString('en-US', {
                   weekday: 'long',
                   month: 'long',
@@ -70,7 +70,7 @@ function CheckoutSuccessContent() {
                   year: 'numeric',
                 })}
               </p>
-              <p className="text-sm text-blue-700">
+              <p className="text-sm text-brand-blue-700">
                 Your card will be charged automatically when the trial ends.
               </p>
             </div>
@@ -138,7 +138,7 @@ function CheckoutSuccessContent() {
           </p>
           <Link
             href="/account/billing"
-            className="text-sm text-blue-600 font-medium hover:underline"
+            className="text-sm text-brand-blue-600 font-medium hover:underline"
           >
             Manage Billing →
           </Link>
@@ -147,7 +147,7 @@ function CheckoutSuccessContent() {
         {/* Support */}
         <div className="mt-8 text-center text-sm text-gray-500">
           <p>
-            Questions? <Link href="/contact" className="text-blue-600 hover:underline">Contact support</Link>
+            Questions? <Link href="/contact" className="text-brand-blue-600 hover:underline">Contact support</Link>
           </p>
         </div>
       </div>

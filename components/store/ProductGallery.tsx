@@ -29,7 +29,7 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
         />
 
         {product.featured && (
-          <div className="absolute top-4 right-4 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg shadow-lg">
+          <div className="absolute top-4 right-4 px-4 py-2 bg-brand-blue-600 text-white font-bold rounded-lg shadow-lg">
             Featured
           </div>
         )}
@@ -50,7 +50,7 @@ export default function ProductGallery({ product }: ProductGalleryProps) {
               onClick={() => setSelectedImage(index)}
               className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-all ${
                 selectedImage === index
-                  ? 'border-blue-600 ring-2 ring-blue-200'
+                  ? 'border-brand-blue-600 ring-2 ring-blue-200'
                   : 'border-slate-200 hover:border-slate-300'
               }`}
             >

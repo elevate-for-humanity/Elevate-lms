@@ -98,7 +98,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
     active: 'bg-green-100 text-green-800',
     on_leave: 'bg-yellow-100 text-yellow-800',
     terminated: 'bg-red-100 text-red-800',
-    probation: 'bg-blue-100 text-blue-800',
+    probation: 'bg-brand-blue-100 text-brand-blue-800',
   };
 
   return (
@@ -115,11 +115,11 @@ export default async function EmployeeDetailPage({ params }: Props) {
 
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center">
+            <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center">
               {profile?.avatar_url ? (
                 <img src={profile.avatar_url} alt={`${profile?.first_name} ${profile?.last_name}`} className="w-16 h-16 rounded-full object-cover" />
               ) : (
-                <User className="w-8 h-8 text-blue-600" />
+                <User className="w-8 h-8 text-brand-blue-600" />
               )}
             </div>
             <div>
@@ -157,8 +157,8 @@ export default async function EmployeeDetailPage({ params }: Props) {
             <h2 className="text-lg font-semibold text-slate-900 mb-4">Employment Details</h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Briefcase className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                  <Briefcase className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <div>
                   <p className="text-sm text-slate-600">Job Title</p>
@@ -177,8 +177,8 @@ export default async function EmployeeDetailPage({ params }: Props) {
                 </div>
               </div>
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Clock className="w-5 h-5 text-blue-600" />
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                  <Clock className="w-5 h-5 text-brand-blue-600" />
                 </div>
                 <div>
                   <p className="text-sm text-slate-600">Employment Type</p>
@@ -205,7 +205,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
               <h2 className="text-lg font-semibold text-slate-900">Time Off Requests</h2>
               <Link
                 href={`/admin/hr/time-off?employee=${id}`}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-brand-blue-600 hover:underline"
               >
                 View All
               </Link>
@@ -244,7 +244,7 @@ export default async function EmployeeDetailPage({ params }: Props) {
               <h2 className="text-lg font-semibold text-slate-900">Performance Reviews</h2>
               <Link
                 href={`/admin/hr/performance?employee=${id}`}
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-brand-blue-600 hover:underline"
               >
                 View All
               </Link>
@@ -330,9 +330,9 @@ export default async function EmployeeDetailPage({ params }: Props) {
               <div className="pt-4 border-t border-slate-200">
                 <p className="text-sm text-slate-600 mb-2">Benefits</p>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">Health Insurance</span>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">401(k)</span>
-                  <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">PTO</span>
+                  <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-800 rounded text-xs">Health Insurance</span>
+                  <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-800 rounded text-xs">401(k)</span>
+                  <span className="px-2 py-1 bg-brand-blue-100 text-brand-blue-800 rounded text-xs">PTO</span>
                 </div>
               </div>
             </div>

@@ -105,7 +105,7 @@ export default async function CertificationPage() {
           <div className="text-gray-600 text-sm">Earned</div>
         </div>
         <div className="bg-white rounded-xl shadow-sm border p-5 text-center">
-          <Clock className="w-8 h-8 text-blue-500 mx-auto mb-2" />
+          <Clock className="w-8 h-8 text-brand-blue-500 mx-auto mb-2" />
           <div className="text-2xl font-bold">{inProgress?.length || 0}</div>
           <div className="text-gray-600 text-sm">In Progress</div>
         </div>
@@ -187,8 +187,8 @@ export default async function CertificationPage() {
               <h2 className="text-xl font-semibold mb-4">In Progress</h2>
               <div className="space-y-3">
                 {inProgress.map((item: any) => (
-                  <div key={item.id} className="flex items-center gap-4 p-3 bg-blue-50 rounded-lg">
-                    <Clock className="w-5 h-5 text-blue-600" />
+                  <div key={item.id} className="flex items-center gap-4 p-3 bg-brand-blue-50 rounded-lg">
+                    <Clock className="w-5 h-5 text-brand-blue-600" />
                     <div className="flex-1">
                       <h3 className="font-medium">{item.course?.certification_name}</h3>
                       <p className="text-sm text-gray-500">{item.course?.title}</p>
@@ -196,13 +196,13 @@ export default async function CertificationPage() {
                     <div className="flex items-center gap-2">
                       <div className="w-20 h-2 bg-gray-200 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-blue-600 rounded-full"
+                          className="h-full bg-brand-blue-600 rounded-full"
                           style={{ width: `${item.progress}%` }}
                         />
                       </div>
                       <span className="text-sm text-gray-500">{item.progress}%</span>
                     </div>
-                    <Link href={`/lms/courses/${item.course?.id}`} className="text-blue-600 text-sm font-medium">
+                    <Link href={`/lms/courses/${item.course?.id}`} className="text-brand-blue-600 text-sm font-medium">
                       Continue
                     </Link>
                   </div>

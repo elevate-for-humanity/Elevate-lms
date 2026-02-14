@@ -184,8 +184,8 @@ export default async function ProgressPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-8">
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <BookOpen className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <BookOpen className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.totalCourses}</div>
@@ -208,8 +208,8 @@ export default async function ProgressPage() {
           
           <div className="bg-white rounded-xl border border-slate-200 p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Target className="w-5 h-5 text-blue-600" />
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center">
+                <Target className="w-5 h-5 text-brand-blue-600" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-slate-900">{stats.completedLessons}</div>
@@ -298,7 +298,7 @@ export default async function ProgressPage() {
                               <span className={`px-2 py-1 rounded text-xs font-medium ${
                                 enrollment.status === 'completed'
                                   ? 'bg-green-100 text-green-700'
-                                  : 'bg-blue-100 text-blue-700'
+                                  : 'bg-brand-blue-100 text-brand-blue-700'
                               }`}>
                                 {enrollment.status === 'completed' ? 'Completed' : 'In Progress'}
                               </span>
@@ -311,7 +311,7 @@ export default async function ProgressPage() {
                                 <div className="h-2 bg-slate-100 rounded-full overflow-hidden">
                                   <div 
                                     className={`h-full rounded-full ${
-                                      progress === 100 ? 'bg-green-500' : 'bg-blue-500'
+                                      progress === 100 ? 'bg-green-500' : 'bg-brand-blue-500'
                                     }`}
                                     style={{ width: `${progress}%` }}
                                   />
@@ -337,7 +337,7 @@ export default async function ProgressPage() {
                   </p>
                   <Link
                     href="/lms/courses"
-                    className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-700 transition"
+                    className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-brand-blue-700 transition"
                   >
                     Browse Courses
                   </Link>
@@ -401,7 +401,7 @@ export default async function ProgressPage() {
               <div className="space-y-2">
                 <Link 
                   href="/lms/courses"
-                  className="block w-full text-center bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition"
+                  className="block w-full text-center bg-brand-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-brand-blue-700 transition"
                 >
                   Continue Learning
                 </Link>

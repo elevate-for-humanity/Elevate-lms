@@ -248,7 +248,7 @@ function CheckInContent() {
 
         {status === 'checking' ? (
           <div className="bg-slate-800 rounded-2xl p-12 text-center">
-            <Loader2 className="w-16 h-16 text-blue-500 mx-auto mb-4 animate-spin" />
+            <Loader2 className="w-16 h-16 text-brand-blue-500 mx-auto mb-4 animate-spin" />
             <p className="text-white font-medium">Checking in...</p>
           </div>
         ) : (
@@ -261,7 +261,7 @@ function CheckInContent() {
                   <p className="text-slate-400 text-center px-4">
                     Camera access required for QR scanning
                   </p>
-                  <button className="mt-4 bg-blue-600 text-white px-6 py-2 rounded-xl text-sm font-medium">
+                  <button className="mt-4 bg-brand-blue-600 text-white px-6 py-2 rounded-xl text-sm font-medium">
                     Enable Camera
                   </button>
                 </div>
@@ -297,13 +297,13 @@ function CheckInContent() {
                     onChange={(e) => setManualCode(e.target.value.toUpperCase())}
                     placeholder="Enter 8-character code"
                     maxLength={8}
-                    className="w-full bg-slate-700 text-white text-center text-2xl font-mono tracking-widest rounded-xl px-4 py-4 placeholder:text-slate-500 placeholder:text-base placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full bg-slate-700 text-white text-center text-2xl font-mono tracking-widest rounded-xl px-4 py-4 placeholder:text-slate-500 placeholder:text-base placeholder:tracking-normal focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
                   />
                 </div>
                 <button
                   onClick={() => handleCheckIn(manualCode)}
                   disabled={manualCode.length < 6}
-                  className="w-full bg-blue-600 text-white font-bold py-4 rounded-xl hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-brand-blue-600 text-white font-bold py-4 rounded-xl hover:bg-brand-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Check In
                 </button>
@@ -315,8 +315,8 @@ function CheckInContent() {
               <h3 className="text-white font-medium mb-3">Recent Locations</h3>
               <div className="space-y-2">
                 <button className="w-full flex items-center gap-3 p-3 bg-slate-700 rounded-xl hover:bg-slate-600 text-left">
-                  <div className="w-10 h-10 bg-blue-500/20 rounded-full flex items-center justify-center">
-                    <MapPin className="w-5 h-5 text-blue-400" />
+                  <div className="w-10 h-10 bg-brand-blue-500/20 rounded-full flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-brand-blue-400" />
                   </div>
                   <div className="flex-1">
                     <p className="text-white font-medium">Classic Cuts Barbershop</p>
@@ -331,19 +331,19 @@ function CheckInContent() {
               <h3 className="text-white font-medium mb-2">How to check in</h3>
               <ol className="text-slate-400 text-sm space-y-2">
                 <li className="flex gap-2">
-                  <span className="text-blue-400">1.</span>
+                  <span className="text-brand-blue-400">1.</span>
                   Ask your supervisor to show the shop's QR code
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-blue-400">2.</span>
+                  <span className="text-brand-blue-400">2.</span>
                   Scan the code or enter it manually
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-blue-400">3.</span>
+                  <span className="text-brand-blue-400">3.</span>
                   Your training time starts automatically
                 </li>
                 <li className="flex gap-2">
-                  <span className="text-blue-400">4.</span>
+                  <span className="text-brand-blue-400">4.</span>
                   Check out when you leave to log your hours
                 </li>
               </ol>
@@ -358,7 +358,7 @@ function CheckInContent() {
 function LoadingFallback() {
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-      <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+      <Loader2 className="w-10 h-10 text-brand-blue-500 animate-spin" />
     </div>
   );
 }

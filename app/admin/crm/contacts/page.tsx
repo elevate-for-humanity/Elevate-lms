@@ -66,9 +66,9 @@ export default async function ContactsPage() {
 
   const getTypeColor = (type: string) => {
     switch (type) {
-      case 'Lead': return 'bg-blue-100 text-blue-700';
+      case 'Lead': return 'bg-brand-blue-100 text-brand-blue-700';
       case 'Customer': return 'bg-green-100 text-green-700';
-      case 'Partner': return 'bg-blue-100 text-blue-700';
+      case 'Partner': return 'bg-brand-blue-100 text-brand-blue-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   };
@@ -81,14 +81,14 @@ export default async function ContactsPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Users className="w-8 h-8 text-blue-600" />
+                <Users className="w-8 h-8 text-brand-blue-600" />
                 <h1 className="text-3xl font-bold text-gray-900">Contacts</h1>
               </div>
               <p className="text-gray-600">Manage your contacts and relationships</p>
             </div>
             <Link
               href="/admin/crm/contacts/new"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
             >
               <Plus className="w-5 h-5" />
               Add Contact
@@ -106,7 +106,7 @@ export default async function ContactsPage() {
               <input
                 type="text"
                 placeholder="Search contacts..."
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
               />
             </div>
             <div className="flex gap-3">
@@ -184,7 +184,7 @@ export default async function ContactsPage() {
                   <span className="text-sm text-gray-500">Last contact: {contact.lastContact}</span>
                   <Link
                     href={`/admin/crm/contacts/${contact.id}`}
-                    className="text-blue-600 text-sm font-medium hover:text-blue-700"
+                    className="text-brand-blue-600 text-sm font-medium hover:text-brand-blue-700"
                   >
                     View Details
                   </Link>

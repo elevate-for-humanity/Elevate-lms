@@ -67,12 +67,12 @@ export default function VerifyEmailPage() {
           <p className="text-brand-blue-600 font-semibold mt-2">{email}</p>
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-          <h2 className="font-semibold text-blue-900 mb-2 flex items-center">
+        <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
+          <h2 className="font-semibold text-brand-blue-900 mb-2 flex items-center">
             <CheckCircle className="w-5 h-5 mr-2" />
             Next Steps:
           </h2>
-          <ol className="text-sm text-blue-800 space-y-2 ml-7">
+          <ol className="text-sm text-brand-blue-800 space-y-2 ml-7">
             <li>1. Check your email inbox</li>
             <li>2. Click the verification link</li>
             <li>3. Return here and refresh the page</li>

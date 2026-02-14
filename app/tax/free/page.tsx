@@ -62,33 +62,33 @@ export default function FreeTaxPage() {
                 </div>
               </div>
             </div>
-            <div className="bg-blue-50 rounded-lg p-8 border border-blue-200">
+            <div className="bg-brand-blue-50 rounded-lg p-8 border border-brand-blue-200">
               <h3 className="text-2xl font-bold mb-4">What's Included</h3>
               <ul className="space-y-3 text-black">
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>Funded tax preparation</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>IRS-certified volunteers</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>Electronic filing (e-file)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>Direct deposit setup</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-blue-600 font-bold">•</span>
+                  <span className="text-brand-blue-600 font-bold">•</span>
                   <span>All federal and state forms</span>
                 </li>
               </ul>
               <Link
                 href="/tax/rise-up-foundation/site-locator"
-                className="block w-full bg-blue-600 hover:bg-blue-700 text-white text-center px-8 py-3 rounded-lg font-semibold transition-colors mt-6"
+                className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center px-8 py-3 rounded-lg font-semibold transition-colors mt-6"
               >
                 Find a VITA Site
               </Link>
@@ -100,29 +100,29 @@ export default function FreeTaxPage() {
             <h3 className="text-2xl font-bold mb-6 text-center">How It Works</h3>
             <div className="grid md:grid-cols-4 gap-6">
               <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <MapPin className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <MapPin className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <h4 className="font-semibold mb-2">1. Find a Site</h4>
                 <p className="text-sm text-black">Locate a VITA site near you</p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Calendar className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Calendar className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <h4 className="font-semibold mb-2">2. Schedule</h4>
                 <p className="text-sm text-black">Book your appointment</p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Users className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <h4 className="font-semibold mb-2">3. Meet Volunteer</h4>
                 <p className="text-sm text-black">Work with certified preparer</p>
               </div>
               <div className="text-center">
-                <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-8 h-8 text-brand-blue-600" />
                 </div>
                 <h4 className="font-semibold mb-2">4. File Free</h4>
                 <p className="text-sm text-black">E-file at no cost</p>

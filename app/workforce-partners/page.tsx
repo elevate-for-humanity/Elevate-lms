@@ -63,7 +63,7 @@ export default function WorkforcePartnersPage() {
         <Image src="/images/heroes/workforce-partner-1.jpg" alt="Workforce development partners" fill className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
-            <div className="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
+            <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
               <Handshake className="w-4 h-4" /> Partner Network
             </div>
             <h1 className="text-4xl md:text-5xl font-black text-white mb-4">
@@ -73,7 +73,7 @@ export default function WorkforcePartnersPage() {
               We work with WorkOne centers, workforce boards, and community organizations to connect Hoosiers with free career training.
             </p>
             <div className="flex flex-wrap gap-4">
-              <Link href="/contact" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-full font-bold transition-all hover:scale-105">
+              <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-full font-bold transition-all hover:scale-105">
                 Become a Partner <ArrowRight className="w-5 h-5" />
               </Link>
               <Link href="/workone-partner-packet" className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-6 py-3 rounded-full font-bold transition-all border border-white/40">
@@ -94,8 +94,8 @@ export default function WorkforcePartnersPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map((service, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-slate-200 text-center">
-                <div className="w-14 h-14 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <service.icon className="w-7 h-7 text-blue-600" />
+                <div className="w-14 h-14 bg-brand-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <service.icon className="w-7 h-7 text-brand-blue-600" />
                 </div>
                 <h3 className="font-bold text-slate-900 mb-2">{service.title}</h3>
                 <p className="text-slate-600 text-sm">{service.desc}</p>
@@ -116,7 +116,7 @@ export default function WorkforcePartnersPage() {
                 <div className="relative h-48">
                   <Image src={partner.image} alt={partner.name} fill className="object-cover" />
                   <div className="absolute top-4 left-4">
-                    <span className="bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">{partner.type}</span>
+                    <span className="bg-brand-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">{partner.type}</span>
                   </div>
                 </div>
                 <div className="p-6">
@@ -134,12 +134,12 @@ export default function WorkforcePartnersPage() {
       </section>
 
       {/* For WorkOne Staff */}
-      <section className="py-16 bg-blue-600">
+      <section className="py-16 bg-brand-blue-600">
         <div className="max-w-5xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-white">
               <h2 className="text-3xl font-black mb-6">For WorkOne Staff</h2>
-              <p className="text-blue-100 mb-6">
+              <p className="text-brand-blue-100 mb-6">
                 Career advisors and case managers: We've created resources specifically for you to help your clients access our training programs.
               </p>
               <ul className="space-y-4 mb-8">
@@ -155,7 +155,7 @@ export default function WorkforcePartnersPage() {
                   </li>
                 ))}
               </ul>
-              <Link href="/workone-partner-packet" className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition-all">
+              <Link href="/workone-partner-packet" className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-6 py-3 rounded-full font-bold hover:bg-gray-100 transition-all">
                 Access Partner Packet <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
@@ -180,7 +180,7 @@ export default function WorkforcePartnersPage() {
                   Job seekers can use Individual Training Accounts (ITAs) to enroll in our programs at no cost to them.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                  <Link href="/programs" className="inline-flex items-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors">
+                  <Link href="/programs" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors">
                     View Approved Programs
                   </Link>
                   <a href="https://www.in.gov/dwd/career-training-adult-ed/intraining/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 border border-slate-300 text-slate-700 px-6 py-3 rounded-lg font-semibold hover:bg-slate-100 transition-colors">
@@ -196,7 +196,7 @@ export default function WorkforcePartnersPage() {
                   { label: 'Job Placement', value: '85%' },
                 ].map((stat, i) => (
                   <div key={i} className="bg-white rounded-xl p-6 text-center shadow-sm">
-                    <div className="text-3xl font-black text-blue-600 mb-1">{stat.value}</div>
+                    <div className="text-3xl font-black text-brand-blue-600 mb-1">{stat.value}</div>
                     <div className="text-slate-600 text-sm">{stat.label}</div>
                   </div>
                 ))}
@@ -214,7 +214,7 @@ export default function WorkforcePartnersPage() {
             Let's work together to connect more Hoosiers with career training and employment.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/contact" className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 rounded-full font-bold transition-all hover:scale-105">
+            <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-8 py-4 rounded-full font-bold transition-all hover:scale-105">
               Contact Us <ArrowRight className="w-5 h-5" />
             </Link>
             <a href="/support" className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white px-8 py-4 rounded-full font-bold transition-all border border-white/30">

@@ -193,17 +193,17 @@ export default async function AdminPayoutsPage() {
       </div>
 
       {/* Payout Instructions */}
-      <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-        <h3 className="font-semibold text-blue-900 mb-3">
+      <div className="mt-8 bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-6">
+        <h3 className="font-semibold text-brand-blue-900 mb-3">
           Manual Payout Process
         </h3>
-        <ol className="list-decimal list-inside space-y-2 text-sm text-blue-800">
+        <ol className="list-decimal list-inside space-y-2 text-sm text-brand-blue-800">
           <li>Review creators ready for payout (minimum $50)</li>
           <li>Process payment via their preferred method (ACH/PayPal/Zelle)</li>
           <li>Click "Mark as Paid" to update records</li>
           <li>Creator will see updated balance in their dashboard</li>
         </ol>
-        <p className="mt-4 text-sm text-blue-700">
+        <p className="mt-4 text-sm text-brand-blue-700">
           <strong>Future:</strong> Upgrade to Stripe Connect for automatic
           payouts. See STRIPE_CONNECT_UPGRADE.md for details.
         </p>

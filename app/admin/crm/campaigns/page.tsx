@@ -71,7 +71,7 @@ export default async function CampaignsPage() {
           </div>
           <Link
             href="/admin/crm/campaigns/new"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
           >
             <Plus className="w-5 h-5" />
             New Campaign
@@ -85,7 +85,7 @@ export default async function CampaignsPage() {
               <span className="text-sm font-semibold text-black">
                 Total Sent
               </span>
-              <Mail className="w-5 h-5 text-blue-600" />
+              <Mail className="w-5 h-5 text-brand-blue-600" />
             </div>
             <p className="text-3xl font-bold text-black">
               {totalSent.toLocaleString()}
@@ -110,7 +110,7 @@ export default async function CampaignsPage() {
               <span className="text-sm font-semibold text-black">
                 Click Rate
               </span>
-              <TrendingUp className="w-5 h-5 text-blue-600" />
+              <TrendingUp className="w-5 h-5 text-brand-blue-600" />
             </div>
             <p className="text-3xl font-bold text-black">{clickRate}%</p>
             <p className="text-sm text-black mt-1">
@@ -168,7 +168,7 @@ export default async function CampaignsPage() {
                         </span>
                         <span className="text-black">
                           Clicked:{' '}
-                          <span className="font-semibold text-blue-600">
+                          <span className="font-semibold text-brand-blue-600">
                             {campaign.clicked_count || 0}
                           </span>
                         </span>
@@ -181,7 +181,7 @@ export default async function CampaignsPage() {
                             ? 'bg-green-100 text-green-700'
                             : campaign.status === 'draft'
                               ? 'bg-gray-100 text-black'
-                              : 'bg-blue-100 text-blue-700'
+                              : 'bg-brand-blue-100 text-brand-blue-700'
                         }`}
                       >
                         {campaign.status}
@@ -205,7 +205,7 @@ export default async function CampaignsPage() {
               </p>
               <Link
                 href="/admin/crm/campaigns/new"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
               >
                 <Plus className="w-5 h-5" />
                 Create Campaign

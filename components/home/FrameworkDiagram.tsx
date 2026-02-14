@@ -39,8 +39,8 @@ export default function FrameworkDiagram() {
           {/* Step 2: Train */}
           <div className="relative">
             <div className="bg-white rounded-2xl shadow-lg p-8 text-center hover:shadow-xl transition-shadow">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-20 h-20 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg className="w-10 h-10 text-brand-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
                 </svg>
               </div>
@@ -51,7 +51,7 @@ export default function FrameworkDiagram() {
             </div>
             {/* Arrow */}
             <div className="hidden md:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-              <svg className="w-8 h-8 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-8 h-8 text-brand-blue-400" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clipRule="evenodd" />
               </svg>
             </div>
@@ -101,7 +101,7 @@ export default function FrameworkDiagram() {
             <div className="text-black">Free Training Available</div>
           </div>
           <div className="text-center">
-            <div className="text-4xl font-bold text-blue-600 mb-2">6-12</div>
+            <div className="text-4xl font-bold text-brand-blue-600 mb-2">6-12</div>
             <div className="text-black">Weeks to Complete</div>
           </div>
           <div className="text-center">

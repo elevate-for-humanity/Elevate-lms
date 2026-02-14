@@ -193,6 +193,7 @@ export default function LoginForm() {
             Sign in with Google
           </button>
 
+          {process.env.NEXT_PUBLIC_GITHUB_ENABLED !== 'false' && (
           <button
             onClick={() => handleOAuthLogin('github')}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center"
@@ -202,6 +203,7 @@ export default function LoginForm() {
             </svg>
             Sign in with GitHub
           </button>
+          )}
         </div>
       </div>
 

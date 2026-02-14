@@ -5,7 +5,6 @@ import { Play } from 'lucide-react';
 
 interface PageAvatarProps {
   videoSrc: string;
-  voiceoverSrc?: string;
   title?: string;
   position?: 'default' | 'inline';
   loop?: boolean;

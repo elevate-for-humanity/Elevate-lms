@@ -110,8 +110,8 @@ const avatarConfig: { pattern: RegExp; video: string; name: string }[] = [
   // Business page
   { pattern: /^\/programs\/business/i, video: '/videos/avatars/financial-guide.mp4', name: 'Business Guide' },
   
-  // Financial/Tax pages
-  { pattern: /^\/(vita|tax|financial-aid|funding|wioa)/i, video: '/videos/avatars/financial-guide.mp4', name: 'Financial Guide' },
+  // Financial/Tax pages (funding pages excluded per audit)
+  { pattern: /^\/(vita|tax|financial-aid)/i, video: '/videos/avatars/financial-guide.mp4', name: 'Financial Guide' },
   
   // Store pages - checkout only
   { pattern: /^\/store\/checkout/i, video: '/videos/avatars/store-assistant.mp4', name: 'Checkout Guide' },
@@ -157,7 +157,8 @@ export default function GlobalAvatar() {
     const video = videoRef.current;
     if (!video) return;
     
-    video.volume = 1;
+    video.muted = true;
+    video.volume = 0;
     video.play().catch(() => {
       // Browser blocked autoplay - will play on interaction
     });
@@ -181,6 +182,7 @@ export default function GlobalAvatar() {
             className="w-full aspect-video object-cover"
             playsInline
             autoPlay
+            muted
             preload="metadata"
           >
             <source src={config.video} type="video/mp4" />

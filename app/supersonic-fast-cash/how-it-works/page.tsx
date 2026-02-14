@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   title: 'How It Works | SupersonicFastCash Tax Preparation',
   description: 'Get your taxes done in 3 simple steps. Upload documents, we prepare your return, get your refund fast. Same-day refund advances available.',
   alternates: {
-    canonical: 'https://elevateforhumanity.org/supersonic-fast-cash/how-it-works',
+    canonical: 'https://www.elevateforhumanity.org/supersonic-fast-cash/how-it-works',
   },
 };
 

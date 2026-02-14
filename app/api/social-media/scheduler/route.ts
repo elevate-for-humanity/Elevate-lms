@@ -16,10 +16,11 @@ export async function GET(req: Request) {
   try {
     const supabase = await createClient();
 
-    // Get current hour (EST)
+    // Get current hour in configured timezone
     const now = new Date();
+    const tz = process.env.SOCIAL_MEDIA_TIMEZONE || 'America/New_York';
     const estHour = new Date(
-      now.toLocaleString('en-US', { timeZone: 'America/New_York' })
+      now.toLocaleString('en-US', { timeZone: tz })
     ).getHours();
 
     // Determine which posting slot (0 = morning, 1 = afternoon, 2 = evening)

@@ -342,6 +342,7 @@ function SignupFormContent() {
             Sign up with Google
           </button>
 
+          {process.env.NEXT_PUBLIC_GITHUB_ENABLED !== 'false' && (
           <button
             onClick={() => handleOAuthSignup('github')}
             className="w-full px-4 py-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors flex items-center justify-center"
@@ -351,6 +352,7 @@ function SignupFormContent() {
             </svg>
             Sign up with GitHub
           </button>
+          )}
         </div>
       </div>
 

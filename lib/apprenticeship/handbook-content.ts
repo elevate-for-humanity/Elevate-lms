@@ -41,8 +41,8 @@ Congratulations on taking the first step toward your career as a licensed barber
 In partnership with 2Exclusive LLC
 
 ## Program Registration
-- **DOL RAPIDS Program Number:** 2025-IN-132301
-- **RTI Provider ID:** 208029
+- **DOL RAPIDS Program Number:** ${process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || '2025-IN-132301'}
+- **RTI Provider ID:** ${process.env.NEXT_PUBLIC_RTI_PROVIDER_ID || '208029'}
 - **ETPL Approved:** Yes
 
 ## Program Duration

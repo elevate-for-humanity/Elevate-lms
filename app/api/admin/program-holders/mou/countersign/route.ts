@@ -78,6 +78,29 @@ export const POST = withAuth(
       return new Response(toErrorMessage(error), { status: 500 });
     }
 
+    // Send archive copy of fully executed MOU
+    const archiveEmail = process.env.MOU_ARCHIVE_EMAIL;
+    if (archiveEmail && updated) {
+      try {
+        const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
+        await fetch(`${siteUrl}/api/email/send`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            to: archiveEmail,
+            subject: `MOU Fully Executed: ${updated.name}`,
+            html: `<p>MOU for program holder <strong>${updated.name}</strong> has been fully executed.</p>
+              <p>Holder signed by: ${updated.mou_holder_name} on ${updated.mou_holder_signed_at}</p>
+              <p>Admin signed by: ${updated.mou_admin_name} on ${updated.mou_admin_signed_at}</p>
+              <p>Payout share: ${updated.payout_share}%</p>`,
+          }),
+        });
+      } catch (emailErr) {
+        // Non-blocking — log but don't fail the request
+        logger.error('Failed to send MOU archive email:', emailErr instanceof Error ? emailErr : new Error(String(emailErr)));
+      }
+    }
+
     return Response.json(updated);
   },
   { roles: ['admin', 'super_admin'] }

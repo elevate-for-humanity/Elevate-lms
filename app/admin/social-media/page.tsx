@@ -98,7 +98,7 @@ export default function SocialMediaPage() {
       {/* Hero Section */}
       <section className="relative h-[500px] md:h-[600px] lg:h-[700px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/success-new/success-16.jpg"
+          src="/images/heroes-hq/success-stories-hero.jpg"
           alt="Social Media"
           fill
           className="object-cover"

@@ -1,193 +1,149 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { hashSSN, getSSNLast4, isValidSSN } from '@/lib/security/ssn';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60;
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
+// Public endpoint uses anon key — the view grants SELECT to anon.
+// Do NOT use service role key here.
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-// Simple in-memory rate limiting (use Redis in production)
-const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
-const RATE_LIMIT = 5; // requests per window
-const RATE_WINDOW = 60 * 1000; // 1 minute
+// In-memory rate limiting (use Upstash Redis in production).
+// Two buckets: per-IP and per-tracking-code.
+const ipLimits = new Map<string, { count: number; resetTime: number }>();
+const codeLimits = new Map<string, { count: number; resetTime: number }>();
+const IP_RATE_LIMIT = 5;
+const CODE_RATE_LIMIT = 5;
+const RATE_WINDOW = 60_000; // 1 minute
+const FAILURE_DELAY_MS = 300; // slow down enumeration attempts
 
-function isRateLimited(ip: string): boolean {
+function checkLimit(
+  map: Map<string, { count: number; resetTime: number }>,
+  key: string,
+  limit: number,
+): boolean {
   const now = Date.now();
-  const record = rateLimitMap.get(ip);
-  
+  const record = map.get(key);
+
   if (!record || now > record.resetTime) {
-    rateLimitMap.set(ip, { count: 1, resetTime: now + RATE_WINDOW });
+    map.set(key, { count: 1, resetTime: now + RATE_WINDOW });
     return false;
   }
-  
-  if (record.count >= RATE_LIMIT) {
-    return true;
-  }
-  
+
+  if (record.count >= limit) return true;
   record.count++;
   return false;
 }
 
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+// Generic response for not-found / bad-format — prevents tracking-code enumeration
+const NOT_FOUND_BODY = {
+  success: false,
+  error: 'No return found for the provided tracking code.',
+};
+
+// Every response must include these headers — no CDN caching of tracking results
+const NO_CACHE_HEADERS = {
+  'Cache-Control': 'no-store, no-cache, must-revalidate',
+  'Pragma': 'no-cache',
+};
+
+function jsonResponse(body: Record<string, unknown>, status: number) {
+  return NextResponse.json(body, { status, headers: NO_CACHE_HEADERS });
+}
+
 /**
- * Track refund status - uses SSN hash for secure lookup
+ * POST: Look up return status by public tracking code.
+ * Reads ONLY from sfc_tax_return_public_status view — never from sfc_tax_returns.
  */
 export async function POST(request: NextRequest) {
   try {
-    // Rate limiting
-    const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
-    if (isRateLimited(ip)) {
-      return NextResponse.json(
-        { error: 'Too many requests. Please try again later.' },
-        { status: 429 }
-      );
+    // Netlify sets x-nf-client-connection-ip; fall back to x-forwarded-for first entry
+    const rawForwarded = request.headers.get('x-nf-client-connection-ip')
+      || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
+      || 'unknown';
+    const ip = rawForwarded;
+
+    if (checkLimit(ipLimits, ip, IP_RATE_LIMIT)) {
+      return jsonResponse({ error: 'Too many requests. Please try again later.' }, 429);
     }
 
     const body = await request.json();
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+    const trackingCode = (body.trackingCode || '').trim();
 
-    // Validate input
-    if (!body.ssn || !body.filingStatus || !body.refundAmount) {
-      return NextResponse.json(
-        { error: 'Missing required fields' },
-        { status: 400 }
-      );
+    // Same generic message for bad format and not-found — prevents enumeration
+    if (!trackingCode || trackingCode.length < 6 || trackingCode.length > 40) {
+      await delay(FAILURE_DELAY_MS);
+      return jsonResponse(NOT_FOUND_BODY, 404);
     }
 
-    if (!isValidSSN(body.ssn)) {
-      return NextResponse.json(
-        { error: 'Invalid SSN format' },
-        { status: 400 }
-      );
+    // Per-code throttle: prevents spraying many codes from rotating IPs
+    if (checkLimit(codeLimits, trackingCode, CODE_RATE_LIMIT)) {
+      return jsonResponse({ error: 'Too many requests. Please try again later.' }, 429);
     }
 
-    const ssnClean = body.ssn.replace(/\D/g, '');
-
-    // Use hashed SSN for lookup (more secure than plain text)
-    const ssnHash = hashSSN(ssnClean);
-    const ssnLast4 = getSSNLast4(ssnClean);
-
-    // Find tax return by SSN hash or last 4 (fallback for existing records)
-    const { data: client } = await supabase
-      .from('clients')
-      .select('id, tax_returns(*)')
-      .or(`ssn_hash.eq.${ssnHash},ssn_last4.eq.${ssnLast4}`)
-      .single();
-
-    let status = 'received';
-    let statusMessage = 'Your tax return has been received and is being processed';
-    let expectedDate = null;
-
-    if (client?.tax_returns?.[0]) {
-      const taxReturn = client.tax_returns[0];
-
-      // Determine status based on tax return status
-      if (taxReturn.status === 'filed') {
-        status = 'approved';
-        statusMessage = 'Your refund has been approved and will be sent soon';
-
-        // Calculate expected date (typically 21 days from filing)
-        const filedDate = new Date(taxReturn.filed_date || taxReturn.created_at);
-        expectedDate = new Date(filedDate);
-        expectedDate.setDate(expectedDate.getDate() + 21);
-      } else if (taxReturn.status === 'accepted') {
-        status = 'sent';
-        statusMessage = 'Your refund has been sent';
-        expectedDate = new Date();
-      }
+    if (!supabaseUrl || !supabaseAnonKey) {
+      await delay(FAILURE_DELAY_MS);
+      return jsonResponse(NOT_FOUND_BODY, 404);
     }
 
-    // Save refund tracking lookup
-    const { data: tracking, error: trackingError } = await supabase
-      .from('refund_tracking')
-      .insert({
-        tax_return_id: client?.tax_returns?.[0]?.id || null,
-        refund_type: 'federal',
-        expected_amount: parseFloat(body.refundAmount),
-        status: status,
-        irs_status_code: status.toUpperCase(),
-        last_checked_at: new Date().toISOString(),
-        created_at: new Date().toISOString(),
-      })
-      .select()
-      .single();
+    const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-    if (trackingError) {
-      /* Tracking error handled silently */
+    // Read from the VIEW only — never from sfc_tax_returns directly.
+    // View exposes: public_tracking_code, status (mapped), rejection_reason (sanitized),
+    // created_at, updated_at, client_first_name, client_last_initial.
+    // Does NOT expose: efile_submission_id, raw last_error, user_id, email, phone, notes.
+    const { data, error } = await supabase
+      .from('sfc_tax_return_public_status')
+      .select('public_tracking_code, status, rejection_reason, created_at, updated_at, client_first_name, client_last_initial')
+      .eq('public_tracking_code', trackingCode)
+      .maybeSingle();
+
+    if (error || !data) {
+      await delay(FAILURE_DELAY_MS);
+      return jsonResponse(NOT_FOUND_BODY, 404);
     }
 
-    return NextResponse.json({
+    // Status messages map to the view's public-safe status values
+    const statusMessages: Record<string, string> = {
+      received: 'Your tax return has been received and is being processed.',
+      processing: 'Your return is being reviewed and prepared for filing.',
+      submitted: 'Your return has been submitted to the IRS.',
+      accepted: 'Your return has been accepted by the IRS.',
+      action_required: 'Your return requires attention. A preparer will contact you.',
+    };
+
+    // Rejection reason messages — sanitized codes from the view, not raw errors
+    const rejectionMessages: Record<string, string> = {
+      missing_documents: 'Additional documents are needed to complete your return.',
+      verification_failed: 'Identity verification could not be completed.',
+      identity_mismatch: 'Information provided does not match IRS records.',
+      duplicate_filing: 'A return has already been filed for this tax year.',
+      review_required: 'Your return requires additional review by a preparer.',
+    };
+
+    // All masking is done in SQL — the route only formats the response
+    return jsonResponse({
       success: true,
-      status: status,
-      statusMessage: statusMessage,
-      refundAmount: parseFloat(body.refundAmount),
-      expectedDate: expectedDate?.toISOString().split('T')[0],
-      method: body.refundMethod || 'direct_deposit',
-      lastUpdated: new Date().toISOString(),
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to track refund' },
-      { status: 500 }
-    );
+      trackingCode: data.public_tracking_code,
+      status: data.status,
+      statusMessage: statusMessages[data.status] || 'Status is being updated.',
+      clientName: data.client_first_name
+        ? `${data.client_first_name} ${data.client_last_initial || ''}.`
+        : undefined,
+      rejectionReason: data.rejection_reason
+        ? rejectionMessages[data.rejection_reason] || 'Your return requires attention.'
+        : undefined,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at,
+    }, 200);
+  } catch {
+    return jsonResponse(NOT_FOUND_BODY, 404);
   }
 }
 
-/**
- * Get refund tracking history
- */
-export async function GET(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const ssn = searchParams.get('ssn');
-
-    if (!ssn) {
-      return NextResponse.json(
-        { error: 'SSN required' },
-        { status: 400 }
-      );
-    }
-
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Find client and their refund tracking
-    const { data: client } = await supabase
-      .from('clients')
-      .select(`
-        id,
-        first_name,
-        last_name,
-        tax_returns (
-          id,
-          tax_year,
-          status,
-          federal_refund,
-          refund_tracking (*)
-        )
-      `)
-      .eq('ssn', ssn)
-      .single();
-
-    if (!client) {
-      return NextResponse.json(
-        { error: 'No tax return found' },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({
-      success: true,
-      client: {
-        name: `${client.first_name} ${client.last_name}`,
-        taxReturns: client.tax_returns,
-      },
-    });
-  } catch (error) {
-    return NextResponse.json(
-      { error: 'Failed to get tracking history' },
-      { status: 500 }
-    );
-  }
-}
+// GET handler removed — tracking codes must be submitted via POST body, never in URL params

@@ -163,7 +163,7 @@ export default function MediaStudioPage() {
       {/* Hero Section */}
       <section className="relative h-[500px] md:h-[600px] lg:h-[700px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/success-new/success-8.jpg"
+          src="/images/heroes-hq/success-stories-hero.jpg"
           alt="Media Studio"
           fill
           className="object-cover"

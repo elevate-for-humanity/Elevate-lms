@@ -1,255 +1,108 @@
 import { Metadata } from 'next';
-import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronRight, Award, CheckCircle } from 'lucide-react';
-
-export const dynamic = 'force-dynamic';
+import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import { ArrowRight, Award, Shield, CheckCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/credentials',
-  },
-  title: 'Credentials | Elevate For Humanity',
-  description:
-    'Industry-recognized certifications and licenses. Earn credentials that employers value and trust.',
+  title: 'Credentials & Certifications | Elevate for Humanity',
+  description: 'Industry-recognized credentials and certifications earned through Elevate for Humanity training programs. OSHA, HSI, CNA, CDL, and more.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/credentials' },
 };
 
-export default async function CredentialsPage() {
-  const supabase = await createClient();
+const credentials = [
+  { name: 'OSHA 10 / OSHA 30', field: 'Construction & Trades', issuer: 'OSHA', desc: 'Workplace safety certification required by most employers in construction and manufacturing.' },
+  { name: 'HSI CPR/AED/First Aid', field: 'Healthcare & General', issuer: 'Health & Safety Institute', desc: 'Same-day certification. Valid for 2 years. Required for healthcare, childcare, and many trades.' },
+  { name: 'Certified Nursing Assistant (CNA)', field: 'Healthcare', issuer: 'Indiana State Dept. of Health', desc: 'State-certified credential for patient care in hospitals, nursing homes, and home health.' },
+  { name: 'Commercial Driver License (CDL)', field: 'Transportation', issuer: 'Indiana BMV', desc: 'Class A or Class B CDL for commercial truck driving. Includes pre-trip, skills, and road test.' },
+  { name: 'EPA 608 Certification', field: 'HVAC', issuer: 'EPA', desc: 'Required for handling refrigerants. Universal, Type I, II, or III certification.' },
+  { name: 'Barber License', field: 'Cosmetology', issuer: 'Indiana PLA', desc: 'State barber license earned through DOL Registered Apprenticeship. 1,500 hours of training.' },
+  { name: 'Phlebotomy Technician', field: 'Healthcare', issuer: 'NHA / ASCP', desc: 'National certification for blood draw and specimen collection.' },
+  { name: 'Medical Assistant', field: 'Healthcare', issuer: 'NHA', desc: 'Clinical and administrative skills for physician offices and outpatient clinics.' },
+];
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch credentials
-  const { data: credentials } = await supabase
-    .from('credentials')
-    .select('*')
-    .order('name');
+export default function CredentialsPage() {
   return (
     <div className="min-h-screen bg-white">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Credentials" }]} />
+      <div className="bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[{ label: 'Credentials' }]} />
+        </div>
       </div>
-{/* Breadcrumb Navigation */}
-      <nav className="bg-white border-b border-gray-200 py-3">
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-2 text-sm">
-            <Link href="/" className="text-black hover:text-teal-600 transition">
-              Home
-            </Link>
-            <ChevronRight className="w-4 h-4 text-black" />
-            <Link href="/programs" className="text-black hover:text-teal-600 transition">
-              Programs
-            </Link>
-            <ChevronRight className="w-4 h-4 text-black" />
-            <span className="text-teal-600 font-semibold">Credentials</span>
-          </div>
-        </div>
-      </nav>
 
-      {/* Hero Section */}
-      <section className="relative h-[400px] flex items-center justify-center text-white overflow-hidden">
-        
-
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          {/* Logo */}
-          <div className="mb-6">
-            <Image
-              src="/logo.png"
-              alt="Elevate for Humanity"
-              width={150}
-              height={60}
-              className="mx-auto brightness-0 invert"
-            />
-          </div>
-
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20 mb-6">
-            <Award className="w-5 h-5" />
-            <span className="text-sm font-semibold">Industry Certifications</span>
-          </div>
-
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 uppercase">
-            Credentials That Matter
-          </h1>
-          <p className="text-xl mb-8 text-teal-100 max-w-2xl mx-auto">
-            Earn industry-recognized certifications and licenses that employers value and trust
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/apply"
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all hover:scale-105 shadow-xl"
-            >
-              Apply Now
-            </Link>
-            <Link
-              href="/programs"
-              className="bg-white/10 backdrop-blur-sm border-2 border-white hover:bg-white hover:text-teal-600 text-white px-8 py-4 rounded-xl text-lg font-bold transition-all"
-            >
-              View Programs
-            </Link>
+      {/* Hero */}
+      <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
+        <Image src="/images/hero/hero-certifications.jpg" alt="Industry certifications" fill className="object-cover" priority sizes="100vw" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
+        <div className="absolute inset-0 flex items-end">
+          <div className="max-w-6xl mx-auto px-4 w-full pb-10 sm:pb-14">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Credentials & Certifications</h1>
+            <p className="text-lg text-white/90 max-w-2xl">Industry-recognized credentials that employers require. Earn yours in weeks, not years.</p>
           </div>
         </div>
       </section>
 
-      {/* Content Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            {/* Feature Grid */}
-            <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-              <div>
-                <h2 className="text-3xl md:text-4xl font-black mb-6 text-black">
-                  Industry-Recognized Credentials
-                </h2>
-                <p className="text-xl text-black mb-8">
-                  Our programs prepare you to earn completion certificates and licenses that employers actively seek. Graduate with credentials that open doors.
-                </p>
-                <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <CheckCircle className="w-6 h-6 text-teal-600 mr-3 flex-shrink-0 mt-1" />
-                    <div>
-                      <strong className="text-black">National Certifications</strong>
-                      <p className="text-black">Recognized across all 50 states</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="w-6 h-6 text-teal-600 mr-3 flex-shrink-0 mt-1" />
-                    <div>
-                      <strong className="text-black">State Licenses</strong>
-                      <p className="text-black">Required credentials for regulated professions</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="w-6 h-6 text-teal-600 mr-3 flex-shrink-0 mt-1" />
-                    <div>
-                      <strong className="text-black">Exam Preparation</strong>
-                      <p className="text-black">We prepare you to pass certification exams</p>
-                    </div>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="w-6 h-6 text-teal-600 mr-3 flex-shrink-0 mt-1" />
-                    <div>
-                      <strong className="text-black">Funded</strong>
-                      <p className="text-black">Training and exam costs covered</p>
-                    </div>
-                  </li>
-                </ul>
+      {/* Credentials Grid */}
+      <section className="py-14 sm:py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-3">Available Certifications</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">Each credential is nationally or state recognized and accepted by employers across Indiana and beyond.</p>
+          </div>
+          <div className="grid sm:grid-cols-2 gap-5">
+            {credentials.map((cred) => (
+              <div key={cred.name} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-md transition">
+                <div className="flex items-start gap-4">
+                  <Award className="w-8 h-8 text-blue-600 flex-shrink-0 mt-1" />
+                  <div>
+                    <h3 className="font-bold text-slate-900 text-lg">{cred.name}</h3>
+                    <p className="text-sm text-blue-600 font-medium mb-2">{cred.field} — Issued by {cred.issuer}</p>
+                    <p className="text-slate-600 text-sm">{cred.desc}</p>
+                  </div>
+                </div>
               </div>
-              <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
-                <Image
-                  src="/images/success-new/success-6.jpg"
-                  alt="Credentials"
-                  fill
-                  className="object-cover"
-                  quality={100}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why Credentials Matter */}
+      <section className="py-14 sm:py-20 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-10 items-center">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-6">Why Credentials Matter</h2>
+              <div className="space-y-4">
+                {[
+                  'Employers require specific certifications before hiring',
+                  'Certified workers earn 20-40% more than non-certified peers',
+                  'Credentials are portable — they follow you to any employer',
+                  'Many certifications can be earned in 2-12 weeks',
+                  'Funding may cover all certification and exam fees',
+                ].map((item) => (
+                  <div key={item} className="flex items-start gap-3">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-slate-700">{item}</p>
+                  </div>
+                ))}
               </div>
             </div>
-
-            {/* Feature Cards */}
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <svg
-                    className="w-6 h-6 text-brand-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-3">Learn</h3>
-                <p className="text-black">
-                  Access quality training programs
-                </p>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
-                  <svg
-                    className="w-6 h-6 text-brand-green-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-3">Certify</h3>
-                <p className="text-black">Earn industry certifications</p>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <svg
-                    className="w-6 h-6 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-3">Work</h3>
-                <p className="text-black">Get hired in your field</p>
-              </div>
+            <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">
+              <Image src="/images/trades/program-hvac-technician.jpg" alt="Earning industry credentials" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700 text-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Ready to Get Started?
-            </h2>
-            <p className="text-base md:text-lg text-blue-100 mb-8">
-              Join thousands who have launched successful careers through our
-              programs.
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link
-                href="/contact"
-                className="bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
-              >
-                Apply Now
-              </Link>
-              <Link
-                href="/programs"
-                className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg"
-              >
-                Browse Programs
-              </Link>
-            </div>
+      {/* CTA */}
+      <section className="py-16 sm:py-24 bg-brand-red-600">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <Shield className="w-10 h-10 text-white/80 mx-auto mb-4" />
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Get Certified. Get Hired.</h2>
+          <p className="text-xl text-white/90 mb-10">Training may be free for eligible Indiana residents.</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/apply/student" className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">Apply Now</Link>
+            <Link href="/programs" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">View Programs</Link>
           </div>
         </div>
       </section>

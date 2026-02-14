@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/server';
+import { createPublicClient } from '@/lib/supabase/public';
 import Link from 'next/link';
 import { 
   ArrowRight, 
@@ -113,7 +113,7 @@ export default async function LicensePage() {
                   Schedule Demo
                 </Link>
                 <Link
-                  href={ROUTES.pricing}
+                  href={ROUTES.licensePricing}
                   className="inline-flex items-center justify-center gap-2 bg-white/10 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-white/20 transition text-sm sm:text-lg"
                 >
                   View Pricing

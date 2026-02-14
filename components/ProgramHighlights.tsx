@@ -14,32 +14,32 @@ const defaultHighlights: Highlight[] = [
   {
     title: "100% Free Training",
     description: "No tuition, no fees, no debt. Fully funded through WIOA, WRG, and JRI programs.",
-    image: "/images/students-new/student-5.jpg"
+    image: "/images/trades/program-construction-training.jpg"
   },
   {
     title: "Earn While You Learn",
     description: "Get paid during training through work-study programs and apprenticeships.",
-    image: "/images/students-new/student-12.jpg"
+    image: "/images/trades/program-welding-training.jpg"
   },
   {
     title: "Industry Certification",
     description: "Earn recognized certifications that employers value and actively seek.",
-    image: "/images/success-new/success-3.jpg"
+    image: "/images/hero/hero-certifications.jpg"
   },
   {
     title: "Job Placement Support",
     description: "We connect you with employers hiring in your field. Resume and interview prep included.",
-    image: "/images/career-services/job-fair.jpg"
+    image: "/images/heroes-hq/career-services-hero.jpg"
   },
   {
     title: "Hands-On Experience",
     description: "Real-world training with actual equipment and industry-standard tools.",
-    image: "/images/hero/hero-skilled-trades.jpg"
+    image: "/images/trades/program-hvac-technician.jpg"
   },
   {
-    title: "Flexible Scheduling",
-    description: "Day, evening, and weekend classes available to fit your life.",
-    image: "/images/schedule-card.jpg"
+    title: "Support Services",
+    description: "Childcare, transportation, and career counseling to keep you on track.",
+    image: "/images/heroes-hq/programs-hero.jpg"
   }
 ];
 
@@ -59,20 +59,19 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {highlights.map((highlight, index) => (
             <div key={index} className="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-all group">
-              <div className="relative h-48 overflow-hidden">
+              <div className="relative h-40 overflow-hidden">
                 <Image
                   src={highlight.image}
                   alt={highlight.title}
                   fill
-                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
                 />
-                <div className="absolute inset-0   " />
-                <h3 className="absolute bottom-4 left-4 right-4 text-xl font-bold text-white">
+              </div>
+              <div className="p-5">
+                <h3 className="text-lg font-bold text-slate-900 mb-2">
                   {highlight.title}
                 </h3>
-              </div>
-              <div className="p-6">
-                <p className="text-black leading-relaxed">
+                <p className="text-slate-600 text-sm leading-relaxed">
                   {highlight.description}
                 </p>
               </div>
@@ -86,7 +85,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="/images/students-new/student-3.jpg"
+                  src="/images/trades/program-electrical-training.jpg"
                   alt="Small class sizes"
                   fill
                   className="object-cover"
@@ -122,7 +121,7 @@ export default function ProgramHighlights({ highlights = defaultHighlights }: Pr
             <div>
               <div className="relative w-16 h-16 mx-auto mb-3 rounded-full overflow-hidden">
                 <Image
-                  src="/images/success-new/success-5.jpg"
+                  src="/images/heroes-hq/success-hero.jpg"
                   alt="Job placement"
                   fill
                   className="object-cover"

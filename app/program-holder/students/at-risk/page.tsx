@@ -99,7 +99,7 @@ export default async function AtRiskStudentsPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/success-new/success-3.jpg"
+          src="/images/programs-hq/students-learning.jpg"
           alt="At-Risk Students"
           fill
           className="object-cover"

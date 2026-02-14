@@ -52,27 +52,7 @@ export function TrustBadges() {
           </div>
         </div>
 
-        {/* Partner Logos Content */}
-        <div className="mt-12 pt-8 border-t border-slate-200">
-          <p className="text-center text-sm text-black mb-6">
-            Partnered with leading workforce development organizations
-          </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 items-center opacity-60">
-            {/* Content for partner logos */}
-            <div className="h-12 bg-slate-200 rounded flex items-center justify-center">
-              <span className="text-xs text-slate-500">WorkOne</span>
-            </div>
-            <div className="h-12 bg-slate-200 rounded flex items-center justify-center">
-              <span className="text-xs text-slate-500">EmployIndy</span>
-            </div>
-            <div className="h-12 bg-slate-200 rounded flex items-center justify-center">
-              <span className="text-xs text-slate-500">Indiana DWD</span>
-            </div>
-            <div className="h-12 bg-slate-200 rounded flex items-center justify-center">
-              <span className="text-xs text-slate-500">Marion County</span>
-            </div>
-          </div>
-        </div>
+
       </div>
     </section>
   );

@@ -117,7 +117,7 @@ export default async function ResetPasswordPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/success-new/success-1.jpg"
+                  src="/images/heroes-hq/success-hero.jpg"
                   alt="Reset Password"
                   fill
                   className="object-cover"

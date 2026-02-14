@@ -77,6 +77,14 @@
     "sharp"
   ]
 
+# SFC: File return function
+[functions."file-return"]
+  external_node_modules = ["@supabase/supabase-js"]
+
+# SFC: Refund tracking function (public, anon key only)
+[functions."refund-tracking"]
+  external_node_modules = ["@supabase/supabase-js"]
+
 # Social Media Scheduler - DISABLED due to AWS Lambda 4KB env var limit
 # TODO: Re-enable with reduced env vars or use background functions
 # [functions."social-media-scheduler"]
@@ -164,6 +172,20 @@
 [[redirects]]
   from = "/api/image/optimize"
   to = "/.netlify/functions/image-optimize"
+  status = 200
+  force = true
+
+# SFC: File tax return - routed to dedicated Netlify function
+[[redirects]]
+  from = "/api/file-return"
+  to = "/.netlify/functions/file-return"
+  status = 200
+  force = true
+
+# SFC: Refund tracking (public, anon key) - routed to dedicated Netlify function
+[[redirects]]
+  from = "/api/refund-tracking"
+  to = "/.netlify/functions/refund-tracking"
   status = 200
   force = true
 

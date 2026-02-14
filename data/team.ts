@@ -1,0 +1,89 @@
+/**
+ * Canonical team data — single source of truth.
+ * Sourced from existing repo content (app/about/team/page.tsx fallbackTeam).
+ * Used by: /about/team, /team, homepage "Meet the Team" section.
+ *
+ * Do NOT fabricate bios or credentials. If data is missing, use placeholder text.
+ */
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  title: string;
+  orgRole?: string;
+  bio: string;
+  headshotSrc?: string;
+  email?: string;
+  linkedin?: string;
+}
+
+export const TEAM: TeamMember[] = [
+  {
+    id: '1',
+    name: 'Elizabeth Greene',
+    title: 'Founder & Chief Executive Officer',
+    orgRole: 'Executive Leadership',
+    bio: 'Elizabeth founded Elevate for Humanity with a mission to connect everyday people to free workforce training. She also owns Textures Institute of Cosmetology, Greene Staffing Solutions, and Greene Property Management—creating a holistic ecosystem for training, employment, and housing.',
+    headshotSrc: '/images/team/founder/elizabeth-greene-founder-hero-01.jpg',
+    email: 'elizabeth@elevateforhumanity.org',
+  },
+  {
+    id: '2',
+    name: 'Jozanna George',
+    title: 'Director of Enrollment & Beauty Industry Programs',
+    orgRole: 'Enrollment & Instruction',
+    bio: 'Jozanna is a multi-licensed beauty professional holding Nail Technician, Nail Instructor, and Esthetician licenses. She oversees the nail program at Textures Institute of Cosmetology and manages enrollment operations for Elevate for Humanity.',
+    headshotSrc: '/images/jozanna-george.jpg',
+    email: 'jozanna@elevateforhumanity.org',
+  },
+  {
+    id: '3',
+    name: 'Dr. Carlina Wilkes',
+    title: 'Executive Director of Financial Operations & Organizational Compliance',
+    orgRole: 'Grants & Compliance',
+    bio: 'Dr. Wilkes brings 24+ years of federal experience with DFAS, holding DoD Financial Management Certification Level II. She oversees financial operations and compliance at Elevate for Humanity.',
+    headshotSrc: '/images/carlina-wilkes.jpg',
+    email: 'carlina@elevateforhumanity.org',
+  },
+  {
+    id: '4',
+    name: 'Sharon Douglass',
+    title: 'Respiratory Therapy & Health Informatics Specialist',
+    orgRole: 'Healthcare Programs',
+    bio: 'Sharon brings 30+ years as a Respiratory Therapist with a Master\'s in Health Informatics. She supports healthcare training programs and workforce readiness initiatives.',
+    headshotSrc: '/images/sharon-douglas.jpg',
+    email: 'sharon@elevateforhumanity.org',
+  },
+  {
+    id: '5',
+    name: 'Leslie Wafford',
+    title: 'Director of Community Services',
+    orgRole: 'Community & Supportive Services',
+    bio: 'Leslie promotes low-barrier housing access and eviction prevention, helping families navigate housing challenges with her "reach one, teach one" philosophy.',
+    headshotSrc: '/images/leslie-wafford.jpg',
+    email: 'leslie@elevateforhumanity.org',
+  },
+  {
+    id: '6',
+    name: 'Alina Smith, PMHNP',
+    title: 'Psychiatric Mental Health Nurse Practitioner',
+    orgRole: 'Behavioral Health',
+    bio: 'Alina is a board-certified PMHNP from Purdue University, providing mental health assessments, interventions, and medication management for program participants.',
+    headshotSrc: '/images/alina-smith.jpg',
+    email: 'alina@elevateforhumanity.org',
+  },
+  {
+    id: '7',
+    name: 'Delores Reynolds',
+    title: 'Social Media & Digital Engagement Coordinator',
+    orgRole: 'Communications',
+    bio: 'Delores manages digital communications, sharing student success stories and promoting program offerings to reach those who can benefit from free training.',
+    headshotSrc: '/images/delores-reynolds.jpg',
+    email: 'delores@elevateforhumanity.org',
+  },
+];
+
+export const FOUNDER = TEAM[0];
+
+/** Members to show in the homepage preview (founder + 3 others) */
+export const TEAM_PREVIEW = [TEAM[0], TEAM[2], TEAM[1], TEAM[3]];

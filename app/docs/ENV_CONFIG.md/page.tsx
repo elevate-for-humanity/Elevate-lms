@@ -22,8 +22,8 @@ export default async function ENVCONFIGmdPage() {
 {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/success-new/success-6.jpg"
-          alt="ENV_CONFIG.md"
+          src="/images/programs-hq/technology-hero.jpg"
+          alt="Environment Configuration"
           fill
           className="object-cover"
           quality={100}
@@ -119,8 +119,8 @@ export default async function ENVCONFIGmdPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/success-new/success-7.jpg"
-                  alt="ENV_CONFIG.md"
+                  src="/images/heroes-hq/how-it-works-hero.jpg"
+                  alt="Configuration guide"
                   fill
                   className="object-cover"
                   quality={100}

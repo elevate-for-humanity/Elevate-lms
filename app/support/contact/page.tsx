@@ -35,7 +35,7 @@ export default async function ContactPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">Contact Support</h1>
           <p className="text-base md:text-lg md:text-xl mb-8 text-gray-100">
-            Access your dashboard and
+            Get help with enrollment, programs, and career services.
             development.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -65,7 +65,7 @@ export default async function ContactPage() {
                 <h2 className="text-2xl md:text-3xl font-bold mb-6">Contact Support</h2>
                 <p className="text-black mb-6">
                   Contact our support team for assistance.
-                  and development.
+                  Support resources for students, employers, and partners.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start">

@@ -83,8 +83,8 @@ export default async function GrantWorkflowPage() {
       {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/success-new/success-6.jpg"
-          alt="Hero"
+          src="/images/heroes-hq/funding-hero.jpg"
+          alt="Grant Workflow"
           fill
           className="object-cover"
           quality={100}

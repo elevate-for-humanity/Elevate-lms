@@ -1,252 +1,142 @@
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-
-export const dynamic = 'force-dynamic';
+import { Building2, MapPin, Phone, Globe, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/directory',
-  },
-  title: 'Directory | Elevate For Humanity',
-  description:
-    'Access tools and resources for workforce development.',
+  title: 'Partner Directory | Elevate for Humanity',
+  description: 'Workforce development partners, employer partners, and community resources in Indianapolis. WorkOne, Indiana DWD, EmployIndy, and more.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/directory' },
 };
 
-export default async function DirectoryPage() {
-  const supabase = await createClient();
+const partners = [
+  {
+    name: 'WorkOne Indy',
+    type: 'Workforce Center',
+    desc: 'WIOA and WRG funding eligibility, career counseling, and job search assistance.',
+    address: 'Indianapolis, IN',
+    url: 'https://www.workoneindy.com',
+    logo: '/images/partners/workone.svg',
+  },
+  {
+    name: 'Indiana DWD',
+    type: 'State Agency',
+    desc: 'Indiana Department of Workforce Development. Administers WIOA, WRG, JRI, and Next Level Jobs.',
+    address: 'Indianapolis, IN',
+    url: 'https://www.in.gov/dwd',
+    logo: '/images/partners/dwd.svg',
+  },
+  {
+    name: 'EmployIndy',
+    type: 'Workforce Board',
+    desc: 'Marion County workforce development board. Oversees local WIOA funding and employer partnerships.',
+    address: 'Indianapolis, IN',
+    url: 'https://employindy.org',
+    logo: null,
+  },
+  {
+    name: 'U.S. Department of Labor',
+    type: 'Federal Agency',
+    desc: 'Registered Apprenticeship oversight and national workforce policy.',
+    address: 'Washington, DC',
+    url: 'https://www.dol.gov',
+    logo: '/images/partners/usdol.webp',
+  },
+  {
+    name: 'Next Level Jobs',
+    type: 'State Program',
+    desc: 'Workforce Ready Grant and Employer Training Grant programs for Indiana residents.',
+    address: 'Indiana',
+    url: 'https://nextleveljobs.org',
+    logo: '/images/partners/nextleveljobs.webp',
+  },
+];
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch directory entries
-  const { data: entries } = await supabase
-    .from('directory')
-    .select('*')
-    .order('name');
+const resources = [
+  { name: 'Indiana Career Connect', desc: 'State job board and career services portal', url: 'https://www.indianacareerconnect.com' },
+  { name: 'OSHA Training', desc: 'Workplace safety certification information', url: 'https://www.osha.gov' },
+  { name: 'HSI (Health & Safety Institute)', desc: 'CPR/AED/First Aid certification', url: 'https://hsi.com' },
+  { name: 'Indiana PLA', desc: 'Professional Licensing Agency — barber and cosmetology licensing', url: 'https://www.in.gov/pla' },
+];
+
+export default function DirectoryPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 py-4">
-        <Breadcrumbs items={[{ label: "Directory" }]} />
+    <div className="min-h-screen bg-white">
+      <div className="bg-slate-50 border-b">
+        <div className="max-w-6xl mx-auto px-4 py-3">
+          <Breadcrumbs items={[{ label: 'Partner Directory' }]} />
+        </div>
       </div>
-{/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
-        <Image
-          src="/images/artlist/hero-training-8.jpg"
-          alt="Directory"
-          fill
-          className="object-cover"
-          quality={100}
-          priority
-          sizes="100vw"
-        />
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Directory
-          </h1>
-          <p className="text-base md:text-lg mb-8 text-gray-100">
-            Access tools and resources for
-            development.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href="/contact"
-              className="bg-brand-orange-600 hover:bg-brand-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-            >
-              Get Started
-            </Link>
-            <Link
-              href="/programs"
-              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-            >
-              View Programs
-            </Link>
+      {/* Hero */}
+      <section className="bg-slate-900 py-14 sm:py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">Partner Directory</h1>
+          <p className="text-lg text-slate-300 max-w-2xl">Workforce development partners, government agencies, and community resources.</p>
+        </div>
+      </section>
+
+      {/* Partners */}
+      <section className="py-14 sm:py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">Workforce Partners</h2>
+          <div className="space-y-4">
+            {partners.map((p) => (
+              <div key={p.name} className="bg-white rounded-xl p-6 border border-slate-200 hover:shadow-md transition">
+                <div className="flex items-start gap-5">
+                  <div className="w-14 h-14 rounded-lg bg-slate-100 flex items-center justify-center flex-shrink-0">
+                    {p.logo ? (
+                      <Image src={p.logo} alt={p.name} width={40} height={40} className="w-10 h-10 object-contain" />
+                    ) : (
+                      <Building2 className="w-6 h-6 text-slate-400" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h3 className="font-bold text-slate-900 text-lg">{p.name}</h3>
+                        <p className="text-sm text-blue-600 font-medium">{p.type}</p>
+                      </div>
+                      {p.url && (
+                        <a href={p.url} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline flex items-center gap-1 flex-shrink-0">
+                          <Globe className="w-4 h-4" /> Website
+                        </a>
+                      )}
+                    </div>
+                    <p className="text-slate-600 mt-2">{p.desc}</p>
+                    <p className="text-sm text-slate-400 mt-2 flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {p.address}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* Content Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            {/* Feature Grid */}
-            <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-6">
-                  Directory
-                </h2>
-                <p className="text-black mb-6">
-                  Tools and resources for career advancement
-                  and development.
-                </p>
-                <ul className="space-y-3">
-                  <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span>Free training for eligible participants</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span>Industry-standard certifications</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span>Career support and job placement</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
-                <Image
-                  src="/images/artlist/hero-training-5.jpg"
-                  alt="Directory"
-                  fill
-                  className="object-cover"
-                  quality={100}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
-              </div>
-            </div>
-
-            {/* Feature Cards */}
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <svg
-                    className="w-6 h-6 text-brand-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-3">Learn</h3>
-                <p className="text-black">
-                  Access quality training programs
-                </p>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-brand-green-100 rounded-lg flex items-center justify-center mb-4">
-                  <svg
-                    className="w-6 h-6 text-brand-green-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-3">Certify</h3>
-                <p className="text-black">Earn industry certifications</p>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm border p-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                  <svg
-                    className="w-6 h-6 text-blue-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                    />
-                  </svg>
-                </div>
-                <h3 className="text-lg font-semibold mb-3">Work</h3>
-                <p className="text-black">Get hired in your field</p>
-              </div>
-            </div>
+      {/* External Resources */}
+      <section className="py-14 sm:py-20 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-8">External Resources</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            {resources.map((r) => (
+              <a key={r.name} href={r.url} target="_blank" rel="noopener noreferrer" className="block bg-white rounded-xl p-5 border border-slate-200 hover:border-blue-300 hover:shadow-sm transition group">
+                <h3 className="font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">{r.name}</h3>
+                <p className="text-sm text-slate-500 mt-1">{r.desc}</p>
+              </a>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700 text-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Ready to Get Started?
-            </h2>
-            <p className="text-base md:text-lg text-blue-100 mb-8">
-              Join thousands who have launched successful careers through our
-              programs.
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link
-                href="/contact"
-                className="bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
-              >
-                Apply Now
-              </Link>
-              <Link
-                href="/programs"
-                className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg"
-              >
-                Browse Programs
-              </Link>
-            </div>
+      {/* CTA */}
+      <section className="py-14 sm:py-20">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Want to Partner With Us?</h2>
+          <p className="text-slate-600 mb-8">Employers, workforce agencies, and community organizations — let&apos;s connect.</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/contact" className="inline-flex items-center gap-2 bg-brand-red-600 hover:bg-brand-red-700 text-white px-8 py-4 rounded-full font-bold transition">Contact Us <ArrowRight className="w-5 h-5" /></Link>
+            <Link href="/employer" className="inline-flex items-center gap-2 border-2 border-slate-300 text-slate-700 px-8 py-4 rounded-full font-bold hover:border-slate-400 transition">Employer Portal</Link>
           </div>
         </div>
       </section>

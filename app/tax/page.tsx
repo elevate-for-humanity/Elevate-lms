@@ -186,7 +186,7 @@ export default function TaxServicesPage() {
             <div className="bg-white rounded-2xl border-2 border-red-200 overflow-hidden shadow-lg hover:shadow-xl transition-shadow">
               <div className="relative h-48">
                 <Image
-                  src="/images/success-new/success-14.jpg"
+                  src="/images/heroes-hq/tax-refund-hero.jpg"
                   alt="Supersonic Fast Cash Tax Services"
                   fill
                   className="object-cover"

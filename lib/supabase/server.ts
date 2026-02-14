@@ -98,6 +98,7 @@ export async function createClient(): Promise<SupabaseClient<any>> {
 
 // Cookie-free client for public data reads (keeps pages statically renderable).
 // Uses the anon key with no session — do NOT use for auth-gated queries.
+// Returns mockClient if the Supabase constructor fails (e.g. during static prerender).
 export function createPublicClient(): SupabaseClient<any> {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -106,12 +107,17 @@ export function createPublicClient(): SupabaseClient<any> {
     return mockClient;
   }
 
-  return createSupabaseClient(supabaseUrl, supabaseAnonKey, {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  });
+  try {
+    return createSupabaseClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    });
+  } catch {
+    // Supabase client constructor can fail during static prerendering
+    return mockClient;
+  }
 }
 
 // Returns null if admin client cannot be created - NEVER throws

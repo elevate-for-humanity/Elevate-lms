@@ -39,9 +39,9 @@ export default function DisclosuresPage() {
       </div>
 
       {/* Hero Banner */}
-      <section className="relative min-h-[500px] flex items-center overflow-hidden">
+      <section className="relative min-h-[400px] flex items-center overflow-hidden">
         <Image
-          src="/images/success-new/success-8.jpg"
+          src="/images/heroes-hq/about-hero.jpg"
           alt="Student Consumer Information"
           fill
           className="object-cover"
@@ -111,7 +111,7 @@ export default function DisclosuresPage() {
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
                 <Image
-                  src="/images/success-new/success-19.jpg"
+                  src="/images/heroes-hq/programs-hero.jpg"
                   alt="Our Institution"
                   fill
                   className="object-cover"
@@ -141,7 +141,7 @@ export default function DisclosuresPage() {
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
                 <Image
-                  src="/images/success-new/success-9.jpg"
+                  src="/images/heroes-hq/funding-hero.jpg"
                   alt="Approvals"
                   fill
                   className="object-cover"

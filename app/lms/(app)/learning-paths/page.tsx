@@ -200,7 +200,7 @@ export default async function LearningPathsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/success-new/success-20.jpg"
+                  src="/images/heroes-hq/career-services-hero.jpg"
                   alt="Learning Paths"
                   fill
                   className="object-cover"

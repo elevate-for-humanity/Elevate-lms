@@ -141,8 +141,8 @@ export default async function CoursedetailPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/success-new/success-5.jpg"
-                  alt="Coursedetail"
+                  src="/images/heroes-hq/programs-hero.jpg"
+                  alt="Course detail"
                   fill
                   className="object-cover"
                   quality={100}

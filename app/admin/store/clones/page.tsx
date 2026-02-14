@@ -116,7 +116,7 @@ export default function StoreBuilderPage() {
 {/* Hero Section */}
       <section className="relative h-[500px] md:h-[600px] lg:h-[700px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/success-new/success-10.jpg"
+          src="/images/heroes-hq/programs-hero.jpg"
           alt="Clones"
           fill
           className="object-cover"

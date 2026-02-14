@@ -121,7 +121,7 @@ export default async function CreateProgramPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/success-new/success-1.jpg"
+                  src="/images/heroes-hq/employer-hero.jpg"
                   alt="Create Program"
                   fill
                   className="object-cover"

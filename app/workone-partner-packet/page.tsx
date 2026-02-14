@@ -228,7 +228,7 @@ export default function WorkOnePartnerPacketPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32">
-                <Image src="/images/students-new/student-4.jpg" alt="Referral" fill className="object-cover" />
+                <Image src="/images/programs-hq/business-training.jpg" alt="Referral" fill className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">1</div>
@@ -241,7 +241,7 @@ export default function WorkOnePartnerPacketPage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32">
-                <Image src="/images/students-new/student-6.jpg" alt="Enrollment" fill className="object-cover" />
+                <Image src="/images/programs-hq/students-learning.jpg" alt="Enrollment" fill className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">2</div>

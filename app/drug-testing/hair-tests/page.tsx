@@ -24,7 +24,7 @@ const hairTests = [
     ],
     turnaround: '3-5 business days',
     detection: '90 days',
-    image: '/images/success-new/success-2.jpg',
+    image: '/images/heroes-hq/employer-hero.jpg',
   },
   {
     name: 'Hair Follicle 10-Panel',
@@ -41,7 +41,7 @@ const hairTests = [
     ],
     turnaround: '3-5 business days',
     detection: '90 days',
-    image: '/images/success-new/success-3.jpg',
+    image: '/images/heroes-hq/programs-hero.jpg',
   },
   {
     name: 'Hair 5-Panel (NO THC)',
@@ -57,7 +57,7 @@ const hairTests = [
     ],
     turnaround: '3-5 business days',
     detection: '90 days',
-    image: '/images/success-new/success-4.jpg',
+    image: '/images/heroes-hq/about-hero.jpg',
   },
 ];
 

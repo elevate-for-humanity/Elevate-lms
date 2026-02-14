@@ -161,8 +161,7 @@ export default function ClientWidgets() {
       <VersionGuard />
       <SentryInit />
 
-      {/* Funding Toast - WIOA/free tuition notification */}
-      {showFundingToast && <FundingToast />}
+      {/* FundingToast disabled — replaced by CookieBanner */}
       
       {/* Sticky Mobile CTA - Apply/Contact buttons on program pages */}
       {showStickyCTA && <StickyMobileCTA />}
@@ -180,9 +179,7 @@ export default function ClientWidgets() {
           <SearchDialog />
           <SecurityMonitor />
           <OfflineIndicator />
-          <VoiceAssistant />
           <GlobalAvatar />
-          <MobileVoiceOver />
         </>
       )}
     </>

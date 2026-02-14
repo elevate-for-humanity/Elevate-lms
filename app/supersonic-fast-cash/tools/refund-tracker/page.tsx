@@ -8,95 +8,66 @@ import {
   CheckCircle,
   Clock,
   AlertCircle,
-  DollarSign,
   Calendar,
   ExternalLink,
   RefreshCw,
 } from 'lucide-react';
 
 interface RefundStatus {
-  status: 'received' | 'approved' | 'sent' | 'not_found';
+  status: string;
   statusMessage: string;
-  refundAmount?: number;
-  expectedDate?: string;
-  actualDate?: string;
-  method?: 'direct_deposit' | 'check';
-  lastUpdated: string;
+  trackingCode?: string;
+  clientName?: string;
+  rejectionReason?: string;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export default function RefundTrackerPage() {
-  const [ssn, setSsn] = useState('');
-  const [filingStatus, setFilingStatus] = useState('');
-  const [refundAmount, setRefundAmount] = useState('');
+  const [trackingCode, setTrackingCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [refundStatus, setRefundStatus] = useState<RefundStatus | null>(null);
   const [error, setError] = useState('');
-
-  const formatSSN = (value: string) => {
-    const numbers = value.replace(/\D/g, '');
-    if (numbers.length <= 3) return numbers;
-    if (numbers.length <= 5)
-      return `${numbers.slice(0, 3)}-${numbers.slice(3)}`;
-    return `${numbers.slice(0, 3)}-${numbers.slice(3, 5)}-${numbers.slice(5, 9)}`;
-  };
-
-  const handleSSNChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatSSN(e.target.value);
-    setSsn(formatted);
-  };
 
   const trackRefund = async () => {
     setError('');
     setRefundStatus(null);
 
-    // Validation
-    if (!ssn || ssn.replace(/\D/g, '').length !== 9) {
-      setError('Please enter a valid 9-digit SSN');
-      return;
-    }
-    if (!filingStatus) {
-      setError('Please select your filing status');
-      return;
-    }
-    if (!refundAmount || parseFloat(refundAmount) <= 0) {
-      setError('Please enter your expected refund amount');
+    const code = trackingCode.trim();
+    if (!code || code.length < 6) {
+      setError('Please enter your tracking code (provided when your return was filed).');
       return;
     }
 
     setLoading(true);
 
     try {
-      // Call refund tracking API
       const response = await fetch(
         '/api/supersonic-fast-cash/refund-tracking',
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            ssn: ssn.replace(/\D/g, ''),
-            filingStatus,
-            refundAmount,
-          }),
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ trackingCode: code }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error('Failed to track refund');
-      }
-
       const result = await response.json();
+
+      if (!result.success) {
+        setError(result.error || 'No return found for the provided tracking code.');
+        return;
+      }
 
       setRefundStatus({
         status: result.status,
         statusMessage: result.statusMessage,
-        refundAmount: result.refundAmount,
-        expectedDate: result.expectedDate,
-        method: result.method,
-        lastUpdated: result.lastUpdated,
+        trackingCode: result.trackingCode,
+        clientName: result.clientName,
+        rejectionReason: result.rejectionReason,
+        createdAt: result.createdAt,
+        updatedAt: result.updatedAt,
       });
-    } catch (err) {
+    } catch {
       setError('Unable to retrieve refund status. Please try again later.');
     } finally {
       setLoading(false);
@@ -106,26 +77,29 @@ export default function RefundTrackerPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'received':
-        return <Clock className="w-12 h-12 text-blue-600" />;
-      case 'approved':
-        return <CheckCircle className="w-12 h-12 text-green-600" />;
-      case 'sent':
-        return <TrendingUp className="w-12 h-12 text-blue-600" />;
+        return <Clock className="w-12 h-12 text-blue-200" />;
+      case 'processing':
+      case 'submitted':
+        return <TrendingUp className="w-12 h-12 text-blue-200" />;
+      case 'accepted':
+        return <CheckCircle className="w-12 h-12 text-green-200" />;
+      case 'action_required':
+        return <AlertCircle className="w-12 h-12 text-red-200" />;
       default:
-        return <AlertCircle className="w-12 h-12 text-black" />;
+        return <Clock className="w-12 h-12 text-gray-200" />;
     }
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'received':
-        return 'bg-blue-600';
-      case 'approved':
+      case 'accepted':
         return 'bg-green-600';
-      case 'sent':
-        return 'bg-blue-600';
+      case 'action_required':
+        return 'bg-red-600';
+      case 'submitted':
+        return 'bg-blue-700';
       default:
-        return 'bg-gray-600';
+        return 'bg-blue-600';
     }
   };
 
@@ -160,59 +134,18 @@ export default function RefundTrackerPage() {
             <div className="space-y-6">
               <div>
                 <label className="block text-sm font-medium mb-2">
-                  Social Security Number
+                  Tracking Code
                 </label>
                 <input
                   type="text"
-                  value={ssn}
-                  onChange={handleSSNChange}
-                  placeholder="XXX-XX-XXXX"
-                  maxLength={11}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
+                  value={trackingCode}
+                  onChange={(e) => setTrackingCode(e.target.value.toUpperCase())}
+                  placeholder="SFC-1234567890-ABCD"
+                  maxLength={40}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none font-mono"
                 />
-                <p className="text-xs text-black mt-1">
-                  Your SSN is encrypted and secure
-                </p>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Filing Status
-                </label>
-                <select
-                  value={filingStatus}
-                  onChange={(e) => setFilingStatus(e.target.value)}
-                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
-                >
-                  <option value="">Select filing status...</option>
-                  <option value="single">Single</option>
-                  <option value="married_joint">Married Filing Jointly</option>
-                  <option value="married_separate">
-                    Married Filing Separately
-                  </option>
-                  <option value="head_of_household">Head of Household</option>
-                  <option value="qualifying_widow">Qualifying Widow(er)</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">
-                  Expected Refund Amount
-                </label>
-                <div className="relative">
-                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-black">
-                    $
-                  </span>
-                  <input
-                    type="number"
-                    value={refundAmount}
-                    onChange={(e) => setRefundAmount(e.target.value)}
-                    placeholder="2,500"
-                    className="w-full pl-8 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:border-green-500 focus:outline-none"
-                  />
-                </div>
-                <p className="text-xs text-black mt-1">
-                  Enter the exact amount from your tax return
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter the tracking code provided when your return was filed
                 </p>
               </div>
 
@@ -281,7 +214,7 @@ export default function RefundTrackerPage() {
             >
               <div className="flex items-start justify-between mb-6">
                 <div>
-                  <h2 className="text-3xl font-bold mb-2">Refund Status</h2>
+                  <h2 className="text-3xl font-bold mb-2">Return Status</h2>
                   <p className="text-lg opacity-90">
                     {refundStatus.statusMessage}
                   </p>
@@ -289,27 +222,27 @@ export default function RefundTrackerPage() {
                 {getStatusIcon(refundStatus.status)}
               </div>
 
-              {refundStatus.refundAmount && (
-                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-6 mb-6">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium opacity-90">
-                      Refund Amount
-                    </span>
-                    <DollarSign className="w-6 h-6" />
-                  </div>
-                  <div className="text-4xl font-bold mt-2">
-                    ${refundStatus.refundAmount.toLocaleString()}
-                  </div>
+              {refundStatus.clientName && (
+                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
+                  <span className="text-sm font-medium opacity-90">Filed for: </span>
+                  <span className="font-bold">{refundStatus.clientName}</span>
                 </div>
               )}
 
-              {refundStatus.expectedDate && (
+              {refundStatus.rejectionReason && (
+                <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4 mb-4">
+                  <span className="text-sm font-medium opacity-90">Action needed: </span>
+                  <span>{refundStatus.rejectionReason}</span>
+                </div>
+              )}
+
+              {refundStatus.updatedAt && (
                 <div className="flex items-center gap-3 text-sm">
                   <Calendar className="w-5 h-5" />
                   <span>
-                    Expected deposit date:{' '}
+                    Last updated:{' '}
                     <strong>
-                      {new Date(refundStatus.expectedDate).toLocaleDateString(
+                      {new Date(refundStatus.updatedAt).toLocaleDateString(
                         'en-US',
                         {
                           month: 'long',
@@ -393,10 +326,7 @@ export default function RefundTrackerPage() {
                   <div className="flex-1">
                     <h4 className="font-semibold mb-1">Refund Sent</h4>
                     <p className="text-sm text-black">
-                      Your refund has been sent via{' '}
-                      {refundStatus.method === 'direct_deposit'
-                        ? 'direct deposit'
-                        : 'check'}
+                      Your return has been accepted and your refund is on the way
                     </p>
                     <p className="text-xs text-black mt-1">
                       {refundStatus.status === 'sent' ? 'Completed' : 'Pending'}
@@ -427,44 +357,7 @@ export default function RefundTrackerPage() {
               </a>
             </div>
 
-            {/* Refund Advance Offer */}
-            {refundStatus.status !== 'sent' &&
-              refundStatus.refundAmount &&
-              refundStatus.refundAmount >= 250 && (
-                <div className="bg-slate-700 rounded-2xl shadow-xl p-8 text-black">
-                  <h3 className="text-2xl font-bold mb-3">
-                    <DollarSign className="w-5 h-5 inline-block" /> Get Your
-                    Money Today!
-                  </h3>
-                  <p className="text-lg mb-6">
-                    Don't wait for your refund. Get up to $
-                    {Math.min(refundStatus.refundAmount, 7500).toLocaleString()}{' '}
-                    today with our refund advance.
-                  </p>
 
-                  <div className="flex items-center gap-4 mb-6 text-sm">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5" />
-                      <span>Same-day funding</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5" />
-                      <span>3.5% + $35 fee</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <CheckCircle className="w-5 h-5" />
-                      <span>No credit check</span>
-                    </div>
-                  </div>
-
-                  <a
-                    href="/supersonic-fast-cash/book-appointment"
-                    className="inline-flex items-center gap-2 px-8 py-4 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition"
-                  >
-                    Apply for Refund Advance →
-                  </a>
-                </div>
-              )}
           </div>
         )}
 

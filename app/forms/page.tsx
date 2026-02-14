@@ -22,7 +22,7 @@ export default async function FormsPage() {
 {/* Hero Section */}
       <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/success-new/success-5.jpg"
+          src="/images/heroes-hq/contact-hero.jpg"
           alt="Forms"
           fill
           className="object-cover"
@@ -34,8 +34,7 @@ export default async function FormsPage() {
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">Forms</h1>
           <p className="text-base md:text-lg mb-8 text-gray-100">
-            Access your dashboard and
-            development.
+            Download and submit enrollment, funding, and program forms online.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
@@ -63,8 +62,7 @@ export default async function FormsPage() {
               <div>
                 <h2 className="text-2xl md:text-3xl font-bold mb-6">Forms</h2>
                 <p className="text-black mb-6">
-                  Access your dashboard and
-                  development.
+                  Access enrollment applications, funding verification forms, and program-specific documents.
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start">
@@ -119,7 +117,7 @@ export default async function FormsPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/success-new/success-6.jpg"
+                  src="/images/heroes-hq/programs-hero.jpg"
                   alt="Forms"
                   fill
                   className="object-cover"

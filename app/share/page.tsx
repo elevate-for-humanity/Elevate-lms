@@ -141,7 +141,7 @@ export default async function SharePage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/success-new/success-10.jpg"
+                  src="/images/heroes-hq/success-stories-hero.jpg"
                   alt="Share"
                   fill
                   className="object-cover"

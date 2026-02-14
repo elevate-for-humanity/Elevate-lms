@@ -1,245 +1,137 @@
 import { Metadata } from 'next';
-import { createPublicClient } from '@/lib/supabase/server';
-
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-
-export const dynamic = 'force-dynamic';
+import { ArrowRight, CheckCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/funding/jri',
-  },
-  title: 'Justice Reinvestment Initiative (JRI) | Reentry Training | Elevate For Humanity',
+  title: 'JRI — Job-Ready Incentive Funding | Elevate for Humanity',
   description:
-    'Justice Reinvestment Initiative funding information.',
+    'Job-Ready Incentive (JRI) funding may cover tuition for eligible justice-involved individuals. Career training in healthcare, skilled trades, CDL, and more.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/funding/jri' },
 };
 
-export default async function JriPage() {
-  const supabase = createPublicClient();
+const eligibility = [
+  'Currently or formerly justice-involved',
+  'Indiana resident',
+  'At least 18 years of age',
+  'Enrolled in or accepted to an eligible training program',
+  'Not currently receiving other state tuition funding for the same program',
+];
 
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Fetch JRI funding info
-  const { data: jriInfo } = await supabase
-    .from('funding_options')
-    .select('*')
-    .eq('type', 'jri')
-    .single();
+const coveredItems = [
+  'Tuition and training fees',
+  'Certification and exam fees',
+  'Required tools, uniforms, and supplies',
+  'Background check fees (where applicable)',
+];
+
+export default function JRIFundingPage() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Breadcrumbs */}
+    <div className="min-h-screen bg-white">
       <div className="bg-slate-50 border-b">
         <div className="max-w-6xl mx-auto px-4 py-3">
           <Breadcrumbs items={[{ label: 'Funding', href: '/funding' }, { label: 'JRI' }]} />
         </div>
       </div>
 
-      {/* Hero Section - No Overlay */}
-      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center overflow-hidden">
-        <Image
-          src="/images/heroes-hq/jri-hero.jpg"
-          alt="Justice Reinvestment Initiative - Second Chance Career Training"
-          fill
-          className="object-cover"
-          quality={100}
-          priority
-          sizes="100vw"
-        />
+      {/* Hero */}
+      <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
+        <Image src="/images/heroes-hq/jri-hero.jpg" alt="JRI Job-Ready Incentive program" fill className="object-cover" priority sizes="100vw" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
+        <div className="absolute inset-0 flex items-end">
+          <div className="max-w-6xl mx-auto px-4 w-full pb-10 sm:pb-14">
+            <p className="text-green-300 font-semibold text-sm mb-2 uppercase tracking-wide">Indiana DWD</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Job-Ready Incentive (JRI)</h1>
+            <p className="text-lg text-white/90 max-w-2xl">Career training for eligible justice-involved Hoosiers. Tuition, supplies, and certification fees may be covered.</p>
+          </div>
+        </div>
+      </section>
 
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl">
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-4 text-gray-900">
-              Justice Reinvestment Initiative
-            </h1>
-            <p className="text-lg md:text-xl mb-6 text-gray-700">
-              Free career training for justice-involved individuals. Your past doesn&apos;t define your future.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                href="/apply?program=jri"
-                className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-              >
-                Apply Now - It&apos;s Free
+      {/* What Is JRI */}
+      <section className="py-14 sm:py-20">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-10 items-start">
+            <div>
+              <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">What Is JRI?</h2>
+              <p className="text-slate-700 leading-relaxed mb-4">
+                The Job-Ready Incentive (JRI) is an Indiana state program designed to cover the cost of career training for eligible justice-involved individuals. Administered by the Indiana Department of Workforce Development (DWD), JRI removes financial barriers so participants can focus on earning certifications and building careers.
+              </p>
+              <p className="text-slate-700 leading-relaxed mb-6">
+                Elevate for Humanity is an approved JRI training provider. Our programs are designed to get participants certified and employed in high-demand fields within weeks, not years.
+              </p>
+              <Link href="/apply/student" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold transition hover:scale-105 shadow-lg">
+                Apply for JRI Funding <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link
-                href="/programs"
-                className="bg-gray-100 hover:bg-gray-200 text-gray-900 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-              >
-                View Programs
-              </Link>
+            </div>
+            <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">
+              <Image src="/images/trades/program-construction-training.jpg" alt="JRI career training" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Content Section */}
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-7xl mx-auto">
-            {/* Feature Grid */}
-            <div className="grid md:grid-cols-2 gap-12 items-center mb-16">
-              <div>
-                <h2 className="text-2xl md:text-3xl font-bold mb-6">JRI</h2>
-                <p className="text-black mb-6">
-                  Access your dashboard and
-                  development.
-                </p>
-                <ul className="space-y-3">
-                  <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span>Free training for eligible participants</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span>Industry-standard certifications</span>
-                  </li>
-                  <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                    <span>Career support and job placement</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
-                <Image
-                  src="/images/trades/program-construction-training.jpg"
-                  alt="JRI"
-                  fill
-                  className="object-cover"
-                  quality={100}
-                  sizes="(max-width: 768px) 100vw, 50vw"
-                />
+      {/* What's Covered + Eligibility */}
+      <section className="py-14 sm:py-20 bg-slate-50">
+        <div className="max-w-6xl mx-auto px-4">
+          <div className="grid md:grid-cols-2 gap-10">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">What JRI Covers</h2>
+              <div className="space-y-3">
+                {coveredItems.map((item) => (
+                  <div key={item} className="flex items-start gap-3 bg-white rounded-xl p-4 border border-slate-200">
+                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-slate-700">{item}</p>
+                  </div>
+                ))}
               </div>
             </div>
-
-            {/* Feature Cards with Pictures */}
-            <div className="grid md:grid-cols-3 gap-8">
-              <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <div className="relative h-48">
-                  <Image
-                    src="/images/hero/hero-hands-on-training.jpg"
-                    alt="Hands-on training"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2">Learn</h3>
-                  <p className="text-gray-600">
-                    Get hands-on training in barbering, CDL, healthcare, construction, and more.
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <div className="relative h-48">
-                  <Image
-                    src="/images/programs/cna-hero.jpg"
-                    alt="Earn certifications"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2">Certify</h3>
-                  <p className="text-gray-600">
-                    Earn industry-recognized certifications and licenses that employers want.
-                  </p>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-xl shadow-sm border overflow-hidden">
-                <div className="relative h-48">
-                  <Image
-                    src="/images/funding/funding-jri-program-v2.jpg"
-                    alt="Get hired"
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold mb-2">Work</h3>
-                  <p className="text-gray-600">
-                    Get job placement support and connect with employers who hire JRI graduates.
-                  </p>
-                </div>
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 mb-6">Eligibility</h2>
+              <div className="space-y-3">
+                {eligibility.map((item) => (
+                  <div key={item} className="flex items-start gap-3 bg-white rounded-xl p-4 border border-slate-200">
+                    <CheckCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <p className="text-slate-700">{item}</p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-16 bg-brand-blue-700 text-white">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-bold mb-4">
-              Ready to Get Started?
-            </h2>
-            <p className="text-base md:text-lg text-blue-100 mb-8">
-              Join thousands who have launched successful careers through our
-              programs.
-            </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Link
-                href="/contact"
-                className="bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
-              >
-                Apply Now
-              </Link>
-              <Link
-                href="/programs"
-                className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg"
-              >
-                Browse Programs
-              </Link>
-            </div>
+      {/* How to Apply */}
+      <section className="py-14 sm:py-20">
+        <div className="max-w-4xl mx-auto px-4">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-10">How to Get JRI Funding</h2>
+          <div className="space-y-6">
+            {[
+              { step: '1', title: 'Contact Elevate for Humanity', desc: 'Call (317) 314-3757 or apply online. Our enrollment team will verify your eligibility and help you choose a program.' },
+              { step: '2', title: 'Register at WorkOne', desc: 'Create an account at indianacareerconnect.com and schedule an appointment with your local WorkOne office.' },
+              { step: '3', title: 'Get Approved', desc: 'WorkOne confirms your JRI eligibility and issues a funding voucher for your training program.' },
+              { step: '4', title: 'Start Training', desc: 'Begin your program. For approved participants, JRI covers tuition and related costs.' },
+            ].map((s) => (
+              <div key={s.step} className="flex gap-5 items-start">
+                <div className="w-10 h-10 rounded-full bg-green-600 text-white text-lg font-bold flex items-center justify-center flex-shrink-0">{s.step}</div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-lg">{s.title}</h3>
+                  <p className="text-slate-600">{s.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-16 sm:py-24 bg-green-700">
+        <div className="max-w-4xl mx-auto px-4 text-center">
+          <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Your Past Doesn&apos;t Define Your Future</h2>
+          <p className="text-xl text-white/90 mb-10">JRI funding may give you a fresh start with funded career training. Check your eligibility today.</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/apply/student" className="bg-white text-green-700 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition hover:scale-105 shadow-lg">Apply Now</Link>
+            <Link href="/contact" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition">Contact Us</Link>
           </div>
         </div>
       </section>

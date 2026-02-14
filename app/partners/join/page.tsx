@@ -1,120 +1,56 @@
 import { Metadata } from 'next';
+import PublicLandingPage from '@/components/marketing/PublicLandingPage';
 
 export const metadata: Metadata = {
-  title: 'Partners Join | Elevate For Humanity',
-  description: 'Elevate For Humanity - Career training and workforce development',
+  title: 'Become a Partner | Elevate for Humanity',
+  description: 'Join the Elevate for Humanity partner network. Workforce agencies, employers, training providers, and community organizations.',
+  alternates: { canonical: 'https://www.elevateforhumanity.org/partners/join' },
 };
 
-import { redirect } from 'next/navigation';
-export const dynamic = 'force-dynamic';
-import { createClient } from '@/utils/supabase/server';
-import RoleSelectionCards from './RoleSelectionCards';
-
-
-export default async function PartnersJoinPage() {
-  const supabase = await createClient();
-
-  if (!supabase) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
-      </div>
-    );
-  }
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) {
-    redirect('/login?next=/partners/join');
-  }
-
-  // Check if user already has a partner profile
-  const { data: existingProfile } = await supabase
-    .from('partner_profiles')
-    .select('role, status')
-    .eq('user_id', user.id)
-    .single();
-
-  if (existingProfile) {
-    // Already has a role, redirect to onboarding or dashboard
-    if (existingProfile.status === 'pending') {
-      redirect('/partners/onboarding');
-    } else {
-      const dashboardMap: Record<string, string> = {
-        PROGRAM_HOLDER: '/program-holder',
-        WORKSITE_ONLY: '/worksite',
-        SITE_COORDINATOR: '/coordinator',
-      };
-      redirect(dashboardMap[existingProfile.role] || '/dashboard');
-    }
-  }
-
-  // Get role packages
-  const { data: rolePackages } = await supabase
-    .from('role_packages')
-    .select('*')
-    .order('sort_order', { ascending: true });
-
+export default function JoinPartnerPage() {
   return (
-    <div className="min-h-screen bg-slate-50">
-      {/* Header */}
-      <div className="bg-white border-b border-slate-200">
-        <div className="max-w-7xl mx-auto px-4 py-8">
-          <h1 className="text-3xl font-bold text-black mb-2">
-            Become a Partner
-          </h1>
-          <p className="text-lg text-black">
-            Join our network and help students succeed. Choose the role that
-            fits your capacity and expertise.
-          </p>
-        </div>
-      </div>
-
-      {/* Role Selection */}
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <RoleSelectionCards
-          rolePackages={rolePackages || []}
-          userId={user.id}
-        />
-      </div>
-
-      {/* Footer Info */}
-      <div className="max-w-7xl mx-auto px-4 pb-12">
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="text-lg font-semibold text-blue-900 mb-2">
-            What Happens Next?
-          </h3>
-          <ol className="space-y-2 text-blue-800">
-            <li className="flex items-start gap-2">
-              <span className="font-bold">1.</span>
-              <span>Choose your role and review the responsibilities</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="font-bold">2.</span>
-              <span>
-                Complete the onboarding checklist (MOU, handbook, tax forms)
-              </span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="font-bold">3.</span>
-              <span>E-sign all required documents</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="font-bold">4.</span>
-              <span>Wait for admin approval (typically 1-2 business days)</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="font-bold">5.</span>
-              <span>Access your dashboard and start working with students</span>
-            </li>
-          </ol>
-        </div>
-      </div>
-    </div>
+    <PublicLandingPage config={{
+      breadcrumbs: [{ label: 'Partners', href: '/partners' }, { label: 'Join' }],
+      hero: {
+        image: '/images/heroes-hq/employer-hero.jpg',
+        title: 'Become a Partner',
+        subtitle: 'Join our network of workforce agencies, employers, and community organizations building career pathways.',
+      },
+      intro: {
+        heading: 'Partner With Us',
+        paragraphs: [
+          'Elevate for Humanity works with workforce development boards, employers, training providers, reentry organizations, and community agencies to deliver career training and employment services.',
+          'Whether you want to refer participants, hire graduates, co-deliver training, or support our mission — we have a partnership model that fits.',
+        ],
+      },
+      features: {
+        heading: 'Partnership Types',
+        items: [
+          'Workforce Agency — refer funded participants to our training programs',
+          'Employer — hire certified graduates and host apprentices',
+          'Training Provider — co-deliver programs and share resources',
+          'Reentry Organization — connect justice-involved individuals to JRI-funded training',
+          'Community Organization — refer clients facing barriers to employment',
+          'Philanthropic — fund training, supplies, and support services',
+        ],
+      },
+      steps: {
+        heading: 'Getting Started',
+        items: [
+          { title: 'Contact Us', desc: 'Tell us about your organization and what you\'re looking for.' },
+          { title: 'Explore Options', desc: 'We\'ll identify the right partnership model and programs.' },
+          { title: 'Formalize Agreement', desc: 'Sign an MOU or partnership agreement.' },
+          { title: 'Launch', desc: 'Start referring participants, hiring graduates, or co-delivering programs.' },
+        ],
+      },
+      cta: {
+        heading: 'Ready to Partner?',
+        subtitle: 'Contact us to discuss partnership opportunities.',
+        primaryLabel: 'Contact Us',
+        primaryHref: '/contact',
+        secondaryLabel: 'View Programs',
+        secondaryHref: '/programs',
+      },
+    }} />
   );
 }

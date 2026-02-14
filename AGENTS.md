@@ -10,7 +10,7 @@
 - **Database**: Supabase (project `cuxzzpsyufcewtmicszk`, 516+ tables)
 - **Hosting**: Netlify with `@netlify/plugin-nextjs`
 - **Package Manager**: pnpm
-- **Build**: `pnpm next build` — expect 865+ pages, zero errors
+- **Build**: `pnpm next build` — expect 882+ pages, zero errors
 
 ## Common Commands
 
@@ -132,3 +132,22 @@ Last verified: 882/882 pages, zero errors
 - Cookie banner / GlobalAvatar / voice-over issues in ClientWidgets.tsx
 - Partner card JSX nesting bug on homepage
 - Drug-testing instant-tests broken string from sed
+
+# Brand Color Convention
+
+All `blue-*` Tailwind classes have been migrated to `brand-blue-*` tokens across app/ and components/ (1,469 files). The hex values are identical — this enforces naming consistency.
+
+Semantic colors (indigo, teal, purple, emerald, cyan) are intentionally kept for UI state differentiation (status badges, category colors, charts).
+
+When adding new UI, always use `brand-blue-*`, `brand-red-*`, `brand-orange-*`, or `brand-green-*` for brand elements.
+
+# Cleanup Status
+
+- ✅ All stock images replaced with local workforce images
+- ✅ All "Join thousands" template CTAs eliminated
+- ✅ All inline SVG Learn/Certify/Work cards → Lucide icons
+- ✅ All pexels image references → local images (except preview/[previewId])
+- ✅ All empty alt="" attributes → descriptive alt text
+- ✅ All blue-* → brand-blue-* across app/ and components/
+- ✅ 27+ public pages rewritten with real content
+- ✅ Auth flow: signin/signup redirect to real forms

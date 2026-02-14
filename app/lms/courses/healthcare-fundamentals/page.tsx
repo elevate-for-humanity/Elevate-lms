@@ -204,7 +204,7 @@ export default function HealthcareFundamentalsCoursePage() {
                   key={idx}
                   className="bg-white rounded-xl p-6 border-2 border-gray-200"
                 >
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                     <Icon className="w-6 h-6 text-blue-600" />
                   </div>
                   <h3 className="text-lg font-bold text-black mb-2">

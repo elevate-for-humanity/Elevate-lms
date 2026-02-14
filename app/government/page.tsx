@@ -540,7 +540,7 @@ export default async function GovernmentPage() {
               const IconComponent = item.icon;
               return (
                 <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                     <IconComponent className="w-6 h-6 text-blue-600" />
                   </div>
                   <h3 className="font-bold text-gray-900 mb-2">{item.name}</h3>

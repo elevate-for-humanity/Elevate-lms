@@ -198,7 +198,7 @@ export default function BarbershopPartnerPage() {
           <div className="grid md:grid-cols-2 gap-8 mb-12">
             <div className="bg-white p-8 rounded-xl shadow-sm">
               <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                   <Shield className="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
@@ -275,7 +275,7 @@ export default function BarbershopPartnerPage() {
             </div>
 
             <div className="bg-gray-50 p-6 rounded-xl border-2 border-gray-200">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <Briefcase className="w-5 h-5 text-blue-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Commission</h3>
@@ -286,7 +286,7 @@ export default function BarbershopPartnerPage() {
             </div>
 
             <div className="bg-gray-50 p-6 rounded-xl border-2 border-blue-300 bg-blue-50">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <Award className="w-5 h-5 text-blue-600" />
               </div>
               <h3 className="font-bold text-gray-900 mb-2">Hybrid</h3>
@@ -382,7 +382,7 @@ export default function BarbershopPartnerPage() {
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white p-8 rounded-xl shadow-sm">
             <div className="flex items-start gap-4 mb-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
                 <FileText className="w-6 h-6 text-blue-600" />
               </div>
               <div>

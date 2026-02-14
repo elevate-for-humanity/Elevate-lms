@@ -169,7 +169,7 @@ export default async function ProgramHolderOnboarding() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <span className="text-2xl font-bold text-blue-700">1</span>
               </div>
               <h3 className="text-lg font-bold mb-3">Apply</h3>
@@ -186,7 +186,7 @@ export default async function ProgramHolderOnboarding() {
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <span className="text-2xl font-bold text-blue-700">2</span>
               </div>
               <h3 className="text-lg font-bold mb-3">Get Approved</h3>
@@ -200,7 +200,7 @@ export default async function ProgramHolderOnboarding() {
             </div>
 
             <div className="bg-white rounded-lg shadow-sm border p-6">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <span className="text-2xl font-bold text-blue-700">3</span>
               </div>
               <h3 className="text-lg font-bold mb-3">Access Dashboard</h3>
@@ -228,7 +228,7 @@ export default async function ProgramHolderOnboarding() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                   <Users className="text-blue-700" size={24} />
                 </div>
                 <h3 className="text-lg font-bold">Student Management</h3>
@@ -248,7 +248,7 @@ export default async function ProgramHolderOnboarding() {
 
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                   <BarChart className="text-blue-700" size={24} />
                 </div>
                 <h3 className="text-lg font-bold">Reports & Analytics</h3>
@@ -268,7 +268,7 @@ export default async function ProgramHolderOnboarding() {
 
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                   <MessageSquare className="text-blue-700" size={24} />
                 </div>
                 <h3 className="text-lg font-bold">Communication</h3>
@@ -287,7 +287,7 @@ export default async function ProgramHolderOnboarding() {
 
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center">
                   <BookOpen className="text-blue-700" size={24} />
                 </div>
                 <h3 className="text-lg font-bold">Program Access</h3>
@@ -378,7 +378,7 @@ export default async function ProgramHolderOnboarding() {
               href="/docs/program-holder-guide"
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-all"
             >
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <FileText className="text-blue-700" size={24} />
               </div>
               <h3 className="text-lg font-bold mb-2">User Guide</h3>
@@ -393,7 +393,7 @@ export default async function ProgramHolderOnboarding() {
               href="/program-holder/training"
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-all"
             >
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex-items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex-items-center justify-center mb-4">
                 <Video className="text-blue-700" size={24} />
               </div>
               <h3 className="text-lg font-bold mb-2">Video Tutorials</h3>
@@ -410,7 +410,7 @@ export default async function ProgramHolderOnboarding() {
               href="/support"
               className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition-all"
             >
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <HelpCircle className="text-blue-700" size={24} />
               </div>
               <h3 className="text-lg font-bold mb-2">Get Support</h3>
@@ -517,7 +517,7 @@ export default async function ProgramHolderOnboarding() {
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/program-holder/apply"
-              className="bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg transition-all"
+              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg transition-all"
             >
               Apply Now
             </Link>

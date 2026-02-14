@@ -296,7 +296,7 @@ export default async function TaxFilingAdminPage() {
         <div className="grid md:grid-cols-2 gap-4 mt-4">
           <div>
             <h4 className="font-semibold text-blue-900 mb-2">Features:</h4>
-            <ul className="list-disc list-inside text-sm text-blue-700">
+            <ul className="list-disc list-inside text-sm text-brand-blue-700">
               <li>professional tax software integration</li>
               <li>All IRS forms supported</li>
               <li>Automatic calculations</li>
@@ -309,7 +309,7 @@ export default async function TaxFilingAdminPage() {
             <h4 className="font-semibold text-blue-900 mb-2">
               Setup Required:
             </h4>
-            <ul className="list-disc list-inside text-sm text-blue-700">
+            <ul className="list-disc list-inside text-sm text-brand-blue-700">
               <li>professional tax software license</li>
               <li>tax software API credentials</li>
               <li>IRS EFIN (E-File ID Number)</li>
@@ -433,20 +433,20 @@ export default async function TaxFilingAdminPage() {
               <h2 className="text-2xl md:text-3xl font-bold mb-6">
                 Ready to Improve Your Career?
               </h2>
-              <p className="text-base md:text-lg mb-8 text-blue-100">
-                Join thousands who have launched successful careers through our
+              <p className="text-base md:text-lg mb-8 text-brand-blue-100">
+                Explore training programs and earn industry certifications through Elevate for
                 free training programs.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/contact"
-                  className="bg-white text-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
+                  className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
                 >
                   Apply Now - It's Free
                 </Link>
                 <Link
                   href="/programs"
-                  className="bg-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
+                  className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
                 >
                   Browse All Programs
                 </Link>

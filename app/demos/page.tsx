@@ -270,7 +270,7 @@ export default function DemosPage() {
 
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <Monitor className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Student Experience</h3>
@@ -290,7 +290,7 @@ export default function DemosPage() {
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <ArrowRight className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">Integration Options</h3>

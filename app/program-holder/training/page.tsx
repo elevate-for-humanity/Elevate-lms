@@ -117,7 +117,7 @@ export default async function TrainingPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Module 1 */}
             <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <span className="text-2xl font-bold text-blue-700">1</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Getting Started</h3>
@@ -153,7 +153,7 @@ export default async function TrainingPage() {
 
             {/* Module 3 */}
             <div className="bg-white rounded-lg shadow-sm border p-6 hover:shadow-md transition">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <span className="text-2xl font-bold text-blue-700">3</span>
               </div>
               <h3 className="text-xl font-bold mb-3">Compliance & Reporting</h3>
@@ -240,7 +240,7 @@ export default async function TrainingPage() {
             <div className="flex flex-wrap gap-4 justify-center">
               <Link
                 href="/support"
-                className="bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+                className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
               >
                 Apply Now
               </Link>

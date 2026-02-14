@@ -67,7 +67,7 @@ export default function PlatformLicensingPage() {
           
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-slate-50 rounded-xl p-8 border border-slate-200">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <Building2 className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="text-xl font-bold text-gray-900 mb-3">Training Providers</h3>
@@ -121,7 +121,7 @@ export default function PlatformLicensingPage() {
               },
             ].map((feature, idx) => (
               <div key={idx} className="bg-white rounded-xl p-6 border border-slate-200">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <feature.icon className="w-5 h-5 text-blue-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">{feature.title}</h3>
@@ -153,7 +153,7 @@ export default function PlatformLicensingPage() {
               },
             ].map((feature, idx) => (
               <div key={idx} className="bg-white rounded-xl p-6 border border-slate-200">
-                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+                <div className="w-10 h-10 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                   <feature.icon className="w-5 h-5 text-blue-600" />
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-3">{feature.title}</h3>

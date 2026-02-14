@@ -381,7 +381,7 @@ export default function TaxServicesPage() {
               href="/tax/upload"
               className="bg-white p-6 rounded-xl border-2 border-gray-200 hover:border-blue-500 hover:shadow-lg transition-all group"
             >
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4 group-hover:bg-blue-600 transition-colors">
                 <FileCheck className="w-6 h-6 text-blue-600 group-hover:text-white" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -396,7 +396,7 @@ export default function TaxServicesPage() {
             </Link>
 
             <div className="bg-white p-6 rounded-xl border-2 border-gray-200">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
+              <div className="w-12 h-12 bg-brand-blue-100 rounded-lg flex items-center justify-center mb-4">
                 <Shield className="w-6 h-6 text-blue-600" />
               </div>
               <h3 className="text-lg font-bold text-gray-900 mb-2">

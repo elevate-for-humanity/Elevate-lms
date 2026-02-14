@@ -369,7 +369,7 @@ export default function SocialMediaPage() {
                           `/admin/social-media/campaigns/${campaign.id}/edit`
                         )
                       }
-                      className="p-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                      className="p-2 bg-blue-100 text-brand-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
                       title="Edit"
                     >
                       <Edit className="w-4 h-4" />
@@ -508,20 +508,20 @@ export default function SocialMediaPage() {
               <h2 className="text-2xl md:text-3xl font-bold mb-6">
                 Ready to Improve Your Career?
               </h2>
-              <p className="text-base md:text-lg mb-8 text-blue-100">
-                Join thousands who have launched successful careers through our
+              <p className="text-base md:text-lg mb-8 text-brand-blue-100">
+                Explore training programs and earn industry certifications through Elevate for
                 free training programs.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/contact"
-                  className="bg-white text-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
+                  className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-bold hover:bg-gray-50 text-lg shadow-2xl transition-all"
                 >
                   Apply Now - It's Free
                 </Link>
                 <Link
                   href="/programs"
-                  className="bg-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
+                  className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-600 border-2 border-white text-lg shadow-2xl transition-all"
                 >
                   Browse All Programs
                 </Link>

@@ -199,6 +199,52 @@ export async function DELETE(
       );
     }
 
+    // Recalculate enrollment progress (same logic as POST handler)
+    const { data: lessonRow } = await supabase
+      .from('lessons')
+      .select('course_id')
+      .eq('id', lessonId)
+      .single();
+
+    if (lessonRow?.course_id) {
+      const courseId = lessonRow.course_id;
+
+      const { data: allLessons } = await supabase
+        .from('lessons')
+        .select('id')
+        .eq('course_id', courseId);
+
+      const totalLessons = allLessons?.length || 0;
+
+      const { data: completedLessons } = await supabase
+        .from('lesson_progress')
+        .select('lesson_id')
+        .eq('user_id', user.id)
+        .eq('completed', true)
+        .in('lesson_id', (allLessons || []).map((l: any) => l.id));
+
+      const completedCount = completedLessons?.length || 0;
+      const progressPercent = totalLessons > 0
+        ? Math.round((completedCount / totalLessons) * 100)
+        : 0;
+
+      // Update enrollment progress
+      const { error: rpcError } = await supabase.rpc('update_enrollment_progress_manual', {
+        p_user_id: user.id,
+        p_course_id: courseId,
+        p_progress: progressPercent,
+      });
+
+      if (rpcError) {
+        // Fallback: direct update
+        await supabase
+          .from('enrollments')
+          .update({ progress: progressPercent, updated_at: new Date().toISOString() })
+          .eq('user_id', user.id)
+          .eq('course_id', courseId);
+      }
+    }
+
     return NextResponse.json({
       success: true,
       lessonId,

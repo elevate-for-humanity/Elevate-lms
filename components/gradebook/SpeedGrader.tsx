@@ -70,7 +70,7 @@ export default function SpeedGrader({ submissions, assignment, onGrade }: SpeedG
         feedback,
         rubric_scores: rubricScores,
         graded_at: new Date().toISOString(),
-      }).catch(() => {});
+      });
 
       await onGrade(currentSubmission.id, {
         points,

@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
+import { createAdminClient } from '@/lib/supabase/server';
 import { randomBytes } from 'node:crypto';
 
 function newSerial() {
@@ -25,6 +26,12 @@ export async function POST(req: NextRequest) {
   if (!['admin', 'partner', 'instructor'].includes(prof?.role))
     return new Response('Forbidden', { status: 403 });
 
+  // Use service role for certificate writes (RLS restricts inserts to admin)
+  const adminDb = createAdminClient();
+  if (!adminDb) {
+    return new Response('Server configuration error', { status: 500 });
+  }
+
   const { old_serial, reason } = await req.json();
   if (!old_serial) return new Response('Missing serial', { status: 400 });
 
@@ -36,7 +43,7 @@ export async function POST(req: NextRequest) {
   if (!old) return new Response('Not found', { status: 404 });
 
   // revoke old
-  await supabase
+  await adminDb
     .from('certificates')
     .update({
       revoked_at: new Date().toISOString(),
@@ -46,7 +53,7 @@ export async function POST(req: NextRequest) {
 
   // issue new
   const serial = newSerial();
-  await supabase.from('certificates').insert({
+  await adminDb.from('certificates').insert({
     user_id: old.user_id,
     course_id: old.course_id,
     serial,
@@ -64,7 +71,7 @@ export async function POST(req: NextRequest) {
     .eq('course_id', old.course_id)
     .maybeSingle();
 
-  await supabase.from('enrollment_events').insert({
+  await adminDb.from('enrollment_events').insert({
     user_id: old.user_id,
     course_id: old.course_id,
     funding_program_id: en?.funding_program_id || null,

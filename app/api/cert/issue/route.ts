@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
+import { createAdminClient } from '@/lib/supabase/server';
 import { randomBytes } from 'node:crypto';
 import { getUserById } from '@/lib/supabase-admin';
 import { logger } from '@/lib/logger';
@@ -30,6 +31,12 @@ export async function POST(req: NextRequest) {
 
   if (!['admin', 'partner', 'instructor'].includes(prof?.role)) {
     return new Response('Forbidden', { status: 403 });
+  }
+
+  // Use service role for certificate writes (RLS restricts inserts to admin)
+  const adminDb = createAdminClient();
+  if (!adminDb) {
+    return new Response('Server configuration error', { status: 500 });
   }
 
   const { user_id, course_id, expires_at } = await req.json();
@@ -98,7 +105,7 @@ export async function POST(req: NextRequest) {
   let tries = 0;
 
   while (!ok && tries < 3) {
-    const { error } = await supabase.from('certificates').insert({
+    const { error } = await adminDb.from('certificates').insert({
       user_id,
       course_id,
       serial,
@@ -122,7 +129,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Log certification event
-  await supabase.from('enrollment_events').insert({
+  await adminDb.from('enrollment_events').insert({
     user_id,
     course_id,
     funding_program_id: en?.funding_program_id || null,

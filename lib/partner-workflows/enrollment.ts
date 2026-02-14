@@ -89,7 +89,7 @@ export async function enrollCertiport(
       success: true,
       enrollmentId: enrollment.id,
       message:
-        'Certiport enrollment created. Student should register at certiport.com using provided credentials.',
+        'Certiport exam enrollment created. Admin will assign a voucher code from the Certiport portal. Student takes the proctored exam on-site.',
     };
   } catch (error) { /* Error handled silently */ 
     return {

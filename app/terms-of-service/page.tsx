@@ -22,7 +22,7 @@ export default function TermsOfServicePage() {
 
       <section className="bg-slate-900 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <FileText className="w-16 h-16 mx-auto mb-4 text-brand-blue-400" />
+          <FileText className="w-16 h-16 mx-auto mb-4 text-blue-400" />
           <h1 className="text-4xl font-bold mb-4">Terms of Service</h1>
           <p className="text-xl text-slate-300">
             Please read these terms carefully before using our services.
@@ -36,18 +36,26 @@ export default function TermsOfServicePage() {
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">1. Acceptance of Terms</h2>
             <p className="text-slate-600">
-              By accessing or using Elevate for Humanity&apos;s website, learning management system, 
+              Elevate for Humanity is a workforce development and career training institute
+              operated by 2Exclusive LLC (&quot;Company,&quot; &quot;we,&quot; &quot;our,&quot; &quot;us&quot;),
+              a registered limited liability company in the State of Indiana.
+              By accessing or using our website, learning management system,
               or any of our services, you agree to be bound by these Terms of Service.
+              If you do not agree, do not use our services.
             </p>
           </section>
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">2. Services Description</h2>
+            <p className="text-slate-600 mb-3">
+              The Company provides the following services under the Elevate for Humanity brand:
+            </p>
             <ul className="list-disc pl-6 text-slate-600 space-y-2">
               <li>Career training and workforce development programs</li>
               <li>Online learning management system (LMS)</li>
               <li>Job placement and career services</li>
               <li>Certification and credentialing programs</li>
+              <li>DOL Registered Apprenticeship sponsorship</li>
             </ul>
           </section>
 
@@ -72,23 +80,36 @@ export default function TermsOfServicePage() {
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">5. Intellectual Property</h2>
             <p className="text-slate-600">
-              All content and materials are the property of Elevate for Humanity or our licensors.
+              All content, materials, courseware, and platform software are the property
+              of 2Exclusive LLC (operating as Elevate for Humanity) or our licensors.
+              Unauthorized reproduction or distribution is prohibited.
             </p>
           </section>
 
           <section className="mb-12">
             <h2 className="text-2xl font-bold text-slate-900 mb-4">6. Limitation of Liability</h2>
             <p className="text-slate-600">
-              Services are provided &quot;as is&quot;. We do not guarantee employment outcomes or specific results.
+              Services are provided &quot;as is.&quot; The Company does not guarantee
+              employment outcomes, certification results, or specific program availability.
+              Liability is limited to the fees paid for the specific service in question.
             </p>
           </section>
 
           <section className="mb-12">
-            <h2 className="text-2xl font-bold text-slate-900 mb-4">7. Contact</h2>
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">7. Governing Law</h2>
+            <p className="text-slate-600">
+              These Terms are governed by the laws of the State of Indiana.
+              Any disputes shall be resolved in the courts of Marion County, Indiana.
+            </p>
+          </section>
+
+          <section className="mb-12">
+            <h2 className="text-2xl font-bold text-slate-900 mb-4">8. Contact</h2>
             <div className="bg-slate-50 rounded-xl p-6">
               <p className="text-slate-700">
-                <strong>Elevate for Humanity</strong><br />
-                Email: <a href="mailto:legal@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">legal@elevateforhumanity.org</a><br />
+                <strong>2Exclusive LLC</strong><br />
+                d/b/a Elevate for Humanity<br />
+                Email: <a href="mailto:legal@elevateforhumanity.org" className="text-blue-600 hover:underline">legal@elevateforhumanity.org</a><br />
                 Phone: (317) 314-3757
               </p>
             </div>
@@ -98,8 +119,8 @@ export default function TermsOfServicePage() {
         <div className="border-t pt-8 mt-8">
           <h3 className="font-bold text-slate-900 mb-4">Related Policies</h3>
           <div className="flex flex-wrap gap-4">
-            <Link href="/privacy-policy" className="text-brand-blue-600 hover:underline">Privacy Policy</Link>
-            <Link href="/accessibility" className="text-brand-blue-600 hover:underline">Accessibility</Link>
+            <Link href="/privacy-policy" className="text-blue-600 hover:underline">Privacy Policy</Link>
+            <Link href="/accessibility" className="text-blue-600 hover:underline">Accessibility</Link>
           </div>
         </div>
       </div>

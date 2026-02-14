@@ -34,10 +34,10 @@ export function getPartnerConfig(partner: PartnerType): PartnerConfig {
       break;
 
     case "certiport":
-      config.baseUrl = process.env.CERTIPORT_API_BASE_URL || "";
-      config.apiKey = process.env.CERTIPORT_API_KEY;
-      config.apiSecret = process.env.CERTIPORT_API_SECRET;
-      config.orgId = process.env.CERTIPORT_ORGANIZATION_ID;
+      // Certiport is portal-based (no API). Exams proctored on-site via Compass.
+      // Admin portal: https://certiport.pearsonvue.com
+      // Vouchers managed in portal, results recorded in LMS credential capture.
+      config.baseUrl = "https://certiport.pearsonvue.com";
       break;
 
     case "careersafe":

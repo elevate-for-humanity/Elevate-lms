@@ -9,42 +9,56 @@ import { DashboardDropdown } from '@/components/navigation/DashboardDropdown';
 import { SearchBar } from '@/components/navigation/SearchBar';
 import { ProfileDropdown } from '@/components/navigation/ProfileDropdown';
 
-// STUDENT-FIRST NAVIGATION - Locked for 30 days
+// STUDENT-FIRST NAVIGATION
 // Only paths that move students toward enrollment
 const NAV_ITEMS = [
   { 
     name: 'Programs', 
     href: '/programs',
     subItems: [
+      { name: 'All Programs', href: '/programs' },
       { name: 'Healthcare', href: '/programs/healthcare' },
       { name: 'Skilled Trades', href: '/programs/skilled-trades' },
-      { name: 'Beauty & Barbering', href: '/programs/beauty' },
+      { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
+      { name: 'CDL Training', href: '/programs/cdl' },
       { name: 'Technology', href: '/programs/technology' },
       { name: 'Business', href: '/programs/business' },
-      { name: 'All Programs', href: '/programs' },
     ]
   },
   { 
-    name: 'How It Works', 
-    href: '/how-it-works',
+    name: 'Funding', 
+    href: '/funding',
     subItems: [
-      { name: 'Check Eligibility', href: '/check-eligibility' },
-      { name: 'Funding Options', href: '/funding' },
-      { name: 'FAQ', href: '/faq' },
+      { name: 'Funding Overview', href: '/funding' },
+      { name: 'WIOA Eligibility', href: '/wioa-eligibility' },
+      { name: 'Financial Aid', href: '/financial-aid' },
+      { name: 'Scholarships', href: '/scholarships' },
+      { name: 'Tuition & Fees', href: '/tuition-fees' },
     ]
   },
   { 
     name: 'About', 
     href: '/about',
     subItems: [
-      { name: 'Our Mission', href: '/about' },
-      { name: 'Contact', href: '/contact' },
+      { name: 'About Elevate', href: '/about' },
+      { name: 'How It Works', href: '/how-it-works' },
+      { name: 'Success Stories', href: '/testimonials' },
+      { name: 'FAQ', href: '/faq' },
+    ]
+  },
+  { 
+    name: 'Support', 
+    href: '/support',
+    subItems: [
+      { name: 'Help Center', href: '/help' },
+      { name: 'Contact Us', href: '/contact' },
+      { name: 'FAQ', href: '/faq' },
+      { name: 'Calendar', href: '/academic-calendar' },
     ]
   },
 ];
 
 // Desktop navigation links with dropdowns
-// STUDENT-FIRST: Only paths that move students toward enrollment
 const DESKTOP_NAV_LINKS = [
   { 
     name: 'Programs', 
@@ -53,27 +67,41 @@ const DESKTOP_NAV_LINKS = [
       { name: 'All Programs', href: '/programs' },
       { name: 'Healthcare', href: '/programs/healthcare' },
       { name: 'Skilled Trades', href: '/programs/skilled-trades' },
-      { name: 'Beauty & Barbering', href: '/programs/beauty' },
+      { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship' },
+      { name: 'CDL Training', href: '/programs/cdl' },
       { name: 'Technology', href: '/programs/technology' },
       { name: 'Business', href: '/programs/business' },
     ]
   },
   { 
-    name: 'How It Works', 
-    href: '/how-it-works',
+    name: 'Funding', 
+    href: '/funding',
     subItems: [
-      { name: 'Overview', href: '/how-it-works' },
-      { name: 'Check Eligibility', href: '/check-eligibility' },
-      { name: 'Funding Options', href: '/funding' },
-      { name: 'FAQ', href: '/faq' },
+      { name: 'Funding Overview', href: '/funding' },
+      { name: 'WIOA Eligibility', href: '/wioa-eligibility' },
+      { name: 'Financial Aid', href: '/financial-aid' },
+      { name: 'Scholarships', href: '/scholarships' },
+      { name: 'Tuition & Fees', href: '/tuition-fees' },
     ]
   },
   { 
     name: 'About', 
     href: '/about',
     subItems: [
-      { name: 'Our Mission', href: '/about' },
-      { name: 'Contact', href: '/contact' },
+      { name: 'About Elevate', href: '/about' },
+      { name: 'How It Works', href: '/how-it-works' },
+      { name: 'Success Stories', href: '/testimonials' },
+      { name: 'FAQ', href: '/faq' },
+    ]
+  },
+  { 
+    name: 'Support', 
+    href: '/support',
+    subItems: [
+      { name: 'Help Center', href: '/help' },
+      { name: 'Contact Us', href: '/contact' },
+      { name: 'FAQ', href: '/faq' },
+      { name: 'Calendar', href: '/academic-calendar' },
     ]
   },
 ];

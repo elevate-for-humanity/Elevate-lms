@@ -100,8 +100,8 @@ export default async function StudentDashboardOrchestrated() {
     if (!progressError && progress) {
       courseProgress = progress.progress_percentage || 0;
     } else {
-      // Fallback to progress_percentage column in enrollments
-      courseProgress = activeEnrollment.progress_percentage || 0;
+      // Fallback to progress or progress_percentage column in enrollments
+      courseProgress = activeEnrollment.progress_percentage || activeEnrollment.progress || 0;
     }
   }
 

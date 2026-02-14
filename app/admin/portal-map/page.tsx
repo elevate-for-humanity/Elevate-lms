@@ -157,8 +157,8 @@ const adminRoutes: AdminRoute[] = [
         status: 'active',
       },
       {
-        name: 'Course Studio AI',
-        href: '/admin/course-studio-ai',
+        name: 'Course Generator',
+        href: '/admin/course-generator',
         description: 'AI-powered course creation',
         status: 'active',
       },

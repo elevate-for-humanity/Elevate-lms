@@ -27,8 +27,7 @@ export default function PartnerAttendancePage() {
     (async () => {
       const { data: staff } = await supabase
         .from('shop_staff')
-        .select('shop_id, role, shops:shops(id,name,active)')
-        .eq('is_active', true);
+        .select('shop_id, role, shops:shops(id,name,active)');
 
       const first = staff?.[0]?.shop_id ?? '';
       setShopId(first);

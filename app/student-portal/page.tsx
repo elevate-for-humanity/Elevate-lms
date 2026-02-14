@@ -51,7 +51,7 @@ export default async function StudentPortalPage() {
       icon: BookOpen,
       title: 'My Courses',
       description: 'Access course materials, lectures, and assignments',
-      href: '/student-portal/courses',
+      href: '/lms/courses',
       color: 'blue',
       image: '/images/trades/program-building-construction.jpg',
     },

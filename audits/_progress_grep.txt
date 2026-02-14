@@ -1,0 +1,131 @@
+app/api/apprentice/hours-summary/route.ts:130:      progress_percentage: progressPercentage,
+app/api/progress/route.ts:37:        .from('lesson_progress')
+app/api/progress/route.ts:88:      .from('lesson_progress')
+app/api/progress/route.ts:139:      .from('lesson_progress')
+app/api/lessons/[lessonId]/complete/route.ts:53:      .from('lesson_progress')
+app/api/lessons/[lessonId]/complete/route.ts:86:      .from('lesson_progress')
+app/api/lessons/[lessonId]/complete/route.ts:186:      .from('lesson_progress')
+app/api/enroll/route.ts:8:import { completeEnrollment } from '@/lib/enrollment/complete-enrollment';
+app/api/ai-instructor/route.ts:136:      contextMessage += `\nProgress: ${enrollment.progress_percentage || 0}%`;
+app/api/mobile/summary/route.ts:67:      .from("lesson_progress")
+app/api/mobile/courses/route.ts:84:          .from("lesson_progress")
+app/api/mobile/profile/route.ts:72:          .from("lesson_progress")
+app/api/onboarding/submit/route.ts:129:        progress_percentage: onboardingPackage.status.overallProgress,
+app/api/webhooks/partners/[partner]/route.ts:137:      progress_percentage: data.percentage || data.progress || 0,
+app/api/webhooks/partners/[partner]/route.ts:189:      progress_percentage: 100,
+app/api/reports/usage/route.ts:84:      .from('lesson_progress')
+app/api/learning-paths/route.ts:48:      progress_percentage: 0,
+app/api/scorm/tracking/route.ts:39:        progress_percentage: progress,
+app/api/pwa/barber/training/route.ts:31:      .from('lesson_progress')
+app/api/pwa/barber/training/route.ts:139:      .from('lesson_progress')
+app/api/courses/[courseId]/lessons/[lessonId]/complete/route.ts:24:    const { error } = await supabase.from('lesson_progress').upsert({
+app/api/courses/[courseId]/complete/route.ts:55:      .from('lesson_progress')
+app/api/courses/[courseId]/complete/route.ts:192:      .from('lesson_progress')
+app/api/v1/enrollments/route.ts:57:        progress_percentage,
+app/api/instructor/engagement-stats/route.ts:17:      .from('lesson_progress')
+app/api/system-status/route.ts:66:  { path: '/lms/dashboard', name: 'LMS Dashboard', category: 'Student', uiEntryPoint: 'Header after login', dataWiring: { tables: ['enrollments', 'lesson_progress'] } },
+app/api/system-status/route.ts:109:  'lesson_progress',
+app/api/stripe/connect/onboard/route.ts:30:        `${process.env.NEXT_PUBLIC_SITE_URL}/employers/billing/complete`,
+app/api/lms/progress/complete/route.ts:10: * POST /api/lms/progress/complete
+app/api/student/partner-enrollments/route.ts:44:      progress_percentage,
+app/api/student/partner-enrollments/route.ts:63:    progress_percentage: row.progress_percentage,
+app/api/certiport-exam/request/route.ts:72:        .from('lesson_progress')
+app/api/analytics/admin/route.ts:70:          .from("lesson_progress")
+app/api/analytics/admin/route.ts:105:          .from("lesson_progress")
+app/api/analytics/admin/route.ts:173:              .from("lesson_progress")
+app/api/analytics/reports/usage/route.ts:84:      .from('lesson_progress')
+app/api/analytics/student/route.ts:52:        .from("lesson_progress")
+app/api/analytics/student/route.ts:119:        .from("lesson_progress")
+app/admin/partner-enrollments/page.tsx:83:                    <td className="px-6 py-4">{e.progress_percentage || 0}%</td>
+app/admin/sap/page.tsx:112:      const progressPercentage = enrollment.progress_percentage || 0;
+app/admin/at-risk/page.tsx:256:                              {risk.progress_percentage}%
+app/admin/at-risk/page.tsx:345:                        {risk.progress_percentage}% complete
+app/admin/learner/[id]/page.tsx:91:    .from('lesson_progress')
+app/admin/hsi-enrollments/page.tsx:148:                        {enrollment.progress_percentage || 0}%
+app/admin/enrollments/EnrollmentManagementClient.tsx:159:          .from('lesson_progress')
+app/admin/enrollments/EnrollmentManagementClient.tsx:193:  const markComplete = async (enrollment: Enrollment) => {
+app/admin/enrollments/EnrollmentManagementClient.tsx:352:                        <button onClick={() => markComplete(enrollment)} className="px-3 py-1 text-sm text-green-600 border border-green-200 rounded hover:bg-green-50">Complete</button>
+app/studio/components/Editor.tsx:113:          const res = await fetch('/api/studio/complete', {
+app/enrollment/documents/page.tsx:141:      const response = await fetch('/api/enrollment/documents/complete', {
+app/enrollment/orientation/page.tsx:97:      const response = await fetch('/api/enrollment/orientation/complete', {
+app/tax-self-prep/start/TaxPrepForm.tsx:116:  const markComplete = (sectionId: string) => {
+app/tax-self-prep/start/TaxPrepForm.tsx:365:            <button onClick={() => activeSection === 'review' ? handleSubmit() : markComplete(activeSection)}
+app/courses/[courseId]/leaderboard/page.tsx:66:      .order('progress_percentage', { ascending: false })
+app/courses/[courseId]/leaderboard/page.tsx:74:        item.progress_percentage * 10 + (item.completed_lessons || 0) * 5
+app/courses/[courseId]/leaderboard/page.tsx:483:                          {enstart.progress_percentage}% complete •{' '}
+app/courses/[courseId]/learn/LessonContent.tsx:39:        `/api/courses/${courseId}/lessons/${lesson.id}/complete`,
+app/courses/[courseId]/learn/LessonContent.tsx:122:              {isCompleting ? 'Marking Complete...' : 'Mark as Complete'}
+app/courses/hsi/[courseType]/learn/HSICoursePlayer.tsx:33:    await fetch('/api/courses/complete', {
+app/courses/hsi/[courseType]/learn/HSICoursePlayer.tsx:109:                    click "Mark as Complete" to generate your certificate.
+app/courses/hsi/[courseType]/learn/HSICoursePlayer.tsx:115:                    • Mark as Complete
+app/ferpa/training/complete/page.tsx:12:    canonical: 'https://www.elevateforhumanity.org/ferpa/training/complete',
+app/ferpa/training/complete/page.tsx:32:    redirect('/login?next=/ferpa/training/complete');
+app/staff-portal/qa-checklist/page.tsx:181:                          Mark as Complete
+app/programs/nail-technician-apprenticeship/orientation/page.tsx:171:      await fetch('/api/enrollment/complete-orientation', {
+app/programs/barber-apprenticeship/orientation/page.tsx:174:      const response = await fetch('/api/enrollment/complete-orientation', {
+app/programs/cosmetology-apprenticeship/orientation/page.tsx:173:      const response = await fetch('/api/enrollment/complete-orientation', {
+app/lms/(app)/dashboard/page.tsx:90:  // Get course progress (use progress_percentage from enrollments if course_progress table doesn't exist)
+app/lms/(app)/dashboard/page.tsx:96:      .select('progress_percentage')
+app/lms/(app)/dashboard/page.tsx:101:      courseProgress = progress.progress_percentage || 0;
+app/lms/(app)/dashboard/page.tsx:103:      // Fallback to progress or progress_percentage column in enrollments
+app/lms/(app)/dashboard/page.tsx:104:      courseProgress = activeEnrollment.progress_percentage || activeEnrollment.progress || 0;
+app/lms/(app)/scorm/[scormId]/page.tsx:116:          enrollmentProgress={enrollment?.progress_percentage}
+app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx:78:        .from('lesson_progress')
+app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx:114:  const markComplete = async () => {
+app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx:120:        const response = await fetch(`/api/lessons/${lessonId}/complete`, {
+app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx:144:        const response = await fetch(`/api/lessons/${lessonId}/complete`, {
+app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx:321:                    markComplete();
+app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx:373:              onClick={markComplete}
+app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx:380:              {isCompleted ? '• Completed' : 'Mark as Complete'}
+app/lms/(app)/courses/[courseId]/page.tsx:120:    .from('lesson_progress')
+app/lms/(app)/courses/[courseId]/complete/page.tsx:88:            action="/api/lms/progress/complete"
+app/lms/page.tsx:63:    .from('lesson_progress')
+app/career-services/courses/[slug]/learn/CoursePlayer.tsx:40:  const markComplete = () => {
+app/career-services/courses/[slug]/learn/CoursePlayer.tsx:65:              onEnded={markComplete}
+app/career-services/courses/[slug]/learn/CoursePlayer.tsx:96:                onClick={markComplete}
+lib/actions/scorm.ts:31:      progress_percentage: data.progress,
+lib/actions/scorm.ts:263:      progress_percentage: progressData.progress,
+lib/new-ecosystem-services/courses.ts:73:  const { error } = await supa.from('lesson_progress').upsert({
+lib/new-ecosystem-services/certificates.ts:25:    .from('lesson_progress')
+lib/xapi/xapi-client.ts:99:      id: 'http://adlnet.gov/expapi/verbs/completed',
+lib/xapi/video.ts:21:    completed: 'http://adlnet.gov/expapi/verbs/completed',
+lib/ecr/sync.ts:102:            progress_percentage: progress.percentage,
+lib/ecr/sync.ts:172:      progress_percentage: progressPercentage,
+lib/ecr/sync.ts:199:    progress_percentage: progressPercentage,
+lib/course-progress.ts:7:    .from('lesson_progress')
+lib/course-progress.ts:42:    .from('lesson_progress')
+lib/realtime/notifications.ts:79:        table: 'lesson_progress',
+lib/validation.ts:29:      '*, program:programs(required_lessons), progress:lesson_progress(completed_at)'
+lib/partners/hybrid-enrollment.ts:135:        progress_percentage: 0,
+lib/partners/hybrid-enrollment.ts:226:    progress_percentage: partnerProgress.percentage,
+lib/lms/dashboard-data.ts:117:        progress_percentage,
+lib/lms/dashboard-data.ts:138:    progress: enrollment.student_risk_status?.progress_percentage || 0,
+lib/lms/dashboard-data.ts:165:          progress_percentage,
+lib/lms/dashboard-data.ts:192:        sum + (e.student_risk_status?.progress_percentage || 0),
+lib/lms/dashboard-data.ts:322:        progress_percentage
+lib/lms/dashboard-data.ts:343:    (sum, e) => sum + (e.student_risk_status?.progress_percentage || 0),
+lib/lms/audit-export.ts:12:  progress_percentage: number;
+lib/lms/audit-export.ts:52:        progress_percentage,
+lib/lms/audit-export.ts:80:      progress_percentage: riskStatus?.progress_percentage || 0,
+lib/lms/audit-export.ts:132:          progress_percentage,
+lib/lms/audit-export.ts:160:      progress_percentage: riskStatus?.progress_percentage || 0,
+lib/lms/audit-export.ts:237:          progress_percentage
+lib/lms/student-requirements.ts:27:  progress_percentage: number;
+lib/lms/at-risk-detection.ts:13:  progress_percentage: number;
+lib/lms/at-risk-detection.ts:73:      progress_percentage: risk.progress_percentage,
+lib/lms/at-risk-detection.ts:135:      progress_percentage: risk.progress_percentage,
+lib/lms/at-risk-detection.ts:194:      progress_percentage: risk.progress_percentage,
+lib/enrollment-service.ts:77:      // Already active/completed — don't downgrade, just return
+lib/automation/progressSync.ts:50:      progress_percentage: progress.percentage,
+lib/analytics/course-analytics.ts:91:    .from('lesson_progress')
+lib/course-completion.ts:89:    .from('lesson_progress')
+components/CoursePlayer.tsx:31: * Later we can wire this to Supabase lesson_progress and JRI completions.
+components/hub/ProgressCompliance.tsx:57:        .from('lesson_progress')
+components/nav/InstructorNav.tsx:83:        href: '/instructor/grading/completed',
+components/apprenticeship/ApprenticeProgressWidget.tsx:17:  progress_percentage: number;
+components/apprenticeship/ApprenticeProgressWidget.tsx:50:    progress_percentage: 0,
+components/apprenticeship/ApprenticeProgressWidget.tsx:91:  const progressPercentage = summary.progress_percentage || Math.min((effectiveTotal / summary.required_hours) * 100, 100);
+components/UniversalCoursePlayer.tsx:40:      const response = await fetch('/api/courses/complete', {
+components/UniversalCoursePlayer.tsx:126:                      Complete the course in the {partnerName} system below. When finished, click "Mark as Complete" to generate your Elevate For Humanity certificate.
+components/UniversalCoursePlayer.tsx:133:                      {loading ? 'Processing...' : '✓ Mark as Complete'}
+components/UniversalCoursePlayer.tsx:181:                  <li>• Click "Mark as Complete" to receive your certificate</li>

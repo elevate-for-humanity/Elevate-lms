@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
+import { createAdminClient } from '@/lib/supabase/server';
 import { randomBytes } from 'node:crypto';
 import { getUserByEmail } from '@/lib/supabase-admin';
 
@@ -36,6 +37,12 @@ export async function POST(req: NextRequest) {
     .single();
   if (!['admin', 'partner'].includes(prof?.role))
     return new Response('Forbidden', { status: 403 });
+
+  // Use service role for certificate/enrollment writes (RLS restricts inserts to admin)
+  const adminDb = createAdminClient();
+  if (!adminDb) {
+    return new Response('Server configuration error', { status: 500 });
+  }
 
   const raw = await req.text();
   const rows = parseCSV(raw);
@@ -80,7 +87,7 @@ export async function POST(req: NextRequest) {
       }
 
       // mark enrollment completed (create if missing)
-      await supabase.from('enrollments').upsert({
+      await adminDb.from('enrollments').upsert({
         user_id: u.id,
         course_id: course.id,
         status: 'completed',
@@ -94,7 +101,7 @@ export async function POST(req: NextRequest) {
         .eq('user_id', u.id)
         .eq('course_id', course.id)
         .maybeSingle();
-      await supabase.from('enrollment_events').insert({
+      await adminDb.from('enrollment_events').insert({
         user_id: u.id,
         course_id: course.id,
         funding_program_id: en?.funding_program_id || null,
@@ -120,7 +127,7 @@ export async function POST(req: NextRequest) {
       let ok = false;
       let tries = 0;
       while (!ok && tries < 3) {
-        const { error } = await supabase.from('certificates').insert({
+        const { error } = await adminDb.from('certificates').insert({
           user_id: u.id,
           course_id: course.id,
           serial: s,
@@ -142,7 +149,7 @@ export async function POST(req: NextRequest) {
       }
 
       // Log certification event
-      await supabase.from('enrollment_events').insert({
+      await adminDb.from('enrollment_events').insert({
         user_id: u.id,
         course_id: course.id,
         funding_program_id: en?.funding_program_id || null,

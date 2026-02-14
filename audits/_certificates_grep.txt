@@ -1,0 +1,428 @@
+app/apprentice/transfer-hours/page.tsx:83:            <li>• Documentation required: Employment records, training certificates</li>
+app/apprentice/transfer-hours/page.tsx:155:              <span>Training certificates or completion records</span>
+app/api/cm/learners/[id]/route.ts:99:        .from('certificates')
+app/api/outcomes/stats/route.ts:28:    // Get certificates issued
+app/api/outcomes/stats/route.ts:29:    const { count: certificatesIssued } = await supabase
+app/api/outcomes/stats/route.ts:30:      .from('certificates')
+app/api/outcomes/stats/route.ts:43:      certificatesIssued: certificatesIssued || 0,
+app/api/outcomes/stats/route.ts:57:      certificatesIssued: 412,
+app/api/admin/bulk/route.ts:45:      case 'issue_certificates':
+app/api/admin/completions/route.ts:49:      .from("partner_certificates")
+app/api/admin/export/students/route.ts:39:    const includeCertificates = searchParams.get('include_certificates') === 'true';
+app/api/verify/certificate/[certificateId]/route.ts:19:      .from("certificates")
+app/api/lessons/[lessonId]/complete/route.ts:122:        .from('certificates')
+app/api/lessons/[lessonId]/complete/route.ts:134:          .from('certificates')
+app/api/public/metrics/route.ts:71:      // Total certificates issued
+app/api/public/metrics/route.ts:73:        .from('certificates')
+app/api/cert/bulk-issue/route.ts:123:        const { error } = await supabase.from('certificates').insert({
+app/api/cert/issue/route.ts:101:    const { error } = await supabase.from('certificates').insert({
+app/api/cert/pdf/route.ts:18:    .from('certificates')
+app/api/cert/replace/route.ts:32:    .from('certificates')
+app/api/cert/replace/route.ts:40:    .from('certificates')
+app/api/cert/replace/route.ts:49:  await supabase.from('certificates').insert({
+app/api/mobile/summary/route.ts:36:    // Get certificates count
+app/api/mobile/summary/route.ts:37:    const { count: certificatesCount } = await supabase
+app/api/mobile/summary/route.ts:38:      .from("certificates")
+app/api/mobile/summary/route.ts:75:      certificates: certificatesCount || 0,
+app/api/mobile/profile/route.ts:86:    // 3) Get certificates count
+app/api/mobile/profile/route.ts:87:    const { count: certificatesCount } = await supabase
+app/api/mobile/profile/route.ts:88:      .from("certificates")
+app/api/mobile/profile/route.ts:105:      certificatesCount: certificatesCount || 0,
+app/api/accreditation/report/route.ts:36:    const { data: certificates } = await supabase
+app/api/accreditation/report/route.ts:37:      .from('certificates')
+app/api/accreditation/report/route.ts:43:      const programCertificates = certificates?.filter(c => c.program_id === program.id) || [];
+app/api/accreditation/report/route.ts:59:          certificatesIssued: programCertificates.length,
+app/api/accreditation/report/route.ts:79:        totalCertificates: certificates?.length || 0,
+app/api/courses/[courseId]/complete/route.ts:98:      .from('certificates')
+app/api/courses/[courseId]/complete/route.ts:111:        .from('certificates')
+app/api/courses/[courseId]/complete/route.ts:146:            downloadUrl: `/api/certificates/${certificate.id}/download`,
+app/api/courses/[courseId]/complete/route.ts:199:      .from('certificates')
+app/api/courses/complete/route.ts:33:      .from('module_certificates')
+app/api/emails/certificate/route.ts:32:      .from('certificates')
+app/api/emails/certificate/route.ts:40:        profiles!certificates_student_id_fkey!inner (
+app/api/system-status/route.ts:67:  { path: '/certificates', name: 'Certificates', category: 'Student', uiEntryPoint: 'Student nav', dataWiring: { tables: ['certificates'] } },
+app/api/system-status/route.ts:104:  'certificates',
+app/api/certifications/careersafe/route.ts:15:      .from('certificates')
+app/api/certifications/careersafe/route.ts:23:    const { data: certificates, error } = await query.limit(100);
+app/api/certifications/careersafe/route.ts:26:      console.error('CareerSafe certificates error:', error);
+app/api/certifications/careersafe/route.ts:40:      issuedCertificates: certificates?.length || 0,
+app/api/certifications/careersafe/route.ts:41:      certificates: certificates || [],
+app/api/certifications/careersafe/route.ts:88:      .from('certificates')
+app/api/certifications/rise-up/route.ts:15:      .from('certificates')
+app/api/certifications/rise-up/route.ts:23:    const { data: certificates, error } = await query.limit(100);
+app/api/certifications/rise-up/route.ts:26:      console.error('RISE Up certificates error:', error);
+app/api/certifications/rise-up/route.ts:38:      issuedCertificates: certificates?.length || 0,
+app/api/certifications/rise-up/route.ts:39:      certificates: certificates || [],
+app/api/certifications/rise-up/route.ts:82:      .from('certificates')
+app/api/users/[userId]/progress/route.ts:14:  const [enrollmentsResult, progressResult, certificatesResult] = await Promise.all([
+app/api/users/[userId]/progress/route.ts:24:      .from('certificates')
+app/api/users/[userId]/progress/route.ts:31:  const certificates = certificatesResult.data || [];
+app/api/users/[userId]/progress/route.ts:36:    certificates,
+app/api/users/[userId]/progress/route.ts:41:      certificates_earned: certificates.length,
+app/api/cron/process-provisioning-jobs/route.ts:39:        certificates: true,
+app/api/certificates/verify/route.ts:28:      .from('certificates')
+app/api/certificates/download/route.ts:26:      .from('certificates')
+app/api/certificates/download/route.ts:97:      .from('certificates')
+app/api/certificates/[certificateId]/download/route.ts:7:import { generateCertificatePDF } from '@/lib/certificates/generator';
+app/api/certificates/[certificateId]/download/route.ts:25:      .from('certificates')
+app/api/certificates/generate/route.ts:130:      .from('certificates')
+app/api/certificates/generate/route.ts:158:      .from('certificates')
+app/api/certificates/generate/route.ts:200:    logger.error('Error in /api/certificates/generate:', error);
+app/api/certificates/route.ts:19:    const { data: certificates, error } = await supabase
+app/api/certificates/route.ts:20:      .from('certificates')
+app/api/certificates/route.ts:24:        profiles!certificates_student_id_fkey (
+app/api/certificates/route.ts:40:    return NextResponse.json({ certificates: certificates || [] });
+app/api/certificates/route.ts:65:      .from('certificates')
+app/api/certificates/issue/route.ts:8:import { generateCertificateNumber, generateCertificatePDF } from "@/lib/certificates/generator";
+app/api/certificates/issue/route.ts:53:    const filePath = `certificates/${certificateNumber}.pdf`;
+app/api/certificates/issue/route.ts:55:      .from("certificates")
+app/api/certificates/issue/route.ts:70:      .from("certificates")
+app/api/certificates/issue/route.ts:75:      .from("certificates")
+app/api/enrollments/complete-program/route.ts:19:import { issueCertificate } from '@/lib/certificates/issue-certificate';
+app/api/lms/progress/complete/route.ts:117:        .from('module_certificates')
+app/api/lms/progress/complete/route.ts:147:              <p><a href="https://www.elevateforhumanity.org/lms/certificates">View Your Certificates</a></p>
+app/api/ai/build-remote/route.ts:265:      description: 'Shows enrolled courses, progress, certificates',
+app/api/media/buckets/route.ts:37:          { id: 'certificates', name: 'certificates', public: false },
+app/admin/notifications/page.tsx:337:                      url: '/student/certificates',
+app/admin/dashboard/page.tsx:1325:              href="/admin/certificates"
+app/admin/reports/samples/page.tsx:17:  description: 'Download sample enrollment records, certificates, and funding reports.',
+app/admin/reports/samples/page.tsx:117:            Example formats for enrollment records, certificates, and funding reports
+app/admin/reports/samples/page.tsx:428:            actual enrollment records, certificates, and funding reports. Real data is available 
+app/admin/learner/[id]/page.tsx:82:  // Fetch certificates
+app/admin/learner/[id]/page.tsx:83:  const { data: certificates } = await supabase
+app/admin/learner/[id]/page.tsx:84:    .from('certificates')
+app/admin/learner/[id]/page.tsx:199:              <p className="text-2xl font-bold text-slate-900">{certificates?.length || 0}</p>
+app/admin/learner/[id]/page.tsx:340:            {certificates && certificates.length > 0 ? (
+app/admin/learner/[id]/page.tsx:342:                {certificates.map((cert: any) => (
+app/admin/learner/[id]/page.tsx:355:              <p className="text-slate-500 text-center py-4">No certificates yet</p>
+app/admin/portal-map/page.tsx:343:    href: '/admin/certificates',
+app/admin/portal-map/page.tsx:350:        href: '/admin/certificates',
+app/admin/portal-map/page.tsx:356:        href: '/admin/certificates/issue',
+app/admin/portal-map/page.tsx:357:        description: 'Issue new certificates',
+app/admin/portal-map/page.tsx:362:        href: '/admin/certificates/bulk',
+app/admin/certificates/bulk/page.tsx:9:    canonical: 'https://www.elevateforhumanity.org/admin/certificates/bulk',
+app/admin/certificates/bulk/page.tsx:12:  description: 'Issue certificates to multiple participants at once.',
+app/admin/certificates/bulk/page.tsx:53:  // Fetch eligible participants (completed courses without certificates)
+app/admin/certificates/bulk/page.tsx:77:              <li><Link href="/admin/certificates" className="hover:text-primary">Certificates</Link></li>
+app/admin/certificates/bulk/page.tsx:83:          <p className="text-gray-600 mt-2">Issue certificates to multiple participants at once</p>
+app/admin/certificates/bulk/page.tsx:148:                  <p className="text-sm text-gray-500">Select participants to issue certificates</p>
+app/admin/certificates/issue/page.tsx:9:    canonical: 'https://www.elevateforhumanity.org/admin/certificates/issue',
+app/admin/certificates/issue/page.tsx:69:              <li><Link href="/admin/certificates" className="hover:text-primary">Certificates</Link></li>
+app/admin/certificates/issue/page.tsx:219:                href="/admin/certificates"
+app/admin/certificates/page.tsx:11:    canonical: 'https://www.elevateforhumanity.org/admin/certificates',
+app/admin/certificates/page.tsx:14:  description: 'Manage certificates, credentials, and certifications',
+app/admin/certificates/page.tsx:48:  const { data: certificates, count: totalCertificates } = await supabase
+app/admin/certificates/page.tsx:49:    .from('certificates')
+app/admin/certificates/page.tsx:67:    .from('certificates')
+app/admin/certificates/page.tsx:77:    .from('certificates')
+app/admin/certificates/page.tsx:160:              {certificates && certificates.length > 0 ? (
+app/admin/certificates/page.tsx:162:                  {certificates.map((item: any) => (
+app/admin/layout.tsx:17:    'Manage programs, students, certificates, compliance, and workforce development operations. Admin dashboard for Elevate for Humanity.',
+app/admin/layout.tsx:29:      'Manage programs, students, certificates, and workforce development operations.',
+app/admin/students/export/page.tsx:42:        ...(includeCertificates && { include_certificates: 'true' }),
+app/admin/analytics/learning/page.tsx:61:    .from('certificates')
+app/verify/[certificateId]/page.tsx:32:  // Check program_completion_certificates
+app/verify/[certificateId]/page.tsx:34:    .from('program_completion_certificates')
+app/verify/[certificateId]/page.tsx:48:  // Check partner_certificates
+app/verify/[certificateId]/page.tsx:51:      .from('partner_certificates')
+app/verify/[certificateId]/page.tsx:66:  // Check module_certificates
+app/verify/[certificateId]/page.tsx:69:      .from('module_certificates')
+app/verify/[certificateId]/page.tsx:303:                href="/certificates/verify"
+app/verify/page.tsx:8:  description: 'Verify the authenticity of certificates issued by Elevate for Humanity.',
+app/verify/page.tsx:36:    .from('certificates')
+app/verify/page.tsx:86:            <Link href="/certificates" className="text-sm text-orange-600 hover:text-orange-700">
+app/(public)/lms-portal/page.tsx:8:  description: 'Access your courses, track progress, earn certificates, and advance your career with our online learning platform.',
+app/(public)/lms-portal/page.tsx:67:              <p className="text-slate-600">Earn industry-recognized certificates upon completing your training programs.</p>
+app/community/developers/page.tsx:51:    { name: 'Certificates', path: '/api/certificates', description: 'Certificate generation and verification' },
+app/store/licenses/managed/page.tsx:29:    'Enterprise LMS (courses, assessments, certificates)',
+app/store/licenses/managed-platform/page.tsx:28:      'Progress tracking & certificates',
+app/store/licenses/school-license/page.tsx:252:                desc: 'Courses, quizzes, certificates, progress tracking. Students learn on any device. Instructors see everything.',
+app/store/integrations/page.tsx:200:                      <code className="bg-gray-100 px-2 py-2 rounded">POST /api/certificates</code>
+app/contracts/master-license/page.tsx:36:              <li>Issuance of certificates upon program completion</li>
+app/supersonic-fast-cash/tax-information/page.tsx:253:                <li>• Stock certificates</li>
+app/policies/progress/page.tsx:192:                  <p className="mt-1">Medical records, death certificates, police reports, etc.</p>
+app/policies/attendance/page.tsx:153:                      <li>Death certificates or obituaries</li>
+app/policies/revocation/page.tsx:193:                <li><strong>Return Required:</strong> Physical certificates must be returned within 30 days</li>
+app/policies/credentials/page.tsx:6:  description: 'Standards for issuing, verifying, and maintaining certificates, credentials, and certifications.',
+app/policies/credentials/page.tsx:46:                  <li>Other program certificates</li>
+app/policies/credentials/page.tsx:158:                      credentials available immediately; physical certificates within 2-3 weeks.
+app/policies/credentials/page.tsx:307:              Most Elevate for Humanity certificates do not expire. However, industry certifications and 
+app/policies/data-retention/page.tsx:54:                    <li>Degrees and certificates awarded</li>
+app/policies/federal-compliance/page.tsx:93:              The Institution may disclose "directory information" without prior consent unless the student has opted out. Directory information includes: student name, address, telephone number, email address, photograph, program of study, enrollment status, dates of attendance, degrees and certificates awarded, and honors received. Students may opt out of directory information disclosure by submitting a written request to the Registrar within 14 days of enrollment.
+app/policies/privacy-notice/page.tsx:159:          <li>Issue certificates and credentials</li>
+app/policies/verification/page.tsx:53:                  Confirming authenticity of certificates and credentials for employers.
+app/policies/wrg/page.tsx:47:              pursuing high-value certificates and certifications in high-demand fields. The grant covers
+app/policies/wrg/page.tsx:95:            <p>WRG covers certificates in high-demand fields including:</p>
+app/file-manager/page.tsx:10:  description: 'Manage your documents, certificates, and course materials.',
+app/drug-testing/page.tsx:51:    description: 'Online courses for supervisors, collectors, and employers. DOT-compliant certificates.',
+app/courses/hsi/page.tsx:269:                  Receive industry-standard-recognized certificates upon
+app/client-portal/page.tsx:25:    description: 'Generate compliance reports, completion certificates, and funding documentation.',
+app/client-portal/page.tsx:36:  'Access completion certificates and transcripts',
+app/docs/Indiana-Barbershop-Apprenticeship-MOU/page.tsx:73:            <li>Issue completion certificates upon program finish</li>
+app/docs/lms/page.tsx:15:  { title: 'Certificates', href: '/docs/lms/certificates' },
+app/docs/students/page.tsx:16:  { title: 'Earning Certificates', href: '/docs/students/certificates' },
+app/instructor/page.tsx:117:                <p className="text-slate-600">Issue certificates to completing students.</p>
+app/connect/page.tsx:40:  { id: 'dashboard', name: 'Student Dashboard', icon: Users, description: 'Progress tracking, certificates' },
+app/learner/dashboard/page.tsx:311:                  href="/certificates"
+app/help/tutorials/page.tsx:183:    id: 'downloading-certificates',
+app/help/tutorials/page.tsx:185:    description: 'How to access and download your completion certificates.',
+app/help/tutorials/page.tsx:192:      'Accessing certificates page',
+app/help/tutorials/page.tsx:193:      'Downloading PDF certificates',
+app/help/articles/certifications/page.tsx:8:  description: 'Learn about certifications, how to earn them, and how to access your certificates.',
+app/help/articles/certifications/page.tsx:18:      question: 'Where can I find my certificates?',
+app/help/articles/certifications/page.tsx:19:      answer: 'All your earned certificates are available in your student dashboard under the "Certificates" section. You can view, download, and share them from there.',
+app/help/articles/certifications/page.tsx:65:              <p className="text-sm text-gray-600">View and download your certificates from your dashboard 24/7.</p>
+app/help/articles/certifications/page.tsx:70:              <p className="text-sm text-gray-600">Share certificates with employers who can verify them online.</p>
+app/help/articles/certificates/page.tsx:6:  alternates: { canonical: 'https://www.elevateforhumanity.org/help/articles/certificates' },
+app/features/page.tsx:47:    desc: 'Upload IDs, transcripts, and certifications securely. Download completion certificates and credential verification letters.',
+app/data/store-products.ts:163:      'Progress tracking and certificates',
+app/certificates/[certificateId]/page.tsx:30:    .from('certificates')
+app/certificates/[certificateId]/page.tsx:57:    .from('certificates')
+app/certificates/[certificateId]/page.tsx:77:        <Breadcrumbs items={[{ label: "Certificates", href: "/certificates" }, { label: "[Certificateid]" }]} />
+app/certificates/page.tsx:18:    'Earn industry-recognized certificates and credentials. Verify certificates through government partners including SSA, IRS, DOL, and state licensing boards.',
+app/certificates/page.tsx:20:    canonical: 'https://www.elevateforhumanity.org/certificates',
+app/certificates/page.tsx:33:          src="/images/certificates-hero.jpg"
+app/certificates/page.tsx:49:              Earn industry-recognized certificates that employers trust and
+app/certificates/page.tsx:133:              All certificates are industry-recognized and accepted by employers
+app/staff-portal/training/page.tsx:15:    'Complete training modules, track your progress, and earn completion certificates.',
+app/staff-portal/training/page.tsx:24: * - Take quizzes and earn completion certificates
+app/staff-portal/training/page.tsx:97:                Complete training modules and earn completion certificates
+app/call-now/page.tsx:65:              <p className="text-gray-600 mb-4">Find answers to common questions about enrollment, funding, programs, certificates, and more.</p>
+app/partners/barbershop-apprenticeship/page.tsx:62:  'Issue completion certificates upon program finish',
+app/lms/(public)/page.tsx:79:              'Downloadable certificates',
+app/lms/(public)/page.tsx:107:            <li>Complete lessons, assignments, and earn certificates</li>
+app/lms/(app)/portfolio/page.tsx:18:  description: 'Showcase your achievements, certificates, and completed projects.',
+app/lms/(app)/portfolio/page.tsx:47:  // Fetch certificates
+app/lms/(app)/portfolio/page.tsx:48:  const { data: certificates } = await supabase
+app/lms/(app)/portfolio/page.tsx:49:    .from('certificates')
+app/lms/(app)/portfolio/page.tsx:107:                  {certificates?.length || 0}
+app/lms/(app)/portfolio/page.tsx:149:              {certificates && certificates.length > 0 ? (
+app/lms/(app)/portfolio/page.tsx:151:                  {certificates.map((cert: any) => (
+app/lms/(app)/portfolio/page.tsx:185:                  <h3 className="font-medium text-gray-900 mb-2">No certificates yet</h3>
+app/lms/(app)/portfolio/page.tsx:187:                    Complete courses to earn certificates and credentials
+app/lms/(app)/portfolio/page.tsx:272:                  <span>Add descriptions to your certificates explaining what you learned</span>
+app/lms/(app)/progress/page.tsx:409:                  href="/lms/certificates"
+app/lms/(app)/dashboard/page.tsx:385:                {stateData.availableSections.includes('certificates') && (
+app/lms/(app)/dashboard/page.tsx:389:                    href="/lms/certificates"
+app/lms/(app)/dashboard/page.tsx:577:                  href="/lms/certificates"
+app/lms/(app)/resources/page.tsx:170:  { title: 'Certificates', href: '/lms/certificates', icon: GraduationCap },
+app/lms/(app)/courses/[courseId]/lessons/[lessonId]/page.tsx:492:                    href={`/certificates/${certificate.id}`}
+app/lms/(app)/achievements/page.tsx:99:  // Fetch certificates
+app/lms/(app)/achievements/page.tsx:100:  const { count: certificatesEarned } = await supabase
+app/lms/(app)/achievements/page.tsx:101:    .from('certificates')
+app/lms/(app)/achievements/page.tsx:117:    certificatesEarned: certificatesEarned || 0,
+app/lms/(app)/achievements/page.tsx:128:    (stats.certificatesEarned * 200) +
+app/lms/(app)/achievements/page.tsx:200:      current: stats.certificatesEarned,
+app/lms/(app)/achievements/page.tsx:299:                <div className="text-2xl font-bold text-slate-900">{stats.certificatesEarned}</div>
+app/lms/(app)/certification/page.tsx:46:          <p className="text-gray-600 mb-6">Access your earned certificates and credentials.</p>
+app/lms/(app)/certification/page.tsx:55:  // Get user's certificates
+app/lms/(app)/certification/page.tsx:56:  const { data: certificates } = await supabase
+app/lms/(app)/certification/page.tsx:57:    .from('certificates')
+app/lms/(app)/certification/page.tsx:96:          <p className="text-gray-600">Manage your credentials and certificates</p>
+app/lms/(app)/certification/page.tsx:104:          <div className="text-2xl font-bold">{certificates?.length || 0}</div>
+app/lms/(app)/certification/page.tsx:124:            {certificates && certificates.length > 0 ? (
+app/lms/(app)/certification/page.tsx:126:                {certificates.map((cert: any) => (
+app/lms/(app)/certification/page.tsx:176:                <p className="text-gray-500 mb-3">No certificates earned yet</p>
+app/lms/(app)/certification/page.tsx:178:                  Browse courses to earn certificates
+app/lms/(app)/certification/page.tsx:249:              Employers can verify certificates using the credential ID.
+app/lms/(app)/help/page.tsx:60:      { label: 'Earning Certificates', href: '/lms/help/certificates' },
+app/lms/(app)/profile/page.tsx:21:  const { count: certificates } = await supabase.from('certificates').select('*', { count: 'exact', head: true }).eq('user_id', user.id);
+app/lms/(app)/profile/page.tsx:37:            <div className="p-4 bg-gray-50 rounded-lg"><p className="text-2xl font-bold text-green-600">{certificates || 0}</p><p className="text-sm text-gray-500">Certificates</p></div>
+app/lms/(app)/certificates/page.tsx:13:    canonical: 'https://www.elevateforhumanity.org/lms/certificates',
+app/lms/(app)/certificates/page.tsx:17:    'View and download your earned certificates.',
+app/lms/(app)/certificates/page.tsx:50:  // Fetch certificates
+app/lms/(app)/certificates/page.tsx:51:  const { data: certificates } = await supabase
+app/lms/(app)/certificates/page.tsx:52:    .from('certificates')
+app/lms/(app)/certificates/page.tsx:74:            View and download your earned certificates
+app/lms/(app)/certificates/page.tsx:78:        {certificates && certificates.length > 0 ? (
+app/lms/(app)/certificates/page.tsx:80:            {certificates.map((cert) => (
+app/lms/(app)/alumni/page.tsx:243:              <Link href="/lms/certificates" className="flex items-center gap-2 text-amber-700 hover:underline">
+app/lms/settings/data/page.tsx:96:                course progress, certificates, and activity history.
+app/lms/settings/data/page.tsx:181:                accreditation requirements. Transcripts and certificates are kept permanently.
+app/lms/page.tsx:76:  const { data: certificates } = await supabase.from('certificates').select('*').eq('user_id', user.id).order('issued_at', { ascending: false }).limit(3);
+app/lms/page.tsx:77:  const typedCertificates = (certificates || []) as Certificate[];
+app/lms/page.tsx:303:                <Link href="/lms/certificates" className="text-blue-600 text-sm font-semibold hover:underline">View All</Link>
+app/lms/page.tsx:320:                  <p className="text-sm text-slate-500">Complete courses to earn certificates</p>
+app/legal/governance/security/page.tsx:94:              <p className="text-gray-700 text-sm">Account credentials, course progress, assessment results, certificates, attendance records</p>
+app/legal/governance/platform-overview/page.tsx:180:                  <td className="border p-3">Own courses, progress, certificates, profile</td>
+app/legal/governance/lms-standards/page.tsx:215:          <p className="text-gray-700">All certificates include a unique ID and QR code linking to verification page. Employers and institutions can verify certificate authenticity at elevateforhumanity.org/verify.</p>
+app/legal/governance/tax-operations/page.tsx:130:              <tr className="bg-gray-50"><td className="border p-3">Continuing Education</td><td className="border p-3">18 hours annually (AFSP)</td><td className="border p-3">Completion certificates</td></tr>
+app/legal/mou/page.tsx:98:              <li>Issue certificates upon program completion</li>
+app/student-portal/onboarding/documents/page.tsx:50:    description: 'Transcripts or certificates from previous training programs',
+app/student-portal/page.tsx:93:      description: 'Transcripts, certificates, and important forms',
+app/student-portal/page.tsx:122:      description: 'View earned credentials and download certificates',
+app/student-portal/page.tsx:123:      href: '/lms/certificates',
+app/student-portal/page.tsx:203:        'Yes! Visit "Documents" to request official transcripts, download unofficial transcripts, and access certificates.',
+app/demos/page.tsx:20:    description: 'See how students navigate courses, track progress, earn certificates, and interact with AI tutors.',
+app/demos/page.tsx:278:                See how students enroll, take courses, complete assessments, and earn certificates.
+app/program-holder/onboarding/setup/page.tsx:134:                  This name will appear on certificates: "[Program Name] -
+components/VoiceInput.tsx:109:      'show certificates': {
+components/VoiceInput.tsx:110:        route: '/lms/certificates',
+components/VoiceInput.tsx:111:        response: 'Showing your certificates',
+components/VoiceInput.tsx:113:      'my certificates': {
+components/VoiceInput.tsx:114:        route: '/lms/certificates',
+components/VoiceInput.tsx:115:        response: 'Opening certificates',
+components/VoiceInput.tsx:189:        'I can help you navigate the system. Try saying: go to dashboard, show my courses, show programs, my certificates, or my progress.'
+components/ProgressDashboard.tsx:18:  certificates_earned: number;
+components/ProgressDashboard.tsx:107:      value: data.certificates_earned,
+components/outcomes/LiveOutcomesDashboard.tsx:10:  certificatesIssued: number;
+components/outcomes/LiveOutcomesDashboard.tsx:53:    certificatesIssued: initialData?.certificatesIssued || 412,
+components/outcomes/LiveOutcomesDashboard.tsx:143:      value: data.certificatesIssued,
+components/dashboard/DashboardSidebar.tsx:76:            href="/lms/certificates"
+components/dashboard/RightSidebar.tsx:38:  certificatesEarned: number;
+components/dashboard/RightSidebar.tsx:48:    certificatesEarned: 0,
+components/dashboard/RightSidebar.tsx:151:    // Get certificates
+components/dashboard/RightSidebar.tsx:153:      .from('issued_certificates')
+components/dashboard/RightSidebar.tsx:159:      certificatesEarned: certCount || 0,
+components/dashboard/RightSidebar.tsx:226:            href="/lms/certificates"
+components/dashboard/RightSidebar.tsx:355:            <span className="font-bold">{stats.certificatesEarned}</span>
+components/admin/push-notification-sender.tsx:128:      url: '/student/certificates',
+components/admin/AdminHeader.tsx:48:      { name: 'Certificates', href: '/admin/certificates' },
+components/admin/AdminNav.tsx:93:        { href: '/admin/certificates', label: 'Certificates' },
+components/public/LiveMetrics.tsx:144:      description: 'Total certificates awarded',
+components/ui/Breadcrumbs.tsx:118:  'certificates': 'Certificates',
+components/store/SalesAvatar.tsx:409:    message: "Every course is vetted for quality. You'll see ratings, student counts, and duration so you know what you're getting. Most courses include certificates.",
+components/hub/CredentialsView.tsx:44:      // Fetch certificates/credentials
+components/hub/CredentialsView.tsx:46:        .from('certificates')
+components/hub/EnrollmentState.tsx:89:    return { action: 'View your certificate', url: '/certificates' };
+components/onboarding/OnboardingTour.tsx:301:    description: 'View your active courses, certificates earned, and average scores at a glance. Your learning journey is visualized here.',
+components/navigation/ProfileDropdown.tsx:264:            <Link href="/lms/certificates" className="text-center hover:text-blue-600" onClick={() => setIsOpen(false)}>
+components/navigation/ProfileDropdown.tsx:304:              href="/lms/certificates"
+components/navigation/HubNavigation.tsx:54:      { id: '11', name: 'Certificates', href: '/certificates', description: 'Earn credentials', order_index: 5 },
+components/AutomatedCertificateWorkflow.tsx:55:          <p className="text-red-100">Automated workflow for issuing certificates</p>
+components/AutomatedCertificateWorkflow.tsx:91:                  <p className="text-sm text-purple-700">All certificates recorded on blockchain</p>
+components/enrollment/PaymentDisclosure.tsx:152:              <strong>No certificates, transcripts, or credentials will be released until my balance is $0.</strong> 
+components/enrollment/PaymentDisclosure.tsx:153:              This includes completion certificates, state certification exam eligibility letters, 
+components/ChatAssistant.tsx:96:        'View my certificates',
+components/AdminReportingDashboard.tsx:90:          certificates(count)
+components/AnalyticsDashboard.tsx:14:  certificatesIssued: number;
+components/AnalyticsDashboard.tsx:74:      value: data.certificatesIssued.toLocaleString(),
+components/instructor/EngagementCharts.tsx:22:  certificates,
+components/instructor/EngagementCharts.tsx:26:  certificates: Certificate[];
+components/instructor/EngagementCharts.tsx:50:    certificates.forEach((c) => {
+components/instructor/EngagementCharts.tsx:58:  }, [enrollments, certificates]);
+components/instructor/EngagementCharts.tsx:106:                  value: certificates.length,
+components/VoiceAssistant.tsx:32:    { command: 'my certificates', description: 'View your certificates' },
+components/OnboardingFlow.tsx:154:              Access free career training, earn certificates, and connect with employers.
+components/OnboardingFlow.tsx:194:              <span>Track your achievements and certificates</span>
+components/AdminNav.tsx:66:      { name: 'Certificates', href: '/admin/certificates' },
+components/PageAvatarGuide.tsx:220:    welcomeMessage: "This is the student experience demo. See how learners access courses, track progress, and earn certificates. Want me to walk you through it?",
+components/CertificateDownload.tsx:70:          .from('certificates')
+components/CertificateDownload.tsx:80:            profiles!certificates_user_id_fkey(full_name),
+components/NotificationCenter.tsx:57:      actionUrl: '/lms/certificates',
+components/lms/GenerateCertificateButton.tsx:33:      const res = await fetch('/api/certificates/generate', {
+components/lms/LMSNav.tsx:44:    href: '/lms/certificates',
+components/lms/LMSNav.tsx:125:                  <Link href="/lms/certificates" aria-label="Link" className="cursor-pointer">
+components/lms/LMSNavigation.tsx:76:    { href: '/lms/certificates', label: 'Certificates', icon: Award },
+components/lms/LMSNavigation.tsx:204:                placeholder="Search courses, lessons, certificates..."
+components/lms/LmsSidebar.tsx:28:  { href: '/lms/certificates', label: 'Certificates', icon: Award },
+components/student/ExternalModuleLauncher.tsx:43:        .from('module-certificates')
+components/student/ExternalModuleLauncher.tsx:51:      } = supabase.storage.from('module-certificates').getPublicUrl(fileName);
+components/StudentPortalNav.tsx:45:  { name: 'Certificates', href: '/portal/student/certificates', icon: Award },
+components/SubscriptionManager.tsx:85:        'Course certificates',
+components/layouts/AutoPolishedPage.tsx:75:        shortTagline: "Career training that leads to real jobs, not just certificates.",
+components/layouts/AutoPolishedPage.tsx:213:          `The "${baseLabel}" page supports the admin and staff side of the Elevate For Humanity ecosystem—intake, enrollment, approvals, certificates, and more.`,
+components/StudentPortfolio.tsx:40:  const [activeTab, setActiveTab] = useState<'projects' | 'skills' | 'certificates' | 'about'>('projects');
+components/StudentPortfolio.tsx:56:  const [certificates, setCertificates] = useState<Certificate[]>([]);
+components/StudentPortfolio.tsx:128:        // Fetch certificates
+components/StudentPortfolio.tsx:130:          .from('certificates')
+components/StudentPortfolio.tsx:240:  const certificates: Certificate[] = [
+components/StudentPortfolio.tsx:332:            {(['projects', 'skills', 'certificates', 'about'] as const).map((tab) => (
+components/StudentPortfolio.tsx:490:        {activeTab === 'certificates' && (
+components/StudentPortfolio.tsx:498:              {certificates.map((cert) => (
+components/StudentPortfolio.tsx:588:                      <p className="text-3xl font-bold text-orange-500">{certificates.length}</p>
+components/TrustStrip.tsx:11:  certificatesIssued: number;
+components/TrustStrip.tsx:27:    certificatesIssued: 0,
+components/TrustStrip.tsx:36:    certificatesIssued: 0,
+components/TrustStrip.tsx:50:        certificatesIssued: 1800,
+components/TrustStrip.tsx:71:          { count: certificatesCount },
+components/TrustStrip.tsx:77:          supabase.from('certificates').select('*', { count: 'exact', head: true }),
+components/TrustStrip.tsx:89:          certificatesIssued: certificatesCount || customStats.certificatesIssued || 1800,
+components/TrustStrip.tsx:129:        certificatesIssued: Math.round(targetStats.certificatesIssued * easeOut),
+components/TrustStrip.tsx:218:              <div className="text-3xl font-bold text-gray-900">{formatNumber(animatedStats.certificatesIssued)}</div>
+lib/notifications/sms.ts:116:      message: `Your ${courseName} certificate is ready! Download at www.elevateforhumanity.org/certificates`,
+lib/notifications/push-service.ts:197:      url: '/student/certificates',
+lib/notifications/push-service.ts:260:      url: '/student/certificates',
+lib/partner-workflows/certificates.ts:3: * Generates completion certificates for partner certifications
+lib/partner-workflows/certificates.ts:63:      .from('partner_certificates')
+lib/partner-workflows/certificates.ts:83:      .from('partner_certificates')
+lib/partner-workflows/certificates.ts:176:      .from('partner_certificates')
+lib/partner-workflows/certificates.ts:230:      .from('partner_certificates')
+lib/partner-workflows/certificates.ts:274: * Get all certificates for a student
+lib/partner-workflows/certificates.ts:281:  const { data: certificates } = await supabase
+lib/partner-workflows/certificates.ts:282:    .from('partner_certificates')
+lib/partner-workflows/certificates.ts:287:  if (!certificates) {
+lib/partner-workflows/certificates.ts:291:  return certificates.map((cert) => ({
+lib/partner-workflows/certificates.ts:312:      .from('partner_certificates')
+lib/gdpr.ts:10:    const [profile, enrollments, certificates, assignments, grades, notes, messages] = await Promise.all([
+lib/gdpr.ts:13:      supabase.from('certificates').select('*').eq('student_id', userId),
+lib/gdpr.ts:23:      certificates: certificates.data || [],
+lib/gdpr.ts:60:      supabase.from('certificates').delete().eq('student_id', userId),
+lib/orchestration/state-machine.ts:83:          id: 'certificates',
+lib/orchestration/state-machine.ts:130:          id: 'certificates',
+lib/orchestration/state-machine.ts:167:          id: 'certificates',
+lib/orchestration/state-machine.ts:210:          id: 'certificates',
+lib/orchestration/state-machine.ts:323:        'certificates',
+lib/orchestration/state-machine.ts:351:      'certificates',
+lib/tax-software/mef/soap-client.ts:5: * IMPORTANT: Requires IRS-issued certificates for production use.
+lib/tax-software/mef/soap-client.ts:95:   * Initialize HTTPS agent with mutual TLS if certificates provided
+lib/tax-software/mef/soap-client.ts:99:      rejectUnauthorized: true, // Always verify IRS certificates
+lib/tax-software/mef/soap-client.ts:103:    // Load certificates if provided
+lib/tax-software/mef/soap-client.ts:114:        console.log('[MeF SOAP] Loaded certificates from files');
+lib/tax-software/mef/soap-client.ts:116:        console.error('[MeF SOAP] Failed to load certificates:', err);
+lib/tax-software/mef/certificate-handler.ts:3: * Manages TLS certificates for IRS mutual authentication
+lib/tax-software/mef/certificate-handler.ts:8: * - Separate certificates for TEST and PRODUCTION environments
+lib/tax-software/mef/certificate-handler.ts:41:// Environment variable names for certificates
+lib/tax-software/mef/certificate-handler.ts:103:   * Check if certificates are available
+lib/tax-software/mef/certificate-handler.ts:128:   * Load certificates into memory
+lib/tax-software/mef/certificate-handler.ts:138:          error: `Missing certificates: ${missing.join(', ')}`
+lib/tax-software/mef/certificate-handler.ts:165:        error: err instanceof Error ? err.message : 'Failed to load certificates'
+lib/tax-software/mef/certificate-handler.ts:238:   * Get setup instructions for certificates
+lib/tax-software/mef/certificate-handler.ts:249:   - For TEST: Use IRS-provided test certificates or self-signed for initial testing
+lib/tax-software/mef/certificate-handler.ts:284:   - NEVER commit certificates to version control
+lib/tax-software/mef/certificate-handler.ts:287:   - Rotate certificates before expiry
+lib/tax-software/mef/certificate-handler.ts:290:   Run: npx tsx lib/tax-software/testing/verify-certificates.ts
+lib/tax-software/testing/verify-certificates.ts:5: * Usage: npx tsx lib/tax-software/testing/verify-certificates.ts
+lib/tax-software/testing/verify-certificates.ts:62:  // Print setup instructions if certificates are missing
+lib/tax-software/testing/verify-certificates.ts:68:  // Exit with error if no certificates are loaded
+lib/auth/lms-routes.ts:35:  { path: '/lms/certificates', allowedRoles: ['student', 'instructor', 'staff', 'admin', 'super_admin'] },
+lib/policies/tuition-financing-policy.ts:99:        credentialHold: true, // No certificates until balance = $0
+lib/policies/tuition-financing-policy.ts:175:    'Release certificates or credentials before balance is paid in full',
+lib/new-ecosystem-services/certificates.ts:44:    .from('certificates')
+lib/new-ecosystem-services/certificates.ts:63:    .from('certificates')
+lib/new-ecosystem-services/certificates.ts:83:    .from('certificates')
+lib/new-ecosystem-services/certificates.ts:94:    .from('certificates')
+lib/new-ecosystem-services/certificates.ts:107:    .from('certificates')
+lib/chatbot/config.ts:36:    'certificates',
+lib/backup.ts:3:export async function createBackup(tables: string[] = ['profiles', 'courses', 'enrollments', 'certificates']) {
+lib/backup.ts:62:    tables: ['profiles', 'courses', 'enrollments', 'certificates', 'assignments', 'grades'],
+lib/demo/context.ts:83:    description: 'Student LMS access for courses, progress tracking, and certificates',
+lib/demoData.ts:156:    exports: ['Enrollment reports', 'Completion certificates', 'Attendance records', 'Outcome tracking'],
+lib/certificates/issue-certificate.ts:4: * This is the single source of truth for issuing certificates.
+lib/certificates/issue-certificate.ts:8: * - Idempotent: will not create duplicate certificates
+lib/certificates/issue-certificate.ts:62:      .from('certificates')
+lib/certificates/issue-certificate.ts:74:      const certificateUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/certificates/${existingCert.id}`;
+lib/certificates/issue-certificate.ts:96:      .from('certificates')
+lib/certificates/issue-certificate.ts:144:    const certificateUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/certificates/${certificate.id}`;
+lib/certificates/verification.ts:46:    .from('certificates')
+lib/certificates/verification.ts:92:    .from('certificates')
+lib/pricing.ts:43:      'Progress tracking and certificates',
+lib/workforce-terminology.ts:152:${stats.completions} participants successfully completed at least one training track and were issued verifiable digital certificates (with QR-coded verification and documented case notes).
+lib/guide/flows.ts:215:        content: 'Complete LMS with courses and certificates, multi-stakeholder portals, WIOA-compliant reporting, automated workflows, enterprise security, and dedicated support.',
+lib/guide/page-guides.ts:85:        message: "Every license includes: Complete LMS with courses and certificates, student/instructor/employer portals, WIOA-compliant reporting, automated enrollment workflows, and dedicated support.",
+lib/stripe/licensing-products.ts:38:      'Enterprise LMS (courses, assessments, certificates)',
+lib/case-file/loader.ts:48:  // Load certificates
+lib/case-file/loader.ts:49:  const { data: certificates } = await supabase
+lib/case-file/loader.ts:50:    .from('certificates')
+lib/case-file/loader.ts:164:    credentials: (certificates || []).map(cert => ({
+lib/video/registry.ts:184:    description: 'See how students navigate courses, track progress, and earn certificates.',
+lib/email-alerts.ts:99:      <p><a href="https://www.elevateforhumanity.org/admin/certificates/${data.id}">View Certificate</a></p>
+lib/avatar-scripts.ts:171:  '/certificates': {
+lib/avatar-scripts.ts:176:  '/certificates/[id]': {
+lib/bulkOperations.ts:120:    const certificates = students.map((student) => ({
+lib/bulkOperations.ts:135:      .from('certificates')
+lib/bulkOperations.ts:136:      .insert(certificates)
+lib/bulkOperations.ts:219:      supabase.from('certificates').delete().in('student_id', userIds),
+lib/mou-template.ts:54:b. Provide and maintain the Elevate Learning Management System (LMS), participant portal, case notes, certificates, and reporting tools.
+lib/mou-template.ts:173:c. Elevate will maintain training records, certificates, and participation reports and may share aggregated or participant-level reports with agencies, funders, and employers as required by program rules and privacy laws.
+lib/course-completion.ts:226:  await supabase.from('certificates').insert({

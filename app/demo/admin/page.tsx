@@ -24,7 +24,7 @@ export default function DemoAdminPage() {
           ? Math.round((s.hours_completed / s.hours_required) * 100)
           : 100,
         status: s.status,
-        avatar: '/images/team/founder/elizabeth-greene-founder-hero-01.jpg',
+        avatar: '/images/avatar-default.svg',
       }))}
       programs={DEMO_PROGRAMS.map((p) => ({
         id: p.id,

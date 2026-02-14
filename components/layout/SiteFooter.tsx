@@ -12,8 +12,9 @@ const footerSections = [
     title: 'About',
     links: [
       { name: 'About Elevate', href: '/about' },
-      { name: 'Workforce Operating System', href: '/store/licenses' },
-      { name: 'Our Mission', href: '/about#mission' },
+      { name: 'Our Mission', href: '/about/mission' },
+      { name: 'Features', href: '/features' },
+      { name: 'Credentials', href: '/credentials' },
       { name: 'Indiana Outcomes', href: '/outcomes/indiana' },
       { name: 'Contact', href: '/contact' },
     ],
@@ -22,26 +23,51 @@ const footerSections = [
     title: 'Programs',
     links: [
       { name: 'Training Programs', href: '/programs' },
-      { name: 'Career Pathways', href: '/how-it-works' },
+      { name: 'How It Works', href: '/how-it-works' },
+      { name: 'Certifications', href: '/certifications' },
       { name: 'Apprenticeships', href: '/programs/barber-apprenticeship' },
       { name: 'Employer Partnerships', href: '/employer' },
+      { name: 'Search Programs', href: '/search' },
+    ],
+  },
+  {
+    title: 'Funding',
+    links: [
+      { name: 'Funding Overview', href: '/funding' },
+      { name: 'WIOA Eligibility', href: '/wioa-eligibility' },
+      { name: 'Financial Aid', href: '/financial-aid' },
+      { name: 'Scholarships', href: '/scholarships' },
+      { name: 'Tuition & Fees', href: '/tuition-fees' },
     ],
   },
   {
     title: 'Compliance & Trust',
     links: [
       { name: 'Governance', href: '/governance' },
-      { name: 'Data Privacy', href: '/governance/data' },
+      { name: 'Accreditation', href: '/accreditation' },
       { name: 'Accessibility', href: '/accessibility' },
-      { name: 'AI Governance', href: '/governance/ai' },
+      { name: 'FERPA', href: '/ferpa' },
+      { name: 'Refund Policy', href: '/refund-policy' },
+      { name: 'Equal Opportunity', href: '/equal-opportunity' },
+    ],
+  },
+  {
+    title: 'Support',
+    links: [
+      { name: 'Help Center', href: '/help' },
+      { name: 'FAQ', href: '/faq' },
+      { name: 'Student Handbook', href: '/student-handbook' },
+      { name: 'Grievance', href: '/grievance' },
+      { name: 'Verify Credentials', href: '/verify' },
     ],
   },
   {
     title: 'Access',
     links: [
       { name: 'Student Portal', href: '/login' },
+      { name: 'Employer Portal', href: '/employer' },
       { name: 'Partner Portal', href: '/partner/login' },
-      { name: 'Support', href: '/support' },
+      { name: 'Apply Now', href: '/apply/student' },
     ],
   },
 ];
@@ -130,7 +156,7 @@ export default function SiteFooter() {
                 className="w-5 h-5"
               />
               <span className="text-xs text-gray-500">
-                © {new Date().getFullYear()} Elevate for Humanity
+                © {new Date().getFullYear()} Elevate for Humanity. Operated by 2Exclusive LLC.
               </span>
             </div>
             <div className="flex justify-center gap-4 text-xs text-gray-500">

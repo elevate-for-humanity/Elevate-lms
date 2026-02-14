@@ -74,8 +74,10 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
       submenu: [
         { href: '/admin/courses', label: 'All Courses' },
         { href: '/admin/course-builder', label: 'Course Builder' },
-        { href: '/admin/course-studio', label: 'Course Studio' },
         { href: '/admin/modules', label: 'Modules' },
+        { href: '/admin/lessons', label: 'Lessons' },
+        { href: '/admin/quizzes', label: 'Quizzes' },
+        { href: '/admin/gradebook', label: 'Gradebook' },
         { href: '/admin/quiz-builder', label: 'Quiz Builder' },
         { href: '/admin/curriculum', label: 'Curriculum' },
       ],
@@ -151,7 +153,6 @@ export default function AdminNav({ userRole, showDevTools = false }: AdminNavPro
         { href: '/admin/ai-console', label: 'AI Console' },
         { href: '/admin/course-generator', label: 'Course Generator' },
         { href: '/admin/video-generator', label: 'Video Generator' },
-        { href: '/admin/course-studio-ai', label: 'AI Course Studio' },
       ],
     },
     {

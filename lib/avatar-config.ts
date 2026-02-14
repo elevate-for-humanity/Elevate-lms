@@ -297,7 +297,7 @@ export const PAGE_AVATAR_CONFIGS: Record<string, AvatarContext> = {
     maxMessages: 1,
   },
   
-  '/student-portal/courses': {
+  '/lms/courses': {
     enabled: false, // Silent - UI is self-explanatory
     speakOnLoad: false,
     role: 'assistant',

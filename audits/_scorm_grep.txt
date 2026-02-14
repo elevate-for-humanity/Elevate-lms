@@ -1,0 +1,44 @@
+app/api/scorm/attempts/[attemptId]/data/route.ts:80:    data['cmi.core.lesson_status'] || data['cmi.completion_status'];
+app/api/scorm/attempts/[attemptId]/data/route.ts:81:  const score = data['cmi.core.score.raw'] || data['cmi.score.raw'];
+app/api/scorm/upload/route.ts:8:import JSZip from 'jszip';
+app/api/scorm/upload/route.ts:12: * Find the launch href from a parsed imsmanifest.xml.
+app/api/scorm/upload/route.ts:79:    const zip = await JSZip.loadAsync(zipBuffer);
+app/api/scorm/upload/route.ts:81:    // Parse imsmanifest.xml
+app/api/scorm/upload/route.ts:82:    const manifestFile = zip.file('imsmanifest.xml') || zip.file(/imsmanifest\.xml$/i)[0];
+app/api/scorm/upload/route.ts:85:        { error: 'Invalid SCORM package: missing imsmanifest.xml' },
+app/api/scorm/upload/route.ts:100:        { error: 'Could not determine launch href from imsmanifest.xml' },
+app/lms/(app)/scorm/[scormId]/ScormPlayerWrapper.tsx:4:import { initializeScormAPI } from '@/lib/scorm/api';
+app/lms/(app)/scorm/[scormId]/ScormPlayerWrapper.tsx:7:interface ScormPlayerWrapperProps {
+app/lms/(app)/scorm/[scormId]/ScormPlayerWrapper.tsx:17:export function ScormPlayerWrapper({
+app/lms/(app)/scorm/[scormId]/ScormPlayerWrapper.tsx:25:}: ScormPlayerWrapperProps) {
+app/lms/(app)/scorm/[scormId]/ScormPlayerWrapper.tsx:61:    const api = initializeScormAPI(attemptId.current, version);
+app/lms/(app)/scorm/[scormId]/ScormPlayerWrapper.tsx:68:      if (key === 'cmi.core.lesson_status' || key === 'cmi.completion_status') {
+app/lms/(app)/scorm/[scormId]/ScormPlayerWrapper.tsx:75:      if (key === 'cmi.core.score.raw' || key === 'cmi.score.raw') {
+app/lms/(app)/scorm/[scormId]/ScormPlayerWrapper.tsx:99:      delete (window as any).API_1484_11;
+app/lms/(app)/scorm/[scormId]/page.tsx:6:import { ScormPlayerWrapper } from './ScormPlayerWrapper';
+app/lms/(app)/scorm/[scormId]/page.tsx:110:        <ScormPlayerWrapper
+lib/scorm/scorm-player.ts:166:        LMSInitialize: function(param) {
+lib/scorm/scorm-player.ts:218:      var API_1484_11 = {
+lib/scorm/scorm-player.ts:262:      window.API_1484_11 = API_1484_11;
+lib/scorm/api.ts:17:  LMSInitialize(param: string): string {
+lib/scorm/api.ts:62:    return this.LMSInitialize(param);
+lib/scorm/api.ts:122:export function initializeScormAPI(attemptId: string, version: '1.2' | '2004') {
+lib/scorm/api.ts:128:    (window as any).API_1484_11 = api;
+lib/scorm/scorm-api.ts:24:      if ((currentWindow as any).API_1484_11) {
+lib/scorm/scorm-api.ts:25:        return (currentWindow as any).API_1484_11;
+lib/scorm/scorm-api.ts:42:    if (this.lmsAPI.LMSInitialize) {
+lib/scorm/scorm-api.ts:60:          ? this.lmsAPI.LMSInitialize('')
+lib/scorm/scorm-api.ts:176:        ? 'cmi.core.lesson_status'
+lib/scorm/scorm-api.ts:195:    const prefix = this.version === '1.2' ? 'cmi.core.score' : 'cmi.score';
+lib/scorm/scorm-api.ts:208:      this.version === '1.2' ? 'cmi.core.lesson_location' : 'cmi.location';
+lib/scorm/scorm-api.ts:214:      this.version === '1.2' ? 'cmi.core.lesson_location' : 'cmi.location';
+lib/scorm/scorm-api.ts:220:      this.version === '1.2' ? 'cmi.core.session_time' : 'cmi.session_time';
+lib/grants/package-builder.ts:8:import JSZip from 'jszip';
+lib/grants/package-builder.ts:458:  const zip = new JSZip();
+lib/grants/package-builder.ts:514:  const zip = new JSZip();
+components/scorm/ScormPlayer.tsx:6:// components/scorm/ScormPlayer.tsx
+components/scorm/ScormPlayer.tsx:9:import { initializeScormAPI } from '@/lib/scorm/api';
+components/scorm/ScormPlayer.tsx:11:interface ScormPlayerProps {
+components/scorm/ScormPlayer.tsx:19:export function ScormPlayer({
+components/scorm/ScormPlayer.tsx:25:}: ScormPlayerProps) {
+components/scorm/ScormPlayer.tsx:32:    const api = initializeScormAPI(attemptId, version);

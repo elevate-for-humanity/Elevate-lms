@@ -29,8 +29,7 @@ export default function PartnerDocumentsPage() {
     (async () => {
       const { data: staff } = await supabase
         .from('shop_staff')
-        .select('shop_id')
-        .eq('is_active', true);
+        .select('shop_id');
       setShopId(staff?.[0]?.shop_id ?? '');
     })();
   }, []);

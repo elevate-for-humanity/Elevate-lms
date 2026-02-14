@@ -4,7 +4,9 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 const EFFECTIVE_DATE = 'February 1, 2025';
-const ORG_NAME = 'Elevate for Humanity / Technical Career Institute';
+const LEGAL_ENTITY = '2Exclusive LLC';
+const ORG_NAME = 'Elevate for Humanity';
+const ORG_FULL = `${ORG_NAME}, operated by ${LEGAL_ENTITY}`;
 const ORG_EMAIL = 'privacy@elevateforhumanity.org';
 const ORG_PHONE = '(317) 314-3757';
 const ORG_ADDRESS = 'Indianapolis, IN 46201';
@@ -103,12 +105,13 @@ export default function PrivacyPolicyPage() {
             {/* Intro */}
             <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-xl p-6">
               <p className="text-slate-800 leading-relaxed">
-                {ORG_NAME} (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting the privacy of students,
+                {ORG_FULL} (&quot;Company,&quot; &quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) is committed to protecting the privacy of students,
                 applicants, employers, and visitors who use our website, learning management system, and
-                workforce training services. This policy describes how we collect, use, share, and safeguard
-                personal information in compliance with the Family Educational Rights and Privacy Act (FERPA),
-                the Workforce Innovation and Opportunity Act (WIOA), Indiana state privacy law, and other
-                applicable regulations.
+                workforce training services. {LEGAL_ENTITY} is the data controller and legal operator
+                of all services provided under the {ORG_NAME} brand. This policy describes how we collect,
+                use, share, and safeguard personal information in compliance with the Family Educational
+                Rights and Privacy Act (FERPA), the Workforce Innovation and Opportunity Act (WIOA),
+                Indiana state privacy law, and other applicable regulations.
               </p>
             </div>
 
@@ -440,7 +443,8 @@ export default function PrivacyPolicyPage() {
             {/* 14 Contact */}
             <Section id="contact" number="14" title="Contact Information">
               <div className="bg-slate-50 rounded-xl p-6 not-prose">
-                <p className="font-bold text-slate-900 text-lg mb-3">{ORG_NAME}</p>
+                <p className="font-bold text-slate-900 text-lg mb-1">{LEGAL_ENTITY}</p>
+                <p className="text-slate-500 text-sm mb-3">d/b/a {ORG_NAME}</p>
                 <div className="grid sm:grid-cols-2 gap-4 text-sm text-slate-700">
                   <div>
                     <p className="font-semibold text-slate-900 mb-1">Privacy Inquiries</p>

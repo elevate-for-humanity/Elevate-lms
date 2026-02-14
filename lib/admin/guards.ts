@@ -132,7 +132,7 @@ export const DEV_TOOL_ROUTES = [
  * List of sensitive feature routes (require elevated access in prod)
  */
 export const SENSITIVE_ROUTES = [
-  '/admin/course-studio-ai',
+  '/admin/course-generator',
   '/admin/program-generator',
   '/admin/syllabus-generator',
 ] as const;

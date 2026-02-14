@@ -63,7 +63,7 @@ export default async function AssignmentsPage() {
     
     switch (status) {
       case 'submitted':
-        return { label: 'Submitted', color: 'bg-brand-blue-100 text-brand-blue-700', icon: Clock };
+        return { label: 'Submitted', color: 'bg-blue-100 text-blue-700', icon: Clock };
       case 'graded':
         return { label: 'Graded', color: 'bg-green-100 text-green-700', icon: CheckCircle };
       default:
@@ -94,7 +94,7 @@ export default async function AssignmentsPage() {
             <p className="text-sm text-gray-500">Pending</p>
           </div>
           <div className="bg-white rounded-xl p-4 border">
-            <p className="text-2xl font-bold text-brand-blue-600">{submittedCount}</p>
+            <p className="text-2xl font-bold text-blue-600">{submittedCount}</p>
             <p className="text-sm text-gray-500">Submitted</p>
           </div>
           <div className="bg-white rounded-xl p-4 border">
@@ -141,7 +141,7 @@ export default async function AssignmentsPage() {
                       {assignment.status === 'pending' && (
                         <Link
                           href={`/student-portal/assignments/${assignment.id}`}
-                          className="px-3 py-1 bg-brand-blue-600 text-white text-sm rounded-lg hover:bg-brand-blue-700"
+                          className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700"
                         >
                           Submit
                         </Link>
@@ -157,7 +157,7 @@ export default async function AssignmentsPage() {
             <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 mb-2">No assignments</h2>
             <p className="text-gray-600 mb-6">You don't have any assignments yet.</p>
-            <Link href="/student-portal/courses" className="text-brand-blue-600 hover:underline">
+            <Link href="/lms/courses" className="text-blue-600 hover:underline">
               View your courses
             </Link>
           </div>

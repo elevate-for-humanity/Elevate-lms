@@ -1,15 +1,14 @@
 import { Metadata } from 'next';
-export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import { CreateCourseForm } from './CreateCourseForm';
+
+export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  alternates: {
-    canonical: 'https://www.elevateforhumanity.org/admin/courses/create',
-  },
-  title: 'Create Course | Elevate For Humanity',
-  description: 'Create a new course in the learning management system.',
+  title: 'Create Course | Admin | Elevate LMS',
+  description: 'Create a new course.',
 };
 
 export default async function CreateCoursePage() {
@@ -18,75 +17,63 @@ export default async function CreateCoursePage() {
   if (!supabase) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Service Unavailable</h1>
-          <p className="text-gray-600">Please try again later.</p>
-        </div>
+        <h1 className="text-2xl font-bold text-gray-900">Service Unavailable</h1>
       </div>
     );
   }
-  const { data: { user } } = await supabase.auth.getUser();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
-  if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
 
-  const { data: categories } = await supabase.from('course_categories').select('id, name').order('name');
+  if (!['admin', 'super_admin', 'instructor'].includes(profile?.role || '')) {
+    redirect('/unauthorized');
+  }
+
+  const { data: categories } = await supabase
+    .from('course_categories')
+    .select('id, name')
+    .order('name');
+
+  const { data: programs } = await supabase
+    .from('programs')
+    .select('id, title')
+    .order('title');
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-3xl mx-auto px-4 py-8">
-        <div className="mb-8">
-          <nav className="text-sm mb-4">
-            <ol className="flex items-center space-x-2 text-gray-500">
-              <li><Link href="/admin" className="hover:text-primary">Admin</Link></li>
-              <li>/</li>
-              <li><Link href="/admin/courses" className="hover:text-primary">Courses</Link></li>
-              <li>/</li>
-              <li className="text-gray-900 font-medium">Create</li>
-            </ol>
-          </nav>
-          <h1 className="text-3xl font-bold text-gray-900">Create New Course</h1>
-          <p className="text-gray-600 mt-2">Set up a new course for your learners</p>
-        </div>
+        <nav className="text-sm mb-6">
+          <ol className="flex items-center space-x-2 text-gray-500">
+            <li>
+              <Link href="/admin" className="hover:text-blue-600">
+                Admin
+              </Link>
+            </li>
+            <li>/</li>
+            <li>
+              <Link href="/admin/courses" className="hover:text-blue-600">
+                Courses
+              </Link>
+            </li>
+            <li>/</li>
+            <li className="text-gray-900 font-medium">Create</li>
+          </ol>
+        </nav>
 
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <form className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Course Title *</label>
-              <input type="text" className="w-full border rounded-lg px-3 py-2" placeholder="Enter course title" required />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-              <textarea className="w-full border rounded-lg px-3 py-2" rows={4} placeholder="Course description" />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-                <select className="w-full border rounded-lg px-3 py-2">
-                  <option value="">Select category</option>
-                  {categories?.map((cat: any) => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Duration</label>
-                <input type="text" className="w-full border rounded-lg px-3 py-2" placeholder="e.g., 4 hours" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Thumbnail Image</label>
-              <div className="border-2 border-dashed rounded-lg p-6 text-center">
-                <p className="text-gray-500">Drag and drop or click to upload</p>
-              </div>
-            </div>
-            <div className="flex gap-4 pt-4 border-t">
-              <button type="submit" className="flex-1 bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">Create Course</button>
-              <Link href="/admin/courses" className="px-4 py-2 border rounded-lg hover:bg-gray-50">Cancel</Link>
-            </div>
-          </form>
-        </div>
+        <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Course</h1>
+
+        <CreateCourseForm
+          categories={categories || []}
+          programs={programs || []}
+        />
       </div>
     </div>
   );

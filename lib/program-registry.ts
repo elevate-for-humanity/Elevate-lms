@@ -59,7 +59,7 @@ export const PROGRAMS: ProgramEntry[] = [
   { slug: 'diesel-mechanic', name: 'Diesel Mechanic', category: 'Skilled Trades', formType: 'apply', active: true },
 
   // Additional Barber & Beauty
-  { slug: 'cosmetology-apprenticeship', name: 'Cosmetology Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true },
+  { slug: 'cosmetology-apprenticeship', name: 'Cosmetology Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true, dedicatedApplyPage: '/programs/cosmetology-apprenticeship/apply' },
   { slug: 'nail-technician-apprenticeship', name: 'Nail Technician Apprenticeship', category: 'Barber & Beauty', formType: 'apply', active: true },
 
   // Additional Programs

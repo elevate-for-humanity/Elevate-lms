@@ -70,7 +70,7 @@ export default function HomePage() {
               WIOA &amp; JRI funded programs available. Earn while you learn. Get certified and hired in weeks.
             </p>
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link href="/apply/student" className="bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg sm:text-xl font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center">
+              <Link href="/apply" className="bg-brand-red-600 hover:bg-brand-red-700 text-white text-lg sm:text-xl font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center">
                 Apply Now
               </Link>
               <Link href="/programs" className="bg-white/95 hover:bg-white text-black text-lg sm:text-xl font-bold px-8 py-4 rounded-full transition-all hover:scale-105 shadow-lg text-center backdrop-blur-sm">
@@ -406,7 +406,7 @@ export default function HomePage() {
             Apply in minutes. Most students begin training within 2-4 weeks.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <Link href="/apply/student" className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition-all hover:scale-105 shadow-lg">
+            <Link href="/apply" className="bg-white text-brand-red-600 px-10 py-5 rounded-full font-bold text-xl hover:bg-slate-50 transition-all hover:scale-105 shadow-lg">
               Apply Now
             </Link>
             <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="border-2 border-white text-white px-10 py-5 rounded-full font-bold text-xl hover:bg-white/10 transition-all backdrop-blur-sm">

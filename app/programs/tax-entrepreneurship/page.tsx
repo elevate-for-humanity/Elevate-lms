@@ -71,7 +71,7 @@ export default async function TaxEntrepreneurshipPage() {
 
           <div className="flex flex-col sm:flex-row gap-4">
             <Link
-              href="/apply"
+              href="/apply?program=tax-prep-financial-services"
               className="px-8 py-4 bg-brand-orange-600 hover:bg-brand-orange-600 text-white font-bold rounded-lg transition-all text-center"
             >
               Apply Now
@@ -314,7 +314,7 @@ export default async function TaxEntrepreneurshipPage() {
             </div>
           </div>
           <Link
-            href="/apply"
+            href="/apply?program=tax-prep-financial-services"
             className="inline-block px-10 py-5 bg-brand-orange-600 hover:bg-brand-orange-600 text-white font-bold text-xl rounded-lg transition-all shadow-lg hover:shadow-xl"
           >
             Apply Now

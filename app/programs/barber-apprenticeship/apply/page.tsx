@@ -210,7 +210,7 @@ export default function BarberApprenticeshipApplyPage() {
         });
         
         const sezzleData = await checkoutResponse.json();
-        console.log('Sezzle response:', sezzleData);
+        // Sezzle response received
         
         if (checkoutResponse.ok && sezzleData.checkoutUrl) {
           window.location.href = sezzleData.checkoutUrl;

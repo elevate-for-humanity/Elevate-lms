@@ -69,7 +69,7 @@ export default async function Page() {
         }}
         headline="Direct Support Professional: Make a difference in people's lives"
         description="Funded DSP training. Help individuals with disabilities live independently and participate fully in their communities. 4-6 weeks, job placement included."
-        primaryCTA={{ text: 'Start Eligibility & Choose This Program', href: '/apply' }}
+        primaryCTA={{ text: 'Start Eligibility & Choose This Program', href: '/apply?program=direct-support-professional' }}
         secondaryCTA={{ text: 'Questions? Contact Us', href: 'tel:support center' }}
       />
 

@@ -18,6 +18,7 @@ const NAV_ITEMS = [
     subItems: [
       { name: 'Healthcare', href: '/programs/healthcare' },
       { name: 'Skilled Trades', href: '/programs/skilled-trades' },
+      { name: 'Beauty & Barbering', href: '/programs/beauty' },
       { name: 'Technology', href: '/programs/technology' },
       { name: 'Business', href: '/programs/business' },
       { name: 'All Programs', href: '/programs' },
@@ -27,7 +28,7 @@ const NAV_ITEMS = [
     name: 'How It Works', 
     href: '/how-it-works',
     subItems: [
-      { name: 'Check Eligibility', href: '/enroll' },
+      { name: 'Check Eligibility', href: '/check-eligibility' },
       { name: 'Funding Options', href: '/funding' },
       { name: 'FAQ', href: '/faq' },
     ]
@@ -52,6 +53,7 @@ const DESKTOP_NAV_LINKS = [
       { name: 'All Programs', href: '/programs' },
       { name: 'Healthcare', href: '/programs/healthcare' },
       { name: 'Skilled Trades', href: '/programs/skilled-trades' },
+      { name: 'Beauty & Barbering', href: '/programs/beauty' },
       { name: 'Technology', href: '/programs/technology' },
       { name: 'Business', href: '/programs/business' },
     ]
@@ -61,7 +63,7 @@ const DESKTOP_NAV_LINKS = [
     href: '/how-it-works',
     subItems: [
       { name: 'Overview', href: '/how-it-works' },
-      { name: 'Check Eligibility', href: '/enroll' },
+      { name: 'Check Eligibility', href: '/check-eligibility' },
       { name: 'Funding Options', href: '/funding' },
       { name: 'FAQ', href: '/faq' },
     ]

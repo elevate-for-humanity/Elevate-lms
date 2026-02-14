@@ -56,7 +56,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
             </p>
             <div className="flex flex-wrap gap-3">
               <Link
-                href="/apply"
+                href={`/apply?program=${slug}`}
                 className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg"
               >
                 Check Eligibility
@@ -134,7 +134,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
             Final eligibility is confirmed after review with WorkOne.
           </p>
           <Link
-            href="/apply"
+            href={`/apply?program=${slug}`}
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
           >
             Check Eligibility
@@ -226,7 +226,7 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
               Your first step is confirming eligibility.
             </h2>
             <Link
-              href="/apply"
+              href={`/apply?program=${slug}`}
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-10 py-4 rounded-lg font-bold text-lg transition shadow-lg"
             >
               Start Eligibility Review

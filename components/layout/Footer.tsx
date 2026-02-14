@@ -23,7 +23,10 @@ export function Footer() {
             <h4 className="font-semibold mb-4">Programs</h4>
             <ul className="space-y-2 text-sm text-gray-400">
               <li><Link href="/programs" className="hover:text-white">All Programs</Link></li>
-              <li><Link href="/apprenticeships" className="hover:text-white">Apprenticeships</Link></li>
+              <li><Link href="/programs/healthcare" className="hover:text-white">Healthcare</Link></li>
+              <li><Link href="/programs/skilled-trades" className="hover:text-white">Skilled Trades</Link></li>
+              <li><Link href="/programs/beauty" className="hover:text-white">Beauty & Barbering</Link></li>
+              <li><Link href="/programs/technology" className="hover:text-white">Technology</Link></li>
               <li><Link href="/check-eligibility" className="hover:text-white">Check Eligibility</Link></li>
               <li><Link href="/how-it-works" className="hover:text-white">How It Works</Link></li>
             </ul>
@@ -33,10 +36,11 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Resources</h4>
             <ul className="space-y-2 text-sm text-gray-400">
-              <li><Link href="/resources" className="hover:text-white">Resource Library</Link></li>
-              <li><Link href="/employers" className="hover:text-white">For Employers</Link></li>
+              <li><Link href="/funding" className="hover:text-white">Funding & Financial Aid</Link></li>
               <li><Link href="/faq" className="hover:text-white">FAQ</Link></li>
-              <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
+              <li><Link href="/employers" className="hover:text-white">For Employers</Link></li>
+              <li><Link href="/career-services" className="hover:text-white">Career Services</Link></li>
+              <li><Link href="/support" className="hover:text-white">Support</Link></li>
             </ul>
           </div>
 

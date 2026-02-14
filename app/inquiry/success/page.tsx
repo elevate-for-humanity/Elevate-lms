@@ -36,18 +36,32 @@ export default function InquirySuccessPage() {
 
         <div className="space-y-3">
           <p className="text-gray-600">While you wait, explore more:</p>
-          <div className="flex justify-center gap-4">
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
+            <Link
+              href="/apply"
+              className="flex items-center justify-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+            >
+              Ready to Apply? Start Now
+            </Link>
+            <Link
+              href="/programs"
+              className="flex items-center justify-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+            >
+              Browse Programs
+            </Link>
+          </div>
+          <div className="flex justify-center gap-4 mt-2">
             <a
               href="/faq"
-              className="flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+              className="text-emerald-600 hover:underline text-sm"
             >
               Browse FAQ
             </a>
             <a
               href="mailto:elevate4humanityedu@gmail.com"
-              className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+              className="flex items-center gap-1 text-blue-600 hover:underline text-sm"
             >
-              <Mail className="w-4 h-4" />
+              <Mail className="w-3 h-3" />
               Email Us
             </a>
           </div>

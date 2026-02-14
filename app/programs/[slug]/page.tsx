@@ -328,7 +328,7 @@ export default async function ProgramDetailPage({
 
           <div className="mt-10 flex gap-4">
             <Link
-              href={program.ctaPrimary?.href || '/apply'}
+              href={program.ctaPrimary?.href || `/apply?program=${slug}`}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl transition font-semibold"
             >
               {program.ctaPrimary?.label || 'Apply Now'}

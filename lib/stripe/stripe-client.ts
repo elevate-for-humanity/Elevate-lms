@@ -208,47 +208,13 @@ export function verifyWebhookSignature(
   }
   return stripe.webhooks.constructEvent(payload, signature, secret);
 }
-// Handle webhook events
+/**
+ * @deprecated Use /api/webhooks/stripe/route.ts instead.
+ * This stub is unused — the canonical webhook handler is in the API route.
+ */
 export async function handleWebhookEvent(event: Stripe.Event) {
-  switch (event.type) {
-    case 'checkout.session.completed': {
-      const session = event.data.object as Stripe.Checkout.Session;
-      // Handle successful payment
-      //
-      break;
-    }
-    case 'customer.subscription.created': {
-      const subscription = event.data.object as Stripe.Subscription;
-      // Handle new subscription
-      //
-      break;
-    }
-    case 'customer.subscription.updated': {
-      const updatedSubscription = event.data.object as Stripe.Subscription;
-      // Handle subscription update
-      //
-      break;
-    }
-    case 'customer.subscription.deleted': {
-      const deletedSubscription = event.data.object as Stripe.Subscription;
-      // Handle subscription cancellation
-      //
-      break;
-    }
-    case 'invoice.payment_succeeded': {
-      const invoice = event.data.object as Stripe.Invoice;
-      // Handle successful payment
-      //
-      break;
-    }
-    case 'invoice.payment_failed': {
-      const failedInvoice = event.data.object as Stripe.Invoice;
-      // Handle failed payment
-      //
-      break;
-    }
-    default:
-      //
-  }
+  throw new Error(
+    'handleWebhookEvent is deprecated. Use /api/webhooks/stripe route instead.'
+  );
 }
 export { stripe };

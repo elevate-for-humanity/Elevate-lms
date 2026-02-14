@@ -71,7 +71,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
               {/* Single CTA - Check Eligibility */}
               <div className="flex flex-wrap gap-4">
                 <Link
-                  href="/apply"
+                  href={`/apply?program=${program.slug}`}
                   className="inline-flex items-center gap-2 bg-white text-blue-600 hover:bg-gray-50 px-8 py-4 rounded-xl font-bold text-lg transition shadow-lg"
                 >
                   Check Eligibility
@@ -351,7 +351,7 @@ export function ProgramTemplate({ program }: { program: Program }) {
             </div>
             <div className="mt-8">
               <Link
-                href="/apply"
+                href={`/apply?program=${program.slug}`}
                 className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition"
               >
                 Start Application

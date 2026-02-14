@@ -8,7 +8,7 @@
 export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 
 interface AffirmWebhookEvent {
@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       orderId: event.data?.order_id,
     });
 
-    const supabase = await createClient();
+    const supabase = createAdminClient();
 
     // Validate the order_id exists in our system before processing
     const { data: existingApp } = await supabase
@@ -134,15 +134,23 @@ async function handleChargeCaptured(event: AffirmWebhookEvent, supabase: any) {
       .eq('affirm_order_id', order_id);
 
     // Also update barber_subscriptions if this is a barber enrollment
-    // The record should already exist from the capture route
-    await supabase
-      .from('barber_subscriptions')
-      .update({
-        status: 'active',
-        amount_paid_at_checkout: amount / 100,
-      })
-      .eq('payment_method', 'affirm')
-      .like('created_at', `${new Date().toISOString().split('T')[0]}%`);
+    // Match by customer_email from the application record for reliable lookup
+    const { data: app } = await supabase
+      .from('applications')
+      .select('customer_email')
+      .eq('affirm_order_id', order_id)
+      .single();
+
+    if (app?.customer_email) {
+      await supabase
+        .from('barber_subscriptions')
+        .update({
+          status: 'active',
+          amount_paid_at_checkout: amount / 100,
+        })
+        .eq('payment_method', 'affirm')
+        .eq('customer_email', app.customer_email);
+    }
   }
 }
 

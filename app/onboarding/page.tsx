@@ -58,8 +58,8 @@ export default async function OnboardingPage() {
     <div className="min-h-screen bg-white">
       <section className="relative h-[400px] sm:h-[500px] w-full overflow-hidden bg-white">
         <Image
-          src="/images/healthcare/healthcare-programs-grid.jpg"
-          alt="Welcome"
+          src="/images/heroes-hq/success-hero.jpg"
+          alt="Welcome to Elevate for Humanity"
           fill
           className="object-cover"
           priority
@@ -89,7 +89,7 @@ export default async function OnboardingPage() {
               className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-lg transition-all"
             >
               <div className="relative h-40">
-                <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Student" fill sizes="100vw" className="object-cover" />
+                <Image src="/images/programs-hq/students-learning.jpg" alt="Student" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-8">
               <h3 className="text-lg md:text-lg font-bold text-black mb-3 text-center">
@@ -225,20 +225,19 @@ export default async function OnboardingPage() {
           <h2 className="text-2xl md:text-3xl font-bold mb-4">
             Ready to Get Started?
           </h2>
-          <p className="text-base md:text-lg text-blue-100 mb-8">
-            Join thousands who have launched successful careers through our free
-            training programs.
+          <p className="text-base md:text-lg text-brand-blue-100 mb-8">
+            Create your account and start your career training journey today.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
               href="/signup"
-              className="bg-white text-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
+              className="bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold hover:bg-gray-50 text-lg"
             >
               Sign Up Now
             </Link>
             <Link
               href="/programs"
-              className="bg-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-600 border-2 border-white text-lg"
+              className="bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-semibold hover:bg-brand-blue-600 border-2 border-white text-lg"
             >
               Browse Programs
             </Link>

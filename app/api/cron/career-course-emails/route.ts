@@ -10,7 +10,7 @@ import {
 export const dynamic = 'force-dynamic';
 
 // This endpoint should be called by a cron job daily
-// Vercel Cron or external service like cron-job.org
+// scheduled cron or external service like cron-job.org
 
 export async function GET(req: Request) {
   // Verify cron secret

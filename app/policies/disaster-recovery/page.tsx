@@ -93,7 +93,7 @@ export default function DisasterRecoveryPage() {
             </li>
             <li className="flex items-start gap-3">
               <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-              <span><strong>Immutable deployments</strong> via Vercel</span>
+              <span><strong>Immutable deployments</strong> via Netlify</span>
             </li>
             <li className="flex items-start gap-3">
               <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />

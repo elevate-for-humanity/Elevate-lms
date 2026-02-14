@@ -321,7 +321,7 @@ WHERE id = 'APPLICATION_UUID';
 
 ### Cron jobs not running
 
-1. Check Vercel/Netlify scheduled function logs
+1. Check Netlify/Netlify scheduled function logs
 2. Manually trigger: `POST /api/cron/process-notifications`
 3. Check `CRON_SECRET` is set
 

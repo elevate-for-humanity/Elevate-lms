@@ -51,7 +51,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Return certificate data for client-side PDF generation
-    // Using client-side generation avoids Vercel function size limits
+    // Using client-side generation avoids serverless function size limits
     return NextResponse.json({
       certificate: {
         id: certificate.id,

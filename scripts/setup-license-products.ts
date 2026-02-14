@@ -155,7 +155,7 @@ createLicenseProducts()
     console.log('Done! Products created successfully.');
     console.log('\nNext steps:');
     console.log('1. Add the environment variables above to your .env file');
-    console.log('2. Add them to your production environment (Vercel, etc.)');
+    console.log('2. Add them to your production environment (Netlify, etc.)');
     console.log('3. Restart your development server');
     process.exit(0);
   })

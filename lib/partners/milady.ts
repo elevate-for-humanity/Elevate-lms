@@ -14,7 +14,7 @@ import {
 import { PartnerConfig } from './config';
 import { PartnerAPIError } from './http-client';
 
-// Get Milady config from Vercel environment variables
+// Get Milady config from environment variables
 function getMiladyConfig(): PartnerConfig {
   return {
     apiKey:

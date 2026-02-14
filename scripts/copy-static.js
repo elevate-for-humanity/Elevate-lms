@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Copy static HTML and front-end assets into the Vite dist folder for Vercel
+// Copy static HTML and front-end assets into the Vite dist folder for Netlify
 // This ensures our many standalone HTML pages and shared assets are deployed.
 
 const fs = require('fs');

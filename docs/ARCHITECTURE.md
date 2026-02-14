@@ -35,7 +35,7 @@
 - **Frontend:** Server-Side Rendered (SSR) + Static Site Generation (SSG)
 - **Backend:** Serverless API (Edge Runtime)
 - **Database:** PostgreSQL with Row Level Security
-- **Deployment:** Serverless (Vercel)
+- **Deployment:** Serverless (Netlify)
 - **Pattern:** Jamstack + API-first
 
 ---
@@ -102,7 +102,7 @@
 
 #### Runtime
 - **Node.js 20+** - JavaScript runtime
-- **Edge Runtime** - Vercel Edge Functions
+- **Edge Runtime** - Netlify Edge Functions
 - **Next.js API Routes** - API endpoints
 
 #### Database
@@ -118,17 +118,17 @@
 ### Infrastructure Layer
 
 #### Hosting
-- **Vercel** - Serverless deployment
+- **Netlify** - Serverless deployment
 - **Edge Network** - Global CDN
 - **Serverless Functions** - API execution
 
 #### Storage
 - **Supabase Storage** - File storage
-- **Vercel Blob** - Asset storage (optional)
+- **Cloud storage** - Asset storage (optional)
 
 #### Monitoring
 - **Sentry 10.32.1** - Error tracking
-- **Vercel Analytics** - Performance monitoring
+- **Analytics** - Performance monitoring
 - **Custom Health Checks** - System monitoring
 
 ### Integration Layer
@@ -509,7 +509,7 @@ const limiter = rateLimit({
 
 ```
 ┌─────────────────────────────────────────────┐
-│           Vercel Edge Network               │
+│           Netlify Edge Network               │
 │  (Global CDN + Edge Functions)              │
 └─────────────────┬───────────────────────────┘
                   │
@@ -532,9 +532,9 @@ const limiter = rateLimit({
 ### Deployment Process
 
 1. **Code Push** → GitHub repository
-2. **Trigger** → Vercel webhook
+2. **Trigger** → Netlify webhook
 3. **Build** → Next.js build (8GB memory)
-4. **Deploy** → Vercel serverless
+4. **Deploy** → Netlify serverless
 5. **Verify** → Health checks
 6. **Promote** → Production traffic
 
@@ -546,12 +546,12 @@ const limiter = rateLimit({
 - Stripe test mode
 
 **Staging:**
-- Vercel preview deployment
+- Netlify preview deployment
 - Staging database
 - Stripe test mode
 
 **Production:**
-- Vercel production
+- Netlify production
 - Production database
 - Stripe live mode
 
@@ -669,7 +669,7 @@ const response = await openai.chat.completions.create({
 - Performance issues
 - User feedback
 
-#### Performance Monitoring (Vercel)
+#### Performance Monitoring
 - Web vitals
 - API latency
 - Build times
@@ -761,7 +761,7 @@ VALUES ($1, 'enrollment_created', 'enrollment', $2);
 - Row Level Security
 - Real-time capabilities
 
-**Why Vercel?**
+**Why Netlify?**
 - Seamless Next.js integration
 - Global edge network
 - Automatic scaling

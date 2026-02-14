@@ -6,7 +6,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// This route is called by Vercel Cron weekly (Sunday 7:30 PM EST)
+// This route is called by scheduled cron weekly (Sunday 7:30 PM EST)
 // Generates compliance verdicts for all active enrollments
 export async function POST(request: NextRequest) {
   try {

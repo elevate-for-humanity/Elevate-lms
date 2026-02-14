@@ -2,7 +2,7 @@
  * Cron Job: Check License Status
  * Runs daily to suspend expired licenses and check subscription status
  * 
- * Set up in Vercel: cron: "0 6 * * *" (6 AM daily)
+ * Set up as scheduled cron: "0 6 * * *" (6 AM daily)
  */
 
 import { getStripe } from '@/lib/stripe/client';

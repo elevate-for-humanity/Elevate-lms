@@ -39,7 +39,7 @@ export default function CacheDiagnostic() {
               <dd className="font-mono text-sm">{buildId}</dd>
             </div>
             <div>
-              <dt className="font-medium">Vercel Region:</dt>
+              <dt className="font-medium">Server Region:</dt>
               <dd className="font-mono text-sm">
                 {'netlify'}
               </dd>

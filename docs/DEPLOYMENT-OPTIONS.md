@@ -48,7 +48,7 @@ When someone licenses Elevate, they have different options depending on their ti
 
 #### Option 1: Self-Hosted (They Manage)
 They deploy to their own infrastructure:
-- Vercel / Netlify
+- Netlify / Netlify
 - AWS / GCP / Azure
 - On-premise servers
 
@@ -112,7 +112,7 @@ We deploy and manage their instance:
 - SSL certificate
 
 ### Recommended Stack
-- **Hosting:** Vercel (easiest) or AWS/GCP
+- **Hosting:** Netlify (easiest) or AWS/GCP
 - **Database:** Supabase or managed Postgres
 - **Email:** SendGrid or Resend
 - **Storage:** S3 or Cloudflare R2

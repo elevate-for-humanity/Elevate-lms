@@ -82,7 +82,7 @@ In Cloudflare Dashboard:
 
 ### Step 6: Set Environment Variable
 
-In Vercel (or your deployment platform):
+In Netlify (or your deployment platform):
 ```bash
 NEXT_PUBLIC_SCORM_CDN_URL=https://scorm.www.elevateforhumanity.org
 ```
@@ -147,7 +147,7 @@ wrangler r2 bucket list
 If you don't want to deploy the worker:
 1. Keep SCORM files in `public/scorm/`
 2. Don't set `NEXT_PUBLIC_SCORM_CDN_URL`
-3. Files served directly from Vercel/Next.js
+3. Files served directly from Netlify/Next.js
 4. Works perfectly fine, no Cloudflare needed
 
 ## Current Status

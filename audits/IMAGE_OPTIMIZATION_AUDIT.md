@@ -229,8 +229,8 @@ grep -rn "<img " --include="*.tsx" app/ | cut -d: -f1 | sort -u
 - **Features**: Real-time transformations, CDN
 - **Integration**: Next.js loader available
 
-### Option 3: Vercel Image Optimization (Current)
-- **Cost**: Included with Vercel hosting
+### Option 3: Netlify Image Optimization (Current)
+- **Cost**: Included with Netlify hosting
 - **Features**: Auto WebP/AVIF, resize
 - **Limitation**: Only works with Next/Image component
 

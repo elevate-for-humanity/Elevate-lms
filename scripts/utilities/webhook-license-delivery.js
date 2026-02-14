@@ -1,5 +1,5 @@
 // 🚀 ELEVATE LICENSE DELIVERY WEBHOOK
-// Deploy to Vercel, Netlify Functions, or any Node.js server
+// Deploy to Netlify Functions or any Node.js server
 // Automatically delivers licenses and files after Stripe payment
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);

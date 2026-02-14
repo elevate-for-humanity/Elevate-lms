@@ -24,7 +24,7 @@ SUPABASE_SERVICE_ROLE_KEY_STAGING=<staging-service-key>
 
 These should be set in:
 - Local `.env.local` for development
-- Vercel environment variables for staging deployments
+- Netlify environment variables for staging deployments
 - CI/CD pipeline secrets
 
 ### Switching Environments
@@ -70,7 +70,7 @@ pnpm run seed:staging
 
 Staging deployments are triggered:
 - Automatically on PR creation (preview deployments)
-- Manually via Vercel dashboard
+- Manually via Netlify dashboard
 - Via CI/CD on `staging` branch pushes
 
 ## Access

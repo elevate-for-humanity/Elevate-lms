@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 /**
  * STEP 5D: Daily cron to expire overdue licenses
  * 
- * Call this endpoint daily via Vercel Cron or external scheduler
+ * Call this endpoint daily via scheduled cron or external scheduler
  * Requires CRON_SECRET header for authentication
  */
 export async function GET(request: Request) {

@@ -8,7 +8,7 @@ export const dynamic = 'force-dynamic';
 
 /**
  * Cron job endpoint for enrollment automation
- * Called by Vercel Cron or external scheduler
+ * Called by scheduled cron or external scheduler
  */
 export async function GET(req: Request) {
   try {

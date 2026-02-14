@@ -274,7 +274,7 @@
 - **Database**: Supabase (PostgreSQL)
 - **Authentication**: Supabase Auth
 - **Payments**: Stripe
-- **Hosting**: Vercel-ready
+- **Hosting**: Netlify-ready
 - **Mobile**: Progressive Web App (PWA)
 
 ---

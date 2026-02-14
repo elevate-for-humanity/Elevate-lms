@@ -168,7 +168,7 @@ const checklist = [
   { item: 'Program pages created', status: '✅' },
   { item: 'Navigation registry', status: '✅' },
   { item: 'Route audit script', status: '✅' },
-  { item: 'Environment via Vercel', status: '✅' },
+  { item: 'Environment via Netlify', status: '✅' },
   { item: 'Media assets present', status: '✅' },
 ];
 

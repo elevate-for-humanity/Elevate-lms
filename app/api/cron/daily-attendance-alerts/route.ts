@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@supabase/supabase-js';
 
-// This route is called by Vercel Cron daily at 6 AM
+// This route is called by scheduled cron daily at 6 AM
 // Cron expression: 0 11 * * * (11:00 UTC = 6:00 AM EST)
 export async function POST(request: NextRequest) {
   try {

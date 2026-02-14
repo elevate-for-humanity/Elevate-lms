@@ -14,7 +14,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 const rootDir = join(__dirname, '..');
 
-// Load environment variables (try .env.local for local dev, fallback to process.env for Vercel)
+// Load environment variables (try .env.local for local dev, fallback to process.env for Netlify)
 config({ path: join(rootDir, '.env.local') });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

@@ -24,7 +24,7 @@
 
 - **Type:** RESTful API
 - **Format:** JSON
-- **Runtime:** Edge (Vercel)
+- **Runtime:** Edge (Netlify)
 - **Authentication:** JWT Bearer tokens
 - **Total Endpoints:** 200+
 

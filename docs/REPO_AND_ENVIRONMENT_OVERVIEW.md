@@ -222,7 +222,7 @@ Defined in `proxy.ts`:
 | Environment | Database | Deployment |
 |-------------|----------|------------|
 | Development | Supabase (configured via env vars) | Local/Gitpod |
-| Production | Supabase | Vercel (assumed) |
+| Production | Supabase | Netlify |
 
 **Coding Changes Impact:**
 - Dev changes only affect local/Gitpod environment

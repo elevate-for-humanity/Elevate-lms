@@ -116,7 +116,7 @@ export async function triggerSelfHeal(req: Request, res: Response) {
 
 /**
  * POST /api/autopilot/sync-secrets
- * Sync secrets to GitHub and Vercel
+ * Sync secrets to GitHub and deployment platform
  */
 export async function syncSecrets(req: Request, res: Response) {
   try {

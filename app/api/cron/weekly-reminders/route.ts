@@ -15,7 +15,7 @@ if (VAPID_PUBLIC_KEY && VAPID_PRIVATE_KEY) {
 }
 
 // Cron endpoint for weekly hour logging reminders
-// Should be called by a cron job service (e.g., Vercel Cron, GitHub Actions)
+// Should be called by a cron job service (e.g., scheduled cron, GitHub Actions)
 export async function GET(request: NextRequest) {
   // Verify cron secret
   const authHeader = request.headers.get('authorization');

@@ -1,6 +1,6 @@
 /**
  * Advanced Autopilot - Environment Sync Orchestrator
- * Instructs the Vercel worker to sync all environment variables
+ * Instructs the deployment worker to sync all environment variables
  */
 
 export interface AutopilotInstruction {
@@ -19,7 +19,7 @@ export interface AutopilotResult {
 }
 
 /**
- * Instruct Vercel worker to sync all environment variables
+ * Instruct deployment worker to sync all environment variables
  */
 export async function instructEnvSync(): Promise<AutopilotResult> {
   try {
@@ -35,7 +35,7 @@ export async function instructEnvSync(): Promise<AutopilotResult> {
       };
     }
 
-    // Instruct the Vercel worker
+    // Instruct the deployment worker
     const response = await fetch(`${siteUrl}/api/autopilot/sync-env`, {
       method: 'POST',
       headers: {

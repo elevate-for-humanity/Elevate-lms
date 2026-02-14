@@ -47,7 +47,7 @@ const SEARCH_QUERIES = [
   '"Elevate for Humanity" -site:elevateforhumanity.org',
   '"EFH-ORIGINAL-2024"',
   '"workforce development apprenticeship" "elevate"',
-  'site:vercel.app "elevate" "apprenticeship"',
+  // removed - no vercel deployments
   'site:netlify.app "elevate" "workforce"',
 ];
 

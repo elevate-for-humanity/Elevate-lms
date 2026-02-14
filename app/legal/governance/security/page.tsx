@@ -131,7 +131,7 @@ export default function SecurityStatementPage() {
           <ul className="list-disc pl-6 space-y-2 text-gray-700 mb-4">
             <li><strong>Database:</strong> Supabase (PostgreSQL) with encryption at rest (AES-256)</li>
             <li><strong>File Storage:</strong> Supabase Storage with server-side encryption</li>
-            <li><strong>Application Hosting:</strong> Vercel with automatic HTTPS</li>
+            <li><strong>Application Hosting:</strong> Netlify with automatic HTTPS</li>
             <li><strong>Payment Processing:</strong> Stripe (PCI DSS Level 1 certified)</li>
           </ul>
           

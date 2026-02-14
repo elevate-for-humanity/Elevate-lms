@@ -251,7 +251,7 @@ export default async function AutomationLogPage() {
             </div>
           </div>
           <p className="text-xs text-gray-400 mt-4">
-            Note: Cron jobs are triggered by Vercel Cron. Check Vercel dashboard for execution logs.
+            Note: Cron jobs are triggered by scheduled cron. Check deployment dashboard for execution logs.
           </p>
         </div>
       </div>

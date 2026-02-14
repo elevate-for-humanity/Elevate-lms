@@ -82,7 +82,7 @@ whois [their-domain.com]
 
 | Provider | DMCA URL |
 |----------|----------|
-| Vercel | https://vercel.com/legal/dmca-policy |
+| Netlify | https://netlify.com/legal/dmca-policy |
 | Netlify | https://www.netlify.com/dmca/ |
 | GitHub Pages | https://support.github.com/contact/dmca-takedown |
 | Cloudflare | https://www.cloudflare.com/abuse/form |

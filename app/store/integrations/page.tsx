@@ -151,7 +151,7 @@ export default async function IntegrationsPage() {
               { icon: CreditCard, name: 'Stripe', description: 'Payment processing and subscriptions', color: 'blue' },
               { icon: Mail, name: 'Resend', description: 'Transactional email delivery', color: 'green' },
               { icon: Database, name: 'Supabase', description: 'PostgreSQL database and auth', color: 'emerald' },
-              { icon: Code, name: 'Vercel', description: 'Hosting and deployment', color: 'black' },
+              { icon: Code, name: 'Netlify', description: 'Hosting and deployment', color: 'teal' },
               
               { icon: Zap, name: 'Twilio', description: 'SMS notifications (optional)', color: 'red' },
             ].map((integration, idx) => (

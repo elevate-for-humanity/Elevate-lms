@@ -265,7 +265,7 @@ export default async function ArchitecturePage() {
                 <li>• Row-level security (RLS)</li>
                 <li>• Edge Functions</li>
                 <li>• Real-time subscriptions</li>
-                <li>• Vercel hosting</li>
+                <li>• Netlify hosting</li>
               </ul>
             </div>
             <div>

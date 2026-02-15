@@ -32,6 +32,8 @@ export default function AboutPage() {
           src="/images/heroes-hq/about-hero.jpg"
           alt="Elevate for Humanity Team"
           fill
+          quality={90}
+          sizes="100vw"
           className="object-cover object-center"
           priority
         />
@@ -57,12 +59,14 @@ export default function AboutPage() {
       {/* THE FOUNDER */}
       <section className="py-12 sm:py-16 md:py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
-          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-start">
-            <div className="relative aspect-[4/5] sm:aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden shadow-xl">
+          <div className="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
+            <div className="relative aspect-[4/5] max-h-[480px] mx-auto w-full max-w-md rounded-xl sm:rounded-2xl overflow-hidden shadow-xl">
               <Image
                 src="/images/team/elizabeth-greene.jpg"
                 alt="Elizabeth Greene, Founder & CEO"
                 fill
+                quality={90}
+                sizes="(max-width: 768px) 90vw, 400px"
                 className="object-cover object-top"
               />
             </div>
@@ -115,6 +119,7 @@ export default function AboutPage() {
                     src={member.headshotSrc || '/images/heroes-hq/career-services-hero.jpg'}
                     alt={member.name}
                     fill
+                    quality={90}
                     sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                     className="object-cover object-top"
                   />
@@ -137,11 +142,13 @@ export default function AboutPage() {
           
           <div className="max-w-3xl mx-auto">
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
-              <div className="relative h-64">
+              <div className="relative h-72 sm:h-80 md:h-96">
                 <Image
                   src="/images/hero/hero-hands-on-training.jpg"
                   alt="Elevate for Humanity Training"
                   fill
+                  quality={90}
+                  sizes="(max-width: 768px) 100vw, 768px"
                   className="object-cover object-center"
                 />
               </div>
@@ -165,7 +172,7 @@ export default function AboutPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             <div className="flex items-start gap-4">
               <div className="relative w-20 h-20 flex-shrink-0">
-                <Image src="/images/partners/usdol.webp" alt="USDOL" fill className="object-contain" />
+                <Image src="/images/partners/usdol.webp" alt="USDOL" fill quality={90} className="object-contain" />
               </div>
               <div>
                 <div className="font-bold text-slate-900">U.S. Department of Labor</div>
@@ -175,7 +182,7 @@ export default function AboutPage() {
 
             <div className="flex items-start gap-4">
               <div className="relative w-20 h-20 flex-shrink-0">
-                <Image src="/images/partners/dwd.webp" alt="Indiana DWD" fill className="object-contain" />
+                <Image src="/images/partners/dwd.webp" alt="Indiana DWD" fill quality={90} className="object-contain" />
               </div>
               <div>
                 <div className="font-bold text-slate-900">Indiana DWD</div>
@@ -185,7 +192,7 @@ export default function AboutPage() {
 
             <div className="flex items-start gap-4">
               <div className="relative w-20 h-20 flex-shrink-0">
-                <Image src="/images/partners/workone.webp" alt="WorkOne" fill className="object-contain" />
+                <Image src="/images/partners/workone.webp" alt="WorkOne" fill quality={90} className="object-contain" />
               </div>
               <div>
                 <div className="font-bold text-slate-900">WorkOne</div>
@@ -195,7 +202,7 @@ export default function AboutPage() {
 
             <div className="flex items-start gap-4">
               <div className="relative w-20 h-20 flex-shrink-0">
-                <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" fill className="object-contain" />
+                <Image src="/images/partners/nextleveljobs.webp" alt="Next Level Jobs" fill quality={90} className="object-contain" />
               </div>
               <div>
                 <div className="font-bold text-slate-900">Next Level Jobs</div>
@@ -205,7 +212,7 @@ export default function AboutPage() {
 
             <div className="flex items-start gap-4">
               <div className="relative w-20 h-20 flex-shrink-0">
-                <Image src="/images/partners/osha.webp" alt="OSHA" fill className="object-contain" />
+                <Image src="/images/partners/osha.webp" alt="OSHA" fill quality={90} className="object-contain" />
               </div>
               <div>
                 <div className="font-bold text-slate-900">OSHA</div>
@@ -268,6 +275,7 @@ export default function AboutPage() {
                   src="/images/funding/funding-jri-program-v2.jpg"
                   alt="Justice-Involved Individuals"
                   fill
+                  quality={90}
                   className="object-cover object-center"
                 />
               </div>
@@ -280,6 +288,7 @@ export default function AboutPage() {
                   src="/images/funding/funding-dol-program-v2.jpg"
                   alt="Low-Income Families"
                   fill
+                  quality={90}
                   className="object-cover object-center"
                 />
               </div>
@@ -292,6 +301,7 @@ export default function AboutPage() {
                   src="/images/hero/hero-career-services.jpg"
                   alt="Veterans"
                   fill
+                  quality={90}
                   className="object-cover object-center"
                 />
               </div>
@@ -304,6 +314,7 @@ export default function AboutPage() {
                   src="/images/hero/hero-business.jpg"
                   alt="Career Changers"
                   fill
+                  quality={90}
                   className="object-cover object-center"
                 />
               </div>
@@ -323,7 +334,7 @@ export default function AboutPage() {
             <Link href="/programs/healthcare" className="group">
               <div className="rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
                 <div className="relative h-32">
-                  <Image src="/images/hero/hero-healthcare.jpg" alt="Healthcare" fill className="object-cover object-center" />
+                  <Image src="/images/hero/hero-healthcare.jpg" alt="Healthcare" fill quality={90} className="object-cover object-center" />
                 </div>
                 <div className="p-4 bg-white text-center">
                   <h3 className="font-bold text-slate-900">Healthcare</h3>
@@ -333,7 +344,7 @@ export default function AboutPage() {
             <Link href="/programs/skilled-trades" className="group">
               <div className="rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
                 <div className="relative h-32">
-                  <Image src="/images/hero/hero-skilled-trades.jpg" alt="Skilled Trades" fill className="object-cover object-center" />
+                  <Image src="/images/hero/hero-skilled-trades.jpg" alt="Skilled Trades" fill quality={90} className="object-cover object-center" />
                 </div>
                 <div className="p-4 bg-white text-center">
                   <h3 className="font-bold text-slate-900">Skilled Trades</h3>
@@ -343,7 +354,7 @@ export default function AboutPage() {
             <Link href="/programs/technology" className="group">
               <div className="rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
                 <div className="relative h-32">
-                  <Image src="/images/hero/hero-tech-careers.jpg" alt="Technology" fill className="object-cover object-center" />
+                  <Image src="/images/hero/hero-tech-careers.jpg" alt="Technology" fill quality={90} className="object-cover object-center" />
                 </div>
                 <div className="p-4 bg-white text-center">
                   <h3 className="font-bold text-slate-900">Technology</h3>
@@ -353,7 +364,7 @@ export default function AboutPage() {
             <Link href="/programs/cdl" className="group">
               <div className="rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
                 <div className="relative h-32">
-                  <Image src="/images/cdl-vibrant.jpg" alt="CDL" fill className="object-cover object-center" />
+                  <Image src="/images/cdl-vibrant.jpg" alt="CDL" fill quality={90} className="object-cover object-center" />
                 </div>
                 <div className="p-4 bg-white text-center">
                   <h3 className="font-bold text-slate-900">CDL</h3>
@@ -363,7 +374,7 @@ export default function AboutPage() {
             <Link href="/programs/barber-apprenticeship" className="group">
               <div className="rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-shadow">
                 <div className="relative h-32">
-                  <Image src="/images/barber/gallery-3.jpg" alt="Beauty" fill className="object-cover object-center" />
+                  <Image src="/images/barber/gallery-3.jpg" alt="Beauty" fill quality={90} className="object-cover object-center" />
                 </div>
                 <div className="p-4 bg-white text-center">
                   <h3 className="font-bold text-slate-900">Beauty</h3>

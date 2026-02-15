@@ -44,6 +44,7 @@ export default function BarberApprenticeshipPage() {
         </div>
       </section>
 
+      {/* Avatar Guide */}
       <section className="py-8 bg-white">
         <div className="max-w-3xl mx-auto px-4">
           <PageAvatar videoSrc="/videos/avatars/barber-guide.mp4" title="Barber Apprenticeship Guide" />
@@ -88,22 +89,58 @@ export default function BarberApprenticeshipPage() {
         </div>
       </section>
 
+      {/* Partner Shop Program */}
       <section className="py-8 sm:py-14 bg-slate-50">
         <div className="max-w-4xl mx-auto px-4">
-          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">Career Paths</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {[
-              { title: 'Shop Barber', salary: '$30K-$50K', desc: 'Work at an established shop' },
-              { title: 'Booth Rental', salary: '$40K-$60K+', desc: 'Rent your own chair' },
-              { title: 'Shop Owner', salary: '$60K-$100K+', desc: 'Open your own barbershop' },
-              { title: 'Instructor', salary: '$35K-$55K', desc: 'Teach the next generation' },
-            ].map((c) => (
-              <div key={c.title} className="bg-white rounded-xl border border-slate-200 p-4">
-                <h3 className="font-bold text-slate-900 text-sm">{c.title}</h3>
-                <div className="text-brand-red-600 font-bold text-sm">{c.salary}</div>
-                <p className="text-slate-500 text-xs mt-1">{c.desc}</p>
-              </div>
-            ))}
+          <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-3">Become a Partner Shop</h2>
+          <p className="text-base text-slate-600 text-center mb-8 max-w-2xl mx-auto">
+            Licensed barbershops in Indiana can host apprentices through our USDOL-registered program. 
+            We handle compliance, classroom training, and documentation — you provide hands-on supervision.
+          </p>
+
+          <div className="grid sm:grid-cols-2 gap-6 mb-8">
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <h3 className="font-bold text-slate-900 text-lg mb-3">Shop Requirements</h3>
+              <ul className="space-y-2">
+                {[
+                  'Indiana-licensed barbershop in good standing',
+                  'Supervising barber with active license (2+ years)',
+                  'Workers\' compensation insurance',
+                  'Physical shop location in Indiana',
+                  'Willingness to sign MOU',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
+                    <span className="text-green-600 mt-0.5">✓</span> {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="bg-white rounded-xl border border-slate-200 p-6">
+              <h3 className="font-bold text-slate-900 text-lg mb-3">What We Provide</h3>
+              <ul className="space-y-2">
+                {[
+                  'USDOL/RAPIDS registration and compliance',
+                  'Coordinated classroom instruction',
+                  'Official apprenticeship records',
+                  'Ongoing support and site visits',
+                  'Completion certificates',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
+                    <span className="text-green-600 mt-0.5">✓</span> {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="text-center">
+            <Link
+              href="/partners/barbershop-apprenticeship"
+              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white text-lg font-bold px-8 py-4 rounded-lg transition-colors"
+            >
+              Learn More & Apply
+            </Link>
           </div>
         </div>
       </section>
@@ -113,7 +150,7 @@ export default function BarberApprenticeshipPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">How It Works</h2>
           <div className="space-y-3">
             {[
-              { step: '1', title: 'Apply Online', desc: 'Submit your apprenticeship application.' },
+              { step: '1', title: 'Complete Intake', desc: 'Submit the funding & eligibility intake form.' },
               { step: '2', title: 'Get Matched', desc: 'Paired with a licensed barber instructor at a real shop.' },
               { step: '3', title: 'Earn While You Learn', desc: 'Get paid while completing your 1,500 training hours.' },
               { step: '4', title: 'Get Licensed', desc: 'Pass the Indiana State Board barber exam.' },
@@ -135,7 +172,7 @@ export default function BarberApprenticeshipPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Barber Career</h2>
           <p className="text-white/90 mb-6 text-sm">Earn while you learn. JRI funding available for qualifying students.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/apply?program=barber-apprenticeship" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-red-50 transition-colors text-center">
+            <Link href="/apply/intake?program=barbering" className="bg-white text-brand-red-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-red-50 transition-colors text-center">
               Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />
             </Link>
             <Link href="/funding" className="border-2 border-white text-white font-bold px-6 py-3 rounded-lg text-base hover:bg-white/10 transition-colors text-center">

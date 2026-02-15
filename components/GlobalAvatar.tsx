@@ -16,8 +16,7 @@ import { useEffect, useRef } from 'react';
 // Pages where video avatar is ENABLED (explicit allowlist)
 // If a page is not listed here, NO video avatar appears
 const avatarConfig: { pattern: RegExp; video: string; name: string }[] = [
-  // Homepage
-  { pattern: /^\/$/, video: '/videos/avatars/home-welcome.mp4', name: 'Welcome to Elevate' },
+  // Homepage — handled by PageAvatar in app/page.tsx
   
   // ============ DASHBOARD PORTALS ============
   

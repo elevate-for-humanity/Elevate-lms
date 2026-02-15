@@ -106,7 +106,7 @@ export default function AboutPage() {
             <p className="text-lg text-slate-600">The people behind the mission</p>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
-            {TEAM.map((member) => (
+            {TEAM.filter((m) => m.id !== '1').map((member) => (
               <Link
                 key={member.id}
                 href={`/about/team#${member.id}`}
@@ -429,9 +429,6 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-      {/* Team Section */}
-      <TeamSection />
 
       {/* Industry Partnerships */}
       <section className="py-16 bg-white">

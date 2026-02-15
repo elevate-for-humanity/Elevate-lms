@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Building, CheckCircle, ArrowRight, AlertCircle } from 'lucide-react';
+import { Building, CheckCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function PartnerApplyPage() {

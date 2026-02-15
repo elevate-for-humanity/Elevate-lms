@@ -10,7 +10,7 @@ export const dynamic = 'force-dynamic';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { FileText, Calendar, DollarSign, Download, Clock } from 'lucide-react';
+import { FileText, Calendar, DollarSign, Download } from 'lucide-react';
 
 export default async function ClientPortalPage() {
   const supabase = await createClient();

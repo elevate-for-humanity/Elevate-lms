@@ -10,7 +10,7 @@ import {
   getLanguageFromPath,
 } from '@/lib/github';
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function GET(req: NextRequest) {
   const userToken = req.headers.get('x-gh-token');

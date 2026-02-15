@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { FileText, Download, Printer, ArrowLeft, Key } from 'lucide-react';
+import { Download, Printer, ArrowLeft, Key } from 'lucide-react';
 
 export default function MasterLicensePage() {
   return (

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, FileText, Users, GraduationCap, Clock, Download, TrendingUp, Calendar } from 'lucide-react';
+import { ChevronRight, Users, GraduationCap, Clock, Download, TrendingUp, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {

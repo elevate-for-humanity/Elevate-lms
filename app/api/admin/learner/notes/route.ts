@@ -6,7 +6,7 @@ import { NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { withAuth } from '@/lib/with-auth';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 async function getHandler(
   req: NextRequest,

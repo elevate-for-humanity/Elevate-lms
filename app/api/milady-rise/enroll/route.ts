@@ -4,10 +4,10 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { parseBody } from '@/lib/api-helpers';
 import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
 import miladyConfig from '@/lms-data/milady-rise-integration.json';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function POST(request: Request) {
   try {

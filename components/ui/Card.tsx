@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Clock, MapPin, DollarSign, Star } from 'lucide-react';
+import { Clock, MapPin, Star } from 'lucide-react';
 
 // Base Card Component
 export interface CardProps extends React.HTMLAttributes<HTMLDivElement> {

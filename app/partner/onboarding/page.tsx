@@ -15,7 +15,6 @@ import {
 } from '@/lib/partner/types';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { SponsorshipInfoPanel } from '@/components/partner/SponsorshipInfoPanel';
-import { SponsorshipAcknowledgment } from '@/components/partner/SponsorshipAcknowledgment';
 
 const AVAILABLE_PROGRAMS = [
   { id: 'BARBER', name: 'Barber Apprenticeship', description: 'Host barber apprentices for hands-on training' },

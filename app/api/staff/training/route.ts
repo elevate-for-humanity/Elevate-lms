@@ -4,7 +4,7 @@ export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { parseBody } from '@/lib/api-helpers';
 
 export async function GET() {
   try {

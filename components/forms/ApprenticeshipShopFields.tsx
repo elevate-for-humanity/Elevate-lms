@@ -1,6 +1,5 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { Building2, MapPin, Phone, User, Award, Globe, AlertTriangle, Info } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 

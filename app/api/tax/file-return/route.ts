@@ -7,9 +7,8 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { createMeFSubmission, generateMeFXML } from '@/lib/tax-software/mef/xml-generator';
+import { createMeFSubmission } from '@/lib/tax-software/mef/xml-generator';
 import { createTransmitter } from '@/lib/tax-software/mef/transmission';
-import { createAcknowledgmentHandler } from '@/lib/tax-software/mef/acknowledgment';
 import { TaxReturn } from '@/lib/tax-software/types';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { Resend } from 'resend';

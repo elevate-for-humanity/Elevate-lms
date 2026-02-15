@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Award, DollarSign, Users, Clock, ArrowRight, CheckCircle, Briefcase, GraduationCap } from 'lucide-react';
+import { Award, DollarSign, Users, Clock, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Employer Programs | Employer Portal',

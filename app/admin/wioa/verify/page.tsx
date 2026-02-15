@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, User, FileText, CheckCircle, XCircle, AlertTriangle, Download, Upload } from 'lucide-react';
+import { ArrowLeft, FileText, CheckCircle, XCircle, AlertTriangle, Download, Upload } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Verify Eligibility | Admin',

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { BookOpen, Play, Clock, CheckCircle, Lock, ChevronRight, Award } from 'lucide-react';
+import { BookOpen, Play, Clock, ChevronRight, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Classroom | Elevate Hub',

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { BookOpen, Plus, Users, TrendingUp, MoreVertical, Edit, Eye, Trash2 } from 'lucide-react';
+import { BookOpen, Plus, Edit, Eye, Trash2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface Program {

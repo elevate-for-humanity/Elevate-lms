@@ -7,7 +7,6 @@ export const metadata: Metadata = {
 
 import { createClient } from '@/lib/supabase/server';
 export const dynamic = 'force-dynamic';
-import { requireRole } from '@/lib/auth/require-role';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { safeFormatDate } from '@/lib/format-utils';

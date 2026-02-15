@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Users, TrendingUp, AlertTriangle, CheckCircle, ChevronDown } from 'lucide-react';
+import { Users, ChevronDown } from 'lucide-react';
 
 interface CohortStats {
   id: string;

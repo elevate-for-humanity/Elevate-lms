@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { CheckCircle, Calendar, Users, BookOpen, BarChart, Settings, Shield, Zap } from 'lucide-react';
-import { PLATFORM_FEATURES, ROUTES } from '@/lib/pricing';
+import { ROUTES } from '@/lib/pricing';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {

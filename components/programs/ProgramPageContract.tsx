@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CheckCircle, Clock, DollarSign, Award, Users, BookOpen, ArrowRight } from 'lucide-react';
+import { CheckCircle, DollarSign, Award, Users, BookOpen, ArrowRight } from 'lucide-react';
 import { ReactNode } from 'react';
 
 /**

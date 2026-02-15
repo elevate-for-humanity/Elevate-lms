@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { resend } from '@/lib/resend';
 

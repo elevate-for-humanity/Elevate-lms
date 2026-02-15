@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, Phone, MapPin, Clock, MessageCircle, HelpCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, HelpCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/support/contact' },

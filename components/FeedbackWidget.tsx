@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useState } from 'react';
-import { MessageSquare, X, Send, Camera } from 'lucide-react';
+import { MessageSquare, X, Send } from 'lucide-react';
 
 interface FeedbackWidgetProps {
   userId: string;

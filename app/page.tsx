@@ -49,6 +49,49 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* ===== AUDIENCE QUICK LINKS ===== */}
+      <section className="py-12 sm:py-16 bg-slate-50 border-t border-slate-100">
+        <div className="max-w-5xl mx-auto px-6">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-900 mb-8">
+            How can we help you?
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link
+              href="/programs"
+              className="flex flex-col items-center gap-3 p-6 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
+            >
+              <span className="text-3xl">🎓</span>
+              <span className="font-semibold text-slate-900 group-hover:text-brand-blue-600">I want to train</span>
+              <span className="text-sm text-slate-500">Browse free career programs</span>
+            </Link>
+            <Link
+              href="/funding"
+              className="flex flex-col items-center gap-3 p-6 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
+            >
+              <span className="text-3xl">💰</span>
+              <span className="font-semibold text-slate-900 group-hover:text-brand-blue-600">I need funding</span>
+              <span className="text-sm text-slate-500">WIOA, grants, and financial aid</span>
+            </Link>
+            <Link
+              href="/employer"
+              className="flex flex-col items-center gap-3 p-6 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
+            >
+              <span className="text-3xl">🏢</span>
+              <span className="font-semibold text-slate-900 group-hover:text-brand-blue-600">I&apos;m an employer</span>
+              <span className="text-sm text-slate-500">Hire trained, credentialed talent</span>
+            </Link>
+            <Link
+              href="/store"
+              className="flex flex-col items-center gap-3 p-6 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
+            >
+              <span className="text-3xl">🏫</span>
+              <span className="font-semibold text-slate-900 group-hover:text-brand-blue-600">I run a school</span>
+              <span className="text-sm text-slate-500">License the Elevate platform</span>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* ===== 3-CARD VALUE PROPS ===== */}
       <section className="py-16 sm:py-20">
         <div className="max-w-7xl mx-auto px-6">

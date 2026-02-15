@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { Breadcrumbs, BreadcrumbItem, PROGRAM_LABELS } from '@/components/ui/Breadcrumbs';
+import { Breadcrumbs, BreadcrumbItem } from '@/components/ui/Breadcrumbs';
 
 interface ProgramPageWrapperProps {
   children: ReactNode;

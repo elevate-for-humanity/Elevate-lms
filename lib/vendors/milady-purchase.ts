@@ -13,7 +13,7 @@ import { logger } from '@/lib/logger';
  * - Bulk license codes (pre-purchased)
  */
 
-import { getStripe, stripe } from '@/lib/stripe/client';
+import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 
 

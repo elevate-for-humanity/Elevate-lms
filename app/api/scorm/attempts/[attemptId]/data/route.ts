@@ -5,8 +5,7 @@ export const maxDuration = 60;
 
 // app/api/scorm/attempts/[attemptId]/data/route.ts
 import { NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
-import { requireApiAuth, APIAuthError } from '@/lib/auth';
+import { requireApiAuth } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
 
 export async function GET(

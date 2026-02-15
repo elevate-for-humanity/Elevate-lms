@@ -3,11 +3,10 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
-import { sendPayoutConfirmationEmail } from '@/lib/email/resend';
 import { createClient } from '@supabase/supabase-js';
 import { requireAdmin } from '@/lib/auth';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 function getSupabaseAdmin() {
   if (

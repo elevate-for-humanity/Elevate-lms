@@ -13,7 +13,7 @@ import {
   User,
   RotateCcw
 } from 'lucide-react';
-import { getTour, getTourStep, getTourStepCount, type TourStep } from '@/lib/demo/tours';
+import { getTour, getTourStep, getTourStepCount } from '@/lib/demo/tours';
 import { 
   getProgress, 
   initProgress, 
@@ -21,7 +21,7 @@ import {
   resetProgress,
   type TourProgress 
 } from '@/lib/demo/progress';
-import { type DemoLicenseType, DEMO_USERS } from '@/lib/demo/context';
+import { DEMO_USERS } from '@/lib/demo/context';
 import { DemoTrialFunnelEvents } from '@/lib/analytics/events';
 
 interface TourOverlayProps {

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { Settings, User, Bell, Shield, Building } from 'lucide-react';
+import { Settings, User, Bell, Building } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Settings | Employer Portal',

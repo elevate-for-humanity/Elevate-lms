@@ -7,7 +7,6 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { sendCreatorRejectionEmail } from '@/lib/email/resend';
-import { toError, toErrorMessage } from '@/lib/safe';
 import { z } from 'zod';
 
 // Input validation schema

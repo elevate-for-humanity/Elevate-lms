@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
 import Image from "next/image";
-import { Building, GraduationCap, Briefcase, Shield, Users, Award } from 'lucide-react';
+import { Building, Briefcase, Award } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
 
 export const metadata: Metadata = {

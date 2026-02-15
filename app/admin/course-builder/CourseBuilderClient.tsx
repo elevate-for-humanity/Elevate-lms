@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { apiGet, apiPost, apiPatch, apiDelete } from '@/lib/api';
+import { apiPost, apiPatch } from '@/lib/api';
 import Link from 'next/link';
 
 interface Course {

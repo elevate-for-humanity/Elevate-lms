@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle, Circle, Building, FileText, Settings, ArrowRight } from 'lucide-react';
+import { CheckCircle, Circle, Building, FileText, Settings } from 'lucide-react';
 import LicenseeOnboardingForm from './LicenseeOnboardingForm';
 
 export const metadata: Metadata = {

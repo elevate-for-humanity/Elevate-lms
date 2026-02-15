@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 10;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 
 // Simple in-memory rate limiting (per IP)

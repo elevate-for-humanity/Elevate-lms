@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { ArrowLeft, Plus, Send, Trash2, Bell, Users } from 'lucide-react';
+import { ArrowLeft, Plus, Send, Bell, Users } from 'lucide-react';
 
 interface Announcement {
   id: string;

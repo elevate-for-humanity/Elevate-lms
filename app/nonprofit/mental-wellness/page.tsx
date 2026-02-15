@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { createPublicClient } from '@/lib/supabase/public';
-import { Heart, Brain, Sparkles, Calendar, Circle } from 'lucide-react';
+import { Heart, Brain, Calendar, Circle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {

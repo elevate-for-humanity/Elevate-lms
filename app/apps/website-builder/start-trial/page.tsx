@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Layout, Check, Clock, Shield, Zap } from 'lucide-react';
+import { Layout, Check, Clock } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 

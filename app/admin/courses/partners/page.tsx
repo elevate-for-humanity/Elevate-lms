@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Building, Plus, Search, ExternalLink, Mail, Phone, Edit, Trash2 } from 'lucide-react';
+import { Plus, Search, ExternalLink, Mail, Edit, Trash2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Course Partners | Admin',

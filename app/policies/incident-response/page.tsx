@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { AlertTriangle, Clock, CheckCircle, MessageSquare, FileText } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Incident Response Policy | Elevate for Humanity',

@@ -1,6 +1,5 @@
 export const dynamic = 'force-dynamic';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
 
 import { Metadata } from 'next';
 import Link from 'next/link';

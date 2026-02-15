@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { generateMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
-import { CheckCircle, Play, Award, BookOpen } from 'lucide-react';
+import { CheckCircle, Play, BookOpen } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 

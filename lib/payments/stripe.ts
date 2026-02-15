@@ -1,7 +1,6 @@
 import { logger } from '@/lib/logger';
 
 import Stripe from 'stripe';
-import { getStripe } from '@/lib/stripe/client';
 
 export interface PaymentIntent {
   id: string;

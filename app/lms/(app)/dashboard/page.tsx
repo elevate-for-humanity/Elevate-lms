@@ -12,7 +12,6 @@ export const metadata: Metadata = generateInternalMetadata({
 import { createClient } from '@/lib/supabase/server';
 import { safeFormatDate } from '@/lib/format-utils';
 import { requireRole } from '@/lib/auth/require-role';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';

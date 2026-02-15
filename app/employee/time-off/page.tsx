@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
-import { Calendar, Plus, Clock, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Calendar, Plus, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function TimeOffPage() {

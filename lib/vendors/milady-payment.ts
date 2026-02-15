@@ -3,7 +3,6 @@
  * Processes Milady enrollment and payment automatically
  */
 
-import { getStripe, stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 
 

@@ -6,12 +6,10 @@ export const maxDuration = 60;
 // app/api/live/zoom/route.ts
 // API endpoint for instructors to schedule Zoom live sessions
 import { NextRequest, NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { createZoomMeeting } from '@/lib/integrations/zoom';
-import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
+import { logAuditEvent, getRequestMetadata } from '@/lib/audit';
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
 
 export async function POST(request: NextRequest) {
   const supabase = createSupabaseClient();

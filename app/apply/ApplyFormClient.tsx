@@ -7,7 +7,7 @@ import Image from 'next/image';
 import { ApprenticeshipBadge } from '@/components/programs/ApprenticeshipBadge';
 import { ComplianceNotice } from '@/components/compliance/ComplianceNotice';
 import { getPoliciesForFeature } from '@/lib/policies';
-import { ApprenticeshipShopFields, type ShopFormData } from '@/components/forms/ApprenticeshipShopFields';
+import { ApprenticeshipShopFields } from '@/components/forms/ApprenticeshipShopFields';
 import Turnstile from '@/components/Turnstile';
 
 const APPRENTICESHIP_PROGRAMS = [

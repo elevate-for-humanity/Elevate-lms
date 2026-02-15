@@ -4,7 +4,7 @@
  */
 
 import { createClient } from '@/lib/supabase/server';
-import { programs as staticPrograms, type Program } from '@/app/data/programs';
+import { programs as staticPrograms } from '@/app/data/programs';
 
 /**
  * Get a single program by slug

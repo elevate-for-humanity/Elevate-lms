@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useState, useEffect } from 'react';
-import { Download, Check, Trash2, Loader2 } from 'lucide-react';
+import { Download, Check, Loader2 } from 'lucide-react';
 import {
   OfflineVideoManager,
   DownloadProgress,

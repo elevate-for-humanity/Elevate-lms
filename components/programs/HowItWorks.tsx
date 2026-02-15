@@ -1,4 +1,3 @@
-import { CheckCircle } from 'lucide-react';
 
 interface Step {
   number: number;

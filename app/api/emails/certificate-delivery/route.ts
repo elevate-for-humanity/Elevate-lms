@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function POST(req: NextRequest) {
   try {

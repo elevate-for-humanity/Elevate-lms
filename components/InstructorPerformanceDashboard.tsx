@@ -4,7 +4,6 @@ import React from 'react';
 
 import { useState } from 'react';
 import { Card } from '@/components/ui/Card';
-import { Button } from '@/components/ui/Button';
 
 export default function InstructorPerformanceDashboard() {
   const [timeRange, setTimeRange] = useState('30');

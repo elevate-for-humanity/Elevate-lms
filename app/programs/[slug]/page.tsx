@@ -4,7 +4,7 @@ import { notFound } from 'next/navigation';
 import { createPublicClient } from '@/lib/supabase/server';
 import fs from 'fs';
 import path from 'path';
-import { programs, type Program } from '@/app/data/programs';
+import { programs } from '@/app/data/programs';
 import { ProgramTemplate } from '@/components/programs/ProgramTemplate';
 import { VisualProgramTemplate } from '@/components/programs/VisualProgramTemplate';
 import type { Metadata } from 'next';

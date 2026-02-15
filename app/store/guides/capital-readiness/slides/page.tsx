@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, ArrowRight, Download, Presentation } from 'lucide-react';
+import { ArrowLeft, Download, Presentation } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Capital Readiness Slide Deck | Elevate Store',

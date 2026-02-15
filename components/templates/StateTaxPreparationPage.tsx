@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ArrowRight, CheckCircle, MapPin, Phone, Calendar } from 'lucide-react';
+import { CheckCircle, MapPin, Phone, Calendar } from 'lucide-react';
 import { StateConfig, getOtherStates } from '@/config/states';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 

@@ -1,6 +1,6 @@
 // app/api/account/delete/route.ts
 import { NextResponse } from 'next/server';
-import { requireApiAuth, APIAuthError } from '@/lib/auth';
+import { requireApiAuth } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
 
 export const runtime = 'nodejs';

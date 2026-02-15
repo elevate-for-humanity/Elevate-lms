@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Plug, CheckCircle, XCircle, RefreshCw, Settings } from 'lucide-react';
+import { Plug, CheckCircle, XCircle, Settings } from 'lucide-react';
 
 export default function IntegrationsPage() {
   const supabase = createClient();

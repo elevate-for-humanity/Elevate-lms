@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { createEnrollmentCase, submitCaseForSignatures } from '@/lib/workflow/case-management';
+import { createEnrollmentCase } from '@/lib/workflow/case-management';
 
 export async function POST(req: Request) {
   try {

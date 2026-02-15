@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useState, useEffect } from 'react';
-import { motion, useMotionValue, useTransform, animate } from 'framer-motion';
+import { motion, useMotionValue, animate } from 'framer-motion';
 import { Users, TrendingUp, Clock, Zap, ArrowRight } from 'lucide-react';
 
 interface EnrollmentData {

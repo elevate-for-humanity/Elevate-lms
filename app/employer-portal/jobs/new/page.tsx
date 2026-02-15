@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Briefcase, MapPin, DollarSign, Clock, Users, CheckCircle, ArrowLeft, Save, Eye } from 'lucide-react';
+import { Briefcase, MapPin, DollarSign, Clock, Users, ArrowLeft, Save, Eye } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Post New Job | Employer Portal',

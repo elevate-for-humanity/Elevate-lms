@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { createAdminClient } from '@/lib/supabase/server';
-import { Search, BookOpen, ArrowRight, HelpCircle } from 'lucide-react';
+import { Search, ArrowRight, HelpCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Help Center | Elevate For Humanity',

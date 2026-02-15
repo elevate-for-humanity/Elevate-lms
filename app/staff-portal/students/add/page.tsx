@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, User, Mail, Phone, Calendar, MapPin, GraduationCap, Save, CheckCircle } from 'lucide-react';
+import { User, Phone, Save, CheckCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function AddStudentPage() {

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { FileText, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { FileText, Send, CheckCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function ComplianceReportPage() {

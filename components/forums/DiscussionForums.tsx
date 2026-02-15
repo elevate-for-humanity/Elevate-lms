@@ -1,8 +1,6 @@
 "use client";
 
-import { createClient } from '@/lib/supabase/client';
 
-import { memo } from 'react';
 /**
  * Discussion Forums Component
  * Complete student community and peer support system

@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createServerSupabaseClient } from '@/lib/auth';
 import { withAuth } from '@/lib/with-auth';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export const POST = withAuth(
   async (request: Request, user) => {

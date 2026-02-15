@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Search, X, ArrowRight, User, Building2, Code, Briefcase, GraduationCap, Sparkles } from 'lucide-react';
+import { Search, X, ArrowRight, Building2, Code, Briefcase, GraduationCap, Sparkles } from 'lucide-react';
 
 // Types for search results
 interface SearchItem {

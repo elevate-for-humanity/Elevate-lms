@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle, Clock, FileText, Building, Users, ArrowRight } from 'lucide-react';
+import { CheckCircle, Clock, FileText, Building, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Partner Onboarding | Elevate For Humanity',

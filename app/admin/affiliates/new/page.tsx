@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { ArrowLeft, Users, User, Mail, Phone, Globe, DollarSign, Save } from 'lucide-react';
+import { ArrowLeft, Users, Mail, Phone, Globe, DollarSign, Save } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'New Affiliate | Admin',

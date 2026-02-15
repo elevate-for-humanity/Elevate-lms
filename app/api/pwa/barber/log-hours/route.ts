@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { checkNewMilestone, BARBER_MILESTONES } from '@/lib/pwa/milestones';
+import { checkNewMilestone } from '@/lib/pwa/milestones';
 
 export async function POST(request: NextRequest) {
   try {

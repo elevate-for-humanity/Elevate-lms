@@ -2,7 +2,7 @@
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
-import { Sparkles, ArrowRight, Building2, Users, Palette, Loader2 } from 'lucide-react';
+import { Sparkles, ArrowRight, Loader2 } from 'lucide-react';
 
 type Step = 'info' | 'details' | 'generating' | 'preview';
 

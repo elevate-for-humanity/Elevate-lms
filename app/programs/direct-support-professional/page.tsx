@@ -7,7 +7,7 @@ import { CredentialsOutcomes } from '@/components/programs/CredentialsOutcomes';
 import { createPublicClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, Users, Award, Clock, DollarSign } from 'lucide-react';
+import { Heart } from 'lucide-react';
 import { CompactHero } from '@/components/heroes/CompactHero';
 import { FundingBadge } from '@/components/programs/FundingBadge';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';

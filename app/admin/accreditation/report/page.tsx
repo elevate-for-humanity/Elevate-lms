@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { FileText, Download, Calendar, CheckCircle, AlertTriangle, Clock, ArrowLeft, Filter } from 'lucide-react';
+import { Download, Calendar, CheckCircle, AlertTriangle, Clock, ArrowLeft } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Accreditation Report | Admin',

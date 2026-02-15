@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { parseBody } from '@/lib/api-helpers';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { sendEmail, emailTemplates } from '@/lib/email';

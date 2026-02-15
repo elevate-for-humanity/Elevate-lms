@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, DollarSign, TrendingUp, ArrowRight, CheckCircle, Briefcase, GraduationCap, Award } from 'lucide-react';
+import { Clock, DollarSign, TrendingUp, ArrowRight, CheckCircle, Briefcase } from 'lucide-react';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
 
 export interface VisualProgramData {

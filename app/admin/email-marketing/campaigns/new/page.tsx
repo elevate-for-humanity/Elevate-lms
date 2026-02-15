@@ -18,7 +18,7 @@ import {
   Calendar,
   Mail,
 } from 'lucide-react';
-import { emailTemplates, type EmailTemplateKey } from '@/lib/email-templates';
+import { emailTemplates } from '@/lib/email-templates';
 
 
 export const dynamic = 'force-dynamic';

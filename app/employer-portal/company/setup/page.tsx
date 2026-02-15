@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Building, ArrowLeft, Upload, MapPin, Globe, Phone, Mail, Users, Save } from 'lucide-react';
+import { Building, ArrowLeft, Upload, MapPin, Globe, Phone, Mail, Save } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Company Setup | Employer Portal',

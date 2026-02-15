@@ -1,7 +1,5 @@
 import React from 'react';
 import { useEffect, useState } from 'react';
-import { redirect } from 'next/navigation';
-import { createBrowserClient } from '@supabase/ssr';
 
 type User = {
   id: string;

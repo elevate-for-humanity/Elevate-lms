@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Settings, CheckCircle, BookOpen, ShoppingCart, Code, Shield } from 'lucide-react';
+import { Settings, CheckCircle, BookOpen, ShoppingCart, Code, Shield } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {

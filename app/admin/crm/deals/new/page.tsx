@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, Building, User, Calendar, Save, Tag } from 'lucide-react';
+import { ArrowLeft, DollarSign, Building, User, Calendar, Save } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'New Deal | CRM Admin',

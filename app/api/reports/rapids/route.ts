@@ -5,7 +5,7 @@ export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function GET(req: Request) {
   try {

@@ -1,7 +1,7 @@
 import { logger } from '@/lib/logger';
 import fs from 'fs';
 import path from 'path';
-import { programs, type Program } from '@/app/data/programs';
+import { programs } from '@/app/data/programs';
 
 /**
  * Program Data Loader

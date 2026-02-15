@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, Download, Filter, Calendar } from 'lucide-react';
+import { ArrowLeft, Download } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function PayrollHistoryPage() {

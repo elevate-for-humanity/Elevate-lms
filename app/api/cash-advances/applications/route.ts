@@ -5,7 +5,7 @@ export const maxDuration = 60;
 // app/api/cash-advances/applications/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function GET(request: NextRequest) {
   try {

@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createClient } from '@/lib/supabase/client';
 import { User, GraduationCap, Briefcase, FileText, CheckCircle, ChevronRight, ChevronLeft, Upload } from 'lucide-react';
 import EnrollmentDocumentStep from '@/components/enrollment/EnrollmentDocumentStep';
 

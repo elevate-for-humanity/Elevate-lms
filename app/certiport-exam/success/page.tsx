@@ -4,7 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, Clock, MapPin, ArrowRight } from 'lucide-react';
-import { CERTIPORT_EXAMS, type CertiportExamCode } from '@/lib/partners/certiport';
+import { CERTIPORT_EXAMS } from '@/lib/partners/certiport';
 
 function SuccessContent() {
   const searchParams = useSearchParams();

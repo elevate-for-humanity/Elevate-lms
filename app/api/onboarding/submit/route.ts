@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import {
   OnboardingData,
@@ -18,7 +17,7 @@ import {
 } from '@/lib/onboarding-complete-digital';
 import { generateNDAText } from '@/lib/onboarding-nda-template';
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useExperiment, type Experiment } from '@/lib/experiments/ab-testing';
+import { useExperiment } from '@/lib/experiments/ab-testing';
 import { ReactNode } from 'react';
 
 interface ABTestProps {

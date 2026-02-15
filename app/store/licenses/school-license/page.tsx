@@ -4,7 +4,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Check, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
 
 export default function SchoolLicensePage() {
   const [activeSection, setActiveSection] = useState<string | null>('maria');

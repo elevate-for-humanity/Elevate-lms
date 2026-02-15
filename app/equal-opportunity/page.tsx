@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Scale, Shield, Users, Heart, Accessibility, FileText, ArrowRight, Phone } from 'lucide-react';
+import { Scale, Shield, Users, Accessibility, FileText, ArrowRight, Phone } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Equal Opportunity Employer | Elevate for Humanity',

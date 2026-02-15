@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { FileText, Download, Printer, ArrowLeft, Users } from 'lucide-react';
+import { Download, Printer, ArrowLeft, Users } from 'lucide-react';
 
 export default function WorkforceMOUPage() {
   return (

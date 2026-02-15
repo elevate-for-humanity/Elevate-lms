@@ -6,7 +6,7 @@ export const maxDuration = 60;
 import { cloneRepository } from '@/lib/store/stripe-products';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function POST(req: NextRequest) {
   try {

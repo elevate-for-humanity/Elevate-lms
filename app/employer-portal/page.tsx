@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Building2, Users, FileText, BarChart3, DollarSign, Briefcase } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 

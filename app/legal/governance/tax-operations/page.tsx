@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { FileText, Download, ChevronRight, Calculator, DollarSign, Shield, Clock, AlertTriangle, Users } from 'lucide-react';
+import { FileText, Download, ChevronRight, Calculator, DollarSign, Shield, AlertTriangle, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Tax Preparation and Refund Advance Operations | Elevate For Humanity',

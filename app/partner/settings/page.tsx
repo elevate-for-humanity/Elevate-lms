@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Settings, Building2, User, Bell, Shield, Save, CheckCircle } from 'lucide-react';
+import { Settings, Building2, User, Bell, Save, CheckCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function PartnerSettingsPage() {

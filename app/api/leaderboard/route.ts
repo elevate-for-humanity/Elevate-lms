@@ -5,7 +5,7 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { getCurrentUser, createServerSupabaseClient } from '@/lib/auth';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function GET(request: Request) {
   try {

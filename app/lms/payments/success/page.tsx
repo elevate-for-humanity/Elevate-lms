@@ -3,7 +3,7 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle, Calendar, BookOpen, ArrowRight } from 'lucide-react';
+import { CheckCircle, Calendar, BookOpen } from 'lucide-react';
 
 function SuccessContent() {
   const searchParams = useSearchParams();

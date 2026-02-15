@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Compass, CheckCircle, ArrowRight, Users, Target, TrendingUp } from 'lucide-react';
+import { Compass, CheckCircle, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Career Guidance Mentorship | Elevate for Humanity',

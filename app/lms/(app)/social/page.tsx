@@ -7,7 +7,6 @@ import {
   Users, MessageSquare, Heart, Share2, Image as ImageIcon,
   Plus, Search, Bell, UserPlus, TrendingUp, Trophy, Flame, Award
 } from 'lucide-react';
-import { StreakTracker } from '@/components/gamification/StreakTracker';
 
 export const dynamic = 'force-dynamic';
 

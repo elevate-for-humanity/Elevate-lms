@@ -18,7 +18,6 @@ import {
   Download,
   ClipboardList,
 } from 'lucide-react';
-import { LazyLMSDiscussionForum as DiscussionForum } from '@/components/LazyComponents';
 import { QuizSystem } from '@/components/lms/QuizSystem';
 import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';

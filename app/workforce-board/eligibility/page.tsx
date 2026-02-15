@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckCircle2, XCircle, FileText, HelpCircle } from 'lucide-react';
+import { CheckCircle2, FileText, HelpCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/workforce-board/eligibility' },

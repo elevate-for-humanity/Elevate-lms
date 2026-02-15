@@ -6,7 +6,6 @@ export const maxDuration = 60;
 // app/api/admin/applications/[id]/approve/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseClients";
-import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
 
 export async function POST(

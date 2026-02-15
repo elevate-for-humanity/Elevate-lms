@@ -2,7 +2,7 @@ import { logger } from '@/lib/logger';
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { getPageLoadMessage, getAvatarConfig, type AvatarContext } from '@/lib/avatar-config';
+import { getPageLoadMessage, getAvatarConfig } from '@/lib/avatar-config';
 
 /**
  * useAvatarOnLoad Hook

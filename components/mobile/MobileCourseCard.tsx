@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, BookOpen, Award, ChevronRight } from 'lucide-react';
+import { Clock, BookOpen, ChevronRight } from 'lucide-react';
 
 interface MobileCourseCardProps {
   id: string;

@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { requireAdmin } from '@/lib/authGuards';
-import { supabaseServer } from '@/lib/supabase-server';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';

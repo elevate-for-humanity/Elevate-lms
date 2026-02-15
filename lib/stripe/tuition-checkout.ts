@@ -10,8 +10,8 @@ import { logger } from '@/lib/logger';
  */
 
 import Stripe from 'stripe';
-import { getStripe, stripe } from '@/lib/stripe/client';
-import { getTuitionConfig, PAYMENT_METHODS, INSTALLMENT_RULES } from './tuition-config';
+import { stripe } from '@/lib/stripe/client';
+import { getTuitionConfig, PAYMENT_METHODS } from './tuition-config';
 
 
 

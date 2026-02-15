@@ -4,7 +4,6 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { CertificatePreview } from '@/components/lms/CertificateTemplate';
 import CertificateDownload from '@/components/CertificateDownload';
 import CertificateGenerator from '@/components/CertificateGenerator';
 

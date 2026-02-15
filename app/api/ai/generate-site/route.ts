@@ -1,7 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { TEMPLATE_DESIGNS, getRecommendedTemplate, TemplateDesign } from '@/lib/templates/designs';
+import { getRecommendedTemplate } from '@/lib/templates/designs';
 
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {

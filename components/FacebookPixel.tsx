@@ -4,7 +4,6 @@
 import React from 'react';
 
 import { useEffect, useState } from 'react';
-import { usePathname } from 'next/navigation';
 import Script from 'next/script';
 
 declare global {

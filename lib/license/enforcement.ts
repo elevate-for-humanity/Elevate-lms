@@ -6,7 +6,7 @@
  */
 
 import { PlanId, PLANS, LicenseStatus } from './types';
-import { checkLimits, UsageMetrics, requiresEnterprise, ENTERPRISE_ONLY_FEATURES } from './limits';
+import { checkLimits, UsageMetrics, requiresEnterprise } from './limits';
 
 export interface EnforcementResult {
   allowed: boolean;

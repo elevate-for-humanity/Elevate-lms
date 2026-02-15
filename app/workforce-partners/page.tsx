@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Building2, Users, MapPin, Phone, CheckCircle, ArrowRight, Handshake, Award, FileText } from 'lucide-react';
+import { Users, MapPin, Phone, CheckCircle, ArrowRight, Handshake, Award, FileText } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Workforce Partners | WorkOne & Community Organizations | Elevate For Humanity',

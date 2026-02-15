@@ -9,8 +9,6 @@ import { createClient } from '@/lib/supabase/server';
 import { sendEmail } from './email-service';
 import { studentEmailTemplates } from './templates/student-emails';
 import { appointmentEmailTemplates } from './templates/appointment-emails';
-import { taxEmailTemplates } from './templates/tax-emails';
-import { platformEmailTemplates } from './templates/platform-emails';
 
 /**
  * Send application received email

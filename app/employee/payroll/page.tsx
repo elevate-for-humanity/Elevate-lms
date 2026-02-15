@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { DollarSign, Calendar, Download, FileText, Clock, CheckCircle } from 'lucide-react';
+import { DollarSign, Download, FileText, Clock, CheckCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function PayrollPage() {

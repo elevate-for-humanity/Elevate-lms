@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { BookOpen, Users, Award, BarChart, FileText, Video, ArrowRight } from 'lucide-react';
+import { BookOpen, Award, BarChart, FileText, Video, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Educator Hub | Elevate For Humanity',

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckCircle2, FileText, Users, Award, BarChart3 } from 'lucide-react';
+import { FileText, Users, Award, BarChart3 } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/create-program' },

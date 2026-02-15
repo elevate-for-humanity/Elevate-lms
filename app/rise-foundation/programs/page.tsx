@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ChevronRight, GraduationCap, DollarSign, Users, Calendar, ArrowRight, CheckCircle } from 'lucide-react';
+import { GraduationCap, Users, Calendar, ArrowRight, CheckCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 const programs = [

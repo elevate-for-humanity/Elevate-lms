@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PLATFORM_APPS } from '@/app/data/store-products';
-import { ArrowLeft, Check, Zap } from 'lucide-react';
+import { Check, Zap } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';

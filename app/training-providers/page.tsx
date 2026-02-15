@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckCircle, Users, Award, Building2, TrendingUp, Shield, Phone, ArrowRight } from 'lucide-react';
+import { CheckCircle, Phone, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 

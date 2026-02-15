@@ -5,7 +5,7 @@ export const maxDuration = 60;
 // app/api/auth/landing/route.ts
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import { createServerClient, type CookieOptions } from '@supabase/ssr';
+import { createServerClient } from '@supabase/ssr';
 import { logger } from '@/lib/logger';
 
 export async function GET() {

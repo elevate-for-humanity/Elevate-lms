@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, Award, Zap, BookOpen, CheckCircle2 } from 'lucide-react';
+import { Clock, Award, Zap, BookOpen } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/micro-classes' },

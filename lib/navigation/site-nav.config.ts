@@ -5,7 +5,6 @@
  * Used by SiteHeader and SiteFooter components.
  */
 
-import { LucideIcon } from 'lucide-react';
 
 export interface NavLink {
   label: string;

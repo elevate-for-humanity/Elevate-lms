@@ -4,8 +4,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
-import { exportUserData, requestDataPortability } from '@/lib/gdpr';
+import { requestDataPortability } from '@/lib/gdpr';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 

@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Plus, BarChart3, Users, Calendar, Send, Eye, MousePointer } from 'lucide-react';
+import { Mail, Plus, Users, Calendar, Send, Eye, MousePointer } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { EmailCampaignManager } from '@/components/EmailCampaignManager';
 import { SMSNotificationSystem } from '@/components/SMSNotificationSystem';

@@ -4,7 +4,7 @@
  * Handles Stripe payments for paid certifications
  */
 
-import { getStripe, stripe } from '@/lib/stripe/client';
+import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/client';
 
 

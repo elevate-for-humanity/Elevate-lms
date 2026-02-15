@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Shield, AlertCircle, CheckCircle, Info } from 'lucide-react';
+import { Shield, CheckCircle, Info } from 'lucide-react';
 
 interface RAPIDSData {
   // Personal

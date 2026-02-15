@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { ChevronRight, MessageCircle, MessageSquare, ThumbsUp, Clock, User, Plus, Pin } from 'lucide-react';
+import { MessageCircle, MessageSquare, ThumbsUp, Clock, User, Plus, Pin } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {

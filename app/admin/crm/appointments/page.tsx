@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Calendar, Clock, User, MapPin, Video, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Clock, User, MapPin, Video, Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Appointments | CRM Admin',

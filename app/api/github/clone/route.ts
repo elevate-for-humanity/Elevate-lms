@@ -3,7 +3,7 @@ import { gh, parseRepo } from "@/lib/github";
 export const runtime = 'edge';
 export const maxDuration = 60;
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function POST(req: Request) {
   try {

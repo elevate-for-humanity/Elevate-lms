@@ -4,7 +4,7 @@ export const maxDuration = 60;
 
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function GET() {
   const supabase = await createRouteHandlerClient({ cookies });

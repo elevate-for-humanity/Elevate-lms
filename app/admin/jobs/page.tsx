@@ -1,9 +1,8 @@
 export const dynamic = 'force-dynamic';
-import { createClient } from '@/lib/supabase/server';
 
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Briefcase, Building2, MapPin, Clock, Plus, Search, Filter, Eye, Edit, Trash2 } from 'lucide-react';
+import { Briefcase, Building2, MapPin, Clock, Plus, Search, Eye, Edit, Trash2 } from 'lucide-react';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, User, Bell, Lock, CreditCard, Globe, Palette, Shield, LogOut } from 'lucide-react';
+import { ChevronRight, User, CreditCard, LogOut } from 'lucide-react';
 import SettingsForm from './SettingsForm';
 
 export const metadata: Metadata = {

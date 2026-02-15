@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, BellOff, Check, X } from 'lucide-react';
+import { Bell, BellOff, X } from 'lucide-react';
 
 // VAPID public key would come from environment
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || '';

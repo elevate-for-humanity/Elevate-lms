@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, Mail, CheckCircle, Loader2, Building2, Users, Award, ArrowRight } from 'lucide-react';
+import { Phone, Mail, CheckCircle, Loader2, Building2, ArrowRight } from 'lucide-react';
 
 export default function BarberShopPartnerPage() {
   const [loading, setLoading] = useState(false);

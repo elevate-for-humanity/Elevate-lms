@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Shield, Key, Smartphone, History } from 'lucide-react';
+import { Key, Smartphone, History } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 

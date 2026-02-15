@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { studioAPI, type Workspace } from '../lib/studio-api';
+import { studioAPI } from '../lib/studio-api';
 import { useWebContainer } from './useWebContainer';
 import type { FileNode, OpenFile, Settings, Branch, Commit, Repo, Message } from '../types';
 

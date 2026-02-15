@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Briefcase, Plus, Eye, Edit, Trash2, Clock, MapPin, DollarSign } from 'lucide-react';
+import { Briefcase, Plus, Eye, Edit, Clock, MapPin, DollarSign } from 'lucide-react';
 import { safeFormatDate } from '@/lib/format-utils';
 
 export const metadata: Metadata = {

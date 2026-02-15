@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import { Globe, Check, ChevronDown } from 'lucide-react';
-import { useI18n, LOCALES, LOCALE_NAMES, LOCALE_FLAGS, type Locale } from '@/lib/i18n/context';
+import { useI18n, LOCALES, LOCALE_NAMES, LOCALE_FLAGS } from '@/lib/i18n/context';
 
 export function LanguageSwitcher() {
   const { locale, setLocale } = useI18n();

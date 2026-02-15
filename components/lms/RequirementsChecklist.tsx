@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { CheckCircle, Clock, Upload, FileText, Calendar, AlertCircle } from 'lucide-react';
+import { CheckCircle, Clock, Upload, FileText, Calendar } from 'lucide-react';
 
 interface Requirement {
   id: string;

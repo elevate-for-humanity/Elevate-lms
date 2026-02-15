@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { GraduationCap, BookOpen, Users, BarChart3, FileText, MessageSquare } from 'lucide-react';
+import { GraduationCap } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 

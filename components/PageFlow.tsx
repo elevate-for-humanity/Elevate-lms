@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { ArrowRight, Phone, Calendar } from 'lucide-react';
+import { ArrowRight, Phone } from 'lucide-react';
 
 interface PageFlowProps {
   currentStep?: 'learn' | 'apply' | 'enroll' | 'train' | 'work';

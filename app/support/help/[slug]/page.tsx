@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createAdminClient } from '@/lib/supabase/server';
-import { ArrowLeft, ThumbsUp, ThumbsDown, Clock, Eye } from 'lucide-react';
+import { ArrowLeft, ThumbsUp, ThumbsDown, Eye } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 

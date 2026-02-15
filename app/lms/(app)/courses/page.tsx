@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Clock, Users, Star } from 'lucide-react';
+import { Clock, Users, Star } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Interactive Courses | LMS',

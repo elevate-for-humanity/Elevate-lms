@@ -1,9 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { NextRequest } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { TenantContext } from './withTenant';
-import { checkLicenseAccess, type BillingAuthority } from '@/lib/licensing/billing-authority';
+import { checkLicenseAccess } from '@/lib/licensing/billing-authority';
 
 export interface LicenseContext extends TenantContext {
   licenseId: string;

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Target, CheckCircle, ArrowRight, Calendar, TrendingUp, Award } from 'lucide-react';
+import { Target, ArrowRight, Calendar, TrendingUp, Award } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Goal Setting Mentorship | Elevate for Humanity',

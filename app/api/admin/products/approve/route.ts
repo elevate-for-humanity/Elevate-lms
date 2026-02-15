@@ -3,10 +3,9 @@ import { NextResponse } from 'next/server';
 
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
-import { sendProductApprovalEmail } from '@/lib/email/resend';
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function POST(req: Request) {
   try {

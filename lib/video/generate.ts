@@ -8,7 +8,7 @@
  */
 
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/openai-client';
-import { getInstructorForCourse, generateLessonScript, AIInstructor } from '@/lib/ai-instructors';
+import { getInstructorForCourse, generateLessonScript } from '@/lib/ai-instructors';
 import { logger } from '@/lib/logger';
 import fs from 'fs/promises';
 import path from 'path';

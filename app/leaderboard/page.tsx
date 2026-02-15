@@ -1,8 +1,6 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
-import { Trophy, Medal, Star, Flame, TrendingUp } from 'lucide-react';
+import { Trophy, Medal, Flame } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Leaderboard | Elevate For Humanity',

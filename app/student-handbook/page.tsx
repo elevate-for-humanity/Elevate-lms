@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { BookOpen, Download, ChevronRight, FileText, Shield, Users, Clock, Award } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { redirect } from 'next/navigation';
 
 export const metadata: Metadata = {
   title: 'Student Handbook | Elevate For Humanity',

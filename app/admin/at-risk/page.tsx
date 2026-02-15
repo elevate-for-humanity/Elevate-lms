@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { AlertCircle, TrendingDown, Users, FileWarning } from 'lucide-react';
+import { AlertCircle, TrendingDown, FileWarning } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'At-Risk Students | Admin Dashboard',

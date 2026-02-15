@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { Users, GraduationCap, Briefcase, DollarSign, TrendingUp, Award, Clock, Target } from 'lucide-react';
 
 interface OutcomesData {

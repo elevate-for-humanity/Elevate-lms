@@ -2,7 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 
 interface StudentRecord {
   name: string;

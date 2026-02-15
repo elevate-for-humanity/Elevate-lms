@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight, Clock, DollarSign, MapPin } from 'lucide-react';
+import { Clock, DollarSign, MapPin } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Certification Training Programs | Elevate for Humanity',

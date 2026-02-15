@@ -9,9 +9,9 @@ import { logger } from '@/lib/logger';
 import * as fs from 'fs';
 import * as path from 'path';
 import { TaxReturn } from '../types';
-import { createMeFSubmission, generateMeFXML } from '../mef/xml-generator';
+import { generateMeFXML } from '../mef/xml-generator';
 import { IRSSchemaValidator, createSchemaValidator } from '../schemas/schema-validator';
-import { MeFSOAPClient, createSOAPClient, SOAPTransmitResponse } from '../mef/soap-client';
+import { MeFSOAPClient, createSOAPClient } from '../mef/soap-client';
 import { createCertificateHandler, CertificateStatus } from '../mef/certificate-handler';
 
 // ATS Test Scenarios

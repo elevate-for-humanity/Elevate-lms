@@ -3,7 +3,7 @@
 import Image from 'next/image';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
-import { Trophy, Medal, Award } from 'lucide-react';
+import { Trophy, Medal } from 'lucide-react';
 
 interface LeaderboardEntry {
   rank: number;

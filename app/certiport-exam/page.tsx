@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Award, CheckCircle, Lock, ArrowRight, Shield, MapPin, Clock } from 'lucide-react';
-import { CERTIPORT_EXAMS, type CertiportExamCode, CERTIPORT_PORTAL_URL } from '@/lib/partners/certiport';
+import { CERTIPORT_EXAMS } from '@/lib/partners/certiport';
 
 type FundingStatus = 'funded' | 'self_pay' | 'loading';
 type CourseStatus = 'complete' | 'incomplete' | 'loading';

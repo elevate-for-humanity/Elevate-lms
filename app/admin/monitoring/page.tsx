@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Activity, AlertCircle, CheckCircle, Clock, Database, Server, TrendingUp, Users, Zap } from 'lucide-react';
+import { Activity, AlertCircle, CheckCircle, Database, Server, TrendingUp, Users, Zap } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface SystemStatus {

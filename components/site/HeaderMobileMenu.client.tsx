@@ -22,6 +22,16 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
   const [userProfile, setUserProfile] = useState<any>(null);
   const supabase = createClient();
 
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [isOpen]);
+
   // Load user profile from DB when menu opens
   useEffect(() => {
     async function loadProfile() {
@@ -44,7 +54,7 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden p-2 text-slate-700 hover:text-slate-900"
+        className="md:hidden p-3 text-slate-700 hover:text-slate-900 min-w-[44px] min-h-[44px] flex items-center justify-center"
         aria-label={isOpen ? 'Close menu' : 'Open menu'}
         aria-expanded={isOpen}
       >
@@ -73,6 +83,7 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
                   <button
                     onClick={() => setExpandedItem(expandedItem === item.name ? null : item.name)}
                     className="flex items-center justify-between w-full py-3 text-slate-900 font-medium"
+                    aria-expanded={expandedItem === item.name}
                   >
                     {item.name}
                     <ChevronDown
@@ -88,7 +99,7 @@ export default function HeaderMobileMenu({ items }: HeaderMobileMenuProps) {
                           key={subItem.name}
                           href={subItem.href}
                           onClick={() => setIsOpen(false)}
-                          className="block py-2 text-slate-600 hover:text-blue-600"
+                          className="block py-3 text-slate-600 hover:text-blue-600"
                         >
                           {subItem.name}
                         </Link>

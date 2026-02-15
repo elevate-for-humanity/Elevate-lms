@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { Award } from 'lucide-react';
 
 export function Hero() {
   return (

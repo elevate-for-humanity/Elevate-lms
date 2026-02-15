@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CheckCircle, Shield, Scale, Users, FileText, Download, ArrowRight, Phone } from 'lucide-react';
+import { CheckCircle, Shield, Scale, Users, FileText, ArrowRight, Phone } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Federal Compliance | Elevate For Humanity',

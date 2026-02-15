@@ -6,7 +6,7 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import * as crypto from 'crypto';
 import { TaxReturn } from '../tax-software/types';
-import { createMeFSubmission, generateMeFXML } from '../tax-software/mef/xml-generator';
+import { createMeFSubmission } from '../tax-software/mef/xml-generator';
 import { validateTaxReturn } from '../tax-software/validation/irs-rules';
 import { preparerService } from './preparer-service';
 import { clientService } from './client-service';

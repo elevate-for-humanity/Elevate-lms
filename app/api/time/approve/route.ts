@@ -4,7 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
 type Action = 'APPROVE' | 'REJECT' | 'LOCK';

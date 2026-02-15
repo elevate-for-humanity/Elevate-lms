@@ -1,8 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Badge } from '@/components/ui/Badge';
-import { Trophy, Star, Award, Target, Zap } from 'lucide-react';
+import { Zap } from 'lucide-react';
 
 interface Achievement {
   id: string;

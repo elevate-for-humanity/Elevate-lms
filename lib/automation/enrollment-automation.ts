@@ -6,7 +6,6 @@ import { logger } from '@/lib/logger';
  */
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import { welcomeEmail, enrollmentReminderEmail } from '@/lib/email/professional-templates';
 
 export interface EnrollmentAutomation {
   id: string;

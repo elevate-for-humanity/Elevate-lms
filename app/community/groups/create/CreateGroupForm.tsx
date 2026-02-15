@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Users, Globe, Lock, Save } from 'lucide-react';
+import { Users, Globe, Lock } from 'lucide-react';
 
 interface Program {
   id: string;

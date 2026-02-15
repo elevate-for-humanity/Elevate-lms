@@ -1,4 +1,3 @@
-import { handleApiError } from './api-error-handler';
 
 export class ApiClient {
   private baseUrl: string;

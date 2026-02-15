@@ -1,6 +1,5 @@
 // lib/withAuth.ts - Centralized authentication wrapper
 import { NextRequest, NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 
 type Role = 'student' | 'staff' | 'admin' | 'super_admin' | 'partner';

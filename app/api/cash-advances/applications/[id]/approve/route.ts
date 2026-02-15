@@ -4,10 +4,10 @@ export const maxDuration = 60;
 
 // app/api/cash-advances/applications/[id]/approve/route.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { parseBody } from '@/lib/api-helpers';
 import { supabaseServer } from '@/lib/supabase-server';
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function POST(
   request: NextRequest,

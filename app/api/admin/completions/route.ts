@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 async function getSupabaseServerClient() {
   const cookieStore = await cookies();

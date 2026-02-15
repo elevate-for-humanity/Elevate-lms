@@ -5,7 +5,7 @@ import React from 'react';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { Menu, X, ChevronDown, Search } from 'lucide-react';
 import clsx from 'clsx';
 import { PremiumMobileNav } from './PremiumMobileNav';

@@ -3,9 +3,8 @@ import { NextResponse } from 'next/server';
 
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
-import { sendMarketplaceApplicationEmail } from '@/lib/email/resend';
 import { createClient } from '@/lib/supabase/server';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 import {
   rateLimit,
   getClientIdentifier,

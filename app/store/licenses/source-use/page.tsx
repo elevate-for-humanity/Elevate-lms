@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { AlertTriangle, Check, X, FileCode, Building2, Shield, ArrowRight, Ban } from 'lucide-react';
+import { AlertTriangle, Check, X, Building2, Shield, ArrowRight, Ban } from 'lucide-react';
 import { LicenseDemo } from '@/components/store/LicenseDemo';
 
 export const metadata: Metadata = {

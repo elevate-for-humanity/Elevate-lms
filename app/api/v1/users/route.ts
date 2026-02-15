@@ -4,7 +4,7 @@ export const maxDuration = 60;
 
 // Public REST API - Users Endpoint
 import { NextRequest, NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { parseBody } from '@/lib/api-helpers';
 import {
   authenticateAPI,
   apiResponse,

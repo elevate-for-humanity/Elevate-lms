@@ -2,7 +2,6 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
-import { supabaseServer } from '@/lib/supabase-server';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';

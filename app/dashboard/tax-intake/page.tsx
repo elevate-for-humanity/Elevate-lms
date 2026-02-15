@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, FileText, Users, Clock, CheckCircle, AlertCircle, Search, Filter } from 'lucide-react';
+import { ChevronRight, FileText, Users, Clock, CheckCircle, AlertCircle, Search } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Tax Intake | Dashboard | Elevate For Humanity',

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { ArrowLeft, Award, Calendar, User, Building, Save } from 'lucide-react';
+import { ArrowLeft, Award, Calendar, User, Save } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Create License | Admin',

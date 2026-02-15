@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { X, ChevronRight, Volume2, VolumeX, MessageCircle, Sparkles } from 'lucide-react';
+import { X, ChevronRight, Volume2, VolumeX, Sparkles } from 'lucide-react';
 
 interface SalesMessage {
   id: string;

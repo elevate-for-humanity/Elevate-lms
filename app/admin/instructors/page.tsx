@@ -7,7 +7,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Users, Award, BookOpen, TrendingUp, Star } from 'lucide-react';
+import { Users, Award, BookOpen, Star } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function InstructorsPage() {

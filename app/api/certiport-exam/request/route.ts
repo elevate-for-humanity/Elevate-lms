@@ -6,7 +6,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe/client';
-import { CERTIPORT_EXAMS, type CertiportExamCode } from '@/lib/partners/certiport';
+import { CERTIPORT_EXAMS } from '@/lib/partners/certiport';
 
 /**
  * Certiport Exam Request

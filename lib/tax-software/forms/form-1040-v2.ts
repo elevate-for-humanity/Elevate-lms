@@ -7,7 +7,7 @@
  */
 
 import { TaxReturn } from '../types';
-import { loadTaxConfig, TaxConfig, TaxBracket } from '../config';
+import { loadTaxConfig, TaxConfig } from '../config';
 
 export interface Form1040Result {
   // Income

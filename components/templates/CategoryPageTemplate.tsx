@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { LucideIcon } from 'lucide-react';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { AtAGlanceSection } from '@/components/sections/AtAGlanceSection';
 import { WhoThisIsForSection } from '@/components/sections/WhoThisIsForSection';

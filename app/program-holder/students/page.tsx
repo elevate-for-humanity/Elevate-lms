@@ -1,8 +1,6 @@
 export const dynamic = 'force-dynamic';
 
 import { Metadata } from 'next';
-import { createClient } from '@/lib/supabase/server';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Users, Search, Filter, Download, Mail, Eye } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';

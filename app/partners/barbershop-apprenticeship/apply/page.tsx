@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Loader2, AlertCircle, CheckCircle, Download } from 'lucide-react';
+import { ArrowLeft, Loader2, AlertCircle, Download } from 'lucide-react';
 
 const employmentModels = [
   { value: 'hourly', label: 'Hourly Wage' },

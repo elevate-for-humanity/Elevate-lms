@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Scale, FileText, Clock, Phone, Mail, AlertTriangle } from 'lucide-react';
+import { Scale, Phone, Mail, AlertTriangle } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/grievance' },

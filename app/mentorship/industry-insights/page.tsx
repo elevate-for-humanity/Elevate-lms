@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Lightbulb, CheckCircle, ArrowRight, TrendingUp, Briefcase, BarChart } from 'lucide-react';
+import { Lightbulb, ArrowRight, TrendingUp, Briefcase, BarChart } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Industry Insights Mentorship | Elevate for Humanity',

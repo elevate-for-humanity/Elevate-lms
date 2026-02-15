@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Calendar, Users, Clock, CheckCircle, XCircle, Plus } from 'lucide-react';
+import { Calendar, Users, CheckCircle, Plus } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 

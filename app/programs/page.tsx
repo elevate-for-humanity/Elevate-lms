@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 // Programs page - pulls from database with ISR caching
 import { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -143,7 +144,7 @@ export default async function ProgramsPage() {
       {/* HERO - Full width, consistent height */}
       <section className="relative w-full h-[45vh] sm:h-[50vh] lg:h-[55vh]">
         <div className="absolute inset-0">
-          <img src="/images/programs-hero-vibrant.jpg" alt="Career training programs" className="w-full h-full object-cover" />
+          <Image src="/images/programs-hero-vibrant.jpg" alt="Career training programs" fill className="object-cover" priority />
         </div>
         <div className="absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-8 sm:right-8">
           <span className="inline-block bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold">
@@ -254,7 +255,7 @@ export default async function ProgramsPage() {
             
             <div className="lg:sticky lg:top-24">
               <div className="aspect-square max-h-[320px] rounded-xl overflow-hidden shadow-lg">
-                <img src="/images/prog-roadmap.jpg" alt="Career roadmap" className="w-full h-full object-cover" />
+                <Image src="/images/prog-roadmap.jpg" alt="Career roadmap" fill className="object-cover" />
               </div>
             </div>
           </div>
@@ -301,7 +302,7 @@ export default async function ProgramsPage() {
             </div>
             <div className="order-1 lg:order-2">
               <div className="aspect-square max-h-[320px] rounded-xl overflow-hidden shadow-lg">
-                <img src="/images/prog-why.jpg" alt="Career support" className="w-full h-full object-cover" />
+                <Image src="/images/prog-why.jpg" alt="Career support" fill className="object-cover" />
               </div>
             </div>
           </div>

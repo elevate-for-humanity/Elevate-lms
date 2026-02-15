@@ -2,9 +2,9 @@
 
 import React from 'react';
 import Image from 'next/image';
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Play, Pause, Volume2, VolumeX, Maximize, X, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
+import { Play, X, ChevronLeft, ChevronRight, Quote } from 'lucide-react';
 
 interface Testimonial {
   id: string;

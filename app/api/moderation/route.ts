@@ -2,10 +2,9 @@ export const runtime = 'edge';
 export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { parseBody } from '@/lib/api-helpers';
 import { apiRequireAdmin } from '@/lib/authGuards';
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
 import {
   reportContent,
   getPendingReports,

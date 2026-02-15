@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { User, Copy, Check, X, ChevronDown } from 'lucide-react';
-import { DEMO_USERS, type DemoRole } from '@/lib/demo/context';
+import { DEMO_USERS } from '@/lib/demo/context';
 
 interface DemoRoleSwitcherProps {
   currentRole?: DemoRole;

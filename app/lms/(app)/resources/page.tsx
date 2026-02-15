@@ -5,7 +5,6 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { ResourceLibrary } from '@/components/ResourceLibrary';
 import {
   BookOpen,
   FileText,

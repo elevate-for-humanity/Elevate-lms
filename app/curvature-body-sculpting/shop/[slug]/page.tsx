@@ -6,7 +6,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { createClient } from '@/lib/supabase/server';
-import { ArrowLeft, ShoppingCart, Heart, Truck, Shield, RotateCcw, Minus, Plus } from 'lucide-react';
+import { ShoppingCart, Truck, Shield, RotateCcw } from 'lucide-react';
 import AddToCartButton from './AddToCartButton';
 
 interface Props {

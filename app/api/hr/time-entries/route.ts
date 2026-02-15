@@ -4,9 +4,9 @@ export const maxDuration = 60;
 
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 // GET /api/hr/time-entries?employee_id=&start=&end=&status=
 export async function GET(request: NextRequest) {

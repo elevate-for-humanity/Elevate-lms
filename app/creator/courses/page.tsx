@@ -3,7 +3,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { ChevronRight, Plus, BookOpen, Users, Star, MoreVertical, Eye, Edit, Trash2 } from 'lucide-react';
+import { ChevronRight, Plus, BookOpen, Users, Star, Eye, Edit, Trash2 } from 'lucide-react';
 
 interface Course {
   id: number | string;

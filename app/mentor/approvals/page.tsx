@@ -10,7 +10,6 @@ export const metadata: Metadata = generateMetadata({
 
 export const dynamic = 'force-dynamic';
 
-import { redirect } from 'next/navigation';
 
 
 type Profile = { id: string; full_name: string | null };

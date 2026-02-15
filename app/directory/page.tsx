@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Building2, MapPin, Phone, Globe, ArrowRight } from 'lucide-react';
+import { Building2, MapPin, Globe, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Partner Directory | Elevate for Humanity',

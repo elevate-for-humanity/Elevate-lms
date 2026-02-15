@@ -6,11 +6,10 @@ export const maxDuration = 60;
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
-import { sendMarketplaceSaleNotification } from '@/lib/email/resend';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { randomBytes } from 'node:crypto';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function POST(req: Request) {
   const supabase = createAdminClient();

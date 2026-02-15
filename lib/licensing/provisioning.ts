@@ -6,7 +6,7 @@
 
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
-import { generateLicenseKey, hashLicenseKey } from '@/lib/store/license';
+import { generateLicenseKey } from '@/lib/store/license';
 import * as crypto from 'node:crypto';
 
 const ENVIRONMENT = process.env.NODE_ENV === 'production' ? 'production' : 'development';

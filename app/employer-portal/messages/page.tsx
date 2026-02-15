@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Image from 'next/image';
-import { MessageSquare, Search, Star, Send, Paperclip, MoreVertical, Check, CheckCheck } from 'lucide-react';
+import { MessageSquare, Search, Star, Send, Paperclip, MoreVertical, CheckCheck } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Messages | Employer Portal',

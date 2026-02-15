@@ -4,7 +4,7 @@
  */
 
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
-import { Document, Packer, Paragraph, TextRun, HeadingLevel } from 'docx';
+import { Document, Packer, Paragraph, HeadingLevel } from 'docx';
 import JSZip from 'jszip';
 
 export interface GrantPackage {

@@ -1,6 +1,5 @@
 
 import Stripe from 'stripe';
-import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 
 // =====================================================

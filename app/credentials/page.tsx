@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight, Award, Shield, CheckCircle } from 'lucide-react';
+import { Award, Shield, CheckCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Credentials & Certifications | Elevate for Humanity',

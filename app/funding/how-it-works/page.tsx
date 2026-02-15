@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { DollarSign, FileCheck, GraduationCap, CheckCircle2, HelpCircle } from 'lucide-react';
+import { DollarSign, FileCheck, GraduationCap, HelpCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/how-it-works' },

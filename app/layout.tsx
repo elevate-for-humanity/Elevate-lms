@@ -4,7 +4,6 @@ import './globals.css';
 import StructuredData from '@/components/StructuredData';
 import PublicLayout from '@/components/layout/PublicLayout';
 import { Toaster } from 'react-hot-toast';
-import { ClientProviders } from '@/components/ClientProviders';
 import CookieConsent from '@/components/CookieConsent';
 import { SkipToContent } from '@/components/ui/SkipToContent';
 

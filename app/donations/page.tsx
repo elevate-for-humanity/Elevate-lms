@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, DollarSign, Users, Award, ArrowRight, CheckCircle } from 'lucide-react';
+import { Heart, DollarSign, Users, Award, CheckCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {

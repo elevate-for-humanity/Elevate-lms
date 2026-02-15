@@ -4,7 +4,6 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ScrollReveal } from '@/components/animations/ScrollReveal';
-import { CountUp } from '@/components/animations/CountUp';
 import { BarChart, Lock, Smartphone, Zap,
   Phone
 } from 'lucide-react';

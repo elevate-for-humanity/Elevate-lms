@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { MessageCircle, X, Send, Minimize2, Maximize2, Scissors } from 'lucide-react';
+import { X, Send, Minimize2, Maximize2, Scissors } from 'lucide-react';
 
 interface Message {
   role: 'user' | 'assistant';

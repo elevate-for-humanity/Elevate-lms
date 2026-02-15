@@ -34,7 +34,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 import Stripe from 'stripe';
-import { getStripe, stripe } from '@/lib/stripe/client';
+import { stripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { createClient } from '@supabase/supabase-js';

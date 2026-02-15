@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Heart, Users, BookOpen, Award, Target, Zap } from 'lucide-react';
+import { Heart, Users, BookOpen, Target, Zap } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'About | Elevate Hub',

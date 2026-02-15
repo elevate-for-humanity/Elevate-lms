@@ -278,18 +278,12 @@ html, body {
     height: auto;
   }
 
-  /* Focus visible styles for accessibility */
+  /* Focus-visible styles — only show on keyboard navigation, not mouse clicks */
   *:focus-visible {
-    @apply outline-2 outline-offset-2 outline-blue-600 rounded;
-  }
-
-  button:focus,
-  a:focus {
-    outline: 2px solid #dc2626;
+    outline: 3px solid #2563eb;
     outline-offset: 2px;
+    border-radius: 4px;
   }
-
-  /* Skip to main content removed per user request */
 }
 
 /* ============================================================================

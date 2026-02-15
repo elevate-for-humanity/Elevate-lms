@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Folder, File, Upload, Search, Grid, List, Plus } from 'lucide-react';
+import { Folder, File, Upload, Search, Grid, List } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'File Manager | Elevate For Humanity',

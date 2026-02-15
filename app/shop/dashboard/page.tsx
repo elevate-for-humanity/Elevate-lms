@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ShoppingBag, DollarSign, Package, TrendingUp, Users, BarChart3 } from 'lucide-react';
+import { ShoppingBag, DollarSign, Package, Users, BarChart3 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Building2, Briefcase, TrendingUp, Users, ArrowRight, Loader2 } from 'lucide-react';
+import { Building2, Briefcase, Users, ArrowRight, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface Partner {

@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, Phone, MessageCircle, Clock, HelpCircle } from 'lucide-react';
+import { Mail, Phone, Clock, HelpCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Support | Program Holder Portal',

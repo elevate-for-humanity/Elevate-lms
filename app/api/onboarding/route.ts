@@ -2,11 +2,9 @@
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
-import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { requireApiAuth, APIAuthError } from '@/lib/auth';
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
 import { parseBody, getErrorMessage } from '@/lib/api-helpers';
 import {
   startOnboarding,

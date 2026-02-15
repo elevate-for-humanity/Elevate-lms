@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { Building2, Users, Briefcase, GraduationCap, Handshake, Award } from 'lucide-react';
+import { Building2, Briefcase, GraduationCap, Handshake, Award } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createPublicClient } from '@/lib/supabase/server';
 

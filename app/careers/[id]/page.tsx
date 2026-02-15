@@ -3,7 +3,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Upload, CheckCircle, Briefcase, MapPin, Clock, DollarSign } from 'lucide-react';
+import { ArrowLeft, Upload, CheckCircle, Briefcase, MapPin, Clock } from 'lucide-react';
 
 export default function CareerApplicationPage({ params }: { params: { id: string } }) {
   const [formData, setFormData] = useState({

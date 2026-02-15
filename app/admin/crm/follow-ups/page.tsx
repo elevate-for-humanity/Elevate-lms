@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Clock, Phone, Mail, Calendar, User, CheckCircle, AlertTriangle, Plus } from 'lucide-react';
+import { Clock, Phone, Mail, Calendar, Plus } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Follow-ups | CRM Admin',

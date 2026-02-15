@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireActiveLicense, License, LicenseError } from './requireActiveLicense';
+import { requireActiveLicense, License } from './requireActiveLicense';
 
 /**
  * STEP 5C: Feature Entitlement Enforcement

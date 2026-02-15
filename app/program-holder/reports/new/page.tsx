@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FileText, Calendar, Clock, Save } from 'lucide-react';
+import { Calendar, Clock, Save } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'New Report | Program Holder Portal',

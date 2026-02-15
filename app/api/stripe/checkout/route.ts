@@ -6,7 +6,7 @@ export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import { getProductBySlug } from '@/app/data/store-products';
 import { STRIPE_PRICE_IDS, isPriceConfigured } from '@/lib/stripe/price-map';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 import { createClient } from '@/lib/supabase/server';
 import { paymentRateLimit } from '@/lib/rate-limit';
 

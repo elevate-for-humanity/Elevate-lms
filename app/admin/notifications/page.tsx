@@ -2,10 +2,10 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import React from 'react';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Bell, Send, Users, CheckCircle, AlertCircle } from 'lucide-react';
+import { Bell, Send, CheckCircle, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 

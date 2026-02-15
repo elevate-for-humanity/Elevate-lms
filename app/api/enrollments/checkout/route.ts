@@ -6,7 +6,7 @@ import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
 

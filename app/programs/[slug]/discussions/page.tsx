@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
-import { ArrowLeft, Plus, MessageSquare, ThumbsUp, Clock, User, AlertCircle } from 'lucide-react';
+import { Plus, MessageSquare, ThumbsUp, Clock, User } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface Thread {

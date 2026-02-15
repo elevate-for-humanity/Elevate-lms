@@ -9,7 +9,7 @@ export const maxDuration = 60;
  */
 
 import { NextRequest, NextResponse } from 'next/server';
-import { parseBody, getErrorMessage } from '@/lib/api-helpers';
+import { parseBody } from '@/lib/api-helpers';
 import fs from 'fs';
 import path from 'path';
 

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CheckCircle, ArrowRight, Phone, Mail, Shield, FileText, Clock, AlertCircle } from 'lucide-react';
+import { CheckCircle, ArrowRight, Phone, Mail, Shield, AlertCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Funding Verification Policy | Elevate for Humanity',

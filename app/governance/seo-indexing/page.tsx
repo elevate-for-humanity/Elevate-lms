@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Search, CheckCircle, XCircle, Shield, Code } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Code } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {

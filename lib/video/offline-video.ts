@@ -1,5 +1,5 @@
 // Offline video download and playback utilities
-import { getDB, OfflineVideo } from '@/lib/offline/db';
+import { getDB } from '@/lib/offline/db';
 export interface DownloadProgress {
   loaded: number;
   total: number;

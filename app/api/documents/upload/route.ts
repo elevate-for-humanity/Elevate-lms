@@ -1,5 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
-import { withErrorHandling, APIErrors, ErrorCode } from '@/lib/api';
+import { withErrorHandling, APIErrors } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 // OCR processing moved to Netlify function: /.netlify/functions/ocr-extract

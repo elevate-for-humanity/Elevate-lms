@@ -2,7 +2,7 @@ import { createCheckoutSession } from '@/lib/store/stripe';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
-import { validateCheckoutAuthorization, isLicensingControlled } from '@/lib/store/licensing-mode';
+import { validateCheckoutAuthorization } from '@/lib/store/licensing-mode';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

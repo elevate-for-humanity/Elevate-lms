@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { CheckCircle, Phone, Mail } from 'lucide-react';
+import { CheckCircle, Mail } from 'lucide-react';
 
 
 export const metadata: Metadata = {

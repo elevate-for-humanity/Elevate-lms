@@ -1,6 +1,5 @@
 import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import {

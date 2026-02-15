@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { BarChart3, FileText, Download, Calendar } from 'lucide-react';
+import { BarChart3, FileText, Download } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 

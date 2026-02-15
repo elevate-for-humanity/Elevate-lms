@@ -53,10 +53,10 @@ const footerLinks = {
 
 export default function ServerFooter() {
   return (
-    <footer className="bg-slate-900 text-white">
+    <footer className="bg-slate-900 text-white" role="contentinfo" aria-label="Site footer">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* 5-Column Footer */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
+        <nav aria-label="Footer navigation" className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
           {/* Column 1: About */}
           <div>
             <h3 className="font-semibold mb-4 text-white text-sm uppercase tracking-wide">About</h3>
@@ -126,7 +126,7 @@ export default function ServerFooter() {
               ))}
             </ul>
           </div>
-        </div>
+        </nav>
 
         {/* Bottom Bar: Legal Links + Copyright */}
         <div className="border-t border-slate-800 pt-8">

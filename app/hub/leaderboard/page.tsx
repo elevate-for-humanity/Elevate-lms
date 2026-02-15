@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Trophy, Medal, Flame, TrendingUp, Crown, Star } from 'lucide-react';
+import { Trophy, Medal, Crown, Star } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Leaderboard | Elevate Hub',

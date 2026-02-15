@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ChevronRight, FileText, Download, Eye, Search, FolderOpen, File, Upload } from 'lucide-react';
+import { ChevronRight, FileText, Download, Eye, Search, FolderOpen, Upload } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Documents | Elevate For Humanity',

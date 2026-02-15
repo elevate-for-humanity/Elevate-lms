@@ -1,4 +1,3 @@
-import { NextRequest } from 'next/server';
 import { createDeprecatedCheckoutHandler } from '@/lib/checkout/deprecated';
 
 export const runtime = 'nodejs';

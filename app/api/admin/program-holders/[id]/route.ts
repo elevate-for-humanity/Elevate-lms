@@ -4,7 +4,6 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createRouteHandlerClient } from '@/lib/auth';
-import { withAuth } from '@/lib/with-auth';
 
 export async function GET(
   req: Request,

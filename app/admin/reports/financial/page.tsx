@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { ArrowLeft, DollarSign, FileText, CheckCircle, Clock } from 'lucide-react';
+import { ArrowLeft, DollarSign, FileText, Clock } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 

@@ -10,7 +10,6 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { getCurrentUser } from '@/lib/auth';
 import { WorkforceAgencyType, WorkforceReferralStatus } from '@/types/enrollment';
 
 // GET: List referrals or get specific referral

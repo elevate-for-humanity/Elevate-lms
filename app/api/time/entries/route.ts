@@ -4,7 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 type HourType = 'RTI' | 'OJT';
 type FundingPhase = 'PRE_WIOA' | 'WIOA' | 'POST_CERT';

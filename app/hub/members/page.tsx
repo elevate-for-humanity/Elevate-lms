@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Users, Search, Filter, MessageSquare, UserPlus } from 'lucide-react';
+import { Search, Filter, MessageSquare, UserPlus } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Members | Elevate Hub',

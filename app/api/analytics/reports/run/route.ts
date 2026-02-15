@@ -5,7 +5,7 @@ export const maxDuration = 60;
 // app/api/reports/run/route.ts
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export async function POST(request: Request) {
   const supabase = await createClient();

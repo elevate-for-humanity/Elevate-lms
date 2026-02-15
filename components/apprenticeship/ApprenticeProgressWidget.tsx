@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useState, useEffect } from 'react';
-import { Clock, Award, TrendingUp, BookOpen, Briefcase, ArrowRight } from 'lucide-react';
+import { Clock, Award, BookOpen, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 
 interface HourSummary {

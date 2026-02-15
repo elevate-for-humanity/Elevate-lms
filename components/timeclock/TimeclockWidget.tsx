@@ -1,7 +1,6 @@
 'use client';
 
-import { useTimeclock, TimeclockState } from '@/hooks/useTimeclock';
-import { formatDistanceToNow } from 'date-fns';
+import { useTimeclock } from '@/hooks/useTimeclock';
 
 interface TimeclockWidgetProps {
   siteId: string;

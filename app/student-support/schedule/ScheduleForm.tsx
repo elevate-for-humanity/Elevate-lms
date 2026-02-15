@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Calendar, Clock, User, Video, Phone, MapPin, CheckCircle } from 'lucide-react';
+import { User, Video, Phone, MapPin, CheckCircle } from 'lucide-react';
 
 interface Advisor {
   id: string;

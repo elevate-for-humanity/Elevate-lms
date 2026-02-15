@@ -3,7 +3,6 @@
 import { createClient } from '@/lib/supabase/client';
 
 import React from 'react';
-import { memo } from 'react';
 
 import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';

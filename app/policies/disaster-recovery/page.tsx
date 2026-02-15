@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Shield, Database, Clock, AlertTriangle, CheckCircle } from 'lucide-react';
+import { Shield, Database, Clock, CheckCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Disaster Recovery Policy | Elevate for Humanity',

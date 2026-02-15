@@ -3,8 +3,8 @@
  * Validates software against IRS Assurance Testing System (ATS) requirements
  */
 
-import { TaxReturn, W2Income, Dependent, ScheduleCBusiness } from '../types';
-import { validateTaxReturn, ValidationResult } from '../validation/irs-rules';
+import { TaxReturn, W2Income, Dependent } from '../types';
+import { validateTaxReturn } from '../validation/irs-rules';
 import { generateForm1040, generateMeFXML } from '../mef/xml-generator';
 
 export interface TestScenario {

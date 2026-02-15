@@ -2,11 +2,11 @@
 export const runtime = 'edge';
 export const maxDuration = 60;
 
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { gh, parseRepo } from '@/lib/github';
 import { marked } from 'marked';
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 // Simple HTML escape for security
 function escapeHtml(text: string): string {

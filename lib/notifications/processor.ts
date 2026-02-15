@@ -7,7 +7,7 @@ import { logger } from '@/lib/logger';
  */
 
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getTemplate, type TemplateKey } from './templates';
+import { getTemplate } from './templates';
 
 const DEFAULT_FROM = process.env.EMAIL_FROM || 'notifications@elevateforhumanity.org';
 const MAX_BATCH_SIZE = 50;

@@ -8,9 +8,6 @@ import { logger } from '@/lib/logger';
 
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { MeFAcknowledgment, MeFError } from './acknowledgment';
-import { MeFSOAPClient, createSOAPClient, SOAPTransmitResponse } from './soap-client';
-import { IRSSchemaValidator, validateXMLOrThrow } from '../schemas/schema-validator';
-import { createCertificateHandler } from './certificate-handler';
 
 const EFIN = process.env.IRS_EFIN || '000000';
 

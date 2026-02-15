@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle, CreditCard, Calendar, Loader2, AlertCircle } from 'lucide-react';
+import { CheckCircle, CreditCard, Calendar, Loader2 } from 'lucide-react';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
 
 // Pricing derived from canonical source

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Clock, ThumbsUp, ThumbsDown, Share2, Printer } from 'lucide-react';
+import { Clock, ThumbsUp, ThumbsDown, Share2, Printer } from 'lucide-react';
 import { sanitizeHtml } from '@/lib/sanitize';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 

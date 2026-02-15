@@ -4,7 +4,7 @@ export const runtime = 'edge';
 export const maxDuration = 60;
 import { gh, parseRepo } from '@/lib/github';
 import { logger } from '@/lib/logger';
-import { toError, toErrorMessage } from '@/lib/safe';
+import { toErrorMessage } from '@/lib/safe';
 
 export const dynamic = 'force-dynamic';
 

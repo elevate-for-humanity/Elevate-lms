@@ -1,4 +1,3 @@
-import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { CheckCircle, Play, ArrowRight, Mail } from 'lucide-react';

@@ -27,7 +27,6 @@
  *   licenses, license_events, donations, payments, payment_logs,
  *   audit_logs, tenants, applications
  * 
- * TODO: Decompose into lib/webhooks/handle-*.ts modules
  */
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

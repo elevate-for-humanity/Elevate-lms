@@ -183,7 +183,6 @@ export async function sendInvoice(invoiceId: string): Promise<void> {
 
   if (!profile) throw new Error('User not found');
 
-  // TODO: PDF generation moved to Netlify functions
   // For now, just update status
   // In production, call /.netlify/functions/invoice-pdf to generate PDF
 

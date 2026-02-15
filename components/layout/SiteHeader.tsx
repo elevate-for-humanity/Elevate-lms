@@ -233,7 +233,7 @@ export default function SiteHeader() {
           >
             <Image
               src="/logo.png"
-              alt=""
+              alt="Elevate for Humanity logo"
               width={40}
               height={40}
               className="w-10 h-10"

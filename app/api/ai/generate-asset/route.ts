@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'AI Asset Generator error:',
       error instanceof Error ? error : new Error(String(error))

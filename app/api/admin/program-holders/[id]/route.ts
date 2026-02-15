@@ -4,12 +4,16 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createRouteHandlerClient } from '@/lib/auth';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const { id } = await params;
   const supabase = await createRouteHandlerClient({ cookies });
   const {
     data: { user },

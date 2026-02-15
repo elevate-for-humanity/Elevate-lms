@@ -89,7 +89,7 @@ export const POST = withAuth(
     }
 
     return NextResponse.json(result);
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Bulk operation error:', error);
     return NextResponse.json(
       { error: 'Failed to perform bulk operation' },

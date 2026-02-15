@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
       },
       message: commitMessage,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'GitHub commit error:',
       error instanceof Error ? error : new Error(String(error))

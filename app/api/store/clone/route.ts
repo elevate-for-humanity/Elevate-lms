@@ -132,7 +132,7 @@ export async function POST(req: Request) {
       repoUrl: result.repoUrl,
       cloneUrl: result.cloneUrl,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Clone error:',
       error instanceof Error ? error : new Error(String(error))

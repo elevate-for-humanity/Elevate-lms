@@ -140,11 +140,11 @@ export async function POST(request: NextRequest) {
         platform_url: result.url,
       });
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         error: 'Internal server err',
-        details: error instanceof Error ? error.message : String(error),
+        details: 'Internal server error',
       },
       { status: 500 }
     );
@@ -243,10 +243,10 @@ async function postToLinkedIn(data: any) {
       post_id: result.id,
       url: `https://www.linkedin.com/feed/update/${result.id}`,
     };
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Internal server error',
     };
   }
 }
@@ -295,10 +295,10 @@ async function postToFacebook(data: any) {
       post_id: result.id,
       url: `https://www.facebook.com/${pageId}/posts/${result.id}`,
     };
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Internal server error',
     };
   }
 }
@@ -323,10 +323,10 @@ async function postToYouTube(data: any) {
       error:
         'YouTube posting requires OAuth 2.0 setup. Please configure refresh token.',
     };
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Internal server error',
     };
   }
 }
@@ -397,7 +397,7 @@ async function postToInstagram(data: any) {
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Internal server error',
     };
   }
 }
@@ -497,7 +497,7 @@ async function postToTwitter(data: any) {
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Internal server error',
     };
   }
 }
@@ -508,6 +508,9 @@ async function postToTwitter(data: any) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     const {
@@ -541,18 +544,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         {
           error: 'Failed to fetch posts',
-          details: error instanceof Error ? error.message : String(error),
+          details: 'Internal server error',
         },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ posts });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         error: 'Internal server err',
-        details: error instanceof Error ? error.message : String(error),
+        details: 'Internal server error',
       },
       { status: 500 }
     );

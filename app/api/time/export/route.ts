@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function csvEscape(data: any) {
   const s = String(v ?? '');
@@ -14,7 +15,10 @@ function csvEscape(data: any) {
 }
 
 export async function GET(req: Request) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   const {
     data: { user },
     error: authErr,

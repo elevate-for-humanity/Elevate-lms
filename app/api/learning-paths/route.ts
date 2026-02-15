@@ -13,7 +13,10 @@ async function parseBody<T>(request: NextRequest): Promise<T> {
 }
 
 export async function GET(request: NextRequest) {
-  const supabase = getSupabaseServerClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = getSupabaseServerClient();
 
   const { data, error }: any = await supabase
     .from("learning_paths")

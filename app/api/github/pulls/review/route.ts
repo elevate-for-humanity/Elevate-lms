@@ -54,7 +54,10 @@ export async function POST(req: NextRequest) {
 
 // Add a comment to PR
 export async function PUT(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
 
   try {
     const { repo, number, body, path, line, side, commit_id } = await req.json();

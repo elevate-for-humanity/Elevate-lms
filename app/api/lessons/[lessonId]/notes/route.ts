@@ -12,7 +12,10 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   const user = await getCurrentUser();
 
   if (!user) {

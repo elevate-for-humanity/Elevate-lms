@@ -52,13 +52,16 @@ export async function POST(request: Request) {
         instructions: miladyConfig.enrollment_instructions,
       },
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }
 
-export async function GET() {
-  return NextResponse.json({
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({
     program: miladyConfig.program,
     certification: miladyConfig.certification,
     scholarship: miladyConfig.scholarship_details,

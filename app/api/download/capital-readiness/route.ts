@@ -2,9 +2,13 @@ import { logger } from '@/lib/logger';
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedDownload } from "@/lib/storage/getSignedDownload";
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function GET() {
-  const supabase = await createClient();
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   
   // Get authenticated user
   const { data: { user }, error: authError } = await supabase.auth.getUser();

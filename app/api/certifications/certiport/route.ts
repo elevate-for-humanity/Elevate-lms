@@ -5,8 +5,11 @@ export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function GET() {
-  return NextResponse.json({
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({
     provider: 'Certiport',
     status: 'active',
     certifications: [

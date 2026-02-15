@@ -10,6 +10,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createServerSupabaseClient();
     const { searchParams } = new URL(req.url);
     const categoryId = searchParams.get('category_id');
@@ -40,7 +43,7 @@ export async function GET(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ threads: data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error fetching threads:', error);
     return NextResponse.json(
       { error: 'Failed to fetch threads' },
@@ -87,7 +90,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ thread: data }, { status: 201 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error creating thread:', error);
     return NextResponse.json(
       { error: 'Failed to create thread' },

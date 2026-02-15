@@ -7,12 +7,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { id } = await params;
   try {
     const supabase = await createClient();
     const body = await parseBody<Record<string, any>>(request);
@@ -53,7 +57,7 @@ export async function PATCH(
     if (error) throw error;
 
     return NextResponse.json({ timeEntry: data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error updating time entry:',
       error instanceof Error ? error : new Error(String(error))
@@ -69,7 +73,10 @@ export async function DELETE(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { id } = await params;
   try {
     const supabase = await createClient();
     const { error } = await supabase.from('time_entries').delete().eq('id', id);
@@ -77,7 +84,7 @@ export async function DELETE(
     if (error) throw error;
 
     return NextResponse.json({ message: 'Time entry deleted' });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error deleting time entry:',
       error instanceof Error ? error : new Error(String(error))

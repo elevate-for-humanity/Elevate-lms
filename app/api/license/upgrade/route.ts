@@ -198,8 +198,11 @@ export async function POST(request: NextRequest) {
  * 
  * Returns available subscription tiers for upgrade
  */
-export async function GET() {
-  const tiers = Object.entries(SUBSCRIPTION_TIERS).map(([id, config]) => ({
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const tiers = Object.entries(SUBSCRIPTION_TIERS).map(([id, config]) => ({
     id,
     name: config.name,
     tier: config.tier,

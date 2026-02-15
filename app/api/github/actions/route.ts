@@ -9,7 +9,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // List workflows and runs
 export async function GET(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
   const repo = req.nextUrl.searchParams.get('repo');
   const type = req.nextUrl.searchParams.get('type') || 'runs';
   const workflowId = req.nextUrl.searchParams.get('workflow_id');
@@ -205,7 +208,10 @@ export async function POST(req: NextRequest) {
 
 // Get workflow logs
 export async function PUT(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
 
   try {
     const { repo, job_id } = await req.json();

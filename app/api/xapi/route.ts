@@ -46,7 +46,10 @@ export async function POST(request: Request) {
 }
 
 export async function GET(request: Request) {
-  const supabase = createSupabaseClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = createSupabaseClient();
   // xAPI GET endpoint for retrieving statements
   const { searchParams } = new URL(request.url);
   const actor = searchParams.get('agent');

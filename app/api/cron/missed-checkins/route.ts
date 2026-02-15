@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
       alerts_sent: results.length,
       results,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Missed check-ins cron error:', error);
     return NextResponse.json(
       { error: 'Failed to check missed check-ins' },

@@ -5,12 +5,16 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ enrollmentId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { enrollmentId } = await params;
     const {
@@ -54,7 +58,7 @@ export async function GET(
     }
 
     return NextResponse.json(enrollment);
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('SCORM enrollment GET error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

@@ -42,7 +42,7 @@ export async function POST(
     if (error) throw error;
 
     return NextResponse.json({ success: true, data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         success: false,

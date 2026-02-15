@@ -96,6 +96,9 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { searchParams } = new URL(req.url);
     const token = searchParams.get('token');
 

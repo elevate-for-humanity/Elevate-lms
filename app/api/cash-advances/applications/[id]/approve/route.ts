@@ -70,7 +70,7 @@ export async function POST(
       application: data,
       message: 'Application approved successfully',
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }

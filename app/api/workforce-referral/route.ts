@@ -15,7 +15,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET: List referrals or get specific referral
 export async function GET(request: NextRequest) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -148,7 +151,10 @@ export async function POST(request: NextRequest) {
 
 // PATCH: Update referral status
 export async function PATCH(request: NextRequest) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) {
@@ -272,7 +278,10 @@ export async function PATCH(request: NextRequest) {
 
 // Automated status update endpoint (for cron jobs)
 export async function PUT(request: NextRequest) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   
   // This endpoint is for automated status updates
   // Should be called by a cron job

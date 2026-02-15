@@ -111,5 +111,8 @@ export async function POST(request: Request) {
 
 // Allow GET for manual trigger (admin only)
 export async function GET(request: Request) {
-  return POST(request);
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return POST(request);
 }

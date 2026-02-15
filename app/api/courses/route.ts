@@ -13,6 +13,9 @@ export const maxDuration = 60;
  */
 export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || undefined;
     const programId = searchParams.get('program_id') || undefined;

@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: `All sessions revoked for user ${userId}`,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Internal server error', details: error.message },
       { status: 500 }

@@ -34,13 +34,16 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ ok: true, intake_id: data.id });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
 export async function GET(req: Request) {
-  // Only allow service role to list intakes
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+// Only allow service role to list intakes
   const authHeader = req.headers.get("authorization");
   if (!authHeader || !authHeader.includes(process.env.SUPABASE_SERVICE_ROLE_KEY!)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

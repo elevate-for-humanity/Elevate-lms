@@ -8,6 +8,7 @@ import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -82,12 +83,11 @@ export async function POST(request: NextRequest) {
           `— Elevate for Humanity\n`,
       });
     } catch (emailError) {
-      // Error: $1
-      // Continue - inquiry is saved
+        logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     // Error: $1
     return NextResponse.json(
       { error: 'Failed to process inquiry' },

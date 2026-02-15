@@ -12,6 +12,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 // GET /api/hr/departments - List all departments
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     const { data: departments, error } = await supabase
@@ -30,7 +33,7 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ departments });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error fetching departments:',
       error instanceof Error ? error : new Error(String(error))
@@ -91,7 +94,7 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ department }, { status: 201 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error creating department:',
       error instanceof Error ? error : new Error(String(error))

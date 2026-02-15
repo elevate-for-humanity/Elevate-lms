@@ -13,6 +13,9 @@ type Params = { params: Promise<{ videoId: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { videoId } = await params;
     const supabase = await createClient();
 
@@ -42,7 +45,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
       chapters: chapters || [],
       transcript: transcript || null,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error("[Video Meta Error]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -156,7 +159,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error("[Video Meta Update Error]:", error);
     return NextResponse.json(
       { error: "Internal server error" },

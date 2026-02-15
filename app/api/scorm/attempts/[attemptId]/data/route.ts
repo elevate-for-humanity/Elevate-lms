@@ -13,7 +13,10 @@ export async function GET(
   request: Request,
   { params }: { params: Promise<{ attemptId: string }> }
 ) {
-  const supabase = createSupabaseClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = createSupabaseClient();
   const { attemptId } = await params;
   const session = await requireApiAuth();
 

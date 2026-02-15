@@ -12,6 +12,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 // GET /api/hr/benefits/enrollments?employee_id=
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const params = request.nextUrl.searchParams;
     const employeeId = params.get('employee_id');
@@ -37,7 +40,7 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ enrollments: data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error fetching benefits enrollments:',
       error instanceof Error ? error : new Error(String(error))
@@ -86,7 +89,7 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ enrollment: data }, { status: 201 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error creating benefits enrollment:',
       error instanceof Error ? error : new Error(String(error))

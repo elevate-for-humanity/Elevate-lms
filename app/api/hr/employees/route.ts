@@ -14,6 +14,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 // GET /api/hr/employees - List all employees
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const searchParams = request.nextUrl.searchParams;
 
@@ -65,7 +68,7 @@ export async function GET(request: NextRequest) {
         totalPages: Math.ceil((count || 0) / limit),
       },
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error fetching employees:',
       error instanceof Error ? error : new Error(String(error))
@@ -179,7 +182,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ employee }, { status: 201 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error creating employee:',
       error instanceof Error ? error : new Error(String(error))

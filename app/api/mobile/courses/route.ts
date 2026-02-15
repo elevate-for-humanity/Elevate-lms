@@ -7,9 +7,13 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const authHeader = request.headers.get("authorization");
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
       return NextResponse.json(
@@ -118,7 +122,7 @@ export async function GET(request: NextRequest) {
     const validCourses = coursesWithProgress.filter((c) => c !== null);
 
     return NextResponse.json(validCourses);
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error("[Mobile Courses Error]:", error);
     return NextResponse.json(
       { error: "Internal server error" },

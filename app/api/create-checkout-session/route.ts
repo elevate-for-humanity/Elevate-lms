@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
     const session = await stripe.checkout.sessions.create(sessionConfig);
 
     return NextResponse.json({ url: session.url });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Stripe error:', error);
     return NextResponse.json(
       { error: 'Error creating checkout session' },

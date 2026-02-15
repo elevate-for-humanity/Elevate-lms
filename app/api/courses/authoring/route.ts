@@ -10,6 +10,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     const {
@@ -52,7 +55,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ courses: courses || [] });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error("[Course Authoring Error]:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -146,7 +149,7 @@ export async function POST(req: NextRequest) {
       course_id: course.id,
       course,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error("[Course Creation Error]:", error);
     return NextResponse.json(
       { error: "Internal server error" },

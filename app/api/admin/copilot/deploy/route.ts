@@ -15,8 +15,11 @@ interface CopilotDeployment {
 }
 
 // GET - List all copilot deployments
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -138,6 +141,9 @@ export async function POST(request: NextRequest) {
 // PATCH - Update deployment status (start/stop)
 export async function PATCH(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
@@ -187,6 +193,9 @@ export async function PATCH(request: NextRequest) {
 // DELETE - Remove a deployment
 export async function DELETE(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();

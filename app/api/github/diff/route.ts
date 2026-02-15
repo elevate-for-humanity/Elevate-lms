@@ -5,10 +5,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { gh, parseRepo, getUserOctokit } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Get diff between two refs or for a specific file
 export async function GET(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
   const repo = req.nextUrl.searchParams.get('repo');
   const base = req.nextUrl.searchParams.get('base') || 'HEAD~1';
   const head = req.nextUrl.searchParams.get('head') || 'HEAD';

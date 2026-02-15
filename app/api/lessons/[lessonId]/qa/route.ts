@@ -12,7 +12,10 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
-  const { lessonId } = await params;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { lessonId } = await params;
   const supabase = await createClient();
 
   // Q + A list (readable without login if you want)

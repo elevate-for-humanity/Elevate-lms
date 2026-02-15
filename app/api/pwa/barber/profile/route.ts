@@ -5,9 +5,13 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getAchievedMilestones, BARBER_MILESTONES } from '@/lib/pwa/milestones';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     
     if (!supabase) {

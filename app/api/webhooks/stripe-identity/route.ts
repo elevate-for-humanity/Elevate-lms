@@ -35,7 +35,7 @@ export async function POST(request: NextRequest) {
       signature,
       process.env.STRIPE_IDENTITY_WEBHOOK_SECRET!
     );
-  } catch (error) { /* Error handled silently */ }
+  } catch (error) { }
 
   // Idempotency check
   if (supabase) {
@@ -83,7 +83,7 @@ export async function POST(request: NextRequest) {
 
       // Email notification handled by trigger to user
 
-    } catch (error) { /* Error handled silently */ 
+    } catch (error) { 
       return NextResponse.json(
         { error: 'Database update failed' },
         { status: 500 }
@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
 
       // Email notification handled by trigger to user
 
-    } catch (error) { /* Error handled silently */ 
+    } catch (error) { 
       return NextResponse.json(
         { error: 'Database update failed' },
         { status: 500 }

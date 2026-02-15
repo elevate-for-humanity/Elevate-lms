@@ -5,9 +5,13 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Get recent enrollments
@@ -70,7 +74,7 @@ export async function GET() {
     activities.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
     return NextResponse.json(activities.slice(0, 20));
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error fetching recent activity:', error);
     return NextResponse.json(
       { error: 'Failed to fetch recent activity' },

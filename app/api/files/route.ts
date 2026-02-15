@@ -10,7 +10,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 // Use Node.js runtime for file uploads
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -94,7 +97,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

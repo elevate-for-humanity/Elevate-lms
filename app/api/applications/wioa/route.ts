@@ -145,7 +145,7 @@ export async function POST(req: Request) {
           `,
         }),
       });
-    } catch (error) { /* Error handled silently */ }
+    } catch (error) { }
 
     // Send notification to admin
     try {
@@ -172,7 +172,7 @@ export async function POST(req: Request) {
           `,
         }),
       });
-    } catch (error) { /* Error handled silently */ }
+    } catch (error) { }
 
     return NextResponse.json(
       {
@@ -182,7 +182,7 @@ export async function POST(req: Request) {
       },
       { status: 200 }
     );
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         error:

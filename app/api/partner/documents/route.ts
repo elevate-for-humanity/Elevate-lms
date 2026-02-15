@@ -10,6 +10,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 // GET - List partner's documents and requirements
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     

@@ -9,7 +9,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // List pull requests
 export async function GET(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
   const repo = req.nextUrl.searchParams.get('repo');
   const state = req.nextUrl.searchParams.get('state') || 'open';
   const prNumber = req.nextUrl.searchParams.get('number');
@@ -155,7 +158,10 @@ export async function POST(req: NextRequest) {
 
 // Update pull request (merge, close, update)
 export async function PUT(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
 
   try {
     const { repo, number, action, title, body, state, merge_method } = await req.json();

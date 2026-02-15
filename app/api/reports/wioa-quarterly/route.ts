@@ -15,6 +15,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Check authentication
@@ -78,7 +81,7 @@ export async function GET(request: NextRequest) {
       },
       data: reportData,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('WIOA report generation error:', error);
     return NextResponse.json(
       { error: 'Failed to generate report' },
@@ -334,7 +337,7 @@ export async function POST(request: NextRequest) {
       message: 'Report saved successfully',
       data,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error saving report:', error);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }

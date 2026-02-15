@@ -75,6 +75,9 @@ export async function POST(req: Request) {
 // Bulk approve
 export async function PUT(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { hour_ids } = await req.json();
 
     if (!hour_ids || !Array.isArray(hour_ids)) {

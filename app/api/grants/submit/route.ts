@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Submission tracking error:', error);
     return NextResponse.json(
       { error: (error as Error).message },
@@ -104,6 +104,9 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { searchParams } = new URL(req.url);
     const applicationId = searchParams.get('applicationId');
 
@@ -124,7 +127,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ submission });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error fetching submission:', error);
     return NextResponse.json(
       { error: (error as Error).message },

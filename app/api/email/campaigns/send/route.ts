@@ -83,7 +83,7 @@ export async function POST(req: Request) {
           status: 'sent',
           sent_at: new Date().toISOString(),
         });
-      } catch (error) { /* Error handled silently */ 
+      } catch (error) { 
         logger.error(
           `Error sending to ${recipient.email}:`,
           error instanceof Error ? error : new Error(String(error))
@@ -127,7 +127,7 @@ export async function POST(req: Request) {
         failed: results.filter((r) => !r.success).length,
       },
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error sending campaign:',
       error instanceof Error ? error : new Error(String(error))

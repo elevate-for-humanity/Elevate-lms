@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Notification error:', error);
     return NextResponse.json(
       { error: (error as Error).message },
@@ -93,6 +93,9 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
     const unreadOnly = searchParams.get('unreadOnly') === 'true';
@@ -113,7 +116,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({ notifications });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error fetching notifications:', error);
     return NextResponse.json(
       { error: (error as Error).message },
@@ -124,6 +127,9 @@ export async function GET(req: NextRequest) {
 
 export async function PATCH(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const { notificationId, read } = body;
 
@@ -144,7 +150,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true, message: 'Notification updated' });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error updating notification:', error);
     return NextResponse.json(
       { error: (error as Error).message },

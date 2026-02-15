@@ -2,9 +2,13 @@ import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { rateLimitNew as rateLimit, getClientIdentifier } from '@/lib/rateLimit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Rate limit: 60 requests per minute
     const identifier = getClientIdentifier(request.headers);
     const rateLimitResult = rateLimit(identifier, { limit: 60, windowMs: 60000 });

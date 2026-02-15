@@ -3,9 +3,13 @@ export const maxDuration = 60;
 
 // app/api/lti/login/route.ts
 import { NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const url = new URL(request.url);
   const iss = url.searchParams.get('iss');
   const loginHint = url.searchParams.get('login_hint');
   const clientId = url.searchParams.get('client_id');

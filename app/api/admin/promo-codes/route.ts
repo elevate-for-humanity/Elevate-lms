@@ -18,8 +18,11 @@ async function guardAdmin() {
 }
 
 // GET - Fetch all promo codes
-export async function GET() {
-  const denied = await guardAdmin();
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const denied = await guardAdmin();
   if (denied) return denied;
   try {
     const supabase = createAdminClient();
@@ -81,7 +84,10 @@ export async function POST(req: Request) {
 
 // PUT - Update promo code
 export async function PUT(req: Request) {
-  const denied = await guardAdmin();
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const denied = await guardAdmin();
   if (denied) return denied;
   try {
     const body = await req.json();
@@ -120,7 +126,10 @@ export async function PUT(req: Request) {
 
 // DELETE - Delete promo code
 export async function DELETE(req: Request) {
-  const denied = await guardAdmin();
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const denied = await guardAdmin();
   if (denied) return denied;
   try {
     const { searchParams } = new URL(req.url);

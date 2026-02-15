@@ -17,7 +17,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/v1/users - List users
 export async function GET(request: NextRequest) {
-  const startTime = Date.now();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const startTime = Date.now();
   let statusCode = 200;
 
   try {

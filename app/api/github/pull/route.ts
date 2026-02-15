@@ -85,7 +85,10 @@ export async function POST(req: NextRequest) {
 
 // Sync local state with remote (refresh files)
 export async function PUT(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
 
   try {
     const { repo, branch, currentSha } = await req.json();
@@ -129,9 +132,9 @@ export async function PUT(req: NextRequest) {
           head: latestSha,
         });
         changedFiles = comparison.files?.map(f => f.filename) || [];
-      } catch {
-        // If comparison fails, just return all files need refresh
-      }
+      } catch (err) {
+          logger.error("Unhandled error", err instanceof Error ? err : undefined);
+        }
     }
 
     return NextResponse.json({

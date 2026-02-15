@@ -37,7 +37,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, wotc: data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : String(error) },
       { status: 500 }
@@ -45,8 +45,11 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = createAdminClient();
 
     const { data, error }: any = await supabase
@@ -75,7 +78,7 @@ export async function GET() {
     });
 
     return NextResponse.json({ wotc_tracking: enrichedData });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : String(error) },
       { status: 500 }

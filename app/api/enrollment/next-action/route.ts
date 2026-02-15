@@ -8,9 +8,13 @@ import {
   getActionDescription,
   type EnrollmentState 
 } from '@/lib/enrollment/state-machine';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();

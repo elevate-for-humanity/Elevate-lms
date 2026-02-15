@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Learner onboarding submitted successfully',
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Learner onboarding error:',
       error instanceof Error ? error : new Error(String(error))

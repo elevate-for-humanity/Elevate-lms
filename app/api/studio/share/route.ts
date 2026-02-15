@@ -15,7 +15,10 @@ function generateShareCode(): string {
 }
 
 export async function GET(req: NextRequest) {
-  const code = req.nextUrl.searchParams.get('code');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const code = req.nextUrl.searchParams.get('code');
   
   if (!code) {
     return NextResponse.json({ error: 'code required' }, { status: 400 });
@@ -91,7 +94,10 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const userId = req.headers.get('x-user-id');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userId = req.headers.get('x-user-id');
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }

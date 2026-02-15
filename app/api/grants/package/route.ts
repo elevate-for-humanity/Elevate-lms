@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Package builder error:', error);
     return NextResponse.json(
       { error: (error as Error).message },

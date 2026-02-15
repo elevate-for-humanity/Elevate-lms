@@ -198,6 +198,9 @@ export async function POST(request: NextRequest) {
 // GET - List applications (admin only)
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = createAdminClient();
     
     // Verify admin role via auth header or cookie

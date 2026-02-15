@@ -84,7 +84,7 @@ const startTime = Date.now();
     const duration = Date.now() - startTime;
 
     return NextResponse.json({ ok: true, id: data?.id });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     // Log failure
     if (emailTo && emailSubject) {
       await logEmailDelivery({

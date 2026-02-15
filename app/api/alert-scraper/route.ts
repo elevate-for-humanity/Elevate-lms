@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     });
 
     return responsePromise;
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error processing scraper alert:', error);
     return NextResponse.json(
       { error: 'Failed to process alert' },
@@ -189,7 +189,7 @@ async function sendSlackAlert(data: Record<string, any>) {
         ],
       }),
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Failed to send Slack alert:', error);
   }
 }
@@ -197,8 +197,11 @@ async function sendSlackAlert(data: Record<string, any>) {
 /**
  * GET endpoint to check alert system status
  */
-export async function GET() {
-  return NextResponse.json({
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({
     status: 'active',
     message: 'Scraper detection system is active',
     features: [

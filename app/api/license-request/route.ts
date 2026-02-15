@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -90,8 +91,8 @@ export async function POST(req: Request) {
         `— Elevate for Humanity\n`,
     });
   } catch (emailError) {
-    // Error: $1
-  }
+      logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
+    }
 
   return NextResponse.redirect(new URL('/licensing?submitted=true', req.url), {
     status: 303,

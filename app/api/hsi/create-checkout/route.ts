@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
     });
 
     return NextResponse.json({ sessionId: session.id, url: session.url });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Stripe checkout error:',
       error instanceof Error ? error : new Error(String(error))

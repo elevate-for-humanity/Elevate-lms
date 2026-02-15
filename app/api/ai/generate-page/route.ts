@@ -4,9 +4,13 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
-  const openaiKey = process.env.OPENAI_API_KEY;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const openaiKey = process.env.OPENAI_API_KEY;
   if (!openaiKey) {
     return NextResponse.json(
       {
@@ -76,7 +80,7 @@ Component should be a default export function.`;
       pageType,
       description,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'AI Page Builder error:',
       error instanceof Error ? error : new Error(String(error))

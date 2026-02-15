@@ -114,9 +114,9 @@ Keep responses concise (2-4 paragraphs max), practical, and encouraging. Focus o
           user_message: latest,
           assistant_response: reply,
         }).catch(() => {});
-      } catch {
-        // DB logging is non-critical
-      }
+      } catch (err) {
+          logger.error("Unhandled error", err instanceof Error ? err : undefined);
+        }
 
       return NextResponse.json({ text: reply });
     } catch (err: any) {

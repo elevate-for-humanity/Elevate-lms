@@ -109,7 +109,7 @@ export async function GET(request: NextRequest) {
       summaries_sent: results.length,
       results,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('End of day summary cron error:', error);
     return NextResponse.json(
       { error: 'Failed to send end of day summaries' },

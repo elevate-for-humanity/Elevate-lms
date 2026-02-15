@@ -9,7 +9,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Get reviews for a PR
 export async function GET(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
   const repo = req.nextUrl.searchParams.get('repo');
   const prNumber = req.nextUrl.searchParams.get('pr');
 
@@ -115,7 +118,10 @@ export async function POST(req: NextRequest) {
 
 // Add inline comment to a PR
 export async function PUT(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
 
   try {
     const { repo, pr, body, path, line, side, commit_id, in_reply_to } = await req.json();

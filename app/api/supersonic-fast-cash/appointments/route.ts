@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
@@ -114,8 +115,8 @@ export async function POST(request: NextRequest) {
         .update({ confirmation_sent: true })
         .eq('id', appointment.id);
     } catch (emailError) {
-      // Don't fail the request if email fails
-    }
+        logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
+      }
 
     // Send notification to admin
     try {
@@ -135,7 +136,7 @@ export async function POST(request: NextRequest) {
           ${needsRefundAdvance ? `<p><strong>Refund Advance:</strong> ${refundAdvanceAmount}</p>` : ''}
         `,
       });
-    } catch (error) { /* Error handled silently */ }
+    } catch (error) { }
 
     return NextResponse.json({
       success: true,
@@ -152,6 +153,9 @@ export async function POST(request: NextRequest) {
 // GET endpoint to fetch appointments
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     const email = searchParams.get('email');

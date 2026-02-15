@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { programs } from '@/app/data/programs';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 async function guardAdmin() {
   const supabase = await createClient();
@@ -15,7 +16,10 @@ async function guardAdmin() {
 }
 
 export async function GET(request: NextRequest) {
-  const denied = await guardAdmin();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const denied = await guardAdmin();
   if (denied) return denied;
   const { searchParams } = new URL(request.url);
   const format = searchParams.get('format') || 'html';

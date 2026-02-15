@@ -3,9 +3,13 @@ export const maxDuration = 60;
 
 // app/api/lti/config/route.ts
 import { NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function GET() {
-  const toolUrl = process.env.LTI_TOOL_URL || 'https://www.elevateforhumanity.org';
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const toolUrl = process.env.LTI_TOOL_URL || 'https://www.elevateforhumanity.org';
 
   const config = {
     title: 'Elevate for Humanity LMS',

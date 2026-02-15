@@ -22,6 +22,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action');
 
@@ -79,7 +82,7 @@ export async function GET(request: NextRequest) {
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Referrals GET error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch referral data' },
@@ -167,7 +170,7 @@ export async function POST(request: NextRequest) {
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Referrals POST error:', error);
     return NextResponse.json(
       {

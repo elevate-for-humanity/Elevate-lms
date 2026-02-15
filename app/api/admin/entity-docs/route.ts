@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,7 +11,10 @@ export const dynamic = 'force-dynamic';
  * Used by the admin verification drawer to show entity-level doc checklist.
  */
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { searchParams } = new URL(request.url);
   const userId = searchParams.get('userId');
   const category = searchParams.get('category');
 

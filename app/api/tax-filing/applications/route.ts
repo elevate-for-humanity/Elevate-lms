@@ -11,6 +11,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = supabaseServer();
     const searchParams = request.nextUrl.searchParams;
 
@@ -52,7 +55,7 @@ export async function GET(request: NextRequest) {
       limit,
       offset,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: toErrorMessage(error) },
       { status: 500 }
@@ -82,7 +85,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(data, { status: 201 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: toErrorMessage(error) },
       { status: 500 }

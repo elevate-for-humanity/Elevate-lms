@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getMarketingPageBySlug } from '@/lib/api/marketing';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * GET /api/marketing/[slug]
@@ -11,7 +12,10 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = await params;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { slug } = await params;
 
   if (!slug || typeof slug !== 'string') {
     return NextResponse.json({ error: 'Invalid slug' }, { status: 400 });

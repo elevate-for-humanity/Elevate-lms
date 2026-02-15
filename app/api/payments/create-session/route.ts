@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 
 
@@ -135,8 +136,7 @@ export async function POST(request: NextRequest) {
           .update({ stripe_customer_id: customer.id })
           .eq('id', user.id);
       } catch (customerError) {
-        // Error: $1
-        // Continue without customer ID - Stripe will create one
+          logger.error("Unhandled error", customerError instanceof Error ? customerError : undefined);
       }
     }
 
@@ -274,8 +274,7 @@ export async function POST(request: NextRequest) {
           sessionConfig.discounts = [{ coupon: couponCode }];
         }
       } catch (couponError) {
-        // Error: $1
-        // Continue without coupon
+          logger.error("Unhandled error", couponError instanceof Error ? couponError : undefined);
       }
     }
 
@@ -299,8 +298,7 @@ export async function POST(request: NextRequest) {
         },
       });
     } catch (logError) {
-      // Error: $1
-      // Continue - logging failure shouldn't block payment
+        logger.error("Unhandled error", logError instanceof Error ? logError : undefined);
     }
 
     // Return checkout URL
@@ -368,7 +366,10 @@ export async function POST(request: NextRequest) {
 
 // GET endpoint to retrieve session status
 export async function GET(request: NextRequest) {
-  if (!stripe) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+if (!stripe) {
     return NextResponse.json(
       { error: 'Payment system not configured' },
       { status: 503 }

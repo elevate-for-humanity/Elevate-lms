@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, ojt: data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : String(error) },
       { status: 500 }
@@ -51,8 +51,11 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = createAdminClient();
 
     const { data, error }: any = await supabase
@@ -65,7 +68,7 @@ export async function GET() {
     }
 
     return NextResponse.json({ ojt_reimbursements: data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : String(error) },
       { status: 500 }
@@ -75,6 +78,9 @@ export async function GET() {
 
 export async function PATCH(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const { id, status } = body;
 
@@ -92,7 +98,7 @@ export async function PATCH(req: Request) {
     }
 
     return NextResponse.json({ success: true, ojt: data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : String(error) },
       { status: 500 }

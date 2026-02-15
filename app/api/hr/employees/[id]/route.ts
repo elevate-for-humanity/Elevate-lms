@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/hr/employees/[id] - Get single employee
 export async function GET(
@@ -14,6 +15,9 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { id } = await params;
 
@@ -59,7 +63,7 @@ export async function GET(
     }
 
     return NextResponse.json({ employee });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error fetching employee:',
       error instanceof Error ? error : new Error(String(error))
@@ -77,6 +81,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
@@ -107,7 +114,7 @@ export async function PATCH(
     if (error) throw error;
 
     return NextResponse.json({ employee });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error updating employee:',
       error instanceof Error ? error : new Error(String(error))
@@ -125,6 +132,9 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { id } = await params;
     const searchParams = request.nextUrl.searchParams;
@@ -159,7 +169,7 @@ export async function DELETE(
       message: 'Employee terminated successfully',
       employee,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error terminating employee:',
       error instanceof Error ? error : new Error(String(error))

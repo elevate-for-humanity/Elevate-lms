@@ -7,6 +7,7 @@ export const maxDuration = 60;
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
@@ -105,8 +106,8 @@ export async function POST(req: Request) {
         `,
       });
     } catch (emailError) {
-      // Don't fail the request if email fails
-    }
+        logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
+      }
 
     // Send notification to staff
     try {
@@ -128,14 +129,14 @@ export async function POST(req: Request) {
           </ul>
         `,
       });
-    } catch (error) { /* Error handled silently */ }
+    } catch (error) { }
 
     return NextResponse.json({
       success: true,
       appointment: data,
       message: 'Appointment booked successfully! Check your email for confirmation.',
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

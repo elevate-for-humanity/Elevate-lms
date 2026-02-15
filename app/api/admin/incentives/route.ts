@@ -8,6 +8,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Check authentication

@@ -6,6 +6,8 @@ export const maxDuration = 60;
 import { getDigitalProduct } from '@/lib/store/digital-products';
 import { createClient } from '@/lib/supabase/server';
 import { generateSignedDownloadUrl, isStorageConfigured, getProductFileInfo, getPublicFallbackUrl } from '@/lib/storage/file-storage';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 /**
  * Download digital product
@@ -82,8 +84,8 @@ async function logDownload(
       user_agent: request.headers.get('user-agent'),
     });
   } catch (error) {
-    // Download logging is non-critical
-  }
+      logger.error("Unhandled error", error instanceof Error ? error : undefined);
+    }
 }
 
 /**
@@ -94,6 +96,9 @@ export async function GET(
   { params }: { params: Promise<{ productId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { productId } = await params;
     const searchParams = request.nextUrl.searchParams;
     const token = searchParams.get('token'); // Verification token from purchase

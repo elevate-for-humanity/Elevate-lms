@@ -19,6 +19,9 @@ const resend = process.env.RESEND_API_KEY
  */
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     if (!resend) {
       return NextResponse.json(
         { success: false, error: 'Email service not configured' },
@@ -60,7 +63,7 @@ export async function GET(req: Request) {
           name: workflow.name,
           processed,
         });
-      } catch (error) { /* Error handled silently */ 
+      } catch (error) { 
         logger.error(
           `Error processing workflow ${workflow.id}:`,
           error instanceof Error ? error : new Error(String(error))
@@ -78,7 +81,7 @@ export async function GET(req: Request) {
       message: `Processed ${workflows.length} workflows`,
       results,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Workflow processor error:',
       error instanceof Error ? error : new Error(String(error))
@@ -289,7 +292,7 @@ async function processPendingEmails(supabase: any, workflow: any, now: Date) {
       });
 
       processed++;
-    } catch (error) { /* Error handled silently */ 
+    } catch (error) { 
       logger.error(
         `Error processing enrollment ${enrollment.id}:`,
         error instanceof Error ? error : new Error(String(error))

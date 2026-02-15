@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { getPartnerClient, PartnerType } from '@/lib/partners';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function getSupabaseServerClient() {
   const cookieStore = cookies();
@@ -29,7 +30,10 @@ interface Params {
 }
 
 export async function GET(_req: Request, { params }: Params) {
-  const supabase = getSupabaseServerClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = getSupabaseServerClient();
   const { enrollmentId } = await params;
 
   const { data: enrollment, error } = await supabase

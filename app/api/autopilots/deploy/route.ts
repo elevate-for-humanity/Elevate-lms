@@ -14,7 +14,10 @@ export async function POST(request: Request) {
   return NextResponse.json(result);
 }
 
-export async function GET() {
-  const result = await prepareDeploy();
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const result = await prepareDeploy();
   return NextResponse.json(result);
 }

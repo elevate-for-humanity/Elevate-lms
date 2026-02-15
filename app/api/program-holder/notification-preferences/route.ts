@@ -77,7 +77,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ success: true, preferences });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('[Notification Preferences] Error', error);
     return NextResponse.json(
       { error: 'Internal server error' },

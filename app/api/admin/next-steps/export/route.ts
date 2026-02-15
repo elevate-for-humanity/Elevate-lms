@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function csvEscape(v: any) {
   const s = (v ?? '').toString().replace(/\r?\n/g, ' ').trim();
@@ -13,7 +14,10 @@ function csvEscape(v: any) {
 }
 
 export async function GET(req: Request) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();

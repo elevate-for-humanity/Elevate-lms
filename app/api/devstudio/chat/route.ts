@@ -58,9 +58,9 @@ Be concise and direct. Provide working code.`;
         file_context: fileContext || null,
         tokens_used: response.usage?.total_tokens || 0,
       }).catch(() => {});
-    } catch {
-      // DB logging is non-critical
-    }
+    } catch (err) {
+        logger.error("Unhandled error", err instanceof Error ? err : undefined);
+      }
 
     return NextResponse.json({
       message: assistantMessage,

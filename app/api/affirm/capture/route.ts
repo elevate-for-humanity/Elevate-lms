@@ -15,9 +15,13 @@ import { affirm } from '@/lib/affirm/client';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
-  // Lazy config: re-read env vars if missed at module load
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+// Lazy config: re-read env vars if missed at module load
   affirm.tryLateConfig();
 
   const searchParams = request.nextUrl.searchParams;

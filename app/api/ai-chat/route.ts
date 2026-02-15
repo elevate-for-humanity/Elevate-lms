@@ -190,9 +190,9 @@ You are the Elevate for Humanity AI Assistant - a warm, helpful guide for prospe
         assistant_response: reply,
         model: 'gpt-4o-mini',
       }).catch(() => {});
-    } catch {
-      // DB logging is non-critical
-    }
+    } catch (err) {
+        logger.error("Unhandled error", err instanceof Error ? err : undefined);
+      }
 
     return NextResponse.json({ reply });
   } catch (error) {

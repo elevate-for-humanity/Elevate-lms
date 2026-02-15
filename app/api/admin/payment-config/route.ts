@@ -8,12 +8,16 @@ import { NextResponse } from 'next/server';
 import { apiRequireAdmin } from '@/lib/authGuards';
 import { sezzle } from '@/lib/sezzle/client';
 import { affirm } from '@/lib/affirm/client';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-  const guard = await apiRequireAdmin();
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const guard = await apiRequireAdmin();
   if (guard) return guard;
 
   const response = NextResponse.json({

@@ -10,6 +10,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     const { data: campaigns, error } = await supabase
@@ -20,7 +23,7 @@ export async function GET(req: Request) {
     if (error) throw error;
 
     return NextResponse.json({ success: true, campaigns });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error fetching campaigns:',
       error instanceof Error ? error : new Error(String(error))
@@ -60,7 +63,7 @@ export async function POST(req: Request) {
     if (error) throw error;
 
     return NextResponse.json({ success: true, campaign });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error creating campaign:',
       error instanceof Error ? error : new Error(String(error))

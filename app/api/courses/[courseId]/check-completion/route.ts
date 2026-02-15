@@ -119,7 +119,10 @@ export async function POST(req: NextRequest, { params }: Params) {
 
 // GET endpoint to check status without updating
 export async function GET(req: NextRequest, { params }: Params) {
-  const supabase = getSupabaseServerClient();
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = getSupabaseServerClient();
   const { courseId } = await params;
 
   const {

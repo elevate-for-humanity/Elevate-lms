@@ -59,7 +59,10 @@ export async function POST(request: NextRequest) {
  * GET endpoint for simple token validation (redirect flow)
  */
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { searchParams } = new URL(request.url);
   const token = searchParams.get('token');
 
   if (!token) {

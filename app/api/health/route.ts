@@ -2,13 +2,17 @@ import { NextResponse } from 'next/server';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
 import { getAppVersion } from '@/lib/version/getAppVersion';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-export async function GET() {
-  const checks: Record<string, any> = {
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const checks: Record<string, any> = {
     status: 'healthy',
     timestamp: new Date().toISOString(),
     version: getAppVersion(),
@@ -53,7 +57,7 @@ export async function GET() {
         error: 'Missing Supabase credentials',
       };
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     checks.checks.database = {
       connected: false,
       status: 'fail',

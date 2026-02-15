@@ -5,10 +5,14 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/wioa/reporting - Generate WIOA reports
 export async function GET(request: NextRequest) {
-  const supabase = createSupabaseClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = createSupabaseClient();
   try {
     const { searchParams } = new URL(request.url);
     const reportType = searchParams.get('type');
@@ -72,7 +76,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ success: true, data: reportData });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         success: false,

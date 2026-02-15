@@ -7,6 +7,7 @@ import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -105,14 +106,14 @@ export async function POST(request: NextRequest) {
         `,
       });
     } catch (emailError) {
-      // Continue - request is logged
-    }
+        logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
+      }
 
     return NextResponse.json({
       success: true,
       message: 'Partnership request received. We will contact you within 1-2 business days.'
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Failed to process partnership request' },
       { status: 500 }

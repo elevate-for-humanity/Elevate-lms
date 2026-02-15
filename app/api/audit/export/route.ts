@@ -5,9 +5,13 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { auditExport } from '@/lib/auditLog';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { searchParams } = new URL(req.url);
     const format = searchParams.get('format') || 'csv';
 
@@ -55,7 +59,7 @@ export async function GET(req: Request) {
         'Content-Disposition': `attachment; filename="audit_export_${new Date().toISOString().split('T')[0]}.csv"`,
       },
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : String(error) },
       { status: 500 }

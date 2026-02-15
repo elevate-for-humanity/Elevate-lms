@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -164,8 +165,8 @@ export async function POST(request: NextRequest) {
         `
       });
     } catch (emailError) {
-      // Don't fail the request if email fails
-    }
+        logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
+      }
 
     return NextResponse.json({
       success: true,

@@ -104,7 +104,7 @@ Welcome to Elevate for Humanity!`
     });
 
     return Response.json({ ok: true });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error resending welcome email:', error);
     return new Response('Failed to resend email', { status: 500 });
   }

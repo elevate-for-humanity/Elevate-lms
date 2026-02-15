@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const MILESTONES = [
   { hours: 250, label: 'Foundation', color: 'blue' },
@@ -14,8 +15,11 @@ const MILESTONES = [
   { hours: 2000, label: 'Licensed', color: 'emerald' },
 ];
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     
     if (!supabase) {

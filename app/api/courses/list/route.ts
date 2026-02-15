@@ -6,9 +6,13 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Get query parameters
@@ -61,7 +65,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ courses });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Courses list error:',
       error instanceof Error ? error : new Error(String(error))

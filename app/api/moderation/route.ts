@@ -21,6 +21,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const authResult = await apiRequireAdmin();
 
     if (authResult instanceof NextResponse) {
@@ -79,7 +82,7 @@ export async function GET(request: NextRequest) {
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Moderation GET error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch moderation data' },
@@ -160,7 +163,7 @@ export async function POST(request: NextRequest) {
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Moderation POST error:', error);
     return NextResponse.json(
       { error: 'Failed to process moderation action' },

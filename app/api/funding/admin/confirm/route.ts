@@ -5,9 +5,13 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
-  const supabase = await createRouteHandlerClient({ cookies });
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createRouteHandlerClient({ cookies });
 
   const url = new URL(req.url);
   const token = url.searchParams.get('token');

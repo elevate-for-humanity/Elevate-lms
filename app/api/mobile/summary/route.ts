@@ -6,9 +6,13 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     const {
@@ -79,7 +83,7 @@ export async function GET(req: NextRequest) {
       longestStreak: streakData?.longest_streak || 0,
       recentActivity: recentActivityCount || 0,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error("[Mobile Summary Error]:", error);
     return NextResponse.json(
       { error: "Internal server error" },

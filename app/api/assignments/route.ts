@@ -11,6 +11,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 // GET /api/assignments - Fetch assignments for enrolled courses
 export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -60,7 +63,7 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({ assignments });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error in GET /api/assignments:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -123,7 +126,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ assignment }, { status: 201 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error in POST /api/assignments:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

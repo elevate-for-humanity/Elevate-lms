@@ -62,6 +62,9 @@ export async function POST(req: Request) {
 // Get student's hours
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const {
       data: { user },

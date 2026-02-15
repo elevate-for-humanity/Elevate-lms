@@ -14,6 +14,9 @@ export async function GET(
   { params }: { params: Promise<{ quizId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = getSupabaseServerClient();
     const { quizId } = await params;
 
@@ -44,7 +47,7 @@ export async function GET(
       quiz,
       questions: finalQuestions,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: toErrorMessage(error) || 'Failed to load quiz' },
       { status: 500 }
@@ -161,7 +164,7 @@ export async function POST(
       attemptNumber,
       maxAttempts: quiz.max_attempts,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: toErrorMessage(error) || 'Failed to submit quiz' },
       { status: 500 }

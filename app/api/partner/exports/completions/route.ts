@@ -2,9 +2,14 @@ import { NextResponse } from 'next/server';
 import { getMyPartnerContext } from '@/lib/partner/access';
 import { getPartnerStudentsWithTraining } from '@/lib/partner/students';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
-export async function GET() {
-  const ctx = await getMyPartnerContext();
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const ctx = await getMyPartnerContext();
   if (!ctx) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -123,7 +128,7 @@ async function logExportAudit(
       export_type: 'completions_csv',
       exported_at: timestamp,
     });
-  } catch {
-    // Fire-and-forget — audit failure must not block the export
-  }
+  } catch (err) {
+      logger.error("Unhandled error", err instanceof Error ? err : undefined);
+    }
 }

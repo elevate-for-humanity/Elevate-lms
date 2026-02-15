@@ -14,7 +14,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  */
 
 export async function GET(req: Request) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
 
   // Verify staff role
   const {

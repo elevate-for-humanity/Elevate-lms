@@ -14,6 +14,9 @@ type Params = { params: Promise<{ forumId: string; threadId: string }> };
 // GET: full thread details + posts
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { threadId } = await params;
     const supabase = await createClient();
 
@@ -109,7 +112,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     };
 
     return NextResponse.json(response);
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error("[thread detail] error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
@@ -185,7 +188,7 @@ export async function POST(req: NextRequest, { params }: Params) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error("[thread reply] error:", error);
     return NextResponse.json(
       { error: "Internal server error" },

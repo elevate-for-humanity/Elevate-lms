@@ -5,9 +5,13 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     // Verify admin access
     const supabase = await createClient();
     const {
@@ -153,7 +157,7 @@ export async function GET(req: Request) {
       record_count: exportData.length,
       data: exportData,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json({ error: 'Export failed' }, { status: 500 });
   }
 }

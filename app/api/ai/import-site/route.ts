@@ -226,9 +226,9 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedData
             images: page$('img').map((_, el) => page$(el).attr('src')).get().slice(0, 5),
           });
         }
-      } catch {
-        // Skip failed pages
-      }
+      } catch (err) {
+          logger.error("Unhandled error", err instanceof Error ? err : undefined);
+        }
     }
 
     result.success = true;

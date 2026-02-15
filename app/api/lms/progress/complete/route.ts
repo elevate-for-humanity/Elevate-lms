@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 /**
  * Mark course as completed
@@ -12,6 +13,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * Accepts both JSON and FormData
  */
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
@@ -110,7 +114,7 @@ export async function POST(req: NextRequest) {
           .eq('id', user.id);
       }
     } catch (pointsErr) {
-      // Points error handled silently - don't fail completion
+      logger.error("Points award failed", pointsErr instanceof Error ? pointsErr : undefined);
     }
 
     // Generate certificate
@@ -154,9 +158,11 @@ export async function POST(req: NextRequest) {
             }),
           }
         );
-      } catch (error) { /* Error handled silently */ }
+      } catch (emailErr) {
+        logger.error("Completion email failed", emailErr instanceof Error ? emailErr : undefined);
+      }
     } catch (certError) {
-      // Don't fail the completion if certificate fails
+      logger.error("Certificate generation failed", certError instanceof Error ? certError : undefined);
     }
 
     // Redirect if form submission, JSON response if API call
@@ -170,7 +176,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) {
     return NextResponse.json(
       {
         error:

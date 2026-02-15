@@ -11,6 +11,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -43,7 +46,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ notes });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error fetching notes:', error);
     return NextResponse.json(
       { error: 'Failed to fetch notes' },
@@ -92,7 +95,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ note });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error creating note:', error);
     return NextResponse.json(
       { error: 'Failed to create note' },

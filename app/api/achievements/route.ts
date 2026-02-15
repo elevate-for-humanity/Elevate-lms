@@ -9,6 +9,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -24,7 +27,7 @@ export async function GET(request: Request) {
         totalAchievements: 0,
       },
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -67,7 +70,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ achievement }, { status: 201 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

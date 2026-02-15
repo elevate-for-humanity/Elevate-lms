@@ -42,8 +42,11 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const result = await prepareDeploy();
     return NextResponse.json(result);
   } catch (error) {

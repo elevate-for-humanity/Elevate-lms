@@ -83,8 +83,11 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
-  // Return standard deductions for reference
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+// Return standard deductions for reference
   return NextResponse.json({
     taxYear: 2024,
     standardDeductions: {

@@ -5,13 +5,17 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // PATCH /api/messages/[id] - Mark message as read
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { id } = await params;
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -42,7 +46,7 @@ export async function PATCH(
     }
 
     return NextResponse.json({ message });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error in PATCH /api/messages/[id]:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -56,7 +60,10 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { id } = await params;
   try {
     const user = await getCurrentUser();
     if (!user) {
@@ -81,7 +88,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error in DELETE /api/messages/[id]:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

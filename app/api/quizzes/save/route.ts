@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
       quizId: quizData.id,
       message: 'Quiz saved successfully',
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error saving quiz:',
       error instanceof Error ? error : new Error(String(error))

@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Webhooks GET error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch webhook data' },
@@ -167,7 +167,7 @@ export async function POST(request: NextRequest) {
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Webhooks POST error:', error);
     return NextResponse.json(
       { error: 'Failed to process webhook action' },

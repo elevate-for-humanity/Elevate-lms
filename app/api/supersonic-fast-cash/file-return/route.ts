@@ -241,7 +241,7 @@ export async function POST(request: NextRequest) {
           </html>
         `
       });
-    } catch (error) { /* Error handled silently */ }
+    } catch (error) { }
 
     return NextResponse.json({
       success: true,

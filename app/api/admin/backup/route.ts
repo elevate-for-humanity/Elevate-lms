@@ -29,7 +29,7 @@ export const POST = withAuth(
       recordCount: result.recordCount,
       download: `/api/admin/backup/download?timestamp=${result.timestamp}`,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Backup error:', error);
     return NextResponse.json(
       { error: 'Failed to create backup' },
@@ -50,7 +50,7 @@ export const GET = withAuth(
     const backups = await listBackups();
 
     return NextResponse.json({ backups });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error listing backups:', error);
     return NextResponse.json(
       { error: 'Failed to list backups' },

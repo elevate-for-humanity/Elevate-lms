@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Course saved successfully',
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error saving course:',
       error instanceof Error ? error : new Error(String(error))

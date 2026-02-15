@@ -223,7 +223,7 @@ export async function POST(request: NextRequest) {
       sent_count: sentCount,
       total_recipients: recipients.length,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         error:

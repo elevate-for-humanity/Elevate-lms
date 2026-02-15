@@ -65,7 +65,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   
   // Get current user and verify admin role
   const { data: { user }, error: authError } = await supabase.auth.getUser();

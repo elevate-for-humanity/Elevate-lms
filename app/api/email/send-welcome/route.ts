@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
         dev: true,
       });
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Send welcome email error:',
       error instanceof Error ? error : new Error(String(error))

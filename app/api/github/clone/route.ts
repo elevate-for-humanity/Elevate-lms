@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       repo: newRepo.data.full_name,
       url: newRepo.data.html_url,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return Response.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }

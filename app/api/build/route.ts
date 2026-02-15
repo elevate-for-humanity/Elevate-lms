@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = "force-dynamic";
 
-export async function GET() {
-  const payload = {
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const payload = {
     now: new Date().toISOString(),
     platform: 'netlify',
     env: process.env.NODE_ENV ?? null,

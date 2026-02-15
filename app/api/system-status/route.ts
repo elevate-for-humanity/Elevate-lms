@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -151,8 +152,11 @@ function determineRouteStatus(route: typeof ROUTES_TO_AUDIT[0], tableAudits: Tab
   return 'ACTIVE';
 }
 
-export async function GET() {
-  // Require admin auth — this endpoint exposes infrastructure details
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+// Require admin auth — this endpoint exposes infrastructure details
   const authClient = await createClient();
   if (authClient) {
     const { data: { user } } = await authClient.auth.getUser();

@@ -6,9 +6,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { gh, parseRepo } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { searchParams } = new URL(req.url);
     const course = searchParams.get('course');
     const repo = searchParams.get('repo') || 'elevateforhumanity/fix2';
@@ -46,7 +50,7 @@ export async function GET(req: NextRequest) {
     const metadata = JSON.parse(raw);
 
     return NextResponse.json(metadata);
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Get metadata error:',
       error instanceof Error ? error : new Error(String(error))

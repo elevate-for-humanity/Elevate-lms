@@ -13,7 +13,10 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = createSupabaseClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = createSupabaseClient();
   try {
     const { id } = await params;
 
@@ -26,7 +29,7 @@ export async function GET(
     if (error) throw error;
 
     return NextResponse.json({ success: true, data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         success: false,
@@ -42,7 +45,10 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = createSupabaseClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = createSupabaseClient();
   try {
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
@@ -62,7 +68,7 @@ export async function PUT(
     if (error) throw error;
 
     return NextResponse.json({ success: true, data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         success: false,
@@ -103,7 +109,7 @@ export async function POST(
     if (error) throw error;
 
     return NextResponse.json({ success: true, data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         success: false,

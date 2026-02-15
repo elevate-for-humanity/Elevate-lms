@@ -8,9 +8,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { cacheGet, cacheSet } from '@/lib/cache';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(_req: NextRequest) {
-  const supabase = createSupabaseClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = createSupabaseClient();
   const cacheKey = 'programs:featured';
 
   // Try cache first

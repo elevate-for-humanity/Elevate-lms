@@ -90,7 +90,7 @@ export async function POST(req: NextRequest) {
       raw: output,
       success: true,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'AI generation error:',
       error instanceof Error ? error : new Error(String(error))

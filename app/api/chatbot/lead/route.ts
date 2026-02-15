@@ -180,8 +180,11 @@ export async function POST(request: NextRequest) {
 }
 
 // GET endpoint to check API health
-export async function GET() {
-  return NextResponse.json({
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({
     status: 'ok',
     endpoint: 'chatbot/lead',
     description: 'Captures qualified leads from AI chatbot conversations',

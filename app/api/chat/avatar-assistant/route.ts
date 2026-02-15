@@ -156,9 +156,9 @@ export async function POST(request: NextRequest) {
         assistant_response: reply,
         context: body.context || null,
       }).catch(() => {});
-    } catch {
-      // DB logging is non-critical
-    }
+    } catch (err) {
+        logger.error("Unhandled error", err instanceof Error ? err : undefined);
+      }
 
     return NextResponse.json({ message: reply });
   } catch (error) {
@@ -182,7 +182,10 @@ export async function POST(request: NextRequest) {
  * Used for initial avatar message on page load
  */
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { searchParams } = new URL(request.url);
   const route = searchParams.get('route');
 
   if (!route) {

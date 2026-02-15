@@ -8,7 +8,10 @@ import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
-  const repo = req.nextUrl.searchParams.get('repo');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const repo = req.nextUrl.searchParams.get('repo');
   const userToken = req.headers.get('x-gh-token');
 
   if (!repo) {
@@ -39,7 +42,7 @@ export async function GET(req: NextRequest) {
     }));
 
     return NextResponse.json(branches);
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'GitHub branches error:',
       error instanceof Error ? error : new Error(String(error))

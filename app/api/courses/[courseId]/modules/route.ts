@@ -9,6 +9,9 @@ export async function GET(
   { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { courseId } = await params;
     const supabase = await createClient();
 
@@ -75,6 +78,9 @@ export async function PUT(
   { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { courseId } = await params;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

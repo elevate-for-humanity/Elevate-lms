@@ -139,7 +139,7 @@ export async function POST(req: Request) {
         ? 'Congratulations! Your application is approved. Funds will be deposited within 24 hours.'
         : "Your application is being reviewed. You'll hear from us within 1 hour.",
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Cash advance application error:',
       error instanceof Error ? error : new Error(String(error))

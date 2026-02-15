@@ -43,7 +43,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ success: true, id: data.id });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error("API error:", error);
     return NextResponse.json(
       { error: "Server error" },
@@ -53,8 +53,11 @@ export async function POST(req: Request) {
 }
 
 // GET endpoint to fetch pending requests (for your team dashboard)
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     const { data, error }: any = await supabase
@@ -69,7 +72,7 @@ export async function GET() {
     }
 
     return NextResponse.json({ requests: data || [] });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error("API error:", error);
     return NextResponse.json(
       { error: "Server error" },

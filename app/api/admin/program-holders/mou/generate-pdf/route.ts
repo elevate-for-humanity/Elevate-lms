@@ -18,8 +18,11 @@ async function guardAdmin() {
 }
 
 // MOU PDF generation moved to reduce bundle size
-export async function GET() {
-  const denied = await guardAdmin();
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const denied = await guardAdmin();
   if (denied) return denied;
   return NextResponse.json(
     { error: 'PDF generation temporarily unavailable' },

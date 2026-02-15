@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       success: true,
       message: 'Subscription saved',
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('[Notifications] Subscribe error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to save subscription' },

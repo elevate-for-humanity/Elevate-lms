@@ -7,12 +7,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { supabaseServer } from '@/lib/supabase-server';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = supabaseServer();
     const { id } = await params;
 
@@ -27,7 +31,7 @@ export async function GET(
     }
 
     return NextResponse.json(data);
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }
@@ -37,6 +41,9 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = supabaseServer();
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
@@ -53,7 +60,7 @@ export async function PATCH(
     }
 
     return NextResponse.json(data);
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }

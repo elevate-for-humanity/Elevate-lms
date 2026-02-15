@@ -4,11 +4,15 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 type Params = Promise<{ id: string }>;
 
 export async function PATCH(req: Request, { params }: { params: Params }) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { id } = await params;
     const body = await req.json();
     const { status, notes } = body;
@@ -27,7 +31,7 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
     }
 
     return NextResponse.json({ success: true, onboarding: data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: error instanceof Error ? error.message : String(error) },
       { status: 500 }

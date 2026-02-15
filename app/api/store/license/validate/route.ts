@@ -126,7 +126,7 @@ export async function POST(req: Request) {
         expiresAt: license.expires_at,
       },
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'License validation error:',
       error instanceof Error ? error : new Error(String(error))

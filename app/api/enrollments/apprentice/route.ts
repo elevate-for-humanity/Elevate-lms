@@ -111,9 +111,9 @@ export async function POST(request: NextRequest) {
           }),
         }
       );
-    } catch {
-      // Email failure shouldn't fail the request
-    }
+    } catch (err) {
+        logger.error("Unhandled error", err instanceof Error ? err : undefined);
+      }
 
     return NextResponse.json({
       success: true,

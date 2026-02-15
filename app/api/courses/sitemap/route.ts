@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { gh, parseRepo } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -12,6 +13,9 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const repo =
       req.nextUrl.searchParams.get('repo') || 'elevateforhumanity/fix2';
     const branch = req.nextUrl.searchParams.get('branch') || 'main';
@@ -78,7 +82,7 @@ export async function GET(req: NextRequest) {
       courses: Object.keys(sitemap),
       totalFiles: courseFiles.length,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Generate sitemap error:',
       error instanceof Error ? error : new Error(String(error))

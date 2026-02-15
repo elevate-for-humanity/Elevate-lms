@@ -118,7 +118,7 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json({ url: session.url });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: toErrorMessage(error) },
       { status: 500 }

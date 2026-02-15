@@ -47,15 +47,15 @@ export async function POST(request: NextRequest) {
         sent_at: new Date().toISOString(),
         status: 'sent',
       }).catch(() => {});
-    } catch {
-      // DB logging is non-critical
-    }
+    } catch (err) {
+        logger.error("Unhandled error", err instanceof Error ? err : undefined);
+      }
 
     return NextResponse.json({
       success: true,
       message: 'Notification sent',
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('[Notifications] Send error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to send notification' },

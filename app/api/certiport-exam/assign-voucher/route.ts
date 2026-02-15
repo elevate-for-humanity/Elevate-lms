@@ -84,9 +84,9 @@ export async function POST(request: NextRequest) {
           email: updated.student_email,
         },
       });
-    } catch {
-      // Notification is best-effort
-    }
+    } catch (err) {
+        logger.error("Unhandled error", err instanceof Error ? err : undefined);
+      }
 
     return NextResponse.json({
       message: 'Voucher assigned successfully.',

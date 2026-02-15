@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
       repo: clonedRepo,
       url: `https://github.com/${clonedRepo}`,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Clone codebase error:',
       error instanceof Error ? error : new Error(String(error))

@@ -15,7 +15,10 @@ function jsonError(message: string, status = 400) {
 }
 
 export async function GET(req: Request) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   const {
     data: { user },
     error: authErr,

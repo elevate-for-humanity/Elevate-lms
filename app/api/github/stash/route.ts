@@ -12,7 +12,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 // by creating temporary branches or storing in database
 
 export async function GET(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
   const userId = req.headers.get('x-user-id');
   const repo = req.nextUrl.searchParams.get('repo');
 
@@ -119,7 +122,10 @@ export async function POST(req: NextRequest) {
 
 // Apply/pop a stash
 export async function PUT(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
 
   try {
     const { repo, stashName, targetBranch, pop } = await req.json();
@@ -187,7 +193,10 @@ export async function PUT(req: NextRequest) {
 
 // Delete a stash
 export async function DELETE(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
 
   try {
     const { repo, stashName } = await req.json();

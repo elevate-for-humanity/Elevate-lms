@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
           </p>
         `,
       });
-    } catch (error) { /* Error handled silently */ }
+    } catch (error) { }
 
     // Send notification to admin
     try {
@@ -143,7 +143,7 @@ export async function POST(request: NextRequest) {
           </p>
         `,
       });
-    } catch (error) { /* Error handled silently */ }
+    } catch (error) { }
 
     return NextResponse.json({
       success: true,
@@ -163,6 +163,9 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { searchParams } = new URL(request.url);
     const email = searchParams.get('email');
     const applicationId = searchParams.get('id');

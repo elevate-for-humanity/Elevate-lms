@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       status: 'ok',
       message: 'Tracking recorded',
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Tracking error:', error);
     return NextResponse.json({ error: 'Tracking failed' }, { status: 500 });
   }
@@ -206,7 +206,10 @@ async function logUnauthorizedAccess(data: {
  * GET endpoint to check tracking status
  */
 export async function GET(request: NextRequest) {
-  // Only allow from authorized domains
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+// Only allow from authorized domains
   const origin = request.headers.get('origin') || '';
   const isAuthorized = OFFICIAL_DOMAINS.some((domain) =>
     origin.includes(domain)

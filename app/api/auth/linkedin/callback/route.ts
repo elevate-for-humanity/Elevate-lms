@@ -4,13 +4,17 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * LinkedIn OAuth Callback Handler
  * Exchanges authorization code for access token
  */
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const searchParams = request.nextUrl.searchParams;
   const code = searchParams.get('code');
   const error = searchParams.get('error');
   const state = searchParams.get('state');

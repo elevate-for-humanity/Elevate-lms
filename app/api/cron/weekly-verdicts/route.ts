@@ -5,6 +5,7 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { logger } from '@/lib/logger';
 
 // This route is called by scheduled cron weekly (Sunday 7:30 PM EST)
 // Generates compliance verdicts for all active enrollments
@@ -82,7 +83,7 @@ export async function POST(request: NextRequest) {
       no_activity: result.no_activity,
       timestamp: new Date().toISOString(),
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         ok: false,
@@ -166,7 +167,10 @@ async function createAlertsFromVerdicts(
     });
 
     await supabase.from('alert_notifications').insert(alerts);
-  } catch (error) { /* Error handled silently */ }
+  } catch (error) {
+    logger.error("Unhandled error", error instanceof Error ? error : undefined);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 // Allow GET for manual testing (development only)

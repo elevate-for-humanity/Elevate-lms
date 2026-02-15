@@ -7,9 +7,13 @@ import { createClient } from '@/lib/supabase/server';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/openai-client';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
-  if (!isOpenAIConfigured()) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+if (!isOpenAIConfigured()) {
     return NextResponse.json(
       { error: 'AI features not configured. Please set OPENAI_API_KEY.' },
       { status: 503 }
@@ -121,7 +125,7 @@ ${JSON.stringify(features, null, 2)}
     }
 
     return NextResponse.json({ scores: parsed });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Dropout risk prediction error:',
       error instanceof Error ? error : new Error(String(error))

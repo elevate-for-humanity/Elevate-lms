@@ -33,7 +33,10 @@ function decrypt(text: string): string {
 
 // Get deploy tokens for user
 export async function GET(req: NextRequest) {
-  const userId = req.headers.get('x-user-id');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userId = req.headers.get('x-user-id');
 
   if (!userId) {
     return NextResponse.json({ error: 'Missing user ID' }, { status: 401 });
@@ -123,7 +126,10 @@ export async function POST(req: NextRequest) {
 
 // Get decrypted token for deployment (internal use)
 export async function PUT(req: NextRequest) {
-  const userId = req.headers.get('x-user-id');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userId = req.headers.get('x-user-id');
 
   if (!userId) {
     return NextResponse.json({ error: 'Missing user ID' }, { status: 401 });
@@ -166,7 +172,10 @@ export async function PUT(req: NextRequest) {
 
 // Delete deploy token
 export async function DELETE(req: NextRequest) {
-  const userId = req.headers.get('x-user-id');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userId = req.headers.get('x-user-id');
   const provider = req.nextUrl.searchParams.get('provider');
 
   if (!userId) {

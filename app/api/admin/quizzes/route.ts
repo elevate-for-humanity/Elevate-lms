@@ -20,7 +20,10 @@ async function requireAdmin() {
 }
 
 export async function GET(request: Request) {
-  const auth = await requireAdmin();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const auth = await requireAdmin();
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
   try {
     const { searchParams } = new URL(request.url);

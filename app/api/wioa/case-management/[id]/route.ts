@@ -6,13 +6,17 @@ export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/wioa/case-management/[id] - Get case by ID
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = createSupabaseClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = createSupabaseClient();
   try {
     const { id } = await params;
 
@@ -25,7 +29,7 @@ export async function GET(
     if (error) throw error;
 
     return NextResponse.json({ success: true, data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         success: false,
@@ -41,7 +45,10 @@ export async function PUT(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const supabase = createSupabaseClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = createSupabaseClient();
   try {
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);
@@ -56,7 +63,7 @@ export async function PUT(
     if (error) throw error;
 
     return NextResponse.json({ success: true, data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         success: false,

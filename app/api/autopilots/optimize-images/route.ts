@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
       totalSavings,
       details: optimized,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Optimize images error:',
       error instanceof Error ? error : new Error(String(error))

@@ -18,7 +18,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/v1/courses - List all courses
 export async function GET(request: NextRequest) {
-  const startTime = Date.now();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const startTime = Date.now();
   let statusCode = 200;
   let error: string | undefined;
 

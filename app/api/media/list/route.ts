@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Allowed bucket names (whitelist)
 const ALLOWED_BUCKETS = ['media', 'documents', 'avatars', 'course-content'];
@@ -14,6 +15,9 @@ const SAFE_FOLDER_PATTERN = /^[a-zA-Z0-9_-]*$/;
 
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Authentication check

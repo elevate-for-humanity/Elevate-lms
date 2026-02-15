@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import OpenAI from 'openai';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 function getOpenAIClient() {
   return new OpenAI({
@@ -103,8 +104,7 @@ export async function POST(req: Request) {
         .eq('student_id', user.id)
         .eq('ai_instructor_met', false);
     } catch (onboardingError) {
-      // Error: $1
-      // Continue - not critical
+        logger.error("Unhandled error", onboardingError instanceof Error ? onboardingError : undefined);
     }
 
     // Pull recent history
@@ -145,7 +145,7 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ reply });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     // Error: $1
     return NextResponse.json(
       { error: toErrorMessage(error) || 'Failed to process chat' },
@@ -157,6 +157,9 @@ export async function POST(req: Request) {
 // Get chat history
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const {
       data: { user },
@@ -185,7 +188,7 @@ export async function GET(req: Request) {
       .order('created_at', { ascending: true });
 
     return NextResponse.json({ messages: messages || [] });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     // Error: $1
     return NextResponse.json(
       { error: 'Failed to load chat history' },

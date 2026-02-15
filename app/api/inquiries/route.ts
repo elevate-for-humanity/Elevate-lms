@@ -163,8 +163,8 @@ export async function POST(req: Request) {
         }
       );
     } catch (emailError) {
-      // Don't fail the inquiry if email fails
-    }
+        logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
+      }
 
     return NextResponse.json(
       {
@@ -175,7 +175,7 @@ export async function POST(req: Request) {
       },
       { status: 200 }
     );
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Unexpected error processing inquiry' },
       { status: 500 }

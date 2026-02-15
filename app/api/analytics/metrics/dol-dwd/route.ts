@@ -4,9 +4,13 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createServerSupabaseClient } from '@/lib/auth';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function GET() {
-  const supabase = await createServerSupabaseClient();
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createServerSupabaseClient();
 
   // Get DOL/DWD reporting data
   const { data: enrollments } = await supabase

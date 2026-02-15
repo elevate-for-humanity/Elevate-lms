@@ -235,8 +235,8 @@ export async function POST(request: NextRequest) {
         `,
       });
     } catch (emailError) {
-      // Don't fail the webhook if email fails
-    }
+        logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
+      }
 
     // Step 9: Send notification to tax pro
     try {
@@ -285,7 +285,7 @@ export async function POST(request: NextRequest) {
           </p>
         `,
       });
-    } catch (error) { /* Error handled silently */ }
+    } catch (error) { }
 
     // Return success
     return NextResponse.json({
@@ -304,6 +304,9 @@ export async function POST(request: NextRequest) {
 }
 
 /** Health check — returns 200 with no details */
-export async function GET() {
-  return NextResponse.json({ ok: true });
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({ ok: true });
 }

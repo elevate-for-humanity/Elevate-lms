@@ -9,6 +9,7 @@ import {
   getFailedLoginsByIP,
 } from '@/lib/monitoring';
 import { requireOrgAdmin } from '@/lib/auth/require-org-admin';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * GET /api/monitoring/stats
@@ -16,6 +17,9 @@ import { requireOrgAdmin } from '@/lib/auth/require-org-admin';
  */
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     // Require super_admin for monitoring access
     // In development, allow without auth
     if (process.env.NODE_ENV === 'production') {
@@ -68,7 +72,7 @@ export async function GET(req: Request) {
       })),
       failedLoginsByIP: failedLoginsByIP.slice(0, 20), // Top 20 IPs
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     if (error instanceof Error && error.message === 'Unauthorized') {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }

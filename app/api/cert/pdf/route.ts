@@ -2,12 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { getUserById } from '@/lib/supabase-admin';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 // Use Node.js runtime
 export const runtime = 'nodejs';
 
 export async function GET(req: NextRequest) {
-  const supabase = await createRouteHandlerClient({ cookies });
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createRouteHandlerClient({ cookies });
   const { searchParams } = new URL(req.url);
   const serial = searchParams.get('serial');
 
@@ -27,8 +32,8 @@ export async function GET(req: NextRequest) {
   try {
     u = await getUserById(cert.user_id);
   } catch (error) {
-    // User lookup failed, will use fallback data
-  }
+      logger.error("Unhandled error", error instanceof Error ? error : undefined);
+    }
 
   const { data: c } = await supabase
     .from('courses')

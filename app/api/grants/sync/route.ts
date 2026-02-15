@@ -131,8 +131,11 @@ export async function POST(request: Request) {
  * GET /api/grants/sync
  * Get sync status and recent grants
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Get grant counts
     const { count: totalGrants } = await supabaseAdmin
       .from('grant_opportunities')

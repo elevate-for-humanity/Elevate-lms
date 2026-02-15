@@ -7,9 +7,13 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function GET() {
-  const cookieStore = await cookies();
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const cookieStore = await cookies();
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -22,7 +26,7 @@ export async function GET() {
         set(name: string, value: string, options: CookieOptions) {
           try {
             cookieStore.set({ name, value, ...options });
-          } catch (error) { /* Error handled silently */ 
+          } catch (error) { 
             // Handle cookie setting errors
             logger.error('Error setting cookie:', error);
           }
@@ -30,7 +34,7 @@ export async function GET() {
         remove(name: string, options: CookieOptions) {
           try {
             cookieStore.set({ name, value: '', ...options });
-          } catch (error) { /* Error handled silently */ 
+          } catch (error) { 
             // Handle cookie removal errors
             logger.error('Error removing cookie:', error);
           }
@@ -89,7 +93,7 @@ export async function GET() {
     }
 
     return NextResponse.json({ redirectTo });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Auth landing error:', error);
     return NextResponse.json(
       { error: 'Authentication error' },

@@ -1,9 +1,13 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { searchStore } from '@/lib/store/db';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const searchParams = request.nextUrl.searchParams;
   const query = searchParams.get('q') || '';
   const audience = searchParams.get('audience') || undefined;
   const category = searchParams.get('category') || undefined;

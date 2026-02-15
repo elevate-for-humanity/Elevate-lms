@@ -7,6 +7,7 @@ import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { resend } from '@/lib/resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -79,7 +80,8 @@ export async function POST(request: NextRequest) {
         });
 
         sentCount++;
-      } catch (error) { /* Error handled silently */ 
+      } catch (error) {
+          logger.error("Unhandled error", error instanceof Error ? error : undefined);
   }
     }
 
@@ -88,7 +90,7 @@ export async function POST(request: NextRequest) {
       sent_count: sentCount,
       total_selected: students.length,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         error:

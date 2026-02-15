@@ -8,7 +8,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Get PR tracking data for user
 export async function GET(req: NextRequest) {
-  const userId = req.headers.get('x-user-id');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userId = req.headers.get('x-user-id');
   const repoId = req.nextUrl.searchParams.get('repo_id');
 
   if (!userId) {
@@ -98,7 +101,10 @@ export async function POST(req: NextRequest) {
 
 // Update PR tracking (notes, watching status)
 export async function PUT(req: NextRequest) {
-  const userId = req.headers.get('x-user-id');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userId = req.headers.get('x-user-id');
 
   if (!userId) {
     return NextResponse.json({ error: 'Missing user ID' }, { status: 401 });
@@ -140,7 +146,10 @@ export async function PUT(req: NextRequest) {
 
 // Delete PR tracking
 export async function DELETE(req: NextRequest) {
-  const userId = req.headers.get('x-user-id');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userId = req.headers.get('x-user-id');
   const id = req.nextUrl.searchParams.get('id');
 
   if (!userId) {

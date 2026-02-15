@@ -149,9 +149,9 @@ Keep responses concise but helpful. Use bullet points for clarity when listing i
           tokens_used: completion.usage?.total_tokens || 0,
           model: 'gpt-4o-mini',
         });
-      } catch {
-        // Silently fail - don't block the response
-      }
+      } catch (err) {
+          logger.error("Unhandled error", err instanceof Error ? err : undefined);
+        }
     }
 
     return NextResponse.json({

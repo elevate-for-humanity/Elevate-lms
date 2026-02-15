@@ -2,13 +2,17 @@ import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { Redis } from '@upstash/redis';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
 
-export async function GET() {
-  // Require admin auth — this endpoint exposes infrastructure details
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+// Require admin auth — this endpoint exposes infrastructure details
   const supabase = await createClient();
   if (supabase) {
     const { data: { user } } = await supabase.auth.getUser();

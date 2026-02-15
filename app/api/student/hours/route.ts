@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * GET /api/student/hours
@@ -9,8 +10,11 @@ import { createClient } from '@/lib/supabase/server';
  * Groups by enrollment with verified/pending breakdown.
  * Strict rendering: Returns empty array if no data.
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });

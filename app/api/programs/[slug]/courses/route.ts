@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,9 @@ export async function GET(
   { params }: { params: Params }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { slug } = await params;
     const supabase = await createServerSupabaseClient();
 
@@ -70,7 +74,7 @@ export async function GET(
       courses: transformedCourses,
       total: transformedCourses.length 
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json({ 
       error: toErrorMessage(error), 
       courses: [] 

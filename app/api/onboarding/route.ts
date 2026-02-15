@@ -23,6 +23,9 @@ interface User {
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const user = await requireApiAuth() as User;
     const { searchParams } = new URL(request.url);
     const action = searchParams.get('action');

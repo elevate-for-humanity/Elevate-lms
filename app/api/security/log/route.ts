@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     });
 
     return responsePromise;
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     // Fail-open - always return 200 so client doesn't retry
     logger.error('[Security Log] Request error:', error);
     return NextResponse.json({ success: true }, { status: 200 });

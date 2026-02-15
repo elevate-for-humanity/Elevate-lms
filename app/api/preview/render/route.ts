@@ -7,6 +7,7 @@ import { gh, parseRepo } from '@/lib/github';
 import { marked } from 'marked';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Simple HTML escape for security
 function escapeHtml(text: string): string {
@@ -19,7 +20,10 @@ function escapeHtml(text: string): string {
 }
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const { searchParams } = new URL(req.url);
   const repo = searchParams.get('repo');
   const ref = searchParams.get('ref') || 'main';
   const path = searchParams.get('path') || 'README.md';
@@ -270,7 +274,7 @@ export async function GET(req: NextRequest) {
     return new Response(rendered, {
       headers: { 'content-type': 'text/html' },
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Preview render error:',
       error instanceof Error ? error : new Error(String(error))

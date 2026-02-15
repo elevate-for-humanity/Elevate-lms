@@ -64,6 +64,9 @@ export async function POST(request: Request) {
  */
 export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });

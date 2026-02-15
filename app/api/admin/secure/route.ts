@@ -5,9 +5,13 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { requireRole } from '@/lib/requireRole';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     // Get authenticated user
     const supabase = await createClient();
     const {

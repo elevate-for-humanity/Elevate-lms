@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     // Redirect to success page
     return NextResponse.redirect(new URL('/apply/staff/success', request.url));
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

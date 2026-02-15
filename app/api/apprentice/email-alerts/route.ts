@@ -87,7 +87,10 @@ export async function POST(request: Request) {
 
 // Cron endpoint to check for missed check-ins
 export async function GET(request: Request) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   const today = new Date().toISOString().split('T')[0];
   const currentHour = new Date().getHours();
 

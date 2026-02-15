@@ -4,12 +4,16 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id } = await params;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { id } = await params;
   const supabase = await createClient();
 
   const { data: doc, error } = await supabase

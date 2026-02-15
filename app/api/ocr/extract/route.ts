@@ -92,8 +92,11 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
-  return NextResponse.json({
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({
     name: 'Universal OCR API',
     version: '2.0.0',
     description: 'Extract text from documents (powered by Netlify function)',

@@ -27,7 +27,10 @@ interface BrandingSettings {
 
 // GET - Retrieve current branding settings
 export async function GET(request: NextRequest) {
-  const apiKey = request.headers.get('x-api-key');
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const apiKey = request.headers.get('x-api-key');
   if (!apiKey) {
     return NextResponse.json({ error: 'Missing API key' }, { status: 401 });
   }
@@ -70,7 +73,10 @@ export async function GET(request: NextRequest) {
 
 // PATCH - Update branding settings
 export async function PATCH(request: NextRequest) {
-  const apiKey = request.headers.get('x-api-key');
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const apiKey = request.headers.get('x-api-key');
   if (!apiKey) {
     return NextResponse.json({ error: 'Missing API key' }, { status: 401 });
   }

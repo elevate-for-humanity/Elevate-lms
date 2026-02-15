@@ -161,7 +161,10 @@ export async function POST(request: NextRequest) {
  * Get checkout session status
  */
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { searchParams } = new URL(request.url);
   const sessionId = searchParams.get('session_id');
 
   if (!sessionId) {

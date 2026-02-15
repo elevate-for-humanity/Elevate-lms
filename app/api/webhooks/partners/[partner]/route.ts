@@ -89,7 +89,7 @@ export async function POST(
     await client.processWebhook(payload);
 
     return NextResponse.json({ success: true });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       `[Webhook] Error processing ${partner} webhook:`,
       error instanceof Error ? error : new Error(String(error))

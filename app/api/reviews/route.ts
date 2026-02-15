@@ -9,6 +9,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status');
@@ -69,7 +72,7 @@ export async function GET(request: Request) {
       total: reviews?.length || 0,
       averageRating: parseFloat(avgRating),
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -148,7 +151,7 @@ export async function POST(request: Request) {
       message:
         'Thank you for your review! It will be published after moderation.',
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

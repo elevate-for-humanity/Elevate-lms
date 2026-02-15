@@ -7,7 +7,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Get or create cart
 export async function GET(request: NextRequest) {
-  const cookieStore = await cookies();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const cookieStore = await cookies();
   const cartId = cookieStore.get('cart_id')?.value;
   const sessionId = cookieStore.get('session_id')?.value || crypto.randomUUID();
 
@@ -99,6 +102,9 @@ export async function POST(request: NextRequest) {
 // Update cart item
 export async function PATCH(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     const { itemId, quantity } = body;
 
@@ -131,7 +137,10 @@ export async function PATCH(request: NextRequest) {
 
 // Remove item from cart
 export async function DELETE(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const searchParams = request.nextUrl.searchParams;
   const itemId = searchParams.get('itemId');
 
   if (!itemId) {

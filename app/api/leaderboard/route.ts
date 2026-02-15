@@ -6,9 +6,13 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { getCurrentUser, createServerSupabaseClient } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -87,7 +91,7 @@ export async function GET(request: Request) {
       leaderboard: rankedLeaderboard,
       timeframe,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }
 }

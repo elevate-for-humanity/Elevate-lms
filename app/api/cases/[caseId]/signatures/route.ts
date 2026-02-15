@@ -84,6 +84,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ caseId:
 
 export async function GET(req: Request, { params }: { params: Promise<{ caseId: string }> }) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { data: { user }, error: authErr } = await supabase.auth.getUser();
     

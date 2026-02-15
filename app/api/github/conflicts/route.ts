@@ -9,7 +9,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Check for merge conflicts between branches
 export async function GET(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
   const repo = req.nextUrl.searchParams.get('repo');
   const base = req.nextUrl.searchParams.get('base') || 'main';
   const head = req.nextUrl.searchParams.get('head');

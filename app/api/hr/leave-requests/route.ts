@@ -12,6 +12,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 // GET /api/hr/leave-requests?employee_id=&status=
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const params = request.nextUrl.searchParams;
 
@@ -40,7 +43,7 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ leaveRequests: data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error fetching leave requests:',
       error instanceof Error ? error : new Error(String(error))
@@ -104,7 +107,7 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ leaveRequest: data }, { status: 201 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error creating leave request:',
       error instanceof Error ? error : new Error(String(error))

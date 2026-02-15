@@ -11,9 +11,13 @@ import {
 } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
   const repo = req.nextUrl.searchParams.get('repo');
   const path = req.nextUrl.searchParams.get('path');
   const ref = req.nextUrl.searchParams.get('ref') || 'main';
@@ -65,7 +69,7 @@ export async function GET(req: NextRequest) {
       html_url: data.html_url,
       download_url: data.download_url,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'GitHub file read error:',
       error instanceof Error ? error : new Error(String(error))
@@ -82,7 +86,10 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
 
   try {
     const body = await req.json();
@@ -143,7 +150,7 @@ export async function PUT(req: NextRequest) {
       },
       message: commitMessage,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'GitHub file write error:',
       error instanceof Error ? error : new Error(String(error))
@@ -160,7 +167,10 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
 
   try {
     const body = await req.json();
@@ -194,7 +204,7 @@ export async function DELETE(req: NextRequest) {
       commit: res.data.commit.sha,
       message: commitMessage,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'GitHub file delete error:',
       error instanceof Error ? error : new Error(String(error))
@@ -212,7 +222,10 @@ export async function DELETE(req: NextRequest) {
 
 // Rename/move file (creates new file, deletes old)
 export async function PATCH(req: NextRequest) {
-  const userToken = req.headers.get('x-gh-token');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userToken = req.headers.get('x-gh-token');
 
   try {
     const body = await req.json();

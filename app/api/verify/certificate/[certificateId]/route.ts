@@ -6,11 +6,15 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 type Params = { params: Promise<{ certificateId: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { certificateId } = await params;
     const supabase = await createClient();
 
@@ -74,7 +78,7 @@ export async function GET(_req: NextRequest, { params }: Params) {
     };
 
     return NextResponse.json(response);
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error("[Certificate Verification Error]:", error);
     return NextResponse.json(
       { error: "Internal server error", valid: false },

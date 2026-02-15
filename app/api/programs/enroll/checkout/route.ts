@@ -221,8 +221,11 @@ export async function POST(request: NextRequest) {
 /**
  * GET - Return API documentation
  */
-export async function GET() {
-  return NextResponse.json({
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({
     name: 'Program Enrollment Checkout API',
     description: 'Canonical endpoint for all program enrollments',
     method: 'POST',

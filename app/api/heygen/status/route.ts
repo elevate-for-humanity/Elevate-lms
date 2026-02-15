@@ -1,10 +1,14 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
 
 export async function GET(request: NextRequest) {
-  if (!HEYGEN_API_KEY) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+if (!HEYGEN_API_KEY) {
     return NextResponse.json({ error: 'HeyGen API key not configured' }, { status: 500 });
   }
 

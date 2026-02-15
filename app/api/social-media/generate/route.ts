@@ -145,7 +145,7 @@ Return ONLY a JSON array of ${count} posts, no other text.`;
     posts = posts.slice(0, count);
 
     return NextResponse.json({ success: true, posts });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Social media generation error:',
       error instanceof Error ? error : new Error(String(error))

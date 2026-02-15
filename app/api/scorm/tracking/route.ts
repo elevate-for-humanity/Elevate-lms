@@ -85,7 +85,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ success: true, enrollment });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('SCORM tracking error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
@@ -93,6 +93,9 @@ export async function POST(request: Request) {
 
 export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
@@ -121,7 +124,7 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json(enrollment || {});
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('SCORM tracking GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }

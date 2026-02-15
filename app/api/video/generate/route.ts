@@ -198,7 +198,10 @@ async function handleSceneVideoGeneration(body: VideoRequest) {
  * Get video generation status
  */
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url);
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { searchParams } = new URL(request.url);
   const videoId = searchParams.get('id');
 
   if (!videoId) {

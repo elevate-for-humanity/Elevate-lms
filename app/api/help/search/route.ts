@@ -6,9 +6,13 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { sanitizeSearchInput } from '@/lib/utils';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
-  const supabase = createSupabaseClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = createSupabaseClient();
   const { searchParams } = new URL(request.url);
   const q = searchParams.get('q') || '';
 

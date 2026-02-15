@@ -10,6 +10,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     const { data: workflows, error } = await supabase
@@ -20,7 +23,7 @@ export async function GET(req: Request) {
     if (error) throw error;
 
     return NextResponse.json({ success: true, workflows });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error fetching workflows:',
       error instanceof Error ? error : new Error(String(error))
@@ -55,7 +58,7 @@ export async function POST(req: Request) {
     if (error) throw error;
 
     return NextResponse.json({ success: true, workflow });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error creating workflow:',
       error instanceof Error ? error : new Error(String(error))

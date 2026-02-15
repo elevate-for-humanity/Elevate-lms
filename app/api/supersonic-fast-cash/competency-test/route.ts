@@ -79,8 +79,11 @@ const TEST_QUESTIONS = [
   },
 ];
 
-export async function GET() {
-  // Return test questions (without correct answers)
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+// Return test questions (without correct answers)
   const questions = TEST_QUESTIONS.map(({ correct, ...q }) => q);
   return NextResponse.json({ 
     questions,
@@ -131,9 +134,9 @@ export async function POST(request: NextRequest) {
             answers: JSON.stringify(answers),
             completed_at: new Date().toISOString(),
           });
-      } catch {
-        // Table may not exist yet - ignore
-      }
+      } catch (err) {
+          logger.error("Unhandled error", err instanceof Error ? err : undefined);
+        }
     }
 
     return NextResponse.json({

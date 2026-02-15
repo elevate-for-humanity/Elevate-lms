@@ -10,6 +10,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 // GET /api/marketing/campaigns
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const searchParams = req.nextUrl.searchParams;
     const status = searchParams.get('status');

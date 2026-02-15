@@ -204,6 +204,9 @@ async function checkPartnerUrl(url: string): Promise<{
  */
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     if (!supabase) {
       return NextResponse.json({ error: 'Database not available' }, { status: 500 });

@@ -9,6 +9,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createServerSupabaseClient();
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('user_id');
@@ -38,7 +41,7 @@ export async function GET(req: NextRequest) {
       if (error) throw error;
       return NextResponse.json({ badges: data });
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error fetching badges:', error);
     return NextResponse.json(
       { error: 'Failed to fetch badges' },
@@ -103,7 +106,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({ badge: data }, { status: 201 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error awarding badge:', error);
     return NextResponse.json(
       { error: 'Failed to award badge' },

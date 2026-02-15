@@ -7,9 +7,13 @@ import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const session = await requireApiAuth();
     const email = session.user?.email;
 
@@ -101,7 +105,7 @@ export async function GET() {
         'Content-Disposition': 'attachment; filename="efh-account-export.json"',
       },
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Unexpected error in account export', error as Error);
     return NextResponse.json(
       { error: 'Failed to export account data' },

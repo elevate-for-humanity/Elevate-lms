@@ -35,8 +35,11 @@ export async function POST(request: Request) {
   return NextResponse.json({ success: true, tracking: data });
 }
 
-export async function GET() {
-  const supabase = await createServerSupabaseClient();
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createServerSupabaseClient();
 
   const { data }: any = await supabase
     .from('funding_tracking')

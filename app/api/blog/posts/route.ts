@@ -9,6 +9,9 @@ export const dynamic = 'force-dynamic';
 // GET - Fetch all published blog posts
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = createAdminClient();
     const { searchParams } = new URL(request.url);
     

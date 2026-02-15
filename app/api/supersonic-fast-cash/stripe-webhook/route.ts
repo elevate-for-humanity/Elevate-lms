@@ -4,6 +4,7 @@ import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -147,7 +148,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       session.amount_total ? session.amount_total / 100 : 0
     );
 
-  } catch (error) { /* Error handled silently */ }
+  } catch (error) {
+    logger.error("Unhandled error", error instanceof Error ? error : undefined);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }
 
 async function sendPurchaseConfirmationEmail(
@@ -251,5 +255,8 @@ async function sendPurchaseConfirmationEmail(
       `
     });
 
-  } catch (error) { /* Error handled silently */ }
+  } catch (error) {
+    logger.error("Unhandled error", error instanceof Error ? error : undefined);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
 }

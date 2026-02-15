@@ -5,9 +5,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { getUserOctokit, gh } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
-  // Support both user token (x-gh-token header) and server token (env)
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+// Support both user token (x-gh-token header) and server token (env)
   const userToken = req.headers.get('x-gh-token');
 
   try {
@@ -44,7 +48,7 @@ export async function GET(req: NextRequest) {
     }));
 
     return NextResponse.json(repos);
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'GitHub repos error:',
       error instanceof Error ? error : new Error(String(error))

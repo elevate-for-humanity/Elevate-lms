@@ -1,12 +1,16 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getPageGuide } from '@/lib/store/db';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ pageId: string }> }
 ) {
-  const { pageId } = await params;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { pageId } = await params;
 
   try {
     const guide = await getPageGuide(pageId);

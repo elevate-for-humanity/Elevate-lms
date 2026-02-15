@@ -286,8 +286,11 @@ export async function POST(request: NextRequest) {
 }
 
 // GET endpoint for webhook verification
-export async function GET() {
-  return NextResponse.json({
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({
     status: 'ok',
     endpoint: 'chatbot/calendly-webhook',
     description: 'Handles Calendly booking events for scope confirmation calls',

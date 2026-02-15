@@ -12,7 +12,10 @@ export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
   const { courseId } = await params;
 
   const { data, error }: any = await supabase

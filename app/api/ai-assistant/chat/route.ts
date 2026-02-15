@@ -120,8 +120,11 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
-  return NextResponse.json({
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({
     name: 'AI Assistant Chat API',
     version: '1.0.0',
     description: 'Powers the AIAssistantBubble chat widget',

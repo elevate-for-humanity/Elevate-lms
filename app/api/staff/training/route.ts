@@ -7,8 +7,11 @@ import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     const {
@@ -59,7 +62,7 @@ export async function GET() {
       totalModules: modules?.length || 0,
       completedModules: progress?.filter((p) => p.completed_at).length || 0,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -135,7 +138,7 @@ export async function POST(request: Request) {
       progress,
       certified: quiz_score && quiz_score >= 80,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

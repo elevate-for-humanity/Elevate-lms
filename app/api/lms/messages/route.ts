@@ -5,7 +5,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET - Fetch user's messages/conversations
 export async function GET(request: NextRequest) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
 
   if (!supabase) {
     return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });

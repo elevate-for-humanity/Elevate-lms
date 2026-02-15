@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { runCertificationTests } from '@/lib/tax-software/testing/irs-certification';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const searchParams = request.nextUrl.searchParams;
   const runTests = searchParams.get('runTests') === 'true';
   
   const status = {

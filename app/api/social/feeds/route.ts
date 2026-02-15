@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Social Media Feeds API
@@ -229,8 +230,11 @@ async function fetchInstagramPosts(): Promise<SocialPost[]> {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Fetch from all platforms in parallel
     const [facebookPosts, youtubeVideos, linkedinPosts, instagramPosts] = await Promise.all([
       fetchFacebookPosts(),

@@ -8,6 +8,7 @@ import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { sendCreatorApprovalEmail } from '@/lib/email/resend';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: Request) {
   try {
@@ -64,7 +65,7 @@ export async function POST(req: Request) {
           name: profile.full_name || 'Creator',
         });
       } catch (error) {
-        /* Email error handled silently */
+          logger.error("Unhandled error", error instanceof Error ? error : undefined);
       }
     }
 

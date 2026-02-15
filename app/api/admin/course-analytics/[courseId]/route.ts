@@ -9,12 +9,16 @@ import {
   getStudentEngagement,
   generateCourseReport,
 } from '@/lib/analytics/course-analytics';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
   req: Request,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { courseId } = await params;
     const supabase = await createClient();
     const {

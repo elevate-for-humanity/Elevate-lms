@@ -169,8 +169,11 @@ function generateSuggestions(response: string, profile: any): string[] {
   return suggestions.slice(0, 4);
 }
 
-export async function GET() {
-  return NextResponse.json({
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({
     name: 'AI Career Counseling API',
     version: '1.0.0',
     description: 'Personalized career guidance powered by AI',

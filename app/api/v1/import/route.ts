@@ -352,7 +352,10 @@ function generateTempPassword(): string {
 
 // GET endpoint for import status/documentation
 export async function GET(request: NextRequest) {
-  return NextResponse.json({
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({
     name: 'Elevate LMS Import API',
     version: '1.0',
     endpoints: {

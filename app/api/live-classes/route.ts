@@ -9,6 +9,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createServerSupabaseClient();
     const { searchParams } = new URL(req.url);
     const courseId = searchParams.get('course_id');
@@ -38,7 +41,7 @@ export async function GET(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ classes: data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error fetching live classes:', error);
     return NextResponse.json(
       { error: 'Failed to fetch live classes' },
@@ -108,7 +111,7 @@ export async function POST(req: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ class: data }, { status: 201 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Error creating live class:', error);
     return NextResponse.json(
       { error: 'Failed to create live class' },

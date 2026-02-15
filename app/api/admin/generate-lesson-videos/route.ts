@@ -169,6 +169,9 @@ Remember to take notes and complete the quiz at the end of this lesson.
 // GET endpoint to check generation status
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     const { count: total } = await supabase

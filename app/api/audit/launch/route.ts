@@ -44,7 +44,10 @@ interface Finding {
 }
 
 export async function GET(request: NextRequest) {
-  return handleAudit(request, {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return handleAudit(request, {
     mode: 'quick',
     maxRoutes: 200,
     sample: 'top',
@@ -85,7 +88,7 @@ async function handleAudit(request: NextRequest, options: AuditOptions) {
         'Cache-Control': 'no-cache, no-store, must-revalidate',
       },
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         error: 'Audit failed',

@@ -49,7 +49,8 @@ export async function POST(request: Request) {
         studentEmail = envelopeData.to?.find((e: string) => 
           !e.includes('elevate') && !e.includes('milady')
         );
-      } catch { /* Parse error ignored */ }
+      } catch (err) { /* Parse error ignored */ }
+          logger.error("Unhandled error", err instanceof Error ? err : undefined);
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey);

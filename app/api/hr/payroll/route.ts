@@ -34,6 +34,9 @@ function calculateTaxes(grossPay: number) {
 // GET /api/hr/payroll - List payroll runs
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const searchParams = request.nextUrl.searchParams;
 
@@ -67,7 +70,7 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ payrollRuns });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error fetching payroll runs:',
       error instanceof Error ? error : new Error(String(error))
@@ -297,7 +300,7 @@ export async function POST(request: NextRequest) {
       },
       { status: 201 }
     );
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Error creating payroll run:',
       error instanceof Error ? error : new Error(String(error))

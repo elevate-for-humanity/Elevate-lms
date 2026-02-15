@@ -5,12 +5,16 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { generateCertificatePDF } from '@/lib/certificates/generator';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ certificateId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { certificateId } = await params;
     const {
@@ -49,7 +53,7 @@ export async function GET(
         'Content-Disposition': `attachment; filename="certificate-${certificate.certificate_number}.pdf"`,
       },
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

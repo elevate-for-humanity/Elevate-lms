@@ -10,7 +10,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  * Any access to this endpoint indicates a bot or scraper
  */
 export async function GET(req: NextRequest) {
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
              req.headers.get('x-real-ip') ||
              'unknown';
 

@@ -102,7 +102,7 @@ export async function POST(request: Request) {
       document,
       message: 'File uploaded successfully.',
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

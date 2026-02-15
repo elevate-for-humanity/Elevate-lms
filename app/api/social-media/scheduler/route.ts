@@ -15,6 +15,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  */
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Get current hour in configured timezone
@@ -102,7 +105,7 @@ export async function GET(req: Request) {
               postIndex,
               success: true,
             });
-          } catch (error) { /* Error handled silently */ 
+          } catch (error) { 
             logger.error(
               `Error posting to ${platform}:`,
               error instanceof Error ? error : new Error(String(error))
@@ -134,7 +137,7 @@ export async function GET(req: Request) {
           .from('social_media_campaigns')
           .update({ last_post_at: now.toISOString() })
           .eq('id', campaign.id);
-      } catch (error) { /* Error handled silently */ 
+      } catch (error) { 
         logger.error(
           `Error processing campaign ${campaign.id}:`,
           error instanceof Error ? error : new Error(String(error))
@@ -154,7 +157,7 @@ export async function GET(req: Request) {
       slot: ['morning', 'afternoon', 'evening'][slot],
       results,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Scheduler error:',
       error instanceof Error ? error : new Error(String(error))
@@ -227,7 +230,7 @@ async function postToFacebook(
     }
 
     return { success: true, platform: 'facebook', postId: data.id };
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Facebook posting error:',
       error instanceof Error ? error : new Error(String(error))
@@ -280,7 +283,7 @@ async function postToLinkedIn(
     }
 
     return { success: true, platform: 'linkedin', postId: data.id };
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'LinkedIn posting error:',
       error instanceof Error ? error : new Error(String(error))

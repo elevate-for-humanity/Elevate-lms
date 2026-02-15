@@ -70,8 +70,11 @@ export async function POST(req: Request) {
 /**
  * GET - Get monitor status
  */
-export async function GET() {
-  const denied = await guardAdmin();
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const denied = await guardAdmin();
   if (denied) return denied;
   try {
     const { createMonitor } = await import('@/lib/tax-software/irs-monitor');

@@ -8,7 +8,10 @@ export const dynamic = 'force-dynamic';
 
 // GET: Fetch transfer hour requests for current user
 export async function GET(req: Request) {
-  const supabase = await createClient();
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createClient();
 
   const {
     data: { user },

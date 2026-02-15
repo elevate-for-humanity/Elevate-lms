@@ -5,14 +5,18 @@ export const maxDuration = 60;
 
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Public Metrics API
  * Returns real backend activity metrics that can be verified
  * No authentication required - public data only
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Get real metrics from database
@@ -118,7 +122,7 @@ export async function GET() {
         'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
       },
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: 'Failed to fetch metrics' },
       { status: 500 }

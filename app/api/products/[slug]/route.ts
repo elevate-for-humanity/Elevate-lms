@@ -1,12 +1,16 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getProduct, getRecommendations, getAvatarSalesMessage } from '@/lib/store/db';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = await params;
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const { slug } = await params;
 
   try {
     const product = await getProduct(slug);

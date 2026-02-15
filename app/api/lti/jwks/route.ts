@@ -3,9 +3,13 @@ export const maxDuration = 60;
 
 // app/api/lti/jwks/route.ts
 import { NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function GET() {
-  // Replace with actual generated key material
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+// Replace with actual generated key material
   const jwks = {
     keys: [
       {

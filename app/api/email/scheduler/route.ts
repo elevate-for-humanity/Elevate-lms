@@ -15,6 +15,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
  */
 export async function GET(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Get scheduled campaigns that are due
@@ -91,7 +94,7 @@ export async function GET(req: Request) {
             error: sendResult.error,
           });
         }
-      } catch (error) { /* Error handled silently */ 
+      } catch (error) { 
         logger.error(
           `Error processing campaign ${campaign.id}:`,
           error instanceof Error ? error : new Error(String(error))
@@ -121,7 +124,7 @@ export async function GET(req: Request) {
       processed: campaigns.length,
       results,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Scheduler error:',
       error instanceof Error ? error : new Error(String(error))

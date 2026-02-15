@@ -52,8 +52,11 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export async function GET() {
-  return NextResponse.json({
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+return NextResponse.json({
     name: 'OCR Extract API',
     version: '2.0',
     description: 'Extract text from documents using OCR (powered by Netlify function)',

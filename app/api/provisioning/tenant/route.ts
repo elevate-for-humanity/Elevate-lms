@@ -252,7 +252,10 @@ export async function POST(request: NextRequest) {
  * Check if subdomain is available
  */
 export async function GET(request: NextRequest) {
-  const subdomain = request.nextUrl.searchParams.get('subdomain');
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const subdomain = request.nextUrl.searchParams.get('subdomain');
   
   if (!subdomain) {
     return NextResponse.json({ error: 'Subdomain required' }, { status: 400 });

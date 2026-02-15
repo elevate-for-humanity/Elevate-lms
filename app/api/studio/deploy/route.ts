@@ -97,7 +97,10 @@ export async function POST(req: NextRequest) {
 
 // Get deployment status
 export async function GET(req: NextRequest) {
-  const userId = req.headers.get('x-user-id');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userId = req.headers.get('x-user-id');
   const provider = req.nextUrl.searchParams.get('provider');
   const deploymentId = req.nextUrl.searchParams.get('id');
   const token = req.headers.get('x-deploy-token');
@@ -149,7 +152,10 @@ export async function GET(req: NextRequest) {
 
 // List deployments
 export async function PUT(req: NextRequest) {
-  const userId = req.headers.get('x-user-id');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const userId = req.headers.get('x-user-id');
 
   if (!userId) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

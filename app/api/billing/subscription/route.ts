@@ -6,12 +6,16 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { getOrgContext } from '@/lib/org/getOrgContext';
 import { getOrgSubscription, getLicenseStatus } from '@/lib/billing';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Get organization subscription and license status
  */
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const {
       data: { user },

@@ -82,7 +82,7 @@ export async function POST(req: Request) {
       "I apologize, I'm having trouble responding right now. Please visit /contact or /faq for help.";
 
     return NextResponse.json({ response });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Receptionist API error:', error);
 
     // Return helpful fallback

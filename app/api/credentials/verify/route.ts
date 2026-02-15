@@ -156,7 +156,10 @@ export async function POST(req: NextRequest) {
  * Alternative GET endpoint for simple verification
  */
 export async function GET(req: NextRequest) {
-  const code = req.nextUrl.searchParams.get('code');
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const code = req.nextUrl.searchParams.get('code');
 
   if (!code) {
     return NextResponse.json(

@@ -6,9 +6,13 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = supabaseServer();
     const searchParams = request.nextUrl.searchParams;
 
@@ -44,7 +48,7 @@ export async function GET(request: NextRequest) {
       limit,
       offset,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       { error: toErrorMessage(error) },
       { status: 500 }

@@ -89,6 +89,9 @@ export async function POST(request: NextRequest) {
 // GET - Fetch user's OJT hours
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     if (!supabase) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

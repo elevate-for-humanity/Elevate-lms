@@ -11,6 +11,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const authResult = await apiAuthGuard({ requireAuth: true });
     if (!authResult.authorized) {
       return NextResponse.json({ error: authResult.error }, { status: 401 });
@@ -44,7 +47,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Tutorials GET error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch tutorial data' },
@@ -107,7 +110,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Tutorials POST error:', error);
     return NextResponse.json(
       { error: 'Failed to process tutorial action' },

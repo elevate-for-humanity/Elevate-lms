@@ -86,6 +86,9 @@ async function getUserStripeCustomerId(userId: string): Promise<string | null> {
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const authResult = await apiAuthGuard({ requireAuth: true });
     if (!authResult.authorized) {
       return NextResponse.json({ error: authResult.error }, { status: 401 });
@@ -122,7 +125,7 @@ export async function GET(request: NextRequest) {
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Payments GET error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch payment data' },
@@ -335,7 +338,7 @@ export async function POST(request: NextRequest) {
       default:
         return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Payments POST error:', error);
     return NextResponse.json(
       {

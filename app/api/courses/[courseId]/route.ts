@@ -6,12 +6,16 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { courseId } = await params;
     const supabase = await createClient();
 
@@ -54,7 +58,7 @@ export async function GET(
     }
 
     return NextResponse.json({ course });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Course fetch error:',
       error instanceof Error ? error : new Error(String(error))
@@ -71,6 +75,9 @@ export async function PATCH(
   { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { courseId } = await params;
     const supabase = await createClient();
 
@@ -110,7 +117,7 @@ export async function PATCH(
     }
 
     return NextResponse.json({ course });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Course update error:',
       error instanceof Error ? error : new Error(String(error))
@@ -127,6 +134,9 @@ export async function DELETE(
   { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { courseId } = await params;
     const supabase = await createClient();
 
@@ -165,7 +175,7 @@ export async function DELETE(
     }
 
     return NextResponse.json({ success: true });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Course delete error:',
       error instanceof Error ? error : new Error(String(error))

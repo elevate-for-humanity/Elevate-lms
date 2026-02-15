@@ -155,6 +155,9 @@ export async function POST(request: Request) {
 // Get video info
 export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Authentication check
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();

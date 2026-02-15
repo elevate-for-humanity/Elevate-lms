@@ -5,9 +5,13 @@ export const maxDuration = 60;
 import { gh, parseRepo } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { searchParams } = new URL(req.url);
     const repo = searchParams.get('repo') || 'elevateforhumanity/fix2';
     const branch = searchParams.get('branch') || 'main';
@@ -46,7 +50,7 @@ export async function GET(req: NextRequest) {
       count: uniqueCourses.length,
       files: metadataFiles.map((f) => f.path),
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Scan courses error:',
       error instanceof Error ? error : new Error(String(error))

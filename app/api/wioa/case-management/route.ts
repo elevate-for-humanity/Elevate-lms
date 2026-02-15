@@ -10,7 +10,10 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/wioa/case-management - Get all cases
 export async function GET(request: NextRequest) {
-  const supabase = createSupabaseClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = createSupabaseClient();
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get('userId');
@@ -34,7 +37,7 @@ export async function GET(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ success: true, data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         success: false,
@@ -97,7 +100,7 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ success: true, data }, { status: 201 });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     return NextResponse.json(
       {
         success: false,

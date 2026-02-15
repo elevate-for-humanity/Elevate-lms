@@ -6,9 +6,13 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     const { data, error }: any = await supabase
@@ -25,7 +29,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json(data || []);
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Get products error:',
       error instanceof Error ? error : new Error(String(error))

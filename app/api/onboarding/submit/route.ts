@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
         ? 'Onboarding completed successfully!'
         : 'Onboarding saved. Please complete remaining items.',
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Onboarding submission error:',
       error instanceof Error ? error : new Error(String(error))
@@ -241,6 +241,9 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const {
       data: { user },
@@ -273,7 +276,7 @@ export async function GET(request: NextRequest) {
       onboarding: onboarding || null,
       hasOnboarding: !!onboarding,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Onboarding fetch error:',
       error instanceof Error ? error : new Error(String(error))

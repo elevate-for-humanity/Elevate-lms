@@ -19,8 +19,11 @@ async function guardAdmin() {
 }
 
 // GET - Fetch all career courses with modules
-export async function GET() {
-  const denied = await guardAdmin();
+export async function GET(request: Request) {
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const denied = await guardAdmin();
   if (denied) return denied;
   try {
     const supabase = createAdminClient();

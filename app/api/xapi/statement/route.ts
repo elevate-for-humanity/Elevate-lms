@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ stored: records.length });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('xAPI endpoint error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
@@ -71,7 +71,10 @@ export async function POST(request: NextRequest) {
  * Retrieve xAPI statements (LRS query)
  */
 export async function GET(request: NextRequest) {
-  const supabase = createSupabaseClient();
+  
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = createSupabaseClient();
   try {
     const { searchParams } = new URL(request.url);
     const learnerId = searchParams.get('actor');
@@ -103,7 +106,7 @@ export async function GET(request: NextRequest) {
     }
 
     return NextResponse.json({ statements: data });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('xAPI query endpoint error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },

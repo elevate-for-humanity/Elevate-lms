@@ -7,9 +7,13 @@ import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: NextRequest) {
-  const supabase = await createRouteHandlerClient({ cookies });
+  
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+const supabase = await createRouteHandlerClient({ cookies });
 
   // Check authentication
   const {

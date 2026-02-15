@@ -151,7 +151,7 @@ export async function POST(req: NextRequest) {
     // For now, returning success - integrate with actual email service
 
     return NextResponse.json({ success: true });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Email delivery error:',
       error instanceof Error ? error : new Error(String(error))

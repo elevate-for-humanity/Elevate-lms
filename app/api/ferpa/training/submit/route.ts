@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
@@ -113,8 +114,7 @@ export async function POST(request: NextRequest) {
         })
       });
     } catch (emailError) {
-      // Error: $1
-      // Don't fail the request if email fails
+        logger.error("Unhandled error", emailError instanceof Error ? emailError : undefined);
     }
 
     return NextResponse.json({
@@ -123,7 +123,7 @@ export async function POST(request: NextRequest) {
       training_record: trainingRecord
     });
 
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     // Error: $1
     return NextResponse.json(
       { error: 'Internal server error' },

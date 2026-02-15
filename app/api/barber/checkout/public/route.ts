@@ -257,6 +257,9 @@ export async function POST(request: NextRequest) {
  */
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { searchParams } = new URL(request.url);
     const hoursPerWeek = parseInt(searchParams.get('hours_per_week') || '40');
     const transferredHours = parseInt(searchParams.get('transferred_hours') || '0');

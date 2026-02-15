@@ -21,6 +21,9 @@ import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type');
     const format = searchParams.get('format') || 'csv';
@@ -167,7 +170,7 @@ export async function GET(request: NextRequest) {
         { status: 400 }
       );
     }
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Export error:', error);
     return NextResponse.json(
       { error: 'Failed to export data' },
@@ -262,7 +265,7 @@ export async function POST(request: NextRequest) {
         {} as Record<string, number>
       ),
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error('Batch export error:', error);
     return NextResponse.json(
       { error: 'Failed to perform batch export' },

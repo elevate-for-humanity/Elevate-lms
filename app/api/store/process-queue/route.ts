@@ -65,8 +65,11 @@ export async function POST(req: Request) {
 /**
  * Get queue stats
  */
-export async function GET() {
+export async function GET(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const stats = await getQueueStats();
     return Response.json({ stats });
   } catch (error) {

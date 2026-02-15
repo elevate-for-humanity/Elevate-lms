@@ -138,7 +138,7 @@ export async function POST(request: NextRequest) {
       sessionId: session.id,
       url: session.url,
     });
-  } catch (error) { /* Error handled silently */ 
+  } catch (error) { 
     logger.error(
       'Checkout error:',
       error instanceof Error ? error : new Error(String(error))

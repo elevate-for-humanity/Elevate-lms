@@ -75,7 +75,7 @@ export default function FounderPage() {
       {/* Hero Section */}
       <section className="relative min-h-[500px] flex items-end overflow-hidden">
         <Image
-          src="/images/team/founder/elizabeth-greene-founder-hero-01.jpg"
+          src="/images/team/elizabeth-greene.jpg"
           alt="Elizabeth Greene - Founder"
           fill
           className="object-cover"

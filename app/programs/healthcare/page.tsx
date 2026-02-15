@@ -4,6 +4,7 @@ import Image from 'next/image';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
+import PageAvatar from '@/components/PageAvatar';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -44,6 +45,13 @@ export default function HealthcareProgramsPage() {
         </div>
       </section>
 
+      {/* Avatar Guide */}
+      <section className="py-8 bg-white">
+        <div className="max-w-3xl mx-auto px-4">
+          <PageAvatar videoSrc="/videos/avatars/healthcare-guide.mp4" title="Healthcare Programs Guide" />
+        </div>
+      </section>
+
       {/* Quick Stats */}
       <section className="bg-slate-900 py-5">
         <div className="max-w-4xl mx-auto px-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
@@ -72,7 +80,7 @@ export default function HealthcareProgramsPage() {
               { name: 'Phlebotomy', href: '/programs/phlebotomy-technician', img: '/images/healthcare/hero-program-phlebotomy.jpg', duration: '4-8 weeks' },
               { name: 'Pharmacy Technician', href: '/programs/pharmacy-technician', img: '/images/healthcare/hero-program-medical-assistant.jpg', duration: '8-12 weeks' },
               { name: 'Dental Assistant', href: '/programs/dental-assistant', img: '/images/healthcare/hero-program-patient-care.jpg', duration: '10-12 weeks' },
-              { name: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi', img: '/images/programs/cpr-group-training-hd.jpg', duration: '1 day' },
+              { name: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi', img: '/images/healthcare/program-cpr-certification.jpg', duration: '1 day' },
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group">
                 <div className="relative aspect-[3/2] rounded-xl overflow-hidden mb-2">

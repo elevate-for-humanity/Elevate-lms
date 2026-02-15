@@ -37,14 +37,14 @@ export const metadata: Metadata = {
     description: 'Get CPR, AED, and First Aid certified in one day. HSI-certified courses.',
     url: `${SITE_URL}/programs/cpr-first-aid-hsi`,
     siteName: 'Elevate for Humanity',
-    images: [{ url: `${SITE_URL}/images/healthcare/cpr-certification-group.jpg`, width: 1200, height: 630, alt: 'CPR First Aid Training' }],
+    images: [{ url: `${SITE_URL}/images/healthcare/program-cpr-certification.jpg`, width: 1200, height: 630, alt: 'CPR First Aid Training' }],
     type: 'website',
   },
   twitter: {
     card: 'summary_large_image',
     title: 'CPR & First Aid Certification (HSI)',
     description: 'Get CPR, AED, and First Aid certified in one day.',
-    images: [`${SITE_URL}/images/healthcare/cpr-certification-group.jpg`],
+    images: [`${SITE_URL}/images/healthcare/program-cpr-certification.jpg`],
   },
 };
 
@@ -109,7 +109,7 @@ export default function CPRFirstAidPage() {
       {/* Hero */}
       <section className="relative h-[50vh] min-h-[400px]">
         <Image 
-          src="/images/healthcare/cpr-certification-group.jpg" 
+          src="/images/healthcare/program-cpr-certification.jpg" 
           alt="CPR First Aid Training" 
           fill sizes="100vw"
           className="object-cover" 
@@ -207,7 +207,7 @@ export default function CPRFirstAidPage() {
             </div>
             <div className="relative h-80 lg:h-96 rounded-2xl overflow-hidden shadow-2xl">
               <Image 
-                src="/images/healthcare/cpr-individual-practice.jpg" 
+                src="/images/healthcare/healthcare-professional-portrait-1.jpg" 
                 alt="CPR practice on mannequin" 
                 fill sizes="100vw"
                 className="object-cover" 
@@ -312,7 +312,7 @@ export default function CPRFirstAidPage() {
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-2xl">
               <Image 
-                src="/images/healthcare/cpr-group-training-session.jpg" 
+                src="/images/healthcare/emergency-safety.jpg" 
                 alt="Group CPR training session" 
                 fill sizes="100vw"
                 className="object-cover" 

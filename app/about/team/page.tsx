@@ -73,6 +73,14 @@ const fallbackTeam = [
     bio: 'Delores manages digital communications, sharing student success stories and promoting program offerings to reach those who can benefit from free training.',
     email: 'delores@elevateforhumanity.org',
   },
+  {
+    id: '8',
+    name: 'Clystjah Woodley',
+    title: 'Program Coordinator',
+    image_url: '/images/clystjah-woodley.jpg',
+    bio: 'Clystjah supports program operations and student services, helping participants navigate enrollment and stay on track through their training programs.',
+    email: 'clystjah@elevateforhumanity.org',
+  },
 ];
 
 export default async function TeamPage() {

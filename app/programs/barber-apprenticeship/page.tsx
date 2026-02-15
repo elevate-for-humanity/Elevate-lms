@@ -4,6 +4,7 @@ import Image from 'next/image';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
+import PageAvatar from '@/components/PageAvatar';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -40,6 +41,12 @@ export default function BarberApprenticeshipPage() {
               Get paid during your apprenticeship. Become a licensed barber in 18 months with hands-on training.
             </p>
           </div>
+        </div>
+      </section>
+
+      <section className="py-8 bg-white">
+        <div className="max-w-3xl mx-auto px-4">
+          <PageAvatar videoSrc="/videos/avatars/barber-guide.mp4" title="Barber Apprenticeship Guide" />
         </div>
       </section>
 

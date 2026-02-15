@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function PathwaysPage() {
   const pathways = [
-    { name: 'Healthcare', description: 'Medical assistant, phlebotomy, CNA, and more', image: '/images/healthcare/cpr-certification-group.jpg', programs: 8, href: '/programs/healthcare', color: 'blue' },
+    { name: 'Healthcare', description: 'Medical assistant, phlebotomy, CNA, and more', image: '/images/healthcare/program-cpr-certification.jpg', programs: 8, href: '/programs/healthcare', color: 'blue' },
     { name: 'Skilled Trades', description: 'HVAC, electrical, plumbing, and construction', image: '/images/trades/program-building-construction.jpg', programs: 6, href: '/programs/skilled-trades', color: 'orange' },
     { name: 'Technology', description: 'IT support, cybersecurity, and software development', image: '/images/technology/hero-program-it-support.jpg', programs: 5, href: '/programs/technology', color: 'blue' },
     { name: 'Business', description: 'Entrepreneurship, marketing, and management', image: '/images/heroes/hero-federal-funding.jpg', programs: 4, href: '/programs/business', color: 'green' },

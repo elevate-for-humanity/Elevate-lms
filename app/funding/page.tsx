@@ -120,7 +120,7 @@ export default function FundingPage() {
             {/* OJT */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/heroes/workforce-partner-5.jpg" alt="On the job training" fill className="object-cover" />
+                <Image src="/images/heroes-hq/career-services-hero.jpg" alt="On the job training" fill className="object-cover" />
                 <div className="absolute top-3 left-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
               </div>
               <div className="p-5">

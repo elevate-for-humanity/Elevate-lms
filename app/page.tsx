@@ -27,7 +27,7 @@ export default function HomePage() {
       {/* ===== HERO ===== */}
       <section className="relative h-[75vh] min-h-[520px] max-h-[720px]">
         <HomeHeroVideo />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent z-20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/25 to-transparent z-20" />
         <div className="absolute inset-0 z-30 flex items-center">
           <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full">
             <div className="max-w-2xl">
@@ -67,13 +67,13 @@ export default function HomePage() {
               { title: 'Hire Our Graduates', desc: 'Our candidates come out credentialed and ready to work.', href: '/employer', image: '/images/heroes-hq/employer-hero.jpg' },
             ].map((card) => (
               <Link key={card.title} href={card.href} className="group bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-shadow border border-slate-100">
-                <div className="relative w-full aspect-[16/10]">
+                <div className="relative w-full h-64 sm:h-72">
                   <Image
                     src={card.image}
                     alt={card.title}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover"
+                    className="object-cover object-center"
                   />
                 </div>
                 <div className="p-6">
@@ -88,7 +88,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== PROGRAMS ===== */}
-      <section className="py-16 sm:py-20 bg-slate-50">
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-12">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Programs & Pathways</h2>
@@ -100,15 +100,15 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {programs.map((program) => (
               <Link key={program.name} href={program.href} className="group">
-                <div className="relative w-full aspect-[3/2] rounded-xl overflow-hidden">
+                <div className="relative w-full h-80 sm:h-96 lg:h-[28rem] rounded-xl overflow-hidden">
                   <Image
                     src={program.image}
                     alt={program.name}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    className="object-cover object-center group-hover:scale-105 transition-transform duration-500"
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-5">
                     <h3 className="text-white font-bold text-lg sm:text-xl">{program.name}</h3>
                     <p className="text-white/85 text-sm sm:text-base mt-1">{program.desc}</p>
@@ -149,7 +149,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== FUNDING ===== */}
-      <section className="py-16 sm:py-20 bg-slate-50">
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden">
@@ -227,7 +227,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== EMPLOYERS ===== */}
-      <section className="py-16 sm:py-20 bg-slate-50">
+      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <div>
@@ -285,7 +285,7 @@ export default function HomePage() {
               { quote: 'They provided an extremely informative and hospitable environment. I really enjoyed my classes. Thank you so much!', name: 'Timothy S.', program: 'CDL Training' },
               { quote: 'Anyone who wants to grow and make more money should try Elevate. You deserve it! The staff is amazing and easy to communicate with.', name: 'Jasmine R.', program: 'CNA Certification' },
             ].map((t) => (
-              <div key={t.name} className="bg-slate-50 rounded-xl p-8 border border-slate-100">
+              <div key={t.name} className="bg-white rounded-xl p-8 border border-slate-200 shadow-sm">
                 <p className="text-slate-800 text-lg mb-6 leading-relaxed">&ldquo;{t.quote}&rdquo;</p>
                 <div>
                   <p className="font-bold text-slate-900 text-base">{t.name}</p>

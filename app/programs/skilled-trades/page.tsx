@@ -4,6 +4,7 @@ import Image from 'next/image';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
+import PageAvatar from '@/components/PageAvatar';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 
@@ -40,6 +41,13 @@ export default function SkilledTradesPage() {
               HVAC, Electrical, Welding, Plumbing, and CDL. Hands-on training with real job placement assistance.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Avatar Guide */}
+      <section className="py-8 bg-white">
+        <div className="max-w-3xl mx-auto px-4">
+          <PageAvatar videoSrc="/videos/avatars/trades-guide.mp4" title="Skilled Trades Guide" />
         </div>
       </section>
 

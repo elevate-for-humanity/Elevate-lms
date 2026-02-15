@@ -4,6 +4,7 @@ import Image from 'next/image';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
+import PageAvatar from '@/components/PageAvatar';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
 

@@ -24,7 +24,7 @@ export const TEAM: TeamMember[] = [
     title: 'Founder & Chief Executive Officer',
     orgRole: 'Executive Leadership',
     bio: 'Elizabeth founded Elevate for Humanity with a mission to connect everyday people to free workforce training. She also owns Textures Institute of Cosmetology, Greene Staffing Solutions, and Greene Property Management—creating a holistic ecosystem for training, employment, and housing.',
-    headshotSrc: '/images/team/founder/elizabeth-greene-founder-hero-01.jpg',
+    headshotSrc: '/images/team/elizabeth-greene.jpg',
     email: 'elizabeth@elevateforhumanity.org',
   },
   {
@@ -80,6 +80,15 @@ export const TEAM: TeamMember[] = [
     bio: 'Delores manages digital communications, sharing student success stories and promoting program offerings to reach those who can benefit from free training.',
     headshotSrc: '/images/delores-reynolds.jpg',
     email: 'delores@elevateforhumanity.org',
+  },
+  {
+    id: '8',
+    name: 'Clystjah Woodley',
+    title: 'Program Coordinator',
+    orgRole: 'Program Operations',
+    bio: 'Clystjah supports program operations and student services, helping participants navigate enrollment and stay on track through their training programs.',
+    headshotSrc: '/images/clystjah-woodley.jpg',
+    email: 'clystjah@elevateforhumanity.org',
   },
 ];
 

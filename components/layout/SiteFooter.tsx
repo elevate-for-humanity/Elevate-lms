@@ -156,7 +156,7 @@ export default function SiteFooter() {
                 className="w-5 h-5"
               />
               <span className="text-xs text-gray-500">
-                © {new Date().getFullYear()} Elevate for Humanity. Operated by 2Exclusive LLC.
+                © {new Date().getFullYear()} Elevate for Humanity, Inc.
               </span>
             </div>
             <div className="flex justify-center gap-4 text-xs text-gray-500">

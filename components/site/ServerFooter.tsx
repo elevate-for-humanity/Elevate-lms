@@ -24,12 +24,12 @@ const footerLinks = {
     { name: 'Employer Partnerships', href: '/employer' },
   ],
   platform: [
-    { name: 'Platform Overview', href: '/platform' },
-    { name: 'Partners', href: '/platform/partners' },
-    { name: 'Managed Platform', href: '/platform/managed' },
-    { name: 'Enterprise Access', href: '/platform/enterprise' },
-    { name: 'Workforce Boards', href: '/platform/workforce-boards' },
-    { name: 'Licensing', href: '/platform/licensing' },
+    { name: 'Platform Overview', href: '/store' },
+    { name: 'Licensing', href: '/store/licenses' },
+    { name: 'Managed Platform', href: '/store/licenses/managed-platform' },
+    { name: 'Enterprise Access', href: '/store/licenses/enterprise-license' },
+    { name: 'Demos', href: '/store/demo' },
+    { name: 'Add-Ons', href: '/store/add-ons' },
   ],
   compliance: [
     { name: 'Governance', href: '/governance' },
@@ -141,7 +141,7 @@ export default function ServerFooter() {
                 className="w-7 h-7"
               />
               <p className="text-slate-400 text-sm">
-                © {new Date().getFullYear()} Elevate for Humanity. Operated by 2Exclusive LLC. All rights reserved.
+                © {new Date().getFullYear()} Elevate for Humanity, Inc. All rights reserved.
               </p>
             </div>
             

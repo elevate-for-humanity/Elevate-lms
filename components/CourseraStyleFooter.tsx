@@ -181,7 +181,7 @@ export default function CourseraStyleFooter() {
               <div className="flex items-center gap-4">
                 <div className="text-xl font-bold text-brand-blue-600">Elevate</div>
                 <span className="text-sm text-gray-500">
-                  © {new Date().getFullYear()} Elevate for Humanity. Operated by 2Exclusive LLC.
+                  © {new Date().getFullYear()} Elevate for Humanity, Inc.
                 </span>
               </div>
             </div>

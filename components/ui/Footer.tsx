@@ -213,7 +213,7 @@ export const Footer: React.FC = () => {
           {/* Copyright & Legal Links */}
           <div className="mt-8 pt-8 border-t border-slate-800">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 text-sm text-slate-500">
-              <p>© {currentYear} Elevate for Humanity. Operated by 2Exclusive LLC. All rights reserved.</p>
+              <p>© {currentYear} Elevate for Humanity, Inc. All rights reserved.</p>
               <div className="flex flex-wrap justify-center sm:justify-end gap-4">
                 {footerLinks.legal.map((link) => (
                   <Link

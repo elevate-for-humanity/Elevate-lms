@@ -13,12 +13,7 @@ const programs = [
   { name: 'CPR & First Aid', href: '/programs/cpr-first-aid-hsi', image: '/images/healthcare/healthcare-professional-portrait-1.jpg', desc: 'HSI certified — same-day available' },
 ];
 
-const steps = [
-  { num: '01', title: 'Register', desc: 'Sign up at indianacareerconnect.com to determine funding eligibility.', href: '/funding' },
-  { num: '02', title: 'Choose a Program', desc: 'Pick the career path that fits your goals and schedule.', href: '/programs' },
-  { num: '03', title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works' },
-  { num: '04', title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services' },
-];
+
 
 export default function HomePage() {
   return (
@@ -167,14 +162,26 @@ export default function HomePage() {
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {steps.map((step) => (
-              <Link key={step.num} href={step.href} className="group text-center">
-                <div className="w-16 h-16 bg-red-600 text-white rounded-full flex items-center justify-center mx-auto mb-4 text-xl font-bold group-hover:bg-red-700 transition-colors">
-                  {step.num}
-                </div>
+            {[
+              { title: 'Register', desc: 'Sign up at indianacareerconnect.com to determine funding eligibility.', href: '/funding', image: '/images/heroes-hq/how-it-works-hero.jpg' },
+              { title: 'Choose a Program', desc: 'Pick the career path that fits your goals and schedule.', href: '/programs', image: '/images/heroes-hq/programs-hero.jpg' },
+              { title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works', image: '/images/programs-hq/training-classroom.jpg' },
+              { title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services', image: '/images/heroes-hq/career-services-hero.jpg' },
+            ].map((step) => (
+              <div key={step.title} className="text-center">
+                <Image
+                  src={step.image}
+                  alt={step.title}
+                  width={400}
+                  height={267}
+                  className="w-full h-auto rounded-lg mb-4"
+                />
                 <h3 className="text-xl font-bold text-slate-900 mb-2">{step.title}</h3>
-                <p className="text-slate-700 text-base">{step.desc}</p>
-              </Link>
+                <p className="text-slate-700 text-base mb-4">{step.desc}</p>
+                <Link href={step.href} className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+                  Learn More
+                </Link>
+              </div>
             ))}
           </div>
         </div>
@@ -182,45 +189,48 @@ export default function HomePage() {
 
       {/* ===== FUNDING ===== */}
       <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-6">
           <Image
             src="/images/heroes-hq/jri-hero.jpg"
             alt="Earn while you learn"
             width={1400}
             height={933}
             sizes="(max-width: 768px) 100vw, 960px"
-            className="w-full h-auto mb-10"
+            className="w-full h-auto rounded-lg mb-10"
           />
           <p className="text-red-600 font-bold text-sm mb-2 uppercase tracking-wide">Funding Available</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">100% Tuition-Free Programs</h2>
-          <p className="text-lg text-slate-700 mb-6">
+          <p className="text-lg text-slate-700 mb-8">
             Most programs are fully funded through WIOA, WRG, and JRI. No tuition, no fees, no debt.
           </p>
-          <ul className="space-y-4 mb-8">
+          <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs' },
-              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost.', href: '/funding/state-programs' },
-              { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri' },
-              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', external: true },
+              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/heroes-hq/funding-hero.jpg' },
+              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost.', href: '/funding/state-programs', image: '/images/programs-hq/students-learning.jpg' },
+              { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/funding/funding-jri-program-v2.jpg' },
+              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/heroes-hq/career-services-hero.jpg', external: true },
             ].map((item) => (
-              <li key={item.label}>
-                <Link href={item.href} className="flex items-start gap-3 group" {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
-                  <span className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                  </span>
-                  <div>
-                    <span className="font-bold text-slate-900 group-hover:text-red-600 transition-colors">{item.label}</span>
-                    <span className="text-slate-600"> — {item.desc}</span>
-                  </div>
-                </Link>
-              </li>
+              <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
+                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-auto" />
+                <div className="p-5">
+                  <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
+                  <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
+                  <Link
+                    href={item.href}
+                    {...(item.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                    className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors"
+                  >
+                    Learn More
+                  </Link>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/wioa-eligibility" className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center">
+            <Link href="/wioa-eligibility" className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center">
               Check Eligibility
             </Link>
-            <Link href="/funding" className="border-2 border-red-600 text-red-600 font-bold px-6 py-3 rounded-lg hover:bg-red-50 transition-colors text-center">
+            <Link href="/funding" className="border-2 border-red-600 text-red-600 font-bold px-8 py-4 rounded-lg hover:bg-red-50 transition-colors text-center">
               All Funding Options
             </Link>
           </div>
@@ -254,45 +264,44 @@ export default function HomePage() {
 
       {/* ===== EMPLOYERS ===== */}
       <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
-        <div className="max-w-5xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-6">
           <Image
             src="/images/heroes-hq/employer-hero.jpg"
             alt="Hire our graduates"
             width={1600}
             height={1067}
             sizes="(max-width: 768px) 100vw, 960px"
-            className="w-full h-auto mb-10"
+            className="w-full h-auto rounded-lg mb-10"
           />
           <p className="text-red-600 font-bold text-sm mb-2 uppercase tracking-wide">For Employers</p>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-4">Hire Our Skilled Graduates</h2>
-          <p className="text-lg text-slate-700 mb-6">
+          <p className="text-lg text-slate-700 mb-8">
             Our candidates come out of our programs credentialed and ready to work. Access tax credits and funding.
           </p>
-          <ul className="space-y-4 mb-8">
+          <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'Pre-trained candidates', desc: 'Certified and ready to work from day one.', href: '/career-services' },
-              { label: 'WOTC tax credits', desc: 'Up to $9,600 per hire for qualifying employees.', href: '/employer' },
-              { label: 'OJT reimbursement', desc: 'Covers 50-75% of wages during on-the-job training.', href: '/ojt-and-funding' },
-              { label: 'Post jobs online', desc: 'Browse candidates and post openings through our portal.', href: '/employer' },
+              { label: 'Pre-trained Candidates', desc: 'Certified and ready to work from day one.', href: '/career-services', image: '/images/heroes-hq/success-hero.jpg' },
+              { label: 'WOTC Tax Credits', desc: 'Up to $9,600 per hire for qualifying employees.', href: '/employer', image: '/images/programs-hq/business-office.jpg' },
+              { label: 'OJT Reimbursement', desc: 'Covers 50-75% of wages during on-the-job training.', href: '/ojt-and-funding', image: '/images/heroes-hq/career-services-hero.jpg' },
+              { label: 'Post Jobs Online', desc: 'Browse candidates and post openings through our portal.', href: '/employer', image: '/images/programs-hq/business-training.jpg' },
             ].map((item) => (
-              <li key={item.label}>
-                <Link href={item.href} className="flex items-start gap-3 group">
-                  <span className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                  </span>
-                  <div>
-                    <span className="font-bold text-slate-900 group-hover:text-red-600 transition-colors">{item.label}</span>
-                    <span className="text-slate-600"> — {item.desc}</span>
-                  </div>
-                </Link>
-              </li>
+              <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
+                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-auto" />
+                <div className="p-5">
+                  <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
+                  <p className="text-slate-600 text-sm mb-4">{item.desc}</p>
+                  <Link href={item.href} className="inline-block bg-red-600 hover:bg-red-700 text-white font-semibold text-sm px-5 py-2.5 rounded-lg transition-colors">
+                    Learn More
+                  </Link>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
           <div className="flex flex-col sm:flex-row gap-3">
-            <Link href="/employer" className="bg-red-600 hover:bg-red-700 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center">
+            <Link href="/employer" className="bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center">
               Employer Portal
             </Link>
-            <Link href="/apply/program-holder" className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-lg transition-colors text-center">
+            <Link href="/apply/program-holder" className="bg-slate-900 hover:bg-slate-800 text-white font-bold px-8 py-4 rounded-lg transition-colors text-center">
               Become a Partner
             </Link>
           </div>

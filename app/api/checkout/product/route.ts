@@ -4,8 +4,12 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json(
       { error: 'Stripe not configured' },

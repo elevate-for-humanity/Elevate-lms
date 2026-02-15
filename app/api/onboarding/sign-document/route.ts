@@ -8,9 +8,13 @@ import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/utils/supabase/server';
 import * as crypto from 'node:crypto';
 import { checkPartnerApproval } from '@/lib/automation/partner-approval';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     const {

@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Partner Approval - Two-Phase Atomic Flow
@@ -27,6 +28,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const { id: applicationId } = await params;
   const supabase = createAdminClient();
   

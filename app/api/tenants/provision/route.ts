@@ -8,8 +8,12 @@ import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { sendSlackMessage } from '@/lib/notifications/slack';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: Request) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   const session = await requireApiAuth();
   if (!(session as string).isAdmin) {

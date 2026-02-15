@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,7 +12,10 @@ export async function GET() {
   );
 }
 
-export async function POST() {
+export async function POST(request: Request) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   return NextResponse.json(
     { error: 'PDF report generation temporarily unavailable' },
     { status: 503 }

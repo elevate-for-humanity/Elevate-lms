@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -22,6 +23,9 @@ function getSupabaseAdmin() {
  * Also accepts x-correlation-id header.
  */
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const body = await request.json().catch(() => ({}));
   const correlationId: string =
     body.correlationId ||

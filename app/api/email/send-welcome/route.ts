@@ -5,9 +5,13 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
     const { to, name, userId } = await request.json();
 
     // Email content

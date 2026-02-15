@@ -23,6 +23,9 @@ function getOpenAI() {
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     const { 
       url,
@@ -124,6 +127,7 @@ add_action('wp_enqueue_scripts', 'elevate_lms_init');
       velo: `
 // Add to page code for custom integration
 import { elevateLMS } from 'public/elevate-lms.js';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 $w.onReady(function () {
     elevateLMS.init({

@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { searchEntities } from '@/lib/integrations/sam-gov';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +17,9 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Verify authorization (cron secret or admin)
     const authHeader = request.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;

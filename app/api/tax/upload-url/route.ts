@@ -5,12 +5,16 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@supabase/supabase-js';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const { filename, contentType, contactInfo } = body;
 

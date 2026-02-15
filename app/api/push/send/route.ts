@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import webpush from 'web-push';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Initialize web-push with VAPID keys
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
@@ -26,6 +27,9 @@ interface NotificationPayload {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
     // Verify internal API key or service role
     const authHeader = request.headers.get('authorization');
     const apiKey = process.env.INTERNAL_API_KEY;

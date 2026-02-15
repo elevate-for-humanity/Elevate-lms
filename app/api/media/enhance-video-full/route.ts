@@ -11,6 +11,7 @@ import { promisify } from 'util';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const execFileAsync = promisify(execFile);
 
@@ -43,6 +44,9 @@ function sanitizeVolume(vol: string | null, defaultVal: number): number {
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Authentication check - require admin role
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();

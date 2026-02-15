@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * POST /api/social-media/post
@@ -13,6 +14,9 @@ import { createClient } from '@/lib/supabase/server';
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Check authentication

@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCourseBySlug } from '@/lib/courses/definitions';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET() {
   try {
@@ -118,6 +119,9 @@ export async function GET() {
 // Mark a lesson as complete
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     
     if (!supabase) {

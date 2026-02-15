@@ -20,6 +20,7 @@ import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 interface FinalizePaymentRequest {
   enrollmentId: string;
@@ -28,6 +29,9 @@ interface FinalizePaymentRequest {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
     // Check if Stripe is configured
     if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json(

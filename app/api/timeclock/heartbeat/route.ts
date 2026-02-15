@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient, createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const MAX_ACCURACY_M = 50;
 
@@ -28,6 +29,9 @@ function haversineDistance(
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     const { progress_entry_id, lat, lng, accuracy_m } = body;
 

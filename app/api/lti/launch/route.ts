@@ -6,8 +6,12 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 import { createSupabaseClient } from '@/lib/supabase-api';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: Request) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   const formData = await request.formData();
   const idToken = String(formData.get('id_token') || '');

@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import OpenAI from 'openai';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Initialize OpenAI client only if API key is available
 const openai = process.env.OPENAI_API_KEY
@@ -83,6 +84,9 @@ When a student asks a question, provide helpful guidance while directing them to
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Check if OpenAI is configured
     if (!openai) {
       return NextResponse.json(

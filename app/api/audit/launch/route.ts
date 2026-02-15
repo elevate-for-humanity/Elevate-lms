@@ -5,6 +5,7 @@ export const maxDuration = 60;
 import React from 'react';
 import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Launch Audit Endpoint
@@ -51,6 +52,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const body = await request.json().catch(() => ({}));
   const options: AuditOptions = {
     mode: body.mode || 'quick',

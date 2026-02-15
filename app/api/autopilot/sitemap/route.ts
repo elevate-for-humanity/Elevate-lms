@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { generateSitemap } from '@/lib/autopilot/deploy-prep';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,8 +20,11 @@ export async function GET() {
   }
 }
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const result = await generateSitemap();
     return NextResponse.json(result);
   } catch (error) {

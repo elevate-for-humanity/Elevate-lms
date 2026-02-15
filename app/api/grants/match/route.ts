@@ -7,6 +7,7 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function computeMatchScore(
   entityNaics: string[],
@@ -47,8 +48,11 @@ function computeMatchScore(
   return { score, reasons };
 }
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { data: entities, error: entitiesError } = await supabaseAdmin
       .from('entities')
       .select('*');

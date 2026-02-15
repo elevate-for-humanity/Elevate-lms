@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: Request) {
   try {
@@ -45,6 +46,9 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

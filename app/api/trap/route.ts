@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'edge';
 export const maxDuration = 60;
 import { logSecurityEvent, blacklistIP } from '@/lib/security-monitor';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Honeypot endpoint - should never be accessed by legitimate users
@@ -55,5 +56,8 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   return GET(req);
 }

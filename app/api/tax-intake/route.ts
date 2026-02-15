@@ -5,9 +5,13 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { NextResponse } from "next/server";
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = supabaseServer();
     const body = await req.json();
 

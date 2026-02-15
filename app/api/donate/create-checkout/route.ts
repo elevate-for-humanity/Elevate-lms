@@ -3,9 +3,13 @@ import { NextRequest, NextResponse } from 'next/server';
 export const runtime = 'edge';
 export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     if (!stripe) {
       return NextResponse.json(
         { error: 'Payment processing is not configured' },

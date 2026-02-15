@@ -8,8 +8,12 @@ import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/billing/stripe';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: Request) {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   const auth = request.headers.get('x-internal-token');
   if (auth !== process.env.INTERNAL_CRON_TOKEN) {

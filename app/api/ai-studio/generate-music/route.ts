@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * AI Music Generation API
@@ -16,6 +17,9 @@ import { toErrorMessage } from '@/lib/safe';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { prompt, duration = 60, style = 'upbeat' } = await request.json();
 
     if (!prompt || prompt.trim().length === 0) {

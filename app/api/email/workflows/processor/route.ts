@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -313,5 +314,8 @@ async function processPendingEmails(supabase: any, workflow: any, now: Date) {
  * Manual trigger for testing
  */
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
   return GET(req);
 }

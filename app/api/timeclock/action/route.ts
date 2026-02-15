@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const MAX_ACCURACY_M = 50;
 const LUNCH_DURATION_MINUTES = 60;
@@ -64,6 +65,9 @@ async function raiseAdminAlert(
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body: ActionPayload = await request.json();
     const {
       action,

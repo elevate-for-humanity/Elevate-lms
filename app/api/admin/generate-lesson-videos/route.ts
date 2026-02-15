@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300; // 5 minutes
@@ -18,6 +19,9 @@ export const maxDuration = 300; // 5 minutes
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     
     // Check admin auth

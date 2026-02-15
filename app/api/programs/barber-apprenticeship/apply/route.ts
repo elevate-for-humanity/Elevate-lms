@@ -8,6 +8,7 @@ import { z } from 'zod';
 import { DOT_CODES } from '@/lib/compliance/rapids-integration';
 import { RAPIDS_CONFIG, getRAPIDSEnrollmentData } from '@/lib/compliance/rapids-config';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const barberApplicationSchema = z.object({
   firstName: z.string().min(1),
@@ -33,6 +34,9 @@ const barberApplicationSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     const data = await req.json();
     const validated = barberApplicationSchema.parse(data);
 

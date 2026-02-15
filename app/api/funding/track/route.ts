@@ -6,8 +6,12 @@ export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createServerSupabaseClient } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: Request) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const body = await parseBody<Record<string, any>>(request);
   const supabase = await createServerSupabaseClient();
 

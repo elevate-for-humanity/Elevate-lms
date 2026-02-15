@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -16,6 +17,9 @@ function getResend() {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
     const data = await parseBody<Record<string, any>>(request);
     const supabase = await createClient();
 

@@ -4,6 +4,7 @@ import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
 import { headers } from "next/headers";
 import crypto from "crypto";
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // 5 requests per 5 minutes per IP
 const ratelimit =
@@ -23,6 +24,9 @@ function hashIp(ip: string): string {
 }
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const headersList = await headers();
   const ip =
     headersList.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";

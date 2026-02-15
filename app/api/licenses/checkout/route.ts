@@ -3,6 +3,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { CLONE_LICENSES } from '@/app/data/store-products';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * POST /api/licenses/checkout
@@ -13,6 +14,9 @@ import { CLONE_LICENSES } from '@/app/data/store-products';
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     if (!supabase) {
       return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });

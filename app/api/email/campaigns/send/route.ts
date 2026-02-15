@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
@@ -15,6 +16,9 @@ const resend = process.env.RESEND_API_KEY
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     if (!resend) {
       return NextResponse.json(
         { success: false, error: 'Email service not configured' },

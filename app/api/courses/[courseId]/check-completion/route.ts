@@ -7,10 +7,14 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabaseServer';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 type Params = { params: Promise<{ courseId: string }> };
 
 export async function POST(req: NextRequest, { params }: Params) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = getSupabaseServerClient();
   const { courseId } = await params;
 

@@ -13,6 +13,7 @@ import {
 } from '@/lib/api/rest-api';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/v1/enrollments - List enrollments
 export async function GET(request: NextRequest) {
@@ -112,6 +113,9 @@ export async function GET(request: NextRequest) {
 
 // POST /api/v1/enrollments - Create enrollment
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const startTime = Date.now();
   let statusCode = 201;
 

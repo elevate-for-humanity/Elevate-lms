@@ -7,8 +7,12 @@ import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { getUserByEmail } from '@/lib/supabase-admin';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createRouteHandlerClient({ cookies });
   const {
     data: { user },

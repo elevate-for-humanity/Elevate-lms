@@ -8,9 +8,13 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { sendEmail, emailTemplates } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     const body = await parseBody<Record<string, any>>(request);
     const { certificateId } = body;
 

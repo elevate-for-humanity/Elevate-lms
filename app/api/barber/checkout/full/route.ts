@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * POST /api/barber/checkout/full
@@ -11,6 +12,9 @@ import { BARBER_PRICING } from '@/lib/programs/pricing';
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     const {
       transferred_hours = 0,

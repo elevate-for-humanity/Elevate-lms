@@ -6,9 +6,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { resend } from '@/lib/resend';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const {
       data: { user },

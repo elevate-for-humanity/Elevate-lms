@@ -5,12 +5,16 @@ import { NextRequest, NextResponse } from 'next/server';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 // import { resend } from '@/lib/resend'; // your Resend client - add later
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
   const { id } = await params;
   try {
     const supabase = await createClient();

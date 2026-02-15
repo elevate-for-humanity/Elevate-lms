@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { sanitizeSearchInput } from '@/lib/utils';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -86,6 +87,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const auth = await requireAdmin();
   if ('error' in auth) return NextResponse.json({ error: auth.error }, { status: auth.status });
   

@@ -8,6 +8,7 @@ import { toErrorMessage } from '@/lib/safe';
 import { v4 as uuidv4 } from 'uuid';
 import { generateCourseVideo, getAvailableServices } from '@/lib/video/generate';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 interface Scene {
   id: string;
@@ -38,6 +39,9 @@ interface VideoRequest {
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     
     // Check if this is a course video request (AI instructor mode)

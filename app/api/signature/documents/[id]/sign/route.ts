@@ -5,11 +5,15 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from "@/lib/supabase/server";
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const { id } = await params;
   const supabase = await createClient();
   const { signerName, signerEmail, role } = await request.json();

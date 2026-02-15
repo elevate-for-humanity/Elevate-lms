@@ -4,9 +4,13 @@ export const runtime = 'edge';
 export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { sourceRepo, newRepoName } = await req.json();
 
     if (!sourceRepo || !newRepoName) {

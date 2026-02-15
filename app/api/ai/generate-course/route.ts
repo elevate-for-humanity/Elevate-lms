@@ -5,9 +5,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { mode, prompt } = await req.json();
 
     if (!mode || !prompt) {

@@ -11,8 +11,12 @@ import {
   createRateLimitHeaders,
   RateLimitPresets,
 } from '@/lib/rateLimit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
   // Rate limiting: 3 applications per hour per IP
   const identifier = getClientIdentifier(req.headers);
   const rateLimitResult = rateLimit(identifier, {

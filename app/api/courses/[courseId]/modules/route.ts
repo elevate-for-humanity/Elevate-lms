@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 
@@ -32,6 +33,9 @@ export async function POST(
   { params }: { params: Promise<{ courseId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { courseId } = await params;
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();

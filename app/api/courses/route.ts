@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { CourseCreateSchema } from '@/lib/validators/course';
 import { createCourse, listCourses } from '@/lib/db/courses';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -28,6 +29,9 @@ export async function GET(request: Request) {
  */
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Auth check
     const supabase = await createClient();
     if (!supabase) {

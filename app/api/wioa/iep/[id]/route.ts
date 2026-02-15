@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/wioa/iep/[id] - Get IEP by ID
 export async function GET(
@@ -77,6 +78,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   try {
     const { id } = await params;

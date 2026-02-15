@@ -5,6 +5,7 @@ import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { supabaseServer } from '@/lib/supabaseServer';
 import { Resend } from 'resend';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -41,6 +42,9 @@ function isAllowedIP(ip: string): boolean {
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Verify source IP
     const forwardedFor = request.headers.get('x-forwarded-for');
     const sourceIP = forwardedFor?.split(',')[0]?.trim() || '';

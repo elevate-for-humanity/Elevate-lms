@@ -7,13 +7,17 @@ import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 import { isDemoEnabled, getDemoTenantSlug } from '@/lib/demo/context';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 
 const DEMO_TENANT_ID = '00000000-0000-0000-0000-000000000001';
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Check if demo mode is enabled
     if (!isDemoEnabled()) {
       return NextResponse.json(

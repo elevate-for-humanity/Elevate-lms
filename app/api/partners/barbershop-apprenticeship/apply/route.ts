@@ -8,6 +8,7 @@ import { rateLimitNew as rateLimit, getClientIdentifier, RATE_LIMITS } from '@/l
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
 import crypto from 'crypto';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 interface ApplicationData {
   shopLegalName: string;
@@ -67,6 +68,9 @@ function hashIP(ip: string): string {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     const identifier = getClientIdentifier(req.headers);
     const rateLimitResult = rateLimit(`barbershop-partner:${identifier}`, RATE_LIMITS.APPLICATION_FORM);
 

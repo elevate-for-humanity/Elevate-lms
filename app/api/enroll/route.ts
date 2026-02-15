@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { completeEnrollment } from '@/lib/enrollment/complete-enrollment';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 interface EnrollRequestBody {
   firstName: string;
@@ -20,6 +21,9 @@ interface EnrollRequestBody {
 }
 
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
 
   // Check authentication

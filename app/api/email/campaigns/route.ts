@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(req: Request) {
   try {
@@ -33,6 +34,9 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const body = await req.json();
 

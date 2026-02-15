@@ -8,12 +8,16 @@ import { parseBody } from '@/lib/api-helpers';
 import { supabaseServer } from '@/lib/supabase-server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = supabaseServer();
     const { id } = await params;
     const body = await parseBody<Record<string, any>>(request);

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Admin API for Enrollment Jobs
@@ -64,6 +65,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
 
   // Verify staff role

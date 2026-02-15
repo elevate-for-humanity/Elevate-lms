@@ -6,8 +6,12 @@ export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { toError, toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
-export async function POST() {
+export async function POST(request: Request) {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json(
       { error: 'Stripe not configured' },

@@ -9,12 +9,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * POST /api/xapi/statement
  * Receive and store xAPI statements
  */
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   try {
     const body = await parseBody<Record<string, any>>(request);

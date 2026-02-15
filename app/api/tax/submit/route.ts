@@ -4,9 +4,13 @@ import { validateTaxReturn } from '@/lib/tax-software/validation/irs-rules';
 import { createMeFSubmission } from '@/lib/tax-software/mef/xml-generator';
 import { createTransmitter } from '@/lib/tax-software/mef/transmission';
 import { TaxReturn } from '@/lib/tax-software/types';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     
     // Build complete tax return

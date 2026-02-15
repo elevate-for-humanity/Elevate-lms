@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Scraper Alert Endpoint
@@ -16,6 +17,9 @@ import { logger } from '@/lib/logger';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await parseBody<Record<string, any>>(request);
     const { type, url, timestamp, ...additionalData } = body;
 

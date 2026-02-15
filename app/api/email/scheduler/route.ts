@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Email Scheduler - Processes scheduled campaigns
@@ -136,5 +137,8 @@ export async function GET(req: Request) {
  * Manual trigger for testing
  */
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
   return GET(req);
 }

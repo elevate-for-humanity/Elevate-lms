@@ -4,9 +4,13 @@ export const maxDuration = 60;
 // app/api/partners/lead/route.ts
 import { NextResponse } from 'next/server';
 import { createOrUpdateContact, createOpportunity, createOrUpdateAccount, createLead } from '@/lib/integrations/salesforce';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: Request) {
-  const { name, email, phone, company, programInterest } = await request.json();
+  
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+const { name, email, phone, company, programInterest } = await request.json();
 
   if (!name || !email) {
     return NextResponse.json(

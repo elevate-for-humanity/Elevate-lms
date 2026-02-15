@@ -7,9 +7,13 @@ import { createClient } from '@/lib/supabase/server';
 import { NextResponse } from 'next/server';
 import { createAccount, enrollInCourse } from '@/lib/partners/milady';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { studentId, programId } = await request.json();
 
     const supabase = await createClient();

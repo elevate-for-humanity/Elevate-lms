@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Mark course as completed
@@ -12,6 +13,9 @@ import { createClient } from '@/lib/supabase/server';
  */
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const {
       data: { user },

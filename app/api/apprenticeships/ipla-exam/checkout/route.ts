@@ -3,9 +3,13 @@ export const maxDuration = 60;
 
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     if (!stripe) {
       return NextResponse.json(
         { error: 'Payment system not configured' },

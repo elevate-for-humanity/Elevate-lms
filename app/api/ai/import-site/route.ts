@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import * as cheerio from 'cheerio';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
@@ -25,6 +26,9 @@ function getOpenAI() {
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     const { url, includePages = ['/', '/about', '/programs', '/contact'] } = body;
 

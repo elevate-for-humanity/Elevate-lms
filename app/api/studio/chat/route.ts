@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import OpenAI from 'openai';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const getOpenAI = () => new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -44,6 +45,9 @@ export async function GET(req: NextRequest) {
 
 // Streaming chat
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const userId = req.headers.get('x-user-id');
   
   try {

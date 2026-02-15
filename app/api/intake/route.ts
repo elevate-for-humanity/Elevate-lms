@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Auto-tag funding eligibility based on intake answers
 function determineFundingTag(body: Record<string, string>): string {
@@ -11,6 +12,9 @@ function determineFundingTag(body: Record<string, string>): string {
 }
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
   const supabase = createAdminClient();
   if (!supabase) {
     return NextResponse.json(

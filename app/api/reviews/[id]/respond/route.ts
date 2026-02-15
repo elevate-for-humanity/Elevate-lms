@@ -5,11 +5,15 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const { id } = await params;
   try {
     const supabase = await createClient();

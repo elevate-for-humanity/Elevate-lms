@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -8,8 +9,11 @@ export const dynamic = 'force-dynamic';
  * POST /api/admin/deploy
  * Triggers a Netlify deployment via build hook
  */
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Verify admin access
     const supabase = await createClient();
     if (!supabase) {

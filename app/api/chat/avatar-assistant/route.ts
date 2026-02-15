@@ -7,6 +7,7 @@ import {
   getPageScript,
   getStatusScript 
 } from '@/lib/avatar-scripts';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -101,6 +102,9 @@ function getFallbackResponse(message: string): string {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body: ChatRequest = await request.json();
     const { message, history = [] } = body;
 

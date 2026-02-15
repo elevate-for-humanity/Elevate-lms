@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -12,6 +13,9 @@ function getOpenAIClient() {
 }
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const openai = getOpenAIClient();
   try {
     const { courseTitle, moduleTitle, moduleDescription, duration } = await req.json();

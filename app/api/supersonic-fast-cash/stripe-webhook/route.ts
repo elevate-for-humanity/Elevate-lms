@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -15,6 +16,9 @@ const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KE
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
 

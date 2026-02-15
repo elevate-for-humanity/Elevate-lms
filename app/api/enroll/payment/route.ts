@@ -4,6 +4,7 @@ import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { paymentRateLimit } from '@/lib/rate-limit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -19,6 +20,9 @@ const PROGRAM_DETAILS: Record<string, { name: string; totalPrice: number }> = {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
     // Rate limiting
     if (paymentRateLimit) {
       const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';

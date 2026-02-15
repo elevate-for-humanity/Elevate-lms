@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logAuditEvent, AuditActions } from '@/lib/audit';
 import { Resend } from 'resend';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -16,6 +17,9 @@ function getResend() {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const supabase = await createClient();
 

@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({
@@ -23,6 +24,9 @@ const contextPrompts = {
 };
 
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   // Fallback messages for when API is not configured
   const fallbackMessages = {
     welcome:

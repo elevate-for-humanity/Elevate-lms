@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
 import { getCart, addToCart, updateCartItem, removeFromCart } from '@/lib/store/db';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Get or create cart
 export async function GET(request: NextRequest) {
@@ -63,6 +64,9 @@ export async function GET(request: NextRequest) {
 
 // Add item to cart
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const cookieStore = await cookies();
   const cartId = cookieStore.get('cart_id')?.value;
 

@@ -15,9 +15,13 @@ import {
   getSubmissionHistory,
   addTimelineEvent,
 } from '@/lib/grants/submission-tracker';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const { action, applicationId, submittedBy, method, details } = body;
 

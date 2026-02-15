@@ -9,9 +9,13 @@ import { STRIPE_PRICE_IDS, isPriceConfigured } from '@/lib/stripe/price-map';
 import { toErrorMessage } from '@/lib/safe';
 import { createClient } from '@/lib/supabase/server';
 import { paymentRateLimit } from '@/lib/rate-limit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
     // Rate limiting
     if (paymentRateLimit) {
       const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || 'unknown';

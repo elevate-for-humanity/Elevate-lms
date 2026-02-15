@@ -7,9 +7,13 @@ import { cloneRepository } from '@/lib/store/stripe-products';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { productId } = await req.json();
 
     if (!productId) {

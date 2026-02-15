@@ -7,9 +7,13 @@ import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const data = await parseBody<Record<string, any>>(request);
     const supabase = await createClient();
 

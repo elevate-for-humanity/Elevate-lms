@@ -3,6 +3,7 @@ import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Barber Apprenticeship pricing (configured in Stripe Dashboard)
 const PRICING = {
@@ -23,6 +24,9 @@ const PRICING = {
 type PaymentOption = 'full' | 'deposit' | 'installment';
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
   if (!stripe) {
     return NextResponse.json(
       { error: 'Payment system not configured' },

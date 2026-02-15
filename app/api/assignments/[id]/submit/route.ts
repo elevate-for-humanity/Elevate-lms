@@ -6,12 +6,16 @@ import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // POST /api/assignments/[id]/submit - Submit assignment
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
   const { id } = await params;
   try {
     const user = await getCurrentUser();

@@ -5,8 +5,12 @@ import { NextRequest, NextResponse } from 'next/server';
 import { gh, parseRepo, getUserOctokit } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const userToken = req.headers.get('x-gh-token');
 
   try {

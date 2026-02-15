@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * DMCA Tracking Endpoint
@@ -38,6 +39,9 @@ const getOfficialDomains = () => {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await parseBody<Record<string, any>>(request);
 
     const { siteId, owner, url, referrer, timestamp, userAgent } = body;

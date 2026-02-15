@@ -14,6 +14,7 @@ import {
   exportCancellations,
   markAsSubmitted,
 } from '@/lib/compliance/rapids-export';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -95,6 +96,9 @@ export async function GET(request: NextRequest) {
  * POST - Mark records as submitted to RAPIDS
  */
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   // Verify admin access
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

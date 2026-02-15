@@ -7,9 +7,13 @@ import { createClient } from '@/lib/supabase/server';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { sendCreatorApprovalEmail } from '@/lib/email/resend';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const {
       data: { user },

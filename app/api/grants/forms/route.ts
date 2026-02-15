@@ -14,9 +14,13 @@ import {
   generateSF424A,
   generateSFLLL,
 } from '@/lib/grants/federal-forms';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const { action, applicationId, entityId, grantId, formData } = body;
 

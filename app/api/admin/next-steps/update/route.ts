@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 type Payload = {
   id: string;
@@ -12,6 +13,9 @@ type Payload = {
 };
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   const {
     data: { user },

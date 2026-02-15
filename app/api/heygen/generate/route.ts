@@ -1,5 +1,6 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
 const HEYGEN_API_URL = 'https://api.heygen.com/v2/video/generate';
@@ -13,6 +14,9 @@ interface VideoGenerateRequest {
 }
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
   if (!HEYGEN_API_KEY) {
     return NextResponse.json({ error: 'HeyGen API key not configured' }, { status: 500 });
   }

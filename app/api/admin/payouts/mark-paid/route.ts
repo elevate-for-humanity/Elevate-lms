@@ -7,6 +7,7 @@ import { createClient } from '@supabase/supabase-js';
 import { requireAdmin } from '@/lib/auth';
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function getSupabaseAdmin() {
   if (
@@ -22,6 +23,9 @@ function getSupabaseAdmin() {
 }
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = getSupabaseAdmin();
   try {
     const { session } = await requireAdmin();

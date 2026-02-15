@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { stripe } from '@/lib/stripe/client';
 import { CERTIPORT_EXAMS } from '@/lib/partners/certiport';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Certiport Exam Request
@@ -28,6 +29,9 @@ import { CERTIPORT_EXAMS } from '@/lib/partners/certiport';
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 

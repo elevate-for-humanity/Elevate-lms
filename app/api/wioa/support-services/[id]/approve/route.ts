@@ -6,12 +6,16 @@ export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // POST /api/wioa/support-services/[id]/approve - Approve/deny support service
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   try {
     const { id } = await params;

@@ -6,9 +6,13 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { requireAdmin } from '@/lib/auth';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     await requireAdmin();
 
     const supabase = await createClient();

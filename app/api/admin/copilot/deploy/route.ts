@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,6 +50,9 @@ export async function GET() {
 // POST - Deploy a new copilot
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();

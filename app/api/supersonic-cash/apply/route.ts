@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Supersonic Cash Advance Application API
@@ -14,6 +15,9 @@ import { toErrorMessage } from '@/lib/safe';
  */
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const applicationData = await req.json();
 

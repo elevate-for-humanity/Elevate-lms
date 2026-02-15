@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
   _req: NextRequest,
@@ -73,6 +74,9 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ courseId: string }> }
 ) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   const user = await getCurrentUser();
   if (!user)

@@ -6,12 +6,16 @@ export const maxDuration = 30;
 import { NextResponse } from 'next/server';
 import { sendEmail } from '@/lib/email/resend';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const ADMIN_EMAIL = 'elevate4humanityedu@gmail.com';
 const ADMIN_SMS = '3177607908@txt.att.net';
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     const contentType = req.headers.get('content-type');
     let data;
 

@@ -7,8 +7,12 @@ import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: Request) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   // xAPI endpoint for receiving learning activity statements
   const body = await parseBody<Record<string, any>>(request);

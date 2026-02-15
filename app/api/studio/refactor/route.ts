@@ -3,6 +3,7 @@ export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const getOpenAI = () => new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -10,6 +11,9 @@ const getOpenAI = () => new OpenAI({
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { files, oldName, newName, type } = await req.json();
 
     if (!files || !oldName || !newName) {

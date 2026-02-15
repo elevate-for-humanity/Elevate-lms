@@ -12,6 +12,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import OpenAI from 'openai';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({
@@ -21,6 +22,9 @@ const openai = process.env.OPENAI_API_KEY
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { conversation_id, message, user_id, context } = await request.json();
 
     if (!message) {

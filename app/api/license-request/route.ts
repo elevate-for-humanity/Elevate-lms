@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function getResend() {
   const key = process.env.RESEND_API_KEY;
@@ -14,6 +15,9 @@ function getResend() {
 }
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const formData = await req.formData();
 
   const payload = {

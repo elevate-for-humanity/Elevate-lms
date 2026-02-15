@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Manual ID Upload API
@@ -18,6 +19,9 @@ import { createClient } from '@/lib/supabase/server';
  */
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   const {
     data: { user },

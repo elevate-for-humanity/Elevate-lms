@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 // App pricing (monthly in cents)
 const APP_PRICES: Record<string, Record<string, number>> = {
   'sam-gov': {
@@ -23,6 +24,9 @@ const APP_PRICES: Record<string, Record<string, number>> = {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 503 });

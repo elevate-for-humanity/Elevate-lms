@@ -2,12 +2,16 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { payoutService } from '@/lib/franchise/payout-service';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ payoutId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
     

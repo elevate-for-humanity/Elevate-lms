@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { gh, parseRepo, getUserOctokit } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Git stash operations via GitHub API
 // Note: GitHub API doesn't have native stash support, so we simulate it
@@ -51,6 +52,9 @@ export async function GET(req: NextRequest) {
 
 // Create a stash (save current changes to a temporary branch)
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const userToken = req.headers.get('x-gh-token');
 
   try {

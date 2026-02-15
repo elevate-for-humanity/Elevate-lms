@@ -18,9 +18,13 @@ import {
 import { generateNDAText } from '@/lib/onboarding-nda-template';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
     const data: OnboardingData = await request.json();
     const supabase = await createClient();
 

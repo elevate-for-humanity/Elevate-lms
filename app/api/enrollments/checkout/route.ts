@@ -9,6 +9,7 @@ import type { NextRequest } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function getSupabase() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -18,6 +19,9 @@ function getSupabase() {
 }
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
   const stripe = getStripe();
   const supabase = getSupabase();
   

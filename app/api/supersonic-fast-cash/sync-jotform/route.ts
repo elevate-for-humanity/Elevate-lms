@@ -3,6 +3,7 @@ import { jotFormIntegration } from '@/lib/integrations/jotform';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { createClient } from '@supabase/supabase-js';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -21,6 +22,9 @@ interface SyncJotformBody {
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // This is an admin-only endpoint — require service role key
     const authHeader = request.headers.get('authorization');
     if (!authHeader || authHeader !== `Bearer ${supabaseServiceKey}`) {

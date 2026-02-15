@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { canApproveApprentice } from '@/lib/documents';
 import { notifyApprenticeDecision } from '@/lib/notifications';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 interface ApproveEnrollmentRequest {
   enrollment_id: string;
@@ -32,6 +33,9 @@ interface ApproveEnrollmentRequest {
  */
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Check authentication

@@ -6,12 +6,16 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getCurrentUser } from '@/lib/auth';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ lessonId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

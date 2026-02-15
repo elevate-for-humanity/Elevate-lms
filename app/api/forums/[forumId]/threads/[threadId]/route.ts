@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getUserIdFromRequest } from "@/lib/getUserIdFromRequest";
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 type Params = { params: Promise<{ forumId: string; threadId: string }> };
 
@@ -120,6 +121,9 @@ export async function GET(_req: NextRequest, { params }: Params) {
 // POST: add a reply to the thread
 export async function POST(req: NextRequest, { params }: Params) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { threadId } = await params;
     const userId = getUserIdFromRequest(req);
     if (!userId) {

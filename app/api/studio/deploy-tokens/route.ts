@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseServer } from '@/lib/supabase-server';
 import crypto from 'crypto';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Simple encryption for tokens - in production use a proper KMS
 const ENCRYPTION_KEY = process.env.DEPLOY_TOKEN_KEY || 'default-key-change-in-production-32';
@@ -66,6 +67,9 @@ export async function GET(req: NextRequest) {
 
 // Save or update deploy token
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const userId = req.headers.get('x-user-id');
 
   if (!userId) {

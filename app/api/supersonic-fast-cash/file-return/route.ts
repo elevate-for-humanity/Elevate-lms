@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { Resend } from 'resend';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -75,6 +76,9 @@ interface TaxReturnBody {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const taxReturn: TaxReturnBody = await request.json();
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 

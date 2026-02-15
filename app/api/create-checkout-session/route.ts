@@ -5,10 +5,14 @@ import { stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
 import { getRAPIDSMetadata, isRAPIDSProgram } from '@/lib/compliance/rapids-config';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   // Log for debugging (remove in production)
 
   if (!stripe) {

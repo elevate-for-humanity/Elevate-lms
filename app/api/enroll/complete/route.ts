@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 interface CompleteEnrollmentRequest {
   sessionId: string;
@@ -21,6 +22,9 @@ interface CompleteEnrollmentRequest {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
     const body: CompleteEnrollmentRequest = await req.json();
     const {
       sessionId,

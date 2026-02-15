@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { COMPLIANCE_THRESHOLDS } from '@/types/enrollment';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET: Get audit for specific month/year or list all
 export async function GET(request: NextRequest) {
@@ -56,6 +57,9 @@ export async function GET(request: NextRequest) {
 
 // POST: Generate new audit for month/year
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   
   const { data: { user } } = await supabase.auth.getUser();

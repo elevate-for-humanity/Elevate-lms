@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const ApplicationSchema = z.object({
   leadId: z.string().uuid(),
@@ -47,6 +48,9 @@ const ApplicationSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const parsed = ApplicationSchema.safeParse(body);
 

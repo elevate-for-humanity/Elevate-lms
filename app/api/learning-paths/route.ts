@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { getSupabaseServerClient } from "@/lib/supabaseServer";
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 async function parseBody<T>(request: NextRequest): Promise<T> {
   return request.json() as Promise<T>;
@@ -28,6 +29,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = getSupabaseServerClient();
 
   const { data: { user } } = await supabase.auth.getUser();

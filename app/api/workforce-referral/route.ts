@@ -11,6 +11,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { WorkforceAgencyType, WorkforceReferralStatus } from '@/types/enrollment';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET: List referrals or get specific referral
 export async function GET(request: NextRequest) {
@@ -70,6 +71,9 @@ export async function GET(request: NextRequest) {
 
 // POST: Create new referral
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   
   const { data: { user } } = await supabase.auth.getUser();

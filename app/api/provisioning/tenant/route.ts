@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -74,6 +75,9 @@ async function sendWelcomeEmail(email: string, orgName: string, subdomain: strin
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Verify admin or webhook secret
     const webhookSecret = request.headers.get('x-webhook-secret');
     

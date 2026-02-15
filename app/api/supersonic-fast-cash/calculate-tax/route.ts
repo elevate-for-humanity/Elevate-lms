@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'edge';
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     const taxReturn = await request.json();
 
     // Calculate total income

@@ -20,9 +20,13 @@ import { getAffirmCheckoutConfig, affirm } from '@/lib/affirm/client';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
 import { resolvePaymentAmount } from '@/lib/payments/resolve-amount';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     // Lazy config: re-read env vars if missed at module load
     affirm.tryLateConfig();
 

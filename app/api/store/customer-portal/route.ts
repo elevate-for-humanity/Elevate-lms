@@ -8,6 +8,7 @@ import type { NextRequest } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@supabase/supabase-js';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 
 
@@ -17,6 +18,9 @@ const supabase =
   supabaseUrl && supabaseKey ? createClient(supabaseUrl, supabaseKey) : null;
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   if (!stripe || !supabase) {
     return NextResponse.json(
       { error: 'Stripe or Supabase not configured' },

@@ -4,6 +4,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Subscription tiers available for upgrade
@@ -52,6 +53,9 @@ type SubscriptionTierId = keyof typeof SUBSCRIPTION_TIERS;
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     const { 
       tierId,

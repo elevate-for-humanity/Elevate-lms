@@ -8,6 +8,7 @@ import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 30;
@@ -34,6 +35,9 @@ Keep responses brief (2-4 sentences) unless more detail is needed.`;
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const { message, conversationId } = await req.json();
 

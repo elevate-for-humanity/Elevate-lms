@@ -17,9 +17,13 @@ import {
 } from '@/lib/grants/notification-system';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const { action, applicationId, grantId, submittedBy, confirmationNumber, daysRemaining } = body;
 

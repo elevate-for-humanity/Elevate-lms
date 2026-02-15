@@ -2,9 +2,13 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { validateTaxReturn, validateSSN, validateEIN, validateRoutingNumber } from '@/lib/tax-software/validation/irs-rules';
 import { TaxReturn } from '@/lib/tax-software/types';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     
     // If just validating a single field

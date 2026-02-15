@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 import { createRouteHandlerClient } from '@/lib/auth';
 import { getUserById } from '@/lib/supabase-admin';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Simple email function (replace with Resend in production)
 async function sendEmail(to: string, subject: string, text: string) {
@@ -16,6 +17,9 @@ async function sendEmail(to: string, subject: string, text: string) {
 }
 
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createRouteHandlerClient({ cookies });
 
   // Check authentication

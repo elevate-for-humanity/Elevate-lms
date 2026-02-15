@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET - List partner's documents and requirements
 export async function GET(request: NextRequest) {
@@ -83,6 +84,9 @@ export async function GET(request: NextRequest) {
 // POST - Upload a document
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const supabaseAdmin = createAdminClient();
     

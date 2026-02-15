@@ -6,8 +6,12 @@ export const maxDuration = 60;
 // Track user activity events
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   const { tenantId, userId, eventType, payload, path } = await req.json();
 

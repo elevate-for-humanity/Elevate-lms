@@ -22,6 +22,7 @@ import {
   verifyWebhookSignature,
   handleStripeWebhook,
 } from '@/lib/payments';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Verify that the Stripe customer ID belongs to the authenticated user.
@@ -132,6 +133,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await parseBody<Record<string, any>>(request);
     const { action } = body;
 

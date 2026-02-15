@@ -9,6 +9,7 @@ import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { sanitizeSearchInput } from '@/lib/utils';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/hr/employees - List all employees
 export async function GET(request: NextRequest) {
@@ -79,6 +80,9 @@ export async function GET(request: NextRequest) {
 // POST /api/hr/employees - Create new employee
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const body = await parseBody<Record<string, any>>(request);
 

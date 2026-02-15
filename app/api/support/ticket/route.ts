@@ -8,8 +8,12 @@ import { requireApiAuth } from '@/lib/auth';
 import { createZendeskTicket } from '@/lib/support/zendesk';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: Request) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const session = await requireApiAuth();
   const { subject, message } = await request.json();
 

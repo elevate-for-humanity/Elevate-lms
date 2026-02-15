@@ -9,9 +9,13 @@ import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { requireActiveLicense, LicenseError, licenseErrorResponse } from '@/lib/license/requireActiveLicense';
 import { TenantContextError } from '@/lib/tenant';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     // STEP 5B: Require active license for paid features
     await requireActiveLicense();
     

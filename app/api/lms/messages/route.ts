@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET - Fetch user's messages/conversations
 export async function GET(request: NextRequest) {
@@ -89,6 +90,9 @@ export async function GET(request: NextRequest) {
 
 // POST - Send a new message
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
 
   if (!supabase) {

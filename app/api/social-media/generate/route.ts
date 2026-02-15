@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import OpenAI from 'openai';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const openai = process.env.OPENAI_API_KEY
   ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
@@ -30,6 +31,9 @@ const PROGRAM_INFO = {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
     if (!openai) {
       return NextResponse.json(
         { success: false, error: 'AI service not configured' },

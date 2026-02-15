@@ -7,6 +7,7 @@ export const maxDuration = 60;
 import { NextResponse } from 'next/server';
 import { requireApiAuth } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(
   request: Request,
@@ -44,6 +45,9 @@ export async function POST(
   request: Request,
   { params }: { params: Promise<{ attemptId: string }> }
 ) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   const { attemptId } = await params;
   const session = await requireApiAuth();

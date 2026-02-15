@@ -4,6 +4,7 @@ export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 async function sendSMS(phone: string, message: string): Promise<boolean> {
   if (
@@ -43,6 +44,9 @@ async function sendSMS(phone: string, message: string): Promise<boolean> {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const { application_id, reminder_type } = body;
 

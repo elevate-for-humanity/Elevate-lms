@@ -17,6 +17,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { sezzle } from '@/lib/sezzle/client';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 interface VirtualCardProcessRequest {
   // Session info from Sezzle
@@ -61,6 +62,9 @@ interface VirtualCardProcessRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Lazy config re-check
     if (!sezzle.isConfigured() && process.env.SEZZLE_PUBLIC_KEY && process.env.SEZZLE_PRIVATE_KEY) {
       sezzle.configure({

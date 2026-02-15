@@ -7,6 +7,7 @@ import {
   calculateWeeklyPayment,
   formatFirstBillingDate,
 } from '@/lib/programs/pricing';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * POST /api/barber/checkout/public
@@ -24,6 +25,9 @@ import {
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     const {
       hours_per_week = 40,

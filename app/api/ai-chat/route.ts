@@ -5,11 +5,15 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const OPENAI_API_URL = "https://api.openai.com/v1/chat/completions";
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json().catch(() => null);
     const apiKey = process.env.OPENAI_API_KEY;
 

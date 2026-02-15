@@ -6,9 +6,13 @@ export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { auditLog } from '@/lib/auditLog';
 import { updateTenantLicense } from '@/lib/licenseGuard';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const { name, state, plan = 'starter', branding } = body;
 

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
 import { strictRateLimit } from '@/lib/rate-limit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const TRIAL_DURATION_DAYS = 14;
 
@@ -103,6 +104,9 @@ async function sendTrialWelcomeEmail(
  * Returns: { ok, tenantUrl, subdomain, trialEndsAt, correlationId }
  */
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   // Correlation ID for tracing failures across client ↔ server
   const correlationId = `trial_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 8)}`;
 

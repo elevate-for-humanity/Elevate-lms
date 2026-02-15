@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { getSupabaseServerClient } from '@/lib/supabaseServer';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/quizzes/[quizId] - Load quiz with questions
 export async function GET(
@@ -57,6 +58,9 @@ export async function POST(
   { params }: { params: Promise<{ quizId: string }> }
 ) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = getSupabaseServerClient();
     const { quizId } = await params;
     const body = await parseBody<Record<string, any>>(request);

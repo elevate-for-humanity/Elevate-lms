@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Utility: simple tax calc (you can later replace with real tax engine)
 function calculateTaxes(grossPay: number) {
@@ -81,6 +82,9 @@ export async function GET(request: NextRequest) {
 // POST /api/hr/payroll - Create new payroll run & pay stubs
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const body = await parseBody<Record<string, any>>(request);
 

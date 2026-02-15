@@ -7,6 +7,7 @@ import { z } from 'zod';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { rateLimitNew as rateLimit, getClientIdentifier, RATE_LIMITS } from '@/lib/rateLimit';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Validation schema for contact form
 const ContactSchema = z.object({
@@ -31,6 +32,9 @@ const DemoScheduleSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     // Rate limiting: 5 requests per minute per IP
     const identifier = getClientIdentifier(req.headers);
     const rateLimitResult = rateLimit(identifier, RATE_LIMITS.CONTACT_FORM);

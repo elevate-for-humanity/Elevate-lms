@@ -3,10 +3,14 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import Stripe from 'stripe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
     const { courseIds, email, successUrl, cancelUrl, promoCode } = await req.json();
 
     if (!courseIds || !Array.isArray(courseIds) || courseIds.length === 0) {

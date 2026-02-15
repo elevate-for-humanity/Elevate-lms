@@ -18,9 +18,13 @@ import {
   createBridgePaymentPlan,
 } from '@/lib/enrollment/funding-enforcement';
 import { FundingPathway, BRIDGE_PLAN_CONSTRAINTS } from '@/types/enrollment';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const user = await getCurrentUser();
 
     if (!user) {

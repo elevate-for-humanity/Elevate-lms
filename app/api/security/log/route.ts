@@ -7,6 +7,7 @@ export const maxDuration = 10;
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Simple in-memory rate limiting (per IP)
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
@@ -32,6 +33,9 @@ function checkRateLimit(ip: string): boolean {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const ip = request.ip || request.headers.get('x-forwarded-for') || 'unknown';
     
     // Rate limit check

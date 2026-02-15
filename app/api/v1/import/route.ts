@@ -7,6 +7,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { validateApiKey } from '@/lib/licensing';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -47,6 +48,9 @@ interface ImportRequest {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Validate API key
     const apiKey = request.headers.get('x-api-key');
     if (!apiKey) {

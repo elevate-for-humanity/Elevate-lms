@@ -9,12 +9,16 @@ import { createAdminClient } from '@/lib/supabase/server';
 import { randomBytes } from 'node:crypto';
 import { getUserById } from '@/lib/supabase-admin';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function makeSerial() {
   return `EFH-${randomBytes(4).toString('hex').toUpperCase()}`;
 }
 
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createRouteHandlerClient({ cookies });
   const {
     data: { user },

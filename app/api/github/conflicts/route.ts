@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { gh, parseRepo, getUserOctokit } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Check for merge conflicts between branches
 export async function GET(req: NextRequest) {
@@ -83,6 +84,9 @@ export async function GET(req: NextRequest) {
 
 // Get file content for conflict resolution
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const userToken = req.headers.get('x-gh-token');
 
   try {

@@ -7,6 +7,7 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Allowed MIME types for media uploads
 const ALLOWED_TYPES = [
@@ -26,6 +27,9 @@ const ALLOWED_FOLDER_PATTERN = /^[a-zA-Z0-9_-]+$/;
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Authentication check

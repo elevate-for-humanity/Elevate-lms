@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import Stripe from "stripe";
 import { NextResponse } from "next/server";
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const DIY_SERVICES = {
   review: {
@@ -26,6 +27,9 @@ const DIY_SERVICES = {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { service_type, intake_id } = await req.json();
 
     if (!intake_id) {

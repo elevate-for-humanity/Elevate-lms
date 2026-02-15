@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Direct Phone Integration API
@@ -22,6 +23,9 @@ import { logger } from '@/lib/logger';
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { action, phoneNumber, message, callerId } = await req.json();
 
     // Log the call request

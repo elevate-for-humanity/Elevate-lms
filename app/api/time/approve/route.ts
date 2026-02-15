@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 type Action = 'APPROVE' | 'REJECT' | 'LOCK';
 
@@ -89,6 +90,9 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
 
   const {

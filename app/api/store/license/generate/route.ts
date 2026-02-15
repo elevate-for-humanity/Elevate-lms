@@ -8,6 +8,7 @@ export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Verify admin API key for internal/webhook calls
 function verifyAdminApiKey(request: Request): boolean {
@@ -88,6 +89,9 @@ function getProductTier(productSlug: string): {
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
     // Rate limiting - strict limit for license generation
     const clientIp = req.headers.get('x-forwarded-for')?.split(',')[0] || 
                      req.headers.get('x-real-ip') || 

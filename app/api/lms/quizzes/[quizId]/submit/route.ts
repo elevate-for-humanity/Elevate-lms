@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 interface SubmitRequest {
   attemptId: string;
@@ -11,6 +12,9 @@ export async function POST(
   request: NextRequest,
   { params }: { params: Promise<{ quizId: string }> }
 ) {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
   const { quizId } = await params;
   const supabase = await createClient();
 

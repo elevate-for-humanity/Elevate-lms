@@ -8,6 +8,7 @@ import { NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 import { sendCreatorRejectionEmail } from '@/lib/email/resend';
 import { z } from 'zod';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Input validation schema
 const rejectCreatorSchema = z.object({
@@ -19,6 +20,9 @@ const rejectCreatorSchema = z.object({
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     // 1. Authentication
     const supabase = await createClient();
     const {

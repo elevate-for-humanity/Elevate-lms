@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { validateApiKey } from '@/lib/licensing';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 
@@ -159,6 +160,9 @@ export async function PATCH(request: NextRequest) {
 
 // POST - Upload logo/favicon (returns upload URL)
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const apiKey = request.headers.get('x-api-key');
   if (!apiKey) {
     return NextResponse.json({ error: 'Missing API key' }, { status: 401 });

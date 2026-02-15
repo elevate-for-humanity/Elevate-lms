@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { IntakeCreateSchema } from '@/lib/validators/course';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -11,6 +12,9 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     if (!supabase) {
       return NextResponse.json({ error: 'Database unavailable' }, { status: 500 });

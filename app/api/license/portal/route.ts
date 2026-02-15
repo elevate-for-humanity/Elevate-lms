@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * POST /api/license/portal
@@ -15,6 +16,9 @@ import Stripe from 'stripe';
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await request.json();
     const { customerId } = body;
 

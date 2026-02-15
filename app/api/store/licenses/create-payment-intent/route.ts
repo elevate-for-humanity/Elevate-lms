@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 interface CustomerInfo {
   email: string;
@@ -21,6 +22,9 @@ interface RequestBody {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     const body = await parseBody<RequestBody>(request);
     const { productId, customerInfo } = body;
 

@@ -18,13 +18,17 @@ import {
   searchHHSGrants,
   type GrantsGovOpportunity,
 } from '@/lib/integrations/grants-gov';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * POST /api/grants/sync
  * Sync grants from Grants.gov to local database
  */
-export async function POST() {
+export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Ensure grant source exists
     const { data: source, error: sourceError } = await supabaseAdmin
       .from('grant_sources')

@@ -7,8 +7,12 @@ export const maxDuration = 60;
 import { NextRequest, NextResponse } from 'next/server';
 import { createSupabaseClient } from "@/lib/supabase-api";
 import { logAuditEvent, AuditActions, getRequestMetadata } from '@/lib/audit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   const { email } = await req.json();
 

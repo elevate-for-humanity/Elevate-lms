@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const EligibilitySchema = z.object({
   leadId: z.string().uuid(),
@@ -110,6 +111,9 @@ function checkEligibility(data: z.infer<typeof EligibilitySchema>): {
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const parsed = EligibilitySchema.safeParse(body);
 

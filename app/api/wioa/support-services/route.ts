@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/wioa/support-services - Get support service requests
 export async function GET(request: NextRequest) {
@@ -43,6 +44,9 @@ export async function GET(request: NextRequest) {
 
 // POST /api/wioa/support-services - Request support service
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   try {
     const body = await parseBody<Record<string, any>>(request);

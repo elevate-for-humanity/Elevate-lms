@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import fs from 'fs';
 import path from 'path';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const dynamic = 'force-dynamic';
 
@@ -106,6 +107,9 @@ export async function GET(request: NextRequest) {
 // POST - Add new task or update state
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await parseBody<Record<string, any>>(request);
     const state = loadState();
 

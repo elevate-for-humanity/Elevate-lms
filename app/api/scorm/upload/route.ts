@@ -7,6 +7,7 @@ import { createServerSupabaseClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import JSZip from 'jszip';
 import { XMLParser } from 'fast-xml-parser';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Find the launch href from a parsed imsmanifest.xml.
@@ -42,6 +43,9 @@ function findScormVersion(manifestObj: Record<string, any>): string {
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createServerSupabaseClient();
     const {
       data: { user },

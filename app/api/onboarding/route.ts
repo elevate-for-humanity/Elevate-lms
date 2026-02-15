@@ -14,6 +14,7 @@ import {
   getOnboardingProgress,
   getRecommendedOnboarding,
 } from '@/lib/onboarding';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 interface User {
   id: string;
@@ -59,6 +60,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const user = await requireApiAuth() as User;
     const body = await parseBody<{ action?: string; flowId?: string }>(request);
     const { action, flowId } = body;

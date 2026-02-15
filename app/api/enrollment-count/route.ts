@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 export const runtime = 'edge';
 export const maxDuration = 60;
 import { parseBody } from '@/lib/api-helpers';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Simulated database - in production, this would query your actual database
 const enrollmentData = {
@@ -32,6 +33,9 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await parseBody<Record<string, any>>(request);
 
     // Increment counters

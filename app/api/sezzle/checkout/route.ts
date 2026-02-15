@@ -17,9 +17,13 @@ import { sezzle, SezzleSessionRequest } from '@/lib/sezzle/client';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { resolvePaymentAmount } from '@/lib/payments/resolve-amount';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     // Lazy config: if singleton missed env vars at module load (cold start),
     // try again now — handles key rotation and delayed env injection
     if (!sezzle.isConfigured() && process.env.SEZZLE_PUBLIC_KEY && process.env.SEZZLE_PRIVATE_KEY) {

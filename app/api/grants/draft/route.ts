@@ -8,6 +8,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseAdmin';
 import { logger } from '@/lib/logger';
 import OpenAI from 'openai';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Lazy-load OpenAI client to prevent build-time errors
 function getOpenAI() {
@@ -19,6 +20,9 @@ function getOpenAI() {
 }
 
 export async function POST(req: NextRequest) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   if (
     !process.env.OPENAI_API_KEY ||
     process.env.OPENAI_API_KEY === 'Content-key'

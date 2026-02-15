@@ -14,6 +14,7 @@ import { requireRoleAPI } from '@/lib/rbac-guard';
 import { randomCredentialCode } from '@/lib/crypto-utils';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const IssueSchema = z.object({
   title: z.string().min(2),
@@ -28,6 +29,9 @@ const IssueSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     // Auth check
     const session = await requireAuthAPI();
     if (session instanceof Response) return session;

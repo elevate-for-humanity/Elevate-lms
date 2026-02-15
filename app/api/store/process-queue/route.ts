@@ -4,6 +4,7 @@ export const maxDuration = 60;
 
 import { processFulfillmentQueue, getQueueStats } from '@/lib/store/fulfillment-queue';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * Process fulfillment queue
@@ -14,6 +15,9 @@ import { logger } from '@/lib/logger';
  */
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     // Verify authorization (cron secret or admin)
     const authHeader = req.headers.get('authorization');
     const cronSecret = process.env.CRON_SECRET;

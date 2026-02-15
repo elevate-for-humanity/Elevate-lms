@@ -6,11 +6,15 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 import { billingConfigs } from '../../../lms-data/billingConfig';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const stripe = getStripe();
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
     if (!stripe) {
       return NextResponse.json(
         { error: 'Stripe is not configured on the server.' },

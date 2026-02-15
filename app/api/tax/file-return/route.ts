@@ -12,6 +12,7 @@ import { createTransmitter } from '@/lib/tax-software/mef/transmission';
 import { TaxReturn } from '@/lib/tax-software/types';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { Resend } from 'resend';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,6 +27,9 @@ const SOFTWARE_ID = process.env.IRS_SOFTWARE_ID || 'PENDING_APPROVAL';
 const EFIN = '358459';
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
   
   try {

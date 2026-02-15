@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import crypto from 'crypto';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 function generateCode(): string {
   return crypto.randomBytes(4).toString('hex').toUpperCase();
@@ -88,6 +89,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   // Force generate new code
   try {
     const supabase = await createClient();

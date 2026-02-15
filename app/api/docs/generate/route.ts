@@ -7,8 +7,12 @@ import { fillTemplate } from "@/lib/docs/templateEngine";
 import { LETTER_OF_SUPPORT_TEMPLATE } from "@/lib/docs/templates/letterOfSupport";
 import { MOU_TEMPLATE } from "@/lib/docs/templates/mou";
 import { createClient } from "@/lib/supabase/server";
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   const {
     data: { user },

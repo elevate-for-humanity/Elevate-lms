@@ -11,8 +11,12 @@ import {
 } from '@/lib/rateLimit';
 import { logAuditEvent } from '@/lib/audit';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createAdminClient();
   const identifier = getClientIdentifier(req.headers);
   const rateLimitResult = rateLimit(identifier, {

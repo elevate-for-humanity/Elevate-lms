@@ -9,9 +9,13 @@ import {
   sendAdminProgramHolderNotification,
 } from '@/lib/email/service';
 import { checkRateLimit, verifyTurnstileToken } from '@/lib/turnstile';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
 
     // Rate limiting by email

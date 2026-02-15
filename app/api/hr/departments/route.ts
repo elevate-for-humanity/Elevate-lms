@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/hr/departments - List all departments
 export async function GET(request: NextRequest) {
@@ -44,6 +45,9 @@ export async function GET(request: NextRequest) {
 // POST /api/hr/departments - Create new department
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const body = await parseBody<Record<string, any>>(request);
 

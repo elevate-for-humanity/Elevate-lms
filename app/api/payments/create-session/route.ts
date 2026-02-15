@@ -8,6 +8,7 @@ import { stripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 
 
@@ -19,6 +20,9 @@ interface CheckoutRequest {
 }
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   // Check if Stripe is configured
   if (!stripe) {
     return NextResponse.json(

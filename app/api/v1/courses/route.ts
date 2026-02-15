@@ -14,6 +14,7 @@ import {
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { sanitizeSearchInput } from '@/lib/utils';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/v1/courses - List all courses
 export async function GET(request: NextRequest) {
@@ -127,6 +128,9 @@ export async function GET(request: NextRequest) {
 
 // POST /api/v1/courses - Create a new course
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const startTime = Date.now();
   let statusCode = 201;
   let error: string | undefined;

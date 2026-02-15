@@ -10,6 +10,7 @@ import { existsSync } from 'fs';
 import { createClient } from '@/lib/supabase/server';
 import { rateLimitNew as rateLimit } from '@/lib/rateLimit';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const UPLOAD_DIR = join(process.cwd(), 'public', 'uploads');
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
@@ -97,6 +98,9 @@ function getFileExtension(filename: string): string {
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Authentication check
     const supabase = await createClient();
     const { data: { user }, error: authError } = await supabase.auth.getUser();

@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import webpush from 'web-push';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Configure web-push with VAPID keys
 // In production, these should be in environment variables
@@ -19,6 +20,9 @@ if (vapidPublicKey && vapidPrivateKey) {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
     const { subscription, notification } = await request.json();
 
     if (!subscription || !notification) {

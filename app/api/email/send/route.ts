@@ -4,13 +4,17 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 import { Resend } from 'resend';
 import { logEmailDelivery } from '@/lib/email/monitor';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const resend = process.env.RESEND_API_KEY
   ? new Resend(process.env.RESEND_API_KEY)
   : null;
 
 export async function POST(req: Request) {
-  const startTime = Date.now();
+  
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+const startTime = Date.now();
   let emailTo = '';
   let emailSubject = '';
 

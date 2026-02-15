@@ -12,6 +12,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { z } from 'zod';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const InterestSchema = z.object({
   firstName: z.string().min(1).max(100),
@@ -24,6 +25,9 @@ const InterestSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const parsed = InterestSchema.safeParse(body);
 

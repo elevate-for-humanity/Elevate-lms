@@ -8,9 +8,13 @@ import { parseBody } from '@/lib/api-helpers';
 import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
 import miladyConfig from '@/lms-data/milady-rise-integration.json';
 import { toErrorMessage } from '@/lib/safe';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

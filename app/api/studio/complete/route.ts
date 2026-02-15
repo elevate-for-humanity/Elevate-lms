@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 const getOpenAI = () => new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
@@ -11,6 +12,9 @@ const getOpenAI = () => new OpenAI({
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { prefix, suffix, language, filename } = await req.json();
 
     if (!prefix) {

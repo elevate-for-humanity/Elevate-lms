@@ -9,6 +9,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { validateIntakeCompletion } from '@/lib/enrollment/funding-enforcement';
 import { IntakeStatus, FundingPathway } from '@/types/enrollment';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET: Retrieve intake record for user/program
 export async function GET(request: NextRequest) {
@@ -46,6 +47,9 @@ export async function GET(request: NextRequest) {
 
 // POST: Create new intake record
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   
   const { data: { user } } = await supabase.auth.getUser();

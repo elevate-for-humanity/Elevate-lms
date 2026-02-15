@@ -7,6 +7,7 @@ import { parseBody } from '@/lib/api-helpers';
 import { apiAuthGuard } from '@/lib/authGuards';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -54,6 +55,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const authResult = await apiAuthGuard({ requireAuth: true });
     if (!authResult.authorized) {
       return NextResponse.json({ error: authResult.error }, { status: 401 });

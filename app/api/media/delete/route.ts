@@ -6,6 +6,7 @@ export const maxDuration = 60;
 
 import { toErrorMessage } from '@/lib/safe';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // Allowed bucket names (whitelist)
 const ALLOWED_BUCKETS = ['media', 'documents', 'avatars', 'course-content'];
@@ -15,6 +16,9 @@ const SAFE_PATH_PATTERN = /^[a-zA-Z0-9_/-]+\.[a-zA-Z0-9]+$/;
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
 
     // Authentication check

@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { validateCheckoutAuthorization } from '@/lib/store/licensing-mode';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -10,6 +11,9 @@ export const maxDuration = 60;
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
     const { productId, email, adminSessionId, approvedLinkId } = await req.json();
 
     // SECTION 1: Licensing mode check

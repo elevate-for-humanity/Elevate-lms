@@ -17,6 +17,7 @@ import {
 } from '@/lib/dataExport';
 import { auditLog } from '@/lib/auditLog';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function GET(request: NextRequest) {
   try {
@@ -177,6 +178,9 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const authResult = await apiRequireAdmin();
 
     if (authResult instanceof NextResponse) {

@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // useToken is not a React hook - it's a server-side token validation function
 // eslint-disable-next-line react-hooks/rules-of-hooks
 import { useToken } from '@/lib/notifications';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -13,6 +14,9 @@ export const dynamic = 'force-dynamic';
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const { token } = await request.json();
 
     if (!token) {

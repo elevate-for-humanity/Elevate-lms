@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -62,6 +63,9 @@ function jsonResponse(body: Record<string, unknown>, status: number) {
  */
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Netlify sets x-nf-client-connection-ip; fall back to x-forwarded-for first entry
     const rawForwarded = request.headers.get('x-nf-client-connection-ip')
       || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()

@@ -1,6 +1,7 @@
 import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -233,6 +234,9 @@ Timestamp: ${new Date().toISOString()}
 
 export async function POST(request: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     // Verify webhook signature (Calendly uses a signing key)
     const signature = request.headers.get('calendly-webhook-signature');
     // In production, verify this signature against CALENDLY_WEBHOOK_SECRET

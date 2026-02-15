@@ -6,6 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { sanitizeSearchInput } from '@/lib/utils';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/marketing/contacts
 export async function GET(req: NextRequest) {
@@ -62,6 +63,9 @@ export async function GET(req: NextRequest) {
 // POST /api/marketing/contacts
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(req, 'strict');
+    if (rateLimited) return rateLimited;
+
     const supabase = await createClient();
     const body = await req.json();
 

@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
 import { createServerSupabaseClient, getCurrentUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 // GET /api/messages - Fetch user's messages
 export async function GET(request: Request) {
@@ -76,6 +77,9 @@ export async function GET(request: Request) {
 // POST /api/messages - Send a new message
 export async function POST(request: Request) {
   try {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const user = await getCurrentUser();
     if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });

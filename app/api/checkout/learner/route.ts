@@ -4,6 +4,7 @@ import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { APP_STORE_PRODUCTS } from '@/lib/stripe/app-store-products';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -37,6 +38,9 @@ interface CheckoutRequest {
 }
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'contact');
+    if (rateLimited) return rateLimited;
+
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json(
       { error: 'Payment system not configured' },

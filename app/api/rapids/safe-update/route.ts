@@ -9,9 +9,13 @@ import {
   canTransitionRapidsStatus,
   type RapidsStatus,
 } from '@/lib/rapids';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const { apprentice_id, status, rapids_id } = body;
 

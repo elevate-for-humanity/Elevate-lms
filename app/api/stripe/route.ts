@@ -1,8 +1,12 @@
 import { getStripe } from '@/lib/stripe/client';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
+    const rateLimited = await applyRateLimit(req, 'contact');
+    if (rateLimited) return rateLimited;
+
   const stripe = getStripe();
   const body = await req.json();
 

@@ -5,9 +5,13 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { checkRateLimit } from '@/lib/rate-limit';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     // Rate limiting
     const ip =
       req.headers.get('x-forwarded-for') ||

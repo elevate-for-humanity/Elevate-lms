@@ -6,6 +6,7 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { toErrorMessage } from '@/lib/safe';
 import { canMatchApprentice, hasVerifiedDocuments } from '@/lib/documents';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * MANDATORY VERIFICATION ENFORCEMENT:
@@ -15,6 +16,9 @@ import { canMatchApprentice, hasVerifiedDocuments } from '@/lib/documents';
  */
 export async function POST(req: Request) {
   try {
+    const rateLimited = await applyRateLimit(req, 'api');
+    if (rateLimited) return rateLimited;
+
     const { studentId, shopId, shopName, shopAddress, supervisorName, supervisorEmail } =
       await req.json();
 

@@ -10,8 +10,12 @@ import { createSupabaseClient } from "@/lib/supabase-api";
 import { createZoomMeeting } from '@/lib/integrations/zoom';
 import { logAuditEvent, getRequestMetadata } from '@/lib/audit';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
   const supabase = createSupabaseClient();
   try {
     const { courseId, topic, startTime, durationMinutes, instructorZoomId, tenantId } = await request.json();

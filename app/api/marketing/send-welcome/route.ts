@@ -4,9 +4,13 @@ import { NextRequest, NextResponse } from 'next/server';
 export const maxDuration = 60;
 import { sendEmail } from '@/lib/email';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export async function POST(req: NextRequest) {
   try {
+    const rateLimited = await applyRateLimit(request, 'strict');
+    if (rateLimited) return rateLimited;
+
     const body = await req.json();
     const { contactId, email, name, interest, subject, body: emailBody } = body;
 

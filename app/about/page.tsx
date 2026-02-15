@@ -3,9 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { ArrowRight } from 'lucide-react';
-import TeamSection from '@/components/TeamSection';
-import IndustryPartnershipPortal from '@/components/IndustryPartnershipPortal';
-import { SocialLearningCommunity } from '@/components/SocialLearningCommunity';
+
 import { TEAM } from '@/data/team';
 
 const SITE_URL = 'https://www.elevateforhumanity.org';
@@ -430,19 +428,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Industry Partnerships */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4">
-          <IndustryPartnershipPortal />
-        </div>
-      </section>
 
-      {/* Social Learning Community */}
-      <section className="py-16 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4">
-          <SocialLearningCommunity />
-        </div>
-      </section>
     </div>
   );
 }

@@ -1,10 +1,7 @@
-export const dynamic = 'force-dynamic';
-
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { createPublicClient } from '@/lib/supabase/server';
 
 export const metadata: Metadata = {
   alternates: {
@@ -84,17 +81,8 @@ const fallbackTeam = [
 ];
 
 export default async function TeamPage() {
-  const supabase = createPublicClient();
-
-  // Fetch team members from database
-  const { data: teamMembers } = await supabase
-    .from('team_members')
-    .select('*')
-    .eq('is_active', true)
-    .order('display_order');
-
-  // Only use database data - no fake fallbacks
-  const members = teamMembers || [];
+  // Use canonical team data from data/team.ts — the DB has fake seed data
+  const members = fallbackTeam;
 
   return (
     <div className="min-h-screen bg-white">

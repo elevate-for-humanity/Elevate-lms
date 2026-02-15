@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 
 /**
@@ -65,7 +66,7 @@ export async function getMarketingPageBySlug(slug: string): Promise<MarketingPag
   // Strict: Hero image required
   if (!page.hero_image || !page.hero_image_alt) {
     if (process.env.NODE_ENV === 'development') {
-      console.error(`Marketing page "${slug}" missing hero image`);
+      logger.error(`Marketing page "${slug}" missing hero image`);
     }
     return null;
   }

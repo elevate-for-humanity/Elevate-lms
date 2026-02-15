@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Demo Reset API
  * Clears demo tenant data and re-seeds fresh state
@@ -92,7 +93,7 @@ export async function POST() {
     });
 
   } catch (error) {
-    console.error('Demo reset error:', error);
+    logger.error('Demo reset error:', error);
     return NextResponse.json(
       { error: 'Failed to reset demo data', details: String(error) },
       { status: 500 }

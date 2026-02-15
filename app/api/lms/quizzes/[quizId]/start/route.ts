@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { redirect } from 'next/navigation';
@@ -64,7 +65,7 @@ export async function POST(
     .single();
 
   if (attemptError) {
-    console.error('Error creating quiz attempt:', attemptError);
+    logger.error('Error creating quiz attempt:', attemptError);
     return NextResponse.json({ error: 'Failed to start quiz' }, { status: 500 });
   }
 

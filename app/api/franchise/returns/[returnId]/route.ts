@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -54,7 +55,7 @@ export async function GET(
 
     return NextResponse.json(submission);
   } catch (error) {
-    console.error('Error getting return:', error);
+    logger.error('Error getting return:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to get return' },
       { status: 500 }
@@ -170,7 +171,7 @@ export async function PATCH(
 
     return NextResponse.json(updated);
   } catch (error) {
-    console.error('Error updating return:', error);
+    logger.error('Error updating return:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to update return' },
       { status: 500 }

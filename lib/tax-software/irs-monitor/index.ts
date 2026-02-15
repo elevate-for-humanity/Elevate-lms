@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * IRS Monitor Service
  * Main entry point for automated tax parameter monitoring
@@ -92,11 +93,11 @@ export class IRSMonitor {
     const runId = `run_${Date.now().toString(36)}`;
     const timestamp = new Date().toISOString();
     
-    console.log(`\n${'='.repeat(60)}`);
-    console.log(`IRS Monitor - Run ${runId}`);
-    console.log(`Timestamp: ${timestamp}`);
-    console.log(`Tax Year: ${this.config.taxYear}`);
-    console.log(`${'='.repeat(60)}\n`);
+    logger.info(`\n${'='.repeat(60)}`);
+    logger.info(`IRS Monitor - Run ${runId}`);
+    logger.info(`Timestamp: ${timestamp}`);
+    logger.info(`Tax Year: ${this.config.taxYear}`);
+    logger.info(`${'='.repeat(60)}\n`);
     
     const changes: ChangeDetection[] = [];
     const updates: TaxParameterUpdate[] = [];
@@ -104,14 +105,14 @@ export class IRSMonitor {
     
     // Check each source
     for (const sourceKey of this.config.sources) {
-      console.log(`Checking ${sourceKey}...`);
+      logger.info(`Checking ${sourceKey}...`);
       
       try {
         const change = await this.scraper.checkSource(sourceKey);
         changes.push(change);
         
         if (change.detected) {
-          console.log(`  ⚠️  Change detected!`);
+          logger.info(`  ⚠️  Change detected!`);
           
           // Send alert
           await this.alertManager.createAlertFromChange(change);
@@ -131,10 +132,10 @@ export class IRSMonitor {
             }
           }
         } else {
-          console.log(`  ✓ No changes`);
+          logger.info(`  ✓ No changes`);
         }
       } catch (error) {
-        console.error(`  ✗ Error: ${error}`);
+        logger.error(`  ✗ Error: ${error}`);
       }
       
       // Rate limit
@@ -155,13 +156,13 @@ export class IRSMonitor {
     // Save report
     await this.saveReport(report);
     
-    console.log(`\n${'='.repeat(60)}`);
-    console.log(`Run Complete`);
-    console.log(`Sources checked: ${report.sourcesChecked}`);
-    console.log(`Changes detected: ${report.changesDetected}`);
-    console.log(`Updates found: ${report.updatesFound}`);
-    console.log(`Alerts sent: ${report.alertsSent}`);
-    console.log(`${'='.repeat(60)}\n`);
+    logger.info(`\n${'='.repeat(60)}`);
+    logger.info(`Run Complete`);
+    logger.info(`Sources checked: ${report.sourcesChecked}`);
+    logger.info(`Changes detected: ${report.changesDetected}`);
+    logger.info(`Updates found: ${report.updatesFound}`);
+    logger.info(`Alerts sent: ${report.alertsSent}`);
+    logger.info(`${'='.repeat(60)}\n`);
     
     return report;
   }
@@ -264,7 +265,7 @@ export class IRSMonitor {
         config.taxYear = update.taxYear;
         config.effectiveDate = `${update.taxYear}-01-01`;
       } else {
-        console.error(`Cannot create config for ${update.taxYear} - no previous year config found`);
+        logger.error(`Cannot create config for ${update.taxYear} - no previous year config found`);
         return;
       }
     }
@@ -284,7 +285,7 @@ export class IRSMonitor {
     
     // Save config
     fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-    console.log(`Updated config for ${update.taxYear}: ${update.parameter} = ${update.newValue}`);
+    logger.info(`Updated config for ${update.taxYear}: ${update.parameter} = ${update.newValue}`);
   }
   
   /**

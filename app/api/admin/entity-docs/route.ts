@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -163,7 +164,7 @@ async function getEntityStatus(
       ready: intakeComplete && agreementAccepted && docsVerified,
     };
   } catch (error) {
-    console.error('Failed to get entity status:', error);
+    logger.error('Failed to get entity status:', error);
     return null;
   }
 }

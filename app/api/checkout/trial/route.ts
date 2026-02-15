@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
@@ -76,7 +77,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.redirect(new URL('/store/licenses', request.url));
   } catch (error) {
-    console.error('Stripe checkout error:', error);
+    logger.error('Stripe checkout error:', error);
     return NextResponse.redirect(new URL('/store/licenses?error=checkout_failed', request.url));
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -80,7 +81,7 @@ Return ONLY the test code, no explanation.`;
       usage: response.usage,
     });
   } catch (error) {
-    console.error('Generate tests error:', error);
+    logger.error('Generate tests error:', error);
     return NextResponse.json(
       { error: 'Failed to generate tests' },
       { status: 500 }

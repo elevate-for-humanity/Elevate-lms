@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 'use client';
 
 import { useState, useCallback, useEffect, useRef } from 'react';
@@ -139,7 +140,7 @@ export function useTimeclock(options: UseTimeclockOptions) {
         }
       },
       (error) => {
-        console.warn('[Timeclock] GPS watch error:', error.message);
+        logger.warn('[Timeclock] GPS watch error:', error.message);
       },
       {
         enableHighAccuracy: true,
@@ -192,7 +193,7 @@ export function useTimeclock(options: UseTimeclockOptions) {
         stopHeartbeat();
       }
     } catch (error) {
-      console.error('[Timeclock] Heartbeat error:', error);
+      logger.error('[Timeclock] Heartbeat error:', error);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.progressEntryId, gpsPosition, onAutoClockOut]);

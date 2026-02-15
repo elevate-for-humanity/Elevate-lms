@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import fs from 'fs';
 import path from 'path';
 import { programs, type Program } from '@/app/data/programs';
@@ -32,7 +33,7 @@ export function loadProgramsFromJSON(): Program[] {
 
   // Check if directory exists
   if (!fs.existsSync(programsDir)) {
-    console.warn('Programs directory not found, using TypeScript data');
+    logger.warn('Programs directory not found, using TypeScript data');
     return programs;
   }
 
@@ -48,7 +49,7 @@ export function loadProgramsFromJSON(): Program[] {
 
     return jsonPrograms.length > 0 ? jsonPrograms : programs;
   } catch (error) {
-    console.error('Error loading programs from JSON:', error);
+    logger.error('Error loading programs from JSON:', error);
     return programs;
   }
 }

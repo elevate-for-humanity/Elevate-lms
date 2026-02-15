@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Error handling utilities for type-safe error management
  */
@@ -39,5 +40,5 @@ export function isError(error: any): error is Error {
 export function logError(error: any, context?: string): void {
   const err = toError(error);
   const prefix = context ? `[${context}]` : '';
-  console.error(`${prefix} ${err.message}`, err.stack);
+  logger.error(`${prefix} ${err.message}`, err.stack);
 }

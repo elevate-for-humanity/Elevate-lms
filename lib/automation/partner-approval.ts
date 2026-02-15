@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Partner/Shop Auto-Approval
  * Automatically approves partners when all required documents pass validation
@@ -234,7 +235,7 @@ export async function checkPartnerApproval(
       review_queue_id: reviewQueueId,
     };
   } catch (error) {
-    console.error('Partner approval error:', error);
+    logger.error('Partner approval error:', error);
     return {
       success: false,
       approved: false,

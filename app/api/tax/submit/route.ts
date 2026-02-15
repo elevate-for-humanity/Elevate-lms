@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { validateTaxReturn } from '@/lib/tax-software/validation/irs-rules';
 import { createMeFSubmission } from '@/lib/tax-software/mef/xml-generator';
@@ -93,7 +94,7 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
   } catch (error) {
-    console.error('Tax submission error:', error);
+    logger.error('Tax submission error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to submit tax return' },
       { status: 500 }

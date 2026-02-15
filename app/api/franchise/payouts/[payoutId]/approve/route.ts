@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { payoutService } from '@/lib/franchise/payout-service';
@@ -47,7 +48,7 @@ export async function POST(
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error approving payout:', error);
+    logger.error('Error approving payout:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to approve payout' },
       { status: 500 }

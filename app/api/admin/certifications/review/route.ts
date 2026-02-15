@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -48,7 +49,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    console.error('Failed to update submission:', error);
+    logger.error('Failed to update submission:', error);
     return NextResponse.json({ error: 'Failed to update submission' }, { status: 500 });
   }
 
@@ -99,7 +100,7 @@ export async function GET(request: NextRequest) {
   const { data, error } = await query;
 
   if (error) {
-    console.error('Failed to fetch submissions:', error);
+    logger.error('Failed to fetch submissions:', error);
     return NextResponse.json({ error: 'Failed to fetch submissions' }, { status: 500 });
   }
 

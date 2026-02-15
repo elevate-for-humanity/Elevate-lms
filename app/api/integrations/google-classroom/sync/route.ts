@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, synced_at: new Date().toISOString() });
@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     .single();
 
   if (error && error.code !== 'PGRST116') {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   return NextResponse.json(data || { last_sync_at: null, settings: {}, status: 'disconnected' });

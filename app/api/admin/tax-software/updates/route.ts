@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Tax Software Updates API
  * Manage pending tax parameter updates
@@ -46,7 +47,7 @@ export async function GET() {
       }
     });
   } catch (error) {
-    console.error('Error fetching tax updates:', error);
+    logger.error('Error fetching tax updates:', error);
     return NextResponse.json(
       { error: 'Failed to fetch updates' },
       { status: 500 }
@@ -96,7 +97,7 @@ export async function POST(req: Request) {
     
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (error) {
-    console.error('Error processing tax update action:', error);
+    logger.error('Error processing tax update action:', error);
     return NextResponse.json(
       { error: 'Failed to process action' },
       { status: 500 }

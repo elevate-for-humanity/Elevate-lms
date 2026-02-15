@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -34,9 +35,9 @@ export async function POST(req: Request) {
     });
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error:', error);
       // Log for manual follow-up even if DB fails
-      console.log('Enrollment booking (DB failed):', {
+      logger.info('Enrollment booking (DB failed):', {
         name: `${firstName} ${lastName}`,
         email,
         phone,
@@ -59,12 +60,12 @@ export async function POST(req: Request) {
         })
       });
     } catch (emailError) {
-      console.error('Failed to send confirmation email:', emailError);
+      logger.error('Failed to send confirmation email:', emailError);
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Booking error:', error);
+    logger.error('Booking error:', error);
     return NextResponse.json(
       { error: 'Failed to process booking' },
       { status: 500 }

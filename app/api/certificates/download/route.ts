@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
         : 'Use client-side PDF generation with the certificate data',
     });
   } catch (error) {
-    console.error('Certificate download error:', error);
+    logger.error('Certificate download error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch certificate' },
       { status: 500 }
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: 'Certificate PDF URL saved' });
   } catch (error) {
-    console.error('Certificate update error:', error);
+    logger.error('Certificate update error:', error);
     return NextResponse.json({ error: 'Failed to update certificate' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Advanced Autopilot - Environment Sync Orchestrator
  * Instructs the deployment worker to sync all environment variables
@@ -139,7 +140,7 @@ export async function downloadEnvFile(autopilotSecret: string): Promise<string |
     return result.envContent || null;
 
   } catch (error) { /* Error handled silently */ 
-    console.error('Failed to download env file:', error);
+    logger.error('Failed to download env file:', error);
     return null;
   }
 }

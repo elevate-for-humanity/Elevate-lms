@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { TEMPLATE_DESIGNS, getRecommendedTemplate, TemplateDesign } from '@/lib/templates/designs';
@@ -86,7 +87,7 @@ Return ONLY valid JSON, no markdown.`;
       const jsonStr = responseText.replace(/```json\n?|\n?```/g, '').trim();
       siteConfig = JSON.parse(jsonStr);
     } catch (parseError) {
-      console.error('Failed to parse AI response:', responseText);
+      logger.error('Failed to parse AI response:', responseText);
       // Return default config if parsing fails
       siteConfig = getDefaultConfig(organizationName, organizationType);
     }
@@ -171,7 +172,7 @@ Return ONLY valid JSON, no markdown.`;
       previewUrl: `/preview/${previewId}`,
     });
   } catch (error) {
-    console.error('AI generation error:', error);
+    logger.error('AI generation error:', error);
     return NextResponse.json(
       { error: 'Failed to generate site configuration' },
       { status: 500 }

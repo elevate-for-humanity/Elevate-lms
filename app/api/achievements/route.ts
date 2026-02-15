@@ -25,7 +25,7 @@ export async function GET(request: Request) {
       },
     });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -60,11 +60,11 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ achievement }, { status: 201 });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json({ error: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await query.order('updated_at', { ascending: false }).limit(1).single();
 
   if (error && error.code !== 'PGRST116') {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   return NextResponse.json(data || null);
@@ -61,7 +61,7 @@ export async function PUT(req: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   return NextResponse.json(data);

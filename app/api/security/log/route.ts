@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -68,14 +69,14 @@ export async function POST(request: NextRequest) {
         }
       } catch (error) {
         // Silent fail - logging should never break the app
-        console.error('[Security Log] Background error:', error);
+        logger.error('[Security Log] Background error:', error);
       }
     });
 
     return responsePromise;
   } catch (error) { /* Error handled silently */ 
     // Fail-open - always return 200 so client doesn't retry
-    console.error('[Security Log] Request error:', error);
+    logger.error('[Security Log] Request error:', error);
     return NextResponse.json({ success: true }, { status: 200 });
   }
 }
@@ -101,7 +102,7 @@ function isCriticalEvent(eventType: string): boolean {
 
 async function sendSecurityAlert(data: Record<string, any>) {
   // Send email/SMS/Slack notification for critical events
-  console.warn('[CRITICAL SECURITY EVENT]', data);
+  logger.warn('[CRITICAL SECURITY EVENT]', data);
 
   // Example: Send to admin email (disabled for now)
   // Uncomment when notification service is configured
@@ -117,7 +118,7 @@ async function sendSecurityAlert(data: Record<string, any>) {
       }),
     });
   } catch (error) {
-    console.error('[Security Alert] Failed to send:', error);
+    logger.error('[Security Alert] Failed to send:', error);
   }
   */
 }

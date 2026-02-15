@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -23,7 +24,7 @@ export async function GET(request: NextRequest) {
     const { data: certificates, error } = await query.limit(100);
 
     if (error) {
-      console.error('RISE Up certificates error:', error);
+      logger.error('RISE Up certificates error:', error);
     }
 
     return NextResponse.json({
@@ -40,7 +41,7 @@ export async function GET(request: NextRequest) {
       integrationStatus: 'active',
     });
   } catch (error) {
-    console.error('RISE Up API error:', error);
+    logger.error('RISE Up API error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch RISE Up certifications' },
       { status: 500 }
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Certificate creation error:', error);
+      logger.error('Certificate creation error:', error);
       return NextResponse.json(
         { error: 'Failed to issue certificate' },
         { status: 500 }
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest) {
       message: 'RISE Up certification issued successfully',
     });
   } catch (error) {
-    console.error('RISE Up certification error:', error);
+    logger.error('RISE Up certification error:', error);
     return NextResponse.json(
       { error: 'Failed to process certification' },
       { status: 500 }

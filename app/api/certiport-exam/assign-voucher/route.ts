@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error || !updated) {
-      console.error('Failed to assign voucher:', error);
+      logger.error('Failed to assign voucher:', error);
       return NextResponse.json(
         { error: 'Failed to assign voucher. Request may not exist or is already assigned.' },
         { status: 400 }
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
       requestId: updated.id,
     });
   } catch (error) {
-    console.error('Assign voucher error:', error);
+    logger.error('Assign voucher error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

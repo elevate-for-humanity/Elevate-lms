@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -26,7 +27,7 @@ export async function GET() {
       userId: user.id,
     });
   } catch (error) {
-    console.error('Admin check error:', error);
+    logger.error('Admin check error:', error);
     return NextResponse.json({ isAdmin: false, error: 'Check failed' });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
@@ -64,7 +65,7 @@ export class StripeService {
         clientSecret: paymentIntent.client_secret || '',
       };
     } catch (error) {
-      console.error('Error creating payment intent:', error);
+      logger.error('Error creating payment intent:', error);
       throw error;
     }
   }
@@ -82,7 +83,7 @@ export class StripeService {
         clientSecret: paymentIntent.client_secret || '',
       };
     } catch (error) {
-      console.error('Error confirming payment:', error);
+      logger.error('Error confirming payment:', error);
       throw error;
     }
   }
@@ -97,7 +98,7 @@ export class StripeService {
 
       return customer.id;
     } catch (error) {
-      console.error('Error creating customer:', error);
+      logger.error('Error creating customer:', error);
       throw error;
     }
   }
@@ -124,7 +125,7 @@ export class StripeService {
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
       };
     } catch (error) {
-      console.error('Error creating subscription:', error);
+      logger.error('Error creating subscription:', error);
       throw error;
     }
   }
@@ -145,7 +146,7 @@ export class StripeService {
         cancelAtPeriodEnd: subscription.cancel_at_period_end,
       };
     } catch (error) {
-      console.error('Error canceling subscription:', error);
+      logger.error('Error canceling subscription:', error);
       throw error;
     }
   }
@@ -171,7 +172,7 @@ export class StripeService {
       if (error.code === 'resource_missing') {
         return null;
       }
-      console.error('Error getting subscription:', error);
+      logger.error('Error getting subscription:', error);
       throw error;
     }
   }
@@ -196,7 +197,7 @@ export class StripeService {
         };
       });
     } catch (error) {
-      console.error('Error listing products:', error);
+      logger.error('Error listing products:', error);
       throw error;
     }
   }
@@ -223,7 +224,7 @@ export class StripeService {
 
       return refund.status === 'succeeded' || refund.status === 'pending';
     } catch (error) {
-      console.error('Error creating refund:', error);
+      logger.error('Error creating refund:', error);
       return false;
     }
   }
@@ -246,51 +247,51 @@ export class StripeService {
       switch (event.type) {
         case 'payment_intent.succeeded':
           const paymentIntent = event.data.object as Stripe.PaymentIntent;
-          console.log('Payment succeeded:', paymentIntent.id);
+          logger.info('Payment succeeded:', paymentIntent.id);
           // Handle successful payment (e.g., update order status, send confirmation email)
           break;
 
         case 'payment_intent.payment_failed':
           const failedPayment = event.data.object as Stripe.PaymentIntent;
-          console.log('Payment failed:', failedPayment.id);
+          logger.info('Payment failed:', failedPayment.id);
           // Handle failed payment (e.g., notify user, update order status)
           break;
 
         case 'customer.subscription.created':
           const newSubscription = event.data.object as Stripe.Subscription;
-          console.log('Subscription created:', newSubscription.id);
+          logger.info('Subscription created:', newSubscription.id);
           // Handle new subscription (e.g., grant access, send welcome email)
           break;
 
         case 'customer.subscription.updated':
           const updatedSubscription = event.data.object as Stripe.Subscription;
-          console.log('Subscription updated:', updatedSubscription.id);
+          logger.info('Subscription updated:', updatedSubscription.id);
           // Handle subscription update (e.g., update user access level)
           break;
 
         case 'customer.subscription.deleted':
           const deletedSubscription = event.data.object as Stripe.Subscription;
-          console.log('Subscription deleted:', deletedSubscription.id);
+          logger.info('Subscription deleted:', deletedSubscription.id);
           // Handle subscription cancellation (e.g., revoke access, send cancellation email)
           break;
 
         case 'invoice.paid':
           const paidInvoice = event.data.object as Stripe.Invoice;
-          console.log('Invoice paid:', paidInvoice.id);
+          logger.info('Invoice paid:', paidInvoice.id);
           // Handle paid invoice (e.g., extend subscription, send receipt)
           break;
 
         case 'invoice.payment_failed':
           const failedInvoice = event.data.object as Stripe.Invoice;
-          console.log('Invoice payment failed:', failedInvoice.id);
+          logger.info('Invoice payment failed:', failedInvoice.id);
           // Handle failed invoice payment (e.g., notify user, retry payment)
           break;
 
         default:
-          console.log('Unhandled event type:', event.type);
+          logger.info('Unhandled event type:', event.type);
       }
     } catch (error) {
-      console.error('Webhook error:', error);
+      logger.error('Webhook error:', error);
       throw error;
     }
   }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { processNotificationQueue, getQueueStats } from '@/lib/notifications/processor';
 
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
       timestamp: new Date().toISOString(),
     });
   } catch (error: any) {
-    console.error('Notification processing error:', error);
+    logger.error('Notification processing error:', error);
     return NextResponse.json(
       {
         success: false,

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      console.error('Deviation error:', error);
+      logger.error('Deviation error:', error);
       return NextResponse.json({ 
         success: true, 
         message: 'Script deviation logged' 
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
       message: 'Script deviation logged' 
     });
   } catch (error) {
-    console.error('Deviation error:', error);
+    logger.error('Deviation error:', error);
     return NextResponse.json({ 
       success: true, 
       message: 'Script deviation logged' 

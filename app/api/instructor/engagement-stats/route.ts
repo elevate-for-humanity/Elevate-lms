@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -41,7 +42,7 @@ export async function GET() {
     
     return NextResponse.json({ engagement: result });
   } catch (error) {
-    console.error('Engagement stats error:', error);
+    logger.error('Engagement stats error:', error);
     return NextResponse.json({ engagement: [] }, { status: 500 });
   }
 }

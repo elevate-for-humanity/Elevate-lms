@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getSignedDownload } from "@/lib/storage/getSignedDownload";
@@ -36,7 +37,7 @@ export async function GET() {
     const url = await getSignedDownload("capital-readiness-guide-v1.pdf");
     return NextResponse.json({ url });
   } catch (err) {
-    console.error("Error generating signed URL:", err);
+    logger.error("Error generating signed URL:", err);
     return NextResponse.json(
       { error: "Failed to generate download link" },
       { status: 500 }

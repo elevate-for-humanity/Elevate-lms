@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -133,7 +134,7 @@ export async function POST(
     .eq('id', attemptId);
 
   if (updateError) {
-    console.error('Error updating attempt:', updateError);
+    logger.error('Error updating attempt:', updateError);
     return NextResponse.json({ error: 'Failed to save results' }, { status: 500 });
   }
 

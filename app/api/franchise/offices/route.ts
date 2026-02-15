@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { officeService } from '@/lib/franchise/office-service';
@@ -35,7 +36,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error listing offices:', error);
+    logger.error('Error listing offices:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to list offices' },
       { status: 500 }
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(office, { status: 201 });
   } catch (error) {
-    console.error('Error creating office:', error);
+    logger.error('Error creating office:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to create office' },
       { status: 500 }

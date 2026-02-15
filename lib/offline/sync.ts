@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 // Background sync manager for offline data
 import { getDB } from './db';
@@ -81,7 +82,7 @@ export class SyncManager {
               //
             }
           } else {
-            console.error(
+            logger.error(
               `[Sync] Failed to sync progress:`,
               response.statusText
             );

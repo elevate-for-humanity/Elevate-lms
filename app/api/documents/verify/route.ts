@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { withErrorHandling, APIErrors } from '@/lib/api';
 import { NextRequest, NextResponse } from 'next/server';
@@ -158,7 +159,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       }
     } catch (notifyError) {
       // Log but don't fail the request
-      console.error('Failed to send notification:', notifyError);
+      logger.error('Failed to send notification:', notifyError);
     }
   }
 

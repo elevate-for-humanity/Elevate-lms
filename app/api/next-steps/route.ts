@@ -52,7 +52,7 @@ export async function GET() {
     .maybeSingle();
 
   if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
   // Create default row if missing (one-shot UX)
   if (!data) {
@@ -158,7 +158,7 @@ export async function PATCH(req: Request) {
     .single();
 
   if (error)
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
 
   // Send email notification to admin
   try {

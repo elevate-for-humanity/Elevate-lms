@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
       integration,
     });
   } catch (error) {
-    console.error('Build remote error:', error);
+    logger.error('Build remote error:', error);
     return NextResponse.json(
       { error: 'Failed to generate integration' },
       { status: 500 }

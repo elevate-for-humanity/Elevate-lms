@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ ok: true, intake_id: data.id });
   } catch (error) { /* Error handled silently */ 
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 

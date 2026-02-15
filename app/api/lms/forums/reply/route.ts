@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    console.error('Error creating reply:', error);
+    logger.error('Error creating reply:', error);
     return NextResponse.json({ error: 'Failed to create reply' }, { status: 500 });
   }
 

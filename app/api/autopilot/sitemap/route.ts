@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { generateSitemap } from '@/lib/autopilot/deploy-prep';
 
@@ -10,7 +11,7 @@ export async function GET() {
     const result = await generateSitemap();
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Sitemap generation error:', error);
+    logger.error('Sitemap generation error:', error);
     return NextResponse.json(
       { error: 'Sitemap generation failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
@@ -23,7 +24,7 @@ export async function POST() {
     const result = await generateSitemap();
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Sitemap generation error:', error);
+    logger.error('Sitemap generation error:', error);
     return NextResponse.json(
       { error: 'Sitemap generation failed' },
       { status: 500 }

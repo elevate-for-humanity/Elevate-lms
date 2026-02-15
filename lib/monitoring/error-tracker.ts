@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { Resend } from 'resend';
 
@@ -12,7 +13,7 @@ async function sendCriticalAlert(data: {
   const adminEmail = process.env.ADMIN_ALERT_EMAIL || 'admin@elevateforhumanity.org';
   
   if (!resendKey) {
-    console.error('RESEND_API_KEY not configured for alerts');
+    logger.error('RESEND_API_KEY not configured for alerts');
     return;
   }
 
@@ -47,7 +48,7 @@ async function sendCriticalAlert(data: {
         }),
       });
     } catch (slackError) {
-      console.error('Failed to send Slack alert:', slackError);
+      logger.error('Failed to send Slack alert:', slackError);
     }
   }
 }
@@ -87,7 +88,7 @@ export async function logError(errorLog: ErrorLog): Promise<void> {
     });
   } catch (error) {
     // Don't throw - logging errors shouldn't break the app
-    console.error('Failed to log error:', error);
+    logger.error('Failed to log error:', error);
   }
 }
 
@@ -118,7 +119,7 @@ export async function logRequest(data: {
       },
     });
   } catch (error) {
-    console.error('Failed to log request:', error);
+    logger.error('Failed to log request:', error);
   }
 }
 
@@ -145,7 +146,7 @@ export async function logRateLimitHit(data: {
       },
     });
   } catch (error) {
-    console.error('Failed to log rate limit hit:', error);
+    logger.error('Failed to log rate limit hit:', error);
   }
 }
 
@@ -177,15 +178,15 @@ export async function logSecurityEvent(data: {
 
     // Send alerts for critical events
     if (data.severity === 'critical') {
-      console.error('🚨 CRITICAL SECURITY EVENT:', data);
+      logger.error('🚨 CRITICAL SECURITY EVENT:', data);
       try {
         await sendCriticalAlert(data);
       } catch (alertError) {
-        console.error('Failed to send critical alert:', alertError);
+        logger.error('Failed to send critical alert:', alertError);
       }
     }
   } catch (error) {
-    console.error('Failed to log security event:', error);
+    logger.error('Failed to log security event:', error);
   }
 }
 
@@ -238,7 +239,7 @@ export async function getErrorStats(timeRange: '1h' | '24h' | '7d' = '24h'): Pro
       byStatusCode,
     };
   } catch (error) {
-    console.error('Failed to get error stats:', error);
+    logger.error('Failed to get error stats:', error);
     return {
       total: 0,
       byEndpoint: {},

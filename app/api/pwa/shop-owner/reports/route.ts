@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -177,7 +178,7 @@ export async function GET(request: NextRequest) {
       period,
     });
   } catch (error) {
-    console.error('Error fetching reports:', error);
+    logger.error('Error fetching reports:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

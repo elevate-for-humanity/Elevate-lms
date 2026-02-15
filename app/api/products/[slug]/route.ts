@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getProduct, getRecommendations, getAvatarSalesMessage } from '@/lib/store/db';
 
@@ -26,7 +27,7 @@ export async function GET(
       salesMessage,
     });
   } catch (error) {
-    console.error('Product API error:', error);
+    logger.error('Product API error:', error);
     return NextResponse.json({ error: 'Failed to fetch product' }, { status: 500 });
   }
 }

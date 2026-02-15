@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -30,7 +31,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, enrollment });
   } catch (error) {
-    console.error('Enrollment error:', error);
+    logger.error('Enrollment error:', error);
     return NextResponse.json({ success: false, error: 'Failed to submit enrollment' }, { status: 500 });
   }
 }

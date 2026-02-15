@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { uploadToR2, getContentType, isR2Configured } from '@/lib/cloudflare-r2';
 import { createClient } from '@/lib/supabase/server';
@@ -80,7 +81,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('R2 upload error:', error);
+    logger.error('R2 upload error:', error);
     return NextResponse.json(
       { error: 'Upload failed' },
       { status: 500 }

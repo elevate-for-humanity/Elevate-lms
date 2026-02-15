@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -107,7 +108,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Upgrade error:', error);
+    logger.error('Upgrade error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -85,7 +86,7 @@ export async function POST(
       .eq('id', enrollment.id);
 
     if (updateError) {
-      console.error('Course completion error:', updateError);
+      logger.error('Course completion error:', updateError);
       return NextResponse.json(
         { error: 'Failed to complete course' },
         { status: 500 }
@@ -154,7 +155,7 @@ export async function POST(
         : null,
     });
   } catch (error) {
-    console.error('Course complete API error:', error);
+    logger.error('Course complete API error:', error);
     return NextResponse.json(
       { error: 'Failed to complete course' },
       { status: 500 }
@@ -216,7 +217,7 @@ export async function GET(
       certificate: certificate || null,
     });
   } catch (error) {
-    console.error('Course completion status error:', error);
+    logger.error('Course completion status error:', error);
     return NextResponse.json(
       { error: 'Failed to get completion status' },
       { status: 500 }

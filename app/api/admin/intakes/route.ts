@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -30,13 +31,13 @@ export async function GET() {
       .limit(100);
 
     if (error) {
-      console.error('Intakes error:', error);
+      logger.error('Intakes error:', error);
       return NextResponse.json({ intakes: [] });
     }
 
     return NextResponse.json({ intakes: intakes || [] });
   } catch (error) {
-    console.error('Intakes error:', error);
+    logger.error('Intakes error:', error);
     return NextResponse.json({ intakes: [] });
   }
 }
@@ -63,13 +64,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Create intake error:', error);
+      logger.error('Create intake error:', error);
       return NextResponse.json({ error: 'Failed to create intake' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, intake });
   } catch (error) {
-    console.error('Create intake error:', error);
+    logger.error('Create intake error:', error);
     return NextResponse.json({ error: 'Failed to create intake' }, { status: 500 });
   }
 }

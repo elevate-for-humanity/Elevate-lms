@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Demo Tour Progress Persistence
  * Tracks user progress through guided tours
@@ -62,7 +63,7 @@ export function saveProgress(userId: string, progress: TourProgress): void {
     progress.lastUpdatedAt = new Date().toISOString();
     localStorage.setItem(key, JSON.stringify(progress));
   } catch (e) {
-    console.error('Failed to save tour progress:', e);
+    logger.error('Failed to save tour progress:', e);
   }
 }
 

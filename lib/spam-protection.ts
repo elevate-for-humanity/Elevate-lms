@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Spam protection utilities
  * Rate limiting and honeypot fields
@@ -54,7 +55,7 @@ export async function verifyTurnstile(token: string): Promise<boolean> {
     const data = await response.json();
     return data.success === true;
   } catch (error) { /* Error handled silently */ 
-    console.error('Turnstile verification error:', error);
+    logger.error('Turnstile verification error:', error);
     return false;
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -34,7 +35,7 @@ export async function GET(request: NextRequest) {
       ownerName: shop.owner_name || '',
     });
   } catch (error) {
-    console.error('Shop details error:', error);
+    logger.error('Shop details error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -81,13 +82,13 @@ export async function PUT(request: NextRequest) {
       .eq('id', shop.id);
 
     if (updateError) {
-      console.error('Error updating shop:', updateError);
+      logger.error('Error updating shop:', updateError);
       return NextResponse.json({ error: 'Failed to update shop' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Shop update error:', error);
+    logger.error('Shop update error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -16,10 +16,17 @@ interface SyncJotformBody {
 }
 
 /**
- * Manually sync JotForm submissions
+ * Manually sync JotForm submissions.
+ * Requires admin auth via Authorization header (service role key).
  */
 export async function POST(request: NextRequest) {
   try {
+    // This is an admin-only endpoint — require service role key
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || authHeader !== `Bearer ${supabaseServiceKey}`) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+    }
+
     const body: SyncJotformBody = await request.json();
     const formId = body.formId || process.env.JOTFORM_FORM_ID;
 

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -84,7 +85,7 @@ export async function POST(req: Request) {
       newTotal: Math.round((subtotal - discountAmount) * 100) / 100,
     });
   } catch (error) {
-    console.error('Promo validation error:', error);
+    logger.error('Promo validation error:', error);
     return NextResponse.json({ error: 'Failed to validate promo code' }, { status: 500 });
   }
 }

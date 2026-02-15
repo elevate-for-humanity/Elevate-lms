@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -33,13 +34,13 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query;
 
     if (error) {
-      console.error('Error fetching testimonials:', error);
+      logger.error('Error fetching testimonials:', error);
       return NextResponse.json({ testimonials: [] });
     }
 
     return NextResponse.json({ testimonials: data || [] });
   } catch (error) {
-    console.error('Error in testimonials API:', error);
+    logger.error('Error in testimonials API:', error);
     return NextResponse.json({ testimonials: [] });
   }
 }

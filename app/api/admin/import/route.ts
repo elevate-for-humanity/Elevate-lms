@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Admin Data Import API
  * Handles CSV file uploads and parses them for import
@@ -381,7 +382,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Import error:', error);
+    logger.error('Import error:', error);
     return NextResponse.json(
       { 
         success: false, 

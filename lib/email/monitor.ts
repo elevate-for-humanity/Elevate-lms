@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Email Delivery Monitoring System
  * Tracks email success/failure rates and provides visibility
@@ -34,7 +35,7 @@ export async function logEmailDelivery(log: EmailLog): Promise<void> {
     });
   } catch (error) { /* Error handled silently */ 
     // Don't fail the email send if logging fails
-    console.error('[Email Monitor] Failed to log email:', error);
+    logger.error('[Email Monitor] Failed to log email:', error);
   }
 }
 

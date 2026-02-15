@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { headers } from 'next/headers';
@@ -25,7 +26,7 @@ export async function POST(req: Request) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err: any) {
-    console.error('Webhook signature verification failed:', err.message);
+    logger.error('Webhook signature verification failed:', err.message);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -73,7 +74,7 @@ export async function POST(req: Request) {
           });
 
         if (error) {
-          console.error('Error recording purchase:', error);
+          logger.error('Error recording purchase:', error);
         }
       }
 
@@ -109,7 +110,7 @@ export async function POST(req: Request) {
             }),
           });
         } catch (emailError) {
-          console.error('Error sending confirmation email:', emailError);
+          logger.error('Error sending confirmation email:', emailError);
         }
       }
 
@@ -118,7 +119,7 @@ export async function POST(req: Request) {
 
     case 'payment_intent.payment_failed': {
       const paymentIntent = event.data.object as Stripe.PaymentIntent;
-      console.log('Payment failed:', paymentIntent.id);
+      logger.info('Payment failed:', paymentIntent.id);
       break;
     }
   }

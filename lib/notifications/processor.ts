@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Notification Queue Processor
  * 
@@ -55,7 +56,7 @@ export async function processNotificationQueue(): Promise<ProcessResult> {
     .limit(MAX_BATCH_SIZE);
 
   if (fetchError) {
-    console.error('Failed to fetch notifications:', fetchError);
+    logger.error('Failed to fetch notifications:', fetchError);
     return { ...result, errors: [{ id: 'fetch', error: fetchError.message }] };
   }
 
@@ -132,10 +133,10 @@ async function sendEmail(params: {
   const RESEND_API_KEY = process.env.RESEND_API_KEY;
 
   if (!RESEND_API_KEY) {
-    console.warn('RESEND_API_KEY not configured, skipping email send');
+    logger.warn('RESEND_API_KEY not configured, skipping email send');
     // In development, log and return success
     if (process.env.NODE_ENV === 'development') {
-      console.log('DEV EMAIL:', params.to, params.subject);
+      logger.info('DEV EMAIL:', params.to, params.subject);
       return { success: true, messageId: 'dev-' + Date.now() };
     }
     return { success: false, error: 'Email provider not configured' };

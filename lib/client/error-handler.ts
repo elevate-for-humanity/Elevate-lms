@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 'use client';
 
 /**
@@ -89,7 +90,7 @@ export function setupGlobalErrorHandler() {
 
   // Handle unhandled promise rejections
   window.addEventListener('unhandledrejection', (event) => {
-    console.error('[Unhandled Promise Rejection]', event.reason);
+    logger.error('[Unhandled Promise Rejection]', event.reason);
     
     // Send to Sentry
     if (window.Sentry) {
@@ -101,7 +102,7 @@ export function setupGlobalErrorHandler() {
 
   // Handle global errors
   window.addEventListener('error', (event) => {
-    console.error('[Global Error]', event.error);
+    logger.error('[Global Error]', event.error);
     
     // Send to Sentry
     if (window.Sentry) {
@@ -116,7 +117,7 @@ export function setupGlobalErrorHandler() {
  * Log error to Sentry (client-side)
  */
 export function logError(error: Error, context?: Record<string, any>) {
-  console.error('[Client Error]', error, context);
+  logger.error('[Client Error]', error, context);
   
   if (typeof window !== 'undefined' && window.Sentry) {
     window.Sentry.captureException(error, {

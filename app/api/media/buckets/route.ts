@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -27,7 +28,7 @@ export async function GET() {
     const { data: buckets, error } = await supabase.storage.listBuckets();
 
     if (error) {
-      console.error('Buckets error:', error);
+      logger.error('Buckets error:', error);
       // Return default buckets for demo
       return NextResponse.json({
         buckets: [
@@ -41,7 +42,7 @@ export async function GET() {
 
     return NextResponse.json({ buckets: buckets || [] });
   } catch (error) {
-    console.error('Buckets error:', error);
+    logger.error('Buckets error:', error);
     return NextResponse.json({
       buckets: [
         { id: 'documents', name: 'documents', public: false },

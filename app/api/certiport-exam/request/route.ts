@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -139,7 +140,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) {
-        console.error('Failed to create exam request:', error);
+        logger.error('Failed to create exam request:', error);
         return NextResponse.json({ error: 'Failed to submit exam request' }, { status: 500 });
       }
 
@@ -197,7 +198,7 @@ export async function POST(request: NextRequest) {
       sessionId: session.id,
     });
   } catch (error) {
-    console.error('Certiport exam request error:', error);
+    logger.error('Certiport exam request error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

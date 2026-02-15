@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -110,7 +111,7 @@ export async function GET(request: Request) {
       completedCount: enrollments?.filter((e) => e.status === 'completed').length || 0,
     });
   } catch (error) {
-    console.error('Progress API error:', error);
+    logger.error('Progress API error:', error);
     return NextResponse.json({ error: 'Failed to fetch progress' }, { status: 500 });
   }
 }
@@ -154,7 +155,7 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      console.error('Progress update error:', error);
+      logger.error('Progress update error:', error);
       return NextResponse.json({ error: 'Failed to update progress' }, { status: 500 });
     }
 
@@ -163,7 +164,7 @@ export async function POST(request: Request) {
       progress: data,
     });
   } catch (error) {
-    console.error('Progress API error:', error);
+    logger.error('Progress API error:', error);
     return NextResponse.json({ error: 'Failed to update progress' }, { status: 500 });
   }
 }

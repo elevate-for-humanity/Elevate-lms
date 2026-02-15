@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * IRS MeF Acknowledgment Handler
  * Processes IRS responses and manages return status
@@ -91,7 +92,7 @@ export class AcknowledgmentHandler {
    */
   async processAcknowledgment(acknowledgment: MeFAcknowledgment): Promise<void> {
     if (!this.supabase) {
-      console.log('Supabase not configured, skipping database updates');
+      logger.info('Supabase not configured, skipping database updates');
       return;
     }
 

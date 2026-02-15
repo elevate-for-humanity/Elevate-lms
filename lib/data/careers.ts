@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 /**
  * Careers Data - Real data from Supabase
@@ -43,7 +44,7 @@ export async function getActivePositions(): Promise<JobPosition[]> {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching positions:', error);
+    logger.error('Error fetching positions:', error);
     return [];
   }
 
@@ -69,7 +70,7 @@ export async function getPositionById(id: string): Promise<JobPosition | null> {
     .single();
 
   if (error) {
-    console.error('Error fetching position:', error);
+    logger.error('Error fetching position:', error);
     return null;
   }
 
@@ -97,7 +98,7 @@ export async function getPositionsByDepartment(
     .order('title');
 
   if (error) {
-    console.error('Error fetching positions by department:', error);
+    logger.error('Error fetching positions by department:', error);
     return [];
   }
 
@@ -125,7 +126,7 @@ export async function getPositionsByType(
     .order('title');
 
   if (error) {
-    console.error('Error fetching positions by type:', error);
+    logger.error('Error fetching positions by type:', error);
     return [];
   }
 

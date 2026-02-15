@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Database-driven Store Functions
  * All data comes from Supabase - no mock fallbacks
@@ -233,7 +234,7 @@ export async function getProducts(options?: {
   const { data, error } = await query;
 
   if (error) {
-    console.error('Error fetching products:', error);
+    logger.error('Error fetching products:', error);
     return [];
   }
 
@@ -256,7 +257,7 @@ export async function getProduct(slug: string): Promise<Product | null> {
     .single();
 
   if (error) {
-    console.error('Error fetching product:', error);
+    logger.error('Error fetching product:', error);
     return null;
   }
 
@@ -274,7 +275,7 @@ export async function getProductsByIds(ids: string[]): Promise<Product[]> {
     .eq('is_active', true);
 
   if (error) {
-    console.error('Error fetching products by IDs:', error);
+    logger.error('Error fetching products by IDs:', error);
     return [];
   }
 
@@ -296,7 +297,7 @@ export async function getCategories(): Promise<Category[]> {
     .order('sort_order', { ascending: true });
 
   if (error) {
-    console.error('Error fetching categories:', error);
+    logger.error('Error fetching categories:', error);
     return [];
   }
 
@@ -315,7 +316,7 @@ export async function getCategory(slug: string): Promise<Category | null> {
     .single();
 
   if (error) {
-    console.error('Error fetching category:', error);
+    logger.error('Error fetching category:', error);
     return null;
   }
 
@@ -352,7 +353,7 @@ export async function getCart(cartId?: string, sessionId?: string): Promise<Cart
   const { data, error } = await query.single();
 
   if (error) {
-    console.error('Error fetching cart:', error);
+    logger.error('Error fetching cart:', error);
     return null;
   }
 
@@ -400,7 +401,7 @@ export async function addToCart(
     .single();
 
   if (error) {
-    console.error('Error adding to cart:', error);
+    logger.error('Error adding to cart:', error);
     return null;
   }
 
@@ -434,7 +435,7 @@ export async function updateCartItem(
     .single();
 
   if (error) {
-    console.error('Error updating cart item:', error);
+    logger.error('Error updating cart item:', error);
     return null;
   }
 
@@ -451,7 +452,7 @@ export async function removeFromCart(itemId: string): Promise<boolean> {
     .eq('id', itemId);
 
   if (error) {
-    console.error('Error removing from cart:', error);
+    logger.error('Error removing from cart:', error);
     return false;
   }
 
@@ -476,7 +477,7 @@ export async function getOrders(customerId: string): Promise<Order[]> {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching orders:', error);
+    logger.error('Error fetching orders:', error);
     return [];
   }
 
@@ -500,7 +501,7 @@ export async function getOrder(orderId: string): Promise<Order | null> {
     .single();
 
   if (error) {
-    console.error('Error fetching order:', error);
+    logger.error('Error fetching order:', error);
     return null;
   }
 
@@ -544,7 +545,7 @@ export async function searchStore(
   const { data, error } = await dbQuery;
 
   if (error) {
-    console.error('Error searching:', error);
+    logger.error('Error searching:', error);
     return [];
   }
 
@@ -567,7 +568,7 @@ export async function getFeaturedForAudience(
     .limit(limit);
 
   if (error) {
-    console.error('Error fetching featured:', error);
+    logger.error('Error fetching featured:', error);
     return [];
   }
 
@@ -589,7 +590,7 @@ export async function getStoreCards(): Promise<{ primary: StoreCard[]; secondary
     .order('sort_order', { ascending: true });
 
   if (error) {
-    console.error('Error fetching store cards:', error);
+    logger.error('Error fetching store cards:', error);
     return { primary: [], secondary: [] };
   }
 
@@ -627,7 +628,7 @@ export async function getPageGuide(pageId: string): Promise<PageGuide | null> {
     .order('sort_order', { ascending: true });
 
   if (messagesError) {
-    console.error('Error fetching guide messages:', messagesError);
+    logger.error('Error fetching guide messages:', messagesError);
   }
 
   return {
@@ -655,7 +656,7 @@ export async function getRecommendations(productId: string): Promise<Recommendat
     .order('sort_order', { ascending: true });
 
   if (error) {
-    console.error('Error fetching recommendations:', error);
+    logger.error('Error fetching recommendations:', error);
     return [];
   }
 

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Compliance Enforcement Module
  * Handles onboarding progress tracking and compliance enforcement
@@ -13,7 +14,7 @@ export async function updateOnboardingProgress(
   const supabase = createClient();
   
   if (!supabase) {
-    console.warn('[Compliance] Supabase not configured, skipping progress update');
+    logger.warn('[Compliance] Supabase not configured, skipping progress update');
     return;
   }
 
@@ -29,7 +30,7 @@ export async function updateOnboardingProgress(
         onConflict: 'user_id,step'
       });
   } catch (error) {
-    console.error('[Compliance] Failed to update onboarding progress:', error);
+    logger.error('[Compliance] Failed to update onboarding progress:', error);
   }
 }
 
@@ -53,7 +54,7 @@ export async function getOnboardingProgress(userId: string): Promise<Record<stri
       return acc;
     }, {} as Record<string, string>);
   } catch (error) {
-    console.error('[Compliance] Failed to get onboarding progress:', error);
+    logger.error('[Compliance] Failed to get onboarding progress:', error);
     return {};
   }
 }
@@ -108,7 +109,7 @@ export async function recordAgreementAcceptance(
   const supabase = createClient();
   
   if (!supabase) {
-    console.warn('[Compliance] Supabase not configured, skipping agreement recording');
+    logger.warn('[Compliance] Supabase not configured, skipping agreement recording');
     return { success: false, error: 'Database not configured' };
   }
 
@@ -135,13 +136,13 @@ export async function recordAgreementAcceptance(
       .single();
 
     if (error) {
-      console.error('[Compliance] Failed to record agreement acceptance:', error);
+      logger.error('[Compliance] Failed to record agreement acceptance:', error);
       return { success: false, error: error.message };
     }
 
     return { success: true, acceptanceId: data?.id };
   } catch (error) {
-    console.error('[Compliance] Failed to record agreement acceptance:', error);
+    logger.error('[Compliance] Failed to record agreement acceptance:', error);
     return { success: false, error: 'Failed to record agreement' };
   }
 }

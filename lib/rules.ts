@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export interface StateRules {
@@ -25,7 +26,7 @@ export async function getStateRules(state: string): Promise<StateRules | null> {
     .single();
 
   if (error) {
-    console.error('Failed to fetch state rules:', error);
+    logger.error('Failed to fetch state rules:', error);
     return null;
   }
 
@@ -86,7 +87,7 @@ export async function getAllStateRules(): Promise<StateRules[]> {
     .order('state');
 
   if (error) {
-    console.error('Failed to fetch all state rules:', error);
+    logger.error('Failed to fetch all state rules:', error);
     return [];
   }
 
@@ -109,7 +110,7 @@ export async function updateStateRules(
     .single();
 
   if (error) {
-    console.error('Failed to update state rules:', error);
+    logger.error('Failed to update state rules:', error);
     return null;
   }
 

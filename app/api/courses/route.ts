@@ -19,7 +19,7 @@ export async function GET(request: Request) {
     const data = await listCourses({ status, programId });
     return NextResponse.json({ data }, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Failed to list courses' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to list courses' }, { status: 500 });
   }
 }
 
@@ -64,6 +64,6 @@ export async function POST(request: Request) {
     const data = await createCourse(parsed.data);
     return NextResponse.json({ data }, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message || 'Failed to create course' }, { status: 500 });
+    return NextResponse.json({ error: 'Failed to create course' }, { status: 500 });
   }
 }

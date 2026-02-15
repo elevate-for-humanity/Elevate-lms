@@ -27,7 +27,7 @@ export async function GET(_: Request, { params }: { params: Promise<{ id: string
     if (!data) return NextResponse.json({ error: 'Not found' }, { status: 404 });
     return NextResponse.json({ data }, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -64,7 +64,7 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
     
     return NextResponse.json({ data }, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -92,6 +92,6 @@ export async function DELETE(_: Request, { params }: { params: Promise<{ id: str
     
     return NextResponse.json({ data }, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

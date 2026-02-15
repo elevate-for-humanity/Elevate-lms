@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -24,13 +25,13 @@ export async function POST(request: NextRequest) {
       .eq('endpoint', endpoint);
 
     if (error) {
-      console.error('[Push] Failed to remove subscription:', error);
+      logger.error('[Push] Failed to remove subscription:', error);
       return NextResponse.json({ error: 'Failed to unsubscribe' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[Push] Unsubscribe error:', error);
+    logger.error('[Push] Unsubscribe error:', error);
     return NextResponse.json({ error: 'Internal error' }, { status: 500 });
   }
 }

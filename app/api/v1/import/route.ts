@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Data Import API for License Holders
  * Allows bulk import of students, courses, and enrollments
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Import error:', error);
+    logger.error('Import error:', error);
     return NextResponse.json(
       { error: 'Import failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

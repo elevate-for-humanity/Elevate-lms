@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { eroService } from '@/lib/franchise/ero-service';
@@ -47,7 +48,7 @@ export async function GET(request: NextRequest) {
       validation
     });
   } catch (error) {
-    console.error('Error getting ERO config:', error);
+    logger.error('Error getting ERO config:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to get ERO config' },
       { status: 500 }
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(config, { status: 201 });
   } catch (error) {
-    console.error('Error setting ERO config:', error);
+    logger.error('Error setting ERO config:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to set ERO config' },
       { status: 500 }

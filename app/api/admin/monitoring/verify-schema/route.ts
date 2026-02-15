@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -77,7 +78,7 @@ export async function GET() {
         }
       }
     } catch (error) {
-      console.error('Error checking audit_logs:', error);
+      logger.error('Error checking audit_logs:', error);
     }
 
     // Test if we can insert
@@ -101,7 +102,7 @@ export async function GET() {
           .eq('description', 'Schema verification test');
       }
     } catch (error) {
-      console.error('Error testing insert:', error);
+      logger.error('Error testing insert:', error);
     }
 
     // Determine overall status
@@ -122,7 +123,7 @@ export async function GET() {
       ].filter(Boolean) : [],
     });
   } catch (error) {
-    console.error('Schema verification error:', error);
+    logger.error('Schema verification error:', error);
     return NextResponse.json({
       status: 'error',
       error: error instanceof Error ? error.message : 'Unknown error',

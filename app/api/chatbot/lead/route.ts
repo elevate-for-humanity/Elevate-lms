@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
@@ -147,13 +148,13 @@ export async function POST(request: NextRequest) {
           text: summary,
         });
       } catch (emailError) {
-        console.error('[Chatbot Lead] Failed to send email:', emailError);
+        logger.error('[Chatbot Lead] Failed to send email:', emailError);
         // Don't fail the request if email fails
       }
     }
     
     // Log the lead (could also save to database here)
-    console.log('[Chatbot Lead] New lead captured:', {
+    logger.info('[Chatbot Lead] New lead captured:', {
       organization: data.organization,
       buyerScore,
       timestamp: new Date().toISOString(),
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error) {
-    console.error('[Chatbot Lead] Error:', error);
+    logger.error('[Chatbot Lead] Error:', error);
     return NextResponse.json(
       { error: 'Failed to process lead' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -156,7 +157,7 @@ Keep responses concise but helpful. Use bullet points for clarity when listing i
       tokens_used: completion.usage?.total_tokens || 0,
     });
   } catch (err: any) {
-    console.error('AI Chat error:', err);
+    logger.error('AI Chat error:', err);
     return NextResponse.json({
       response: "I'm having a bit of trouble right now. Please call us at (317) 314-3757 or visit elevateforhumanity.org/apply to get started!",
       needs_human: true,

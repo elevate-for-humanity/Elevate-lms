@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 
 /**
@@ -10,7 +11,7 @@ export function createStaticClient() {
 
   if (!supabaseUrl || !supabaseAnonKey) {
     if (process.env.NODE_ENV === 'development') {
-      console.log(
+      logger.info(
         '[Supabase Static] Missing environment variables - returning mock client'
       );
     }

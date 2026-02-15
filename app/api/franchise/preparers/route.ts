@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { preparerService } from '@/lib/franchise/preparer-service';
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error listing preparers:', error);
+    logger.error('Error listing preparers:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to list preparers' },
       { status: 500 }
@@ -109,7 +110,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(preparer, { status: 201 });
   } catch (error) {
-    console.error('Error creating preparer:', error);
+    logger.error('Error creating preparer:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to create preparer' },
       { status: 500 }

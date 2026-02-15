@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -60,7 +61,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    console.error('Failed to create submission:', error);
+    logger.error('Failed to create submission:', error);
     return NextResponse.json({ error: 'Failed to submit certification' }, { status: 500 });
   }
 

@@ -57,7 +57,7 @@ export async function POST(
 
     if (error) {
       logger.error('Failed to retry job', error, { jobId });
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     // Log admin action

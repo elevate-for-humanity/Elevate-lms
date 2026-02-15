@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 // useToken is not a React hook - it's a server-side token validation function
 // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
       metadata: result.metadata,
     });
   } catch (error) {
-    console.error('Token validation error:', error);
+    logger.error('Token validation error:', error);
     return NextResponse.json(
       { error: 'Failed to validate token' },
       { status: 500 }

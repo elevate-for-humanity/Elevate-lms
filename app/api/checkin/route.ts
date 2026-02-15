@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (sessionError) {
-      console.error('Error creating session:', sessionError);
+      logger.error('Error creating session:', sessionError);
       return NextResponse.json({ error: 'Failed to check in' }, { status: 500 });
     }
 
@@ -78,7 +79,7 @@ export async function POST(request: NextRequest) {
       checkInTime: checkInTime,
     });
   } catch (error) {
-    console.error('Check-in error:', error);
+    logger.error('Check-in error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

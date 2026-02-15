@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Milady Email Forwarding Webhook
  * 
@@ -30,7 +31,7 @@ export async function POST(request: Request) {
 
     // Verify it's from Milady
     if (!from?.toLowerCase().includes('milady')) {
-      console.log('[milady-email] Ignoring non-Milady email from:', from);
+      logger.info('[milady-email] Ignoring non-Milady email from:', from);
       return NextResponse.json({ ok: true, ignored: true });
     }
 
@@ -137,12 +138,12 @@ export async function POST(request: Request) {
           milady_credentials_received_at: new Date().toISOString(),
         }, { onConflict: 'student_id' });
 
-      console.log('[milady-email] Forwarded to student:', studentEmail);
+      logger.info('[milady-email] Forwarded to student:', studentEmail);
     }
 
     return NextResponse.json({ ok: true, forwarded: !!student });
   } catch (error: any) {
-    console.error('[milady-email] Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    logger.error('[milady-email] Error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

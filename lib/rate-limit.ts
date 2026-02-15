@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 
@@ -92,7 +93,7 @@ interface RateLimitConfig {
 export async function checkRateLimit(config: RateLimitConfig) {
   const r = getRedis();
   if (!r) {
-    console.warn('⚠️ Rate limiting disabled - Redis not configured');
+    logger.warn('⚠️ Rate limiting disabled - Redis not configured');
     return { ok: true, remaining: config.limit, current: 0 };
   }
 

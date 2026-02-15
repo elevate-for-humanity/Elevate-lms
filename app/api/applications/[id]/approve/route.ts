@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -146,7 +147,7 @@ export async function POST(
       enrollment,
     });
   } catch (error) {
-    console.error('Application approval error:', error);
+    logger.error('Application approval error:', error);
     return NextResponse.json({ error: 'Failed to approve application' }, { status: 500 });
   }
 }

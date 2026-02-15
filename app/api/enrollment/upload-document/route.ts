@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
       });
 
     if (uploadError) {
-      console.error('Upload error:', uploadError);
+      logger.error('Upload error:', uploadError);
       return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
     }
 
@@ -64,7 +65,7 @@ export async function POST(req: Request) {
       .single();
 
     if (dbError) {
-      console.error('Database error:', dbError);
+      logger.error('Database error:', dbError);
       // Don't fail - file is uploaded, just log the error
     }
 
@@ -74,7 +75,7 @@ export async function POST(req: Request) {
       path: fileName,
     });
   } catch (error) {
-    console.error('Document upload error:', error);
+    logger.error('Document upload error:', error);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { eroService } from '@/lib/franchise/ero-service';
@@ -57,7 +58,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ pending, count: pending.length });
   } catch (error) {
-    console.error('Error getting pending signatures:', error);
+    logger.error('Error getting pending signatures:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to get pending signatures' },
       { status: 500 }
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error signing returns:', error);
+    logger.error('Error signing returns:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to sign returns' },
       { status: 500 }

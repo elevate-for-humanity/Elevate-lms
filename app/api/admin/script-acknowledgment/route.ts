@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -27,7 +28,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      console.error('Acknowledgment error:', error);
+      logger.error('Acknowledgment error:', error);
       // Return success for demo
       return NextResponse.json({ 
         success: true, 
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
       message: 'Script acknowledgment recorded' 
     });
   } catch (error) {
-    console.error('Acknowledgment error:', error);
+    logger.error('Acknowledgment error:', error);
     return NextResponse.json({ 
       success: true, 
       message: 'Script acknowledgment recorded' 

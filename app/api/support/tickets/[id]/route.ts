@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 
@@ -42,7 +43,7 @@ export async function GET(request: NextRequest, { params }: { params: Params }) 
     
     return NextResponse.json({ ticket });
   } catch (error) {
-    console.error('Ticket GET error:', error);
+    logger.error('Ticket GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -116,7 +117,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Params }
     
     return NextResponse.json({ success: true, ticket });
   } catch (error) {
-    console.error('Ticket PATCH error:', error);
+    logger.error('Ticket PATCH error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

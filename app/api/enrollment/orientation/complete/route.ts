@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -59,7 +60,7 @@ export async function POST(req: Request) {
       .eq('id', enrollment_id);
 
     if (updateError) {
-      console.error('Failed to update enrollment:', updateError);
+      logger.error('Failed to update enrollment:', updateError);
       return NextResponse.json({ error: 'Failed to complete orientation' }, { status: 500 });
     }
 
@@ -69,7 +70,7 @@ export async function POST(req: Request) {
       redirect: '/enrollment/documents',
     });
   } catch (err) {
-    console.error('Orientation complete error:', err);
+    logger.error('Orientation complete error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

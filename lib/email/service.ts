@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * EMAIL SERVICE
  *
@@ -45,7 +46,7 @@ export async function sendEmail(options: EmailOptions): Promise<boolean> {
 
     return true;
   } catch (error) { /* Error handled silently */ 
-    console.error('❌ Email failed:', error);
+    logger.error('❌ Email failed:', error);
     return false;
   }
 }

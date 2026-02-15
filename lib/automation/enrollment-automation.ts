@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 /**
  * Advanced Enrollment Automation
@@ -126,7 +127,7 @@ export async function sendInactivityReminders() {
       });
       sent++;
     } catch (error) { /* Error handled silently */ 
-      console.error(`Failed to send reminder to ${profile.email}:`, error);
+      logger.error(`Failed to send reminder to ${profile.email}:`, error);
     }
   }
 
@@ -181,7 +182,7 @@ export async function sendCompletionNudges() {
       });
       sent++;
     } catch (error) { /* Error handled silently */ 
-      console.error(`Failed to send nudge to ${profile.email}:`, error);
+      logger.error(`Failed to send nudge to ${profile.email}:`, error);
     }
   }
 

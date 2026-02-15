@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * IRS MeF Transmission Module
  * Handles direct transmission to IRS e-file system
@@ -83,7 +84,7 @@ export class IRSTransmitter {
           .single();
         
         if (dbError) {
-          console.warn(`Database error: ${dbError.message}`);
+          logger.warn(`Database error: ${dbError.message}`);
         }
       }
       

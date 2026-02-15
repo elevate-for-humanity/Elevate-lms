@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -83,7 +84,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(report);
   } catch (error) {
-    console.error('Compliance report error:', error);
+    logger.error('Compliance report error:', error);
     return NextResponse.json(
       { error: 'Failed to generate compliance report' },
       { status: 500 }
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest) {
       message: schedule ? 'Report scheduled successfully' : 'Report generated',
     });
   } catch (error) {
-    console.error('Compliance report error:', error);
+    logger.error('Compliance report error:', error);
     return NextResponse.json(
       { error: 'Failed to create compliance report' },
       { status: 500 }

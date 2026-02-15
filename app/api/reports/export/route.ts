@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -63,7 +64,7 @@ export async function POST(request: NextRequest) {
       .order('date', { ascending: true });
 
     if (entriesError) {
-      console.error('Error fetching entries:', entriesError);
+      logger.error('Error fetching entries:', entriesError);
       return NextResponse.json({ error: 'Failed to fetch hours' }, { status: 500 });
     }
 
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
       });
     }
   } catch (error) {
-    console.error('Report export error:', error);
+    logger.error('Report export error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

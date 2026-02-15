@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
@@ -114,7 +115,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (eventError) {
-      console.error("Failed to log state event:", eventError);
+      logger.error("Failed to log state event:", eventError);
       // Don't fail the request, just log the error
     }
 
@@ -127,7 +128,7 @@ export async function POST(request: NextRequest) {
       event_logged: !eventError,
     });
   } catch (error) {
-    console.error("Transition error:", error);
+    logger.error("Transition error:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabaseAdmin();
     if (!supabase) {
-      console.error(`[trial/begin-onboarding] ${correlationId} — Supabase not configured`);
+      logger.error(`[trial/begin-onboarding] ${correlationId} — Supabase not configured`);
       return NextResponse.json({ error: 'Service unavailable', correlationId }, { status: 503 });
     }
 
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ ok: true, correlationId });
   } catch (error) {
-    console.error(`[trial/begin-onboarding] ${correlationId} — Unexpected error:`, error);
+    logger.error(`[trial/begin-onboarding] ${correlationId} — Unexpected error:`, error);
     return NextResponse.json({ error: 'Internal server error', correlationId }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { Ratelimit } from '@upstash/ratelimit';
@@ -29,7 +30,7 @@ export function withRateLimit<T = any>(
     // Skip if rate limiter not configured
     if (!limiter) {
       if (skipOnMissing) {
-        console.warn('⚠️ Rate limiting skipped - Redis not configured');
+        logger.warn('⚠️ Rate limiting skipped - Redis not configured');
         return handler(request, context);
       } else {
         return NextResponse.json(
@@ -77,7 +78,7 @@ export function withRateLimit<T = any>(
 
       return response;
     } catch (error) {
-      console.error('Rate limit error:', error);
+      logger.error('Rate limit error:', error);
       
       // On error, allow request but log
       if (skipOnMissing) {

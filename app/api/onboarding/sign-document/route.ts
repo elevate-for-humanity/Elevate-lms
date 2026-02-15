@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -138,7 +139,7 @@ export async function POST(request: NextRequest) {
         
         if (partnerRecord?.id) {
           checkPartnerApproval(partnerRecord.id).catch((err) => {
-            console.error('Partner approval check error (non-blocking):', err);
+            logger.error('Partner approval check error (non-blocking):', err);
           });
         }
       }

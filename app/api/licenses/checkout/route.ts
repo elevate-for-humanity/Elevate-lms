@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
       url: session.url,
     });
   } catch (error) {
-    console.error('License checkout error:', error);
+    logger.error('License checkout error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Checkout failed' },
       { status: 500 }

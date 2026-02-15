@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
@@ -44,7 +45,7 @@ ${beforeCursor}[CURSOR]${afterCursor}`,
       usage: response.usage,
     });
   } catch (error) {
-    console.error('Code completion error:', error);
+    logger.error('Code completion error:', error);
     return NextResponse.json(
       { error: 'Failed to get completion' },
       { status: 500 }

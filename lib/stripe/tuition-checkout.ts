@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 /**
  * TUITION CHECKOUT LOGIC
@@ -58,7 +59,7 @@ export async function createTuitionCheckout(params: CheckoutParams): Promise<Che
         return { success: false, error: 'Invalid payment option' };
     }
   } catch (error) {
-    console.error('Checkout error:', error);
+    logger.error('Checkout error:', error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Checkout failed' 
@@ -298,14 +299,14 @@ export async function createInstallmentSubscription(
       },
     });
     
-    console.log(`Created ${interval}ly subscription ${subscription.id} for student ${metadata.student_id}: $${amount}/${interval} x ${numberOfPayments}`);
+    logger.info(`Created ${interval}ly subscription ${subscription.id} for student ${metadata.student_id}: $${amount}/${interval} x ${numberOfPayments}`);
     
     return {
       success: true,
       subscriptionId: subscription.id,
     };
   } catch (error) {
-    console.error('Subscription creation error:', error);
+    logger.error('Subscription creation error:', error);
     return {
       success: false,
       error: error instanceof Error ? error.message : 'Failed to create subscription',
@@ -335,7 +336,7 @@ export async function checkAndCancelCompletedSubscription(
   // Cancel if all installments paid
   if (installmentsPaid >= totalInstallments) {
     await stripe.subscriptions.cancel(subscriptionId);
-    console.log(`Subscription ${subscriptionId} completed - all ${totalInstallments} installments paid`);
+    logger.info(`Subscription ${subscriptionId} completed - all ${totalInstallments} installments paid`);
   }
 }
 
@@ -354,7 +355,7 @@ export async function handleFailedPayment(
     const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
     
     if (!supabaseUrl || !supabaseKey) {
-      console.error('Supabase not configured for payment failure handling');
+      logger.error('Supabase not configured for payment failure handling');
       return;
     }
     
@@ -362,7 +363,7 @@ export async function handleFailedPayment(
     supabase = createClient(supabaseUrl, supabaseKey);
   }
   
-  console.log(`Payment failed for subscription ${subscriptionId}, student ${studentId}`);
+  logger.info(`Payment failed for subscription ${subscriptionId}, student ${studentId}`);
   
   // Update enrollment status to suspended
   const { error } = await supabase
@@ -375,9 +376,9 @@ export async function handleFailedPayment(
     .eq('student_id', studentId);
   
   if (error) {
-    console.error('Failed to suspend enrollment:', error);
+    logger.error('Failed to suspend enrollment:', error);
   } else {
-    console.log(`Enrollment suspended for student ${studentId}`);
+    logger.info(`Enrollment suspended for student ${studentId}`);
   }
   
   // Log the payment failure
@@ -386,5 +387,5 @@ export async function handleFailedPayment(
     stripe_subscription_id: subscriptionId,
     status: 'failed',
     metadata: { reason: 'payment_failed', suspended: true },
-  }).catch((err: Error) => console.warn('Failed to log payment failure:', err));
+  }).catch((err: Error) => logger.warn('Failed to log payment failure:', err));
 }

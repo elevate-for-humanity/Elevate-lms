@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { calculateForm1040, getStandardDeduction } from '@/lib/tax-software/forms/form-1040';
 import { validateTaxReturn } from '@/lib/tax-software/validation/irs-rules';
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
       lines: result
     });
   } catch (error) {
-    console.error('Tax calculation error:', error);
+    logger.error('Tax calculation error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to calculate tax' },
       { status: 500 }

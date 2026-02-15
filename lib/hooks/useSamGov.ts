@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
@@ -109,7 +110,7 @@ export function useSamGov() {
       if (error) throw error;
       setDocuments(data || []);
     } catch (err: any) {
-      console.error('Error fetching documents:', err);
+      logger.error('Error fetching documents:', err);
     }
   }, [supabase, currentEntity]);
 
@@ -127,7 +128,7 @@ export function useSamGov() {
       if (error) throw error;
       setAlerts(data || []);
     } catch (err: any) {
-      console.error('Error fetching alerts:', err);
+      logger.error('Error fetching alerts:', err);
     }
   }, [supabase, currentEntity]);
 
@@ -194,7 +195,7 @@ export function useSamGov() {
       const data = await response.json();
       return data.entities || [];
     } catch (err) {
-      console.error('UEI search error:', err);
+      logger.error('UEI search error:', err);
       return [];
     }
   };
@@ -217,7 +218,7 @@ export function useSamGov() {
       
       return data;
     } catch (err) {
-      console.error('Sync error:', err);
+      logger.error('Sync error:', err);
       return null;
     }
   };
@@ -277,7 +278,7 @@ export function useSamGov() {
         a.id === alertId ? { ...a, is_read: true } : a
       ));
     } catch (err) {
-      console.error('Error marking alert read:', err);
+      logger.error('Error marking alert read:', err);
     }
   };
 

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * IRS ATS (Assurance Testing System) Test Runner
  * Submits test scenarios end-to-end and collects evidence artifacts
@@ -356,7 +357,7 @@ export class ATSTestRunner {
     const results: ATSRunResult[] = [];
     
     for (const scenario of this.scenarios) {
-      console.log(`\n[ATS] Running scenario: ${scenario.id} - ${scenario.name}`);
+      logger.info(`\n[ATS] Running scenario: ${scenario.id} - ${scenario.name}`);
       const result = await this.runScenario(scenario);
       results.push(result);
       
@@ -382,8 +383,8 @@ export class ATSTestRunner {
     // Save full report
     await this.saveReport(report);
     
-    console.log(`\n[ATS] Run complete: ${passed}/${this.scenarios.length} passed`);
-    console.log(`[ATS] Evidence saved to: ${this.evidenceDir}`);
+    logger.info(`\n[ATS] Run complete: ${passed}/${this.scenarios.length} passed`);
+    logger.info(`[ATS] Evidence saved to: ${this.evidenceDir}`);
     
     return report;
   }
@@ -414,7 +415,7 @@ export class ATSTestRunner {
 
     try {
       // Step 1: Generate XML
-      console.log(`  [1/4] Generating XML...`);
+      logger.info(`  [1/4] Generating XML...`);
       const softwareId = process.env.IRS_SOFTWARE_ID || 'ELEVATE001';
       const xml = generateMeFXML(scenario.taxReturn, softwareId);
       result.xmlGenerated = true;
@@ -423,20 +424,20 @@ export class ATSTestRunner {
       result.xmlHash = crypto.createHash('sha256').update(xml).digest('hex').substring(0, 16);
       
       // Step 2: Schema Validation
-      console.log(`  [2/4] Validating against schema...`);
+      logger.info(`  [2/4] Validating against schema...`);
       const validationResult = await this.validator.validate(xml);
       result.schemaValidated = validationResult.valid;
       result.schemaErrors = validationResult.errors.map(e => `${e.code}: ${e.message}`);
       result.schemaWarnings = validationResult.warnings.map(e => `${e.code}: ${e.message}`);
       
       if (!validationResult.valid) {
-        console.log(`  [!] Schema validation failed: ${result.schemaErrors.length} errors`);
+        logger.info(`  [!] Schema validation failed: ${result.schemaErrors.length} errors`);
         result.duration = Date.now() - startTime;
         return result;
       }
       
       // Step 3: Transmission
-      console.log(`  [3/4] ${this.useRealTransmission ? 'Transmitting to IRS...' : 'Simulating transmission...'}`);
+      logger.info(`  [3/4] ${this.useRealTransmission ? 'Transmitting to IRS...' : 'Simulating transmission...'}`);
       const submissionId = `${scenario.id}-${Date.now().toString(36)}`.toUpperCase();
       result.submissionId = submissionId;
       
@@ -472,7 +473,7 @@ export class ATSTestRunner {
       }
       
       // Step 4: Verify outcome
-      console.log(`  [4/4] Verifying outcome...`);
+      logger.info(`  [4/4] Verifying outcome...`);
       result.matchesExpected = result.ackStatus === (scenario.expectedOutcome === 'accept' ? 'accepted' : 'rejected');
       result.passed = result.schemaValidated && result.transmitted && result.matchesExpected;
       
@@ -481,7 +482,7 @@ export class ATSTestRunner {
     }
     
     result.duration = Date.now() - startTime;
-    console.log(`  [${result.passed ? '✓' : '✗'}] ${scenario.id}: ${result.passed ? 'PASSED' : 'FAILED'} (${result.duration}ms)`);
+    logger.info(`  [${result.passed ? '✓' : '✗'}] ${scenario.id}: ${result.passed ? 'PASSED' : 'FAILED'} (${result.duration}ms)`);
     
     return result;
   }
@@ -629,7 +630,7 @@ Each scenario folder contains:
   async runById(scenarioId: string): Promise<ATSRunResult | null> {
     const scenario = this.scenarios.find(s => s.id === scenarioId);
     if (!scenario) {
-      console.error(`Scenario ${scenarioId} not found`);
+      logger.error(`Scenario ${scenarioId} not found`);
       return null;
     }
     
@@ -650,23 +651,23 @@ async function main() {
   const scenarioArg = args.find(a => a.startsWith('--scenario='));
   const scenarioId = scenarioArg?.split('=')[1];
 
-  console.log('='.repeat(60));
-  console.log('IRS ATS Test Runner');
-  console.log('='.repeat(60));
-  console.log(`Mode: ${useReal ? 'REAL TRANSMISSION' : 'SIMULATED'}`);
-  console.log(`Environment: ${process.env.IRS_ENVIRONMENT || 'test'}`);
-  console.log('='.repeat(60));
+  logger.info('='.repeat(60));
+  logger.info('IRS ATS Test Runner');
+  logger.info('='.repeat(60));
+  logger.info(`Mode: ${useReal ? 'REAL TRANSMISSION' : 'SIMULATED'}`);
+  logger.info(`Environment: ${process.env.IRS_ENVIRONMENT || 'test'}`);
+  logger.info('='.repeat(60));
 
   const runner = new ATSTestRunner({ useRealTransmission: useReal });
 
   if (scenarioId) {
     const result = await runner.runById(scenarioId);
     if (result) {
-      console.log(`\nResult: ${result.passed ? 'PASSED' : 'FAILED'}`);
+      logger.info(`\nResult: ${result.passed ? 'PASSED' : 'FAILED'}`);
     }
   } else {
     const report = await runner.runAll();
-    console.log(`\nFinal Result: ${report.passed}/${report.totalScenarios} passed`);
+    logger.info(`\nFinal Result: ${report.passed}/${report.totalScenarios} passed`);
     process.exit(report.failed > 0 ? 1 : 0);
   }
 }

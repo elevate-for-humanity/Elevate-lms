@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -46,7 +47,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (dbError) {
-      console.error('Failed to save licensing request:', dbError);
+      logger.error('Failed to save licensing request:', dbError);
       // Don't fail the request - still send notification
     }
 
@@ -77,13 +78,13 @@ export async function POST(request: NextRequest) {
           }),
         });
       } catch (emailError) {
-        console.error('Failed to send notification email:', emailError);
+        logger.error('Failed to send notification email:', emailError);
       }
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Licensing request error:', error);
+    logger.error('Licensing request error:', error);
     return NextResponse.json(
       { error: 'Failed to process request' },
       { status: 500 }

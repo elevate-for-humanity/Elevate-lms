@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { payoutService } from '@/lib/franchise/payout-service';
@@ -58,7 +59,7 @@ export async function POST(
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error marking payout as paid:', error);
+    logger.error('Error marking payout as paid:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to mark payout as paid' },
       { status: 500 }

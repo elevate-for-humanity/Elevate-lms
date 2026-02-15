@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { geocodeAddress, buildAddressString, isGeocodingResult } from '@/lib/geo/geocode';
@@ -106,7 +107,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ success: false, error: result.error });
     }
   } catch (error) {
-    console.error('Geocode error:', error);
+    logger.error('Geocode error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

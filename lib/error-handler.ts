@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export function sanitizeError(error: any): string {
   if (process.env.NODE_ENV === 'production') {
     return 'An error occurred. Please try again later.';
@@ -11,7 +12,7 @@ export function sanitizeError(error: any): string {
 }
 
 export function logError(context: string, error: any, metadata?: Record<string, any>) {
-  console.error(`[${context}]`, {
+  logger.error(`[${context}]`, {
     error: error instanceof Error ? error.message : String(error),
     stack: error instanceof Error ? error.stack : undefined,
     ...metadata,

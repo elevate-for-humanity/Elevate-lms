@@ -549,7 +549,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ received: true });
   } catch (err: unknown) {
-    console.error('Stripe webhook error:', err);
+    logger.error('Stripe webhook error:', err);
     return NextResponse.json(
       { error: 'Webhook handler failed' },
       { status: 500 }

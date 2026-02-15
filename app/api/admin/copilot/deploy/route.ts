@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -37,7 +38,7 @@ export async function GET() {
 
     return NextResponse.json({ deployments: deployments || [] });
   } catch (error) {
-    console.error('Error fetching copilot deployments:', error);
+    logger.error('Error fetching copilot deployments:', error);
     return NextResponse.json(
       { error: 'Failed to fetch deployments' },
       { status: 500 }
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
       message: 'Copilot deployment initiated',
     });
   } catch (error) {
-    console.error('Error deploying copilot:', error);
+    logger.error('Error deploying copilot:', error);
     return NextResponse.json(
       { error: 'Failed to deploy copilot' },
       { status: 500 }
@@ -171,7 +172,7 @@ export async function PATCH(request: NextRequest) {
       message: `Copilot ${action === 'start' ? 'started' : 'stopped'} successfully`,
     });
   } catch (error) {
-    console.error('Error updating copilot deployment:', error);
+    logger.error('Error updating copilot deployment:', error);
     return NextResponse.json(
       { error: 'Failed to update deployment' },
       { status: 500 }
@@ -212,7 +213,7 @@ export async function DELETE(request: NextRequest) {
       message: 'Deployment removed successfully',
     });
   } catch (error) {
-    console.error('Error removing copilot deployment:', error);
+    logger.error('Error removing copilot deployment:', error);
     return NextResponse.json(
       { error: 'Failed to remove deployment' },
       { status: 500 }

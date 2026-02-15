@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -46,7 +47,7 @@ Do not repeat what's already written.`;
       usage: response.usage,
     });
   } catch (error) {
-    console.error('Completion error:', error);
+    logger.error('Completion error:', error);
     return NextResponse.json(
       { error: 'Failed to get completion' },
       { status: 500 }

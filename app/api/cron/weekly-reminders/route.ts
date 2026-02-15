@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -56,7 +57,7 @@ export async function GET(request: NextRequest) {
       `);
 
     if (subError) {
-      console.error('Error fetching subscriptions:', subError);
+      logger.error('Error fetching subscriptions:', subError);
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
@@ -118,7 +119,7 @@ export async function GET(request: NextRequest) {
         await webpush.sendNotification(pushSubscription, payload);
         sent++;
       } catch (error: any) {
-        console.error('Push notification failed:', error);
+        logger.error('Push notification failed:', error);
         failed++;
 
         // Remove invalid subscriptions
@@ -138,7 +139,7 @@ export async function GET(request: NextRequest) {
       total: subscriptionsToNotify.length,
     });
   } catch (error) {
-    console.error('Cron job error:', error);
+    logger.error('Cron job error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

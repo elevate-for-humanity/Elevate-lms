@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -28,7 +29,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (error) {
-        console.error('Feedback submission error:', error);
+        logger.error('Feedback submission error:', error);
         return NextResponse.json({ error: 'Failed to submit feedback' }, { status: 500 });
       }
 
@@ -37,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (err) {
-    console.error('Feedback API error:', err);
+    logger.error('Feedback API error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

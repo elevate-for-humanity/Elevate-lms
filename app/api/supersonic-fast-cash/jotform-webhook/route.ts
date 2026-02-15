@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { jotFormIntegration } from '@/lib/integrations/jotform';
 import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
@@ -11,12 +12,51 @@ export const maxDuration = 60;
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
 
+// JotForm webhook IPs (https://www.jotform.com/developers/webhooks/)
+const JOTFORM_IP_RANGES = [
+  '34.196.167.172',
+  '34.237.190.83',
+  '52.72.72.44',
+  '52.202.142.2',
+  '54.174.106.22',
+  '54.208.17.89',
+  '54.209.205.2',
+  '67.205.32.0/20',
+];
+
+function isAllowedIP(ip: string): boolean {
+  if (!ip) return false;
+  // Direct match
+  if (JOTFORM_IP_RANGES.includes(ip)) return true;
+  // CIDR /20 check for 67.205.32.0/20 (67.205.32.0 - 67.205.47.255)
+  const parts = ip.split('.').map(Number);
+  if (parts[0] === 67 && parts[1] === 205 && parts[2] >= 32 && parts[2] <= 47) return true;
+  return false;
+}
+
 /**
  * JotForm Webhook Handler
- * Receives form submissions and automatically creates SupersonicFastCash tax returns
+ * Receives form submissions and creates SupersonicFastCash tax returns.
+ * Secured by IP allowlist and optional shared secret.
  */
 export async function POST(request: NextRequest) {
   try {
+    // Verify source IP
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const sourceIP = forwardedFor?.split(',')[0]?.trim() || '';
+    const webhookSecret = process.env.JOTFORM_WEBHOOK_SECRET;
+
+    if (process.env.NODE_ENV === 'production') {
+      if (!isAllowedIP(sourceIP)) {
+        // Check shared secret as fallback
+        const providedSecret = request.headers.get('x-jotform-secret');
+        if (!webhookSecret || providedSecret !== webhookSecret) {
+          logger.error('JotForm webhook: unauthorized request', { sourceIP });
+          return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+        }
+      }
+    }
+
     const supabase = supabaseServer();
     const body = await request.json();
 
@@ -253,23 +293,13 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     return NextResponse.json(
-      {
-        error: 'Failed to process submission',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
+      { error: 'Failed to process submission' },
       { status: 500 }
     );
   }
 }
 
-/**
- * GET endpoint to test webhook
- */
-export async function GET(request: NextRequest) {
-  return NextResponse.json({
-    message: 'JotForm webhook endpoint is active',
-    endpoint: '/api/supersonic-fast-cash/jotform-webhook',
-    method: 'POST',
-    description: 'Receives JotForm submissions and creates SupersonicFastCash tax returns',
-  });
+/** Health check — returns 200 with no details */
+export async function GET() {
+  return NextResponse.json({ ok: true });
 }

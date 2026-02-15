@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -68,7 +69,7 @@ export async function POST(req: Request) {
       .single();
 
     if (error) {
-      console.error('Supabase insert error:', error);
+      logger.error('Supabase insert error:', error);
       return NextResponse.json(
         { error: 'Failed to submit application. Please call 317-314-3757.' },
         { status: 500 }
@@ -115,7 +116,7 @@ export async function POST(req: Request) {
       message: 'Application submitted. Proceed to payment.',
     });
   } catch (err: any) {
-    console.error('Barber application error:', err);
+    logger.error('Barber application error:', err);
     return NextResponse.json(
       { error: err.message || 'Application failed. Please try again.' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 // Push notification manager
 export interface NotificationPermission {
   granted: boolean;
@@ -122,7 +123,7 @@ export class NotificationManager {
         body: JSON.stringify(subscription),
       });
     } catch (error) { /* Error handled silently */ 
-      console.error(
+      logger.error(
         '[Notifications] Failed to send subscription to server:',
         error
       );
@@ -138,7 +139,7 @@ export class NotificationManager {
         body: JSON.stringify(subscription),
       });
     } catch (error) { /* Error handled silently */ 
-      console.error(
+      logger.error(
         '[Notifications] Failed to remove subscription from server:',
         error
       );

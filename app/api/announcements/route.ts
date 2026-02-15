@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -33,13 +34,13 @@ export async function GET(request: NextRequest) {
       .limit(limit);
 
     if (error) {
-      console.error('Announcements fetch error:', error);
+      logger.error('Announcements fetch error:', error);
       return NextResponse.json({ announcements: [] });
     }
 
     return NextResponse.json({ announcements: data || [] });
   } catch (error) {
-    console.error('Announcements API error:', error);
+    logger.error('Announcements API error:', error);
     return NextResponse.json({ announcements: [] });
   }
 }

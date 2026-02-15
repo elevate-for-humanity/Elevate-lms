@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -65,7 +66,7 @@ export async function POST(request: NextRequest) {
       .eq('user_id', payload.userId);
 
     if (subError) {
-      console.error('Error fetching subscriptions:', subError);
+      logger.error('Error fetching subscriptions:', subError);
       return NextResponse.json({ error: 'Database error' }, { status: 500 });
     }
 
@@ -102,7 +103,7 @@ export async function POST(request: NextRequest) {
         await webpush.sendNotification(pushSubscription, notificationPayload);
         sent++;
       } catch (error: any) {
-        console.error('Push notification failed:', error);
+        logger.error('Push notification failed:', error);
         failed++;
 
         // Remove invalid subscriptions
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
       total: subscriptions.length,
     });
   } catch (error) {
-    console.error('Send notification error:', error);
+    logger.error('Send notification error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

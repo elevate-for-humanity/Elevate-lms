@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * SAM.gov API Integration
  * System for Award Management - Federal government contractor database
@@ -33,14 +34,14 @@ export async function getEntityByUEI(uei: string): Promise<SAMEntity | null> {
     );
 
     if (!response.ok) {
-      console.error('SAM.gov API error:', response.status);
+      logger.error('SAM.gov API error:', response.status);
       return null;
     }
 
     const data = await response.json();
     return data.entityData?.[0] || null;
   } catch (error) { /* Error handled silently */ 
-    console.error('Error fetching SAM.gov entity:', error);
+    logger.error('Error fetching SAM.gov entity:', error);
     return null;
   }
 }
@@ -72,7 +73,7 @@ export async function checkExclusions(uei: string): Promise<boolean> {
     const data = await response.json();
     return data.exclusionDetails && data.exclusionDetails.length > 0;
   } catch (error) { /* Error handled silently */ 
-    console.error('Error checking SAM.gov exclusions:', error);
+    logger.error('Error checking SAM.gov exclusions:', error);
     return false;
   }
 }
@@ -104,7 +105,7 @@ export async function searchEntities(name: string): Promise<SAMEntity[]> {
     const data = await response.json();
     return data.entityData || [];
   } catch (error) { /* Error handled silently */ 
-    console.error('Error searching SAM.gov entities:', error);
+    logger.error('Error searching SAM.gov entities:', error);
     return [];
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
         : 'You did not pass. Please review the material and try again.',
     });
   } catch (error) {
-    console.error('Test submission error:', error);
+    logger.error('Test submission error:', error);
     return NextResponse.json({ error: 'Failed to submit test' }, { status: 500 });
   }
 }

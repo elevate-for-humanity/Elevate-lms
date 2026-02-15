@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from "@supabase/supabase-js";
 
 function getSupabaseAdmin() {
@@ -21,7 +22,7 @@ export async function revokeEntitlement(userId: string, entitlementCode: string)
     .eq("entitlement_code", entitlementCode);
 
   if (error) {
-    console.error("Error revoking entitlement:", error);
+    logger.error("Error revoking entitlement:", error);
     throw error;
   }
 
@@ -41,7 +42,7 @@ export async function revokeLmsAccess(userId: string, courseId: string) {
     .eq("course_id", courseId);
 
   if (error) {
-    console.error("Error revoking LMS access:", error);
+    logger.error("Error revoking LMS access:", error);
     throw error;
   }
 
@@ -61,7 +62,7 @@ export async function revokeAllAccessForPayment(userId: string, paymentIntentId:
     .eq("stripe_payment_intent_id", paymentIntentId);
 
   if (entitlementError) {
-    console.error("Error revoking entitlements:", entitlementError);
+    logger.error("Error revoking entitlements:", entitlementError);
   }
 
   // Revoke any enrollments tied to this payment
@@ -75,7 +76,7 @@ export async function revokeAllAccessForPayment(userId: string, paymentIntentId:
     .eq("stripe_payment_intent_id", paymentIntentId);
 
   if (enrollmentError) {
-    console.error("Error revoking enrollments:", enrollmentError);
+    logger.error("Error revoking enrollments:", enrollmentError);
   }
 
   return { success: true };

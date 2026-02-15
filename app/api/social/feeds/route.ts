@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 
 /**
@@ -70,7 +71,7 @@ async function fetchFacebookPosts(): Promise<SocialPost[]> {
       url: `https://facebook.com/${post.id}`,
     }));
   } catch (error) {
-    console.error('Facebook API error:', error);
+    logger.error('Facebook API error:', error);
     return [];
   }
 }
@@ -145,7 +146,7 @@ async function fetchYouTubeVideos(): Promise<YouTubeVideo[]> {
       };
     });
   } catch (error) {
-    console.error('YouTube API error:', error);
+    logger.error('YouTube API error:', error);
     return [];
   }
 }
@@ -186,7 +187,7 @@ async function fetchLinkedInPosts(): Promise<SocialPost[]> {
       url: `https://www.linkedin.com/feed/update/${post.id}`,
     }));
   } catch (error) {
-    console.error('LinkedIn API error:', error);
+    logger.error('LinkedIn API error:', error);
     return [];
   }
 }
@@ -223,7 +224,7 @@ async function fetchInstagramPosts(): Promise<SocialPost[]> {
       url: post.permalink,
     }));
   } catch (error) {
-    console.error('Instagram API error:', error);
+    logger.error('Instagram API error:', error);
     return [];
   }
 }
@@ -257,7 +258,7 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Social feeds error:', error);
+    logger.error('Social feeds error:', error);
     return NextResponse.json(
       { success: false, error: 'Failed to fetch social feeds' },
       { status: 500 }

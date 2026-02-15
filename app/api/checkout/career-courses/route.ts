@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
@@ -99,7 +100,7 @@ export async function POST(req: Request) {
             .update({ current_uses: (promo.current_uses || 0) + 1 })
             .eq('id', promo.id);
         } catch (e) {
-          console.error('Failed to create Stripe coupon:', e);
+          logger.error('Failed to create Stripe coupon:', e);
         }
       }
     }
@@ -126,7 +127,7 @@ export async function POST(req: Request) {
       url: session.url,
     });
   } catch (error: any) {
-    console.error('Checkout error:', error);
+    logger.error('Checkout error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to create checkout session' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: true });
 
     if (error) {
-      console.error('Error fetching messages:', error);
+      logger.error('Error fetching messages:', error);
       return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });
     }
 
@@ -58,7 +59,7 @@ export async function GET(request: NextRequest) {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching conversations:', error);
+    logger.error('Error fetching conversations:', error);
     return NextResponse.json({ error: 'Failed to fetch conversations' }, { status: 500 });
   }
 
@@ -142,7 +143,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    console.error('Error sending message:', error);
+    logger.error('Error sending message:', error);
     return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
   }
 

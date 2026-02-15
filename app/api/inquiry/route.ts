@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -43,7 +44,7 @@ export async function POST(req: Request) {
         created_at: new Date().toISOString(),
       });
     } catch (dbError) {
-      console.error('Failed to save inquiry to database:', dbError);
+      logger.error('Failed to save inquiry to database:', dbError);
       // Continue with email even if DB fails
     }
 
@@ -111,7 +112,7 @@ export async function POST(req: Request) {
       { status: 303 }
     );
   } catch (error) {
-    console.error('Inquiry error:', error);
+    logger.error('Inquiry error:', error);
     return NextResponse.json(
       { error: 'Failed to submit inquiry. Please call 317-314-3757.' },
       { status: 500 }

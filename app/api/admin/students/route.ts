@@ -55,7 +55,7 @@ export async function GET(request: Request) {
     const { data: students, error, count } = await query;
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     // Filter by enrollment status/program if needed
@@ -81,7 +81,7 @@ export async function GET(request: Request) {
       }
     });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     // Log audit
@@ -124,6 +124,6 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ student }, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { Redis } from '@upstash/redis';
@@ -40,7 +41,7 @@ export async function GET() {
       responseTime: Date.now() - startTime,
     });
   } catch (error) {
-    console.error('Monitoring status error:', error);
+    logger.error('Monitoring status error:', error);
     return NextResponse.json({
       overall: 'down',
       timestamp: new Date().toISOString(),

@@ -29,7 +29,7 @@ export async function GET() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ promoCodes });
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
       if (error.code === '23505') {
         return NextResponse.json({ error: 'Promo code already exists' }, { status: 400 });
       }
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ promoCode: data });
@@ -105,7 +105,7 @@ export async function PUT(req: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ promoCode: data });
@@ -134,7 +134,7 @@ export async function DELETE(req: Request) {
       .eq('id', id);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

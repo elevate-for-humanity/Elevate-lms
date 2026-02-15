@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (entryError) {
-      console.error('Error creating hour entry:', entryError);
+      logger.error('Error creating hour entry:', entryError);
       return NextResponse.json({ error: 'Failed to submit hours' }, { status: 500 });
     }
 
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Hours submission error:', error);
+    logger.error('Hours submission error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

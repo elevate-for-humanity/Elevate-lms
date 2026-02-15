@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * API client helper for consistent fetch calls
  * Use this in client components instead of direct fetch
@@ -97,7 +98,7 @@ export function withErrorHandling(
     try {
       return await handler(request);
     } catch (error: any) {
-      console.error('API Error:', error);
+      logger.error('API Error:', error);
       
       // Check if it's a structured API error
       if (error.status && error.error) {

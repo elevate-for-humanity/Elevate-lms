@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * CLOUDFLARE TURNSTILE VERIFICATION
  *
@@ -50,7 +51,7 @@ export async function verifyTurnstileToken(
     const data = await response.json();
 
     if (!data.success) {
-      console.error('❌ Turnstile verification failed:', data['error-codes']);
+      logger.error('❌ Turnstile verification failed:', data['error-codes']);
       return {
         success: false,
         error: 'Verification failed. Please try again.',
@@ -59,7 +60,7 @@ export async function verifyTurnstileToken(
 
     return { success: true };
   } catch (error) { /* Error handled silently */ 
-    console.error('❌ Turnstile verification error:', error);
+    logger.error('❌ Turnstile verification error:', error);
     return {
       success: false,
       error: 'Verification error. Please try again.',

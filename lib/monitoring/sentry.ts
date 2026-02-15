@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 // Sentry Error Monitoring Integration
 
 export const SENTRY_DSN = process.env.NEXT_PUBLIC_SENTRY_DSN || '';
@@ -10,7 +11,7 @@ export const initSentry = () => {
 
 export const captureException = (error: Error, context?: any) => {
   if (typeof window !== 'undefined') {
-    console.error('Error captured:', error, context);
+    logger.error('Error captured:', error, context);
     // Send to Sentry if configured
     if (SENTRY_DSN && window.Sentry) {
       window.Sentry.captureException(error, { extra: context });

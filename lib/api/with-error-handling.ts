@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { APIError } from './api-error';
 import { ErrorCode } from './error-codes';
@@ -19,7 +20,7 @@ async function logErrorToSentry(error: Error, context: Record<string, any>) {
       });
     } catch (error) {
       // Sentry not available, log to console
-      console.error('[Sentry Error]', error);
+      logger.error('[Sentry Error]', error);
     }
   }
 }
@@ -70,7 +71,7 @@ function logError(error: any, context: Record<string, any>) {
     } : String(error),
   };
 
-  console.error('[API Error]', JSON.stringify(errorInfo, null, 2));
+  logger.error('[API Error]', JSON.stringify(errorInfo, null, 2));
 
   // Log to Sentry
   if (error instanceof Error) {
@@ -95,7 +96,7 @@ export function withErrorHandling<T = any>(
       // Log successful requests in development
       if (process.env.NODE_ENV === 'development') {
         const duration = Date.now() - startTime;
-        console.log(`[API] ${method} ${route} - ${response.status} (${duration}ms)`);
+        logger.info(`[API] ${method} ${route} - ${response.status} (${duration}ms)`);
       }
       
       return response;
@@ -160,7 +161,7 @@ export function withErrorHandlingParams<T = any>(
       
       if (process.env.NODE_ENV === 'development') {
         const duration = Date.now() - startTime;
-        console.log(`[API] ${method} ${route} - ${response.status} (${duration}ms)`);
+        logger.info(`[API] ${method} ${route} - ${response.status} (${duration}ms)`);
       }
       
       return response;

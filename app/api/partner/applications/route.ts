@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -90,7 +91,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error('Failed to create partner application:', insertError);
+      logger.error('Failed to create partner application:', insertError);
       return NextResponse.json(
         { error: 'Failed to submit application' },
         { status: 500 }
@@ -134,7 +135,7 @@ export async function POST(request: NextRequest) {
         }),
       });
     } catch (emailError) {
-      console.warn('Failed to send confirmation email:', emailError);
+      logger.warn('Failed to send confirmation email:', emailError);
     }
 
     // Send notification to admin
@@ -174,7 +175,7 @@ export async function POST(request: NextRequest) {
         }),
       });
     } catch (emailError) {
-      console.warn('Failed to send admin notification:', emailError);
+      logger.warn('Failed to send admin notification:', emailError);
     }
 
     return NextResponse.json({
@@ -182,7 +183,7 @@ export async function POST(request: NextRequest) {
       applicationId: application.id,
     });
   } catch (error) {
-    console.error('Partner application error:', error);
+    logger.error('Partner application error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -230,12 +231,12 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ applications });
   } catch (error) {
-    console.error('Failed to fetch applications:', error);
+    logger.error('Failed to fetch applications:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

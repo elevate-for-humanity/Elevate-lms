@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Notification Service
  * 
@@ -59,7 +60,7 @@ export async function enqueueNotification(data: NotificationData): Promise<strin
   });
 
   if (error) {
-    console.error('Failed to enqueue notification:', error);
+    logger.error('Failed to enqueue notification:', error);
     return null;
   }
 
@@ -84,7 +85,7 @@ export async function generateToken(options: TokenOptions): Promise<string | nul
   });
 
   if (error) {
-    console.error('Failed to generate token:', error);
+    logger.error('Failed to generate token:', error);
     return null;
   }
 

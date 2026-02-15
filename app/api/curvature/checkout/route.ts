@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const maxDuration = 60;
 
@@ -137,7 +138,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: session.url, sessionId: session.id });
   } catch (error) {
-    console.error('Checkout error:', error);
+    logger.error('Checkout error:', error);
     return NextResponse.json(
       { error: 'Failed to create checkout session' },
       { status: 500 }

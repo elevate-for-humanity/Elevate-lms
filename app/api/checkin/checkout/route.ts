@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
       .eq('id', session.id);
 
     if (updateError) {
-      console.error('Error updating session:', updateError);
+      logger.error('Error updating session:', updateError);
       return NextResponse.json({ error: 'Failed to check out' }, { status: 500 });
     }
 
@@ -75,7 +76,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (entryError) {
-      console.error('Error creating hour entry:', entryError);
+      logger.error('Error creating hour entry:', entryError);
       // Don't fail checkout if entry creation fails
     }
 
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
       hoursLogged: hoursLogged,
     });
   } catch (error) {
-    console.error('Checkout error:', error);
+    logger.error('Checkout error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

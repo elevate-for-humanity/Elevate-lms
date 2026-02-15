@@ -57,7 +57,7 @@ export async function GET(req: Request) {
     .limit(100);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   return NextResponse.json({ jobs });
@@ -101,7 +101,7 @@ export async function POST(req: Request) {
       .eq('status', 'failed');
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, message: 'Job reset for retry' });
@@ -114,7 +114,7 @@ export async function POST(req: Request) {
     );
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, result: data });

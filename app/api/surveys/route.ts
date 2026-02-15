@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -24,13 +25,13 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Survey submission error:', error);
+      logger.error('Survey submission error:', error);
       return NextResponse.json({ error: 'Failed to submit survey' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, id: data?.id });
   } catch (err) {
-    console.error('Survey API error:', err);
+    logger.error('Survey API error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

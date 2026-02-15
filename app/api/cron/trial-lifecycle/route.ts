@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
@@ -157,7 +158,7 @@ export async function GET(request: Request) {
       }
     }
 
-    console.log('[cron/trial-lifecycle]', JSON.stringify(results));
+    logger.info('[cron/trial-lifecycle]', JSON.stringify(results));
 
     return NextResponse.json({
       ok: true,
@@ -165,7 +166,7 @@ export async function GET(request: Request) {
       ...results,
     });
   } catch (error) {
-    console.error('[cron/trial-lifecycle] Unexpected error:', error);
+    logger.error('[cron/trial-lifecycle] Unexpected error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Error logging OJT hours:', error);
+      logger.error('Error logging OJT hours:', error);
       return NextResponse.json({ error: 'Failed to log hours' }, { status: 500 });
     }
 
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('OJT hours logging error:', error);
+    logger.error('OJT hours logging error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -118,7 +119,7 @@ export async function GET(request: NextRequest) {
     const { data: logs, error } = await query.limit(100);
 
     if (error) {
-      console.error('Error fetching OJT hours:', error);
+      logger.error('Error fetching OJT hours:', error);
       return NextResponse.json({ error: 'Failed to fetch hours' }, { status: 500 });
     }
 
@@ -138,7 +139,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('OJT hours fetch error:', error);
+    logger.error('OJT hours fetch error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

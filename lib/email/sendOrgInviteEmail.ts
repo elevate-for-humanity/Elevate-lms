@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Resend } from 'resend';
 
 const resend = process.env.RESEND_API_KEY
@@ -50,7 +51,7 @@ If you did not expect this invitation, you can safely ignore this email.
     return { success: true };
   } catch (error) { /* Error handled silently */ 
     const message = error instanceof Error ? error.message : String(error);
-    console.error('Failed to send org invite email:', message);
+    logger.error('Failed to send org invite email:', message);
     return { success: false, error: message };
   }
 }

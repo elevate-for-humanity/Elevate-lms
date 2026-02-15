@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import OpenAI from 'openai';
@@ -62,7 +63,7 @@ Be concise and direct. Provide working code.`;
       usage: response.usage,
     });
   } catch (error) {
-    console.error('AI Chat error:', error);
+    logger.error('AI Chat error:', error);
     return NextResponse.json(
       { error: 'Failed to get AI response' },
       { status: 500 }

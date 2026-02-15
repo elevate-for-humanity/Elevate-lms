@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
       status: 'pending',
     });
   } catch (error) {
-    console.error('Deploy error:', error);
+    logger.error('Deploy error:', error);
     return NextResponse.json(
       { error: 'Deployment failed', message: String(error) },
       { status: 500 }
@@ -134,7 +135,7 @@ export async function GET(req: NextRequest) {
       url,
     });
   } catch (error) {
-    console.error('Deploy status error:', error);
+    logger.error('Deploy status error:', error);
     return NextResponse.json(
       { error: 'Failed to get deployment status' },
       { status: 500 }
@@ -173,7 +174,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(data || []);
   } catch (error) {
-    console.error('List deployments error:', error);
+    logger.error('List deployments error:', error);
     return NextResponse.json(
       { error: 'Failed to list deployments' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Workforce Referral API
  * 
@@ -62,7 +63,7 @@ export async function GET(request: NextRequest) {
   const { data, error } = await query.order('created_at', { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   return NextResponse.json({ referrals: data });
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
     .single();
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   return NextResponse.json({ 
@@ -245,7 +246,7 @@ export async function PATCH(request: NextRequest) {
             })
           });
         } catch (emailError) {
-          console.error('Failed to send status email:', emailError);
+          logger.error('Failed to send status email:', emailError);
         }
       }
       break;
@@ -260,7 +261,7 @@ export async function PATCH(request: NextRequest) {
     .eq('id', referralId);
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   return NextResponse.json({ success: true, message: `Action '${action}' completed` });
@@ -315,7 +316,7 @@ export async function PUT(request: NextRequest) {
         })
       });
     } catch (emailError) {
-      console.error('Failed to send email to:', referral.case_manager_email, emailError);
+      logger.error('Failed to send email to:', referral.case_manager_email, emailError);
     }
     
     await supabase

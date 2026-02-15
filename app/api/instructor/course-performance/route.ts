@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -55,7 +56,7 @@ export async function GET() {
     
     return NextResponse.json({ courses });
   } catch (error) {
-    console.error('Course performance error:', error);
+    logger.error('Course performance error:', error);
     return NextResponse.json({ courses: [] }, { status: 500 });
   }
 }

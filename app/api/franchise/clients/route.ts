@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { clientService } from '@/lib/franchise/client-service';
@@ -68,7 +69,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error listing clients:', error);
+    logger.error('Error listing clients:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to list clients' },
       { status: 500 }
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(client, { status: 201 });
   } catch (error) {
-    console.error('Error creating client:', error);
+    logger.error('Error creating client:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to create client' },
       { status: 500 }

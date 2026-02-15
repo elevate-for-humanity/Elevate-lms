@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { NextResponse } from 'next/server';
 
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
     }]);
 
   if (error) {
-    console.error('[Intake API]', error.message);
+    logger.error('[Intake API]', error.message);
     return NextResponse.json({ error: 'Failed to save' }, { status: 500 });
   }
 

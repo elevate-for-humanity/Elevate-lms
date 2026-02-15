@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 // Performance monitoring utilities
 export function measurePageLoad() {
   if (typeof window === 'undefined') return;
@@ -92,12 +93,12 @@ export function trackAPIPerformance(endpoint: string, duration: number) {
   }
   // Log slow API calls
   if (duration > 1000 && process.env.NODE_ENV === 'development') {
-    console.warn(`Slow API call: ${endpoint} took ${duration}ms`);
+    logger.warn(`Slow API call: ${endpoint} took ${duration}ms`);
   }
 }
 export function trackComponentRender(componentName: string, duration: number) {
   if (process.env.NODE_ENV === 'development' && duration > 100) {
-    console.warn(`Slow component render: ${componentName} took ${duration}ms`);
+    logger.warn(`Slow component render: ${componentName} took ${duration}ms`);
   }
 }
 // Resource timing
@@ -108,7 +109,7 @@ export function analyzeResourceTiming() {
   ) as PerformanceResourceTiming[];
   const slowResources = resources.filter((r) => r.duration > 1000);
   if (slowResources.length > 0 && process.env.NODE_ENV === 'development') {
-    console.log(
+    logger.info(
       'Slow resources:',
       slowResources.map((r) => ({
         name: r.name,

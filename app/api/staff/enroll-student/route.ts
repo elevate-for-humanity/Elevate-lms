@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { enqueueNotification, buildTokenUrl } from '@/lib/notifications';
@@ -104,7 +105,7 @@ export async function POST(request: NextRequest) {
         .single();
 
       if (profileError) {
-        console.error('Profile creation error:', profileError);
+        logger.error('Profile creation error:', profileError);
         return NextResponse.json(
           { error: 'Failed to create student profile' },
           { status: 500 }
@@ -166,7 +167,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (enrollmentError) {
-      console.error('Enrollment creation error:', enrollmentError);
+      logger.error('Enrollment creation error:', enrollmentError);
       return NextResponse.json(
         { error: 'Failed to create enrollment' },
         { status: 500 }
@@ -232,7 +233,7 @@ export async function POST(request: NextRequest) {
       message: `Student enrolled successfully. Welcome email with Milady access sent to ${email}`,
     });
   } catch (error: any) {
-    console.error('Staff enrollment error:', error);
+    logger.error('Staff enrollment error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to enroll student' },
       { status: 500 }

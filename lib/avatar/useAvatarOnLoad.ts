@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 'use client';
 
 import { useEffect, useRef } from 'react';
@@ -32,14 +33,14 @@ export function useAvatarOnLoad(pageId: string | undefined) {
       
       // Warn if enabled but no message
       if (config.enabled && config.speakOnLoad && !config.message) {
-        console.warn(
+        logger.warn(
           `[AvatarEngine] Avatar enabled but no message for: ${pageId}`
         );
       }
       
       // Warn if disabled without being explicitly silent
       if (!config.enabled && config.message) {
-        console.warn(
+        logger.warn(
           `[AvatarEngine] Avatar has message but is disabled: ${pageId}`
         );
       }
@@ -48,7 +49,7 @@ export function useAvatarOnLoad(pageId: string | undefined) {
       const marketingPatterns = ['/about', '/contact', '/careers', '/funding', '/testimonials'];
       const isMarketingPage = marketingPatterns.some(p => pageId.startsWith(p));
       if (isMarketingPage && !config.enabled) {
-        console.warn(
+        logger.warn(
           `[AvatarEngine] Marketing page without avatar config: ${pageId}`
         );
       }

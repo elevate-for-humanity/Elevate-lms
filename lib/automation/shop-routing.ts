@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Shop Routing Engine
  * Matches apprentices to shops based on location, capacity, specialties, and preferences
@@ -350,7 +351,7 @@ export async function getRoutingRecommendations(
       review_queue_id: reviewQueueId,
     };
   } catch (error) {
-    console.error('Routing error:', error);
+    logger.error('Routing error:', error);
     return {
       success: false,
       recommendations: [],

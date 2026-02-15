@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 
 export interface ProgramHolderStudent {
@@ -23,7 +24,7 @@ export async function assignProgramToHolder(
   });
 
   if (error) {
-    console.error('Error assigning program to holder:', error);
+    logger.error('Error assigning program to holder:', error);
     return null;
   }
 
@@ -40,7 +41,7 @@ export async function getProgramHolderStudents(
   });
 
   if (error) {
-    console.error('Error fetching program holder students:', error);
+    logger.error('Error fetching program holder students:', error);
     return [];
   }
 
@@ -56,7 +57,7 @@ export async function getProgramHolderPrograms(holderId: string) {
     .eq('program_holder_id', holderId);
 
   if (error) {
-    console.error('Error fetching program holder programs:', error);
+    logger.error('Error fetching program holder programs:', error);
     return [];
   }
 

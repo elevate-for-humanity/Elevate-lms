@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { Redis } from '@upstash/redis';
@@ -53,7 +54,7 @@ export async function GET() {
           keys: keys.slice(0, 100), // Limit to 100 keys
         };
       } catch (error) {
-        console.error('Failed to get Upstash stats:', error);
+        logger.error('Failed to get Upstash stats:', error);
       }
     }
 
@@ -68,7 +69,7 @@ export async function GET() {
       upstashStats,
     });
   } catch (error) {
-    console.error('Rate limit monitoring error:', error);
+    logger.error('Rate limit monitoring error:', error);
     return NextResponse.json({
       error: error instanceof Error ? error.message : 'Unknown error',
     }, { status: 500 });

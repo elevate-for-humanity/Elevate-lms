@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -97,7 +98,7 @@ export async function GET(request: NextRequest) {
       provisionedAt: access.provisioned_at,
     });
   } catch (error) {
-    console.error('[Milady Access API] Error:', error);
+    logger.error('[Milady Access API] Error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -154,7 +155,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('[Milady Access API] Provision error:', error);
+    logger.error('[Milady Access API] Provision error:', error);
     return NextResponse.json(
       { error: 'Failed to provision access' },
       { status: 500 }

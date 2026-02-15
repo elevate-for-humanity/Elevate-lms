@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -86,7 +87,7 @@ Only include files that need changes.`;
       usage: response.usage,
     });
   } catch (error) {
-    console.error('Refactor error:', error);
+    logger.error('Refactor error:', error);
     return NextResponse.json(
       { error: 'Failed to refactor' },
       { status: 500 }

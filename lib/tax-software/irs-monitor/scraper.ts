@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * IRS Website Scraper
  * Monitors IRS.gov for tax parameter changes
@@ -135,7 +136,7 @@ export class IRSScraper {
       });
       
       if (!response.ok) {
-        console.error(`Failed to fetch ${url}: ${response.status}`);
+        logger.error(`Failed to fetch ${url}: ${response.status}`);
         return null;
       }
       
@@ -155,7 +156,7 @@ export class IRSScraper {
         lastModified
       };
     } catch (error) {
-      console.error(`Error fetching ${url}:`, error);
+      logger.error(`Error fetching ${url}:`, error);
       return null;
     }
   }
@@ -210,7 +211,7 @@ export class IRSScraper {
     const results: ChangeDetection[] = [];
     
     for (const sourceKey of Object.keys(IRS_SOURCES)) {
-      console.log(`Checking ${sourceKey}...`);
+      logger.info(`Checking ${sourceKey}...`);
       const result = await this.checkSource(sourceKey);
       results.push(result);
       

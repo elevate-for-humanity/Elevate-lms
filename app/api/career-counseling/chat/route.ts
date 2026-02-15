@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * AI Career Counseling Chat API
  * 
@@ -123,7 +124,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Career counseling error:', error);
+    logger.error('Career counseling error:', error);
     return NextResponse.json({
       success: true,
       message: "I'm here to help with your career planning. What skills or interests would you like to explore?",

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Sezzle BNPL Integration - V2 API
  * 
@@ -430,6 +431,6 @@ if (process.env.SEZZLE_PUBLIC_KEY && process.env.SEZZLE_PRIVATE_KEY) {
     const missing = [];
     if (!process.env.SEZZLE_PUBLIC_KEY) missing.push('SEZZLE_PUBLIC_KEY');
     if (!process.env.SEZZLE_PRIVATE_KEY) missing.push('SEZZLE_PRIVATE_KEY');
-    console.warn(`[Sezzle] Not configured - missing env vars: ${missing.join(', ')}`);
+    logger.warn(`[Sezzle] Not configured - missing env vars: ${missing.join(', ')}`);
   }
 }

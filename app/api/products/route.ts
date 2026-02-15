@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getProducts, getCategories } from '@/lib/store/db';
 
@@ -24,7 +25,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('Products API error:', error);
+    logger.error('Products API error:', error);
     return NextResponse.json({ 
       products: [], 
       categories: [],

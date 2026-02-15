@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Milady Course Purchase & Student Provisioning
  * 
@@ -87,7 +88,7 @@ export async function purchaseMiladyCourse(
     return await queueManualPurchase(supabase, student, programSlug, cost);
 
   } catch (error: any) {
-    console.error('[Milady Purchase] Error:', error);
+    logger.error('[Milady Purchase] Error:', error);
     
     // Record failed attempt
     await supabase.from('vendor_payments').insert({

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
     const { data: posts, error, count } = await query;
     
     if (error) {
-      console.error('Blog fetch error:', error);
+      logger.error('Blog fetch error:', error);
       return NextResponse.json({ error: 'Failed to fetch posts' }, { status: 500 });
     }
     
@@ -38,7 +39,7 @@ export async function GET(request: NextRequest) {
       hasMore: (offset + limit) < (count || 0),
     });
   } catch (error) {
-    console.error('Blog API error:', error);
+    logger.error('Blog API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -102,13 +103,13 @@ export async function POST(request: NextRequest) {
       .single();
     
     if (error) {
-      console.error('Blog create error:', error);
+      logger.error('Blog create error:', error);
       return NextResponse.json({ error: 'Failed to create post' }, { status: 500 });
     }
     
     return NextResponse.json({ success: true, post });
   } catch (error) {
-    console.error('Blog POST error:', error);
+    logger.error('Blog POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

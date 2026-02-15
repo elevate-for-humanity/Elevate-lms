@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { withAuth } from '@/lib/with-auth';
 import { createClient } from '@supabase/supabase-js';
@@ -63,7 +64,7 @@ export const GET = withAuth(
       const { data: events, error } = await query;
 
       if (error) {
-        console.error('[admin/trial-events] Query error:', error);
+        logger.error('[admin/trial-events] Query error:', error);
         return NextResponse.json({ error: 'Failed to query events' }, { status: 500 });
       }
 
@@ -93,7 +94,7 @@ export const GET = withAuth(
 
       return NextResponse.json({ summary, setup_warnings, events });
     } catch (error) {
-      console.error('[admin/trial-events] Unexpected error:', error);
+      logger.error('[admin/trial-events] Unexpected error:', error);
       return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
   },

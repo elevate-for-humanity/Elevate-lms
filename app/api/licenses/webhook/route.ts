@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
-    console.error('[/api/licenses/webhook] Signature verification failed:', err);
+    logger.error('[/api/licenses/webhook] Signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -42,42 +43,42 @@ export async function POST(request: NextRequest) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session;
         const result = await handleCheckoutCompleted(event, session);
-        console.log(`[/api/licenses/webhook] checkout.session.completed:`, result);
+        logger.info(`[/api/licenses/webhook] checkout.session.completed:`, result);
         break;
       }
 
       case 'customer.subscription.updated': {
         const subscription = event.data.object as Stripe.Subscription;
         const result = await handleSubscriptionUpdated(event, subscription);
-        console.log(`[/api/licenses/webhook] subscription.updated:`, result);
+        logger.info(`[/api/licenses/webhook] subscription.updated:`, result);
         break;
       }
 
       case 'customer.subscription.deleted': {
         const subscription = event.data.object as Stripe.Subscription;
         const result = await handleSubscriptionDeleted(event, subscription);
-        console.log(`[/api/licenses/webhook] subscription.deleted:`, result);
+        logger.info(`[/api/licenses/webhook] subscription.deleted:`, result);
         break;
       }
 
       case 'invoice.paid': {
         const invoice = event.data.object as Stripe.Invoice;
         const result = await handleInvoicePaid(event, invoice);
-        console.log(`[/api/licenses/webhook] invoice.paid:`, result);
+        logger.info(`[/api/licenses/webhook] invoice.paid:`, result);
         break;
       }
 
       case 'invoice.payment_failed': {
         const invoice = event.data.object as Stripe.Invoice;
         const result = await handlePaymentFailed(event, invoice);
-        console.log(`[/api/licenses/webhook] invoice.payment_failed:`, result);
+        logger.info(`[/api/licenses/webhook] invoice.payment_failed:`, result);
         break;
       }
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('[/api/licenses/webhook] Processing error:', error);
+    logger.error('[/api/licenses/webhook] Processing error:', error);
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 }

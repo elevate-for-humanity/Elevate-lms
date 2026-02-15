@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
@@ -158,7 +159,7 @@ export async function POST(request: NextRequest) {
       message: 'Payment intent created',
     });
   } catch (error: any) {
-    console.error('License purchase error:', error);
+    logger.error('License purchase error:', error);
     return NextResponse.json(
       { error: error.message || 'Internal server error' },
       { status: 500 }
@@ -195,12 +196,12 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, licenses });
   } catch (error) {
-    console.error('Get licenses error:', error);
+    logger.error('Get licenses error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

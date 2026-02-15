@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -51,7 +52,7 @@ export async function POST(req: Request) {
     if (documents && Array.isArray(documents)) {
       // Could store in enrollment_documents table
       // For now, just log
-      console.log('Documents submitted:', documents);
+      logger.info('Documents submitted:', documents);
     }
 
     // Advance state to documents_complete, then immediately to active
@@ -66,7 +67,7 @@ export async function POST(req: Request) {
       .eq('id', enrollment_id);
 
     if (updateError) {
-      console.error('Failed to update enrollment:', updateError);
+      logger.error('Failed to update enrollment:', updateError);
       return NextResponse.json({ error: 'Failed to complete documents' }, { status: 500 });
     }
 
@@ -76,7 +77,7 @@ export async function POST(req: Request) {
       redirect: '/dashboard',
     });
   } catch (err) {
-    console.error('Documents complete error:', err);
+    logger.error('Documents complete error:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

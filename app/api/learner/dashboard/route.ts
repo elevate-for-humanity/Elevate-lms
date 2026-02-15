@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -226,7 +227,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(dashboard);
 
   } catch (error) {
-    console.error('[Learner Dashboard] Error:', error);
+    logger.error('[Learner Dashboard] Error:', error);
     return NextResponse.json({ error: 'Failed to fetch dashboard data' }, { status: 500 });
   }
 }

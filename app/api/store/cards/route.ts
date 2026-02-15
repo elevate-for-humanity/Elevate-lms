@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { getStoreCards } from '@/lib/store/db';
 
@@ -6,7 +7,7 @@ export async function GET() {
     const cards = await getStoreCards();
     return NextResponse.json(cards);
   } catch (error) {
-    console.error('Store cards API error:', error);
+    logger.error('Store cards API error:', error);
     return NextResponse.json({ 
       primary: [], 
       secondary: [],

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
@@ -101,7 +102,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error('Enrollment payment error:', error);
+    logger.error('Enrollment payment error:', error);
     return NextResponse.json(
       { error: toErrorMessage(error) || 'Payment processing failed' },
       { status: 500 }

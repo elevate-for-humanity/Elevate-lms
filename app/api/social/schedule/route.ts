@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
 
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
       .single();
     
     if (error) {
-      console.error('Social post create error:', error);
+      logger.error('Social post create error:', error);
       return NextResponse.json({ error: 'Failed to schedule post' }, { status: 500 });
     }
     

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Canonical enrollment service.
  * Single write path to program_enrollments.
@@ -75,7 +76,7 @@ export async function createOrUpdateEnrollment(
 
     if (existing?.status === 'ACTIVE' || existing?.status === 'COMPLETED') {
       // Already active/completed — don't downgrade, just return
-      console.log(`[enrollment-service] Already ${existing.status}: ${programSlug} for ${studentId}`);
+      logger.info(`[enrollment-service] Already ${existing.status}: ${programSlug} for ${studentId}`);
       return { id: existing.id, action: 'already_active' };
     }
 
@@ -106,16 +107,16 @@ export async function createOrUpdateEnrollment(
       .single();
 
     if (error) {
-      console.error('[enrollment-service] Upsert failed:', error);
+      logger.error('[enrollment-service] Upsert failed:', error);
       return { id: '', action: 'created', error: error.message };
     }
 
     const action = existing ? 'updated' : 'created';
-    console.log(`[enrollment-service] ${action}: ${enrollment.id} (${programSlug} for ${studentId})`);
+    logger.info(`[enrollment-service] ${action}: ${enrollment.id} (${programSlug} for ${studentId})`);
     return { id: enrollment.id, action };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.error('[enrollment-service] Unexpected error:', message);
+    logger.error('[enrollment-service] Unexpected error:', message);
     return { id: '', action: 'created', error: message };
   }
 }

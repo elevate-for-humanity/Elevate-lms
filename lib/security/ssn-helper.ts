@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * SSN Security Helper
  * Handles secure SSN operations for tax filing
@@ -8,7 +9,7 @@ import crypto from 'crypto';
 // Encryption key MUST come from environment — random fallback would cause data loss on serverless cold starts
 const ENCRYPTION_KEY = process.env.SSN_ENCRYPTION_KEY;
 if (!ENCRYPTION_KEY && typeof window === 'undefined') {
-  console.error('[SECURITY] SSN_ENCRYPTION_KEY is not set. SSN encrypt/decrypt operations will fail.');
+  logger.error('[SECURITY] SSN_ENCRYPTION_KEY is not set. SSN encrypt/decrypt operations will fail.');
 }
 const IV_LENGTH = 16;
 

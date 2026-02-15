@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -50,7 +51,7 @@ export async function POST(req: Request) {
     const referer = req.headers.get('referer') || '/store/cart';
     return NextResponse.redirect(referer, 303);
   } catch (error) {
-    console.error('Cart add error:', error);
+    logger.error('Cart add error:', error);
     return NextResponse.json({ error: 'Failed to add to cart' }, { status: 500 });
   }
 }

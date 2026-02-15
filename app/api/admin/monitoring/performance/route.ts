@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -45,7 +46,7 @@ export async function GET() {
       metrics,
     });
   } catch (error) {
-    console.error('Performance monitoring error:', error);
+    logger.error('Performance monitoring error:', error);
     return NextResponse.json({
       error: error instanceof Error ? error.message : 'Unknown error',
     }, { status: 500 });

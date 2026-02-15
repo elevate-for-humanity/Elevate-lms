@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -69,7 +70,7 @@ export async function POST(
       .single();
 
     if (progressError) {
-      console.error('Lesson completion error:', progressError);
+      logger.error('Lesson completion error:', progressError);
       return NextResponse.json(
         { error: 'Failed to mark lesson complete' },
         { status: 500 }
@@ -160,7 +161,7 @@ export async function POST(
       certificate,
     });
   } catch (error) {
-    console.error('Lesson complete API error:', error);
+    logger.error('Lesson complete API error:', error);
     return NextResponse.json(
       { error: 'Failed to complete lesson' },
       { status: 500 }
@@ -251,7 +252,7 @@ export async function DELETE(
       completed: false,
     });
   } catch (error) {
-    console.error('Lesson uncomplete API error:', error);
+    logger.error('Lesson uncomplete API error:', error);
     return NextResponse.json(
       { error: 'Failed to uncomplete lesson' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (dbError) {
-      console.error('Database error:', dbError);
+      logger.error('Database error:', dbError);
       // Continue even if DB fails - we'll send email notification
     }
 
@@ -92,13 +93,13 @@ This request was submitted via the Platform Licensing page.
           }),
         });
       } catch (emailError) {
-        console.error('Email error:', emailError);
+        logger.error('Email error:', emailError);
       }
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('License request error:', error);
+    logger.error('License request error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

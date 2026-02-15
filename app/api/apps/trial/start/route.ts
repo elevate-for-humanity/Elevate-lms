@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Error creating trial:', error);
+      logger.error('Error creating trial:', error);
       return NextResponse.json({ error: 'Failed to create trial' }, { status: 500 });
     }
 
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Trial start error:', error);
+    logger.error('Trial start error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

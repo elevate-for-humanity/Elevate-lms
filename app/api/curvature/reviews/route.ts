@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -13,13 +14,13 @@ export async function GET() {
       .limit(20);
 
     if (error) {
-      console.error('Failed to fetch curvature reviews:', error);
+      logger.error('Failed to fetch curvature reviews:', error);
       return NextResponse.json({ reviews: [] });
     }
 
     return NextResponse.json({ reviews: reviews || [] });
   } catch (error) {
-    console.error('Error fetching curvature reviews:', error);
+    logger.error('Error fetching curvature reviews:', error);
     return NextResponse.json({ reviews: [] });
   }
 }

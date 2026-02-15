@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import * as cheerio from 'cheerio';
@@ -77,7 +78,7 @@ export async function POST(request: NextRequest) {
       previewUrl: `/preview/${previewId}`,
     });
   } catch (error) {
-    console.error('Import error:', error);
+    logger.error('Import error:', error);
     return NextResponse.json(
       { error: 'Failed to import site' },
       { status: 500 }

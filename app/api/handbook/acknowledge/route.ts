@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -31,13 +32,13 @@ export async function POST(request: NextRequest) {
       });
 
     if (error) {
-      console.error('Error recording acknowledgment:', error);
+      logger.error('Error recording acknowledgment:', error);
       return NextResponse.redirect(new URL('/student-handbook?error=failed', request.url));
     }
 
     return NextResponse.redirect(new URL('/student-handbook?success=acknowledged', request.url));
   } catch (error) {
-    console.error('Handbook acknowledge error:', error);
+    logger.error('Handbook acknowledge error:', error);
     return NextResponse.redirect(new URL('/student-handbook?error=server_error', request.url));
   }
 }

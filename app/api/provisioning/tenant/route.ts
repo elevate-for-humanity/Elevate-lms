@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { createClient as createServerClient } from '@/lib/supabase/server';
@@ -35,7 +36,7 @@ async function verifyAdminAuth(request: NextRequest): Promise<{ isAdmin: boolean
 async function sendWelcomeEmail(email: string, orgName: string, subdomain: string, dashboardUrl: string) {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) {
-    console.warn('RESEND_API_KEY not configured, skipping welcome email');
+    logger.warn('RESEND_API_KEY not configured, skipping welcome email');
     return;
   }
   
@@ -153,7 +154,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (orgError) {
-      console.error('Org creation error:', orgError);
+      logger.error('Org creation error:', orgError);
       return NextResponse.json(
         { error: 'Failed to create organization' },
         { status: 500 }
@@ -179,7 +180,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (licenseError) {
-      console.error('License creation error:', licenseError);
+      logger.error('License creation error:', licenseError);
       // Rollback org creation
       await supabase.from('organizations').delete().eq('id', org.id);
       return NextResponse.json(
@@ -209,7 +210,7 @@ export async function POST(request: NextRequest) {
         `https://${tenantSubdomain}.elevatelms.com/admin`
       );
     } catch (emailError) {
-      console.error('Failed to send welcome email:', emailError);
+      logger.error('Failed to send welcome email:', emailError);
       // Don't fail provisioning if email fails
     }
 
@@ -233,7 +234,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Provisioning error:', error);
+    logger.error('Provisioning error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

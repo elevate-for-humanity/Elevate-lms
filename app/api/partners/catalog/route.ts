@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { sanitizeSearchInput } from '@/lib/utils';
@@ -80,7 +81,7 @@ export async function GET(request: NextRequest) {
     const { data: courses, error, count } = await query;
 
     if (error) {
-      console.error('Catalog query error:', error);
+      logger.error('Catalog query error:', error);
       return NextResponse.json({ error: 'Failed to fetch catalog' }, { status: 500 });
     }
 
@@ -110,7 +111,7 @@ export async function GET(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Catalog API error:', error);
+    logger.error('Catalog API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -187,7 +188,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error('Course insert error:', insertError);
+      logger.error('Course insert error:', insertError);
       return NextResponse.json({ error: 'Failed to create course' }, { status: 500 });
     }
 
@@ -207,7 +208,7 @@ export async function POST(request: NextRequest) {
       message: 'Course added to catalog successfully',
     }, { status: 201 });
   } catch (error) {
-    console.error('Catalog POST error:', error);
+    logger.error('Catalog POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

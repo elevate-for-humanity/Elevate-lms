@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { preparerService } from '@/lib/franchise/preparer-service';
@@ -48,7 +49,7 @@ export async function GET(
 
     return NextResponse.json(preparer);
   } catch (error) {
-    console.error('Error getting preparer:', error);
+    logger.error('Error getting preparer:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to get preparer' },
       { status: 500 }
@@ -121,7 +122,7 @@ export async function PATCH(
     const updated = await preparerService.updatePreparer(preparerId, body, user.id);
     return NextResponse.json(updated);
   } catch (error) {
-    console.error('Error updating preparer:', error);
+    logger.error('Error updating preparer:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to update preparer' },
       { status: 500 }
@@ -176,7 +177,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting preparer:', error);
+    logger.error('Error deleting preparer:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to delete preparer' },
       { status: 500 }

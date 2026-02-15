@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { validateTaxReturn, validateSSN, validateEIN, validateRoutingNumber } from '@/lib/tax-software/validation/irs-rules';
 import { TaxReturn } from '@/lib/tax-software/types';
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
       warningCount: validation.warnings.length
     });
   } catch (error) {
-    console.error('Validation error:', error);
+    logger.error('Validation error:', error);
     return NextResponse.json(
       { valid: false, error: 'Validation failed' },
       { status: 500 }

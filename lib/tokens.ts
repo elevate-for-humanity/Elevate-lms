@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Token Link System
  * 
@@ -69,7 +70,7 @@ export async function createAccessToken(params: {
     .single();
 
   if (error) {
-    console.error('Error creating access token:', error);
+    logger.error('Error creating access token:', error);
     return null;
   }
 

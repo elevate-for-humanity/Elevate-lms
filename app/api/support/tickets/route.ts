@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient, createAdminClient } from '@/lib/supabase/server';
@@ -55,13 +56,13 @@ export async function GET(request: NextRequest) {
     const { data: tickets, error } = await query.limit(50);
     
     if (error) {
-      console.error('Tickets fetch error:', error);
+      logger.error('Tickets fetch error:', error);
       return NextResponse.json({ error: 'Failed to fetch tickets' }, { status: 500 });
     }
     
     return NextResponse.json({ tickets: tickets || [] });
   } catch (error) {
-    console.error('Support API error:', error);
+    logger.error('Support API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -98,7 +99,7 @@ export async function POST(request: NextRequest) {
       .single();
     
     if (error) {
-      console.error('Ticket create error:', error);
+      logger.error('Ticket create error:', error);
       return NextResponse.json({ error: 'Failed to create ticket' }, { status: 500 });
     }
     
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: error.errors[0].message }, { status: 400 });
     }
-    console.error('Support POST error:', error);
+    logger.error('Support POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

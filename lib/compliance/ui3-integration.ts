@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * UI-3 Wage Matching Integration
  *
@@ -50,7 +51,7 @@ export async function submitUI3Request(
   // 3. Receive request ID
   // 4. Poll for results
 
-  console.log('Submitting UI-3 wage match request:', {
+  logger.info('Submitting UI-3 wage match request:', {
     student_count: students.length,
     timestamp: new Date().toISOString(),
   });
@@ -196,7 +197,7 @@ export async function scheduleUI3Matching() {
     .lte('completion_date', twelveMonthsAgo.toISOString())
     .is('verified_4th_quarter', null);
 
-  console.log('Automated UI-3 verification check:', {
+  logger.info('Automated UI-3 verification check:', {
     students_2nd_quarter: students2nd?.length || 0,
     students_4th_quarter: students4th?.length || 0,
   });

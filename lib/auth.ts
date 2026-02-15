@@ -30,7 +30,7 @@ export async function createServerSupabaseClient() {
   
   if (!supabaseUrl || !supabaseAnonKey) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[Auth] Missing Supabase env vars. Auth features disabled.');
+      logger.warn('[Auth] Missing Supabase env vars. Auth features disabled.');
     }
     return null;
   }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * AI Assistant Chat API
  * 
@@ -104,7 +105,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('AI Assistant error:', error);
+    logger.error('AI Assistant error:', error);
     
     // Fallback response if AI fails
     return NextResponse.json({

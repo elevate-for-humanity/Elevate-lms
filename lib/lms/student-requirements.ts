@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 
 export interface StudentRequirement {
@@ -45,7 +46,7 @@ export async function getStudentRequirements(enrollmentId: string): Promise<Stud
     .order('due_date', { ascending: true });
 
   if (error) {
-    console.error('Error fetching student requirements:', error);
+    logger.error('Error fetching student requirements:', error);
     return [];
   }
 
@@ -65,7 +66,7 @@ export async function getStudentRiskStatus(enrollmentId: string): Promise<RiskSt
     .single();
 
   if (error) {
-    console.error('Error fetching risk status:', error);
+    logger.error('Error fetching risk status:', error);
     return null;
   }
 
@@ -97,7 +98,7 @@ export async function updateRequirementStatus(
     .eq('id', requirementId);
 
   if (error) {
-    console.error('Error updating requirement:', error);
+    logger.error('Error updating requirement:', error);
     return false;
   }
 
@@ -132,7 +133,7 @@ export async function verifyRequirement(
     .eq('id', requirementId);
 
   if (error) {
-    console.error('Error verifying requirement:', error);
+    logger.error('Error verifying requirement:', error);
     return false;
   }
 
@@ -177,7 +178,7 @@ export async function createRequirement(
     .single();
 
   if (error) {
-    console.error('Error creating requirement:', error);
+    logger.error('Error creating requirement:', error);
     return null;
   }
 
@@ -199,7 +200,7 @@ export async function getOverdueRequirements(enrollmentId: string): Promise<Stud
     .order('due_date', { ascending: true });
 
   if (error) {
-    console.error('Error fetching overdue requirements:', error);
+    logger.error('Error fetching overdue requirements:', error);
     return [];
   }
 
@@ -230,7 +231,7 @@ export async function getPendingVerifications(programIds: string[]): Promise<Stu
     .order('updated_at', { ascending: true });
 
   if (error) {
-    console.error('Error fetching pending verifications:', error);
+    logger.error('Error fetching pending verifications:', error);
     return [];
   }
 

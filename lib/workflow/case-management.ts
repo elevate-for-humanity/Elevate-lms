@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
 
@@ -79,7 +80,7 @@ export async function createEnrollmentCase(params: CreateCaseParams): Promise<En
     .single();
 
   if (error) {
-    console.error('[createEnrollmentCase] Error:', error);
+    logger.error('[createEnrollmentCase] Error:', error);
     return null;
   }
 
@@ -153,7 +154,7 @@ export async function addSignature(params: SignatureParams): Promise<{ success: 
     .single();
 
   if (error) {
-    console.error('[addSignature] Error:', error);
+    logger.error('[addSignature] Error:', error);
     return { success: false, completeness: { complete: false, required: [], completed: [], missing: [] } };
   }
 
@@ -204,7 +205,7 @@ export async function transitionCaseStatus(caseId: string, newStatus: CaseStatus
     .eq('id', caseId);
 
   if (error) {
-    console.error('[transitionCaseStatus] Error:', error);
+    logger.error('[transitionCaseStatus] Error:', error);
     return false;
   }
 
@@ -261,7 +262,7 @@ export async function completeTask(taskId: string, completedBy: string, evidence
     .single();
 
   if (error) {
-    console.error('[completeTask] Error:', error);
+    logger.error('[completeTask] Error:', error);
     return false;
   }
 

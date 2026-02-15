@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -66,7 +67,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (enrollError) {
-      console.error('Enrollment error:', enrollError);
+      logger.error('Enrollment error:', enrollError);
       return NextResponse.json({ error: 'Failed to enroll' }, { status: 500 });
     }
 
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
       partnerName: partner.name,
     });
   } catch (error) {
-    console.error('Enrollment error:', error);
+    logger.error('Enrollment error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

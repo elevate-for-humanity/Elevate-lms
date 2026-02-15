@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * File Storage Service
  * 
@@ -101,12 +102,12 @@ export async function generateSignedDownloadUrl(
 ): Promise<string | null> {
   const fileInfo = PRODUCT_FILES[productId];
   if (!fileInfo) {
-    console.error(`No file mapping for product: ${productId}`);
+    logger.error(`No file mapping for product: ${productId}`);
     return null;
   }
 
   if (!isStorageConfigured()) {
-    console.error('Storage not configured');
+    logger.error('Storage not configured');
     return null;
   }
 
@@ -125,7 +126,7 @@ export async function generateSignedDownloadUrl(
 
     return signedUrl;
   } catch (error) {
-    console.error('Error generating signed URL:', error);
+    logger.error('Error generating signed URL:', error);
     return null;
   }
 }
@@ -155,7 +156,7 @@ export async function uploadFile(
     await client.send(command);
     return true;
   } catch (error) {
-    console.error('Error uploading file:', error);
+    logger.error('Error uploading file:', error);
     return false;
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { returnService } from '@/lib/franchise/return-service';
@@ -124,7 +125,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ data, total: data?.length || 0 });
   } catch (error) {
-    console.error('Error listing returns:', error);
+    logger.error('Error listing returns:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to list returns' },
       { status: 500 }
@@ -194,7 +195,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result, { status: 201 });
   } catch (error) {
-    console.error('Error creating return:', error);
+    logger.error('Error creating return:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to create return' },
       { status: 500 }

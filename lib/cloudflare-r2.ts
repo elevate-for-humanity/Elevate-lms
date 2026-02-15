@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Cloudflare R2 Storage Client
  * 
@@ -68,7 +69,7 @@ export async function uploadToR2(
 
     return { success: true, key, url };
   } catch (error) {
-    console.error('R2 upload error:', error);
+    logger.error('R2 upload error:', error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Upload failed' 
@@ -94,7 +95,7 @@ export async function uploadFromUrlToR2(
 
     return uploadToR2(buffer, key, contentType);
   } catch (error) {
-    console.error('R2 upload from URL error:', error);
+    logger.error('R2 upload from URL error:', error);
     return { 
       success: false, 
       error: error instanceof Error ? error.message : 'Upload failed' 
@@ -116,7 +117,7 @@ export async function deleteFromR2(key: string): Promise<boolean> {
 
     return true;
   } catch (error) {
-    console.error('R2 delete error:', error);
+    logger.error('R2 delete error:', error);
     return false;
   }
 }
@@ -139,7 +140,7 @@ export async function getSignedR2Url(key: string, expiresIn = 3600): Promise<str
 
     return url;
   } catch (error) {
-    console.error('R2 signed URL error:', error);
+    logger.error('R2 signed URL error:', error);
     return null;
   }
 }
@@ -158,7 +159,7 @@ export async function listR2Files(prefix?: string): Promise<string[]> {
 
     return response.Contents?.map(obj => obj.Key!).filter(Boolean) || [];
   } catch (error) {
-    console.error('R2 list error:', error);
+    logger.error('R2 list error:', error);
     return [];
   }
 }

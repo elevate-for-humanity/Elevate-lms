@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -83,7 +84,7 @@ export const POST = withRateLimit(
       }
 
       if (error) {
-        console.error('Supabase insert error:', error);
+        logger.error('Supabase insert error:', error);
         return NextResponse.json(
           { error: 'Failed to submit application. Please call 317-314-3757 for assistance.' },
           { status: 500 }
@@ -102,7 +103,7 @@ export const POST = withRateLimit(
       if (process.env.AUTOMATION_ENABLE_TRIGGERS !== 'false' && application?.id) {
         if (program?.toLowerCase().includes('apprentice')) {
           getRoutingRecommendations(application.id).catch((err) => {
-            console.error('Routing automation error (non-blocking):', err);
+            logger.error('Routing automation error (non-blocking):', err);
           });
         }
       }
@@ -160,7 +161,7 @@ export const POST = withRateLimit(
         { status: 303 }
       );
     } catch (err: any) {
-      console.error('Apply route error:', err);
+      logger.error('Apply route error:', err);
       
       // Handle validation errors specifically
       if (err?.name === 'ZodError' || err?.issues) {

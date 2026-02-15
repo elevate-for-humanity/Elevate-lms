@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Autopilot: Test Enrollment Flow
  * Tests complete student enrollment including AI instructor assignment
@@ -416,17 +417,17 @@ if (require.main === module) {
         const icon =
           r.status === 'success' ? '✅' : r.status === 'failed' ? '❌' : '⏭️';
         if (r.data) {
-          console.log('  Data:', JSON.stringify(r.data, null, 2));
+          logger.info('  Data:', JSON.stringify(r.data, null, 2));
         }
         if (r.error) {
-          console.error('  Error:', r.error);
+          logger.error('  Error:', r.error);
         }
       });
 
       process.exit(result.success ? 0 : 1);
     })
     .catch((error) => {
-      console.error('Test failed:', error);
+      logger.error('Test failed:', error);
       process.exit(1);
     });
 }

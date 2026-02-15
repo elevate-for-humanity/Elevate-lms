@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * IRS MeF SOAP Client
  * Real SOAP transmission to IRS MeF endpoints with mutual TLS
@@ -111,9 +112,9 @@ export class MeFSOAPClient {
         if (this.config.passphrase) {
           agentOptions.passphrase = this.config.passphrase;
         }
-        console.log('[MeF SOAP] Loaded certificates from files');
+        logger.info('[MeF SOAP] Loaded certificates from files');
       } catch (err) {
-        console.error('[MeF SOAP] Failed to load certificates:', err);
+        logger.error('[MeF SOAP] Failed to load certificates:', err);
       }
     } else if (this.config.cert && this.config.key) {
       agentOptions.cert = this.config.cert;
@@ -124,7 +125,7 @@ export class MeFSOAPClient {
       if (this.config.passphrase) {
         agentOptions.passphrase = this.config.passphrase;
       }
-      console.log('[MeF SOAP] Using provided certificate strings');
+      logger.info('[MeF SOAP] Using provided certificate strings');
     }
 
     this.httpsAgent = new https.Agent(agentOptions);
@@ -353,7 +354,7 @@ export class MeFSOAPClient {
       });
 
       // Don't log the full envelope (contains PII)
-      console.log(`[MeF SOAP] Sending ${action} to ${endpoint}`);
+      logger.info(`[MeF SOAP] Sending ${action} to ${endpoint}`);
       req.write(envelope);
       req.end();
     });

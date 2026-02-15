@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Grants.gov API Integration
  * Federal grant opportunities search and retrieval
@@ -107,7 +108,7 @@ export async function searchOpportunities(
     });
 
     if (!response.ok) {
-      console.error('Grants.gov API error:', response.status, await response.text());
+      logger.error('Grants.gov API error:', response.status, await response.text());
       return {
         totalCount: 0,
         opportunities: [],
@@ -158,7 +159,7 @@ export async function searchOpportunities(
       searchParams: params,
     };
   } catch (error) {
-    console.error('Error searching Grants.gov:', error);
+    logger.error('Error searching Grants.gov:', error);
     return {
       totalCount: 0,
       opportunities: [],
@@ -190,7 +191,7 @@ export async function getOpportunityDetails(
     );
 
     if (!response.ok) {
-      console.error('Grants.gov API error:', response.status);
+      logger.error('Grants.gov API error:', response.status);
       return null;
     }
 
@@ -231,7 +232,7 @@ export async function getOpportunityDetails(
       opportunityUrl: `https://www.grants.gov/search-results-detail/${opp.id || opp.oppId}`,
     };
   } catch (error) {
-    console.error('Error fetching Grants.gov opportunity:', error);
+    logger.error('Error fetching Grants.gov opportunity:', error);
     return null;
   }
 }

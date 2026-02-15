@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import crypto from 'crypto';
@@ -69,7 +70,7 @@ export async function GET(request: NextRequest) {
       });
 
     if (insertError) {
-      console.error('Error creating code:', insertError);
+      logger.error('Error creating code:', insertError);
       return NextResponse.json({ error: 'Failed to generate code' }, { status: 500 });
     }
 
@@ -81,7 +82,7 @@ export async function GET(request: NextRequest) {
       todayCheckIns: 0,
     });
   } catch (error) {
-    console.error('QR code generation error:', error);
+    logger.error('QR code generation error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -129,7 +130,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (insertError) {
-      console.error('Error creating code:', insertError);
+      logger.error('Error creating code:', insertError);
       return NextResponse.json({ error: 'Failed to generate code' }, { status: 500 });
     }
 
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest) {
       todayCheckIns: 0,
     });
   } catch (error) {
-    console.error('QR code generation error:', error);
+    logger.error('QR code generation error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
     const { data: partners, error } = await query.order('name');
 
     if (error) {
-      console.error('Error fetching partners:', error);
+      logger.error('Error fetching partners:', error);
       return NextResponse.json({ error: 'Failed to fetch partners' }, { status: 500 });
     }
 
@@ -48,7 +49,7 @@ export async function GET(request: NextRequest) {
       count: partners?.length || 0,
     });
   } catch (error) {
-    console.error('Partners API error:', error);
+    logger.error('Partners API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

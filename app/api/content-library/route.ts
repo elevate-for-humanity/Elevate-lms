@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -33,13 +34,13 @@ export async function GET(request: NextRequest) {
     const { data, error } = await query.limit(100);
 
     if (error) {
-      console.error('Content library error:', error);
+      logger.error('Content library error:', error);
       return NextResponse.json({ items: [] });
     }
 
     return NextResponse.json({ items: data || [] });
   } catch (err) {
-    console.error('Content library API error:', err);
+    logger.error('Content library API error:', err);
     return NextResponse.json({ items: [] });
   }
 }

@@ -179,7 +179,7 @@ class DataSynchronizationManager {
     attempt: number = 1
   ): Promise<void> {
     if (attempt > this.maxRetries) {
-      console.error(
+      logger.error(
         `[Sync] Max retries reached for ${operation} on ${table}`
       );
       this.queueChange(table, { data, operation, timestamp: Date.now() });

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -106,7 +107,7 @@ export async function GET() {
       totalHoursThisWeek,
     });
   } catch (error) {
-    console.error('Error fetching shop dashboard:', error);
+    logger.error('Error fetching shop dashboard:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
@@ -58,7 +59,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (appError) {
-      console.error('Error inserting apprentice application:', appError);
+      logger.error('Error inserting apprentice application:', appError);
       return NextResponse.json(
         { error: 'Failed to submit application' },
         { status: 500 }
@@ -80,7 +81,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (agreementError) {
-      console.error('Error inserting agreement acceptance:', agreementError);
+      logger.error('Error inserting agreement acceptance:', agreementError);
       // Don't fail the whole request, application is already saved
     }
 
@@ -115,7 +116,7 @@ export async function POST(request: NextRequest) {
       applicationId: application.id,
     });
   } catch (error) {
-    console.error('Apprentice enrollment error:', error);
+    logger.error('Apprentice enrollment error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

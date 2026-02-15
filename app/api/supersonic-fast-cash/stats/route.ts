@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -64,7 +65,7 @@ export async function GET() {
       weeklyRevenue: weeklyRevenue || 0,
     });
   } catch (error) {
-    console.error('Error fetching stats:', error);
+    logger.error('Error fetching stats:', error);
     
     // Return zeros if tables don't exist yet
     return NextResponse.json({

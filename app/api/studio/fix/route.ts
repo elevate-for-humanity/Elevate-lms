@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -50,7 +51,7 @@ Provide ONLY the fixed code, no explanation. Return the complete fixed code.`;
       usage: response.usage,
     });
   } catch (error) {
-    console.error('Fix error:', error);
+    logger.error('Fix error:', error);
     return NextResponse.json(
       { error: 'Failed to fix code' },
       { status: 500 }

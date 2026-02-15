@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 /**
  * Enrollment Actions - Server-side functions for creating and managing enrollments
@@ -159,7 +160,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
         .from('enrollment_module_progress')
         .insert(moduleProgressRows);
       if (progressError) {
-        console.error('Module progress error:', progressError);
+        logger.error('Module progress error:', progressError);
         // Don't fail the whole enrollment, but log it
       } else {
         /* Module progress created successfully */
@@ -180,7 +181,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
           transferred_ojt_hours: 0,
         });
       if (apprenticeError) {
-        console.error('Apprenticeship enrollment error:', apprenticeError);
+        logger.error('Apprenticeship enrollment error:', apprenticeError);
         // Don't fail the whole enrollment
       } else {
         /* Apprenticeship enrollment created successfully */

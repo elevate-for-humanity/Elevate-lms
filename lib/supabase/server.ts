@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createServerClient } from '@supabase/ssr';
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
@@ -59,7 +60,7 @@ export async function createClient(): Promise<SupabaseClient<any>> {
   if (!supabaseUrl || !supabaseAnonKey) {
     // Log warning in development, but don't crash
     if (process.env.NODE_ENV === 'development') {
-      console.warn(
+      logger.warn(
         '[Supabase Server] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. ' +
         'Database features disabled. Set these in .env.local to enable.'
       );
@@ -91,7 +92,7 @@ export async function createClient(): Promise<SupabaseClient<any>> {
       }
     );
   } catch (error) {
-    console.error('[Supabase Server] Failed to create client:', error);
+    logger.error('[Supabase Server] Failed to create client:', error);
     return mockClient;
   }
 }
@@ -127,7 +128,7 @@ export function createAdminClient(): SupabaseClient<any> | null {
 
   if (!supabaseUrl || !serviceRoleKey) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn(
+      logger.warn(
         '[Supabase Admin] Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. ' +
         'Admin features disabled.'
       );
@@ -147,7 +148,7 @@ export function createAdminClient(): SupabaseClient<any> | null {
       }
     );
   } catch (error) {
-    console.error('[Supabase Admin] Failed to create client:', error);
+    logger.error('[Supabase Admin] Failed to create client:', error);
     return null;
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -71,7 +72,7 @@ export async function POST(request: NextRequest) {
       .eq('id', entryId);
 
     if (updateError) {
-      console.error('Update error:', updateError);
+      logger.error('Update error:', updateError);
       return NextResponse.json({ error: 'Failed to update entry' }, { status: 500 });
     }
 
@@ -121,7 +122,7 @@ export async function POST(request: NextRequest) {
         }),
       });
     } catch (notifError) {
-      console.error('Notification error:', notifError);
+      logger.error('Notification error:', notifError);
       // Don't fail the request if notification fails
     }
 
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest) {
       entryId,
     });
   } catch (error) {
-    console.error('Approval error:', error);
+    logger.error('Approval error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

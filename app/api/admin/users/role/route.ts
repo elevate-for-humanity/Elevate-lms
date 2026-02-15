@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -54,7 +55,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Role update error:', error);
+      logger.error('Role update error:', error);
       return NextResponse.json({ error: 'Failed to update role' }, { status: 500 });
     }
 
@@ -68,7 +69,7 @@ export async function POST(request: NextRequest) {
       user: data 
     });
   } catch (error) {
-    console.error('Role API error:', error);
+    logger.error('Role API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -110,13 +111,13 @@ export async function GET(request: NextRequest) {
       .order('email');
 
     if (error) {
-      console.error('Fetch admins error:', error);
+      logger.error('Fetch admins error:', error);
       return NextResponse.json({ error: 'Failed to fetch admins' }, { status: 500 });
     }
 
     return NextResponse.json({ admins: admins || [] });
   } catch (error) {
-    console.error('Role API error:', error);
+    logger.error('Role API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

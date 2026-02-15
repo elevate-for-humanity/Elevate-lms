@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Shared license-linking logic for Stripe webhooks.
  * Called by both /api/license/webhook and /api/licenses/webhook.
@@ -35,11 +36,11 @@ export async function linkStripeToLicense(
   const supabase = createAdminClient();
   
   if (!supabase) {
-    console.error('[linkStripeToLicense] Supabase admin client not available');
+    logger.error('[linkStripeToLicense] Supabase admin client not available');
     return { success: false, error: 'Database connection failed' };
   }
   
-  console.log('[linkStripeToLicense] Starting with:', { eventId, customerId, subscriptionId, metadata });
+  logger.info('[linkStripeToLicense] Starting with:', { eventId, customerId, subscriptionId, metadata });
   const { license_id, tenant_id } = metadata;
 
   const updateData: Record<string, any> = {
@@ -58,7 +59,7 @@ export async function linkStripeToLicense(
     updateData.current_period_end = currentPeriodEnd;
   }
   
-  console.log('[linkStripeToLicense] Update data:', updateData);
+  logger.info('[linkStripeToLicense] Update data:', updateData);
 
   // PRIORITY 1: Update by license_id
   if (license_id) {
@@ -158,7 +159,7 @@ export async function handleCheckoutCompleted(
       const subscription = await stripe.subscriptions.retrieve(subscriptionId);
       currentPeriodEnd = new Date(subscription.current_period_end * 1000).toISOString();
     } catch (e) {
-      console.warn('Could not retrieve subscription:', e);
+      logger.warn('Could not retrieve subscription:', e);
     }
   }
 
@@ -189,7 +190,7 @@ export async function handleInvoicePaid(
       tenant_id: subscription.metadata?.tenant_id,
     };
   } catch (e) {
-    console.warn('Could not retrieve subscription metadata:', e);
+    logger.warn('Could not retrieve subscription metadata:', e);
   }
 
   const currentPeriodEnd = new Date(invoice.period_end * 1000).toISOString();
@@ -349,7 +350,7 @@ function logLinkingProof(
   customerId: string,
   subscriptionId: string | null
 ): void {
-  console.log(JSON.stringify({
+  logger.info(JSON.stringify({
     event: 'LICENSE_LINKED',
     event_id: eventId,
     license_id: result.license_id,

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient, createClient } from '@/lib/supabase/server';
 
@@ -133,7 +134,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (geofenceError) {
-      console.error('[Heartbeat] update_geofence_state error:', geofenceError);
+      logger.error('[Heartbeat] update_geofence_state error:', geofenceError);
     }
 
     // Call auto_clock_out_if_needed DB function
@@ -143,7 +144,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (autoClockError) {
-      console.error('[Heartbeat] auto_clock_out_if_needed error:', autoClockError);
+      logger.error('[Heartbeat] auto_clock_out_if_needed error:', autoClockError);
     }
 
     // Reload row to get updated state
@@ -168,7 +169,7 @@ export async function POST(request: NextRequest) {
       auto_clock_out_reason: updatedEntry?.auto_clock_out_reason || null,
     });
   } catch (error) {
-    console.error('[Heartbeat] Unexpected error:', error);
+    logger.error('[Heartbeat] Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -51,7 +52,7 @@ export async function GET() {
     
     return NextResponse.json({ retention });
   } catch (error) {
-    console.error('Retention stats error:', error);
+    logger.error('Retention stats error:', error);
     return NextResponse.json({ retention: [] }, { status: 500 });
   }
 }

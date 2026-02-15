@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { getRoutingRecommendations, assignToShop } from '@/lib/automation/shop-routing';
@@ -51,7 +52,7 @@ export async function POST(req: Request) {
       return NextResponse.json(result);
     }
   } catch (error) {
-    console.error('Routing error:', error);
+    logger.error('Routing error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

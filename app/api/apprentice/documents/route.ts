@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
       .order('display_order', { ascending: true });
 
     if (typesError) {
-      console.error('[Documents API] Types error:', typesError);
+      logger.error('[Documents API] Types error:', typesError);
     }
 
     // Get student's uploaded documents
@@ -41,7 +42,7 @@ export async function GET(request: NextRequest) {
       .order('uploaded_at', { ascending: false });
 
     if (docsError) {
-      console.error('[Documents API] Docs error:', docsError);
+      logger.error('[Documents API] Docs error:', docsError);
     }
 
     return NextResponse.json({
@@ -49,7 +50,7 @@ export async function GET(request: NextRequest) {
       uploadedDocuments: uploadedDocuments || [],
     });
   } catch (error) {
-    console.error('[Documents API] Error:', error);
+    logger.error('[Documents API] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (uploadError) {
-      console.error('[Documents API] Upload error:', uploadError);
+      logger.error('[Documents API] Upload error:', uploadError);
       return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
     }
 
@@ -150,7 +151,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (recordError) {
-      console.error('[Documents API] Record error:', recordError);
+      logger.error('[Documents API] Record error:', recordError);
       return NextResponse.json({ error: 'Failed to save document record' }, { status: 500 });
     }
 
@@ -182,15 +183,15 @@ export async function POST(request: NextRequest) {
               docType.name || docType.document_type,
               programSlug
             ).catch((err: Error) => {
-              console.error('[Documents API] Staff notification failed:', err);
+              logger.error('[Documents API] Staff notification failed:', err);
             });
           }
         }
-        console.log('[Documents API] Staff notifications sent for document upload');
+        logger.info('[Documents API] Staff notifications sent for document upload');
       }
     } catch (notifyError) {
       // Log but don't fail the upload
-      console.error('[Documents API] Staff notification error:', notifyError);
+      logger.error('[Documents API] Staff notification error:', notifyError);
     }
 
     return NextResponse.json({ 
@@ -198,7 +199,7 @@ export async function POST(request: NextRequest) {
       document: docRecord 
     });
   } catch (error) {
-    console.error('[Documents API] Error:', error);
+    logger.error('[Documents API] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -253,13 +254,13 @@ export async function DELETE(request: NextRequest) {
       .eq('id', docId);
 
     if (error) {
-      console.error('[Documents API] Delete error:', error);
+      logger.error('[Documents API] Delete error:', error);
       return NextResponse.json({ error: 'Failed to delete document' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('[Documents API] Error:', error);
+    logger.error('[Documents API] Error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

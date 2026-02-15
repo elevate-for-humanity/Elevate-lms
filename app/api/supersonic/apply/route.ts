@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -35,7 +36,7 @@ export async function POST(req: Request) {
 
     if (!supabase) {
       // If no database, just log and return success
-      console.log('Tax refund application received:', {
+      logger.info('Tax refund application received:', {
         name: `${firstName} ${lastName}`,
         email,
         phone,
@@ -72,10 +73,10 @@ export async function POST(req: Request) {
     });
 
     if (error) {
-      console.error('Database error:', error);
+      logger.error('Database error:', error);
       // Still return success - we don't want to block the user
       // Log the application for manual follow-up
-      console.log('Tax refund application (DB failed):', {
+      logger.info('Tax refund application (DB failed):', {
         name: `${firstName} ${lastName}`,
         email,
         phone,
@@ -85,7 +86,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error processing tax application:', error);
+    logger.error('Error processing tax application:', error);
     return NextResponse.json(
       { error: 'Failed to process application' },
       { status: 500 }

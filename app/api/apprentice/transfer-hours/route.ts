@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -30,7 +31,7 @@ export async function GET(req: Request) {
     .order('created_at', { ascending: false });
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   return NextResponse.json({ requests });
@@ -126,7 +127,7 @@ export async function POST(req: Request) {
     .single();
 
   if (insertError) {
-    console.error('Error creating transfer request:', insertError);
+    logger.error('Error creating transfer request:', insertError);
     return NextResponse.json(
       { error: 'Failed to submit transfer request' },
       { status: 500 }

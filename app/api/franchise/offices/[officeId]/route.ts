@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { officeService } from '@/lib/franchise/office-service';
@@ -37,7 +38,7 @@ export async function GET(
 
     return NextResponse.json(office);
   } catch (error) {
-    console.error('Error getting office:', error);
+    logger.error('Error getting office:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to get office' },
       { status: 500 }
@@ -96,7 +97,7 @@ export async function PATCH(
     const updated = await officeService.updateOffice(officeId, body, user.id);
     return NextResponse.json(updated);
   } catch (error) {
-    console.error('Error updating office:', error);
+    logger.error('Error updating office:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to update office' },
       { status: 500 }
@@ -132,7 +133,7 @@ export async function DELETE(
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error deleting office:', error);
+    logger.error('Error deleting office:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to delete office' },
       { status: 500 }

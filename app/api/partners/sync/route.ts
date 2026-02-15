@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
     const { data: courses, error } = await query;
 
     if (error) {
-      console.error('Sync query error:', error);
+      logger.error('Sync query error:', error);
       return NextResponse.json({ error: 'Failed to fetch courses for sync' }, { status: 500 });
     }
 
@@ -147,7 +148,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Sync API error:', error);
+    logger.error('Sync API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -243,7 +244,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ status: 'success', data: status });
   } catch (error) {
-    console.error('Sync status error:', error);
+    logger.error('Sync status error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

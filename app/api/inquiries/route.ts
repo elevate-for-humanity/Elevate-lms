@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
@@ -88,7 +89,7 @@ export async function POST(req: Request) {
       .single();
 
     if (error) {
-      console.error('Supabase insert error:', JSON.stringify(error, null, 2));
+      logger.error('Supabase insert error:', JSON.stringify(error, null, 2));
       return NextResponse.json(
         {
           error: 'Failed to save inquiry',

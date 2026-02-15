@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Cron Job: Check License Status
  * Runs daily to suspend expired licenses and check subscription status
@@ -138,7 +139,7 @@ export async function GET(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('License check cron failed:', error);
+    logger.error('License check cron failed:', error);
     return NextResponse.json({
       success: false,
       error: error instanceof Error ? error.message : 'Unknown error',
@@ -162,7 +163,7 @@ async function sendExpirationEmail(email: string, companyName: string): Promise<
       `,
     });
   } catch (error) {
-    console.error('Failed to send expiration email:', error);
+    logger.error('Failed to send expiration email:', error);
   }
 }
 
@@ -181,6 +182,6 @@ async function sendExpiryWarningEmail(email: string, companyName: string, expire
       `,
     });
   } catch (error) {
-    console.error('Failed to send expiry warning email:', error);
+    logger.error('Failed to send expiry warning email:', error);
   }
 }

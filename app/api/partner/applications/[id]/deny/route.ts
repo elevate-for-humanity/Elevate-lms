@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -75,12 +76,12 @@ export async function POST(
         }),
       });
     } catch (emailError) {
-      console.warn('Failed to send denial email:', emailError);
+      logger.warn('Failed to send denial email:', emailError);
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Deny error:', error);
+    logger.error('Deny error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

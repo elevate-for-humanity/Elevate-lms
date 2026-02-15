@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Universal OCR Extraction API
  * Redirects to Netlify function to keep heavy dependencies out of main handler
@@ -78,7 +79,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error) {
-    console.error('OCR extraction failed:', error);
+    logger.error('OCR extraction failed:', error);
     return NextResponse.json({
       success: false,
       error: 'OCR extraction failed',

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -55,7 +56,7 @@ export async function GET(req: NextRequest) {
       }))
     );
   } catch (error) {
-    console.error('Deploy tokens GET error:', error);
+    logger.error('Deploy tokens GET error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch deploy tokens' },
       { status: 500 }
@@ -108,7 +109,7 @@ export async function POST(req: NextRequest) {
       hasToken: true,
     });
   } catch (error) {
-    console.error('Deploy tokens POST error:', error);
+    logger.error('Deploy tokens POST error:', error);
     return NextResponse.json(
       { error: 'Failed to save deploy token' },
       { status: 500 }
@@ -151,7 +152,7 @@ export async function PUT(req: NextRequest) {
       project_id: data.project_id,
     });
   } catch (error) {
-    console.error('Deploy tokens PUT error:', error);
+    logger.error('Deploy tokens PUT error:', error);
     return NextResponse.json(
       { error: 'Failed to get deploy token' },
       { status: 500 }
@@ -185,7 +186,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('Deploy tokens DELETE error:', error);
+    logger.error('Deploy tokens DELETE error:', error);
     return NextResponse.json(
       { error: 'Failed to delete deploy token' },
       { status: 500 }

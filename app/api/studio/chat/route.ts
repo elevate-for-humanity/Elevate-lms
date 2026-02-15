@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -35,7 +36,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await query;
 
   if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 
   return NextResponse.json(data || []);
@@ -177,7 +178,7 @@ Be concise, direct, and provide working code. Focus on the task at hand.`;
       });
     }
   } catch (error) {
-    console.error('AI Chat error:', error);
+    logger.error('AI Chat error:', error);
     return NextResponse.json(
       { error: 'Failed to get AI response' },
       { status: 500 }

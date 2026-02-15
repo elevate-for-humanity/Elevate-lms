@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -48,7 +49,7 @@ export async function GET() {
       .order('enrolled_at', { ascending: false });
 
     if (enrollError) {
-      console.error('Enrollments fetch error:', enrollError);
+      logger.error('Enrollments fetch error:', enrollError);
     }
 
     // Fetch verified hours grouped by enrollment
@@ -59,7 +60,7 @@ export async function GET() {
       .eq('verified', true);
 
     if (verifiedError) {
-      console.error('Verified hours fetch error:', verifiedError);
+      logger.error('Verified hours fetch error:', verifiedError);
     }
 
     // Fetch pending hours grouped by enrollment
@@ -70,7 +71,7 @@ export async function GET() {
       .eq('verified', false);
 
     if (pendingError) {
-      console.error('Pending hours fetch error:', pendingError);
+      logger.error('Pending hours fetch error:', pendingError);
     }
 
     // Fetch tasks for student's enrollments
@@ -97,7 +98,7 @@ export async function GET() {
         .order('created_at', { ascending: true });
 
       if (taskError) {
-        console.error('Tasks fetch error:', taskError);
+        logger.error('Tasks fetch error:', taskError);
       } else {
         tasks = taskData || [];
       }
@@ -135,7 +136,7 @@ export async function GET() {
       completedTasks: tasks.filter(t => t.status === 'approved').length,
     });
   } catch (error) {
-    console.error('Student dashboard API error:', error);
+    logger.error('Student dashboard API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

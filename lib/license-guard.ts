@@ -62,7 +62,7 @@ export async function getLicense(tenantId: string): Promise<License | null> {
     !process.env.NEXT_PUBLIC_SUPABASE_URL ||
     !process.env.SUPABASE_SERVICE_ROLE_KEY
   ) {
-    console.warn('License check skipped: Supabase not configured');
+    logger.warn('License check skipped: Supabase not configured');
     return null;
   }
 

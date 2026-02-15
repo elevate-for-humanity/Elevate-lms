@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -37,7 +38,7 @@ export async function GET() {
     });
 
   } catch (error) {
-    console.error('Error checking onboarding status:', error);
+    logger.error('Error checking onboarding status:', error);
     return NextResponse.json({ completed: false, error: 'Server error' }, { status: 500 });
   }
 }

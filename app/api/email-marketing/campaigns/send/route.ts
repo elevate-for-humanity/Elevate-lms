@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -42,7 +43,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Campaign error:', error);
+      logger.error('Campaign error:', error);
       // Return success for demo even if table doesn't exist
       return NextResponse.json({
         success: true,
@@ -57,7 +58,7 @@ export async function POST(request: NextRequest) {
       message: 'Campaign sent successfully',
     });
   } catch (error) {
-    console.error('Send campaign error:', error);
+    logger.error('Send campaign error:', error);
     return NextResponse.json(
       { error: 'Failed to send campaign' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const dynamic = 'force-dynamic';
 
 // Using Node.js runtime for email compatibility
@@ -37,7 +38,7 @@ export async function POST(req: Request) {
       .single();
 
     if (!profile || (profile.role !== 'admin' && profile.role !== 'super_admin')) {
-      console.warn('[Creator Rejection] Unauthorized attempt', { userId: user.id, role: profile?.role });
+      logger.warn('[Creator Rejection] Unauthorized attempt', { userId: user.id, role: profile?.role });
       return NextResponse.json({ error: 'Forbidden', code: 'INSUFFICIENT_PERMISSIONS' }, { status: 403 });
     }
 
@@ -69,7 +70,7 @@ export async function POST(req: Request) {
       .single();
 
     if (fetchError || !creator) {
-      console.warn('[Creator Rejection] Creator not found', { creatorId });
+      logger.warn('[Creator Rejection] Creator not found', { creatorId });
       return NextResponse.json(
         { error: 'Creator not found', code: 'CREATOR_NOT_FOUND' },
         { status: 404 }
@@ -97,7 +98,7 @@ export async function POST(req: Request) {
       .eq('id', creatorId);
 
     if (updateError) {
-      console.error('[Creator Rejection] Update failed', updateError, { creatorId });
+      logger.error('[Creator Rejection] Update failed', updateError, { creatorId });
       throw updateError;
     }
 
@@ -116,14 +117,14 @@ export async function POST(req: Request) {
         emailSent = result.success;
         
         if (!result.success) {
-          console.error('[Creator Rejection] Email failed', {
+          logger.error('[Creator Rejection] Email failed', {
             creatorId,
             email: creatorProfile.email,
             error: result.error,
           });
         }
       } catch (emailError) {
-        console.error('[Creator Rejection] Email error', emailError, {
+        logger.error('[Creator Rejection] Email error', emailError, {
           creatorId,
           email: creatorProfile.email,
         });
@@ -145,7 +146,7 @@ export async function POST(req: Request) {
       });
     } catch (auditError) {
       // Log but don't fail the request
-      console.error('[Creator Rejection] Audit log failed', auditError);
+      logger.error('[Creator Rejection] Audit log failed', auditError);
     }
 
     // 10. Success response
@@ -159,7 +160,7 @@ export async function POST(req: Request) {
     });
 
   } catch (err: any) {
-    console.error('[Creator Rejection] Failed', err);
+    logger.error('[Creator Rejection] Failed', err);
     
     return NextResponse.json(
       {

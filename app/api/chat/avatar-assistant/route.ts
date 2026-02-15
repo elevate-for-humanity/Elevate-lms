@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAIClient, isOpenAIConfigured } from '@/lib/openai-client';
 import { createClient } from '@/lib/supabase/server';
@@ -157,7 +158,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ message: reply });
   } catch (error) {
-    console.error('Avatar chat error:', error);
+    logger.error('Avatar chat error:', error);
     // Fall back to static responses on any error (including quota exceeded)
     try {
       const body: ChatRequest = await request.clone().json();

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * TUITION WEBHOOK HANDLER
  * 
@@ -27,7 +28,7 @@ import { INSTALLMENT_RULES } from './tuition-config';
 async function sendWelcomeLetterEmail(studentId: string, programId: string): Promise<void> {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) {
-    console.log('RESEND_API_KEY not configured, skipping emails');
+    logger.info('RESEND_API_KEY not configured, skipping emails');
     return;
   }
 
@@ -51,7 +52,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
     .single();
 
   if (!student?.email) {
-    console.error('No student email found');
+    logger.error('No student email found');
     return;
   }
 
@@ -115,7 +116,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
       `,
     });
 
-    console.log(`Payment confirmation (Mikady) sent to ${student.email}`);
+    logger.info(`Payment confirmation (Mikady) sent to ${student.email}`);
 
     // ============================================
     // EMAIL 2: WELCOME LETTER - Complete Enrollment
@@ -210,7 +211,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
       `,
     });
 
-    console.log(`Welcome letter sent to ${student.email} for program ${programName}`);
+    logger.info(`Welcome letter sent to ${student.email} for program ${programName}`);
 
     // Record emails sent
     await supabaseClient.from('email_logs').insert([
@@ -243,7 +244,7 @@ async function sendWelcomeLetterEmail(studentId: string, programId: string): Pro
     await createRAPIDSPendingRecord(supabaseClient, studentId, programId, studentName, programName);
 
   } catch (error) {
-    console.error('Failed to send emails:', error);
+    logger.error('Failed to send emails:', error);
   }
 }
 
@@ -314,10 +315,10 @@ async function sendAdminEnrollmentNotification(
       `,
     });
 
-    console.log(`Admin notification sent for new enrollment: ${studentName}`);
+    logger.info(`Admin notification sent for new enrollment: ${studentName}`);
 
   } catch (error) {
-    console.error('Failed to send admin notification:', error);
+    logger.error('Failed to send admin notification:', error);
   }
 }
 
@@ -343,7 +344,7 @@ async function createRAPIDSPendingRecord(
     const isApprenticeship = program?.type === 'apprenticeship' || program?.rapids_required;
     
     if (!isApprenticeship) {
-      console.log(`Program ${programName} does not require RAPIDS registration`);
+      logger.info(`Program ${programName} does not require RAPIDS registration`);
       return;
     }
 
@@ -357,10 +358,10 @@ async function createRAPIDSPendingRecord(
       notes: 'Awaiting student onboarding completion before RAPIDS submission',
     });
 
-    console.log(`RAPIDS pending record created for ${studentName} - ${programName}`);
+    logger.info(`RAPIDS pending record created for ${studentName} - ${programName}`);
 
   } catch (error) {
-    console.error('Failed to create RAPIDS record:', error);
+    logger.error('Failed to create RAPIDS record:', error);
   }
 }
 
@@ -445,7 +446,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promis
   const { metadata } = session;
   
   if (!metadata?.student_id || !metadata?.program_id) {
-    console.error('Missing metadata in checkout session');
+    logger.error('Missing metadata in checkout session');
     return;
   }
   
@@ -453,7 +454,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promis
   const programId = metadata.program_id;
   const paymentOption = metadata.payment_option;
   
-  console.log(`Checkout completed: ${paymentOption} for student ${studentId}`);
+  logger.info(`Checkout completed: ${paymentOption} for student ${studentId}`);
   
   // Record payment in database
   await supabase.from('tuition_payments').insert({
@@ -517,7 +518,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session): Promis
       // Send welcome letter email
       await sendWelcomeLetterEmail(studentId, programId);
     } else {
-      console.error('Failed to create subscription:', result.error);
+      logger.error('Failed to create subscription:', result.error);
       // Still grant access since deposit was paid, but flag for manual review
       await grantCourseAccess(studentId, programId, 'active');
       await updateEnrollmentStatus(studentId, programId, 'active', 'subscription_failed');
@@ -545,7 +546,7 @@ async function handleInvoicePaid(invoice: Stripe.Invoice): Promise<void> {
   const paymentInterval = subscription.metadata.payment_interval || 'month';
   const amountPaid = invoice.amount_paid / 100;
   
-  console.log(`${paymentInterval}ly payment of $${amountPaid} received for student ${studentId}`);
+  logger.info(`${paymentInterval}ly payment of $${amountPaid} received for student ${studentId}`);
   
   // Record payment in tuition_payments
   await supabase.from('tuition_payments').insert({
@@ -672,7 +673,7 @@ async function sendPaymentConfirmationEmail(
       <p>Thank you for staying on track with your education!</p>
       <p>- Elevate for Humanity</p>
     `,
-  }).catch(err => console.error('Failed to send payment confirmation:', err));
+  }).catch(err => logger.error('Failed to send payment confirmation:', err));
 }
 
 /**
@@ -710,7 +711,7 @@ async function sendPaymentCompletionEmail(studentId: string, programId: string):
       <p>If you have any questions, please don't hesitate to reach out.</p>
       <p>- Elevate for Humanity</p>
     `,
-  }).catch(err => console.error('Failed to send completion email:', err));
+  }).catch(err => logger.error('Failed to send completion email:', err));
 }
 
 /**
@@ -730,7 +731,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice): Promise<void
   const studentId = subscription.metadata.student_id;
   const programId = subscription.metadata.program_id;
   
-  console.log(`Payment failed for student ${studentId}`);
+  logger.info(`Payment failed for student ${studentId}`);
   
   // Record failed payment
   await supabase.from('tuition_payments').insert({
@@ -763,7 +764,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice): Promise<void
   try {
     await sendPaymentFailedEmail(studentId, programId);
   } catch (emailError) {
-    console.error('Failed to send payment failed email:', emailError);
+    logger.error('Failed to send payment failed email:', emailError);
   }
 }
 
@@ -788,14 +789,14 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription): Pro
     
     if (isComplete) {
       // Subscription completed successfully
-      console.log(`Subscription completed for student ${studentId}`);
+      logger.info(`Subscription completed for student ${studentId}`);
       await supabase
         .from('tuition_subscriptions')
         .update({ status: 'completed' })
         .eq('stripe_subscription_id', subscription.id);
     } else {
       // Subscription cancelled before completion
-      console.log(`Subscription cancelled early for student ${studentId}`);
+      logger.info(`Subscription cancelled early for student ${studentId}`);
       await supabase
         .from('tuition_subscriptions')
         .update({ status: 'cancelled' })

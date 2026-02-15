@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Milady Access Provisioning
  * 
@@ -66,7 +67,7 @@ export async function provisionMiladyAccess(
         return apiResult;
       }
     } catch (error) {
-      console.warn('[Milady] API provisioning failed, trying license code');
+      logger.warn('[Milady] API provisioning failed, trying license code');
     }
   }
 
@@ -187,7 +188,7 @@ async function queueManualProvisioning(
     });
 
   if (error) {
-    console.error('[Milady] Failed to queue manual provisioning:', error);
+    logger.error('[Milady] Failed to queue manual provisioning:', error);
   }
 
   // Return link-based access as fallback

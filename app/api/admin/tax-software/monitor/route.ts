@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Tax Software Monitor API
  * Trigger IRS monitoring runs
@@ -54,7 +55,7 @@ export async function POST(req: Request) {
       }
     });
   } catch (error) {
-    console.error('Error running IRS monitor:', error);
+    logger.error('Error running IRS monitor:', error);
     return NextResponse.json(
       { error: 'Failed to run monitor' },
       { status: 500 }
@@ -78,7 +79,7 @@ export async function GET() {
       unacknowledgedAlerts: monitor.getAlerts().length
     });
   } catch (error) {
-    console.error('Error getting monitor status:', error);
+    logger.error('Error getting monitor status:', error);
     return NextResponse.json(
       { error: 'Failed to get status' },
       { status: 500 }

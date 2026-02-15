@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
@@ -59,7 +60,7 @@ Write the complete script now:`;
 
     return NextResponse.json({ script });
   } catch (error: any) {
-    console.error('Script generation error:', error);
+    logger.error('Script generation error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to generate script' },
       { status: 500 }

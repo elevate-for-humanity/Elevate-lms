@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
@@ -43,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     // Check Stripe is configured
     if (!stripe) {
-      console.error('Stripe not configured: STRIPE_SECRET_KEY missing');
+      logger.error('Stripe not configured: STRIPE_SECRET_KEY missing');
       return NextResponse.json(
         { error: 'Payment system is not configured. Please contact support.' },
         { status: 503 }
@@ -89,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     // Check if plan has a Stripe price ID
     if (!plan.stripePriceId) {
-      console.error(`Missing Stripe price ID for plan: ${planId}. Set STRIPE_PRICE_* env vars.`);
+      logger.error(`Missing Stripe price ID for plan: ${planId}. Set STRIPE_PRICE_* env vars.`);
       return NextResponse.json(
         { error: 'This plan is not yet configured for checkout. Please contact support.' },
         { status: 400 }
@@ -189,7 +190,7 @@ export async function POST(request: NextRequest) {
       url: session.url,
     });
   } catch (error) {
-    console.error('Checkout error:', error);
+    logger.error('Checkout error:', error);
     const message = error instanceof Error ? error.message : 'Failed to create checkout session';
     return NextResponse.json(
       { error: message },

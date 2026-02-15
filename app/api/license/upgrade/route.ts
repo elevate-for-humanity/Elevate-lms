@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
@@ -70,7 +71,7 @@ export async function POST(request: NextRequest) {
     const priceId = process.env[tierConfig.priceEnvVar];
 
     if (!priceId) {
-      console.error(`Missing price ID for tier ${tierId}: ${tierConfig.priceEnvVar}`);
+      logger.error(`Missing price ID for tier ${tierId}: ${tierConfig.priceEnvVar}`);
       return NextResponse.json(
         { error: 'Subscription tier not configured' },
         { status: 503 }
@@ -180,7 +181,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('[license/upgrade] Error:', error);
+    logger.error('[license/upgrade] Error:', error);
     return NextResponse.json(
       { error: 'Failed to create checkout session' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -64,7 +65,7 @@ export async function GET(request: NextRequest) {
     const { data: apprenticeships, error } = await query;
 
     if (error) {
-      console.error('Failed to fetch apprentices:', error);
+      logger.error('Failed to fetch apprentices:', error);
       return NextResponse.json({ error: 'Failed to fetch apprentices' }, { status: 500 });
     }
 
@@ -93,7 +94,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ apprentices });
   } catch (error) {
-    console.error('Apprentices API error:', error);
+    logger.error('Apprentices API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

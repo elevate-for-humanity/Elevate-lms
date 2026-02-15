@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Supabase Browser Client
  * For use in Client Components only
@@ -74,7 +75,7 @@ export function createBrowserClient(): SupabaseClient<any> {
 
   if (!supabaseUrl || !supabaseAnonKey) {
     if (!warnedOnce) {
-      console.warn(
+      logger.warn(
         '[Supabase Client] Missing NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY. ' +
         'Using no-op client. Add these to your .env.local to enable database features.'
       );

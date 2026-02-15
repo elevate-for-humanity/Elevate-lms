@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -109,7 +110,7 @@ export async function GET() {
       apprenticeHours: totalHours,
     });
   } catch (error) {
-    console.error('Error fetching training data:', error);
+    logger.error('Error fetching training data:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -148,13 +149,13 @@ export async function POST(request: Request) {
       });
 
     if (error) {
-      console.error('Error updating lesson progress:', error);
+      logger.error('Error updating lesson progress:', error);
       return NextResponse.json({ error: 'Failed to update progress' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error('Error updating lesson progress:', error);
+    logger.error('Error updating lesson progress:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

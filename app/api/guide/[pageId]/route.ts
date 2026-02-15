@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { getPageGuide } from '@/lib/store/db';
 
@@ -16,7 +17,7 @@ export async function GET(
 
     return NextResponse.json({ guide });
   } catch (error) {
-    console.error('Guide API error:', error);
+    logger.error('Guide API error:', error);
     return NextResponse.json({ error: 'Failed to fetch guide' }, { status: 500 });
   }
 }

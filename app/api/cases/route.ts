@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -38,7 +39,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, case: enrollmentCase });
   } catch (err: any) {
-    console.error('[POST /api/cases] Error:', err);
+    logger.error('[POST /api/cases] Error:', err);
     return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
   }
 }
@@ -68,12 +69,12 @@ export async function GET(req: Request) {
     const { data, error } = await query;
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ cases: data || [] });
   } catch (err: any) {
-    console.error('[GET /api/cases] Error:', err);
+    logger.error('[GET /api/cases] Error:', err);
     return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Geocoding utilities with Google Maps primary and Mapbox fallback.
  * Used for shop address geocoding and distance calculations.
@@ -21,7 +22,7 @@ export interface GeocodingError {
 async function geocodeWithGoogle(address: string): Promise<GeocodingResult | null> {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
   if (!apiKey) {
-    console.warn('[geocode] GOOGLE_MAPS_API_KEY not configured');
+    logger.warn('[geocode] GOOGLE_MAPS_API_KEY not configured');
     return null;
   }
 
@@ -43,10 +44,10 @@ async function geocodeWithGoogle(address: string): Promise<GeocodingResult | nul
       };
     }
 
-    console.warn('[geocode] Google returned status:', data.status);
+    logger.warn('[geocode] Google returned status:', data.status);
     return null;
   } catch (error) {
-    console.error('[geocode] Google API error:', error);
+    logger.error('[geocode] Google API error:', error);
     return null;
   }
 }
@@ -57,7 +58,7 @@ async function geocodeWithGoogle(address: string): Promise<GeocodingResult | nul
 async function geocodeWithMapbox(address: string): Promise<GeocodingResult | null> {
   const accessToken = process.env.MAPBOX_ACCESS_TOKEN;
   if (!accessToken) {
-    console.warn('[geocode] MAPBOX_ACCESS_TOKEN not configured');
+    logger.warn('[geocode] MAPBOX_ACCESS_TOKEN not configured');
     return null;
   }
 
@@ -78,10 +79,10 @@ async function geocodeWithMapbox(address: string): Promise<GeocodingResult | nul
       };
     }
 
-    console.warn('[geocode] Mapbox returned no results');
+    logger.warn('[geocode] Mapbox returned no results');
     return null;
   } catch (error) {
-    console.error('[geocode] Mapbox API error:', error);
+    logger.error('[geocode] Mapbox API error:', error);
     return null;
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Payment Monitoring Cron Job
  * 
@@ -59,7 +60,7 @@ export async function GET(request: Request) {
       .in('status', ['active', 'past_due']);
 
     if (subError) {
-      console.error('Error fetching subscriptions:', subError);
+      logger.error('Error fetching subscriptions:', subError);
       results.errors.push('Failed to fetch subscriptions');
     }
 
@@ -101,7 +102,7 @@ export async function GET(request: Request) {
           }
 
         } catch (stripeError) {
-          console.error(`Error processing subscription ${sub.id}:`, stripeError);
+          logger.error(`Error processing subscription ${sub.id}:`, stripeError);
           results.errors.push(`Subscription ${sub.id}: ${stripeError}`);
         }
       }
@@ -130,7 +131,7 @@ export async function GET(request: Request) {
           try {
             await stripe.subscriptions.cancel(sub.stripe_subscription_id);
           } catch (e) {
-            console.error('Error canceling completed subscription:', e);
+            logger.error('Error canceling completed subscription:', e);
           }
           
           results.statusUpdates++;
@@ -138,7 +139,7 @@ export async function GET(request: Request) {
       }
     }
 
-    console.log('Payment monitoring completed:', results);
+    logger.info('Payment monitoring completed:', results);
 
     return NextResponse.json({
       success: true,
@@ -147,7 +148,7 @@ export async function GET(request: Request) {
     });
 
   } catch (error) {
-    console.error('Payment monitoring error:', error);
+    logger.error('Payment monitoring error:', error);
     return NextResponse.json(
       { error: 'Payment monitoring failed', details: String(error) },
       { status: 500 }

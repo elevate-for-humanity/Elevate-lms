@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
@@ -66,7 +67,7 @@ async function scheduleWeeklyInvoices(
     await stripe.invoices.finalizeInvoice(invoice.id);
   }
 
-  console.log(`Scheduled ${weeksRemaining} weekly invoices for customer ${customerId}`);
+  logger.info(`Scheduled ${weeksRemaining} weekly invoices for customer ${customerId}`);
 }
 function getWebhookSecret() {
   return process.env.STRIPE_WEBHOOK_SECRET_BARBER || process.env.STRIPE_WEBHOOK_SECRET || '';
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
   try {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
-    console.error('Webhook signature verification failed:', err);
+    logger.error('Webhook signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
@@ -147,7 +148,7 @@ export async function POST(request: NextRequest) {
                 bnplProvider = paymentMethodType;
               }
             } catch (e) {
-              console.error('Failed to retrieve payment intent:', e);
+              logger.error('Failed to retrieve payment intent:', e);
             }
           }
 
@@ -238,7 +239,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
               `,
             });
           } catch (emailErr) {
-            console.error('Failed to send welcome email:', emailErr);
+            logger.error('Failed to send welcome email:', emailErr);
           }
 
           // Send Milady notification
@@ -258,10 +259,10 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
               `,
             });
           } catch (emailErr) {
-            console.error('Failed to send Milady notification:', emailErr);
+            logger.error('Failed to send Milady notification:', emailErr);
           }
 
-          console.log(`Barber enrollment complete: ${customerId}, fullyPaid: ${fullyPaid}, bnpl: ${bnplProvider}`);
+          logger.info(`Barber enrollment complete: ${customerId}, fullyPaid: ${fullyPaid}, bnpl: ${bnplProvider}`);
           break;
         }
 
@@ -271,7 +272,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
         const enrollmentId = session.metadata?.enrollment_id;
 
         if (!subscriptionId || !userId) {
-          console.error('Missing subscription or user ID for legacy flow');
+          logger.error('Missing subscription or user ID for legacy flow');
           break;
         }
 
@@ -377,7 +378,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
               magicLink = linkData.properties.action_link;
             }
           } catch (linkErr) {
-            console.error('Magic link generation failed:', linkErr);
+            logger.error('Magic link generation failed:', linkErr);
           }
         }
 
@@ -437,7 +438,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
                 `,
               });
             } catch (internalErr) {
-              console.error('Internal notification failed:', internalErr);
+              logger.error('Internal notification failed:', internalErr);
             }
             
             // Mark welcome email as sent
@@ -449,9 +450,9 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
               })
               .eq('stripe_subscription_id', subscriptionId);
               
-            console.log(`Welcome email sent to ${customerEmail}`);
+            logger.info(`Welcome email sent to ${customerEmail}`);
           } catch (emailErr) {
-            console.error('Welcome email failed:', emailErr);
+            logger.error('Welcome email failed:', emailErr);
             // Don't fail webhook - email can be retried
           }
         }
@@ -494,14 +495,14 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
               .update({ milady_email_sent_at: new Date().toISOString() })
               .eq('stripe_subscription_id', subscriptionId);
               
-            console.log(`Milady email sent to ${customerEmail}`);
+            logger.info(`Milady email sent to ${customerEmail}`);
           } catch (emailErr) {
-            console.error('Milady email failed:', emailErr);
+            logger.error('Milady email failed:', emailErr);
             // Don't fail webhook - email can be retried
           }
         }
 
-        console.log(`Barber subscription created: ${subscriptionId} for user ${userId}, apprentice ${apprenticeId}`);
+        logger.info(`Barber subscription created: ${subscriptionId} for user ${userId}, apprentice ${apprenticeId}`);
         break;
       }
 
@@ -525,7 +526,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           })
           .eq('stripe_subscription_id', subscription.id);
 
-        console.log(`Barber subscription updated: ${subscription.id}`);
+        logger.info(`Barber subscription updated: ${subscription.id}`);
         break;
       }
 
@@ -544,7 +545,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           })
           .eq('stripe_subscription_id', subscription.id);
 
-        console.log(`Barber subscription canceled: ${subscription.id}`);
+        logger.info(`Barber subscription canceled: ${subscription.id}`);
         break;
       }
 
@@ -589,7 +590,7 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
           if (newWeeksRemaining <= 0) {
             try {
               await stripe.subscriptions.cancel(subscriptionId);
-              console.log(`Barber subscription auto-canceled (fully paid): ${subscriptionId}`);
+              logger.info(`Barber subscription auto-canceled (fully paid): ${subscriptionId}`);
               
               // Send completion email
               const customerEmail = subscription.metadata?.customer_email;
@@ -617,19 +618,19 @@ ${!fullyPaid ? '• You\'ll receive weekly payment invoices every Friday' : ''}<
                 });
               }
             } catch (cancelErr) {
-              console.error('Failed to auto-cancel subscription:', cancelErr);
+              logger.error('Failed to auto-cancel subscription:', cancelErr);
             }
           }
         }
 
-        console.log(`Barber payment recorded: ${invoice.id}`);
+        logger.info(`Barber payment recorded: ${invoice.id}`);
         break;
       }
     }
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error('Webhook processing error:', error);
+    logger.error('Webhook processing error:', error);
     return NextResponse.json({ error: 'Webhook processing failed' }, { status: 500 });
   }
 }
@@ -728,7 +729,7 @@ export async function PUT(request: NextRequest) {
       message: `Weekly payment updated to $${calculation.weeklyPaymentDollars.toFixed(2)} for ${calculation.weeksRemaining} weeks`,
     });
   } catch (error) {
-    console.error('Transfer hours update error:', error);
+    logger.error('Transfer hours update error:', error);
     return NextResponse.json({ error: 'Failed to update subscription' }, { status: 500 });
   }
 }

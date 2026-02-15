@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Store Entitlements Helper Functions
  * Check user access to store features based on subscription status
@@ -24,7 +25,7 @@ export async function hasEntitlement(
   });
 
   if (error) {
-    console.error('Error checking entitlement:', error);
+    logger.error('Error checking entitlement:', error);
     return false;
   }
 
@@ -43,7 +44,7 @@ export async function getUserEntitlements(userId: string): Promise<string[]> {
     .or(`expires_at.is.null,expires_at.gt.${new Date().toISOString()}`);
 
   if (error) {
-    console.error('Error fetching entitlements:', error);
+    logger.error('Error fetching entitlements:', error);
     return [];
   }
 

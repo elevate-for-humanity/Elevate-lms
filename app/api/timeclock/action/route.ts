@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/server';
 
@@ -57,7 +58,7 @@ async function raiseAdminAlert(
       resolved: false,
     });
   } catch (error) {
-    console.error('[Timeclock] Failed to raise admin alert:', error);
+    logger.error('[Timeclock] Failed to raise admin alert:', error);
   }
 }
 
@@ -181,7 +182,7 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (insertError) {
-          console.error('[Timeclock] clock_in insert error:', insertError);
+          logger.error('[Timeclock] clock_in insert error:', insertError);
           return NextResponse.json(
             { error: 'Failed to clock in', details: insertError.message },
             { status: 500 }
@@ -405,7 +406,7 @@ export async function POST(request: NextRequest) {
         );
     }
   } catch (error) {
-    console.error('[Timeclock] Unexpected error:', error);
+    logger.error('[Timeclock] Unexpected error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

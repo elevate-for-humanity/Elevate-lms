@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(data || []);
   } catch (error) {
-    console.error('PR tracking GET error:', error);
+    logger.error('PR tracking GET error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch PR tracking data' },
       { status: 500 }
@@ -83,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('PR tracking POST error:', error);
+    logger.error('PR tracking POST error:', error);
     return NextResponse.json(
       { error: 'Failed to save PR tracking data' },
       { status: 500 }
@@ -125,7 +126,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('PR tracking PUT error:', error);
+    logger.error('PR tracking PUT error:', error);
     return NextResponse.json(
       { error: 'Failed to update PR tracking' },
       { status: 500 }
@@ -159,7 +160,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('PR tracking DELETE error:', error);
+    logger.error('PR tracking DELETE error:', error);
     return NextResponse.json(
       { error: 'Failed to delete PR tracking' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { payoutService } from '@/lib/franchise/payout-service';
@@ -49,7 +50,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Error generating payouts:', error);
+    logger.error('Error generating payouts:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to generate payouts' },
       { status: 500 }

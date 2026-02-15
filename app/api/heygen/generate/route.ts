@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 
 const HEYGEN_API_KEY = process.env.HEYGEN_API_KEY;
@@ -73,7 +74,7 @@ export async function POST(request: NextRequest) {
       title,
     });
   } catch (error) {
-    console.error('HeyGen API error:', error);
+    logger.error('HeyGen API error:', error);
     return NextResponse.json({ error: 'Failed to generate video' }, { status: 500 });
   }
 }

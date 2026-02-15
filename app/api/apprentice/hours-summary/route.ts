@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -65,7 +66,7 @@ export async function GET(req: Request) {
       .eq('enrollment_id', enrollment?.id || enrollmentId);
 
     if (hoursError) {
-      console.error('Error fetching hours:', hoursError);
+      logger.error('Error fetching hours:', hoursError);
     }
 
     // Calculate totals
@@ -152,7 +153,7 @@ export async function GET(req: Request) {
 
     return NextResponse.json({ summary });
   } catch (error: any) {
-    console.error('Error in hours-summary:', error);
+    logger.error('Error in hours-summary:', error);
     return NextResponse.json(
       { error: error?.message || 'Failed to fetch hour summary' },
       { status: 500 }

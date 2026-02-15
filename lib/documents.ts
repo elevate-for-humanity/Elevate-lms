@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Document Management System
  * 
@@ -514,7 +515,7 @@ export async function createDocumentRecord(params: {
     .single();
 
   if (error) {
-    console.error('Error creating document record:', error);
+    logger.error('Error creating document record:', error);
     return null;
   }
 

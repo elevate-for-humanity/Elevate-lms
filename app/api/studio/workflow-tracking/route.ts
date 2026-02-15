@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(data || []);
   } catch (error) {
-    console.error('Workflow tracking GET error:', error);
+    logger.error('Workflow tracking GET error:', error);
     return NextResponse.json(
       { error: 'Failed to fetch workflow tracking data' },
       { status: 500 }
@@ -84,7 +85,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Workflow tracking POST error:', error);
+    logger.error('Workflow tracking POST error:', error);
     return NextResponse.json(
       { error: 'Failed to save workflow tracking data' },
       { status: 500 }
@@ -126,7 +127,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (error) {
-    console.error('Workflow tracking PUT error:', error);
+    logger.error('Workflow tracking PUT error:', error);
     return NextResponse.json(
       { error: 'Failed to update workflow tracking' },
       { status: 500 }
@@ -160,7 +161,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ ok: true });
   } catch (error) {
-    console.error('Workflow tracking DELETE error:', error);
+    logger.error('Workflow tracking DELETE error:', error);
     return NextResponse.json(
       { error: 'Failed to delete workflow tracking' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -19,7 +20,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
 
     return NextResponse.json({ tasks });
   } catch (err: any) {
-    console.error('[GET /api/cases/[caseId]/tasks] Error:', err);
+    logger.error('[GET /api/cases/[caseId]/tasks] Error:', err);
     return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
   }
 }
@@ -44,7 +45,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ caseId:
 
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (err: any) {
-    console.error('[POST /api/cases/[caseId]/tasks] Error:', err);
+    logger.error('[POST /api/cases/[caseId]/tasks] Error:', err);
     return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
   }
 }
@@ -79,12 +80,12 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
       .eq('id', taskId);
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error('[PATCH /api/cases/[caseId]/tasks] Error:', err);
+    logger.error('[PATCH /api/cases/[caseId]/tasks] Error:', err);
     return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
   }
 }

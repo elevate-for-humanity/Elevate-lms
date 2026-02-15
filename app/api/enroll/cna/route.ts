@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (enrollmentError) {
-      console.error('Enrollment error:', enrollmentError);
+      logger.error('Enrollment error:', enrollmentError);
       // If table doesn't exist, still return success for demo
       if (enrollmentError.code === '42P01') {
         return NextResponse.json({
@@ -83,7 +84,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('CNA enrollment error:', error);
+    logger.error('CNA enrollment error:', error);
     return NextResponse.json(
       { error: 'Failed to process enrollment' },
       { status: 500 }

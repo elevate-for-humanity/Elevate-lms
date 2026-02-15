@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { Resend } from 'resend';
@@ -63,7 +64,7 @@ async function sendTrialWelcomeEmail(
 ) {
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) {
-    console.warn(`[trial] ${correlationId} — RESEND_API_KEY not configured, skipping welcome email`);
+    logger.warn(`[trial] ${correlationId} — RESEND_API_KEY not configured, skipping welcome email`);
     return;
   }
 
@@ -140,7 +141,7 @@ export async function POST(request: NextRequest) {
 
     const supabase = getSupabaseAdmin();
     if (!supabase) {
-      console.error(`[trial] ${correlationId} — Supabase not configured`);
+      logger.error(`[trial] ${correlationId} — Supabase not configured`);
       return NextResponse.json({ error: 'Service unavailable', correlationId }, { status: 503 });
     }
 
@@ -196,7 +197,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (orgError) {
-      console.error(`[trial] ${correlationId} — Org creation error:`, orgError);
+      logger.error(`[trial] ${correlationId} — Org creation error:`, orgError);
       return NextResponse.json({ error: 'Failed to create organization', correlationId }, { status: 500 });
     }
 
@@ -219,7 +220,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (licenseError) {
-      console.error(`[trial] ${correlationId} — License creation error:`, licenseError);
+      logger.error(`[trial] ${correlationId} — License creation error:`, licenseError);
       // Rollback org
       await supabase.from('organizations').delete().eq('id', org.id);
       return NextResponse.json({ error: 'Failed to create trial license', correlationId }, { status: 500 });
@@ -244,7 +245,7 @@ export async function POST(request: NextRequest) {
     try {
       await sendTrialWelcomeEmail(email, orgName.trim(), subdomain, dashboardUrl, correlationId);
     } catch (emailError) {
-      console.error(`[trial] ${correlationId} — Failed to send welcome email:`, emailError);
+      logger.error(`[trial] ${correlationId} — Failed to send welcome email:`, emailError);
       // Don't fail — trial is created
     }
 
@@ -257,7 +258,7 @@ export async function POST(request: NextRequest) {
       message: `Trial created. Check ${email} for login instructions.`,
     });
   } catch (error) {
-    console.error(`[trial] ${correlationId} — Unexpected error:`, error);
+    logger.error(`[trial] ${correlationId} — Unexpected error:`, error);
     return NextResponse.json({ error: 'Internal server error', correlationId }, { status: 500 });
   }
 }

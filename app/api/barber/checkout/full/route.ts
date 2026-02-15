@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import { BARBER_PRICING } from '@/lib/programs/pricing';
@@ -116,7 +117,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error('Barber full checkout error:', error);
+    logger.error('Barber full checkout error:', error);
     return NextResponse.json(
       { error: 'Failed to create checkout session', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

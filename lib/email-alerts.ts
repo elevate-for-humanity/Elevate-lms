@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Email alert system for admin notifications
  * Uses Resend API for reliable email delivery
@@ -36,7 +37,7 @@ export async function sendAdminAlert(alert: EmailAlert) {
 
     return { success: true, provider: 'resend' };
   } catch (error) { /* Error handled silently */ 
-    console.error('Email alert error:', error);
+    logger.error('Email alert error:', error);
     // Fallback to console logging
     return { success: false, error };
   }

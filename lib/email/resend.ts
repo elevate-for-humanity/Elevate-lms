@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { Resend } from 'resend';
 
 const resend = process.env.RESEND_API_KEY
@@ -26,13 +27,13 @@ export async function sendEmail(options: EmailOptions) {
     });
 
     if (error) {
-      console.error('[Email] Send failed:', error);
+      logger.error('[Email] Send failed:', error);
       return { success: false, error: error.message };
     }
 
     return { success: true, data };
   } catch (error) { /* Error handled silently */ 
-    console.error('[Email] Send error:', error);
+    logger.error('[Email] Send error:', error);
     const errorMessage = error instanceof Error ? error.message : 'Unknown error';
     return { success: false, error: errorMessage };
   }

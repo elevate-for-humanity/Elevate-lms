@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from "@/lib/supabase/server";
 
 export type AuditAction = {
@@ -28,6 +29,6 @@ export async function logAction(actor_id: string, actor_role: string, payload: A
   });
 
   if (error) {
-    console.error("audit log insert failed", error);
+    logger.error("audit log insert failed", error);
   }
 }

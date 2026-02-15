@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 /**
  * Database Schema Guard
@@ -54,7 +55,7 @@ export async function verifyTableSchema(
     .order('ordinal_position');
 
   if (error) {
-    console.error('Schema verification error:', error);
+    logger.error('Schema verification error:', error);
     return {
       table: tableName,
       exists: true,
@@ -109,14 +110,14 @@ export async function getTableColumns(
 export function logSchemaVerification(verification: SchemaVerification): void {
   if (process.env.NODE_ENV === 'development') {
     if (verification.missingColumns.length > 0) {
-      console.log(
+      logger.info(
         `   ⚠️  Missing columns: ${verification.missingColumns.join(', ')}`
       );
     }
 
     if (verification.columns.length > 0) {
       verification.columns.forEach((col) => {
-        console.log(`   ✓ ${col.name}: ${col.type}`);
+        logger.info(`   ✓ ${col.name}: ${col.type}`);
       });
     }
   }

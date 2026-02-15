@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -39,7 +40,7 @@ export async function GET() {
       .in('status', ['active', 'enrolled', 'in_progress', 'completed']);
 
     if (enrollError) {
-      console.error('Enrollments fetch error:', enrollError);
+      logger.error('Enrollments fetch error:', enrollError);
       return NextResponse.json({ enrollments: [] });
     }
 
@@ -55,7 +56,7 @@ export async function GET() {
       .order('logged_date', { ascending: false });
 
     if (hoursError) {
-      console.error('Hours fetch error:', hoursError);
+      logger.error('Hours fetch error:', hoursError);
     }
 
     // Group hours by enrollment
@@ -93,7 +94,7 @@ export async function GET() {
 
     return NextResponse.json({ enrollments: result });
   } catch (error) {
-    console.error('Student hours API error:', error);
+    logger.error('Student hours API error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -39,7 +40,7 @@ export async function POST(req: Request) {
 
     return NextResponse.redirect(new URL('/store/cart', req.url), 303);
   } catch (error) {
-    console.error('Cart update error:', error);
+    logger.error('Cart update error:', error);
     return NextResponse.json({ error: 'Failed to update cart' }, { status: 500 });
   }
 }

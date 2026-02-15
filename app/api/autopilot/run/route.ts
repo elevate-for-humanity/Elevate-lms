@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { runAutopilot } from '@/lib/autopilot/deploy-prep';
@@ -36,7 +37,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Autopilot run error:', error);
+    logger.error('Autopilot run error:', error);
     return NextResponse.json(
       { error: 'Autopilot run failed', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

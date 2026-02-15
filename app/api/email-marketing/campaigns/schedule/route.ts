@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -40,7 +41,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Schedule error:', error);
+      logger.error('Schedule error:', error);
       return NextResponse.json({
         success: true,
         message: 'Campaign scheduled',
@@ -55,7 +56,7 @@ export async function POST(request: NextRequest) {
       message: `Campaign scheduled for ${scheduledFor}`,
     });
   } catch (error) {
-    console.error('Schedule campaign error:', error);
+    logger.error('Schedule campaign error:', error);
     return NextResponse.json(
       { error: 'Failed to schedule campaign' },
       { status: 500 }

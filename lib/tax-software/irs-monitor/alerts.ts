@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * IRS Update Alert System
  * Sends notifications when tax parameter changes are detected
@@ -213,7 +214,7 @@ export class AlertManager {
         body: JSON.stringify(payload)
       });
     } catch (error) {
-      console.error('Failed to send webhook:', error);
+      logger.error('Failed to send webhook:', error);
     }
   }
   
@@ -223,8 +224,8 @@ export class AlertManager {
   private async sendEmail(alert: Alert): Promise<void> {
     // Email implementation would go here
     // Using nodemailer or similar
-    console.log(`[EMAIL] Would send to: ${this.config.email?.recipients.join(', ')}`);
-    console.log(`[EMAIL] Subject: ${alert.title}`);
+    logger.info(`[EMAIL] Would send to: ${this.config.email?.recipients.join(', ')}`);
+    logger.info(`[EMAIL] Subject: ${alert.title}`);
   }
   
   /**
@@ -233,8 +234,8 @@ export class AlertManager {
   private async sendSMS(alert: Alert): Promise<void> {
     // SMS implementation would go here
     // Using Twilio or similar
-    console.log(`[SMS] Would send to: ${this.config.sms?.phoneNumbers.join(', ')}`);
-    console.log(`[SMS] Message: ${alert.title}`);
+    logger.info(`[SMS] Would send to: ${this.config.sms?.phoneNumbers.join(', ')}`);
+    logger.info(`[SMS] Message: ${alert.title}`);
   }
   
   /**
@@ -268,10 +269,10 @@ export class AlertManager {
       });
       
       if (!response.ok) {
-        console.error('Failed to save alert to database:', await response.text());
+        logger.error('Failed to save alert to database:', await response.text());
       }
     } catch (error) {
-      console.error('Failed to save alert to database:', error);
+      logger.error('Failed to save alert to database:', error);
     }
   }
   

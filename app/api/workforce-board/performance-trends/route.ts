@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -48,7 +49,7 @@ export async function GET() {
     
     return NextResponse.json({ trends });
   } catch (error) {
-    console.error('Performance trends error:', error);
+    logger.error('Performance trends error:', error);
     return NextResponse.json({ trends: [] }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -69,7 +70,7 @@ export async function POST(request: NextRequest) {
         .eq('id', existingEntry.id);
 
       if (updateError) {
-        console.error('Failed to update progress entry:', updateError);
+        logger.error('Failed to update progress entry:', updateError);
         return NextResponse.json({ error: 'Failed to log hours' }, { status: 500 });
       }
     } else {
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
         });
 
       if (insertError) {
-        console.error('Failed to create progress entry:', insertError);
+        logger.error('Failed to create progress entry:', insertError);
         return NextResponse.json({ error: 'Failed to log hours' }, { status: 500 });
       }
     }
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
           }),
         });
       } catch (notifError) {
-        console.error('Milestone notification error:', notifError);
+        logger.error('Milestone notification error:', notifError);
       }
     }
 
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
       milestone: newMilestone,
     });
   } catch (error) {
-    console.error('Error logging hours:', error);
+    logger.error('Error logging hours:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

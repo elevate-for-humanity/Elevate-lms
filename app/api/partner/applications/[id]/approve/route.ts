@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -79,7 +80,7 @@ export async function POST(
     });
 
     if (approveError) {
-      console.error('Phase 1 RPC error:', approveError);
+      logger.error('Phase 1 RPC error:', approveError);
       return NextResponse.json({ 
         error: 'Approval failed', 
         details: approveError.message 
@@ -126,7 +127,7 @@ export async function POST(
       });
 
       if (createUserError) {
-        console.error('Auth user creation failed:', createUserError);
+        logger.error('Auth user creation failed:', createUserError);
         // Partner is in approved_pending_user state - can retry later
         return NextResponse.json({
           success: true,
@@ -162,7 +163,7 @@ export async function POST(
     });
 
     if (linkError) {
-      console.error('Phase 2 RPC error:', linkError);
+      logger.error('Phase 2 RPC error:', linkError);
       return NextResponse.json({
         success: true,
         partnerId,
@@ -210,7 +211,7 @@ export async function POST(
       status: 'queued',
       scheduled_for: new Date().toISOString(),
     }).catch(err => {
-      console.warn('Failed to queue approval email:', err);
+      logger.warn('Failed to queue approval email:', err);
     });
 
     // ========================================
@@ -224,7 +225,7 @@ export async function POST(
     });
 
   } catch (error) {
-    console.error('Partner approval error:', error);
+    logger.error('Partner approval error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -111,7 +111,7 @@ export async function PATCH(
 
     if (result?.error) {
       logger.error('Admin license action failed', result.error);
-      return NextResponse.json({ error: result.error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     logger.info('Admin license action completed', { 
@@ -165,7 +165,7 @@ export async function DELETE(
 
     if (error) {
       logger.error('License revocation failed', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     logger.info('License revoked', { 

@@ -62,7 +62,7 @@ export async function POST(req: Request) {
     const duplicate = error?.code === "23505";
 
     if (error && !duplicate) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     // Lightweight audit log (fire-and-forget)

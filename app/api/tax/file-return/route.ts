@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Direct IRS E-File API
  * Replaces SupersonicFastCash integration
@@ -193,7 +194,7 @@ export async function POST(request: NextRequest) {
       .single();
     
     if (clientError) {
-      console.error('Client creation error:', clientError);
+      logger.error('Client creation error:', clientError);
     }
     
     // Create MeF submission
@@ -217,7 +218,7 @@ export async function POST(request: NextRequest) {
       });
     
     if (submissionError) {
-      console.error('Submission storage error:', submissionError);
+      logger.error('Submission storage error:', submissionError);
     }
     
     // Create tax return record
@@ -315,7 +316,7 @@ export async function POST(request: NextRequest) {
           html: generateConfirmationEmail(taxReturn, submission.submissionId, calculation)
         });
       } catch (emailError) {
-        console.error('Email error:', emailError);
+        logger.error('Email error:', emailError);
       }
     }
     
@@ -342,7 +343,7 @@ export async function POST(request: NextRequest) {
     });
     
   } catch (error: any) {
-    console.error('Tax filing error:', error);
+    logger.error('Tax filing error:', error);
     return NextResponse.json(
       { error: error.message || 'Failed to process tax return' },
       { status: 500 }

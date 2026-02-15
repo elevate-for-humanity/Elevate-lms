@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Social Learning Service
  * Enables peer collaboration, discussions, and study groups
@@ -56,7 +57,7 @@ export async function createDiscussion(params: {
     .single();
 
   if (error) {
-    console.error('Failed to create discussion:', error);
+    logger.error('Failed to create discussion:', error);
     return { success: false, error };
   }
 
@@ -87,7 +88,7 @@ export async function replyToDiscussion(params: {
     .single();
 
   if (error) {
-    console.error('Failed to create reply:', error);
+    logger.error('Failed to create reply:', error);
     return { success: false, error };
   }
 
@@ -129,7 +130,7 @@ export async function createStudyGroup(params: {
     .single();
 
   if (error) {
-    console.error('Failed to create study group:', error);
+    logger.error('Failed to create study group:', error);
     return { success: false, error };
   }
 

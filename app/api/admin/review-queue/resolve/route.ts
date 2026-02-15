@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { auditLog, AuditAction, AuditEntity } from '@/lib/logging/auditLog';
@@ -219,7 +220,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({ success: true, action, reason_codes: reasonCodes });
   } catch (error) {
-    console.error('Review resolve error:', error);
+    logger.error('Review resolve error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

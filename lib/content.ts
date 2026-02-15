@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Content fetching functions - all site content from database
  * No hardcoded fake data
@@ -108,7 +109,7 @@ export async function getTestimonials(options?: {
   const { data, error } = await query;
   
   if (error) {
-    console.error('Error fetching testimonials:', error);
+    logger.error('Error fetching testimonials:', error);
     return [];
   }
   
@@ -138,7 +139,7 @@ export async function getTeamMembers(options?: {
   const { data, error } = await query;
   
   if (error) {
-    console.error('Error fetching team members:', error);
+    logger.error('Error fetching team members:', error);
     return [];
   }
   
@@ -168,7 +169,7 @@ export async function getSuccessStories(options?: {
   const { data, error } = await query;
   
   if (error) {
-    console.error('Error fetching success stories:', error);
+    logger.error('Error fetching success stories:', error);
     return [];
   }
   
@@ -202,7 +203,7 @@ export async function getFAQs(options?: {
   const { data, error } = await query;
   
   if (error) {
-    console.error('Error fetching FAQs:', error);
+    logger.error('Error fetching FAQs:', error);
     return [];
   }
   
@@ -220,7 +221,7 @@ export async function getLocations(): Promise<Location[]> {
     .order('is_main_office', { ascending: false });
   
   if (error) {
-    console.error('Error fetching locations:', error);
+    logger.error('Error fetching locations:', error);
     return [];
   }
   
@@ -254,7 +255,7 @@ export async function getPartners(options?: {
   const { data, error } = await query;
   
   if (error) {
-    console.error('Error fetching partners:', error);
+    logger.error('Error fetching partners:', error);
     return [];
   }
   
@@ -273,7 +274,7 @@ export async function getMainOffice(): Promise<Location | null> {
     .single();
   
   if (error) {
-    console.error('Error fetching main office:', error);
+    logger.error('Error fetching main office:', error);
     return null;
   }
   

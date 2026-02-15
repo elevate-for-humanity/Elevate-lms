@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 import { rateLimitNew as rateLimit, getClientIdentifier } from '@/lib/rateLimit';
@@ -56,7 +57,7 @@ export async function GET(request: Request) {
     const { data: posts, error, count } = await query;
 
     if (error) {
-      console.error('Blog fetch error:', error);
+      logger.error('Blog fetch error:', error);
       return NextResponse.json(
         { error: 'Failed to fetch blog posts' },
         { status: 500 }
@@ -70,7 +71,7 @@ export async function GET(request: Request) {
       offset,
     });
   } catch (err) {
-    console.error('Blog API error:', err);
+    logger.error('Blog API error:', err);
     return NextResponse.json(
       { error: 'An error occurred' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { preparerService } from '@/lib/franchise/preparer-service';
@@ -55,7 +56,7 @@ export async function GET(
 
     return NextResponse.json(stats);
   } catch (error) {
-    console.error('Error getting preparer stats:', error);
+    logger.error('Error getting preparer stats:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Failed to get preparer stats' },
       { status: 500 }

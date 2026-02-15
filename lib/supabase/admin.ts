@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 
 export function createAdminClient(): SupabaseClient<any> | null {
@@ -6,7 +7,7 @@ export function createAdminClient(): SupabaseClient<any> | null {
 
   if (!url || !key) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn('[Supabase Admin] Missing credentials. Admin features disabled.');
+      logger.warn('[Supabase Admin] Missing credentials. Admin features disabled.');
     }
     return null;
   }

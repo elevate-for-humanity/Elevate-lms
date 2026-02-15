@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import Stripe from 'stripe';
 import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
@@ -164,7 +165,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Apprenticeship checkout error:', error);
+    logger.error('Apprenticeship checkout error:', error);
     return NextResponse.json(
       { error: 'Failed to create checkout session' },
       { status: 500 }

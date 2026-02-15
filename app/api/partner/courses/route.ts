@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -96,8 +97,8 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Course creation error:', error);
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      logger.error('Course creation error:', error);
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({
@@ -106,7 +107,7 @@ export async function POST(request: NextRequest) {
       message: 'Course created successfully',
     });
   } catch (error) {
-    console.error('Create course error:', error);
+    logger.error('Create course error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -134,12 +135,12 @@ export async function GET(request: NextRequest) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true, courses });
   } catch (error) {
-    console.error('Get courses error:', error);
+    logger.error('Get courses error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -53,7 +54,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
       signatureCompleteness: completeness,
     });
   } catch (err: any) {
-    console.error('[GET /api/cases/[caseId]] Error:', err);
+    logger.error('[GET /api/cases/[caseId]] Error:', err);
     return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
   }
 }
@@ -89,7 +90,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
-    console.error('[PATCH /api/cases/[caseId]] Error:', err);
+    logger.error('[PATCH /api/cases/[caseId]] Error:', err);
     return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
   }
 }

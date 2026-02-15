@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 
@@ -159,7 +160,7 @@ Ona`;
     // Note: Resend doesn't support scheduled sends natively
     // In production, you'd use a job queue or cron job
     // For now, we'll log this for manual follow-up or future implementation
-    console.log('[Calendly Webhook] Reminder scheduled for:', {
+    logger.info('[Calendly Webhook] Reminder scheduled for:', {
       email: invitee.email,
       reminderTime: reminderTime.toISOString(),
       meetingTime: scheduledTime,
@@ -238,10 +239,10 @@ export async function POST(request: NextRequest) {
     
     const event: CalendlyEvent = await request.json();
     
-    console.log('[Calendly Webhook] Received event:', event.event);
+    logger.info('[Calendly Webhook] Received event:', event.event);
     
     if (!process.env.RESEND_API_KEY) {
-      console.warn('[Calendly Webhook] RESEND_API_KEY not configured');
+      logger.warn('[Calendly Webhook] RESEND_API_KEY not configured');
       return NextResponse.json({ 
         success: true, 
         warning: 'Email not sent - RESEND_API_KEY not configured' 
@@ -257,22 +258,22 @@ export async function POST(request: NextRequest) {
           sendReminder(event.payload.invitee, event.payload.scheduled_event.start_time),
         ]);
         
-        console.log('[Calendly Webhook] Booking confirmation sent to:', event.payload.invitee.email);
+        logger.info('[Calendly Webhook] Booking confirmation sent to:', event.payload.invitee.email);
         break;
         
       case 'invitee.canceled':
         // Booking canceled - could send cancellation email or update CRM
-        console.log('[Calendly Webhook] Booking canceled:', event.payload.invitee.email);
+        logger.info('[Calendly Webhook] Booking canceled:', event.payload.invitee.email);
         break;
         
       default:
-        console.log('[Calendly Webhook] Unhandled event type:', event.event);
+        logger.info('[Calendly Webhook] Unhandled event type:', event.event);
     }
     
     return NextResponse.json({ success: true });
     
   } catch (error) {
-    console.error('[Calendly Webhook] Error:', error);
+    logger.error('[Calendly Webhook] Error:', error);
     return NextResponse.json(
       { error: 'Failed to process webhook' },
       { status: 500 }

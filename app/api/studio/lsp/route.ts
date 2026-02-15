@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Unknown action' }, { status: 400 });
     }
   } catch (error) {
-    console.error('LSP error:', error);
+    logger.error('LSP error:', error);
     return NextResponse.json({ error: 'LSP request failed' }, { status: 500 });
   }
 }

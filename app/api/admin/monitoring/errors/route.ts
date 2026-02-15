@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -39,7 +40,7 @@ export async function GET(request: NextRequest) {
       .range(offset, offset + limit - 1);
 
     if (error) {
-      console.error('Error fetching errors:', error);
+      logger.error('Error fetching errors:', error);
       return NextResponse.json({ errors: [] });
     }
 
@@ -60,7 +61,7 @@ export async function GET(request: NextRequest) {
       offset,
     });
   } catch (error) {
-    console.error('Monitoring errors endpoint error:', error);
+    logger.error('Monitoring errors endpoint error:', error);
     return NextResponse.json({
       errors: [],
       error: error instanceof Error ? error.message : 'Unknown error',

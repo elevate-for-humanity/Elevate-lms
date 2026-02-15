@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -72,7 +73,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ caseId:
         : `Signature added. Missing: ${result.completeness.missing.join(', ')}`,
     });
   } catch (err: any) {
-    console.error('[POST /api/cases/[caseId]/signatures] Error:', err);
+    logger.error('[POST /api/cases/[caseId]/signatures] Error:', err);
     return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
   }
 }
@@ -95,7 +96,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
       .order('created_at', { ascending: true });
 
     if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 
     const completeness = await checkSignatureCompleteness(caseId);
@@ -105,7 +106,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
       completeness,
     });
   } catch (err: any) {
-    console.error('[GET /api/cases/[caseId]/signatures] Error:', err);
+    logger.error('[GET /api/cases/[caseId]/signatures] Error:', err);
     return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
   }
 }

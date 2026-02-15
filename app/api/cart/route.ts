@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import { createClient } from '@/lib/supabase/server';
@@ -30,7 +31,7 @@ export async function GET(request: NextRequest) {
         .single();
 
       if (error) {
-        console.error('Error creating cart:', error);
+        logger.error('Error creating cart:', error);
         return NextResponse.json({ error: 'Failed to create cart' }, { status: 500 });
       }
 
@@ -55,7 +56,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ cart });
   } catch (error) {
-    console.error('Cart GET error:', error);
+    logger.error('Cart GET error:', error);
     return NextResponse.json({ error: 'Failed to get cart' }, { status: 500 });
   }
 }
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
     const cart = await getCart(cartId);
     return NextResponse.json({ cart, item });
   } catch (error) {
-    console.error('Cart POST error:', error);
+    logger.error('Cart POST error:', error);
     return NextResponse.json({ error: 'Failed to add to cart' }, { status: 500 });
   }
 }
@@ -119,7 +120,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json({ cart });
   } catch (error) {
-    console.error('Cart PATCH error:', error);
+    logger.error('Cart PATCH error:', error);
     return NextResponse.json({ error: 'Failed to update cart' }, { status: 500 });
   }
 }
@@ -146,7 +147,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ cart });
   } catch (error) {
-    console.error('Cart DELETE error:', error);
+    logger.error('Cart DELETE error:', error);
     return NextResponse.json({ error: 'Failed to remove from cart' }, { status: 500 });
   }
 }

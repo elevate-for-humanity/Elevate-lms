@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 
 import { createClient } from '@/lib/supabase/server';
 
@@ -45,7 +46,7 @@ export async function recordConsent(
   });
 
   if (error) {
-    console.error('Error recording consent:', error);
+    logger.error('Error recording consent:', error);
     return null;
   }
 
@@ -66,7 +67,7 @@ export async function hasConsent(
   });
 
   if (error) {
-    console.error('Error checking consent:', error);
+    logger.error('Error checking consent:', error);
     return false;
   }
 
@@ -83,7 +84,7 @@ export async function getUserConsents(userId: string): Promise<ConsentRecord[]> 
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error('Error fetching consents:', error);
+    logger.error('Error fetching consents:', error);
     return [];
   }
 

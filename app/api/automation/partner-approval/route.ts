@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { checkPartnerApproval, processPartnerDocument } from '@/lib/automation/partner-approval';
@@ -60,7 +61,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error('Partner approval error:', error);
+    logger.error('Partner approval error:', error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }

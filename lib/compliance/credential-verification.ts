@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 /**
  * Credential Verification System
  *
@@ -91,7 +92,7 @@ export async function verifyCredential(
   // 3. Or use web scraping (with permission)
 
   // Log the verification request for debugging
-  console.log('Credential verification request:', {
+  logger.info('Credential verification request:', {
     credential_type: request.credential_type,
     database: database.name,
     method: database.verification_method,

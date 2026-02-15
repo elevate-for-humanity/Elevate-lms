@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 30;
@@ -85,7 +86,7 @@ export async function POST(
       status: 'rejected',
     });
   } catch (error) {
-    console.error('Application rejection error:', error);
+    logger.error('Application rejection error:', error);
     return NextResponse.json({ error: 'Failed to reject application' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -28,13 +29,13 @@ export async function POST(req: Request) {
       .is('orientation_completed_at', null);
 
     if (error) {
-      console.error('Error updating enrollment:', error);
+      logger.error('Error updating enrollment:', error);
       // Don't fail - let the flow continue
     }
 
     return NextResponse.json({ success: true, program });
   } catch (error) {
-    console.error('Orientation completion error:', error);
+    logger.error('Orientation completion error:', error);
     return NextResponse.json({ success: true }); // Don't block flow
   }
 }

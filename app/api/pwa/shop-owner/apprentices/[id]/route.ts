@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -146,7 +147,7 @@ export async function GET(
       recentEntries: progressEntries?.slice(0, 10) || [],
     });
   } catch (error) {
-    console.error('Error fetching apprentice details:', error);
+    logger.error('Error fetching apprentice details:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { createAdminClient } from '@/lib/supabase/server';
 
 /**
@@ -64,7 +65,7 @@ export async function getActiveShifts(): Promise<ActiveShift[]> {
     .order('clock_in_at', { ascending: false });
 
   if (error) {
-    console.error('[Timeclock Queries] getActiveShifts error:', error);
+    logger.error('[Timeclock Queries] getActiveShifts error:', error);
     return [];
   }
 
@@ -97,7 +98,7 @@ export async function getAutoClockOuts(
   const { data, error } = await query;
 
   if (error) {
-    console.error('[Timeclock Queries] getAutoClockOuts error:', error);
+    logger.error('[Timeclock Queries] getAutoClockOuts error:', error);
     return [];
   }
 
@@ -133,7 +134,7 @@ export async function getLunchViolations(
   const { data, error } = await query;
 
   if (error) {
-    console.error('[Timeclock Queries] getLunchViolations error:', error);
+    logger.error('[Timeclock Queries] getLunchViolations error:', error);
     return [];
   }
 
@@ -191,7 +192,7 @@ export async function getWeeklyCapWarnings(): Promise<WeeklyCapWarning[]> {
     .not('hours_worked', 'is', null);
 
   if (error) {
-    console.error('[Timeclock Queries] getWeeklyCapWarnings error:', error);
+    logger.error('[Timeclock Queries] getWeeklyCapWarnings error:', error);
     return [];
   }
 
@@ -248,7 +249,7 @@ export async function getApprenticeDailySummary(
     .order('work_date', { ascending: true });
 
   if (error) {
-    console.error('[Timeclock Queries] getApprenticeDailySummary error:', error);
+    logger.error('[Timeclock Queries] getApprenticeDailySummary error:', error);
     return [];
   }
 

@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
@@ -74,7 +75,7 @@ export async function GET(request: NextRequest) {
       partnerId,
     });
   } catch (error) {
-    console.error('Documents GET error:', error);
+    logger.error('Documents GET error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
@@ -132,7 +133,7 @@ export async function POST(request: NextRequest) {
       });
 
     if (uploadError) {
-      console.error('Upload error:', uploadError);
+      logger.error('Upload error:', uploadError);
       return NextResponse.json({ error: 'Failed to upload file' }, { status: 500 });
     }
 
@@ -167,7 +168,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (insertError) {
-      console.error('Insert error:', insertError);
+      logger.error('Insert error:', insertError);
       return NextResponse.json({ error: 'Failed to save document' }, { status: 500 });
     }
 
@@ -190,7 +191,7 @@ export async function POST(request: NextRequest) {
       allDocsComplete,
     });
   } catch (error) {
-    console.error('Documents POST error:', error);
+    logger.error('Documents POST error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

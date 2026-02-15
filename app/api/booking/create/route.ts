@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       // Table might not exist, return success anyway for demo
-      console.error('Booking error:', error);
+      logger.error('Booking error:', error);
       return NextResponse.json({
         success: true,
         booking: {
@@ -67,7 +68,7 @@ export async function POST(request: NextRequest) {
       message: 'Booking confirmed! Check your email for meeting details.',
     });
   } catch (error) {
-    console.error('Booking error:', error);
+    logger.error('Booking error:', error);
     return NextResponse.json(
       { error: 'Failed to create booking' },
       { status: 500 }

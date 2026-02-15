@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { headers } from 'next/headers';
@@ -90,7 +91,7 @@ export async function POST(request: NextRequest) {
       .in('agreement_type', agreements);
 
     if (versionsError) {
-      console.error('Error fetching agreement versions:', versionsError);
+      logger.error('Error fetching agreement versions:', versionsError);
       // Continue with default version if table doesn't exist yet
     }
 
@@ -131,7 +132,7 @@ export async function POST(request: NextRequest) {
       .select();
 
     if (insertError) {
-      console.error('Error recording signed agreements:', insertError);
+      logger.error('Error recording signed agreements:', insertError);
       return NextResponse.json({ error: 'Failed to record signature' }, { status: 500 });
     }
 
@@ -155,7 +156,7 @@ export async function POST(request: NextRequest) {
       });
     } catch (auditError) {
       // Don't fail the request if audit logging fails
-      console.error('Audit log error:', auditError);
+      logger.error('Audit log error:', auditError);
     }
 
     return NextResponse.json({
@@ -173,7 +174,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error) {
-    console.error('Agreement signing error:', error);
+    logger.error('Agreement signing error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

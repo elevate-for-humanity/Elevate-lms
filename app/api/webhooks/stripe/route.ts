@@ -61,7 +61,7 @@ const supabase =
 
 export async function POST(request: NextRequest) {
   // Stage 0: Log env var presence for debugging
-  console.log('[webhook] Env check:', {
+  logger.info('[webhook] Env check:', {
     hasStripeKey: !!process.env.STRIPE_SECRET_KEY,
     hasWebhookSecret: !!webhookSecret,
     hasSupabaseUrl: !!supabaseUrl,
@@ -71,7 +71,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (!stripe || !supabase) {
-    console.error('[webhook] Missing config:', { stripe: !!stripe, supabase: !!supabase });
+    logger.error('[webhook] Missing config:', { stripe: !!stripe, supabase: !!supabase });
     return NextResponse.json(
       { error: 'Stripe or Supabase not configured' },
       { status: 503 }
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
   const signature = request.headers.get('stripe-signature');
 
   if (!signature) {
-    console.error('[webhook] No stripe-signature header');
+    logger.error('[webhook] No stripe-signature header');
     return NextResponse.json(
       { error: 'No signature provided' },
       { status: 400 }
@@ -95,14 +95,14 @@ export async function POST(request: NextRequest) {
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
   } catch (err) {
     const errMsg = err instanceof Error ? err.message : String(err);
-    console.error('[webhook] Signature verification failed:', errMsg);
+    logger.error('[webhook] Signature verification failed:', errMsg);
     logger.error('Webhook signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
   // ========== SIGNATURE VERIFIED - NEVER RETURN 500 FROM HERE ==========
   // Log verified event details
-  console.log('[webhook] Verified event:', {
+  logger.info('[webhook] Verified event:', {
     id: event.id,
     type: event.type,
     livemode: event.livemode,
@@ -120,11 +120,11 @@ export async function POST(request: NextRequest) {
         .single();
       existingEvent = data;
     } catch (idempotencyErr) {
-      console.error('[webhook] Idempotency check failed (continuing):', idempotencyErr);
+      logger.error('[webhook] Idempotency check failed (continuing):', idempotencyErr);
     }
 
     if (existingEvent) {
-      console.log(`[webhook] Already processed: ${event.id}, status: ${existingEvent.status}`);
+      logger.info(`[webhook] Already processed: ${event.id}, status: ${existingEvent.status}`);
       logger.info(`Webhook already processed: ${event.id}, status: ${existingEvent.status}`);
       return NextResponse.json({ received: true, duplicate: true });
     }
@@ -144,16 +144,16 @@ export async function POST(request: NextRequest) {
       if (insertError) {
         // If insert fails due to unique constraint, another process is handling it
         if (insertError.code === '23505') {
-          console.log(`[webhook] Being processed by another instance: ${event.id}`);
+          logger.info(`[webhook] Being processed by another instance: ${event.id}`);
           logger.info(`Webhook being processed by another instance: ${event.id}`);
           return NextResponse.json({ received: true, duplicate: true });
         }
         // Log but continue - idempotency table might not exist yet
-        console.warn('[webhook] Failed to record event (continuing):', insertError);
+        logger.warn('[webhook] Failed to record event (continuing):', insertError);
         logger.warn('Failed to record webhook event (continuing):', insertError);
       }
     } catch (recordErr) {
-      console.error('[webhook] Record event failed (continuing):', recordErr);
+      logger.error('[webhook] Record event failed (continuing):', recordErr);
     }
 
     // Handle the event - each case wrapped in its own try/catch
@@ -173,13 +173,13 @@ export async function POST(request: NextRequest) {
           const amountPaid = (session.amount_total || 0) / 100;
 
           if (!studentId || !programId) {
-            console.error('[webhook] program_enrollment missing required metadata', {
+            logger.error('[webhook] program_enrollment missing required metadata', {
               studentId, programId, programSlug
             });
             break;
           }
 
-          console.log('[webhook] Processing program_enrollment', {
+          logger.info('[webhook] Processing program_enrollment', {
             studentId, programId, programSlug, fundingSource, amountPaid
           });
 
@@ -203,9 +203,9 @@ export async function POST(request: NextRequest) {
             .single();
 
           if (enrollError) {
-            console.error('[webhook] Failed to upsert student_enrollment', enrollError);
+            logger.error('[webhook] Failed to upsert student_enrollment', enrollError);
           } else {
-            console.log('[webhook] student_enrollment created/updated', { 
+            logger.info('[webhook] student_enrollment created/updated', { 
               enrollmentId: enrollment?.id,
               studentId,
               programSlug 
@@ -229,7 +229,7 @@ export async function POST(request: NextRequest) {
 
           logger.info(`✅ Program enrollment provisioned: ${programSlug} for student ${studentId}`);
         } catch (err: any) {
-          console.error('[webhook] Error processing program_enrollment:', err);
+          logger.error('[webhook] Error processing program_enrollment:', err);
           logger.error('Error processing program_enrollment:', err instanceof Error ? err : new Error(String(err)));
         }
         break;
@@ -251,7 +251,7 @@ export async function POST(request: NextRequest) {
 
           logger.info(`✅ Donation recorded: $${amount} from ${donorEmail || 'anonymous'}`);
         } catch (err: any) {
-          console.error('[webhook] Error processing donation:', err);
+          logger.error('[webhook] Error processing donation:', err);
         }
         break;
       }
@@ -268,13 +268,13 @@ export async function POST(request: NextRequest) {
           const amountPaid = (session.amount_total || 0) / 100;
 
           if (!studentId || !applicationId) {
-            console.error('[webhook] apprenticeship_enrollment missing required metadata', {
+            logger.error('[webhook] apprenticeship_enrollment missing required metadata', {
               studentId, applicationId, program, paymentOption
             });
             break;
           }
 
-          console.log('[webhook] Processing apprenticeship_enrollment', {
+          logger.info('[webhook] Processing apprenticeship_enrollment', {
             studentId, applicationId, program, paymentOption, amountPaid
           });
 
@@ -288,7 +288,7 @@ export async function POST(request: NextRequest) {
             .eq('id', applicationId);
 
           if (appError) {
-            console.error('[webhook] Failed to update application', appError);
+            logger.error('[webhook] Failed to update application', appError);
           }
 
           // Create or update enrollment with enrolled_pending_approval status
@@ -312,9 +312,9 @@ export async function POST(request: NextRequest) {
             .single();
 
           if (enrollError) {
-            console.error('[webhook] Failed to create enrollment', enrollError);
+            logger.error('[webhook] Failed to create enrollment', enrollError);
           } else {
-            console.log('[webhook] Apprenticeship enrollment created', {
+            logger.info('[webhook] Apprenticeship enrollment created', {
               enrollmentId: enrollment?.id,
               status: 'enrolled_pending_approval',
               studentId,
@@ -349,7 +349,7 @@ export async function POST(request: NextRequest) {
 
           logger.info(`✅ Apprenticeship enrollment created (pending approval): ${program} for student ${studentId}`);
         } catch (err: any) {
-          console.error('[webhook] Error processing apprenticeship_enrollment:', err);
+          logger.error('[webhook] Error processing apprenticeship_enrollment:', err);
           logger.error('Error processing apprenticeship_enrollment:', err instanceof Error ? err : new Error(String(err)));
         }
         break;
@@ -364,13 +364,13 @@ export async function POST(request: NextRequest) {
           const subscriptionId = session.subscription as string;
 
           if (!tenantId || !previousLicenseId || !newTier) {
-            console.error('[webhook] Trial upgrade missing required metadata', {
+            logger.error('[webhook] Trial upgrade missing required metadata', {
               tenantId, previousLicenseId, newTier
             });
             break;
           }
 
-          console.log('[webhook] Processing trial-to-subscription upgrade', {
+          logger.info('[webhook] Processing trial-to-subscription upgrade', {
             tenantId, previousLicenseId, newTier, subscriptionId
           });
 
@@ -400,11 +400,11 @@ export async function POST(request: NextRequest) {
             .single();
 
           if (createError) {
-            console.error('[webhook] Failed to create subscription license', createError);
+            logger.error('[webhook] Failed to create subscription license', createError);
             break;
           }
 
-          console.log('[webhook] Created subscription license', { newLicenseId: newLicense.id });
+          logger.info('[webhook] Created subscription license', { newLicenseId: newLicense.id });
 
           // 2. Mark trial license as expired
           const { error: expireError } = await supabase
@@ -420,7 +420,7 @@ export async function POST(request: NextRequest) {
             .eq('id', previousLicenseId);
 
           if (expireError) {
-            console.error('[webhook] Failed to expire trial license', expireError);
+            logger.error('[webhook] Failed to expire trial license', expireError);
             // Don't break - new license is created, this is non-critical
           }
 
@@ -432,7 +432,7 @@ export async function POST(request: NextRequest) {
             },
           });
 
-          console.log('[webhook] Trial upgrade complete', {
+          logger.info('[webhook] Trial upgrade complete', {
             tenantId,
             oldLicenseId: previousLicenseId,
             newLicenseId: newLicense.id,
@@ -454,7 +454,7 @@ export async function POST(request: NextRequest) {
           });
 
         } catch (err: any) {
-          console.error('[webhook] Error processing trial upgrade:', err);
+          logger.error('[webhook] Error processing trial upgrade:', err);
           logger.error('Error processing trial upgrade:', err instanceof Error ? err : new Error(String(err)));
         }
         break;
@@ -471,13 +471,13 @@ export async function POST(request: NextRequest) {
           const fundingSource = session.metadata.funding_source || 'self_pay';
 
           if (!programId || !studentId) {
-            console.error('[webhook] Program enrollment missing required metadata', {
+            logger.error('[webhook] Program enrollment missing required metadata', {
               programId, studentId, programSlug
             });
             break;
           }
 
-          console.log('[webhook] Processing program enrollment', {
+          logger.info('[webhook] Processing program enrollment', {
             programId, studentId, programSlug, fundingSource,
             amountTotal: session.amount_total,
           });
@@ -503,13 +503,13 @@ export async function POST(request: NextRequest) {
           if (enrollError) {
             // Check if it's a duplicate (already processed)
             if (enrollError.code === '23505') {
-              console.log('[webhook] Enrollment already exists (duplicate webhook)', { sessionId: session.id });
+              logger.info('[webhook] Enrollment already exists (duplicate webhook)', { sessionId: session.id });
             } else {
-              console.error('[webhook] Failed to create enrollment', enrollError);
+              logger.error('[webhook] Failed to create enrollment', enrollError);
               logger.error('Failed to create student enrollment:', enrollError);
             }
           } else {
-            console.log('[webhook] Student enrollment created', { 
+            logger.info('[webhook] Student enrollment created', { 
               enrollmentId: enrollment?.id,
               programSlug,
               studentId,
@@ -532,7 +532,7 @@ export async function POST(request: NextRequest) {
                 },
               });
             } catch (auditErr) {
-              console.warn('[webhook] Failed to create audit log (non-critical):', auditErr);
+              logger.warn('[webhook] Failed to create audit log (non-critical):', auditErr);
             }
 
             logger.info(`✅ Program enrollment provisioned: ${programSlug} for student ${studentId}`);
@@ -555,11 +555,11 @@ export async function POST(request: NextRequest) {
               },
             });
           } catch (logErr) {
-            console.warn('[webhook] Failed to log payment (non-critical):', logErr);
+            logger.warn('[webhook] Failed to log payment (non-critical):', logErr);
           }
 
         } catch (err: any) {
-          console.error('[webhook] Error processing program enrollment:', err);
+          logger.error('[webhook] Error processing program enrollment:', err);
           logger.error('Error processing program enrollment:', err instanceof Error ? err : new Error(String(err)));
         }
         break;
@@ -1255,7 +1255,7 @@ export async function POST(request: NextRequest) {
       try {
         // Log diagnostic info
         const hasMetadata = !!(session.metadata?.payment_type || session.metadata?.enrollment_id || session.metadata?.program_id);
-        console.log('[webhook] Payment Link fallback check:', {
+        logger.info('[webhook] Payment Link fallback check:', {
           session_id: session.id,
           has_metadata: hasMetadata,
           payment_type: session.metadata?.payment_type || 'none',
@@ -1264,13 +1264,13 @@ export async function POST(request: NextRequest) {
 
         // Skip if we already have proper metadata (handled above)
         if (hasMetadata) {
-          console.log('[webhook] Session has metadata, skipping fallback');
+          logger.info('[webhook] Session has metadata, skipping fallback');
           break;
         }
 
         // Only process payment mode sessions (not subscriptions)
         if (session.mode !== 'payment') {
-          console.log('[webhook] Not a payment session, skipping fallback');
+          logger.info('[webhook] Not a payment session, skipping fallback');
           break;
         }
 
@@ -1280,7 +1280,7 @@ export async function POST(request: NextRequest) {
         });
 
         if (!lineItems.data.length) {
-          console.log('[webhook] No line items found, skipping fallback');
+          logger.info('[webhook] No line items found, skipping fallback');
           break;
         }
 
@@ -1291,14 +1291,14 @@ export async function POST(request: NextRequest) {
           ? firstItem.price.product 
           : firstItem.price?.product?.id || null;
 
-        console.log('[webhook] Payment Link fallback - line item:', {
+        logger.info('[webhook] Payment Link fallback - line item:', {
           price_id: priceId,
           product_id: productId,
           amount: firstItem.amount_total,
         });
 
         if (!priceId && !productId) {
-          console.log('[webhook] No price or product ID, skipping fallback');
+          logger.info('[webhook] No price or product ID, skipping fallback');
           break;
         }
 
@@ -1312,12 +1312,12 @@ export async function POST(request: NextRequest) {
         );
 
         if (mappingError) {
-          console.error('[webhook] Mapping lookup error:', mappingError);
+          logger.error('[webhook] Mapping lookup error:', mappingError);
           break;
         }
 
         if (!mapping || mapping.length === 0) {
-          console.log('[webhook] Payment Link - no enrollment mapping:', {
+          logger.info('[webhook] Payment Link - no enrollment mapping:', {
             session_id: session.id,
             has_metadata: false,
             price_id: priceId,
@@ -1329,7 +1329,7 @@ export async function POST(request: NextRequest) {
         }
 
         const enrollmentConfig = mapping[0];
-        console.log('[webhook] Found enrollment mapping:', {
+        logger.info('[webhook] Found enrollment mapping:', {
           program_slug: enrollmentConfig.program_slug,
           enrollment_type: enrollmentConfig.enrollment_type,
           is_deposit: enrollmentConfig.is_deposit,
@@ -1338,14 +1338,14 @@ export async function POST(request: NextRequest) {
 
         // Skip if auto-enroll is disabled for this mapping
         if (!enrollmentConfig.auto_enroll) {
-          console.log('[webhook] Auto-enroll disabled for this mapping');
+          logger.info('[webhook] Auto-enroll disabled for this mapping');
           break;
         }
 
         // Get customer email
         const customerEmail = session.customer_email || session.customer_details?.email;
         if (!customerEmail) {
-          console.log('[webhook] No customer email, cannot create enrollment');
+          logger.info('[webhook] No customer email, cannot create enrollment');
           break;
         }
 
@@ -1373,14 +1373,14 @@ export async function POST(request: NextRequest) {
             .single();
 
           if (profileError) {
-            console.error('[webhook] Failed to create profile:', profileError);
+            logger.error('[webhook] Failed to create profile:', profileError);
             break;
           }
           studentId = newProfile?.id || null;
         }
 
         if (!studentId) {
-          console.error('[webhook] Could not determine student ID');
+          logger.error('[webhook] Could not determine student ID');
           break;
         }
 
@@ -1406,14 +1406,14 @@ export async function POST(request: NextRequest) {
         });
 
         if (enrollResult.error) {
-          console.error('[webhook] Enrollment service error:', enrollResult.error);
+          logger.error('[webhook] Enrollment service error:', enrollResult.error);
           break;
         }
 
         const enrollmentResult = `${enrollResult.action}:${enrollResult.id}`;
 
         // Log the successful enrollment
-        console.log('[webhook] ✅ Payment Link enrollment processed:', {
+        logger.info('[webhook] ✅ Payment Link enrollment processed:', {
           session_id: session.id,
           price_id: priceId,
           mapping_hit: true,
@@ -1446,15 +1446,15 @@ export async function POST(request: NextRequest) {
                 `,
               }),
             });
-            console.log('[webhook] Welcome email sent to:', customerEmail);
+            logger.info('[webhook] Welcome email sent to:', customerEmail);
           } catch (emailErr) {
-            console.warn('[webhook] Failed to send welcome email:', emailErr);
+            logger.warn('[webhook] Failed to send welcome email:', emailErr);
           }
         }
 
       } catch (fallbackErr) {
         // Don't fail the webhook for fallback errors
-        console.error('[webhook] Payment Link fallback error (non-fatal):', fallbackErr);
+        logger.error('[webhook] Payment Link fallback error (non-fatal):', fallbackErr);
       }
       break;
     }
@@ -1655,7 +1655,7 @@ export async function POST(request: NextRequest) {
           const applicationId = invoice.metadata.application_id;
           const studentId = invoice.metadata.student_id;
 
-          console.log('[webhook] Apprenticeship payment failed, pausing enrollment', {
+          logger.info('[webhook] Apprenticeship payment failed, pausing enrollment', {
             applicationId, studentId
           });
 
@@ -1670,7 +1670,7 @@ export async function POST(request: NextRequest) {
             .eq('application_id', applicationId);
 
           if (pauseError) {
-            console.error('[webhook] Failed to pause enrollment', pauseError);
+            logger.error('[webhook] Failed to pause enrollment', pauseError);
           } else {
             logger.warn(`⚠️ Apprenticeship enrollment paused due to payment failure: ${applicationId}`);
             
@@ -1688,7 +1688,7 @@ export async function POST(request: NextRequest) {
             });
           }
         } catch (err) {
-          console.error('[webhook] Error handling apprenticeship payment failure:', err);
+          logger.error('[webhook] Error handling apprenticeship payment failure:', err);
         }
       }
       break;
@@ -1696,13 +1696,13 @@ export async function POST(request: NextRequest) {
 
     case 'charge.refunded': {
       const charge = event.data.object as Stripe.Charge;
-      console.log('[webhook] Processing refund for charge:', charge.id);
+      logger.info('[webhook] Processing refund for charge:', charge.id);
 
       try {
         // Get payment intent to find metadata
         const paymentIntentId = charge.payment_intent as string;
         if (!paymentIntentId) {
-          console.log('[webhook] No payment intent on charge, skipping');
+          logger.info('[webhook] No payment intent on charge, skipping');
           break;
         }
 
@@ -1712,7 +1712,7 @@ export async function POST(request: NextRequest) {
         const enrollmentId = paymentIntent.metadata?.enrollment_id;
 
         if (!userId) {
-          console.log('[webhook] No user_id in payment intent metadata, checking customer');
+          logger.info('[webhook] No user_id in payment intent metadata, checking customer');
           // Try to find user by customer ID
           const customerId = charge.customer as string;
           if (customerId) {
@@ -1734,9 +1734,9 @@ export async function POST(request: NextRequest) {
                 .eq('stripe_payment_intent_id', paymentIntentId);
 
               if (revokeError) {
-                console.error('[webhook] Error revoking entitlements:', revokeError);
+                logger.error('[webhook] Error revoking entitlements:', revokeError);
               } else {
-                console.log('[webhook] Revoked entitlements for refunded charge');
+                logger.info('[webhook] Revoked entitlements for refunded charge');
               }
             }
           }
@@ -1754,10 +1754,10 @@ export async function POST(request: NextRequest) {
           .eq('stripe_payment_intent_id', paymentIntentId);
 
         if (revokeError) {
-          console.error('[webhook] Error revoking entitlements:', revokeError);
+          logger.error('[webhook] Error revoking entitlements:', revokeError);
           logger.error('Error revoking entitlements on refund:', revokeError);
         } else {
-          console.log(`[webhook] ✅ Revoked entitlements for user ${userId} due to refund`);
+          logger.info(`[webhook] ✅ Revoked entitlements for user ${userId} due to refund`);
           logger.info(`Revoked entitlements for user ${userId} due to refund on charge ${charge.id}`);
         }
 
@@ -1772,9 +1772,9 @@ export async function POST(request: NextRequest) {
             .eq('id', enrollmentId);
 
           if (enrollError) {
-            console.error('[webhook] Error updating enrollment status:', enrollError);
+            logger.error('[webhook] Error updating enrollment status:', enrollError);
           } else {
-            console.log(`[webhook] ✅ Marked enrollment ${enrollmentId} as refunded`);
+            logger.info(`[webhook] ✅ Marked enrollment ${enrollmentId} as refunded`);
           }
         }
 
@@ -1798,9 +1798,9 @@ export async function POST(request: NextRequest) {
               .eq('course_id', product.course_id);
 
             if (lmsError) {
-              console.error('[webhook] Error revoking LMS access:', lmsError);
+              logger.error('[webhook] Error revoking LMS access:', lmsError);
             } else {
-              console.log(`[webhook] ✅ Revoked LMS access for course ${product.course_id}`);
+              logger.info(`[webhook] ✅ Revoked LMS access for course ${product.course_id}`);
             }
           }
         }
@@ -1819,22 +1819,22 @@ export async function POST(request: NextRequest) {
         });
 
       } catch (err) {
-        console.error('[webhook] Error processing refund:', err);
+        logger.error('[webhook] Error processing refund:', err);
         logger.error('Error processing refund:', err);
       }
       break;
     }
 
       default:
-        console.log(`[webhook] Unhandled event type: ${event.type}`);
+        logger.info(`[webhook] Unhandled event type: ${event.type}`);
         logger.info(`Unhandled event type: ${event.type}`);
       }
     } catch (switchErr) {
       // Event handler threw - log but don't fail
       const errMsg = switchErr instanceof Error ? switchErr.message : String(switchErr);
       const errStack = switchErr instanceof Error ? switchErr.stack : undefined;
-      console.error('[webhook] Event handler error:', errMsg);
-      if (errStack) console.error('[webhook] Stack:', errStack);
+      logger.error('[webhook] Event handler error:', errMsg);
+      if (errStack) logger.error('[webhook] Stack:', errStack);
       logger.error('Event handler error:', switchErr);
     }
 
@@ -1845,7 +1845,7 @@ export async function POST(request: NextRequest) {
         .update({ status: 'processed', processed_at: new Date().toISOString() })
         .eq('stripe_event_id', event.id);
     } catch (updateErr) {
-      console.warn('[webhook] Failed to update status:', updateErr);
+      logger.warn('[webhook] Failed to update status:', updateErr);
       logger.warn('Failed to update webhook status:', updateErr);
     }
 
@@ -1853,8 +1853,8 @@ export async function POST(request: NextRequest) {
     // Outer catch - something unexpected happened
     const errMsg = processingError instanceof Error ? processingError.message : String(processingError);
     const errStack = processingError instanceof Error ? processingError.stack : undefined;
-    console.error('[webhook] Post-verify error:', errMsg);
-    if (errStack) console.error('[webhook] Stack:', errStack);
+    logger.error('[webhook] Post-verify error:', errMsg);
+    if (errStack) logger.error('[webhook] Stack:', errStack);
     
     // Try to update webhook event status to failed
     try {
@@ -1867,13 +1867,13 @@ export async function POST(request: NextRequest) {
         })
         .eq('stripe_event_id', event.id);
     } catch (updateErr) {
-      console.warn('[webhook] Failed to update failure status:', updateErr);
+      logger.warn('[webhook] Failed to update failure status:', updateErr);
     }
 
     logger.error('Webhook processing error:', processingError);
   }
 
   // ALWAYS return 200 after signature verification to stop Stripe retries
-  console.log('[webhook] Returning 200 for event:', event.id);
+  logger.info('[webhook] Returning 200 for event:', event.id);
   return NextResponse.json({ received: true });
 }

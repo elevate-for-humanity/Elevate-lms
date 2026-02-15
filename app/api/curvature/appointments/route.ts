@@ -1,3 +1,4 @@
+import { logger } from '@/lib/logger';
 export const runtime = 'nodejs';
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (error) {
-      console.error('Appointment creation error:', error);
+      logger.error('Appointment creation error:', error);
       return NextResponse.json(
         { error: 'Failed to create appointment' },
         { status: 500 }
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
         })
       });
     } catch (emailError) {
-      console.error('Failed to send confirmation email:', emailError);
+      logger.error('Failed to send confirmation email:', emailError);
     }
 
     return NextResponse.json({
@@ -81,7 +82,7 @@ export async function POST(request: NextRequest) {
       message: 'Appointment request submitted successfully',
     });
   } catch (error) {
-    console.error('Appointment error:', error);
+    logger.error('Appointment error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }
@@ -123,7 +124,7 @@ export async function GET(request: NextRequest) {
       bookedTimes,
     });
   } catch (error) {
-    console.error('Services fetch error:', error);
+    logger.error('Services fetch error:', error);
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

@@ -50,7 +50,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         err:
-          (err instanceof Error ? err.message : String(err)) ||
+          ('Internal server error') ||
           'Failed to fetch subscription',
       },
       { status: 500 }

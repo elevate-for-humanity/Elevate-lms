@@ -65,7 +65,7 @@ export async function POST(
   } catch (error) {
     logger.error('Error marking payout as paid:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to mark payout as paid' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

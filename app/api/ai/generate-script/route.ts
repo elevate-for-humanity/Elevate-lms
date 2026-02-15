@@ -66,7 +66,7 @@ Write the complete script now:`;
   } catch (error: any) {
     logger.error('Script generation error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to generate script' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

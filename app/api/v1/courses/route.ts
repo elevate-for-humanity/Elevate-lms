@@ -119,7 +119,7 @@ const startTime = Date.now();
       })
     );
   } catch (err: any) {
-    error = err instanceof Error ? err.message : String(err);
+    error = 'Internal server error';
     statusCode = 500;
     logger.error(
       'API Error:',
@@ -193,7 +193,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(apiResponse(true, course), { status: 201 });
   } catch (err: any) {
-    error = err instanceof Error ? err.message : String(err);
+    error = 'Internal server error';
     statusCode = 500;
     logger.error(
       'API Error:',

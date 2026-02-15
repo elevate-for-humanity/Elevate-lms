@@ -79,7 +79,7 @@ export async function POST(req: Request) {
       }
 
       return NextResponse.json(
-        { error: 'Failed to create appointment', details: error.message },
+        { error: 'Failed to create appointment', details: 'Internal server error' },
         { status: 500 }
       );
     }
@@ -138,7 +138,7 @@ export async function POST(req: Request) {
     });
   } catch (error) { 
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Internal server error', details: 'Internal server error' },
       { status: 500 }
     );
   }

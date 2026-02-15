@@ -86,7 +86,7 @@ export async function PATCH(
     return NextResponse.json(
       {
         err:
-          (err instanceof Error ? err.message : String(err)) ||
+          ('Internal server error') ||
           'Internal server err',
       },
       { status: 500 }

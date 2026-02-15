@@ -131,7 +131,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     logger.error('Error listing returns:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to list returns' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -204,7 +204,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Error creating return:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create return' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

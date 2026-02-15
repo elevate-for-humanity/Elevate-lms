@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         err:
-          (err instanceof Error ? err.message : String(err)) ||
+          ('Internal server error') ||
           'Failed to fetch students',
       },
       { status: 500 }

@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     if (error) {
 
       // If bucket doesn't exist, return helpful error
-      if (error instanceof Error ? error.message : String(error).includes('not found')) {
+      if ('Internal server error'.includes('not found')) {
         return NextResponse.json(
           {
             error: 'Storage bucket not configured. Please contact support.',
@@ -63,7 +63,7 @@ export async function POST(req: Request) {
       }
 
       return NextResponse.json(
-        { error: 'Failed to generate upload URL', details: error instanceof Error ? error.message : String(error) },
+        { error: 'Failed to generate upload URL', details: 'Internal server error' },
         { status: 500 }
       );
     }

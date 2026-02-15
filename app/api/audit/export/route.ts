@@ -21,7 +21,7 @@ export async function GET(req: Request) {
     const { data, error }: any = await supabase.from('audit_snapshot').select('*');
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 400 });
     }
 
     if (!data || data.length === 0) {
@@ -61,7 +61,7 @@ export async function GET(req: Request) {
     });
   } catch (error) { 
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

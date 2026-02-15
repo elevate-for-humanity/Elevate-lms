@@ -92,7 +92,7 @@ async function handleAudit(request: NextRequest, options: AuditOptions) {
     return NextResponse.json(
       {
         error: 'Audit failed',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        message: 'Internal server error',
       },
       { status: 500 }
     );

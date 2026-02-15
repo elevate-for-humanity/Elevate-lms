@@ -272,7 +272,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     logger.error('Barber checkout GET error:', error);
     return NextResponse.json(
-      { error: 'Failed to calculate payment plan', details: error instanceof Error ? error.message : String(error) },
+      { error: 'Failed to calculate payment plan', details: 'Internal server error' },
       { status: 500 }
     );
   }

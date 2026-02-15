@@ -174,10 +174,7 @@ export async function POST(request: NextRequest) {
     logger.error('Referrals POST error:', error);
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : 'Failed to process referral action',
+        error: 'Internal server error',
       },
       { status: 500 }
     );

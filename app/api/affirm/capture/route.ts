@@ -185,7 +185,7 @@ export async function GET(request: NextRequest) {
     
     const errorUrl = new URL(`${siteUrl}/programs/barber-apprenticeship/apply`);
     errorUrl.searchParams.set('error', 'affirm_failed');
-    errorUrl.searchParams.set('message', error instanceof Error ? error.message : 'Authorization failed');
+    errorUrl.searchParams.set('message', 'Authorization failed');
     
     return NextResponse.redirect(errorUrl.toString());
   }

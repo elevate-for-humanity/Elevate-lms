@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     logger.error('Error getting ERO config:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get ERO config' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -109,7 +109,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Error setting ERO config:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to set ERO config' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

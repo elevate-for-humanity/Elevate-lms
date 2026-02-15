@@ -51,7 +51,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           ok: false,
-          error: error instanceof Error ? error.message : String(error),
+          error: 'Internal server error',
           period_start: periodStart,
           period_end: periodEnd,
         },
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
       {
         ok: false,
         error:
-          (error instanceof Error ? error.message : String(error)) ||
+          ('Internal server error') ||
           'Internal server err',
       },
       { status: 500 }

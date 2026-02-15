@@ -114,7 +114,7 @@ async function importStudents(
       }
     } catch (error) {
       result.failed++;
-      result.errors.push(`${record.email || 'Unknown'}: ${error instanceof Error ? error.message : 'Import failed'}`);
+      result.errors.push(`${record.email || 'Unknown'}: ${error instanceof Error ? 'Import failed: see logs' : 'Import failed'}`);
     }
   }
 
@@ -170,7 +170,7 @@ async function importCourses(
       result.imported++;
     } catch (error) {
       result.failed++;
-      result.errors.push(`${record.name || 'Unknown'}: ${error instanceof Error ? error.message : 'Import failed'}`);
+      result.errors.push(`${record.name || 'Unknown'}: ${error instanceof Error ? 'Import failed: see logs' : 'Import failed'}`);
     }
   }
 
@@ -252,7 +252,7 @@ async function importEnrollments(
       result.imported++;
     } catch (error) {
       result.failed++;
-      result.errors.push(`${record.student_email || 'Unknown'}: ${error instanceof Error ? error.message : 'Import failed'}`);
+      result.errors.push(`${record.student_email || 'Unknown'}: ${error instanceof Error ? 'Import failed: see logs' : 'Import failed'}`);
     }
   }
 
@@ -306,7 +306,7 @@ async function importEmployers(
       result.imported++;
     } catch (error) {
       result.failed++;
-      result.errors.push(`${record.company_name || 'Unknown'}: ${error instanceof Error ? error.message : 'Import failed'}`);
+      result.errors.push(`${record.company_name || 'Unknown'}: ${error instanceof Error ? 'Import failed: see logs' : 'Import failed'}`);
     }
   }
 
@@ -392,7 +392,7 @@ export async function POST(request: NextRequest) {
         success: false, 
         imported: 0, 
         failed: 0, 
-        errors: [error instanceof Error ? error.message : 'Import failed'] 
+        errors: [error instanceof Error ? 'Import failed: see logs' : 'Import failed'] 
       },
       { status: 500 }
     );

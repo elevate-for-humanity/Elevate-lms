@@ -42,7 +42,7 @@ export async function GET(req: Request) {
     });
   } catch (err: any) {
     return NextResponse.json(
-      { err: err instanceof Error ? err.message : String(err) },
+      { err: 'Internal server error' },
       { status: 500 }
     );
   }

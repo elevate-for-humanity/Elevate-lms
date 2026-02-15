@@ -200,7 +200,7 @@ export async function POST(request: NextRequest) {
             recipient_email: recipient.email,
             status: 'failed',
             error_message:
-              error instanceof Error ? error.message : 'Unknown error',
+              'Internal server error',
           });
         }
       });
@@ -227,7 +227,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error:
-          (error instanceof Error ? error.message : String(error)) ||
+          ('Internal server error') ||
           'Failed to send campaign',
       },
       { status: 500 }

@@ -156,7 +156,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
       results.push({
         documentId,
         success: false,
-        error: error.message || 'Unknown error',
+        error: 'Internal server error',
       });
     }
   }

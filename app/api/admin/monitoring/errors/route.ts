@@ -68,7 +68,7 @@ export async function GET(request: NextRequest) {
     logger.error('Monitoring errors endpoint error:', error);
     return NextResponse.json({
       errors: [],
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Internal server error',
     }, { status: 500 });
   }
 }

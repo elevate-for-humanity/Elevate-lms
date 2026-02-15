@@ -125,7 +125,7 @@ export async function GET(request: Request) {
         await completeJob(job.id);
         succeeded++;
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = 'Internal server error';
         await failJob(job.id, errorMessage);
         failed++;
         

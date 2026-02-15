@@ -180,7 +180,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         error:
-          (error instanceof Error ? error.message : String(error)) ||
+          ('Internal server error') ||
           'Failed to complete course',
       },
       { status: 500 }

@@ -244,7 +244,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Barber public checkout error:', error);
     return NextResponse.json(
-      { error: 'Failed to create checkout session', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Failed to create checkout session', details: 'Internal server error' },
       { status: 500 }
     );
   }

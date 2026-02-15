@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Import error:', error);
     return NextResponse.json(
-      { error: 'Import failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Import failed', details: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -190,7 +190,7 @@ async function importStudents(
       results.success++;
     } catch (error) {
       results.failed++;
-      results.errors.push(`${student.email}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      results.errors.push(`${student.email}: ${'Internal server error'}`);
       if (!options?.skip_errors) throw error;
     }
   }
@@ -251,7 +251,7 @@ async function importCourses(
       results.success++;
     } catch (error) {
       results.failed++;
-      results.errors.push(`${course.name}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      results.errors.push(`${course.name}: ${'Internal server error'}`);
       if (!options?.skip_errors) throw error;
     }
   }
@@ -335,7 +335,7 @@ async function importEnrollments(
       results.success++;
     } catch (error) {
       results.failed++;
-      results.errors.push(`${enrollment.student_email}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      results.errors.push(`${enrollment.student_email}: ${'Internal server error'}`);
       if (!options?.skip_errors) throw error;
     }
   }

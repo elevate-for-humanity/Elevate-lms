@@ -55,7 +55,7 @@ export async function GET(
   } catch (error) {
     logger.error('Error getting preparer:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get preparer' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -131,7 +131,7 @@ export async function PATCH(
   } catch (error) {
     logger.error('Error updating preparer:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to update preparer' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -189,7 +189,7 @@ export async function DELETE(
   } catch (error) {
     logger.error('Error deleting preparer:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to delete preparer' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

@@ -43,12 +43,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ students: students || [] });
   } catch (error) {
     if (error instanceof TenantContextError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+      return NextResponse.json({ error: 'Internal server error' }, { status: error.statusCode });
     }
     return NextResponse.json(
       {
         error:
-          (error instanceof Error ? error.message : String(error)) ||
+          ('Internal server error') ||
           'Failed to fetch students',
       },
       { status: 500 }

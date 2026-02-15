@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     return NextResponse.json({ 
       error: 'Migration failed', 
-      details: error.message 
+      details: 'Internal server error' 
     }, { status: 500 });
   }
 }

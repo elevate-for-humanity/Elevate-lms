@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Deploy prep error:', error);
     return NextResponse.json(
-      { error: 'Deploy preparation failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Deploy preparation failed', details: 'Internal server error' },
       { status: 500 }
     );
   }

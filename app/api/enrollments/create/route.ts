@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    logger.error('Enrollment API error', { error: error.message, requestId });
+    logger.error('Enrollment API error', { error: 'Internal server error', requestId });
     return NextResponse.json(
       { error: 'Internal server error' },
       { status: 500 }

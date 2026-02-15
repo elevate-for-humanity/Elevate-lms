@@ -44,7 +44,7 @@ export async function GET(
   } catch (error) {
     logger.error('Error getting office:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get office' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -106,7 +106,7 @@ export async function PATCH(
   } catch (error) {
     logger.error('Error updating office:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to update office' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -145,7 +145,7 @@ export async function DELETE(
   } catch (error) {
     logger.error('Error deleting office:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to delete office' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

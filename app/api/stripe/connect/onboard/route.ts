@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: link.url });
   } catch (err: any) {
     return NextResponse.json(
-      { error: err instanceof Error ? err.message : String(err) },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

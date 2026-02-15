@@ -64,7 +64,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     logger.error('Error getting pending signatures:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get pending signatures' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Error signing returns:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to sign returns' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

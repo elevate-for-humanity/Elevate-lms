@@ -133,7 +133,7 @@ export async function POST(req: Request) {
   } catch (error: any) {
     logger.error('Checkout error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create checkout session' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

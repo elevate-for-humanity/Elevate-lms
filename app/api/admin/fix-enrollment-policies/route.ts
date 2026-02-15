@@ -58,7 +58,7 @@ export const POST = withAuth(
       if (error) {
         logger.error('Policy fix error:', error);
         return NextResponse.json(
-          { error: error.message },
+          { error: 'Internal server error' },
           { status: 500 }
         );
       }
@@ -70,7 +70,7 @@ export const POST = withAuth(
     } catch (err: any) {
       logger.error('Fix enrollment policies error:', err);
       return NextResponse.json(
-        { error: err.message || 'Failed to fix policies' },
+        { error: 'Internal server error' },
         { status: 500 }
       );
     }

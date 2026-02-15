@@ -25,7 +25,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ caseId: 
     return NextResponse.json({ tasks });
   } catch (err: any) {
     logger.error('[GET /api/cases/[caseId]/tasks] Error:', err);
-    return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -53,7 +53,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ caseId:
     return NextResponse.json({ error: 'Invalid action' }, { status: 400 });
   } catch (err: any) {
     logger.error('[POST /api/cases/[caseId]/tasks] Error:', err);
-    return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -96,6 +96,6 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ caseId
     return NextResponse.json({ success: true });
   } catch (err: any) {
     logger.error('[PATCH /api/cases/[caseId]/tasks] Error:', err);
-    return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

@@ -430,7 +430,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     logger.error('[RAPIDS Export] Error:', error);
     return NextResponse.json(
-      { error: 'Export failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Export failed', details: 'Internal server error' },
       { status: 500 }
     );
   }

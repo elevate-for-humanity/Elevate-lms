@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Error generating payouts:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to generate payouts' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

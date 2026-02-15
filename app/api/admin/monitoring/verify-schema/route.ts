@@ -130,7 +130,7 @@ export async function GET(request: Request) {
     logger.error('Schema verification error:', error);
     return NextResponse.json({
       status: 'error',
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Internal server error',
     }, { status: 500 });
   }
 }

@@ -63,7 +63,7 @@ const startTime = Date.now();
         subject: emailSubject,
         status: 'failed',
         provider: 'resend',
-        error_message: error instanceof Error ? error.message : String(error) || 'Unknown error',
+        error_message: 'Internal server error' || 'Unknown error',
       });
 
       return NextResponse.json(
@@ -93,7 +93,7 @@ const startTime = Date.now();
         status: 'failed',
         provider: 'resend',
         error_message:
-          (error instanceof Error ? error.message : String(error)) ||
+          ('Internal server error') ||
           'Unexpected error',
       });
     }

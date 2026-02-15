@@ -30,7 +30,7 @@ export async function GET(req: Request) {
     return NextResponse.json(
       {
         err: 'Automation failed',
-        message: err instanceof Error ? err.message : String(err),
+        message: 'Internal server error',
       },
       { status: 500 }
     );

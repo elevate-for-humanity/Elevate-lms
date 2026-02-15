@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     } catch (error) { 
       return NextResponse.json(
         {
-          error: `Webhook Error: ${error instanceof Error ? error.message : String(error)}`,
+          error: `Webhook Error: ${'Internal server error'}`,
         },
         { status: 400 }
       );

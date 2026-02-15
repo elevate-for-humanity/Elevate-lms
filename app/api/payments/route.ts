@@ -343,7 +343,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error:
-          error instanceof Error ? error.message : 'Failed to process payment',
+          'Internal server error',
       },
       { status: 500 }
     );

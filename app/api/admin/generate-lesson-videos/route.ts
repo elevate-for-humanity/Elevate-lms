@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
         results.push({
           lessonId: lesson.id,
           success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: 'Internal server error',
         });
       }
 

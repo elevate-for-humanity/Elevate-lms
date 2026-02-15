@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       {
         error:
-          (err instanceof Error ? err.message : String(err)) ||
+          ('Internal server error') ||
           'Failed to create verification session',
       },
       { status: 500 }

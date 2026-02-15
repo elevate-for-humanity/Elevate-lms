@@ -54,7 +54,7 @@ export async function POST(
   } catch (error) {
     logger.error('Error approving payout:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to approve payout' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

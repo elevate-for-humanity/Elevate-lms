@@ -237,7 +237,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     logger.error('Sezzle virtual card processing error:', error);
-    const message = error instanceof Error ? error.message : 'Failed to process virtual card payment';
+    const message = 'Internal server error';
     return NextResponse.json(
       { error: message },
       { status: 500 }

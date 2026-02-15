@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('License checkout error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Checkout failed' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

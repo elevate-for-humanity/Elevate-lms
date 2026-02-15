@@ -91,7 +91,7 @@ const startTime = Date.now();
       apiResponse(
         false,
         null,
-        err instanceof Error ? err.message : String(err)
+        'Internal server error'
       ),
       {
         status: 500,
@@ -180,7 +180,7 @@ export async function POST(request: NextRequest) {
       apiResponse(
         false,
         null,
-        err instanceof Error ? err.message : String(err)
+        'Internal server error'
       ),
       {
         status: 500,

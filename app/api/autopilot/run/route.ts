@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Autopilot run error:', error);
     return NextResponse.json(
-      { error: 'Autopilot run failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Autopilot run failed', details: 'Internal server error' },
       { status: 500 }
     );
   }

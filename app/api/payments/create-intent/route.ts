@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     logger.error('[Payment Intent] Error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create payment intent' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

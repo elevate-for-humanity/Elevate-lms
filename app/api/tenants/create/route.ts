@@ -70,7 +70,7 @@ export async function POST(req: Request) {
     });
   } catch (error) { 
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -89,13 +89,13 @@ export async function GET(request: Request) {
       .order('created_at', { ascending: false });
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 400 });
     }
 
     return NextResponse.json({ tenants: data || [] });
   } catch (error) { 
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

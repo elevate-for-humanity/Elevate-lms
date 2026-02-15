@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Media enhance error:', error);
     return NextResponse.json(
-      { error: 'Media enhancement failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Media enhancement failed', details: 'Internal server error' },
       { status: 500 }
     );
   }

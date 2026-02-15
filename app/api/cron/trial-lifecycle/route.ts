@@ -145,7 +145,7 @@ export async function GET(request: Request) {
           .eq('id', license.id);
 
         if (error) {
-          results.errors.push(`Failed to expire license ${license.id}: ${error.message}`);
+          results.errors.push('Failed to expire license: see logs');
         } else {
           results.expired++;
           await supabase.from('license_events').insert({

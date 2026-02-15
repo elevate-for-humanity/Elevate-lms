@@ -17,7 +17,7 @@ export async function GET(request: Request) {
   } catch (error) {
     logger.error('Sitemap generation error:', error);
     return NextResponse.json(
-      { error: 'Sitemap generation failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Sitemap generation failed', details: 'Internal server error' },
       { status: 500 }
     );
   }

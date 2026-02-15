@@ -35,7 +35,7 @@ export async function POST(req: Request) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 400 });
     }
 
     // Log the control update
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, data });
   } catch (error) { 
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -72,7 +72,7 @@ export async function GET(request: Request) {
       .order('control_id');
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 400 });
     }
 
     const implemented = data?.filter((c) => c.implemented).length || 0;
@@ -88,7 +88,7 @@ export async function GET(request: Request) {
     });
   } catch (error) { 
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

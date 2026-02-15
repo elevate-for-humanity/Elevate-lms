@@ -348,7 +348,7 @@ export async function POST(request: NextRequest) {
   } catch (error: any) {
     logger.error('Tax filing error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to process tax return' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

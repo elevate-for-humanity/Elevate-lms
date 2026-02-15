@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Scan repo error:', error);
     return NextResponse.json(
-      { error: 'Repository scan failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Repository scan failed', details: 'Internal server error' },
       { status: 500 }
     );
   }

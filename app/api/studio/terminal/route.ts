@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
   } catch (error: any) {
     return NextResponse.json({
       stdout: error.stdout || '',
-      stderr: error.stderr || error.message || 'Command failed',
+      stderr: 'Internal server error',
       exitCode: error.code || 1,
     });
   }

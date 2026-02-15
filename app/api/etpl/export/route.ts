@@ -50,7 +50,7 @@ export async function GET(req: Request) {
 
     if (error) {
       logger.error('ETPL export error:', error);
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 400 });
     }
 
     // Log the export
@@ -70,7 +70,7 @@ export async function GET(req: Request) {
   } catch (error) {
     logger.error('ETPL export error:', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

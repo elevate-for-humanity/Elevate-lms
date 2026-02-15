@@ -55,7 +55,7 @@ export async function GET(req: Request) {
     return NextResponse.json(
       {
         error:
-          (error instanceof Error ? error.message : String(error)) ||
+          ('Internal server error') ||
           'Internal server err',
       },
       { status: 500 }

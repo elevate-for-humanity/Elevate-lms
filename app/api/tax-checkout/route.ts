@@ -76,7 +76,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (error) { 
     return NextResponse.json(
-      { error: error.message || 'Failed to create checkout session' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

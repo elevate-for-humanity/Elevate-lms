@@ -100,7 +100,7 @@ export async function POST(req: Request) {
           error:
             'Failed to save application. Please call 317-314-3757 for assistance.',
           details:
-            process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : String(error) : undefined,
+            process.env.NODE_ENV === 'development' ? 'Internal server error' : undefined,
         },
         { status: 500 }
       );
@@ -186,7 +186,7 @@ export async function POST(req: Request) {
     return NextResponse.json(
       {
         error:
-          (error instanceof Error ? error.message : String(error)) ||
+          ('Internal server error') ||
           'Internal server err',
       },
       { status: 500 }

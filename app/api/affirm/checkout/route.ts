@@ -151,7 +151,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     logger.error('Affirm checkout config error:', error);
-    const message = error instanceof Error ? error.message : 'Failed to create Affirm checkout config';
+    const message = 'Internal server error';
     return NextResponse.json(
       { error: message },
       { status: 500 }

@@ -194,7 +194,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     logger.error('Checkout error:', error);
-    const message = error instanceof Error ? error.message : 'Failed to create checkout session';
+    const message = 'Internal server error';
     return NextResponse.json(
       { error: message },
       { status: 500 }

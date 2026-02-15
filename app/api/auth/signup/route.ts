@@ -51,7 +51,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     if (error.message.includes('already registered')) {
       throw APIErrors.conflict('Email already registered');
     }
-    throw APIErrors.external('Supabase Auth', error.message);
+    throw APIErrors.external('Supabase Auth');
   }
 
   if (!data.user) {

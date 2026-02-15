@@ -260,7 +260,7 @@ export async function POST(request: NextRequest) {
       referenceId,
     });
   } catch (error) {
-    const technicalMessage = error instanceof Error ? error.message : 'Unknown error';
+    const technicalMessage = 'Internal server error';
     logger.error('[Sezzle] Checkout session creation failed:', { technicalMessage });
     return NextResponse.json(
       { error: 'Sezzle checkout could not be created. Please select Card, Payment Plan, or another option above.' },
@@ -314,7 +314,7 @@ export async function GET(request: NextRequest) {
     );
   } catch (error) {
     logger.error('Sezzle status check error:', error);
-    const message = error instanceof Error ? error.message : 'Failed to check status';
+    const message = 'Internal server error';
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }

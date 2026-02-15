@@ -226,7 +226,7 @@ export async function POST(req: Request) {
   } catch (error) {
     logger.error('Review resolve error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

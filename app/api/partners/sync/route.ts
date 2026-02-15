@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
           course_id: course.id,
           course_name: course.course_name,
           status: 'error',
-          message: `Sync failed: ${err instanceof Error ? err.message : 'Unknown error'}`,
+          message: `Sync failed: ${'Internal server error'}`,
         });
       }
     }
@@ -192,7 +192,7 @@ async function checkPartnerUrl(url: string): Promise<{
   } catch (err) {
     return {
       accessible: false,
-      error: err instanceof Error ? err.message : 'Connection failed',
+      error: 'Internal server error',
     };
   }
 }

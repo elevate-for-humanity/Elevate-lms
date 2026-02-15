@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     logger.error('Error listing offices:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to list offices' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Error creating office:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to create office' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

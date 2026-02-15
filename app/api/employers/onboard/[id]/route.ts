@@ -27,13 +27,13 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
       .single();
 
     if (error) {
-      return NextResponse.json({ error: error instanceof Error ? error.message : String(error) }, { status: 400 });
+      return NextResponse.json({ error: 'Internal server error' }, { status: 400 });
     }
 
     return NextResponse.json({ success: true, onboarding: data });
   } catch (error) { 
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : String(error) },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

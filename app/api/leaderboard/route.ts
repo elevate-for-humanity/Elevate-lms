@@ -62,7 +62,7 @@ export async function GET(request: Request) {
 
     if (error) {
       return NextResponse.json(
-        { error: error instanceof Error ? error.message : String(error) },
+        { error: 'Internal server error' },
         { status: 500 }
       );
     }

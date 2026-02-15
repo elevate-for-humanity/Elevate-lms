@@ -61,7 +61,7 @@ export async function GET(
   } catch (error) {
     logger.error('Error getting return:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get return' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
@@ -180,7 +180,7 @@ export async function PATCH(
   } catch (error) {
     logger.error('Error updating return:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to update return' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

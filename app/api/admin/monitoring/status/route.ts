@@ -49,7 +49,7 @@ export async function GET(request: Request) {
     return NextResponse.json({
       overall: 'down',
       timestamp: new Date().toISOString(),
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Internal server error',
       checks: {
         database: { status: 'fail', connected: false },
         redis: { status: 'fail', connected: false },
@@ -88,7 +88,7 @@ async function checkDatabase() {
       return {
         status: 'fail',
         connected: false,
-        error: error.message,
+        error: 'Internal server error',
         latency,
       };
     }
@@ -102,7 +102,7 @@ async function checkDatabase() {
     return {
       status: 'fail',
       connected: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Internal server error',
       latency: Date.now() - startTime,
     };
   }
@@ -140,7 +140,7 @@ async function checkRedis() {
     return {
       status: 'fail',
       connected: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Internal server error',
       latency: Date.now() - startTime,
     };
   }

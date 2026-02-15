@@ -44,7 +44,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ success: true, case: enrollmentCase });
   } catch (err: any) {
     logger.error('[POST /api/cases] Error:', err);
-    return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
 
@@ -82,6 +82,6 @@ export async function GET(req: Request) {
     return NextResponse.json({ cases: data || [] });
   } catch (err: any) {
     logger.error('[GET /api/cases] Error:', err);
-    return NextResponse.json({ error: err.message || 'Internal error' }, { status: 500 });
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

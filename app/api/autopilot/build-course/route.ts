@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error('Build course error:', error);
     return NextResponse.json(
-      { error: 'Course build failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { error: 'Course build failed', details: 'Internal server error' },
       { status: 500 }
     );
   }

@@ -62,7 +62,7 @@ export async function GET(
   } catch (error) {
     logger.error('Error getting preparer stats:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to get preparer stats' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

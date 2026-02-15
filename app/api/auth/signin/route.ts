@@ -33,7 +33,7 @@ export const POST = withRateLimit(
     if (error.message.includes('Email not confirmed')) {
       throw APIErrors.unauthorized('Please confirm your email before signing in');
     }
-    throw APIErrors.external('Supabase Auth', error.message);
+    throw APIErrors.external('Supabase Auth');
   }
 
   if (!data.user || !data.session) {

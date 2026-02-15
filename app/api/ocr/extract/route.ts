@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       success: false,
       error: 'OCR extraction failed',
-      message: error instanceof Error ? error.message : 'Unknown error',
+      message: 'Internal server error',
     }, { status: 500 });
   }
 }

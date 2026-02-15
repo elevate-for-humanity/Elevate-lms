@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       return NextResponse.json(
-        { error: 'Failed to save calculation', details: error.message },
+        { error: 'Failed to save calculation', details: 'Internal server error' },
         { status: 500 }
       );
     }

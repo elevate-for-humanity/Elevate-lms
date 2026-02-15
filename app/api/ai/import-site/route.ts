@@ -234,7 +234,7 @@ async function scrapeSite(baseUrl: string, pages: string[]): Promise<ScrapedData
     result.success = true;
     return result;
   } catch (error) {
-    result.error = error instanceof Error ? error.message : 'Scraping failed';
+    result.error = 'Scraping failed';
     return result;
   }
 }

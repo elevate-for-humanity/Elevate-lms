@@ -14,7 +14,7 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
   const { data: { user }, error } = await supabase.auth.getUser();
 
   if (error) {
-    throw APIErrors.external('Supabase Auth', error.message);
+    throw APIErrors.external('Supabase Auth');
   }
 
   if (!user) {

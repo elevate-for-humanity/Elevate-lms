@@ -169,7 +169,7 @@ export async function POST(req: Request) {
       {
         error: 'Failed to reject creator',
         code: 'REJECTION_FAILED',
-        message: err instanceof Error ? err.message : 'Unknown error',
+        message: 'Internal server error',
       },
       { status: 500 }
     );

@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     logger.error('Sezzle capture error:', error);
-    const message = error instanceof Error ? error.message : 'Failed to capture payment';
+    const message = 'Internal server error';
     return NextResponse.json(
       { error: message },
       { status: 500 }

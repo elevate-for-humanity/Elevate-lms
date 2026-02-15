@@ -142,7 +142,7 @@ export async function GET(request: NextRequest) {
     logger.error('License check cron failed:', error);
     return NextResponse.json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Internal server error',
       ...results,
     }, { status: 500 });
   }

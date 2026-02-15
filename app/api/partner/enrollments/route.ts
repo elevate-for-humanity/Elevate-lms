@@ -49,7 +49,7 @@ export async function GET(request: Request) {
     return NextResponse.json({ enrollments });
   } catch (error) {
     if (error instanceof TenantContextError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+      return NextResponse.json({ error: 'Internal server error' }, { status: error.statusCode });
     }
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }

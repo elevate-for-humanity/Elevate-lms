@@ -97,7 +97,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         {
           error: 'Failed to save inquiry',
-          debug: error.message || error.code || JSON.stringify(error),
+          debug: 'Internal server error',
           code: error.code,
           details: error.details,
           hint: error.hint,

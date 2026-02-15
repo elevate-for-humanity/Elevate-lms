@@ -149,7 +149,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         err:
-          (err instanceof Error ? err.message : String(err)) ||
+          ('Internal server error') ||
           'Failed to create invite',
       },
       { status: 500 }
@@ -198,7 +198,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json(
       {
         err:
-          (err instanceof Error ? err.message : String(err)) ||
+          ('Internal server error') ||
           'Failed to fetch invites',
       },
       { status: 500 }

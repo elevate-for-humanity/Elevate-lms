@@ -106,13 +106,13 @@ export async function POST(req: Request) {
 
     if (error) {
       const errorCode = (error as any)?.code || "UNKNOWN";
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage = 'Internal server error';
       return NextResponse.json(
         {
           error:
             'Failed to save application. Please call 317-314-3757 for immediate assistance.',
           debug:
-            process.env.NODE_ENV === 'development' ? error instanceof Error ? error.message : String(error) : undefined,
+            process.env.NODE_ENV === 'development' ? 'Internal server error' : undefined,
         },
         { status: 500 }
       );

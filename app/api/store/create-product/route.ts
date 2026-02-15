@@ -70,7 +70,7 @@ export async function POST(req: NextRequest) {
       return licenseErrorResponse(error);
     }
     if (error instanceof TenantContextError) {
-      return NextResponse.json({ error: error.message }, { status: error.statusCode });
+      return NextResponse.json({ error: 'Internal server error' }, { status: error.statusCode });
     }
     
     logger.error(

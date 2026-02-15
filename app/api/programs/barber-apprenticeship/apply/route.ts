@@ -122,7 +122,7 @@ export async function POST(req: Request) {
   } catch (err: any) {
     logger.error('Barber application error:', err);
     return NextResponse.json(
-      { error: err.message || 'Application failed. Please try again.' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }

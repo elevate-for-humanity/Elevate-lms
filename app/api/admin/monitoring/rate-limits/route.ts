@@ -75,7 +75,7 @@ export async function GET(request: Request) {
   } catch (error) {
     logger.error('Rate limit monitoring error:', error);
     return NextResponse.json({
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Internal server error',
     }, { status: 500 });
   }
 }

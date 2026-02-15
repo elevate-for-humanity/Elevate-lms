@@ -14,7 +14,7 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    throw APIErrors.external('Supabase Auth', error.message);
+    throw APIErrors.external('Supabase Auth');
   }
 
   return NextResponse.json({

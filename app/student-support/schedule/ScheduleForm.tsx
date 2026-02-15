@@ -74,7 +74,7 @@ export default function ScheduleForm({ userId, userProfile, advisors, existingAp
       setSelectedTime('');
       setNotes('');
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to schedule appointment' });
+      setMessage({ type: 'error', text: 'An error occurred' });
     } finally {
       setIsSubmitting(false);
     }

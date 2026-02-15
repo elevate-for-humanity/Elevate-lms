@@ -6,7 +6,7 @@ export function validateCourse(json: string) {
   } catch (err: any) {
     return {
       ok: false,
-      error: err instanceof Error ? err.message : String(err),
+      error: 'Operation failed',
     };
   }
 }

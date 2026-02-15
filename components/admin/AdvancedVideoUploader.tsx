@@ -77,7 +77,7 @@ Apply today and start your journey.`;
 
     } catch (err: any) {
       // Error: $1
-      setError(err.message || 'Failed to process video');
+      setError('Failed to process video');
     } finally {
       setProcessing(false);
     }

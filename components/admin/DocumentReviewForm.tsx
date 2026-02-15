@@ -52,7 +52,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
       router.push('/admin/documents/review?success=true');
       router.refresh();
     } catch (err: any) {
-      setError(err.message || 'Failed to review document');
+      setError('Failed to review document');
     } finally {
       setLoading(false);
     }

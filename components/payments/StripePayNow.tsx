@@ -60,7 +60,7 @@ export default function StripePayNow({
       }
     } catch (error) { /* Error handled silently */ 
       // Error: $1
-      const errorMessage = error instanceof Error ? error.message : 'Failed to start checkout';
+      const errorMessage = 'Failed to start checkout';
       toast.error(errorMessage);
       if (onError) onError(errorMessage);
       setLoading(false);

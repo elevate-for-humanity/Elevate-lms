@@ -103,7 +103,7 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
       setShowModal(false);
       resetForm();
     } catch (err: any) {
-      setError(err.message || 'Failed to save user');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }
@@ -122,7 +122,7 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
       if (updateError) throw updateError;
       setUsers(users.map(u => u.id === userId ? { ...u, is_active: false } : u));
     } catch (err: any) {
-      setError(err.message || 'Failed to deactivate user');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }
@@ -139,7 +139,7 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
       if (updateError) throw updateError;
       setUsers(users.map(u => u.id === userId ? { ...u, is_active: true } : u));
     } catch (err: any) {
-      setError(err.message || 'Failed to activate user');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }
@@ -158,7 +158,7 @@ export default function UserManagementClient({ initialUsers, stats }: Props) {
       if (deleteError) throw deleteError;
       setUsers(users.filter(u => u.id !== userId));
     } catch (err: any) {
-      setError(err.message || 'Failed to delete user');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

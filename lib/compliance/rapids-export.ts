@@ -174,7 +174,7 @@ export async function exportNewRegistrations(
   const { data: enrollments, error } = await query;
 
   if (error) {
-    return { csv: '', count: 0, errors: [error.message] };
+    return { csv: '', count: 0, errors: ['Export failed'] };
   }
 
   if (!enrollments || enrollments.length === 0) {
@@ -273,7 +273,7 @@ export async function exportProgressUpdates(
     .eq('rapids_submitted', true);
 
   if (error) {
-    return { csv: '', count: 0, errors: [error.message] };
+    return { csv: '', count: 0, errors: ['Export failed'] };
   }
 
   if (!enrollments || enrollments.length === 0) {
@@ -366,7 +366,7 @@ export async function exportCompletions(
   const { data: enrollments, error } = await query;
 
   if (error) {
-    return { csv: '', count: 0, errors: [error.message] };
+    return { csv: '', count: 0, errors: ['Export failed'] };
   }
 
   if (!enrollments || enrollments.length === 0) {
@@ -441,7 +441,7 @@ export async function exportCancellations(
   const { data: enrollments, error } = await query;
 
   if (error) {
-    return { csv: '', count: 0, errors: [error.message] };
+    return { csv: '', count: 0, errors: ['Export failed'] };
   }
 
   if (!enrollments || enrollments.length === 0) {
@@ -532,7 +532,7 @@ export async function markAsSubmitted(
     .in('id', enrollmentIds);
 
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
 
   return { success: true };

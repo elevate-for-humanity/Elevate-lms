@@ -128,7 +128,7 @@ export async function createCertificate(
     // Error: $1
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }
@@ -210,7 +210,7 @@ export async function generateCertificatePDF(
     // Error: $1
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }
@@ -265,7 +265,7 @@ export async function verifyCertificate(certificateNumber: string): Promise<{
     // Error: $1
     return {
       valid: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }
@@ -326,7 +326,7 @@ export async function revokeCertificate(
     // Error: $1
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }

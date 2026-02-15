@@ -16,7 +16,7 @@ export function handleApiError(error: any): NextResponse {
   if (error instanceof ApiError) {
     logger.error('API Error', error);
     return NextResponse.json(
-      { error: error.message, code: error.code },
+      { error: 'Operation failed', code: error.code },
       { status: error.statusCode }
     );
   }

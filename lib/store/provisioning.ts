@@ -200,7 +200,7 @@ export async function provisionLicense(
     };
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorMessage = 'Operation failed';
     logger.error('Provisioning failed', { error: errorMessage, correlationId });
 
     // Log failure

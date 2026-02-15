@@ -105,7 +105,7 @@ export async function processNotificationQueue(): Promise<ProcessResult> {
         .update({
           status: newStatus,
           attempts: newAttempts,
-          last_error: error.message || 'Unknown error',
+          last_error: 'Operation failed',
           // Exponential backoff for retries
           scheduled_for: newStatus === 'queued'
             ? new Date(Date.now() + Math.pow(2, newAttempts) * 60000).toISOString()
@@ -114,7 +114,7 @@ export async function processNotificationQueue(): Promise<ProcessResult> {
         .eq('id', notification.id);
 
       result.failed++;
-      result.errors.push({ id: notification.id, error: error.message });
+      result.errors.push({ id: notification.id, error: 'Operation failed' });
     }
   }
 
@@ -169,7 +169,7 @@ async function sendEmail(params: {
     const data = await response.json();
     return { success: true, messageId: data.id };
   } catch (error: any) {
-    return { success: false, error: error.message || 'Network error' };
+    return { success: false, error: 'Network error' };
   }
 }
 

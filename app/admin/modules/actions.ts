@@ -43,7 +43,7 @@ export async function createModule(formData: FormData) {
     });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error('Operation failed');
   }
 
   revalidatePath('/admin/modules');
@@ -91,7 +91,7 @@ export async function updateModule(id: string, formData: FormData) {
     .eq('id', id);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error('Operation failed');
   }
 
   revalidatePath('/admin/modules');
@@ -122,7 +122,7 @@ export async function deleteModule(id: string) {
     .eq('id', id);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error('Operation failed');
   }
 
   revalidatePath('/admin/modules');

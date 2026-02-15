@@ -65,7 +65,7 @@ export default function EnrollmentDocumentStep({
       try {
         await onUpload(documentType, file);
       } catch (err: any) {
-        setError(err.message || 'Failed to upload document');
+        setError('Failed to upload document');
       } finally {
         setUploading(null);
       }

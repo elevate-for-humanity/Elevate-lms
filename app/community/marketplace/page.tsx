@@ -140,7 +140,7 @@ export default async function CommunityMarketplacePage() {
     totalSellers = sellerCount || 0;
   } catch (error) {
     // Tables may not exist yet
-    console.log('Marketplace tables not available');
+    // Marketplace tables may not exist yet
   }
 
   return (

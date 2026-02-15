@@ -207,7 +207,7 @@ export function AgreementSignature({
         }, 1500);
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      const errorMessage = 'An error occurred';
       setError(errorMessage);
       onError?.(errorMessage);
     } finally {

@@ -34,7 +34,7 @@ export default function AnnouncementsList() {
         const data = await res.json();
         setAnnouncements(data.announcements || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError('An error occurred');
       } finally {
         setLoading(false);
       }

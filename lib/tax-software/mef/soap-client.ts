@@ -472,7 +472,7 @@ export class MeFSOAPClient {
         req.on('error', (err) => {
           resolve({
             success: false,
-            message: `Connection failed: ${err.message}`
+            message: `Connection failed`
           });
         });
 

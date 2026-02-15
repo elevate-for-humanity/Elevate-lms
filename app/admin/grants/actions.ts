@@ -40,7 +40,7 @@ export async function createGrantOpportunity(formData: FormData) {
 
   if (error) {
     console.error('Grant insert error:', error);
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
 
   revalidatePath('/admin/grants');
@@ -82,7 +82,7 @@ export async function updateGrantOpportunity(id: string, formData: FormData) {
     .eq('id', id);
 
   if (error) {
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
 
   revalidatePath('/admin/grants');
@@ -99,7 +99,7 @@ export async function deleteGrantOpportunity(id: string) {
     .eq('id', id);
 
   if (error) {
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
 
   revalidatePath('/admin/grants');
@@ -131,7 +131,7 @@ export async function createGrantApplication(formData: FormData) {
 
   if (error) {
     console.error('Grant application insert error:', error);
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
 
   revalidatePath('/admin/grants');
@@ -169,7 +169,7 @@ export async function updateGrantApplicationStatus(
     .eq('id', id);
 
   if (error) {
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
 
   revalidatePath('/admin/grants');

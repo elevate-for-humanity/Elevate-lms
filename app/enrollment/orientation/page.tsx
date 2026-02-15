@@ -108,7 +108,7 @@ export default function OrientationPage() {
 
       router.push('/enrollment/documents');
     } catch (err: any) {
-      setError(err.message);
+      setError('An error occurred');
       setSubmitting(false);
     }
   }

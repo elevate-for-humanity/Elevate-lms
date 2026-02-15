@@ -79,7 +79,7 @@ export default function EnrollPage() {
 
       await checkEligibility();
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+      const errorMessage = 'An error occurred';
       setMessage(`Error: ${errorMessage}`);
     } finally {
       setLoading(false);
@@ -198,7 +198,7 @@ export default function EnrollPage() {
         }
       }
     } catch (error: any) {
-      setMessage(`Error: ${error.message}`);
+      setMessage('An error occurred');
     } finally {
       setEnrolling(false);
     }

@@ -87,7 +87,7 @@ export default function ProgramDiscussionsPage() {
       .limit(20);
 
     if (threadsError) {
-      console.log('Forum threads not accessible:', threadsError.message);
+      // Forum threads table not accessible
       setThreads([]);
       setLoading(false);
       return;

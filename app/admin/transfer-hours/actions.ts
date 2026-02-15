@@ -38,7 +38,7 @@ export async function approveTransferHours(
     .eq('id', requestId);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error('Operation failed');
   }
 
   revalidatePath('/admin/transfer-hours');
@@ -74,7 +74,7 @@ export async function denyTransferHours(requestId: string, notes?: string) {
     .eq('id', requestId);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error('Operation failed');
   }
 
   revalidatePath('/admin/transfer-hours');

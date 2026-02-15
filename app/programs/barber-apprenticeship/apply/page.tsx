@@ -254,7 +254,7 @@ export default function BarberApprenticeshipApplyPage() {
       }
 
       const checkoutData = await checkoutResponse.json();
-      console.log('Checkout response:', checkoutData);
+      // Checkout response received
 
       if (checkoutResponse.ok && checkoutData.url) {
         // Redirect to Stripe Checkout

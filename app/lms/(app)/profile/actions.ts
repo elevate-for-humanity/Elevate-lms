@@ -28,7 +28,7 @@ export async function updateProfile(formData: FormData) {
     .eq('id', user.id);
 
   if (error) {
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
 
   revalidatePath('/lms/profile');

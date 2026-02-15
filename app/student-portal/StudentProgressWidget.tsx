@@ -62,7 +62,7 @@ export default function StudentProgressWidget() {
         const json = await res.json();
         setData(json);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError('An error occurred');
       } finally {
         setLoading(false);
       }

@@ -106,7 +106,7 @@ export default function DeployClient() {
       // Refresh deployments after a delay to get updated status
       setTimeout(fetchDeployments, 2500);
     } catch (error) {
-      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Deployment failed' });
+      setMessage({ type: 'error', text: 'An error occurred' });
     } finally {
       setDeploying(null);
     }
@@ -134,7 +134,7 @@ export default function DeployClient() {
       setMessage({ type: 'success', text: data.message });
       fetchDeployments();
     } catch (error) {
-      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Action failed' });
+      setMessage({ type: 'error', text: 'An error occurred' });
     }
   };
 
@@ -155,7 +155,7 @@ export default function DeployClient() {
       setMessage({ type: 'success', text: 'Deployment removed' });
       fetchDeployments();
     } catch (error) {
-      setMessage({ type: 'error', text: error instanceof Error ? error.message : 'Removal failed' });
+      setMessage({ type: 'error', text: 'An error occurred' });
     }
   };
 

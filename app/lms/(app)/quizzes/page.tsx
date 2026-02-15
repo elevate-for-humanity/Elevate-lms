@@ -81,7 +81,7 @@ export default async function QuizzesPage() {
       stats.avgScore = Math.round(attempts.reduce((sum, a) => sum + (a.score || 0), 0) / attempts.length);
     }
   } catch (error) {
-    console.log('Error fetching quizzes');
+    // Quiz data fetch failed — tables may not exist yet
   }
 
   const getQuizStatus = (quiz: any) => {

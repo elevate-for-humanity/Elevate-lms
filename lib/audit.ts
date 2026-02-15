@@ -183,7 +183,7 @@ export async function auditedAction<T>(
       resourceType,
       metadata: {
         ...options?.metadata,
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       },
       ipAddress,
       userAgent,

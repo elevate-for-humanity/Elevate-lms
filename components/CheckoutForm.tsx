@@ -92,7 +92,7 @@ function PaymentForm({
         }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Payment failed');
+      setError('Payment failed');
     } finally {
       setIsProcessing(false);
     }

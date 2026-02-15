@@ -141,7 +141,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
       setShowModal(false);
       resetForm();
     } catch (err: any) {
-      setError(err.message || 'Failed to save enrollment');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }
@@ -170,7 +170,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
       if (deleteError) throw deleteError;
       setEnrollments(enrollments.filter(e => e.id !== enrollmentId));
     } catch (err: any) {
-      setError(err.message || 'Failed to delete enrollment');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }
@@ -186,7 +186,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
       if (updateError) throw updateError;
       setEnrollments(enrollments.map(e => e.id === enrollment.id ? { ...e, at_risk: !e.at_risk } : e));
     } catch (err: any) {
-      setError(err.message || 'Failed to update enrollment');
+      setError('An error occurred');
     }
   };
 
@@ -205,7 +205,7 @@ export default function EnrollmentManagementClient({ initialEnrollments, users, 
       if (updateError) throw updateError;
       setEnrollments(enrollments.map(e => e.id === enrollment.id ? { ...e, status: 'completed', progress: 100 } : e));
     } catch (err: any) {
-      setError(err.message || 'Failed to complete enrollment');
+      setError('An error occurred');
     }
   };
 

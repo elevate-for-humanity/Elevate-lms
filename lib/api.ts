@@ -110,7 +110,7 @@ export function withErrorHandling(
       
       // Default to internal server error
       return NextResponse.json(
-        { error: error.message || 'Internal server error', code: ErrorCode.INTERNAL_ERROR },
+        { error: 'Internal server error', code: ErrorCode.INTERNAL_ERROR },
         { status: 500 }
       );
     }

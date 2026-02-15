@@ -81,7 +81,7 @@ export class PreparerService {
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to create preparer: ${error.message}`);
+    if (error) throw new Error(`Failed to create preparer`);
     
     await this.logAudit('preparer_created', 'franchise_preparer', data.id, null, data);
     
@@ -107,7 +107,7 @@ export class PreparerService {
 
     if (error) {
       if (error.code === 'PGRST116') return null;
-      throw new Error(`Failed to get preparer: ${error.message}`);
+      throw new Error(`Failed to get preparer`);
     }
     
     return data as TaxPreparer;
@@ -125,7 +125,7 @@ export class PreparerService {
 
     if (error) {
       if (error.code === 'PGRST116') return null;
-      throw new Error(`Failed to get preparer: ${error.message}`);
+      throw new Error(`Failed to get preparer`);
     }
     
     return data as TaxPreparer;
@@ -143,7 +143,7 @@ export class PreparerService {
 
     if (error) {
       if (error.code === 'PGRST116') return null;
-      throw new Error(`Failed to get preparer: ${error.message}`);
+      throw new Error(`Failed to get preparer`);
     }
     
     return data as TaxPreparer;
@@ -177,7 +177,7 @@ export class PreparerService {
 
     const { data, error, count } = await query;
 
-    if (error) throw new Error(`Failed to list preparers: ${error.message}`);
+    if (error) throw new Error(`Failed to list preparers`);
     
     return {
       preparers: data as TaxPreparer[],
@@ -216,7 +216,7 @@ export class PreparerService {
 
     const { data, error, count } = await query;
 
-    if (error) throw new Error(`Failed to list preparers: ${error.message}`);
+    if (error) throw new Error(`Failed to list preparers`);
     
     return {
       preparers: data as TaxPreparer[],
@@ -252,7 +252,7 @@ export class PreparerService {
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to update preparer: ${error.message}`);
+    if (error) throw new Error(`Failed to update preparer`);
     
     await this.logAudit('preparer_updated', 'franchise_preparer', preparerId, current, data);
     
@@ -334,7 +334,7 @@ export class PreparerService {
       .gte('created_at', seasonStart)
       .lte('created_at', seasonEnd);
 
-    if (error) throw new Error(`Failed to get preparer stats: ${error.message}`);
+    if (error) throw new Error(`Failed to get preparer stats`);
 
     const returns = submissions || [];
     const rejectedReturns = returns.filter(r => r.status === 'rejected');

@@ -137,7 +137,7 @@ export async function recordAgreementAcceptance(
 
     if (error) {
       logger.error('[Compliance] Failed to record agreement acceptance:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: 'Operation failed' };
     }
 
     return { success: true, acceptanceId: data?.id };

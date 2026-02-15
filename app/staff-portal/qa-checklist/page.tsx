@@ -109,7 +109,7 @@ export default async function QAChecklistPage() {
 
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-800">Error: {error.message}</p>
+            <p className="text-red-800">An error occurred</p>
           </div>
         )}
 

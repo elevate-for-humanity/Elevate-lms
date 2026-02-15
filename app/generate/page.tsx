@@ -76,7 +76,7 @@ export default function GenerateSitePage() {
       localStorage.setItem('sitePreviewConfig', JSON.stringify(data.config));
       setStep('preview');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError('An error occurred');
       setStep('details');
     }
   };

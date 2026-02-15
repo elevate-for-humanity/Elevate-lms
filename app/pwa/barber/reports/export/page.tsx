@@ -86,7 +86,7 @@ export default function ExportReportsPage() {
       a.click();
       document.body.removeChild(a);
     } catch (err: any) {
-      setError(err.message || 'Failed to export report. Please try again.');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

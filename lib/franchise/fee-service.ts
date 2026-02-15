@@ -86,7 +86,7 @@ class FeeService {
       .single();
 
     if (error) {
-      throw new Error(`Failed to create fee schedule: ${error.message}`);
+      throw new Error(`Failed to create fee schedule`);
     }
 
     return data;
@@ -103,7 +103,7 @@ class FeeService {
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      throw new Error(`Failed to get fee schedule: ${error.message}`);
+      throw new Error(`Failed to get fee schedule`);
     }
 
     return data;
@@ -121,7 +121,7 @@ class FeeService {
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      throw new Error(`Failed to get default fee schedule: ${error.message}`);
+      throw new Error(`Failed to get default fee schedule`);
     }
 
     return data;
@@ -139,7 +139,7 @@ class FeeService {
       .order('name');
 
     if (error) {
-      throw new Error(`Failed to list fee schedules: ${error.message}`);
+      throw new Error(`Failed to list fee schedules`);
     }
 
     return data || [];
@@ -175,7 +175,7 @@ class FeeService {
       .single();
 
     if (error) {
-      throw new Error(`Failed to update fee schedule: ${error.message}`);
+      throw new Error(`Failed to update fee schedule`);
     }
 
     return data;
@@ -191,7 +191,7 @@ class FeeService {
       .eq('id', scheduleId);
 
     if (error) {
-      throw new Error(`Failed to delete fee schedule: ${error.message}`);
+      throw new Error(`Failed to delete fee schedule`);
     }
   }
 

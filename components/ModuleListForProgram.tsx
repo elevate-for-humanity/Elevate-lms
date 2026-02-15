@@ -82,7 +82,7 @@ export function ModuleListForProgram({
       setModules(data || []);
     } catch (err: any) {
       console.error('Error fetching modules:', err);
-      setError(err.message);
+      setError('Failed to load modules');
     } finally {
       setLoading(false);
     }
@@ -131,7 +131,7 @@ export function ModuleListForProgram({
       }
     } catch (err: any) {
       console.error('Error updating module:', err);
-      setError(err.message);
+      setError('Failed to update module');
     } finally {
       setSaving(null);
     }

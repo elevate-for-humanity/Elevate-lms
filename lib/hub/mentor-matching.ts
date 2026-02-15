@@ -185,7 +185,7 @@ export async function requestMentor(
     });
 
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
 
   // Notify mentor
@@ -233,7 +233,7 @@ export async function respondToMentorshipRequest(
     .eq('id', requestId);
 
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
 
   // Notify mentee
@@ -343,7 +343,7 @@ export async function registerAsMentor(
     });
 
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
 
   return { success: true };

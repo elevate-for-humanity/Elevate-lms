@@ -55,7 +55,7 @@ export class OfficeService {
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to create office: ${error.message}`);
+    if (error) throw new Error(`Failed to create office`);
     
     // Log audit event
     await this.logAudit('office_created', 'franchise_office', data.id, null, data);
@@ -75,7 +75,7 @@ export class OfficeService {
 
     if (error) {
       if (error.code === 'PGRST116') return null;
-      throw new Error(`Failed to get office: ${error.message}`);
+      throw new Error(`Failed to get office`);
     }
     
     return data as TaxOffice;
@@ -93,7 +93,7 @@ export class OfficeService {
 
     if (error) {
       if (error.code === 'PGRST116') return null;
-      throw new Error(`Failed to get office: ${error.message}`);
+      throw new Error(`Failed to get office`);
     }
     
     return data as TaxOffice;
@@ -130,7 +130,7 @@ export class OfficeService {
 
     const { data, error, count } = await query;
 
-    if (error) throw new Error(`Failed to list offices: ${error.message}`);
+    if (error) throw new Error(`Failed to list offices`);
     
     return {
       offices: data as TaxOffice[],
@@ -155,7 +155,7 @@ export class OfficeService {
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to update office: ${error.message}`);
+    if (error) throw new Error(`Failed to update office`);
     
     // Log audit event
     await this.logAudit('office_updated', 'franchise_office', officeId, current, data);
@@ -224,7 +224,7 @@ export class OfficeService {
       .gte('created_at', seasonStart)
       .lte('created_at', seasonEnd);
 
-    if (error) throw new Error(`Failed to get office stats: ${error.message}`);
+    if (error) throw new Error(`Failed to get office stats`);
 
     const returns = submissions || [];
     const acceptedReturns = returns.filter(r => r.status === 'accepted');

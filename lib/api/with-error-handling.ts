@@ -31,7 +31,7 @@ async function logErrorToSentry(error: Error, context: Record<string, any>) {
 function sanitizeError(error: any): { message: string; code: string } {
   if (error instanceof APIError) {
     return {
-      message: error.message,
+      message: 'Internal server error',
       code: error.code,
     };
   }
@@ -45,7 +45,7 @@ function sanitizeError(error: any): { message: string; code: string } {
 
   if (error instanceof Error) {
     return {
-      message: error.message,
+      message: 'Internal server error',
       code: ErrorCode.INT_UNKNOWN_ERROR,
     };
   }
@@ -66,7 +66,7 @@ function logError(error: any, context: Record<string, any>) {
     ...context,
     error: error instanceof Error ? {
       name: error.name,
-      message: error.message,
+      message: 'Internal server error',
       stack: error.stack,
     } : String(error),
   };

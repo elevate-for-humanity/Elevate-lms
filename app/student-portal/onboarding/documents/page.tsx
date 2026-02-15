@@ -199,7 +199,7 @@ export default function OnboardingDocumentsPage() {
       }
     } catch (err) {
       console.error('Upload error:', err);
-      setError(err instanceof Error ? err.message : 'Upload failed');
+      setError('An error occurred');
     } finally {
       setUploading(null);
     }

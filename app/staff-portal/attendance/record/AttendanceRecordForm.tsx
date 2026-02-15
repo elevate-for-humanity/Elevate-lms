@@ -95,7 +95,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
       setMessage({ type: 'success', text: `Saved attendance for ${records.length} students` });
       router.refresh();
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to save attendance' });
+      setMessage({ type: 'error', text: 'An error occurred' });
     } finally {
       setIsSaving(false);
     }

@@ -119,7 +119,7 @@ export function featureErrorResponse(error: FeatureNotEnabledError | LimitExceed
   if (error instanceof FeatureNotEnabledError) {
     return NextResponse.json(
       { 
-        error: error.message,
+        error: 'Operation failed',
         code: 'FEATURE_NOT_ENABLED',
         feature: error.feature
       },
@@ -129,7 +129,7 @@ export function featureErrorResponse(error: FeatureNotEnabledError | LimitExceed
   
   return NextResponse.json(
     { 
-      error: error.message,
+      error: 'Operation failed',
       code: 'LIMIT_EXCEEDED',
       limitType: error.limitType,
       current: error.current,

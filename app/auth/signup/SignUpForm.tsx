@@ -119,7 +119,7 @@ export default function SignUpForm() {
       });
 
       if (error) {
-        setError(error instanceof Error ? error.message : String(error));
+        setError('Operation failed');
       }
     } catch (error) { /* Error handled silently */ 
       setError('OAuth sign-up failed. Please start again.');

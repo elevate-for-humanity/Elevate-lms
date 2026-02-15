@@ -41,7 +41,7 @@ export async function createWOTCApplication(formData: FormData) {
 
   if (error) {
     console.error('WOTC insert error:', error);
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
 
   revalidatePath('/admin/wotc');
@@ -80,7 +80,7 @@ export async function updateWOTCApplication(id: string, formData: FormData) {
     .eq('id', id);
 
   if (error) {
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
 
   revalidatePath('/admin/wotc');
@@ -101,7 +101,7 @@ export async function submitWOTCApplication(id: string) {
     .eq('id', id);
 
   if (error) {
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
 
   revalidatePath('/admin/wotc');
@@ -130,7 +130,7 @@ export async function updateWOTCStatus(id: string, status: string, notes?: strin
     .eq('id', id);
 
   if (error) {
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
 
   revalidatePath('/admin/wotc');
@@ -147,7 +147,7 @@ export async function deleteWOTCApplication(id: string) {
     .eq('id', id);
 
   if (error) {
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
 
   revalidatePath('/admin/wotc');

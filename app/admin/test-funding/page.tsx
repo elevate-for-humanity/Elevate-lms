@@ -35,7 +35,7 @@ export default function TestFundingPage() {
         window.open(data.url, '_blank');
       }
     } catch (err: any) {
-      setResult({ err: err instanceof Error ? err.message : String(err) });
+      setResult({ err: 'Operation failed' });
     } finally {
       setLoading(false);
     }

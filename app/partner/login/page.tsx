@@ -77,7 +77,7 @@ export default function PartnerLoginPage() {
 
     } catch (err: any) {
       console.error('Partner login error:', err);
-      setError(err.message || 'Login failed. Please check your credentials.');
+      setError('Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +107,7 @@ export default function PartnerLoginPage() {
       setError('');
       alert('Check your email for a login link!');
     } catch (err: any) {
-      setError(err.message || 'Failed to send magic link');
+      setError('An error occurred');
     } finally {
       setIsLoading(false);
     }

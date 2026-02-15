@@ -167,7 +167,7 @@ export async function getAuditLogs(
 
   if (error) {
     logger.error('Failed to fetch audit logs:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
 
   return { success: true, data: data || [], logs: data || [] };

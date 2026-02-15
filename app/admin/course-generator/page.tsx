@@ -103,7 +103,7 @@ Include Assignments: ${formData.includeAssignments}
         },
       });
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to generate course');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

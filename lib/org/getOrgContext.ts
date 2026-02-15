@@ -45,7 +45,7 @@ export const getOrgContext = cache(
       .single();
 
     if (error) {
-      throw new Error(`Failed to get org context: ${error.message}`);
+      throw new Error(`Failed to get org context`);
     }
 
     if (!data) {

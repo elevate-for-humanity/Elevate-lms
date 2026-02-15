@@ -53,7 +53,7 @@ export class NdsAPI extends BasePartnerAPI {
       };
     } catch (error) { /* Error handled silently */ 
       this.log('error', 'Failed to create NDS account', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -90,7 +90,7 @@ export class NdsAPI extends BasePartnerAPI {
       };
     } catch (error) { /* Error handled silently */ 
       this.log('error', 'Failed to enroll in NDS course', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -130,7 +130,7 @@ export class NdsAPI extends BasePartnerAPI {
         return null;
       }
       this.log('error', 'Failed to fetch NDS progress', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -162,7 +162,7 @@ export class NdsAPI extends BasePartnerAPI {
         return null;
       }
       this.log('error', 'Failed to fetch NDS certificate', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -188,7 +188,7 @@ export class NdsAPI extends BasePartnerAPI {
       return response.data.launchUrl;
     } catch (error) { /* Error handled silently */ 
       this.log('error', 'Failed to generate NDS SSO URL', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }

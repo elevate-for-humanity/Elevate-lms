@@ -125,7 +125,7 @@ export default function LegalOnboardingPage() {
       ));
 
     } catch (err: any) {
-      setError(err.message || 'Failed to sign agreement');
+      setError('An error occurred');
     } finally {
       setSigning(false);
     }
@@ -158,7 +158,7 @@ export default function LegalOnboardingPage() {
       router.push('/student-portal');
 
     } catch (err: any) {
-      setError(err.message || 'Failed to complete onboarding');
+      setError('An error occurred');
     } finally {
       setSigning(false);
     }
@@ -273,8 +273,8 @@ export default function LegalOnboardingPage() {
             <SignatureInput
               userName={user.user_metadata?.full_name || user.email?.split('@')[0] || 'Student'}
               documentType="onboarding_agreements"
-              onSignatureChange={(sig, type) => console.log('Signature:', type)}
-              onSignatureSaved={(id) => console.log('Saved:', id)}
+              onSignatureChange={() => {}}
+              onSignatureSaved={() => {}}
               autoSave={false}
             />
           </div>

@@ -22,7 +22,7 @@ export async function addToList(
     });
     return { success: true, data: response };
   } catch (error) { /* Error handled silently */ 
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
 }
 
@@ -44,6 +44,6 @@ export async function updateMember(
     );
     return { success: true, data: response };
   } catch (error) { /* Error handled silently */ 
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
 }

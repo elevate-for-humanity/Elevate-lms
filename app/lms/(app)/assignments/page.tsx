@@ -87,7 +87,7 @@ export default async function AssignmentsPage() {
       }
     });
   } catch (error) {
-    console.log('Error fetching assignments');
+    // Assignment data fetch failed — tables may not exist yet
   }
 
   const getSubmissionStatus = (assignment: any) => {

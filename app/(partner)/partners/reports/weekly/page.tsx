@@ -58,7 +58,7 @@ export default function PartnerWeeklyReportsPage() {
       submitted_by_user_id: user.user?.id ?? null,
     });
 
-    if (error) setMsg(error.message);
+    if (error) setMsg('An error occurred');
     else setMsg('Submitted.');
   }
 

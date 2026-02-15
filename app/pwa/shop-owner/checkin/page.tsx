@@ -32,7 +32,7 @@ export default function ShopCheckInPage() {
       setData(result);
       setError(null);
     } catch (err: any) {
-      setError(err.message || 'Failed to load check-in code');
+      setError('An error occurred');
     }
   };
 

@@ -71,7 +71,7 @@ export async function instructEnvSync(): Promise<AutopilotResult> {
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
       message: 'Failed to communicate with worker',
       timestamp: new Date().toISOString(),
     };
@@ -110,7 +110,7 @@ export async function verifyEnvSync(): Promise<AutopilotResult> {
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
       message: 'Failed to verify worker',
       timestamp: new Date().toISOString(),
     };

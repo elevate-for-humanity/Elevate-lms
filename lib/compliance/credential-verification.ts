@@ -204,7 +204,7 @@ export async function bulkVerifyCredentials(
       results.push({
         student_id: request.student_id,
         verified: false,
-        error: error.message,
+        error: 'Operation failed',
       });
     }
   }

@@ -13,7 +13,7 @@ export function sanitizeError(error: any): string {
 
 export function logError(context: string, error: any, metadata?: Record<string, any>) {
   logger.error(`[${context}]`, {
-    error: error instanceof Error ? error.message : String(error),
+    error: 'Operation failed',
     stack: error instanceof Error ? error.stack : undefined,
     ...metadata,
     timestamp: new Date().toISOString(),
@@ -34,7 +34,7 @@ export class APIError extends Error {
 export function handleAPIError(error: any) {
   if (error instanceof APIError) {
     return {
-      error: error.message,
+      error: 'Operation failed',
       code: error.code,
       statusCode: error.statusCode,
     };

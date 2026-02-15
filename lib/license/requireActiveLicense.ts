@@ -188,7 +188,7 @@ export function licenseErrorResponse(error: LicenseError, licenseId?: string): N
   
   return NextResponse.json(
     { 
-      error: error.message,
+      error: 'Operation failed',
       licenseStatus: error.licenseStatus,
       code: 'LICENSE_REQUIRED',
       redirectUrl,
@@ -213,7 +213,7 @@ export function withActiveLicense<T>(
         return licenseErrorResponse(error);
       }
       if (error instanceof TenantContextError) {
-        return NextResponse.json({ error: error.message }, { status: error.statusCode });
+        return NextResponse.json({ error: 'Operation failed' }, { status: error.statusCode });
       }
       throw error;
     }

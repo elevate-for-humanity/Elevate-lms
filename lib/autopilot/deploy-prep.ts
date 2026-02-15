@@ -50,7 +50,7 @@ export async function prepareDeploy(): Promise<DeploymentStatus> {
     return {
       ok: false,
       ready: false,
-      message: `Deployment check failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      message: `Deployment check failed: ${'Operation failed'}`,
       checks,
       timestamp: new Date().toISOString(),
     };
@@ -93,7 +93,7 @@ async function syncEnrollments(supabase: any) {
     .select('*')
     .eq('status', 'active');
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: 'Operation failed' };
 
   return {
     ok: true,
@@ -166,7 +166,7 @@ export async function buildCourse(courseData: {
     .select()
     .single();
 
-  if (error) return { ok: false, error: error.message };
+  if (error) return { ok: false, error: 'Operation failed' };
 
   return {
     ok: true,

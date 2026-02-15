@@ -80,7 +80,7 @@ export function useCollaboration(workspaceId: string | null, userId: string, use
       onEdit: (userId, path, operation) => {
         // Handle incoming edit operations
         // This would integrate with Monaco's edit API
-        console.log('Edit from', userId, 'on', path, operation);
+        // TODO: integrate with Monaco's edit API
       },
       onUserJoined: (userId) => {
         setState(s => ({ ...s, activeUsers: s.activeUsers + 1 }));

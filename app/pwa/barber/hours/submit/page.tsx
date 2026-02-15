@@ -93,7 +93,7 @@ export default function SubmitHoursPage() {
 
       setSuccess(true);
     } catch (err: any) {
-      setError(err.message || 'Failed to submit hours. Please try again.');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

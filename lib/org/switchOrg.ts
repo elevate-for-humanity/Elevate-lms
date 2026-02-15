@@ -27,6 +27,6 @@ export async function switchOrg(
     .eq('id', userId);
 
   if (error) {
-    throw new Error(`Failed to switch org: ${error.message}`);
+    throw new Error(`Failed to switch org`);
   }
 }

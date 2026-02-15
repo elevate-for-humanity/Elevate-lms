@@ -162,7 +162,7 @@ export default function NewPreparerPage() {
       console.error('Error creating preparer:', error);
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to create preparer',
+        description: 'An error occurred',
         variant: 'destructive'
       });
     } finally {

@@ -62,7 +62,7 @@ export default function VideoGeneratorPage() {
       setResults(data.results || []);
       fetchStatus(); // Refresh status
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Generation failed');
+      setError('An error occurred');
     } finally {
       setGenerating(false);
     }

@@ -50,7 +50,7 @@ If you did not expect this invitation, you can safely ignore this email.
 
     return { success: true };
   } catch (error) { /* Error handled silently */ 
-    const message = error instanceof Error ? error.message : String(error);
+    const message = 'Operation failed';
     logger.error('Failed to send org invite email:', message);
     return { success: false, error: message };
   }

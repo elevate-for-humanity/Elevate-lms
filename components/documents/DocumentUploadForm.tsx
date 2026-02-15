@@ -106,7 +106,7 @@ export function DocumentUploadForm({ requirements }: Props) {
         router.push('/student/documents');
       }, 2000);
     } catch (err: any) {
-      setError(err.message || 'Failed to upload document');
+      setError('Failed to upload document');
     } finally {
       setLoading(false);
     }

@@ -39,7 +39,7 @@ export default function TestEmailsPage() {
       setResult({
         success: false,
         message:
-          (err instanceof Error ? err.message : String(err)) ||
+          ('Operation failed') ||
           'Failed to send test email',
       });
     } finally {

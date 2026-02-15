@@ -86,7 +86,7 @@ export async function enrollInExternalModule(
       success: false,
       mode: 'link',
       error:
-        (error instanceof Error ? error.message : String(error)) ||
+        ('Operation failed') ||
         'Enrollment failed',
     };
   }

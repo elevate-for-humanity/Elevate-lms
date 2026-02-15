@@ -113,11 +113,7 @@ export default function EnrollPage({
         window.location.href = course.enrollment_url;
       }
     } catch (err: any) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : 'Failed to enroll. Please try again.'
-      );
+      setError('Failed to enroll. Please try again.');
       setEnrolling(false);
     }
   }

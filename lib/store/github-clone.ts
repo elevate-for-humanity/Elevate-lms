@@ -91,7 +91,7 @@ export async function grantRepoAccess({
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }

@@ -174,7 +174,7 @@ export default function EROQueuePage() {
       console.error('Error signing returns:', error);
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to sign returns',
+        description: 'An error occurred',
         variant: 'destructive'
       });
     } finally {

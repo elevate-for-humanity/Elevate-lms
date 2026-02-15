@@ -188,7 +188,7 @@ export async function issueCertificate(
     return {
       success: false,
       alreadyIssued: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }

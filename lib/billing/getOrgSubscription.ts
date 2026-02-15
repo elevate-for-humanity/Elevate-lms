@@ -35,7 +35,7 @@ export const getOrgSubscription = cache(
       if (error.code === 'PGRST116') {
         return null;
       }
-      throw new Error(`Failed to get subscription: ${error.message}`);
+      throw new Error(`Failed to get subscription`);
     }
 
     return data;

@@ -129,7 +129,7 @@ export default function QuestionManagerClient({ quiz, initialQuestions, quizId, 
       setShowModal(false);
       resetForm();
     } catch (err: any) {
-      setError(err.message || 'Failed to save question');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }
@@ -144,7 +144,7 @@ export default function QuestionManagerClient({ quiz, initialQuestions, quizId, 
       if (deleteError) throw deleteError;
       setQuestions(questions.filter(q => q.id !== questionId));
     } catch (err: any) {
-      setError(err.message || 'Failed to delete question');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

@@ -233,7 +233,7 @@ export default async function ApplicationsPage({
         <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
           {error ? (
             <div className="p-8 text-center text-red-600">
-              Error loading applications: {error.message}
+              Error loading applications
             </div>
           ) : applications && applications.length > 0 ? (
             <>

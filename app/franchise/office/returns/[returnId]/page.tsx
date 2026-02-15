@@ -389,7 +389,7 @@ export default function ReturnDetailPage() {
                     returnData.irs_errors.map((error: any, index: number) => (
                       <div key={index} className="p-4 bg-red-50 dark:bg-red-950 rounded-lg">
                         <p className="font-medium">{error.code || 'Error'}</p>
-                        <p className="text-sm text-muted-foreground">{error.message || JSON.stringify(error)}</p>
+                        <p className="text-sm text-muted-foreground">{'An error occurred'}</p>
                       </div>
                     ))
                   ) : (

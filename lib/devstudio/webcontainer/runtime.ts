@@ -53,7 +53,7 @@ class WebContainerRuntime {
       await this.spawn('corepack', ['enable']);
       this.emit('Corepack enabled\n');
     } catch (error) {
-      const message = error instanceof Error ? error.message : String(error);
+      const message = 'Operation failed';
       this.emit(`Failed to boot WebContainer: ${message}\n`);
       throw error;
     }

@@ -63,7 +63,7 @@ export default function SignInForm() {
       });
 
       if (error) {
-        setError(error instanceof Error ? error.message : String(error));
+        setError('Operation failed');
       }
     } catch (error) { /* Error handled silently */ 
       setError('OAuth sign-in failed. Please start again.');

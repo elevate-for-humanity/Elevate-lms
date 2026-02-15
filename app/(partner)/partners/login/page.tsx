@@ -21,7 +21,7 @@ export default function PartnerLoginPage() {
       password,
     });
     if (error) {
-      setMsg(error.message);
+      setMsg('An error occurred');
       return;
     }
     router.replace('/partners/dashboard');

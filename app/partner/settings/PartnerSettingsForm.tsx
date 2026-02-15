@@ -64,7 +64,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
       setMessage({ type: 'success', text: 'Profile updated successfully' });
       router.refresh();
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to update profile' });
+      setMessage({ type: 'error', text: 'Failed to update profile' });
     } finally {
       setIsSaving(false);
     }
@@ -112,7 +112,7 @@ export default function PartnerSettingsForm({ profile, programHolder, delegate }
       setMessage({ type: 'success', text: 'Organization settings updated' });
       router.refresh();
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to update organization' });
+      setMessage({ type: 'error', text: 'An error occurred' });
     } finally {
       setIsSaving(false);
     }

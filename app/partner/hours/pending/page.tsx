@@ -110,7 +110,7 @@ export default function PartnerHoursPendingPage() {
       setSuccess('Hours approved successfully');
       setPendingHours(prev => prev.filter(h => h.id !== hourId));
     } catch (err: any) {
-      setError(err.message || 'Failed to approve hours');
+      setError('An error occurred');
     } finally {
       setProcessing(null);
     }
@@ -140,7 +140,7 @@ export default function PartnerHoursPendingPage() {
       setSuccess('Hours rejected');
       setPendingHours(prev => prev.filter(h => h.id !== hourId));
     } catch (err: any) {
-      setError(err.message || 'Failed to reject hours');
+      setError('An error occurred');
     } finally {
       setProcessing(null);
     }
@@ -174,7 +174,7 @@ export default function PartnerHoursPendingPage() {
       setSuccess(`${hourIds.length} hours entries approved`);
       setPendingHours([]);
     } catch (err: any) {
-      setError(err.message || 'Failed to approve hours');
+      setError('An error occurred');
     } finally {
       setProcessing(null);
     }

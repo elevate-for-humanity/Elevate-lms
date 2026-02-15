@@ -89,13 +89,13 @@ export async function processMiladyPayment(params: MiladyPaymentParams) {
       action: 'MILADY_PAYMENT_ERROR',
       details: {
         enrollment_id: params.enrollmentId,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'Operation failed',
       },
     });
 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -121,7 +121,7 @@ export async function markMiladyPaymentPaid(
 
   if (error) {
     // Error: $1
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
 
   return { success: true };
@@ -152,7 +152,7 @@ export async function getPendingMiladyPayments() {
 
   if (error) {
     // Error: $1
-    return { success: false, error: error.message, payments: [] };
+    return { success: false, error: 'Operation failed', payments: [] };
   }
 
   return {

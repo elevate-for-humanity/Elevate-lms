@@ -108,14 +108,14 @@ export async function createOrUpdateEnrollment(
 
     if (error) {
       logger.error('[enrollment-service] Upsert failed:', error);
-      return { id: '', action: 'created', error: error.message };
+      return { id: '', action: 'created', error: 'Operation failed' };
     }
 
     const action = existing ? 'updated' : 'created';
     logger.info(`[enrollment-service] ${action}: ${enrollment.id} (${programSlug} for ${studentId})`);
     return { id: enrollment.id, action };
   } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
+    const message = 'Operation failed';
     logger.error('[enrollment-service] Unexpected error:', message);
     return { id: '', action: 'created', error: message };
   }

@@ -24,7 +24,7 @@ class Logger {
         output += `\n  Context: ${JSON.stringify(context, null, 2)}`;
       }
       if (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
+        const errorMessage = 'Operation failed';
         const errorStack = error instanceof Error ? error.stack : undefined;
         output += `\n  Error: ${errorMessage}`;
         if (errorStack) {
@@ -38,7 +38,7 @@ class Logger {
     return JSON.stringify({
       ...entry,
       error: error ? {
-        message: error instanceof Error ? error.message : String(error),
+        message: 'Operation failed',
         stack: error instanceof Error ? error.stack : undefined,
         name: error instanceof Error ? error.name : undefined,
       } : undefined,

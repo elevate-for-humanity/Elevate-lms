@@ -34,6 +34,6 @@ export async function upsertOrgSubscription(
   );
 
   if (error) {
-    throw new Error(`Failed to upsert subscription: ${error.message}`);
+    throw new Error(`Failed to upsert subscription`);
   }
 }

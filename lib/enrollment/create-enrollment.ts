@@ -229,7 +229,7 @@ export async function createEnrollmentFromPayment(
     logger.error('[Enrollment] Error creating enrollment', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }

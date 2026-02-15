@@ -96,7 +96,7 @@ export default function PageManager() {
       loadPages();
     } catch (error) { /* Error handled silently */ 
       // Error: $1
-      alert('Failed to update page status: ' + error instanceof Error ? error.message : String(error));
+      alert('Failed to update page status');
     }
   }
 
@@ -116,7 +116,7 @@ export default function PageManager() {
       loadPages();
     } catch (error) { /* Error handled silently */ 
       // Error: $1
-      alert('Failed to delete page: ' + error instanceof Error ? error.message : String(error));
+      alert('Failed to delete page');
     }
   }
 
@@ -143,7 +143,7 @@ export default function PageManager() {
       if (data) setSelectedPage(data);
     } catch (error) { /* Error handled silently */ 
       // Error: $1
-      alert('Failed to save changes: ' + error instanceof Error ? error.message : String(error));
+      alert('Failed to save changes');
     }
   }
 
@@ -169,7 +169,7 @@ export default function PageManager() {
       if (data) setSelectedPage(data);
     } catch (error) { /* Error handled silently */ 
       // Error: $1
-      alert('Failed to rollback: ' + error instanceof Error ? error.message : String(error));
+      alert('Failed to rollback');
     }
   }
 

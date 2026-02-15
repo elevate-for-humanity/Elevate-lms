@@ -101,7 +101,7 @@ export default function ProgramEnrollment({ program, userId, onEnrollmentComplet
       }
 
     } catch (data: any) {
-      setError(err.message || 'Enrollment failed. Please try again.');
+      setError('Enrollment failed. Please try again.');
       setLoading(false);
     }
   };

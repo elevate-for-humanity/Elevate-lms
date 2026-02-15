@@ -13,7 +13,7 @@ export async function requireLegalClearance(shopId: string) {
     .eq('shop_id', shopId);
 
   if (error) {
-    throw new Error(`Failed to check legal clearance: ${error.message}`);
+    throw new Error(`Failed to check legal clearance`);
   }
 
   // Critical legal documents that MUST be approved
@@ -59,7 +59,7 @@ export async function getLegalClearanceStatus(shopId: string) {
     .in('document_type', ['mou', 'nda', 'non_compete']);
 
   if (error) {
-    throw new Error(`Failed to get legal clearance status: ${error.message}`);
+    throw new Error(`Failed to get legal clearance status`);
   }
 
   const required = ['mou', 'nda', 'non_compete'];

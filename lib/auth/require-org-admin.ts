@@ -54,7 +54,7 @@ export interface OrgAdminResult {
  *     // User is authorized, continue...
  *   } catch (err) {
  *     return NextResponse.json(
- *       { error: err.message },
+ *       { error: 'Authorization failed' },
  *       { status: err.message === 'Unauthorized' ? 401 : 403 }
  *     );
  *   }

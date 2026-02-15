@@ -60,7 +60,7 @@ export async function orchestrateEnrollment(params: {
       logger.error('[Enrollment Orchestration] RPC error:', error);
       return {
         success: false,
-        error: error.message,
+        error: 'Operation failed',
       };
     }
 

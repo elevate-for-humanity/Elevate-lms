@@ -116,7 +116,7 @@ export class MiladyAPI extends BasePartnerAPI {
       };
     } catch (error) { /* Error handled silently */ 
       this.log('error', 'Failed to create Milady RISE account', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -154,7 +154,7 @@ export class MiladyAPI extends BasePartnerAPI {
       };
     } catch (error) { /* Error handled silently */ 
       this.log('error', 'Failed to enroll in Milady RISE course', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -196,7 +196,7 @@ export class MiladyAPI extends BasePartnerAPI {
         return null;
       }
       this.log('error', 'Failed to fetch Milady RISE progress', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -228,7 +228,7 @@ export class MiladyAPI extends BasePartnerAPI {
         return null;
       }
       this.log('error', 'Failed to fetch Milady RISE certificate', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -254,7 +254,7 @@ export class MiladyAPI extends BasePartnerAPI {
       return response.data.launchUrl;
     } catch (error) { /* Error handled silently */ 
       this.log('error', 'Failed to generate Milady RISE SSO URL', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }

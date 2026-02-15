@@ -38,7 +38,7 @@ export default function MarkPaidButton({
       alert('Payout marked as paid successfully!');
       router.refresh();
     } catch (err: any) {
-      alert(`Error: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      alert(`Error: ${'An error occurred'}`);
     } finally {
       setLoading(false);
     }

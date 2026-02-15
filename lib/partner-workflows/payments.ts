@@ -127,7 +127,7 @@ export async function createPartnerPaymentSession(
     // Error: $1
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }

@@ -79,7 +79,7 @@ class ContainerAPI {
     const ws = new WebSocket(`${wsUrl}/terminal`);
 
     ws.onopen = () => {
-      console.log('Container terminal connected');
+      // Terminal connected
     };
 
     ws.onmessage = (event) => {

@@ -156,7 +156,7 @@ export default function PartnerOnboardingPage() {
 
       router.push('/partner/onboarding/success');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong.');
+      setError('An error occurred');
     } finally {
       setIsSubmitting(false);
     }

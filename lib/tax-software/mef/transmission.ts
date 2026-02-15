@@ -161,7 +161,7 @@ export class IRSTransmitter {
       };
       
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = 'Operation failed';
       
       // Update database with error
       if (this.supabase) {

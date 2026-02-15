@@ -97,14 +97,14 @@ export async function purchaseMiladyCourse(
       program_slug: programSlug,
       amount: cost,
       status: 'failed',
-      error_message: error.message,
+      error_message: 'Payment processing failed',
       elevate_payment_id: elevatePaymentId,
       created_at: new Date().toISOString(),
     });
 
     return {
       success: false,
-      error: error.message || 'Failed to purchase Milady course',
+      error: 'Operation failed' || 'Failed to purchase Milady course',
     };
   }
 }

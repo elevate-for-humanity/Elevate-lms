@@ -91,7 +91,7 @@ class PayoutService {
       .single();
 
     if (error) {
-      throw new Error(`Failed to create payout: ${error.message}`);
+      throw new Error(`Failed to create payout`);
     }
 
     return data;
@@ -108,7 +108,7 @@ class PayoutService {
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      throw new Error(`Failed to get payout: ${error.message}`);
+      throw new Error(`Failed to get payout`);
     }
 
     return data;
@@ -147,7 +147,7 @@ class PayoutService {
     const { data, error, count } = await query;
 
     if (error) {
-      throw new Error(`Failed to list payouts: ${error.message}`);
+      throw new Error(`Failed to list payouts`);
     }
 
     return {
@@ -185,7 +185,7 @@ class PayoutService {
     const { data, error, count } = await query;
 
     if (error) {
-      throw new Error(`Failed to list payouts: ${error.message}`);
+      throw new Error(`Failed to list payouts`);
     }
 
     return {
@@ -212,7 +212,7 @@ class PayoutService {
       .single();
 
     if (error) {
-      throw new Error(`Failed to approve payout: ${error.message}`);
+      throw new Error(`Failed to approve payout`);
     }
 
     return data;
@@ -240,7 +240,7 @@ class PayoutService {
       .single();
 
     if (error) {
-      throw new Error(`Failed to mark payout as paid: ${error.message}`);
+      throw new Error(`Failed to mark payout as paid`);
     }
 
     return data;
@@ -333,7 +333,7 @@ class PayoutService {
       } catch (error) {
         errors.push({
           preparerId: preparer.id,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: 'Operation failed'
         });
       }
     }

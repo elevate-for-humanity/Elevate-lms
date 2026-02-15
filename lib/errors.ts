@@ -82,5 +82,5 @@ export function handleError(error: any): { message: string; status: number } {
   }
 
   // Default to 500 for unknown errors
-  return { message: error?.message || "Internal server error", status: 500 };
+  return { message: "Internal server error", status: 500 };
 }

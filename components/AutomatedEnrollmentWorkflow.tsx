@@ -157,7 +157,7 @@ export default function AutomatedEnrollmentWorkflow({
       setWorkflow(derivedWorkflow);
     } catch (err: any) {
       console.error('Error fetching enrollment:', err);
-      setError(err.message);
+      setError('Failed to load enrollment');
       setWorkflow(DEFAULT_WORKFLOW_STEPS.map((s, i) => ({ ...s, id: `step-${i}` })));
     }
   }, [enrollmentId, supabase, deriveWorkflowFromStatus]);

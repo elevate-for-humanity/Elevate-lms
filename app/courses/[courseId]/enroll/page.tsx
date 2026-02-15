@@ -46,7 +46,7 @@ export default function CourseEnrollPage({
         throw new Error('No checkout URL returned');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError('An error occurred');
       setLoading(false);
     }
   };

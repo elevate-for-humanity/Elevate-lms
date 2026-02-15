@@ -35,7 +35,7 @@ export async function runAutopilots(
   } catch (error) { /* Error handled silently */ 
     return {
       ok: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }
@@ -55,7 +55,7 @@ export async function runFullAnalysis(repo = 'elevateforhumanity/fix2') {
   } catch (error) { /* Error handled silently */ 
     return {
       ok: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }

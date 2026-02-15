@@ -201,7 +201,7 @@ export async function createEnrollment(input: CreateEnrollmentInput) {
     return {
       success: false,
       error:
-        (error instanceof Error ? error.message : String(error)) ||
+        ('Operation failed') ||
         'Failed to create enrollment',
     };
   }
@@ -259,7 +259,7 @@ export async function addTransferHours(input: AddTransferHoursInput) {
     return {
       success: false,
       error:
-        (error instanceof Error ? error.message : String(error)) ||
+        ('Operation failed') ||
         'Failed to add transfer hours',
     };
   }
@@ -370,7 +370,7 @@ export async function approveTransferHours(input: ApproveTransferHoursInput) {
     return {
       success: false,
       error:
-        (error instanceof Error ? error.message : String(error)) ||
+        ('Operation failed') ||
         'Failed to approve transfer hours',
     };
   }
@@ -393,7 +393,7 @@ export async function rejectTransferHours(
       .eq('id', transfer_hours_id);
     if (error) {
       throw new Error(
-        `Failed to reject transfer hours: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to reject transfer hours: ${'Operation failed'}`
       );
     }
     return {
@@ -405,7 +405,7 @@ export async function rejectTransferHours(
     return {
       success: false,
       error:
-        (error instanceof Error ? error.message : String(error)) ||
+        ('Operation failed') ||
         'Failed to reject transfer hours',
     };
   }
@@ -453,7 +453,7 @@ export async function updateFundingAmounts(input: UpdateFundingAmountsInput) {
     return {
       success: false,
       error:
-        (error instanceof Error ? error.message : String(error)) ||
+        ('Operation failed') ||
         'Failed to update funding amounts',
     };
   }
@@ -489,7 +489,7 @@ export async function getEnrollmentDetails(enrollment_id: string) {
       .single();
     if (error) {
       throw new Error(
-        `Failed to fetch enrollment: ${error instanceof Error ? error.message : String(error)}`
+        `Failed to fetch enrollment: ${'Operation failed'}`
       );
     }
     // Calculate hours summary
@@ -531,7 +531,7 @@ export async function getEnrollmentDetails(enrollment_id: string) {
     return {
       success: false,
       error:
-        (error instanceof Error ? error.message : String(error)) ||
+        ('Operation failed') ||
         'Failed to fetch enrollment details',
     };
   }

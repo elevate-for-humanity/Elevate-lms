@@ -228,7 +228,7 @@ export async function applyToJob(userId: string, jobId: string): Promise<{ succe
     });
 
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
 
   // Increment applicant count

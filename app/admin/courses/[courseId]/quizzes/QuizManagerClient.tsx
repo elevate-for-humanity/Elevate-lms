@@ -105,7 +105,7 @@ export default function QuizManagerClient({ course, initialQuizzes, courseId }: 
       setShowModal(false);
       resetForm();
     } catch (err: any) {
-      setError(err.message || 'Failed to save quiz');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }
@@ -120,7 +120,7 @@ export default function QuizManagerClient({ course, initialQuizzes, courseId }: 
       if (deleteError) throw deleteError;
       setQuizzes(quizzes.filter(q => q.id !== quizId));
     } catch (err: any) {
-      setError(err.message || 'Failed to delete quiz');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

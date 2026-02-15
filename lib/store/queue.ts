@@ -107,7 +107,7 @@ export async function processPendingJobs(
       
       processed++;
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : String(err);
+      const errorMessage = 'Operation failed';
       
       await adminSupabase
         .from('job_queue')

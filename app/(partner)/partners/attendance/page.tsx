@@ -44,7 +44,7 @@ export default function PartnerAttendancePage() {
       .eq('shop_id', shopId);
 
     if (error) {
-      setMsg(error.message);
+      setMsg('An error occurred');
       return;
     }
 
@@ -94,7 +94,7 @@ export default function PartnerAttendancePage() {
         onConflict: 'shop_id,student_id,program_slug,week_start',
       });
 
-    if (error) setMsg(error.message);
+    if (error) setMsg('An error occurred');
     else setMsg('Saved.');
   }
 

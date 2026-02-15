@@ -170,7 +170,7 @@ export function handleRBACError(error: Error) {
   if (error.message === 'PROFILE_NOT_FOUND') {
     return { error: 'User profile not found', status: 404 };
   }
-  return { error: error.message || 'Internal server error', status: 500 };
+  return { error: 'Internal server error', status: 500 };
 }
 
 /**

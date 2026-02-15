@@ -45,7 +45,7 @@ export async function exportUserData(userId: string) {
     // Error: $1
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -87,7 +87,7 @@ export async function deleteUserData(userId: string, options: { keepProfile?: bo
     // Error: $1
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -130,7 +130,7 @@ export async function anonymizeUserData(userId: string) {
     // Error: $1
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -201,7 +201,7 @@ export async function updateConsentPreferences(userId: string, preferences: {
 
   if (error) {
     // Error: $1
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
 
   return { success: true };

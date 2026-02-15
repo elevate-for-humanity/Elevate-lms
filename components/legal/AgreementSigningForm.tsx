@@ -150,7 +150,7 @@ export default function AgreementSigningForm({
         router.refresh();
       }
     } catch (err: any) {
-      setError(err.message);
+      setError('Failed to sign agreement');
     } finally {
       setSubmitting(false);
     }

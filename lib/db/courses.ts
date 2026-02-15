@@ -33,7 +33,7 @@ export async function createCourse(input: CourseCreate) {
     })
     .select()
     .single();
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -43,7 +43,7 @@ export async function listCourses() {
     .from('courses')
     .select('*, programs(id, title)')
     .order('created_at', { ascending: false });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data || [];
 }
 
@@ -55,7 +55,7 @@ export async function getCourse(id: string) {
     .eq('id', id)
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -68,14 +68,14 @@ export async function updateCourse(id: string, patch: CourseUpdate) {
     .select()
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
 export async function deleteCourse(id: string) {
   const supabase = await getSupabase();
   const { error } = await supabase.from('courses').delete().eq('id', id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return { ok: true };
 }
 
@@ -94,7 +94,7 @@ export async function createLesson(input: LessonCreate) {
     })
     .select()
     .single();
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -105,7 +105,7 @@ export async function listLessons(courseId: string) {
     .select('*')
     .eq('course_id', courseId)
     .order('order_index', { ascending: true });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data || [];
 }
 
@@ -117,7 +117,7 @@ export async function getLesson(id: string) {
     .eq('id', id)
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -130,14 +130,14 @@ export async function updateLesson(id: string, patch: LessonUpdate) {
     .select()
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
 export async function deleteLesson(id: string) {
   const supabase = await getSupabase();
   const { error } = await supabase.from('lessons').delete().eq('id', id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return { ok: true };
 }
 
@@ -156,7 +156,7 @@ export async function createQuiz(input: QuizCreate) {
     })
     .select()
     .single();
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -167,7 +167,7 @@ export async function listQuizzes(courseId: string) {
     .select('*')
     .eq('course_id', courseId)
     .order('created_at', { ascending: false });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data || [];
 }
 
@@ -179,7 +179,7 @@ export async function getQuiz(id: string) {
     .eq('id', id)
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -192,14 +192,14 @@ export async function updateQuiz(id: string, patch: QuizUpdate) {
     .select()
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
 export async function deleteQuiz(id: string) {
   const supabase = await getSupabase();
   const { error } = await supabase.from('quizzes').delete().eq('id', id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return { ok: true };
 }
 
@@ -219,7 +219,7 @@ export async function createQuestion(input: QuestionCreate) {
     })
     .select()
     .single();
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -230,7 +230,7 @@ export async function listQuestions(quizId: string) {
     .select('*')
     .eq('quiz_id', quizId)
     .order('order_index', { ascending: true });
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data || [];
 }
 
@@ -242,7 +242,7 @@ export async function getQuestion(id: string) {
     .eq('id', id)
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -257,14 +257,14 @@ export async function updateQuestion(id: string, patch: QuestionUpdate) {
     .select()
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
 export async function deleteQuestion(id: string) {
   const supabase = await getSupabase();
   const { error } = await supabase.from('quiz_questions').delete().eq('id', id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return { ok: true };
 }
 
@@ -283,7 +283,7 @@ export async function createEnrollment(input: EnrollmentCreate) {
     })
     .select('*, student:profiles!enrollments_user_id_fkey(id, full_name, email), course:courses(id, title)')
     .single();
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -299,7 +299,7 @@ export async function listEnrollments(filters?: { courseId?: string; userId?: st
   if (filters?.status) query = query.eq('status', filters.status);
   
   const { data, error } = await query;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data || [];
 }
 
@@ -311,7 +311,7 @@ export async function getEnrollment(id: string) {
     .eq('id', id)
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -327,14 +327,14 @@ export async function updateEnrollment(id: string, patch: EnrollmentUpdate) {
     .select('*, student:profiles!enrollments_user_id_fkey(id, full_name, email), course:courses(id, title)')
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
 export async function deleteEnrollment(id: string) {
   const supabase = await getSupabase();
   const { error } = await supabase.from('enrollments').delete().eq('id', id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return { ok: true };
 }
 
@@ -359,7 +359,7 @@ export async function createProgram(input: ProgramCreate) {
     })
     .select()
     .single();
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -373,7 +373,7 @@ export async function listPrograms(filters?: { status?: string }) {
   if (filters?.status) query = query.eq('status', filters.status);
   
   const { data, error } = await query;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data || [];
 }
 
@@ -385,7 +385,7 @@ export async function getProgram(id: string) {
     .eq('id', id)
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -398,7 +398,7 @@ export async function updateProgram(id: string, patch: ProgramUpdate) {
     .select()
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -409,7 +409,7 @@ export async function deleteProgram(id: string) {
     .from('programs')
     .update({ status: 'archived', updated_at: new Date().toISOString() })
     .eq('id', id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return { ok: true };
 }
 
@@ -433,7 +433,7 @@ export async function createApplication(input: ApplicationCreate) {
     })
     .select('*, program:programs(id, title, code)')
     .single();
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -448,7 +448,7 @@ export async function listApplications(filters?: { status?: string; programId?: 
   if (filters?.programId) query = query.eq('program_id', filters.programId);
   
   const { data, error } = await query;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data || [];
 }
 
@@ -460,7 +460,7 @@ export async function getApplication(id: string) {
     .eq('id', id)
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
@@ -478,13 +478,13 @@ export async function updateApplication(id: string, patch: ApplicationUpdate) {
     .select('*, program:programs(id, title, code)')
     .single();
   if (error?.code === 'PGRST116') return null;
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return data;
 }
 
 export async function deleteApplication(id: string) {
   const supabase = await getSupabase();
   const { error } = await supabase.from('applications').delete().eq('id', id);
-  if (error) throw new Error(error.message);
+  if (error) throw new Error('Database operation failed');
   return { ok: true };
 }

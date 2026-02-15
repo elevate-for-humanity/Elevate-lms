@@ -105,7 +105,7 @@ export class ClientService {
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to create client: ${error.message}`);
+    if (error) throw new Error(`Failed to create client`);
     
     await this.logAudit('client_created', 'franchise_client', data.id, null, { 
       ...data, 
@@ -128,7 +128,7 @@ export class ClientService {
 
     if (error) {
       if (error.code === 'PGRST116') return null;
-      throw new Error(`Failed to get client: ${error.message}`);
+      throw new Error(`Failed to get client`);
     }
     
     return data as TaxClient;
@@ -166,7 +166,7 @@ export class ClientService {
       .eq('office_id', officeId)
       .eq('ssn_last_four', lastFour);
 
-    if (error) throw new Error(`Failed to search clients: ${error.message}`);
+    if (error) throw new Error(`Failed to search clients`);
     
     // Then verify full SSN match
     for (const client of data || []) {
@@ -193,7 +193,7 @@ export class ClientService {
       .order('last_name', { ascending: true })
       .limit(50);
 
-    if (error) throw new Error(`Failed to search clients: ${error.message}`);
+    if (error) throw new Error(`Failed to search clients`);
     
     return data as TaxClient[];
   }
@@ -230,7 +230,7 @@ export class ClientService {
 
     const { data, error, count } = await query;
 
-    if (error) throw new Error(`Failed to list clients: ${error.message}`);
+    if (error) throw new Error(`Failed to list clients`);
     
     return {
       clients: data as TaxClient[],
@@ -292,7 +292,7 @@ export class ClientService {
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to update client: ${error.message}`);
+    if (error) throw new Error(`Failed to update client`);
     
     await this.logAudit('client_updated', 'franchise_client', clientId, 
       { ...current, ssn_encrypted: '[REDACTED]', spouse_ssn_encrypted: '[REDACTED]' },
@@ -336,7 +336,7 @@ export class ClientService {
       .select()
       .single();
 
-    if (error) throw new Error(`Failed to update client: ${error.message}`);
+    if (error) throw new Error(`Failed to update client`);
     
     await this.logAudit('client_marked_dns', 'franchise_client', clientId, null, { reason });
     

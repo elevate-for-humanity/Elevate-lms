@@ -51,7 +51,7 @@ export default function ShopLogHoursPage() {
         setApprentices(data.apprentices || []);
       } catch (err) {
         console.error('Failed to fetch apprentices:', err);
-        setError(err instanceof Error ? err.message : 'Failed to load data');
+        setError('An error occurred');
       } finally {
         setLoading(false);
       }
@@ -98,7 +98,7 @@ export default function ShopLogHoursPage() {
         setAttestation(false);
       }, 2000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to log hours');
+      setError('An error occurred');
     } finally {
       setSubmitting(false);
     }

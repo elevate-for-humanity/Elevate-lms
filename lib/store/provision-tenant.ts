@@ -206,7 +206,7 @@ export async function provisionTenant(params: ProvisionTenantParams): Promise<Te
     logger.error('Tenant provisioning failed', error as Error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }

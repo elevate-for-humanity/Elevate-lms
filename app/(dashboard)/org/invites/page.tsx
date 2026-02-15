@@ -117,7 +117,7 @@ export default function OrgInvitesPage() {
       await loadInvites();
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Failed to send invitation'
+        'An error occurred'
       );
     } finally {
       setSending(false);

@@ -84,7 +84,7 @@ export default function Terminal({ onCommand, sessionId }: TerminalProps) {
         ...prev,
         {
           type: 'output',
-          text: `Error: ${error instanceof Error ? error.message : String(error)}`,
+          text: 'Error: Command execution failed',
         },
       ]);
     } finally {

@@ -84,7 +84,7 @@ export default function ShopDetailsPage() {
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
-      setError(err.message || 'Failed to save changes');
+      setError('An error occurred');
     } finally {
       setSaving(false);
     }

@@ -28,13 +28,13 @@ export async function sendEmail(options: EmailOptions) {
 
     if (error) {
       logger.error('[Email] Send failed:', error);
-      return { success: false, error: error.message };
+      return { success: false, error: 'Operation failed' };
     }
 
     return { success: true, data };
   } catch (error) { /* Error handled silently */ 
     logger.error('[Email] Send error:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = 'Operation failed';
     return { success: false, error: errorMessage };
   }
 }

@@ -66,9 +66,7 @@ export default function ExternalModuleLauncher({
       );
     } catch (err: any) {
       // Error: $1
-      alert(
-        `Upload failed: ${err instanceof Error ? err.message : String(err)}`
-      );
+      alert('Upload failed');
     } finally {
       setUploading(false);
     }

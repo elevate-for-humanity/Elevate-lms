@@ -105,7 +105,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
       setShowModal(false);
       resetForm();
     } catch (err: any) {
-      setError(err.message || 'Failed to save lesson');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }
@@ -120,7 +120,7 @@ export default function LessonManagerClient({ course, initialLessons, courseId }
       if (deleteError) throw deleteError;
       setLessons(lessons.filter(l => l.id !== lessonId));
     } catch (err: any) {
-      setError(err.message || 'Failed to delete lesson');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

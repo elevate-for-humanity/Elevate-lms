@@ -122,7 +122,7 @@ export async function dbCreate<T>(
     .select(select)
     .single();
 
-  if (error) return { error: error.message };
+  if (error) return { error: 'Operation failed' };
   return { data: result as T };
 }
 
@@ -174,7 +174,7 @@ export async function dbList<T>(
 
   const { data, error, count } = await query;
 
-  if (error) return { error: error.message };
+  if (error) return { error: 'Operation failed' };
   return { data: (data || []) as T[], count: count || 0 };
 }
 
@@ -199,7 +199,7 @@ export async function dbGet<T>(
     if (error.code === 'PGRST116') {
       return { error: 'Not found', notFound: true };
     }
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
   return { data: data as T };
 }
@@ -228,7 +228,7 @@ export async function dbUpdate<T>(
     if (error.code === 'PGRST116') {
       return { error: 'Not found', notFound: true };
     }
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
   return { data: result as T };
 }
@@ -253,7 +253,7 @@ export async function dbSoftDelete(
     if (error.code === 'PGRST116') {
       return { error: 'Not found', notFound: true };
     }
-    return { error: error.message };
+    return { error: 'Operation failed' };
   }
   return { success: true };
 }
@@ -267,6 +267,6 @@ export async function dbHardDelete(
 
   const { error } = await supabase.from(table).delete().eq('id', id);
 
-  if (error) return { error: error.message };
+  if (error) return { error: 'Operation failed' };
   return { success: true };
 }

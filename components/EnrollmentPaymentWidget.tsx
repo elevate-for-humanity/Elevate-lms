@@ -43,7 +43,7 @@ export function EnrollmentPaymentWidget({
       }
     } catch (err: any) {
       // Error: $1
-      setError(err.message || "Something went wrong");
+      setError("Something went wrong");
       setLoading(false);
     }
   };

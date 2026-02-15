@@ -267,7 +267,7 @@ export function useTimeclock(options: UseTimeclockOptions) {
 
       return data;
     } catch (error: any) {
-      onError?.(error.message);
+      onError?.('Operation failed');
       throw error;
     } finally {
       setLoading(false);
@@ -316,7 +316,7 @@ export function useTimeclock(options: UseTimeclockOptions) {
 
       return data;
     } catch (error: any) {
-      onError?.(error.message);
+      onError?.('Operation failed');
       throw error;
     } finally {
       setLoading(false);
@@ -365,7 +365,7 @@ export function useTimeclock(options: UseTimeclockOptions) {
 
       return data;
     } catch (error: any) {
-      onError?.(error.message);
+      onError?.('Operation failed');
       throw error;
     } finally {
       setLoading(false);
@@ -418,7 +418,7 @@ export function useTimeclock(options: UseTimeclockOptions) {
 
       return data;
     } catch (error: any) {
-      onError?.(error.message);
+      onError?.('Operation failed');
       throw error;
     } finally {
       setLoading(false);

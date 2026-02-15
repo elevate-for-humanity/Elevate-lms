@@ -52,7 +52,7 @@ export const getOrgConfig = cache(
       .single();
 
     if (error) {
-      throw new Error(`Failed to get org config: ${error.message}`);
+      throw new Error(`Failed to get org config`);
     }
 
     return (data?.config as OrgConfig) ?? {};

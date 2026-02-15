@@ -139,7 +139,7 @@ export default function NewOfficePage() {
       console.error('Error creating office:', error);
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to create office',
+        description: 'An error occurred',
         variant: 'destructive'
       });
     } finally {

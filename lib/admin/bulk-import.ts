@@ -290,7 +290,7 @@ export async function importUsers(
         email: user.email,
         field: 'system',
         message:
-          (error instanceof Error ? error.message : String(error)) ||
+          ('Operation failed') ||
           'Unknown error',
       });
     }

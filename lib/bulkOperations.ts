@@ -25,7 +25,7 @@ export async function bulkEnrollStudents(
       .select();
 
     if (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: 'Operation failed' };
     }
 
     // Log audit event
@@ -45,7 +45,7 @@ export async function bulkEnrollStudents(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -65,7 +65,7 @@ export async function bulkUnenrollStudents(
       .eq('course_id', courseId);
 
     if (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: 'Operation failed' };
     }
 
     await auditLog({
@@ -83,7 +83,7 @@ export async function bulkUnenrollStudents(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -137,7 +137,7 @@ export async function bulkIssueCertificates(
       .select();
 
     if (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: 'Operation failed' };
     }
 
     await auditLog({
@@ -156,7 +156,7 @@ export async function bulkIssueCertificates(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -204,7 +204,7 @@ export async function bulkUpdateGrades(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -229,7 +229,7 @@ export async function bulkDeleteUsers(userIds: string[], actorId: string) {
       .in('id', userIds);
 
     if (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: 'Operation failed' };
     }
 
     await auditLog({
@@ -245,7 +245,7 @@ export async function bulkDeleteUsers(userIds: string[], actorId: string) {
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -279,7 +279,7 @@ export async function bulkSendNotifications(
       .select();
 
     if (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: 'Operation failed' };
     }
 
     return {
@@ -289,7 +289,7 @@ export async function bulkSendNotifications(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -312,7 +312,7 @@ export async function bulkExportData(
     const { data, error } = await query;
 
     if (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: 'Operation failed' };
     }
 
     // Convert to CSV
@@ -348,7 +348,7 @@ export async function bulkExportData(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }

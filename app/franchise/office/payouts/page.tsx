@@ -205,7 +205,7 @@ export default function PayoutsPage() {
       console.error('Error generating payouts:', error);
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to generate payouts',
+        description: 'An error occurred',
         variant: 'destructive'
       });
     } finally {
@@ -229,7 +229,7 @@ export default function PayoutsPage() {
     } catch (error) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to approve',
+        description: 'An error occurred',
         variant: 'destructive'
       });
     }
@@ -259,7 +259,7 @@ export default function PayoutsPage() {
     } catch (error) {
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to mark as paid',
+        description: 'An error occurred',
         variant: 'destructive'
       });
     }

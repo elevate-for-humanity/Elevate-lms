@@ -345,7 +345,7 @@ export async function generateCourseVideo(
     logger.error('Video generation failed', error as Error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }

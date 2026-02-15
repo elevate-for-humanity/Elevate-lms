@@ -49,7 +49,7 @@ export async function createProgram(formData: FormData) {
     });
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error('Operation failed');
   }
 
   revalidatePath('/admin/programs');
@@ -103,7 +103,7 @@ export async function updateProgram(id: string, formData: FormData) {
     .eq('id', id);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error('Operation failed');
   }
 
   revalidatePath('/admin/programs');
@@ -134,7 +134,7 @@ export async function deleteProgram(id: string) {
     .eq('id', id);
 
   if (error) {
-    throw new Error(error.message);
+    throw new Error('Operation failed');
   }
 
   revalidatePath('/admin/programs');

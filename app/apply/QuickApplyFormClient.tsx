@@ -137,7 +137,7 @@ Preferred Contact: ${form.preferredContact}`,
       }
     } catch (err: any) {
       setErrorMessage(
-        (err instanceof Error ? err.message : String(err)) ||
+        ('Operation failed') ||
           "We're having a temporary issue submitting this form. Please call support center or use the Quick Inquiry form while we fix this."
       );
     } finally {

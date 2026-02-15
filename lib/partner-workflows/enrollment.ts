@@ -94,7 +94,7 @@ export async function enrollCertiport(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }
@@ -157,7 +157,7 @@ export async function enrollHSI(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }
@@ -220,7 +220,7 @@ export async function enrollJRI(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }
@@ -284,7 +284,7 @@ export async function enrollNRFRiseUp(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }
@@ -348,7 +348,7 @@ export async function enrollCareerSafe(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }
@@ -422,7 +422,7 @@ export async function enrollMiladyRISE(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }
@@ -467,7 +467,7 @@ export async function enrollStudent(
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }

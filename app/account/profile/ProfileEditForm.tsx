@@ -64,7 +64,7 @@ export default function ProfileEditForm({ user, profile }: ProfileEditFormProps)
 
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
     } catch (error: any) {
-      setMessage({ type: 'error', text: error.message || 'Failed to update profile' });
+      setMessage({ type: 'error', text: 'Failed to update profile' });
     } finally {
       setLoading(false);
     }

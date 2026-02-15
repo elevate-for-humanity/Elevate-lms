@@ -90,7 +90,7 @@ export function useSamGov() {
         setCurrentEntity(data[0]);
       }
     } catch (err: any) {
-      setError(err.message);
+      setError('Request failed');
     } finally {
       setLoading(false);
     }
@@ -157,7 +157,7 @@ export function useSamGov() {
       setCurrentEntity(data);
       return data;
     } catch (err: any) {
-      setError(err.message);
+      setError('Request failed');
       return null;
     }
   };
@@ -182,7 +182,7 @@ export function useSamGov() {
       }
       return data;
     } catch (err: any) {
-      setError(err.message);
+      setError('Request failed');
       return null;
     }
   };
@@ -259,7 +259,7 @@ export function useSamGov() {
       setDocuments(prev => [data, ...prev]);
       return data;
     } catch (err: any) {
-      setError(err.message);
+      setError('Request failed');
       return null;
     }
   };

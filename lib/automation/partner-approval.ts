@@ -243,7 +243,7 @@ export async function checkPartnerApproval(
       missing_documents: [],
       pending_documents: [],
       failed_documents: [],
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }

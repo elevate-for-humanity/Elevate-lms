@@ -62,7 +62,7 @@ export function ReviewActions({
       router.push('/admin/review-queue');
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

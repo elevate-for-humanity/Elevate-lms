@@ -59,7 +59,7 @@ export default function PaymentButton({
       }
     } catch (data: any) {
       // Error: $1
-      setError(err.message || 'Something went wrong. Please try again.');
+      setError('Something went wrong. Please try again.');
       setLoading(false);
     }
   };

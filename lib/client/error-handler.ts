@@ -76,7 +76,7 @@ export async function fetchWithErrorHandling<T = any>(
     return await response.json();
   } catch (error) {
     if (showToast && error instanceof Error) {
-      showToast(error.message, 'error');
+      showToast('An error occurred', 'error');
     }
     throw error;
   }

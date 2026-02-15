@@ -15,6 +15,6 @@ export async function bindUserToOrg(
     .eq('id', userId);
 
   if (error) {
-    throw new Error(`Failed to bind user to org: ${error.message}`);
+    throw new Error(`Failed to bind user to org`);
   }
 }

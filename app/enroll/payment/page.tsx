@@ -96,7 +96,7 @@ function EnrollPaymentContent() {
       // Redirect to Stripe Checkout
       window.location.href = data.checkout_url;
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Payment failed. Please try again.');
+      setError('An error occurred');
       setLoading(false);
     }
   };

@@ -152,7 +152,7 @@ function SubscriptionsContent() {
     } catch (err) {
       logger.error('Subscription err:', err instanceof Error ? err : new Error(String(err)));
       toast.error(
-        (err instanceof Error ? err.message : String(err)) ||
+        ('Operation failed') ||
           'Failed to start subscription'
       );
       setSubscribing(null);
@@ -182,7 +182,7 @@ function SubscriptionsContent() {
     } catch (err) {
       logger.error('Portal err:', err instanceof Error ? err : new Error(String(err)));
       toast.error(
-        (err instanceof Error ? err.message : String(err)) ||
+        ('Operation failed') ||
           'Failed to open billing portal'
       );
     }

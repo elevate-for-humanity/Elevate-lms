@@ -57,7 +57,7 @@ export class CareerSafeAPI extends BasePartnerAPI {
       };
     } catch (error) { /* Error handled silently */ 
       this.log('error', 'Failed to create CareerSafe account', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -95,7 +95,7 @@ export class CareerSafeAPI extends BasePartnerAPI {
       };
     } catch (error) { /* Error handled silently */ 
       this.log('error', 'Failed to enroll in CareerSafe course', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -137,7 +137,7 @@ export class CareerSafeAPI extends BasePartnerAPI {
         return null;
       }
       this.log('error', 'Failed to fetch CareerSafe progress', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -173,7 +173,7 @@ export class CareerSafeAPI extends BasePartnerAPI {
         return null;
       }
       this.log('error', 'Failed to fetch CareerSafe certificate', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }
@@ -199,7 +199,7 @@ export class CareerSafeAPI extends BasePartnerAPI {
       return response.data.launchUrl;
     } catch (error) { /* Error handled silently */ 
       this.log('error', 'Failed to generate CareerSafe SSO URL', {
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
       });
       throw error;
     }

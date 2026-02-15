@@ -70,7 +70,7 @@ export default function TransitionButtons({
 
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError('An error occurred');
     } finally {
       setLoading(null);
     }

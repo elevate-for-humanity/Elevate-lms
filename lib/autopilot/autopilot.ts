@@ -52,7 +52,7 @@ export async function getStatus(req: Request, res: Response) {
   } catch (error) { /* Error handled silently */ 
     res.status(500).json({
       error: 'Failed to get autopilot status',
-      message: error instanceof Error ? error.message : String(error),
+      message: 'Operation failed',
     });
   }
 }
@@ -80,7 +80,7 @@ export async function triggerHealthCheck(req: Request, res: Response) {
   } catch (error) { /* Error handled silently */ 
     res.status(500).json({
       error: 'Health check failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: 'Operation failed',
     });
   }
 }
@@ -109,7 +109,7 @@ export async function triggerSelfHeal(req: Request, res: Response) {
   } catch (error) { /* Error handled silently */ 
     res.status(500).json({
       error: 'Self-heal failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: 'Operation failed',
     });
   }
 }
@@ -141,7 +141,7 @@ export async function syncSecrets(req: Request, res: Response) {
   } catch (error) { /* Error handled silently */ 
     res.status(500).json({
       error: 'Secret sync failed',
-      message: error instanceof Error ? error.message : String(error),
+      message: 'Operation failed',
     });
   }
 }
@@ -176,7 +176,7 @@ export async function startWorker(req: Request, res: Response) {
   } catch (error) { /* Error handled silently */ 
     res.status(500).json({
       error: 'Failed to start autopilot',
-      message: error instanceof Error ? error.message : String(error),
+      message: 'Operation failed',
     });
   }
 }
@@ -204,7 +204,7 @@ export async function stopWorker(req: Request, res: Response) {
   } catch (error) { /* Error handled silently */ 
     res.status(500).json({
       error: 'Failed to stop autopilot',
-      message: error instanceof Error ? error.message : String(error),
+      message: 'Operation failed',
     });
   }
 }

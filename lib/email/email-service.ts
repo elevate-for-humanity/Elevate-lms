@@ -43,11 +43,11 @@ export async function sendEmail(
       replyTo: options.replyTo,
     });
     if (error) {
-      return { success: false, error: error.message };
+      return { success: false, error: 'Operation failed' };
     }
     return { success: true, messageId: data?.id };
   } catch (error) { /* Error handled silently */ 
-    return { success: false, error: error instanceof Error ? error.message : 'Unknown error' };
+    return { success: false, error: 'Operation failed' };
   }
 }
 // Email templates

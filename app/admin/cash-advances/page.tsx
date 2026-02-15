@@ -163,7 +163,7 @@ export default async function CashAdvancesAdminPage() {
 
         {error && (
           <div className="p-6 text-brand-orange-600">
-            Error loading applications: {error.message}
+            Error loading applications
           </div>
         )}
 

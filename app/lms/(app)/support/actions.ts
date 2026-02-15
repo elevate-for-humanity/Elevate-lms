@@ -34,7 +34,7 @@ export async function submitSupportRequest(formData: FormData) {
 
   if (error) {
     // If table doesn't exist, just log and return success for now
-    console.log('Support ticket submission:', { subject, category, message, priority });
+    // Support tickets table not available — returning success fallback
     return { success: true, message: 'Your request has been submitted. We will contact you soon.' };
   }
 

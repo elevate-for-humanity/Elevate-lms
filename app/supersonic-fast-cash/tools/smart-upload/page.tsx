@@ -180,7 +180,7 @@ export default function SmartUploadPage() {
                 ...f,
                 status: 'error',
                 error:
-                  error instanceof Error ? error.message : 'Processing failed',
+                  'An error occurred',
               }
             : f
         )

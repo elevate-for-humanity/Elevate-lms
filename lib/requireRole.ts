@@ -57,7 +57,7 @@ export async function assignRole(
     .single();
 
   if (error) {
-    throw new Error(`Failed to assign role: ${error.message}`);
+    throw new Error(`Failed to assign role`);
   }
 
   return data;
@@ -73,7 +73,7 @@ export async function removeRole(userId: string, role: UserRole) {
     .eq('role', role);
 
   if (error) {
-    throw new Error(`Failed to remove role: ${error.message}`);
+    throw new Error(`Failed to remove role`);
   }
 }
 

@@ -155,7 +155,7 @@ export default function OfficeSettingsPage() {
       console.error('Error saving settings:', error);
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to save settings',
+        description: 'An error occurred',
         variant: 'destructive'
       });
     } finally {
@@ -208,7 +208,7 @@ export default function OfficeSettingsPage() {
       console.error('Error saving ERO settings:', error);
       toast({
         title: 'Error',
-        description: error instanceof Error ? error.message : 'Failed to save ERO settings',
+        description: 'An error occurred',
         variant: 'destructive'
       });
     } finally {

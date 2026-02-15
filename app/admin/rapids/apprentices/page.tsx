@@ -66,7 +66,7 @@ export default function RAPIDSApprenticesPage() {
       const data = await res.json();
       setApprentices(data.apprentices || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load apprentices');
+      setError('An error occurred');
       setApprentices([]);
     } finally {
       setLoading(false);

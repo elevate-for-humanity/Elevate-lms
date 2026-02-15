@@ -71,7 +71,7 @@ export async function processEmailSend(job: ProvisioningJob): Promise<void> {
       tenant_id: job.tenant_id,
       step: 'email_failed',
       status: 'failed',
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
       metadata: {
         jobId: job.id,
         emailType: payload.emailType,

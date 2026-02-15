@@ -56,7 +56,7 @@ export default function DonationForm() {
       }
     } catch (data: any) {
       // Error: $1
-      setError(err.message || 'Failed to process donation. Please try again.');
+      setError('Failed to process donation. Please try again.');
     } finally {
       setLoading(false);
     }

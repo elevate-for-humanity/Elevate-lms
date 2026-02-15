@@ -115,7 +115,7 @@ export function logError(
     endpoint,
     statusCode,
     userId,
-    message: error instanceof Error ? error.message : String(error),
+    message: 'Operation failed',
     metadata: error instanceof Error ? { stack: error.stack } : undefined,
   });
 }

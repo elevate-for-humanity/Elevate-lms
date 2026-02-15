@@ -100,7 +100,7 @@ export function IDVerificationForm() {
         router.push('/dashboard?verification=submitted');
       }, 2000);
     } catch (err: any) {
-      setError(err.message || 'Failed to submit verification');
+      setError('Failed to submit verification');
     } finally {
       setLoading(false);
     }

@@ -40,7 +40,7 @@ export default function CareersApplyPage() {
 
       setSuccess(true);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit. Please try again or call Get Help Online.');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

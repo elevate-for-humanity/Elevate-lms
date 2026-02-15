@@ -58,7 +58,7 @@ export default function SettingsForm({ profile, preferences, userEmail }: Props)
       setMessage({ type: 'success', text: 'Profile updated successfully' });
       router.refresh();
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to update profile' });
+      setMessage({ type: 'error', text: 'Failed to update profile' });
     } finally {
       setIsSaving(false);
     }

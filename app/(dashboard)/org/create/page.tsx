@@ -48,7 +48,7 @@ export default function CreateOrgPage() {
       router.push('/dashboard');
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Failed to create organization'
+        'An error occurred'
       );
       setLoading(false);
     }

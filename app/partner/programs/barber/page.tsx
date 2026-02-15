@@ -142,7 +142,7 @@ export default function BarberPartnerPage() {
       });
       fetchData();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError('An error occurred');
     } finally {
       setSubmitting(false);
     }

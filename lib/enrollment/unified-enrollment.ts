@@ -78,7 +78,7 @@ export async function createUnifiedEnrollment(
     }
   } catch (error: any) {
     logger.error('Unified enrollment error:', error);
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
 }
 
@@ -126,7 +126,7 @@ async function createCourseEnrollment(
     .single();
 
   if (error) {
-    return { success: false, error: error.message, table: 'enrollments' };
+    return { success: false, error: 'Operation failed', table: 'enrollments' };
   }
 
   return {
@@ -185,7 +185,7 @@ async function createProgramEnrollment(
     .single();
 
   if (error) {
-    return { success: false, error: error.message, table: 'student_enrollments' };
+    return { success: false, error: 'Operation failed', table: 'student_enrollments' };
   }
 
   return {
@@ -241,7 +241,7 @@ async function createWorkforceEnrollment(
     .single();
 
   if (error) {
-    return { success: false, error: error.message, table: 'program_enrollments' };
+    return { success: false, error: 'Operation failed', table: 'program_enrollments' };
   }
 
   return {

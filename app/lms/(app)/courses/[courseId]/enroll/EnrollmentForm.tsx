@@ -55,7 +55,7 @@ export default function EnrollmentForm({ courseId, courseName, price, userEmail,
         router.push(`/lms/courses/${courseId}?enrolled=true`);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to enroll. Please try again.');
+      setError('An error occurred');
     } finally {
       setIsLoading(false);
     }

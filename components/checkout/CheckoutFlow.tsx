@@ -83,7 +83,7 @@ function CheckoutForm({ courseId, courseName, price, userId, onSuccess }: Checko
         onSuccess(enrollmentId);
       }
     } catch (data: any) {
-      setError(err.message || 'Payment failed. Please try again.');
+      setError('Payment failed. Please try again.');
     } finally {
       setLoading(false);
     }

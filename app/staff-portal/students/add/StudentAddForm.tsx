@@ -137,7 +137,7 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
 
       router.push('/staff-portal/students?success=enrolled');
     } catch (err: any) {
-      setError(err.message || 'Failed to enroll student');
+      setError('An error occurred');
     } finally {
       setIsSubmitting(false);
     }

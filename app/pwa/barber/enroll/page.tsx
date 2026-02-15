@@ -75,7 +75,7 @@ export default function BarberEnrollPage() {
 
       setStep('success');
     } catch (err: any) {
-      setError(err.message || 'Failed to enroll. Please try again.');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

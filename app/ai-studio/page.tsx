@@ -102,7 +102,7 @@ export default function AIStudioPage() {
       setPrompt('');
     } catch (error) {
       alert(
-        error instanceof Error ? error.message : 'Failed to generate asset'
+        'An error occurred'
       );
     } finally {
       setLoading(false);

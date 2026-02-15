@@ -202,7 +202,7 @@ export function SignatureInput({
 
     } catch (err: any) {
       console.error('Error saving signature:', err);
-      setError(err.message || 'Failed to save signature');
+      setError('Failed to save signature');
     } finally {
       setSaving(false);
     }

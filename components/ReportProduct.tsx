@@ -39,7 +39,7 @@ export function ReportProduct({ productId }: { productId: string }) {
       setSent(true);
       setShowForm(false);
     } catch (data: any) {
-      alert(error.message);
+      alert('Failed to submit report. Please try again.');
     } finally {
       setLoading(false);
     }

@@ -55,7 +55,7 @@ export default function HoursTracker() {
         const data = await res.json();
         setEnrollments(data.enrollments || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
+        setError('An error occurred');
       } finally {
         setLoading(false);
       }

@@ -137,7 +137,7 @@ export default function UnifiedPaymentFlow({
         throw new Error('No checkout URL received');
       }
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Payment failed';
+      const errorMessage = 'Payment failed';
       setError(errorMessage);
       onError?.(errorMessage);
     } finally {

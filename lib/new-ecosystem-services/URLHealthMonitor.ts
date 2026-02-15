@@ -196,7 +196,7 @@ export class URLHealthMonitor {
         status: 'down',
         responseTime: Date.now() - startTime,
         lastChecked: new Date(),
-        errorMessage: error instanceof Error ? error.message : String(error),
+        errorMessage: 'Operation failed',
       };
 
       this.healthStatus.set(url, check);
@@ -250,7 +250,7 @@ export class URLHealthMonitor {
         status: 'down',
         responseTime: Date.now() - startTime,
         lastChecked: new Date(),
-        errorMessage: error instanceof Error ? error.message : String(error),
+        errorMessage: 'Operation failed',
       };
 
       this.healthStatus.set(endpointId, check);

@@ -119,7 +119,7 @@ export default function DocumentsPage() {
         )
       );
     } catch (err: any) {
-      setError(err.message);
+      setError('An error occurred');
     } finally {
       setUploading(null);
     }
@@ -158,7 +158,7 @@ export default function DocumentsPage() {
         router.push('/dashboard');
       }, 2000);
     } catch (err: any) {
-      setError(err.message);
+      setError('An error occurred');
       setSubmitting(false);
     }
   }

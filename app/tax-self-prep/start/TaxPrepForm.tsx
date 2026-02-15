@@ -152,7 +152,7 @@ export default function TaxPrepForm({ userId, profile, existingDraft, taxYear }:
 
       router.push('/tax-self-prep/success');
     } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to submit' });
+      setMessage({ type: 'error', text: 'An error occurred' });
     } finally {
       setIsSaving(false);
     }

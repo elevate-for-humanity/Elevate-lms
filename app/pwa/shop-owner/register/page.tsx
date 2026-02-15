@@ -77,7 +77,7 @@ export default function ShopOwnerRegisterPage() {
 
       setStep('success');
     } catch (err: any) {
-      setError(err.message || 'Failed to submit application. Please try again.');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

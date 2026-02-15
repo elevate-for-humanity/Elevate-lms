@@ -45,7 +45,7 @@ export default function EnrollButton({
       router.push(`/lms/courses/${courseId}`);
       router.refresh();
     } catch (err: any) {
-      setError(err instanceof Error ? err.message : String(err));
+      setError('Enrollment failed');
       setLoading(false);
     }
   };

@@ -158,13 +158,13 @@ export async function autoEnrollPartnerCourse(
       course_id: payload.courseId,
       program_id: payload.programId ?? null,
       error_message:
-        (err instanceof Error ? err.message : String(err)) ?? 'Unknown error',
+        ('Operation failed') ?? 'Unknown error',
     });
 
     return {
       success: false,
       error:
-        (err instanceof Error ? err.message : String(err)) ?? 'Unknown error',
+        ('Operation failed') ?? 'Unknown error',
     };
   }
 }

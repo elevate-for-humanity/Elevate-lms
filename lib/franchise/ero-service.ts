@@ -77,7 +77,7 @@ class EROService {
       .single();
 
     if (error && error.code !== 'PGRST116') {
-      throw new Error(`Failed to get ERO config: ${error.message}`);
+      throw new Error(`Failed to get ERO config`);
     }
 
     return data;
@@ -122,7 +122,7 @@ class EROService {
       .single();
 
     if (error) {
-      throw new Error(`Failed to create ERO config: ${error.message}`);
+      throw new Error(`Failed to create ERO config`);
     }
 
     await this.logAudit('ero_config_created', input.office_id, data.id, actorId, input);
@@ -283,7 +283,7 @@ class EROService {
       .eq('id', submissionId);
 
     if (error) {
-      throw new Error(`Failed to record ERO signature: ${error.message}`);
+      throw new Error(`Failed to record ERO signature`);
     }
 
     await this.logAudit('ero_signature_recorded', null, submissionId, actorId, {
@@ -309,7 +309,7 @@ class EROService {
       .order('created_at', { ascending: true });
 
     if (error) {
-      throw new Error(`Failed to get pending signatures: ${error.message}`);
+      throw new Error(`Failed to get pending signatures`);
     }
 
     return data || [];
@@ -345,7 +345,7 @@ class EROService {
       } catch (error) {
         failed.push({
           id,
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: 'Operation failed'
         });
       }
     }

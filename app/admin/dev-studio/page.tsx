@@ -242,7 +242,7 @@ export default function DevStudioPage() {
       } else {
         const error = await res.json();
         addTerminalOutput(
-          `<XCircle className="w-5 h-5 inline-block" /> Failed to save: ${error instanceof Error ? error.message : String(error)}`
+          `<XCircle className="w-5 h-5 inline-block" /> Failed to save: ${'Operation failed'}`
         );
       }
     } catch (error) { /* Error handled silently */ 

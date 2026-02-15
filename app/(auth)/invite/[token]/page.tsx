@@ -113,7 +113,7 @@ export default function AcceptInvitePage({
       router.push('/dashboard');
     } catch (err) {
       setError(
-        err instanceof Error ? err.message : 'Failed to accept invitation'
+        'An error occurred'
       );
       setAccepting(false);
     }

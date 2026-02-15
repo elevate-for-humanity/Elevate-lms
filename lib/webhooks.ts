@@ -305,7 +305,7 @@ async function deliverWebhook(
     await supabase
       .from('webhook_deliveries')
       .update({
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: 'Operation failed',
       })
       .eq('id', delivery.id);
 
@@ -572,7 +572,7 @@ export async function testWebhook(webhookId: string): Promise<{
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }

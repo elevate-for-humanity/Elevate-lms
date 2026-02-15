@@ -13,7 +13,7 @@ export async function requireShopOnboardingComplete(shopId: string) {
     .eq('shop_id', shopId);
 
   if (error) {
-    throw new Error(`Failed to check shop onboarding: ${error.message}`);
+    throw new Error(`Failed to check shop onboarding`);
   }
 
   const missing = (data || []).filter((d) => d.required && !d.approved);
@@ -41,7 +41,7 @@ export async function getShopOnboardingStatus(shopId: string) {
     .eq('shop_id', shopId);
 
   if (error) {
-    throw new Error(`Failed to get shop onboarding status: ${error.message}`);
+    throw new Error(`Failed to get shop onboarding status`);
   }
 
   const required = data?.filter((d) => d.required) || [];

@@ -33,7 +33,7 @@ export default function SupportForm() {
       setMessage('');
     } catch (error) {
       setStatus('error');
-      setErrorMessage(error instanceof Error ? error.message : 'Something went wrong');
+      setErrorMessage('Something went wrong');
     }
   };
 

@@ -196,7 +196,7 @@ class SezzleClient {
 
     if (!response.ok) {
       const error = await this.safeJson(response);
-      throw new Error(`Sezzle authentication failed: ${error.message || response.statusText} (${this.config.environment} → ${this.getBaseUrl()})`);
+      throw new Error(`Sezzle authentication failed`);
     }
 
     const data: SezzleAuthResponse = await response.json();
@@ -224,7 +224,7 @@ class SezzleClient {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
-      throw new Error(`Sezzle session creation failed: ${error.message || response.statusText}`);
+      throw new Error(`Sezzle session creation failed`);
     }
 
     return response.json();
@@ -246,7 +246,7 @@ class SezzleClient {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
-      throw new Error(`Sezzle get session failed: ${error.message || response.statusText}`);
+      throw new Error(`Sezzle get session failed`);
     }
 
     return response.json();
@@ -268,7 +268,7 @@ class SezzleClient {
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({}));
-      throw new Error(`Sezzle get order failed: ${error.message || response.statusText}`);
+      throw new Error(`Sezzle get order failed`);
     }
 
     return response.json();
@@ -304,7 +304,7 @@ class SezzleClient {
 
     if (!response.ok) {
       const error = await this.safeJson(response);
-      throw new Error(`Sezzle capture failed: ${error.message || response.statusText}`);
+      throw new Error(`Sezzle capture failed`);
     }
 
     return this.safeJson(response);
@@ -333,7 +333,7 @@ class SezzleClient {
 
     if (!response.ok) {
       const error = await this.safeJson(response);
-      throw new Error(`Sezzle refund failed: ${error.message || response.statusText}`);
+      throw new Error(`Sezzle refund failed`);
     }
 
     return this.safeJson(response);
@@ -362,7 +362,7 @@ class SezzleClient {
 
     if (!response.ok) {
       const error = await this.safeJson(response);
-      throw new Error(`Sezzle release failed: ${error.message || response.statusText}`);
+      throw new Error(`Sezzle release failed`);
     }
 
     return this.safeJson(response);
@@ -388,7 +388,7 @@ class SezzleClient {
 
     if (!response.ok) {
       const error = await this.safeJson(response);
-      throw new Error(`Sezzle update order failed: ${error.message || response.statusText}`);
+      throw new Error(`Sezzle update order failed`);
     }
 
     return this.safeJson(response);
@@ -410,7 +410,7 @@ class SezzleClient {
 
     if (!response.ok) {
       const error = await this.safeJson(response);
-      throw new Error(`Sezzle delete checkout failed: ${error.message || response.statusText}`);
+      throw new Error(`Sezzle delete checkout failed`);
     }
   }
 }

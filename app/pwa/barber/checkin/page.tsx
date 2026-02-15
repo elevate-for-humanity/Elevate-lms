@@ -100,7 +100,7 @@ function CheckInContent() {
       setStatus('checked-in');
       setManualCode('');
     } catch (err: any) {
-      setError(err.message || 'Failed to check in. Please try again.');
+      setError('An error occurred');
       setStatus('error');
     }
   };
@@ -125,7 +125,7 @@ function CheckInContent() {
       setStatus('idle');
       router.push('/pwa/barber?checkout=success&hours=' + data.hoursLogged);
     } catch (err: any) {
-      setError(err.message || 'Failed to check out. Please try again.');
+      setError('An error occurred');
       setStatus('error');
     }
   };

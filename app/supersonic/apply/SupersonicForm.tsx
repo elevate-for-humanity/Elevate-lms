@@ -86,7 +86,7 @@ export default function SupersonicForm({ userId, existingProfile }: Props) {
 
       router.push('/supersonic/success');
     } catch (err: any) {
-      setError(err.message || 'Failed to submit application');
+      setError('An error occurred');
     } finally {
       setIsSubmitting(false);
     }

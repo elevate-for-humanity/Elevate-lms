@@ -331,7 +331,7 @@ export default function ComprehensiveEnrollmentWizard({
         window.location.href = `/programs/${programSlug}/enroll/payment?enrollment=${enrollmentId}`;
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Enrollment failed');
+      setError('Enrollment failed');
     } finally {
       setLoading(false);
     }

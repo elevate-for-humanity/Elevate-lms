@@ -322,7 +322,7 @@ export default function TimeclockPage() {
           break;
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError('An error occurred');
     } finally {
       setActionLoading(null);
     }

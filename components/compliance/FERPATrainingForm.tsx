@@ -259,7 +259,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
       }, 3000);
 
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to submit training');
+      setError('Failed to submit training');
     } finally {
       setLoading(false);
     }

@@ -31,7 +31,7 @@ export async function createBackup(tables: string[] = ['profiles', 'courses', 'e
     // Error: $1
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -86,7 +86,7 @@ export async function restoreFromBackup(backup: Record<string, any[]>, options: 
         results[table] = {
           success: false,
           count: 0,
-          error: error instanceof Error ? error.message : 'Unknown error',
+          error: 'Operation failed',
         };
       }
     }
@@ -97,7 +97,7 @@ export async function restoreFromBackup(backup: Record<string, any[]>, options: 
   } catch (error) { /* Error handled silently */ 
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -124,7 +124,7 @@ export async function deleteOldBackups(retentionDays: number = 30) {
     .lt('timestamp', cutoffDate.toISOString());
   if (error) {
     // Error: $1
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
   return { success: true };
 }

@@ -159,7 +159,7 @@ export class ReturnService {
       .single();
 
     if (error) {
-      throw new Error(`Failed to create submission: ${error.message}`);
+      throw new Error(`Failed to create submission`);
     }
 
     // Update preparer stats
@@ -290,7 +290,7 @@ export class ReturnService {
 
     const { data, error, count } = await query;
 
-    if (error) throw new Error(`Failed to get returns: ${error.message}`);
+    if (error) throw new Error(`Failed to get returns`);
 
     return {
       returns: (data || []).map(r => ({
@@ -348,7 +348,7 @@ export class ReturnService {
 
     const { data, error, count } = await query;
 
-    if (error) throw new Error(`Failed to get returns: ${error.message}`);
+    if (error) throw new Error(`Failed to get returns`);
 
     return {
       returns: (data || []).map(r => ({

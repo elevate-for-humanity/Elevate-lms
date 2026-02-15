@@ -120,7 +120,7 @@ export default function TrackApplicationPage() {
       setApplication(data);
     } catch (err: any) {
       setError(
-        (err instanceof Error ? err.message : String(err)) ||
+        ('Operation failed') ||
           'An error occurred while tracking your application'
       );
     } finally {

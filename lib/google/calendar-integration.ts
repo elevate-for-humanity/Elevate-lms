@@ -70,7 +70,7 @@ export async function addCourseToCalendar(
     // Error: $1
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -138,7 +138,7 @@ export async function createRecurringClassSchedule(
     // Error: $1
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }
@@ -172,7 +172,7 @@ export async function getCalendarTokens(code: string) {
     // Error: $1
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
+      error: 'Operation failed',
     };
   }
 }

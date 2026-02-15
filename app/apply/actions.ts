@@ -114,7 +114,7 @@ async function insertApplication(payload: {
       return { success: false, error: 'Failed to save application. Please try again or email elevate4humanityedu@gmail.com.' };
     }
 
-    console.log(`[Application] Saved: id=${data.id} ref=${referenceNumber} email=${payload.email} source=${payload.source}`);
+    // Application saved successfully
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org';
     const emailEndpoint = `${siteUrl}/api/email/send`;
@@ -162,7 +162,7 @@ async function insertApplication(payload: {
     return { success: true, applicationId: data.id, referenceNumber };
   } catch (error) {
     console.error(`[Application] Unexpected error for ${payload.email}:`, error);
-    return { success: false, error: error instanceof Error ? error.message : 'Failed to submit application' };
+    return { success: false, error: 'An error occurred' };
   }
 }
 

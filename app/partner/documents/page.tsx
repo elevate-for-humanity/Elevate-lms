@@ -82,7 +82,7 @@ export default function PartnerDocumentsPage() {
       // Refresh documents
       await fetchDocuments();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Upload failed');
+      setError('An error occurred');
     } finally {
       setUploading(null);
     }

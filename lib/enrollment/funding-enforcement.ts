@@ -246,7 +246,7 @@ export async function createBridgePaymentPlan(
     .single();
   
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
   
   return { success: true, planId: data.id };
@@ -402,7 +402,7 @@ export async function handleEmployerSeparation(
     .eq('id', sponsorshipId);
   
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
   
   return { success: true };
@@ -444,7 +444,7 @@ export async function assignFundingPathway(
     .eq('id', intakeId);
   
   if (error) {
-    return { success: false, error: error.message };
+    return { success: false, error: 'Operation failed' };
   }
   
   return { success: true };

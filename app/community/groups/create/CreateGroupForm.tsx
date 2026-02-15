@@ -84,7 +84,7 @@ export default function CreateGroupForm({ userId, userName, programs }: Props) {
 
       router.push(`/community/groups/${group.id}`);
     } catch (err: any) {
-      setError(err.message || 'Failed to create group');
+      setError('An error occurred');
     } finally {
       setIsSubmitting(false);
     }

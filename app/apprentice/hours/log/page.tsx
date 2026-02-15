@@ -85,7 +85,7 @@ export default function LogApprenticeHoursPage() {
       setTimeout(() => router.push('/apprentice/hours'), 1500);
     } catch (err: any) {
       console.error('Error logging hours:', err);
-      setError(err.message || 'Failed to log hours. Please try again.');
+      setError('An error occurred');
     } finally {
       setIsSubmitting(false);
     }

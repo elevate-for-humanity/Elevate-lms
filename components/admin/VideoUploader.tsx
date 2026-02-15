@@ -64,10 +64,7 @@ export default function VideoUploader({
       }
     } catch (err: any) {
       // Error: $1
-      setError(
-        (err instanceof Error ? err.message : String(err)) ||
-          'Failed to upload video'
-      );
+      setError('Failed to upload video');
     } finally {
       setUploading(false);
       setEnhancing(false);

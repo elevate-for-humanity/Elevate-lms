@@ -104,7 +104,7 @@ export async function issueCertificate({
     .single();
 
   if (error) {
-    throw new Error(`Failed to issue certificate: ${error.message}`);
+    throw new Error(`Failed to issue certificate`);
   }
 
   return {

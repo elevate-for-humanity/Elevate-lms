@@ -94,7 +94,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
       setShowCreateModal(false);
       resetForm();
     } catch (err: any) {
-      setError(err.message || 'Failed to save course');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }
@@ -113,7 +113,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
       if (deleteError) throw deleteError;
       setCourses(courses.filter(c => c.id !== courseId));
     } catch (err: any) {
-      setError(err.message || 'Failed to delete course');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }
@@ -129,7 +129,7 @@ export default function CourseBuilderClient({ initialCourses, programs }: Props)
       if (updateError) throw updateError;
       setCourses(courses.map(c => c.id === course.id ? { ...c, is_published: !c.is_published } : c));
     } catch (err: any) {
-      setError(err.message || 'Failed to update course');
+      setError('An error occurred');
     }
   };
 

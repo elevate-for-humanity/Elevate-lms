@@ -184,7 +184,7 @@ export async function completeCourse(
   if (error) {
     return {
       success: false,
-      error: error.message,
+      error: 'Operation failed',
     };
   }
 

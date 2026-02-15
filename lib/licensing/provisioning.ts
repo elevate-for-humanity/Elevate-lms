@@ -232,7 +232,7 @@ export async function provisionLicense(ctx: ProvisioningContext): Promise<Provis
     return { success: true, tenantId, licenseId, licenseKey, adminUserId };
 
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = 'Operation failed';
     logger.error('License provisioning failed', error as Error);
     await logProvisioningEvent(correlationId, 'failed', 'failed', tenantId, paymentIntentId, errorMessage);
 

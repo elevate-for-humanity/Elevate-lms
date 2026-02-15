@@ -103,7 +103,7 @@ export default function CertificateDownload({
         });
       } catch (err: any) {
         console.error('Error fetching certificate:', err);
-        setError(err.message);
+        setError('Failed to load certificate');
       } finally {
         setLoading(false);
       }

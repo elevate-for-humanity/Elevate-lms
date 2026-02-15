@@ -54,7 +54,7 @@ class PartnerMonitoring {
       if (error) {
         metrics.lastError = {
           message:
-            (error instanceof Error ? error.message : String(error)) ||
+            ('Operation failed') ||
             'Unknown error',
           timestamp: new Date().toISOString(),
           statusCode: error.statusCode,
@@ -219,7 +219,7 @@ export async function checkPartnerHealth(
       partner,
       healthy: false,
       lastChecked: new Date().toISOString(),
-      error: error instanceof Error ? error.message : String(error),
+      error: 'Operation failed',
     };
   }
 }

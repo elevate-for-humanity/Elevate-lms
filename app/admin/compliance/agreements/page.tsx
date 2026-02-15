@@ -107,7 +107,7 @@ export default function AdminAgreementsPage() {
 
       setRecentAcceptances(recent || []);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load data');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

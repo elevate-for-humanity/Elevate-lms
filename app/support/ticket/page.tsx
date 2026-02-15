@@ -63,7 +63,7 @@ function SubmitTicketContent() {
       setSuccess(true);
       setTicketNumber(data.ticket.ticket_number);
     } catch (err: any) {
-      setError(err.message);
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

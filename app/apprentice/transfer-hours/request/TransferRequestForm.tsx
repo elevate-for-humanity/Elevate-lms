@@ -122,7 +122,7 @@ export default function TransferRequestForm({
         },
       ]);
     } catch (err: any) {
-      setError(err.message || 'Failed to upload document');
+      setError('An error occurred');
     } finally {
       setUploading(null);
     }
@@ -174,7 +174,7 @@ export default function TransferRequestForm({
         router.push('/apprentice/transfer-hours');
       }, 2000);
     } catch (err: any) {
-      setError(err.message || 'Failed to submit request');
+      setError('An error occurred');
     } finally {
       setLoading(false);
     }

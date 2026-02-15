@@ -42,7 +42,7 @@ export default function PartnerDocumentsPage() {
       .select('id, document_type, file_path, status, notes, created_at')
       .eq('shop_id', shopId)
       .order('created_at', { ascending: false });
-    if (error) setMsg(error.message);
+    if (error) setMsg('An error occurred');
     setDocs(data ?? []);
   }
 

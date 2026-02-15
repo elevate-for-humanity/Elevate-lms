@@ -98,7 +98,7 @@ export class TenantRequiredError extends Error {
  */
 export function tenantErrorResponse(error: TenantRequiredError | TenantSpoofingError): NextResponse {
   return NextResponse.json(
-    { error: error.message },
+    { error: 'Operation failed' },
     { status: error.statusCode }
   );
 }

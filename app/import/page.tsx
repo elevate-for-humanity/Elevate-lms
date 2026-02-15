@@ -72,7 +72,7 @@ export default function ImportSitePage() {
       localStorage.setItem('sitePreviewConfig', JSON.stringify(data.config));
       setStep('review');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Something went wrong');
+      setError('An error occurred');
       setStep('url');
     } finally {
       setAnalyzing(false);

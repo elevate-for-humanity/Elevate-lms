@@ -255,7 +255,7 @@ export async function completeWelcomePacketItem(
     .eq('item_id', itemId);
 
   if (error) {
-    throw new Error(`Failed to complete packet item: ${error.message}`);
+    throw new Error(`Failed to complete packet item`);
   }
 
   // Check if all required items are complete

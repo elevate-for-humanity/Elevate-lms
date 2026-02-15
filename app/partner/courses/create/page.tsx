@@ -45,7 +45,7 @@ export default function CreateCoursePage() {
       if (error) throw error;
       setLicenses(data || []);
     } catch (error) { /* Error handled silently */ 
-      setMessage(`Error loading licenses: ${error.message}`);
+      setMessage('Failed to load licenses');
     }
   };
 
@@ -105,7 +105,7 @@ export default function CreateCoursePage() {
       setScormFile(null);
       setSelectedLicense('');
     } catch (error) { /* Error handled silently */ 
-      setMessage(`Error: ${error.message}`);
+      setMessage('An error occurred');
     } finally {
       setLoading(false);
     }

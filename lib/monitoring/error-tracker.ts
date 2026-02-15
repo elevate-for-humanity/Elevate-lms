@@ -281,7 +281,7 @@ export function withErrorLogging<T = any>(
       await logError({
         endpoint,
         method,
-        error: error instanceof Error ? error.message : String(error),
+        error: 'Operation failed',
         statusCode: 500,
         ipAddress: request.headers.get('x-forwarded-for') || undefined,
         userAgent: request.headers.get('user-agent') || undefined,

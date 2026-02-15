@@ -173,7 +173,7 @@ export default function UploadDocumentsPage() {
                   ...f,
                   status: 'error',
                   error:
-                    error instanceof Error ? error.message : 'Upload failed',
+                    'An error occurred',
                 }
               : f
           )

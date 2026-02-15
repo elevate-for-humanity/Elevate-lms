@@ -39,7 +39,7 @@ export class NotFoundError extends AppError {
 export function handleError(error: any): { message: string; statusCode: number } {
   if (error instanceof AppError) {
     return {
-      message: error.message,
+      message: 'Internal server error',
       statusCode: error.statusCode,
     };
   }
@@ -51,7 +51,7 @@ export function handleError(error: any): { message: string; statusCode: number }
     // Track in analytics
     if (typeof window !== 'undefined' && window.gtag) {
       window.gtag('event', 'exception', {
-        description: error.message,
+        description: 'An error occurred',
         fatal: true,
       });
     }
@@ -89,7 +89,7 @@ export function logError(error: any, context?: Record<string, any>) {
   // Send to error tracking service (e.g., Sentry)
   if (typeof window !== 'undefined' && window.gtag) {
     window.gtag('event', 'exception', {
-      description: error instanceof Error ? error.message : String(error),
+      description: 'Operation failed',
       fatal: false,
       ...context,
     });

@@ -1,18 +1,29 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!url || !key) {
-    throw new Error('Missing Supabase credentials');
+/**
+ * Require admin or super_admin role via session cookie.
+ * Returns a 401/403 NextResponse on failure, or null if authorized.
+ */
+async function guardAdmin() {
+  const supabase = await createClient();
+  if (!supabase) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('role')
+    .eq('id', user.id)
+    .single();
+  if (!profile || !['admin', 'super_admin'].includes(profile.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
   }
-  return createClient(url, key);
+  return null;
 }
 
 export async function GET(req: Request) {
@@ -20,7 +31,13 @@ export async function GET(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
 
-    const supabase = getSupabaseAdmin();
+    const denied = await guardAdmin();
+    if (denied) return denied;
+
+    const supabase = await createClient();
+    if (!supabase) {
+      return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+    }
 
     // Fetch all monitoring data in parallel
     const [auditResult, etplResult, rulesResult, rapidsResult, fundingResult] =
@@ -46,18 +63,18 @@ export async function GET(req: Request) {
         states_supported: rulesResult.data?.length || 0,
       },
       errors: {
-        audit_snapshot: auditResult.error?.message || null,
-        etpl_metrics: etplResult.error?.message || null,
-        state_rules: rulesResult.error?.message || null,
-        rapids_tracking: rapidsResult.error?.message || null,
-        funding_cases: fundingResult.error?.message || null,
-      }
+        audit_snapshot: auditResult.error ? true : null,
+        etpl_metrics: etplResult.error ? true : null,
+        state_rules: rulesResult.error ? true : null,
+        rapids_tracking: rapidsResult.error ? true : null,
+        funding_cases: fundingResult.error ? true : null,
+      },
     };
 
     return NextResponse.json(bundle);
-  } catch (err: any) {
+  } catch {
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: 'Failed to generate support bundle' },
       { status: 500 }
     );
   }

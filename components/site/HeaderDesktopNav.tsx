@@ -32,9 +32,9 @@ export default function HeaderDesktopNav({ items }: HeaderDesktopNavProps) {
             {item.name}
           </Link>
           
-          {/* Dropdown - CSS-only hover, no JS needed */}
+          {/* Dropdown - hover only; focus-within was causing stuck-open state */}
           {item.subItems && item.subItems.length > 0 && (
-            <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200">
+            <div className="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
               <div className="bg-white rounded-lg shadow-lg border border-slate-200 py-2 min-w-[220px] max-h-[70vh] overflow-y-auto">
                 {item.subItems.map((subItem) => (
                   subItem.isHeader ? (

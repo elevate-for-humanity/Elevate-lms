@@ -1649,7 +1649,9 @@ footer a:hover {
 
 /* ============================================================================
    HEADER TEXT VISIBILITY FIX - MUST BE LAST
-   Prevents global color/filter rules from hiding header text
+   Prevents global color/filter rules from hiding header text.
+   Scoped to direct children and text elements — NOT dropdown containers,
+   which need opacity-0/invisible to toggle on hover.
    ============================================================================ */
 header[role="banner"] {
   opacity: 1 !important;
@@ -1659,9 +1661,12 @@ header[role="banner"] {
   background-color: #ffffff !important;
 }
 
-header[role="banner"] * {
-  opacity: 1 !important;
-  visibility: visible !important;
+header[role="banner"] > div,
+header[role="banner"] a,
+header[role="banner"] span,
+header[role="banner"] button,
+header[role="banner"] img,
+header[role="banner"] svg {
   -webkit-text-fill-color: unset !important;
   background-clip: unset !important;
 }

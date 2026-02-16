@@ -94,7 +94,7 @@ export default function HigherEdPage() {
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-lg">
               <Image
-                src="/images/programs-hq/students-learning.jpg"
+                src="/images/gallery/image6.jpg"
                 alt="Students in higher education program"
                 fill
                 className="object-cover"

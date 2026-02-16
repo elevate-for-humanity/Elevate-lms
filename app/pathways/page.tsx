@@ -45,7 +45,7 @@ export default function PathwaysPage() {
             {pathways.map((pathway, i) => (
               <Link key={i} href={pathway.href} className="group bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition">
                 <div className="relative h-48">
-                  <Image src={pathway.image} alt={pathway.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
+                  <Image src={pathway.image} alt={pathway.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
                   
                   <div className="absolute bottom-4 left-4">
                     <h3 className="text-xl font-bold text-white">{pathway.name}</h3>

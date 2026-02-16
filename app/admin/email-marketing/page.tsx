@@ -43,7 +43,7 @@ export default function EmailMarketingPage() {
         <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Email Marketing" }]} />
       </div>
       {/* Hero Section */}
-      <section className="relative h-[500px] md:h-[600px] lg:h-[700px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
         <Image
           src="/images/learners/barrier-support.jpg"
           alt="Email Marketing"

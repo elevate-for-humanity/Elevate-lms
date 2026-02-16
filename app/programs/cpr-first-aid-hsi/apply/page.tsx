@@ -14,7 +14,7 @@ export default function ApplyPage() {
   return (
     <main className="min-h-screen bg-white">
       <div className="relative h-[40vh] min-h-[300px] max-h-[400px]">
-        <Image src="/images/healthcare/emergency-safety.jpg" alt="CPR & First Aid (HSI)" fill className="object-cover" priority />
+        <Image src="/images/healthcare/emergency-safety.jpg" alt="CPR & First Aid (HSI)" fill sizes="100vw" className="object-cover" priority />
       </div>
 
       <div className="max-w-4xl mx-auto px-6 py-4">
@@ -24,7 +24,7 @@ export default function ApplyPage() {
       <div className="max-w-4xl mx-auto px-6 py-8">
         <div className="grid md:grid-cols-3 gap-6 mb-10">
           <div className="rounded-2xl overflow-hidden shadow-sm">
-            <Image src="/images/healthcare/healthcare-professional-portrait-1.jpg" alt="CPR & First Aid (HSI) training" width={400} height={300} className="w-full h-48 object-cover" />
+            <Image src="/images/healthcare/cpr-certification-group.jpg" alt="CPR & First Aid (HSI) training" width={400} height={300} className="w-full h-48 object-cover" />
             <div className="bg-white p-4 border-t"><p className="font-bold text-lg text-black">Duration</p><p className="text-black">1 Day</p></div>
           </div>
           <div className="rounded-2xl overflow-hidden shadow-sm">

@@ -23,7 +23,7 @@ export default function WIOAEligibilityPage() {
 
       {/* Hero */}
       <section className="relative h-[220px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/heroes/hero-federal-funding.jpg" alt="WIOA funded career training" fill className="object-cover" priority />
+        <Image src="/images/heroes/hero-federal-funding.jpg" alt="WIOA funded career training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -54,7 +54,7 @@ export default function WIOAEligibilityPage() {
               {
                 step: '2', title: 'WorkOne Appointment',
                 desc: 'Schedule a meeting at your local WorkOne center. They determine your funding eligibility.',
-                image: '/images/heroes-hq/career-services-hero.jpg',
+                image: '/images/heroes/hero-federal-funding.jpg',
                 cta: 'Find WorkOne', href: 'https://www.in.gov/dwd/workone/workone-locations/', external: true,
               },
               {
@@ -66,7 +66,7 @@ export default function WIOAEligibilityPage() {
             ].map((item) => (
               <div key={item.step} className="rounded-2xl overflow-hidden border border-slate-200 shadow-sm">
                 <div className="relative h-[160px] sm:h-[180px]">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                   <div className="absolute top-3 left-3 w-9 h-9 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow">
                     {item.step}
                   </div>
@@ -107,7 +107,7 @@ export default function WIOAEligibilityPage() {
             ].map((item) => (
               <div key={item.title} className="rounded-xl overflow-hidden border border-slate-100 bg-white">
                 <div className="relative h-24 sm:h-32">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-3 text-center">
                   <h3 className="font-semibold text-slate-900 text-sm">{item.title}</h3>
@@ -159,7 +159,7 @@ export default function WIOAEligibilityPage() {
             ].map((item) => (
               <Link key={item.title} href={item.href} className="block rounded-2xl overflow-hidden border border-slate-200 bg-white hover:shadow-lg transition-shadow group">
                 <div className="relative h-[140px] sm:h-[160px]">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-4">
                   <h3 className="font-bold text-slate-900 mb-1">{item.title}</h3>

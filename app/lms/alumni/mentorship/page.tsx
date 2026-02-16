@@ -43,7 +43,7 @@ export default async function MentorshipPage() {
       {/* Hero */}
       <section className="relative h-64 overflow-hidden">
         <Image
-          src="/images/team-hq/team-meeting.jpg"
+          src="/images/compare-programs-hero.jpg"
           alt="Mentorship Program"
           fill
           className="object-cover"
@@ -63,7 +63,7 @@ export default async function MentorshipPage() {
         <div className="grid md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-xl overflow-hidden shadow-sm">
             <div className="relative h-32">
-              <Image src="/images/healthcare/healthcare-professional-portrait-1.jpg" alt="Career Guidance" fill className="object-cover" />
+              <Image src="/images/cta-banner.jpg" alt="Career Guidance" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-4">
               <h3 className="font-semibold mb-2">Career Guidance</h3>
@@ -72,7 +72,7 @@ export default async function MentorshipPage() {
           </div>
           <div className="bg-white rounded-xl overflow-hidden shadow-sm">
             <div className="relative h-32">
-              <Image src="/images/business/tax-prep-certification.jpg" alt="Networking" fill className="object-cover" />
+              <Image src="/images/gallery/image5.jpg" alt="Networking" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-4">
               <h3 className="font-semibold mb-2">Networking</h3>
@@ -81,7 +81,7 @@ export default async function MentorshipPage() {
           </div>
           <div className="bg-white rounded-xl overflow-hidden shadow-sm">
             <div className="relative h-32">
-              <Image src="/images/trades/program-building-construction.jpg" alt="Skill Development" fill className="object-cover" />
+              <Image src="/images/hero-new/hero-9.jpg" alt="Skill Development" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-4">
               <h3 className="font-semibold mb-2">Skill Development</h3>
@@ -95,7 +95,7 @@ export default async function MentorshipPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {mentorList.map((mentor: any, idx: number) => {
               const images = [
-                '/images/healthcare/hero-healthcare-professionals.jpg',
+                '/images/hero-new/hero-3.jpg',
                 '/images/trades/program-hvac-technician.jpg',
                 '/images/technology/hero-programs-technology.jpg',
                 '/images/trades/program-electrical-training.jpg',
@@ -105,7 +105,7 @@ export default async function MentorshipPage() {
               return (
               <div key={mentor.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition">
                 <div className="relative h-40">
-                  <Image src={mentor.profile?.avatar_url || images[idx % images.length]} alt={mentor.profile?.full_name || 'Mentor'} fill className="object-cover" />
+                  <Image src={mentor.profile?.avatar_url || images[idx % images.length]} alt={mentor.profile?.full_name || 'Mentor'} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-6">
                   <h3 className="font-semibold text-gray-900">{mentor.profile?.full_name || 'Industry Mentor'}</h3>
@@ -129,7 +129,7 @@ export default async function MentorshipPage() {
         ) : (
           <div className="bg-white rounded-xl border overflow-hidden">
             <div className="relative h-48">
-              <Image src="/images/healthcare/healthcare-professional-portrait-1.jpg" alt="Mentorship" fill className="object-cover" />
+              <Image src="/images/healthcare/healthcare-professional-portrait-1.jpg" alt="Mentorship" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-8 text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">No Mentors Available</h2>

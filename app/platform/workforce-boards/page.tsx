@@ -49,7 +49,7 @@ export default function WorkforceBoardsPage() {
 
       {/* Hero */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
-        <Image src="/hero-images/wioa-hero.jpg" alt="Workforce Board Solutions" fill className="object-cover" priority />
+        <Image src="/hero-images/wioa-hero.jpg" alt="Workforce Board Solutions" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-brand-blue-900/75" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
           <span className="text-brand-blue-200 font-medium text-sm uppercase tracking-wider">Platform Solutions</span>
@@ -155,7 +155,7 @@ export default function WorkforceBoardsPage() {
               </div>
             </div>
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/technology/hero-program-it-support.jpg" alt="Workforce board dashboard" fill className="object-cover" />
+              <Image src="/images/technology/hero-program-it-support.jpg" alt="Workforce board dashboard" fill sizes="100vw" className="object-cover" />
             </div>
           </div>
         </div>

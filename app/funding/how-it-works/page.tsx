@@ -34,7 +34,7 @@ export default function FundingHowItWorksPage() {
       {/* Hero */}
       <section className="relative h-[300px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/heroes-hq/funding-hero.jpg"
+          src="/images/homepage/funders-philanthropy.jpg"
           alt="How funding works for career training"
           fill
           className="object-cover"

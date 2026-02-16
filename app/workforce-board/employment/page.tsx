@@ -29,7 +29,7 @@ export default function EmploymentPage() {
       {/* Hero */}
       <section className="relative h-[300px] md:h-[350px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/heroes-hq/employer-hero.jpg"
+          src="/images/heroes/about-impact.jpg"
           alt="Employment services"
           fill
           className="object-cover"

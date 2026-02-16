@@ -60,7 +60,7 @@ export default function WorkforcePartnersPage() {
 
       {/* Hero */}
       <section className="relative h-[50vh] min-h-[400px]">
-        <Image src="/images/heroes/workforce-partner-1.jpg" alt="Workforce development partners" fill className="object-cover" priority />
+        <Image src="/images/heroes/workforce-partner-1.jpg" alt="Workforce development partners" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
@@ -114,7 +114,7 @@ export default function WorkforcePartnersPage() {
             {partners.map((partner, i) => (
               <div key={i} className="bg-white rounded-2xl overflow-hidden shadow-lg border border-slate-200 hover:shadow-xl transition-shadow">
                 <div className="relative h-48">
-                  <Image src={partner.image} alt={partner.name} fill className="object-cover" />
+                  <Image src={partner.image} alt={partner.name} fill sizes="100vw" className="object-cover" />
                   <div className="absolute top-4 left-4">
                     <span className="bg-brand-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold">{partner.type}</span>
                   </div>
@@ -160,7 +160,7 @@ export default function WorkforcePartnersPage() {
               </Link>
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="/images/heroes/workforce-partner-5.jpg" alt="WorkOne career advisor" fill className="object-cover" />
+              <Image src="/images/heroes/workforce-partner-5.jpg" alt="WorkOne career advisor" fill sizes="100vw" className="object-cover" />
             </div>
           </div>
         </div>

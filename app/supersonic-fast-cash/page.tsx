@@ -192,7 +192,7 @@ export default function SupersonicFastCashPage() {
               className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all group border border-gray-200"
             >
               <div className="relative h-36">
-                <Image src="/images/business/program-tax-preparation.jpg" alt="Tax Preparation" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image src="/images/business/program-tax-preparation.jpg" alt="Tax Preparation" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
@@ -209,7 +209,7 @@ export default function SupersonicFastCashPage() {
               className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all group border border-gray-200"
             >
               <div className="relative h-36">
-                <Image src="/images/business/program-tax-preparation.jpg" alt="Refund Advance" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image src="/images/business/program-tax-preparation.jpg" alt="Refund Advance" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-green-600 transition-colors">
@@ -226,7 +226,7 @@ export default function SupersonicFastCashPage() {
               className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all group border border-gray-200"
             >
               <div className="relative h-36">
-                <Image src="/images/heroes/employer-partner-3.jpg" alt="DIY Tax Filing" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image src="/images/heroes/employer-partner-3.jpg" alt="DIY Tax Filing" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-brand-blue-600 transition-colors">
@@ -243,7 +243,7 @@ export default function SupersonicFastCashPage() {
               className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all group border border-gray-200"
             >
               <div className="relative h-36">
-                <Image src="/images/heroes/about-team.jpg" alt="Audit Protection" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image src="/images/heroes/about-team.jpg" alt="Audit Protection" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-red-600 transition-colors">
@@ -260,7 +260,7 @@ export default function SupersonicFastCashPage() {
               className="bg-white rounded-2xl overflow-hidden hover:shadow-xl transition-all group border border-gray-200"
             >
               <div className="relative h-36">
-                <Image src="/images/business/tax-prep-certification-optimized.jpg" alt="Tax Preparer Training" fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                <Image src="/images/business/tax-prep-certification-optimized.jpg" alt="Tax Preparer Training" fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
               </div>
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">

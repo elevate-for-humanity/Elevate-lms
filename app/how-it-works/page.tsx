@@ -23,7 +23,7 @@ export default function HowItWorksPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/hero-images/how-it-works-hero.jpg" alt="How Elevate works" fill className="object-cover" priority />
+        <Image src="/hero-images/how-it-works-hero.jpg" alt="How Elevate works" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -41,14 +41,14 @@ export default function HowItWorksPage() {
           <div className="space-y-5">
             {[
               { step: '1', title: 'Register at Indiana Career Connect', desc: 'Create a free account at indianacareerconnect.com. This is the state workforce portal — it takes about 10 minutes. You will need your ID and Social Security number.', image: '/images/homepage/funding-navigation.png', cta: 'Register Now', href: 'https://www.indianacareerconnect.com', external: true },
-              { step: '2', title: 'Schedule a WorkOne Appointment', desc: 'Call or visit your local WorkOne center to schedule an eligibility meeting. A case manager will review your situation and determine which funding programs you qualify for (WIOA, WRG, JRI).', image: '/images/heroes-hq/career-services-hero.jpg', cta: 'Find WorkOne Locations', href: 'https://www.in.gov/dwd/workone/workone-locations/', external: true },
+              { step: '2', title: 'Schedule a WorkOne Appointment', desc: 'Call or visit your local WorkOne center to schedule an eligibility meeting. A case manager will review your situation and determine which funding programs you qualify for (WIOA, WRG, JRI).', image: '/images/marketplace/cybersecurity.jpg', cta: 'Find WorkOne Locations', href: 'https://www.in.gov/dwd/workone/workone-locations/', external: true },
               { step: '3', title: 'Choose Your Program', desc: 'Browse our training programs and pick the career path that fits your goals. Healthcare, skilled trades, CDL, IT, barbering, and more. Your WorkOne case manager can help you decide.', image: '/images/homepage/training-program-collage.png', cta: 'View Programs', href: '/programs', external: false },
               { step: '4', title: 'Complete Training & Get Certified', desc: 'Attend classes, complete hands-on training, and earn your industry certification. Most programs take 4-16 weeks. Some programs let you earn while you learn through apprenticeships.', image: '/images/homepage/certificate-of-completion.png', cta: 'Learn About Earn While You Learn', href: '/ojt-and-funding', external: false },
-              { step: '5', title: 'Get Hired', desc: 'Our career services team helps you build your resume, practice interviews, and connects you directly with employers who are hiring. Many students get job offers before finishing training.', image: '/images/heroes-hq/employer-hero.jpg', cta: 'Career Services', href: '/career-services', external: false },
+              { step: '5', title: 'Get Hired', desc: 'Our career services team helps you build your resume, practice interviews, and connects you directly with employers who are hiring. Many students get job offers before finishing training.', image: '/images/industries/technology.jpg', cta: 'Career Services', href: '/career-services', external: false },
             ].map((item) => (
               <div key={item.step} className="flex flex-col sm:flex-row gap-0 sm:gap-5 rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-full h-[180px] sm:w-64 sm:h-auto sm:min-h-[200px] flex-shrink-0">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                   <div className="absolute top-3 left-3 w-9 h-9 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold shadow">{item.step}</div>
                 </div>
                 <div className="p-5 flex-1">

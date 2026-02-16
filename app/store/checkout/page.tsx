@@ -1,5 +1,2 @@
 import { redirect } from 'next/navigation';
-
-export default function StoreCheckoutRedirect() {
-  redirect('/store/licenses');
-}
+export default function CheckoutRedirect() { redirect('/store/licensing'); }

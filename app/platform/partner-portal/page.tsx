@@ -49,7 +49,7 @@ export default function PartnerPortalPage() {
 
       {/* Hero */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
-        <Image src="/hero-images/pathways-hero.jpg" alt="Partner Portal" fill className="object-cover" priority />
+        <Image src="/hero-images/pathways-hero.jpg" alt="Partner Portal" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-brand-blue-900/70" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
           <span className="text-brand-blue-200 font-medium text-sm uppercase tracking-wider">Platform Solutions</span>
@@ -119,7 +119,7 @@ export default function PartnerPortalPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/team-hq/team-meeting.jpg" alt="Partner collaboration" fill className="object-cover" />
+              <Image src="/images/artlist/office-meeting.jpg" alt="Partner collaboration" fill sizes="100vw" className="object-cover" />
             </div>
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">What Partners Get</h2>

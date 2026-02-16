@@ -262,7 +262,7 @@ export const cdlVisuals: PageVisualConfig = {
   heroes: [
     {
       id: "cdl-hero-main",
-      imageSrc: "/images/trades/hero-program-cdl.jpg",
+      imageSrc: "/images/programs-hq/cdl-trucking.jpg",
       imageAlt: "CDL student standing in front of a commercial truck.",
       eyebrow: "CDL & Transportation",
       title: "Prepare for Transportation Careers with Safety and DOT Readiness.",

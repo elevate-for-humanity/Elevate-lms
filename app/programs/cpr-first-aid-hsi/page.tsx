@@ -207,7 +207,7 @@ export default function CPRFirstAidPage() {
             </div>
             <div className="relative h-80 lg:h-96 rounded-2xl overflow-hidden shadow-2xl">
               <Image 
-                src="/images/healthcare/healthcare-professional-portrait-1.jpg" 
+                src="/images/healthcare/cna-poster.jpg" 
                 alt="CPR practice on mannequin" 
                 fill sizes="100vw"
                 className="object-cover" 

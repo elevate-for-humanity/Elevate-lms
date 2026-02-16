@@ -26,7 +26,7 @@ export default function InstructorPortalLanding() {
       {/* Hero with Image */}
       <section className="relative min-h-[400px] flex items-center overflow-hidden">
         <Image
-          src="/images/trades/program-building-construction.jpg"
+          src="/images/hero-new/hero-7.jpg"
           alt="Instructor Portal"
           fill
           className="object-cover"
@@ -65,7 +65,7 @@ export default function InstructorPortalLanding() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/trades/program-building-construction.jpg" alt="Course Management" fill className="object-cover" />
+                <Image src="/images/trades/program-building-construction.jpg" alt="Course Management" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Course Management</h3>
@@ -74,7 +74,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Student Roster" fill className="object-cover" />
+                <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Student Roster" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Student Roster</h3>
@@ -83,7 +83,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/healthcare/healthcare-professional-portrait-1.jpg" alt="Progress Tracking" fill className="object-cover" />
+                <Image src="/images/career-coaching-new.jpg" alt="Progress Tracking" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Progress Tracking</h3>
@@ -92,7 +92,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/business/tax-prep-certification.jpg" alt="Grading" fill className="object-cover" />
+                <Image src="/images/gallery/image3.jpg" alt="Grading" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Grading</h3>
@@ -101,7 +101,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/team-hq/team-meeting.jpg" alt="Communication" fill className="object-cover" />
+                <Image src="/images/hero/portal-hero.jpg" alt="Communication" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Communication</h3>
@@ -110,7 +110,7 @@ export default function InstructorPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/healthcare/hero-healthcare-professionals.jpg" alt="Certifications" fill className="object-cover" />
+                <Image src="/images/hero-new/hero-2.jpg" alt="Certifications" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Certifications</h3>

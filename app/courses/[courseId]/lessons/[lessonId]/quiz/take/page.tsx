@@ -107,7 +107,7 @@ export default function TakeQuizPage({
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Hero Section */}
-        <section className="relative h-[500px] md:h-[600px] lg:h-[700px] flex items-center justify-center text-white overflow-hidden">
+        <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
           <Image
             src="/images/programs-hq/training-classroom.jpg"
             alt="Quiz Assessment"
@@ -241,7 +241,7 @@ export default function TakeQuizPage({
                   </div>
                   <div className="relative h-[400px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl">
                     <Image
-                      src="/images/programs-hq/students-learning.jpg"
+                      src="/images/artlist/hero-training-7.jpg"
                       alt="Students taking assessment"
                       fill
                       className="object-cover"

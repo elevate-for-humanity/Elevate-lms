@@ -111,7 +111,7 @@ export default function DisclosuresPage() {
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
                 <Image
-                  src="/images/heroes-hq/programs-hero.jpg"
+                  src="/images/heroes/programs.jpg"
                   alt="Our Institution"
                   fill
                   className="object-cover"
@@ -141,7 +141,7 @@ export default function DisclosuresPage() {
             <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
               <div className="h-48 relative">
                 <Image
-                  src="/images/heroes-hq/funding-hero.jpg"
+                  src="/images/career-coaching-new.jpg"
                   alt="Approvals"
                   fill
                   className="object-cover"

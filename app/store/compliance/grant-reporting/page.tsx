@@ -22,13 +22,13 @@ const features = [
   {
     title: 'Custom Report Templates',
     description: 'Pre-built templates for DOL, state agencies, and foundation reporting.',
-    image: '/images/business/tax-prep-certification.jpg',
+    image: '/images/homepage/funding-navigation.png',
     items: ['DOL ETA reports', 'State-specific formats', 'Foundation templates', 'Custom builders'],
   },
   {
     title: 'Outcome Tracking',
     description: 'Track employment, wages, credentials, and other grant outcomes.',
-    image: '/images/team-hq/team-meeting.jpg',
+    image: '/images/homepage/funders-philanthropy.jpg',
     items: ['Employment tracking', 'Wage verification', 'Credential attainment', 'Follow-up automation'],
   },
   {
@@ -90,7 +90,7 @@ export default function GrantReportingPage() {
       {/* Hero */}
       <section className="relative bg-red-600 text-white py-20 overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="/images/heroes-hq/funding-hero.jpg" alt="Grant Reporting" fill className="object-cover opacity-30" />
+          <Image src="/images/homepage/funded-programs.jpg" alt="Grant Reporting" fill sizes="100vw" className="object-cover opacity-30" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -141,7 +141,7 @@ export default function GrantReportingPage() {
             {features.map((feature) => (
               <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-orange-500 hover:shadow-xl transition-all group">
                 <div className="relative h-48">
-                  <Image src={feature.image} alt={feature.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <Image src={feature.image} alt={feature.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                   <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{feature.title}</h3>
                 </div>
                 <div className="p-6">

@@ -56,7 +56,7 @@ export default function TrainingProvidersPage() {
 
       {/* Hero */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
-        <Image src="/hero-images/programs-hero.jpg" alt="Training Provider Solutions" fill className="object-cover" priority />
+        <Image src="/hero-images/programs-hero.jpg" alt="Training Provider Solutions" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-teal-900/70" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
           <span className="text-teal-200 font-medium text-sm uppercase tracking-wider">Platform Solutions</span>
@@ -160,7 +160,7 @@ export default function TrainingProvidersPage() {
               </div>
             </div>
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/team-hq/team-meeting.jpg" alt="Training provider partnership" fill className="object-cover" />
+              <Image src="/images/artlist/hero-training-6.jpg" alt="Training provider partnership" fill sizes="100vw" className="object-cover" />
             </div>
           </div>
         </div>

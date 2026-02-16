@@ -37,7 +37,7 @@ export const metadata: Metadata = {
     description: 'Become an HVAC Technician in 12-16 weeks. Free training through WIOA funding. EPA 608 certification included.',
     url: `${SITE_URL}/programs/hvac-technician`,
     siteName: 'Elevate for Humanity',
-    images: [{ url: `${SITE_URL}/images/trades/hero-program-hvac.jpg`, width: 1200, height: 630, alt: 'HVAC Technician Training Program' }],
+    images: [{ url: `${SITE_URL}/images/trades/program-hvac-overview.jpg`, width: 1200, height: 630, alt: 'HVAC Technician Training Program' }],
     type: 'website',
   },
   twitter: {

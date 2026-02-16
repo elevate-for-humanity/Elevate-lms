@@ -61,7 +61,7 @@ export default async function CountersignMouPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
           src="/images/homepage/student-portal-interface.png"
           alt="Countersign Mou"

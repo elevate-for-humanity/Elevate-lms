@@ -85,7 +85,7 @@ export default async function CompanyProfilePage() {
   const companyData = {
     name: employer.business_name || 'Company Name',
     dba: employer.dba_name,
-    logo: '/images/heroes-hq/employer-hero.jpg',
+    logo: '/images/employers/partnership-meeting.jpg',
     cover: '/images/heroes-hq/employer-hero.jpg',
     industry: employer.industry || 'Not specified',
     size: employer.employee_count ? `${employer.employee_count} employees` : 'Not specified',

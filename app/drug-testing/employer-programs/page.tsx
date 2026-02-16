@@ -294,7 +294,7 @@ export default function EmployerProgramsPage() {
             </div>
             <div className="relative h-[350px] rounded-2xl overflow-hidden">
               <Image
-                src="/images/heroes-hq/employer-hero.jpg"
+                src="/images/homepage/employers.jpg"
                 alt="DOT Compliance"
                 fill
                 className="object-cover"

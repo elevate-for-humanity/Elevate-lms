@@ -62,7 +62,7 @@ export default function WebDevelopmentPage() {
     <main className="min-h-screen bg-white">
       {/* Hero */}
       <section className="relative h-[50vh] min-h-[400px] max-h-[500px]">
-        <Image src="/hero-images/technology-hero.jpg" alt="Web Development Training" fill className="object-cover" priority />
+        <Image src="/hero-images/technology-hero.jpg" alt="Web Development Training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-purple-900/60" />
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="max-w-7xl mx-auto">
@@ -167,7 +167,7 @@ export default function WebDevelopmentPage() {
         <div className="max-w-6xl mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[350px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/technology/hero-program-it-support.jpg" alt="Student coding" fill className="object-cover" />
+              <Image src="/images/technology/hero-program-it-support.jpg" alt="Student coding" fill sizes="100vw" className="object-cover" />
             </div>
             <div>
               <h2 className="text-3xl font-bold text-black mb-6">Build a Professional Portfolio</h2>

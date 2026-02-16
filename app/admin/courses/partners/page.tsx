@@ -24,7 +24,7 @@ const partners = [
   {
     id: 2,
     name: 'CompTIA',
-    logo: '/images/heroes-hq/career-services-hero.jpg',
+    logo: '/images/employers/employer-meeting.jpg',
     type: 'IT Certification',
     courses: 8,
     activeStudents: 189,
@@ -34,7 +34,7 @@ const partners = [
   {
     id: 3,
     name: 'Adobe',
-    logo: '/images/heroes-hq/employer-hero.jpg',
+    logo: '/images/employers/employer-meeting.jpg',
     type: 'Creative Software',
     courses: 6,
     activeStudents: 156,
@@ -44,7 +44,7 @@ const partners = [
   {
     id: 4,
     name: 'OSHA Training Institute',
-    logo: '/images/heroes-hq/success-hero.jpg',
+    logo: '/images/homepage/employer-partnership.png',
     type: 'Safety Training',
     courses: 4,
     activeStudents: 312,

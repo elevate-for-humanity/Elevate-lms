@@ -34,7 +34,7 @@ export default function WebinarsPage() {
       </div>
 
       <section className="relative min-h-[400px] flex items-center overflow-hidden">
-        <Image src="/hero-images/how-it-works-hero.jpg" alt="Webinars" fill className="object-cover" priority />
+        <Image src="/hero-images/how-it-works-hero.jpg" alt="Webinars" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-slate-900/70" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
           <Video className="w-16 h-16 mx-auto mb-6 text-white/80" />

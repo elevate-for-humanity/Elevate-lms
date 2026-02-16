@@ -122,7 +122,7 @@ export default function EmployersPage() {
               {
                 title: 'Certified Skills',
                 description: 'Industry-recognized credentials verify their competency.',
-                image: '/images/healthcare/healthcare-professional-portrait-1.jpg',
+                image: '/images/employers/partnership-handshake.jpg',
               },
               {
                 title: 'No Recruiting Fees',
@@ -132,12 +132,12 @@ export default function EmployersPage() {
               {
                 title: 'Faster Onboarding',
                 description: 'Trained candidates require less ramp-up time.',
-                image: '/images/trades/program-building-construction.jpg',
+                image: '/images/homepage/employer-partnership.png',
               },
             ].map((item) => (
               <div key={item.title} className="bg-white rounded-xl overflow-hidden shadow-sm border">
                 <div className="relative h-32">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-4 text-center">
                   <h3 className="text-lg font-bold text-gray-900 mb-2">{item.title}</h3>

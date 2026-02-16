@@ -134,7 +134,7 @@ export default function StoreDigitalPage() {
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white rounded-2xl overflow-hidden group">
               <div className="relative aspect-video bg-slate-100">
-                <Image src="/images/store/ai-studio.jpg" alt="AI Studio Demo" fill className="object-cover" />
+                <Image src="/images/store/ai-studio.jpg" alt="AI Studio Demo" fill sizes="100vw" className="object-cover" />
                 <div className="absolute inset-0 bg-white/40 flex items-center justify-center group-hover:bg-white/60 transition-all">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                     <Play className="w-8 h-8 text-slate-900 ml-1" />
@@ -148,7 +148,7 @@ export default function StoreDigitalPage() {
             </div>
             <div className="bg-white rounded-2xl overflow-hidden group">
               <div className="relative aspect-video bg-slate-100">
-                <Image src="/images/store/crm-hub.jpg" alt="SAM.gov Assistant Demo" fill className="object-cover" />
+                <Image src="/images/store/crm-hub.jpg" alt="SAM.gov Assistant Demo" fill sizes="100vw" className="object-cover" />
                 <div className="absolute inset-0 bg-white/40 flex items-center justify-center group-hover:bg-white/60 transition-all">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                     <Play className="w-8 h-8 text-slate-900 ml-1" />
@@ -162,7 +162,7 @@ export default function StoreDigitalPage() {
             </div>
             <div className="bg-white rounded-2xl overflow-hidden group">
               <div className="relative aspect-video bg-slate-100">
-                <Image src="/images/store/ai-tutor.jpg" alt="AI Tutor Demo" fill className="object-cover" />
+                <Image src="/images/store/ai-tutor.jpg" alt="AI Tutor Demo" fill sizes="100vw" className="object-cover" />
                 <div className="absolute inset-0 bg-white/40 flex items-center justify-center group-hover:bg-white/60 transition-all">
                   <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                     <Play className="w-8 h-8 text-slate-900 ml-1" />

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     url: 'https://www.elevateforhumanity.org/search',
     images: [
       {
-        url: '/images/heroes-hq/programs-hero.jpg',
+        url: '/images/heroes/resources.jpg',
         width: 1200,
         height: 630,
         alt: 'Elevate for Humanity — Workforce Training Programs',
@@ -44,7 +44,7 @@ const programs = [
   {
     name: 'CDL Training',
     href: '/programs/cdl',
-    image: '/images/programs-hq/cdl-trucking.jpg',
+    image: '/images/gallery/image11.jpg',
     certs: ['Class A CDL', 'Class B CDL'],
     funding: 'WRG eligible',
   },
@@ -189,7 +189,7 @@ export default function SearchPage() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl">
               <Image
-                src="/images/heroes-hq/funding-hero.jpg"
+                src="/images/cta-banner.jpg"
                 alt="Workforce funding and financial aid"
                 fill
                 className="object-cover"
@@ -250,7 +250,7 @@ export default function SearchPage() {
             </div>
             <div className="relative h-[260px] sm:h-[320px] rounded-2xl overflow-hidden shadow-xl order-1 md:order-2">
               <Image
-                src="/images/heroes-hq/employer-hero.jpg"
+                src="/images/heroes/programs.jpg"
                 alt="Employer partnerships"
                 fill
                 className="object-cover"

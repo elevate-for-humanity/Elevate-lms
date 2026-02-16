@@ -405,7 +405,7 @@ export default async function StudentDashboardOrchestrated() {
                     title="Job Placement"
                     description="Connect with employers"
                     href="/lms/placement"
-                    image="/images/trades/hero-program-cdl.jpg"
+                    image="/images/heroes/lms-profile.jpg"
                   />
                 )}
 

@@ -21,7 +21,7 @@ export default async function ENVCONFIGmdPage() {
         <Breadcrumbs items={[{ label: "Docs", href: "/docs" }, { label: "Env_Config.Md" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
           src="/images/programs-hq/technology-hero.jpg"
           alt="Environment Configuration"
@@ -120,7 +120,7 @@ export default async function ENVCONFIGmdPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/heroes-hq/how-it-works-hero.jpg"
+                  src="/images/gallery/image7.jpg"
                   alt="Configuration guide"
                   fill
                   className="object-cover"

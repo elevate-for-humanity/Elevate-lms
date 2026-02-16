@@ -34,7 +34,7 @@ export const metadata: Metadata = {
     description: 'Explore scholarships, grants, and funding options for career training.',
     url: `${SITE_URL}/scholarships`,
     siteName: 'Elevate for Humanity',
-    images: [{ url: `${SITE_URL}/images/heroes-hq/success-hero.jpg`, width: 1200, height: 630, alt: 'Scholarships and Financial Aid' }],
+    images: [{ url: `${SITE_URL}/images/hero-new/hero-7.jpg`, width: 1200, height: 630, alt: 'Scholarships and Financial Aid' }],
     type: 'website',
   },
   twitter: {

@@ -129,7 +129,7 @@ export default async function ApplyPage({
           <div className="rounded-2xl overflow-hidden border border-slate-200 hover:shadow-lg transition-shadow">
             <div className="relative h-[200px]">
               <Image
-                src="/images/heroes-hq/employer-hero.jpg"
+                src="/images/heroes/career-services.jpg"
                 alt="Employer partnership meeting"
                 fill
                 className="object-cover"

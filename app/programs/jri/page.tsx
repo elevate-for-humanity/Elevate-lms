@@ -28,7 +28,7 @@ export default function JRIPage() {
       </div>
 
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/heroes-hq/jri-hero.jpg" alt="JRI Programs" fill className="object-cover" priority />
+        <Image src="/images/heroes-hq/jri-hero.jpg" alt="JRI Programs" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -78,8 +78,8 @@ export default function JRIPage() {
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
             {[
               { name: 'Healthcare', href: '/programs/healthcare', img: '/images/hero/hero-healthcare.jpg' },
-              { name: 'Skilled Trades', href: '/programs/skilled-trades', img: '/images/trades/hero-program-hvac.jpg' },
-              { name: 'CDL Training', href: '/programs/cdl-training', img: '/images/trades/hero-program-cdl.jpg' },
+              { name: 'Skilled Trades', href: '/programs/skilled-trades', img: '/images/hero/training-providers-hero.jpg' },
+              { name: 'CDL Training', href: '/programs/cdl-training', img: '/images/hero-training.jpg' },
               { name: 'Barber Apprenticeship', href: '/programs/barber-apprenticeship', img: '/images/barber-hero-new.jpg' },
               { name: 'Technology', href: '/programs/technology', img: '/images/hero/hero-tech-careers.jpg' },
               { name: 'Culinary', href: '/programs/culinary-apprenticeship', img: '/images/culinary/hero-program-culinary.jpg' },

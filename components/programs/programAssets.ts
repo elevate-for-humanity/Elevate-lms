@@ -55,12 +55,12 @@ export const PROGRAM_HEROES: Record<string, string> = {
   'electrical': '/images/trades/hero-program-electrical.jpg',
   'plumbing': '/images/trades/hero-program-plumbing.jpg',
   'welding': '/images/trades/hero-program-welding.jpg',
-  'diesel-mechanic': '/images/trades/hero-program-cdl.jpg',
+  'diesel-mechanic': '/images/programs-hq/cdl-trucking.jpg',
   'skilled-trades': '/hero-images/skilled-trades-hero.jpg',
 
   // Transportation
-  'cdl-training': '/images/trades/hero-program-cdl.jpg',
-  'cdl': '/images/trades/hero-program-cdl.jpg',
+  'cdl-training': '/images/programs-hq/cdl-trucking.jpg',
+  'cdl': '/images/programs-hq/cdl-trucking.jpg',
   'cdl-transportation': '/hero-images/cdl-cat-new.jpg',
 
   // Technology

@@ -89,7 +89,7 @@ export default async function MarketplaceBrowsePage() {
               <div key={item.id} className="bg-white rounded-xl border overflow-hidden hover:shadow-lg transition">
                 <div className="relative h-40">
                   <Image 
-                    src={item.image_url || '/images/business/tax-prep-certification.jpg'} 
+                    src={item.image_url || '/images/gallery/image4.jpg'} 
                     alt={item.title} 
                     fill 
                     className="object-cover" 
@@ -125,7 +125,7 @@ export default async function MarketplaceBrowsePage() {
         ) : (
           <div className="bg-white rounded-xl border overflow-hidden">
             <div className="relative h-48">
-              <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Browse marketplace" fill className="object-cover" />
+              <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Browse marketplace" fill sizes="100vw" className="object-cover" />
             </div>
             <div className="p-8 text-center">
               <h2 className="text-xl font-semibold text-gray-900 mb-2">No Items Available</h2>

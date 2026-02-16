@@ -70,7 +70,7 @@ export default async function CourseTemplatesPage() {
           <Breadcrumbs items={[{ label: "Admin", href: "/admin" }, { label: "Course Templates" }]} />
         </div>
       {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
           src="/images/courses/barber-apprenticeship-10002417-cover.jpg"
           alt="Course Templates"

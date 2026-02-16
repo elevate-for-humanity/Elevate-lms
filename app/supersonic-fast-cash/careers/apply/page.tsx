@@ -72,7 +72,7 @@ export default function CareersApplyPage() {
       </div>
 {/* Hero */}
       <section className="relative h-[300px] w-full overflow-hidden">
-        <Image src="/images/heroes/alumni.jpg" alt="Apply for Career" fill className="object-cover" quality={85} priority />
+        <Image src="/images/heroes/alumni.jpg" alt="Apply for Career" fill sizes="100vw" className="object-cover" quality={85} priority />
         
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="max-w-4xl mx-auto px-6 text-center text-white">

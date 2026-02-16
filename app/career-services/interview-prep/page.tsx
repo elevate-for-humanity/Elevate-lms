@@ -70,7 +70,7 @@ export default function InterviewPrepPage() {
       {/* Hero */}
       <section className="relative h-[350px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/healthcare/healthcare-professional-portrait-1.jpg"
+          src="/images/heroes/event-1.jpg"
           alt="Interview Preparation Services"
           fill
           className="object-cover object-center"

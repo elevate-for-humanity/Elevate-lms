@@ -28,7 +28,7 @@ export default function LearningCenterPage() {
 
       {/* Hero */}
       <section className="relative h-[300px] md:h-[350px] flex items-center justify-center text-white overflow-hidden">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Learning center resources" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/artlist/hero-training-2.jpg" alt="Learning center resources" fill className="object-cover" priority sizes="100vw" />
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <BookOpen className="w-10 h-10 mx-auto mb-3 text-white/80" />

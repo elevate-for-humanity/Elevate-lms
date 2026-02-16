@@ -75,7 +75,7 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
   
   const { speak, stop, isSpeaking, isMuted, toggleMute } = useSpeech();
 
-  // Check if guide should auto-open on first visit
+  // Auto-open and greet on first visit (or every visit if not dismissed)
   useEffect(() => {
     if (forceOpen) {
       setIsOpen(true);
@@ -83,19 +83,22 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
     }
 
     if (typeof window === 'undefined') return;
+    if (hasAutoOpened) return;
 
-    const dismissed = localStorage.getItem(GUIDE_STORAGE_KEYS.DISMISSED);
     const completed = localStorage.getItem(GUIDE_STORAGE_KEYS.COMPLETED);
+    if (completed) return;
 
-    if (!dismissed && !completed && !hasAutoOpened) {
-      const timer = setTimeout(() => {
-        setIsOpen(true);
-        setHasAutoOpened(true);
-        // console.log(GUIDE_ANALYTICS.GUIDE_OPENED, { auto: true });
-      }, 1000);
-      return () => clearTimeout(timer);
-    }
-  }, [forceOpen, hasAutoOpened]);
+    // Always greet on store pages — clear dismissed flag so returning visitors see it too
+    const timer = setTimeout(() => {
+      setIsOpen(true);
+      setHasAutoOpened(true);
+      const mainQuestion = storeGuideFlow.questions.find(q => q.id === 'main');
+      if (mainQuestion) {
+        setTimeout(() => speak(storeGuideFlow.welcomeMessage + '. ' + mainQuestion.question), 400);
+      }
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [forceOpen, hasAutoOpened, speak]);
 
   const handleOpen = useCallback(() => {
     setIsOpen(true);
@@ -113,10 +116,8 @@ export default function StoreGuideChat({ onStartTour, forceOpen = false }: Store
   const handleClose = useCallback(() => {
     stop();
     setIsOpen(false);
-    if (typeof window !== 'undefined') {
-      localStorage.setItem(GUIDE_STORAGE_KEYS.DISMISSED, 'true');
-    }
-    // console.log(GUIDE_ANALYTICS.GUIDE_DISMISSED);
+    // Only suppress for this session — don't permanently dismiss
+    setHasAutoOpened(true);
   }, [stop]);
 
   const handleChoiceSelect = useCallback((choice: GuideChoice) => {

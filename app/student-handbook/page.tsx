@@ -57,7 +57,7 @@ export default async function StudentHandbookPage() {
       <section className="relative min-h-[350px] flex items-center">
         <div 
           className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/images/programs-hq/students-learning.jpg)' }}
+          style={{ backgroundImage: 'url(/images/heroes/student-progress.jpg)' }}
         />
         
         <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 text-white">

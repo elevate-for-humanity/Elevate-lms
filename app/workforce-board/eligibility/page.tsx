@@ -51,7 +51,7 @@ export default function EligibilityPage() {
       {/* Hero */}
       <section className="relative h-[300px] md:h-[350px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/heroes-hq/funding-hero.jpg"
+          src="/images/homepage/funded-programs.jpg"
           alt="WIOA eligibility information"
           fill
           className="object-cover"

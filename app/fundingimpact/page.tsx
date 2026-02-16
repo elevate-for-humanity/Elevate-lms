@@ -99,7 +99,7 @@ export default function FundingImpactPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-40">
                 <Image
-                  src="/images/heroes-hq/success-hero.jpg"
+                  src="/images/homepage/funders-philanthropy.jpg"
                   alt="Participants in training"
                   fill
                   className="object-cover"
@@ -358,7 +358,7 @@ export default function FundingImpactPage() {
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-48">
                 <Image
-                  src="/images/heroes-hq/funding-hero.jpg"
+                  src="/images/homepage/funded-programs-optimized.jpg"
                   alt="David W. success story"
                   fill
                   className="object-cover"

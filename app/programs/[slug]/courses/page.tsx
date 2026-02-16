@@ -73,7 +73,7 @@ export default function ProgramCoursesPage() {
       {/* Hero Banner */}
       <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
         <img
-          src="/images/business/tax-prep-certification.jpg"
+          src="/images/artlist/hero-training-6.jpg"
           alt="Professional training courses and certification programs"
           className="absolute inset-0 w-full h-full object-cover"
         />
@@ -153,7 +153,7 @@ export default function ProgramCoursesPage() {
                   '/images/programs/efh-tax-office-startup-hero.jpg'
                 ],
                 'transportation': [
-                  '/images/trades/hero-program-cdl.jpg',
+                  '/images/artlist/hero-training-8.jpg',
                   '/images/programs/cdl-hero.jpg',
                   '/images/programs/cdl-hero.jpg'
                 ],
@@ -192,7 +192,7 @@ export default function ProgramCoursesPage() {
                       sizes="(max-width: 768px) 100vw, 33vw"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = '/images/healthcare/hero-healthcare-professionals.jpg';
+                        target.src = '/images/hero-training.jpg';
                       }}
                     />
                     <div className="absolute top-4 right-4">

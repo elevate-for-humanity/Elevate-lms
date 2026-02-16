@@ -23,7 +23,7 @@ export default function FundingPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/heroes/hero-federal-funding.jpg" alt="Funding and financial aid" fill className="object-cover" priority />
+        <Image src="/images/heroes/hero-federal-funding.jpg" alt="Funding and financial aid" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -45,7 +45,7 @@ export default function FundingPage() {
             {/* WIOA */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/heroes/workforce-partner-1.jpg" alt="WIOA funding" fill className="object-cover" />
+                <Image src="/images/heroes/workforce-partner-1.jpg" alt="WIOA funding" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-brand-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">Federal</div>
               </div>
               <div className="p-5">
@@ -70,7 +70,7 @@ export default function FundingPage() {
             {/* WRG */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/heroes/workforce-partner-2.jpg" alt="Workforce Ready Grant" fill className="object-cover" />
+                <Image src="/images/heroes/workforce-partner-2.jpg" alt="Workforce Ready Grant" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
@@ -95,7 +95,7 @@ export default function FundingPage() {
             {/* JRI */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/heroes/workforce-partner-3.jpg" alt="JRI funding" fill className="object-cover" />
+                <Image src="/images/heroes/workforce-partner-3.jpg" alt="JRI funding" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-3 py-1 rounded-full">State</div>
               </div>
               <div className="p-5">
@@ -120,7 +120,7 @@ export default function FundingPage() {
             {/* OJT */}
             <div className="rounded-xl overflow-hidden border border-slate-200">
               <div className="relative h-[180px]">
-                <Image src="/images/heroes-hq/career-services-hero.jpg" alt="On the job training" fill className="object-cover" />
+                <Image src="/images/homepage/funding-navigation.png" alt="On the job training" fill sizes="100vw" className="object-cover" />
                 <div className="absolute top-3 left-3 bg-green-600 text-white text-xs font-bold px-3 py-1 rounded-full">Earn & Learn</div>
               </div>
               <div className="p-5">

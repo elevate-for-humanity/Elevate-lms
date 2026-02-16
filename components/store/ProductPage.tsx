@@ -240,7 +240,7 @@ export function ProductPage({ product }: ProductPageProps) {
                       <Play className="w-6 h-6 text-white" />
                     </div>
                   ) : (
-                    <Image src={img.src} alt={img.alt} fill className="object-cover" />
+                    <Image src={img.src} alt={img.alt} fill sizes="100vw" className="object-cover" />
                   )}
                 </button>
               ))}

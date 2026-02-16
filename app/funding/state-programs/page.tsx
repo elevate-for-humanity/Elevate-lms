@@ -50,7 +50,7 @@ export default function StateProgramsPage() {
 
       {/* Hero */}
       <section className="relative h-[300px] md:h-[350px] flex items-center justify-center text-white overflow-hidden">
-        <Image src="/images/heroes-hq/funding-hero.jpg" alt="Indiana state funding programs" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/homepage/funding-navigation.png" alt="Indiana state funding programs" fill className="object-cover" priority sizes="100vw" />
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-2 mb-3">

@@ -41,7 +41,7 @@ const apprenticeships = [
     name: 'HVAC Apprenticeship', 
     duration: '2-4 years', 
     wage: '$15-$25/hr',
-    image: '/images/trades/hero-program-hvac.jpg',
+    image: '/images/gallery/image10.jpg',
     href: '/programs/hvac-apprenticeship',
     description: 'Heating, ventilation, and air conditioning installation and repair.'
   },
@@ -65,7 +65,7 @@ const apprenticeships = [
     name: 'CDL Training', 
     duration: '3-6 weeks', 
     wage: '$50K-$80K/yr',
-    image: '/images/trades/hero-program-cdl.jpg',
+    image: '/images/heroes/about-impact.jpg',
     href: '/programs/cdl-training',
     description: 'Commercial driver license training with job placement.'
   },
@@ -73,9 +73,9 @@ const apprenticeships = [
 
 const steps = [
   { num: 1, title: 'Apply', desc: 'Submit your application', image: '/images/business/collaboration-1.jpg' },
-  { num: 2, title: 'Interview', desc: 'Meet with employers', image: '/images/heroes-hq/employer-hero.jpg' },
+  { num: 2, title: 'Interview', desc: 'Meet with employers', image: '/images/heroes/resources.jpg' },
   { num: 3, title: 'Train', desc: 'Learn on the job', image: '/images/business/team-1.jpg' },
-  { num: 4, title: 'Certify', desc: 'Earn your credential', image: '/images/heroes-hq/success-hero.jpg' },
+  { num: 4, title: 'Certify', desc: 'Earn your credential', image: '/images/hero-new/hero-8.jpg' },
 ];
 
 export default function ApprenticeshipsPage() {
@@ -90,7 +90,7 @@ export default function ApprenticeshipsPage() {
 
       {/* Hero */}
       <section className="relative h-[55vh] min-h-[400px]">
-        <Image src="/images/skilled-trades-vibrant.jpg" alt="Apprenticeship training" fill className="object-cover" priority />
+        <Image src="/images/skilled-trades-vibrant.jpg" alt="Apprenticeship training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="max-w-5xl mx-auto">
             <div className="inline-flex items-center gap-2 bg-green-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-4">
@@ -169,7 +169,7 @@ export default function ApprenticeshipsPage() {
               </div>
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-2xl">
-              <Image src="/images/trades/hero-program-hvac.jpg" alt="Apprentice training" fill className="object-cover" />
+              <Image src="/images/trades/hero-program-hvac.jpg" alt="Apprentice training" fill sizes="100vw" className="object-cover" />
             </div>
           </div>
         </div>
@@ -186,7 +186,7 @@ export default function ApprenticeshipsPage() {
               <Link key={i} href={prog.href} className="group">
                 <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all border border-slate-200">
                   <div className="relative h-48">
-                    <Image src={prog.image} alt={prog.name} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                    <Image src={prog.image} alt={prog.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                     <div className="absolute bottom-4 left-4 right-4">
                       <h3 className="text-xl font-bold text-white">{prog.name}</h3>
                     </div>
@@ -219,7 +219,7 @@ export default function ApprenticeshipsPage() {
             {steps.map((step, i) => (
               <div key={i} className="group">
                 <div className="relative h-48 rounded-2xl overflow-hidden mb-4 shadow-lg group-hover:shadow-xl transition-shadow">
-                  <Image src={step.image} alt={step.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <Image src={step.image} alt={step.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                   <div className="absolute top-4 left-4 w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
                     {step.num}
                   </div>

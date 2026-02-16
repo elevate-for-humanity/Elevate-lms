@@ -140,7 +140,7 @@ export default function WIOACompliancePage() {
       <section className="relative bg-green-700 text-white py-20 overflow-hidden">
         <div className="absolute inset-0">
           <Image
-            src="/images/heroes-hq/funding-hero.jpg"
+            src="/images/heroes/hero-federal-funding.jpg"
             alt="WIOA Compliance"
             fill
             className="object-cover opacity-30"
@@ -238,7 +238,7 @@ export default function WIOACompliancePage() {
             ].map((item) => (
               <div key={item.step} className="text-center">
                 <div className="relative w-24 h-24 mx-auto mb-4 rounded-full overflow-hidden border-4 border-green-600">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                   <div className="absolute inset-0 bg-green-600/60 flex items-center justify-center">
                     <span className="text-2xl font-black text-slate-900">{item.step}</span>
                   </div>

@@ -29,19 +29,19 @@ const services = [
     title: 'Career Services',
     description: 'Resume building, interview prep, job search support',
     href: '/career-services',
-    image: '/images/heroes-hq/career-services-hero.jpg',
+    image: '/images/homepage/wraparound-support.jpg',
   },
   {
     title: 'Career Center',
     description: 'Job boards, employer connections, placement assistance',
     href: '/career-center',
-    image: '/images/heroes-hq/employer-hero.jpg',
+    image: '/images/community/event-5.jpg',
   },
   {
     title: 'Career Fairs',
     description: 'Meet employers hiring our graduates',
     href: '/career-fair',
-    image: '/images/team-hq/team-meeting.jpg',
+    image: '/images/homepage/overcoming-barriers-support.png',
   },
   {
     title: 'Academic Advising',

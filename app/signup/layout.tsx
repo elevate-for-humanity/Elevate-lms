@@ -1,6 +1,6 @@
 import React from 'react';
 import { Metadata } from 'next';
-// Image asset: /images/heroes-hq/success-hero.jpg
+// Image asset: /images/hero-new/hero-6.jpg
 
 export const metadata: Metadata = {
   title: "Sign Up - Create Your Account",

@@ -41,7 +41,7 @@ export default async function JobPostingsPage() {
       views: 245,
       status: 'Active',
       posted: '5 days ago',
-      image: '/images/healthcare/hero-healthcare-professionals.jpg',
+      image: '/images/employers/partnership-hiring-event.jpg',
     },
     {
       id: 2,

@@ -29,6 +29,9 @@ export default function HomePage() {
               <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-white leading-[1.05]">
                 Limitless<br />Opportunities
               </h1>
+              <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed max-w-xl">
+                Free career training in healthcare, skilled trades, CDL, technology, and barbering. Funded by WIOA, state grants, and employer partnerships across Indiana.
+              </p>
             </div>
           </div>
         </div>
@@ -47,42 +50,55 @@ export default function HomePage() {
       {/* ===== AUDIENCE QUICK LINKS ===== */}
       <section className="py-12 sm:py-16 bg-slate-50 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-900 mb-8">
+          <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-900 mb-3">
             How can we help you?
           </h2>
+          <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
+            Choose your path below. Each option takes you directly to the information you need — no phone calls required.
+          </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link
-              href="/programs"
-              className="flex flex-col items-center gap-3 p-6 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
-            >
-              <span className="text-3xl">🎓</span>
-              <span className="font-semibold text-slate-900 group-hover:text-brand-blue-600">I want to train</span>
-              <span className="text-sm text-slate-500">Browse free career programs</span>
-            </Link>
-            <Link
-              href="/funding"
-              className="flex flex-col items-center gap-3 p-6 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
-            >
-              <span className="text-3xl">💰</span>
-              <span className="font-semibold text-slate-900 group-hover:text-brand-blue-600">I need funding</span>
-              <span className="text-sm text-slate-500">WIOA, grants, and financial aid</span>
-            </Link>
-            <Link
-              href="/employer"
-              className="flex flex-col items-center gap-3 p-6 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
-            >
-              <span className="text-3xl">🏢</span>
-              <span className="font-semibold text-slate-900 group-hover:text-brand-blue-600">I&apos;m an employer</span>
-              <span className="text-sm text-slate-500">Hire trained, credentialed talent</span>
-            </Link>
-            <Link
-              href="/store"
-              className="flex flex-col items-center gap-3 p-6 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
-            >
-              <span className="text-3xl">🏫</span>
-              <span className="font-semibold text-slate-900 group-hover:text-brand-blue-600">I run a school</span>
-              <span className="text-sm text-slate-500">License the Elevate platform</span>
-            </Link>
+            {[
+              {
+                href: '/programs',
+                image: '/images/heroes/hero-students.jpg',
+                alt: 'Students in hands-on training',
+                label: 'I want to train',
+                desc: 'Browse programs in healthcare, trades, CDL, tech, and barbering. See schedules, requirements, and how to enroll.',
+              },
+              {
+                href: '/funding',
+                image: '/images/heroes/hero-federal-funding.jpg',
+                alt: 'Funding and financial aid resources',
+                label: 'I need funding',
+                desc: 'Most programs are 100% free. Check eligibility for WIOA, Workforce Ready Grant, JRI, and other funding sources.',
+              },
+              {
+                href: '/employer',
+                image: '/images/heroes/hero-employers.jpg',
+                alt: 'Employer meeting with trained candidates',
+                label: 'I&apos;m an employer',
+                desc: 'Hire credentialed graduates, access WOTC tax credits up to $9,600/hire, and get OJT wage reimbursements.',
+              },
+              {
+                href: '/store',
+                image: '/images/heroes/lms-dashboard.jpg',
+                alt: 'Platform dashboard on office screens',
+                label: 'I run a school',
+                desc: 'License the Elevate platform for your organization. White-label LMS with enrollment, compliance, and reporting.',
+              },
+            ].map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="flex flex-col items-center gap-3 p-5 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
+              >
+                <div className="relative w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
+                  <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="56px" />
+                </div>
+                <span className="font-semibold text-slate-900 group-hover:text-brand-blue-600">{item.label}</span>
+                <span className="text-sm text-slate-500">{item.desc}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
@@ -92,19 +108,20 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             {[
-              { title: 'Career Opportunities', desc: 'See our career pathways and find the best fit for your future.', href: '/programs', image: '/images/hero/hero-hands-on-training.jpg' },
-              { title: 'Funding Available', desc: 'Most programs are 100% free through WIOA, WRG, and JRI funding.', href: '/funding', image: '/images/heroes-hq/funding-hero.jpg' },
-              { title: 'Hire Our Graduates', desc: 'Our candidates come out credentialed and ready to work.', href: '/employer', image: '/images/heroes-hq/employer-hero.jpg' },
+              { title: 'Career Opportunities', desc: 'We offer certification programs in healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking, IT/cybersecurity, and barbering. Most programs are 4-16 weeks and include hands-on training.', href: '/programs', image: '/images/hero/hero-hands-on-training.jpg' },
+              { title: 'Funding Available', desc: 'Most students pay nothing. WIOA covers tuition, books, and supplies. The Workforce Ready Grant funds high-demand certifications. JRI provides paid apprenticeships for justice-involved individuals. Check your eligibility online in minutes.', href: '/funding', image: '/images/homepage/funded-programs.jpg' },
+              { title: 'Hire Our Graduates', desc: 'Employers: our graduates hold industry-recognized credentials and are ready to work. Access WOTC tax credits (up to $9,600/hire), OJT wage reimbursements (50-75% of wages), and post jobs directly to our candidate pool.', href: '/employer', image: '/images/heroes/employer-partner-1.jpg' },
             ].map((card) => (
               <Link key={card.title} href={card.href} className="group block">
-                <Image
-                  src={card.image}
-                  alt={card.title}
-                  width={800}
-                  height={533}
-                  sizes="(max-width: 1024px) 100vw, 33vw"
-                  className="w-full h-auto rounded-lg"
-                />
+                <div className="relative aspect-[3/2] rounded-lg overflow-hidden">
+                  <Image
+                    src={card.image}
+                    alt={card.title}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 33vw"
+                    className="object-cover"
+                  />
+                </div>
                 <div className="pt-5">
                   <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">{card.title}</h3>
                   <p className="text-base text-slate-700 mb-3">{card.desc}</p>
@@ -163,10 +180,10 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { title: 'Register', desc: 'Sign up at indianacareerconnect.com to determine funding eligibility.', href: '/funding', image: '/images/heroes-hq/how-it-works-hero.jpg' },
+              { title: 'Register', desc: 'Sign up at indianacareerconnect.com to determine funding eligibility.', href: '/funding', image: '/images/heroes/hero-state-funding.jpg' },
               { title: 'Choose a Program', desc: 'Pick the career path that fits your goals and schedule.', href: '/programs', image: '/images/heroes-hq/programs-hero.jpg' },
-              { title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works', image: '/images/programs-hq/training-classroom.jpg' },
-              { title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services', image: '/images/heroes-hq/career-services-hero.jpg' },
+              { title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works', image: '/images/artlist/hero-training-2.jpg' },
+              { title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services', image: '/images/heroes/success-story-1.jpg' },
             ].map((step) => (
               <div key={step.title} className="text-center">
                 <Image
@@ -205,10 +222,10 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/heroes-hq/funding-hero.jpg' },
+              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/heroes/cash-bills.jpg' },
               { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost.', href: '/funding/state-programs', image: '/images/programs-hq/students-learning.jpg' },
               { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/funding/funding-jri-program-v2.jpg' },
-              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/heroes-hq/career-services-hero.jpg', external: true },
+              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/heroes/career-services.jpg', external: true },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
                 <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-auto" />
@@ -280,13 +297,15 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'Pre-trained Candidates', desc: 'Certified and ready to work from day one.', href: '/career-services', image: '/images/heroes-hq/success-hero.jpg' },
-              { label: 'WOTC Tax Credits', desc: 'Up to $9,600 per hire for qualifying employees.', href: '/employer', image: '/images/programs-hq/business-office.jpg' },
-              { label: 'OJT Reimbursement', desc: 'Covers 50-75% of wages during on-the-job training.', href: '/ojt-and-funding', image: '/images/heroes-hq/career-services-hero.jpg' },
-              { label: 'Post Jobs Online', desc: 'Browse candidates and post openings through our portal.', href: '/employer', image: '/images/programs-hq/business-training.jpg' },
+              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. They are background-checked, drug-tested, and ready to start working on day one.', href: '/career-services', image: '/images/heroes/success-story-2.jpg' },
+              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives you up to $9,600 per qualifying hire. We help you identify eligible candidates and file the paperwork before the 28-day deadline.', href: '/employer', image: '/images/heroes/employer-partner-2.jpg' },
+              { label: 'OJT Reimbursement', desc: 'On-the-Job Training funding reimburses 50-75% of a new hire\'s wages during their training period. You train them your way while the workforce board covers most of the cost.', href: '/ojt-and-funding', image: '/images/hero-new/hero-2.jpg' },
+              { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/programs-hq/business-training.jpg' },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
-                <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-auto" />
+                <div className="relative aspect-[3/2]">
+                  <Image src={item.image} alt={item.label} fill className="object-cover" sizes="(max-width: 640px) 100vw, 50vw" />
+                </div>
                 <div className="p-5">
                   <h3 className="font-bold text-slate-900 text-lg mb-1">{item.label}</h3>
                   <p className="text-slate-600 text-sm mb-4">{item.desc}</p>

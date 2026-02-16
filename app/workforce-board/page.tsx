@@ -43,7 +43,7 @@ export default async function WorkforceBoardPage() {
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/trades/hero-program-hvac.jpg',
+      image: '/images/gallery/image9.jpg',
       title: 'Compliance Reporting',
       description: 'Automated WIOA, DOL, and state compliance reports with audit trails',
       href: '/workforce-board/reports',
@@ -61,7 +61,7 @@ export default async function WorkforceBoardPage() {
       href: '/workforce-board/reports',
     },
     {
-      image: '/images/trades/hero-program-cdl.jpg',
+      image: '/images/programs-hq/cdl-trucking.jpg',
       title: 'Goal Monitoring',
       description: 'Track progress toward performance goals and benchmarks',
       href: '/workforce-board/reports/performance',
@@ -111,7 +111,7 @@ export default async function WorkforceBoardPage() {
       </div>
 
       {/* Video Hero Section */}
-      <section className="relative h-[500px] md:h-[600px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-[300px] md:h-[380px] flex items-center justify-center text-white overflow-hidden">
         <video
           autoPlay
           muted

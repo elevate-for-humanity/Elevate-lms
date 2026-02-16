@@ -1,34 +1,69 @@
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
+import { CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+
+const participants = [
+  { name: 'Marcus Johnson', title: 'Adult', eligible: true, barriers: ['Low Income', 'Basic Skills Deficient'], ita: '$4,500', status: 'Active' },
+  { name: 'Sarah Williams', title: 'Dislocated Worker', eligible: true, barriers: ['Plant Closure'], ita: '$6,200', status: 'Active' },
+  { name: 'David Chen', title: 'Youth', eligible: true, barriers: ['Out of School', 'Foster Care'], ita: '$3,800', status: 'Active' },
+  { name: 'Maria Garcia', title: 'Adult', eligible: true, barriers: ['English Language Learner'], ita: '$4,500', status: 'Pending Docs' },
+  { name: 'James Brown', title: 'Dislocated Worker', eligible: true, barriers: ['Long-term Unemployed'], ita: '$5,100', status: 'Active' },
+  { name: 'Aisha Patel', title: 'Youth', eligible: false, barriers: [], ita: '—', status: 'Ineligible' },
+];
 
 export default function DemoWioaPage() {
   return (
-    <DemoPageShell title="WIOA Eligibility" description="Workforce Innovation and Opportunity Act eligibility tracking">
-      <div className="space-y-4">
-        <div className="grid sm:grid-cols-3 gap-3">
-          <div className="bg-white rounded-lg border p-4 text-center">
-            <p className="text-2xl font-bold text-brand-blue-600">38</p>
-            <p className="text-xs text-gray-500">WIOA Eligible</p>
-          </div>
-          <div className="bg-white rounded-lg border p-4 text-center">
-            <p className="text-2xl font-bold text-green-600">12</p>
-            <p className="text-xs text-gray-500">Enrolled via WIOA</p>
-          </div>
-          <div className="bg-white rounded-lg border p-4 text-center">
-            <p className="text-2xl font-bold text-amber-600">5</p>
-            <p className="text-xs text-gray-500">Pending Review</p>
-          </div>
+    <DemoPageShell title="WIOA" description="WIOA eligibility, Individual Training Accounts, and participant tracking." portal="admin">
+      <div className="grid sm:grid-cols-3 gap-4 mb-6">
+        <div className="bg-white rounded-xl border p-4">
+          <div className="text-2xl font-bold text-gray-900">182</div>
+          <div className="text-xs text-gray-500">WIOA Participants</div>
         </div>
-        <div className="bg-white rounded-lg border p-4">
-          <h3 className="font-bold text-gray-900 mb-3">Eligibility Criteria Tracking</h3>
-          <div className="space-y-2 text-sm">
-            {['Low Income', 'Public Assistance', 'Veterans', 'Displaced Workers', 'Youth (16-24)'].map((c) => (
-              <div key={c} className="flex items-center justify-between py-2 border-b last:border-0">
-                <span className="text-gray-900">{c}</span>
-                <span className="text-gray-500">{Math.floor(Math.random() * 15 + 3)} participants</span>
-              </div>
+        <div className="bg-white rounded-xl border p-4">
+          <div className="text-2xl font-bold text-gray-900">$847K</div>
+          <div className="text-xs text-gray-500">ITA Funds Obligated</div>
+        </div>
+        <div className="bg-white rounded-xl border p-4">
+          <div className="text-2xl font-bold text-gray-900">94%</div>
+          <div className="text-xs text-gray-500">Eligibility Verified</div>
+        </div>
+      </div>
+      <div className="bg-white rounded-xl border overflow-hidden">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-xs text-gray-500 border-b bg-gray-50">
+              <th className="px-5 py-3 font-medium">Participant</th>
+              <th className="px-5 py-3 font-medium">Title</th>
+              <th className="px-5 py-3 font-medium">Barriers</th>
+              <th className="px-5 py-3 font-medium">ITA</th>
+              <th className="px-5 py-3 font-medium">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {participants.map((p, i) => (
+              <tr key={i} className="border-b last:border-0 hover:bg-gray-50">
+                <td className="px-5 py-3 font-medium text-gray-900">{p.name}</td>
+                <td className="px-5 py-3 text-gray-600">{p.title}</td>
+                <td className="px-5 py-3">
+                  <div className="flex flex-wrap gap-1">
+                    {p.barriers.map((b) => (
+                      <span key={b} className="px-1.5 py-0.5 bg-gray-100 text-gray-600 rounded text-[10px]">{b}</span>
+                    ))}
+                    {p.barriers.length === 0 && <span className="text-xs text-gray-400">—</span>}
+                  </div>
+                </td>
+                <td className="px-5 py-3 text-gray-600">{p.ita}</td>
+                <td className="px-5 py-3">
+                  <span className="flex items-center gap-1">
+                    {p.status === 'Active' && <CheckCircle className="w-3.5 h-3.5 text-green-500" />}
+                    {p.status === 'Pending Docs' && <Clock className="w-3.5 h-3.5 text-amber-500" />}
+                    {p.status === 'Ineligible' && <AlertTriangle className="w-3.5 h-3.5 text-red-500" />}
+                    <span className="text-xs">{p.status}</span>
+                  </span>
+                </td>
+              </tr>
             ))}
-          </div>
-        </div>
+          </tbody>
+        </table>
       </div>
     </DemoPageShell>
   );

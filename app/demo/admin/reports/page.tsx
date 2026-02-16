@@ -1,42 +1,40 @@
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
-import { DEMO_METRICS } from '@/lib/demo/sandbox-data';
+import { FileText, Download } from 'lucide-react';
 
 const reports = [
-  { name: 'Enrollment Report', description: 'Active and historical enrollment data' },
-  { name: 'Completion Report', description: 'Program completion rates and outcomes' },
-  { name: 'WIOA Compliance', description: 'Federal workforce compliance metrics' },
-  { name: 'Financial Summary', description: 'Funding received and expenditures' },
-  { name: 'Partner Activity', description: 'Employer partner engagement metrics' },
-  { name: 'Placement Report', description: 'Job placement rates and wage data' },
+  { name: 'PIRL Quarterly Report', period: 'Q4 2025', status: 'Overdue', format: 'CSV' },
+  { name: 'WIOA Performance Summary', period: 'Q3 2025', status: 'Submitted', format: 'PDF' },
+  { name: 'Enrollment by Program', period: 'January 2026', status: 'Ready', format: 'Excel' },
+  { name: 'Completion & Credential Report', period: 'Q3 2025', status: 'Submitted', format: 'PDF' },
+  { name: 'Funding Utilization', period: 'FY 2025', status: 'Ready', format: 'Excel' },
+  { name: 'Employer Outcome Tracking', period: 'Q4 2025', status: 'Draft', format: 'PDF' },
+  { name: 'Attendance & Compliance', period: 'January 2026', status: 'Ready', format: 'Excel' },
 ];
 
 export default function DemoReportsPage() {
-  const m = DEMO_METRICS;
   return (
-    <DemoPageShell title="Reports" description="Analytics and reporting dashboard">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <div className="bg-white rounded-lg border p-3 text-center">
-          <p className="text-2xl font-bold text-gray-900">{m.totalStudents}</p>
-          <p className="text-xs text-gray-500">Total Students</p>
-        </div>
-        <div className="bg-white rounded-lg border p-3 text-center">
-          <p className="text-2xl font-bold text-green-600">{m.placementRate}%</p>
-          <p className="text-xs text-gray-500">Placement Rate</p>
-        </div>
-        <div className="bg-white rounded-lg border p-3 text-center">
-          <p className="text-2xl font-bold text-gray-900">${m.averageWage}/hr</p>
-          <p className="text-xs text-gray-500">Avg Wage</p>
-        </div>
-        <div className="bg-white rounded-lg border p-3 text-center">
-          <p className="text-2xl font-bold text-gray-900">${(m.fundingReceived / 1000).toFixed(0)}k</p>
-          <p className="text-xs text-gray-500">Funding</p>
-        </div>
-      </div>
-      <div className="grid sm:grid-cols-2 gap-3">
-        {reports.map((r) => (
-          <div key={r.name} className="bg-white rounded-lg border p-4 hover:shadow-sm transition">
-            <h3 className="font-bold text-gray-900">{r.name}</h3>
-            <p className="text-sm text-gray-500 mt-1">{r.description}</p>
+    <DemoPageShell title="Reports" description="Generate and download compliance, enrollment, and outcome reports." portal="admin">
+      <div className="space-y-3">
+        {reports.map((r, i) => (
+          <div key={i} className="bg-white rounded-xl border p-4 flex items-center justify-between hover:shadow-sm transition">
+            <div className="flex items-center gap-3">
+              <FileText className="w-5 h-5 text-gray-400" />
+              <div>
+                <div className="font-medium text-gray-900 text-sm">{r.name}</div>
+                <div className="text-xs text-gray-500">{r.period} · {r.format}</div>
+              </div>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+                r.status === 'Submitted' ? 'bg-green-100 text-green-800' :
+                r.status === 'Overdue' ? 'bg-red-100 text-red-800' :
+                r.status === 'Ready' ? 'bg-brand-blue-100 text-brand-blue-800' :
+                'bg-gray-100 text-gray-600'
+              }`}>{r.status}</span>
+              <button className="p-2 text-gray-400 hover:text-gray-600 rounded-lg hover:bg-gray-50">
+                <Download className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         ))}
       </div>

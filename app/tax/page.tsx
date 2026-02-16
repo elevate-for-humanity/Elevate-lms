@@ -44,7 +44,7 @@ export default function TaxServicesPage() {
 {/* Hero Section */}
       <section className="relative min-h-[550px] flex items-center overflow-hidden">
         <Image
-          src="/images/business/tax-prep-certification.jpg"
+          src="/images/business/customer-service.jpg"
           alt="Tax Preparation Services"
           fill
           className="object-cover"

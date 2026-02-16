@@ -1452,34 +1452,14 @@ section {
   box-shadow: var(--efh-card-shadow) !important;
 }
 
-/* 4) Typography readability guardrails - scoped to content */
-main h1, main h2, main h3, main h4,
-section h1, section h2, section h3, section h4,
-article h1, article h2, article h3, article h4 {
-  color: #0f172a; /* slate-900 */
-}
+/* Typography: let Tailwind classes control colors.
+   Previous global overrides forced dark text on hero sections and dark backgrounds. */
 
-/* Body text color - scoped to main content, not header/nav */
-main p,
-main li,
-main span,
-section p,
-section li,
-section span,
-article p,
-article li,
-article span {
-  color: #334155; /* slate-700 */
-}
-
-/* Links readable and professional */
+/* Links - inherit color, don't force underline on hover (breaks nav/buttons) */
 a {
   color: inherit;
   text-decoration-thickness: 1px;
   text-underline-offset: 3px;
-}
-a:hover {
-  text-decoration: underline;
 }
 
 /* 5) Images: prevent "cheap" stretching - exclude Next.js Image */
@@ -1776,37 +1756,8 @@ header[role="banner"] a.\!text-white {
  * are excluded via :not() selectors.
  */
 
-/* --- Fix light-grey body text on light backgrounds --- */
-
-/* gray-300 (#d1d5db) → gray-700 (#374151) on light backgrounds */
-:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50, [class*="bg-white"]) .text-gray-300:not(footer .text-gray-300):not([class*="bg-slate-9"] .text-gray-300):not([class*="bg-gray-9"] .text-gray-300):not([class*="bg-blue-9"] .text-gray-300) {
-  color: #374151;
-}
-
-/* gray-400 (#9ca3af) → gray-700 (#374151) */
-:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50) .text-gray-400:not(footer .text-gray-400):not([class*="bg-slate-9"] .text-gray-400):not([class*="bg-gray-9"] .text-gray-400) {
-  color: #374151;
-}
-
-/* gray-500 (#6b7280) → gray-800 (#1f2937) */
-:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50) .text-gray-500:not(footer .text-gray-500):not([class*="bg-slate-9"] .text-gray-500):not([class*="bg-gray-9"] .text-gray-500) {
-  color: #1f2937;
-}
-
-/* slate-300 (#cbd5e1) → slate-700 (#334155) on light backgrounds */
-:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50) .text-slate-300:not(footer .text-slate-300):not([class*="bg-slate-9"] .text-slate-300):not([class*="bg-gray-9"] .text-slate-300) {
-  color: #334155;
-}
-
-/* slate-400 (#94a3b8) → slate-700 (#334155) */
-:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50) .text-slate-400:not(footer .text-slate-400):not([class*="bg-slate-9"] .text-slate-400):not([class*="bg-gray-9"] .text-slate-400) {
-  color: #334155;
-}
-
-/* slate-500 (#64748b) → slate-800 (#1e293b) */
-:where(main, section, .bg-white, .bg-slate-50, .bg-stone-50, .bg-gray-50) .text-slate-500:not(footer .text-slate-500):not([class*="bg-slate-9"] .text-slate-500):not([class*="bg-gray-9"] .text-slate-500) {
-  color: #1e293b;
-}
+/* Light-grey text overrides removed — Tailwind utility classes control text color.
+   Previous rules forced gray-300/400/500 to darker values, killing visual hierarchy. */
 
 /* zinc/neutral grey variants → same treatment */
 :where(main, section) .text-zinc-400,
@@ -1869,11 +1820,5 @@ header[role="banner"] a.\!text-white {
   color: #1f2937; /* gray-800 */
 }
 
-/* --- Trust badges and small labels: darken from slate-500 --- */
-:where(main) .text-xs.text-slate-500,
-:where(main) .text-xs.text-gray-500,
-:where(main) .text-sm.text-slate-500,
-:where(main) .text-sm.text-gray-500 {
-  color: #374151;
-}
+/* Trust badge/label overrides removed — Tailwind controls text color */
 

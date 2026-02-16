@@ -56,7 +56,7 @@ const instantTests = [
       'Combined reporting',
     ],
     turnaround: '5-10 minutes',
-    image: '/images/heroes-hq/employer-hero.jpg',
+    image: '/images/heroes/contact.jpg',
   },
 ];
 

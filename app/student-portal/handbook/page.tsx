@@ -29,7 +29,7 @@ export default function StudentHandbookPage() {
       {/* Hero */}
       <section className="relative h-[250px] md:h-[300px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/programs-hq/students-learning.jpg"
+          src="/images/heroes/student-catalog.jpg"
           alt="Student handbook"
           fill
           className="object-cover"

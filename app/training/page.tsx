@@ -14,7 +14,7 @@ const PROGRAM_AREAS = [
   { title: 'Healthcare', desc: 'CNA, Medical Assistant, Phlebotomy, Home Health Aide', icon: Stethoscope, href: '/programs/healthcare', image: '/images/programs-hq/healthcare-hero.jpg' },
   { title: 'Skilled Trades', desc: 'Welding, HVAC, Electrical, Plumbing, Construction', icon: Wrench, href: '/programs/skilled-trades', image: '/images/programs-hq/skilled-trades-hero.jpg' },
   { title: 'Technology', desc: 'IT Support, Cybersecurity, CompTIA Certifications', icon: Monitor, href: '/programs/technology', image: '/images/programs-hq/technology-hero.jpg' },
-  { title: 'CDL & Transportation', desc: 'Class A CDL, Commercial Driving, Logistics', icon: Truck, href: '/programs/cdl', image: '/images/programs-hq/cdl-trucking.jpg' },
+  { title: 'CDL & Transportation', desc: 'Class A CDL, Commercial Driving, Logistics', icon: Truck, href: '/programs/cdl', image: '/images/artlist/hero-training-6.jpg' },
   { title: 'Barbering & Cosmetology', desc: 'Barber Apprenticeship, Cosmetology, Nail Technician', icon: Scissors, href: '/programs/barber-apprenticeship', image: '/images/programs-hq/barber-hero.jpg' },
   { title: 'Business & Professional', desc: 'Tax Preparation, Office Administration, Entrepreneurship', icon: BookOpen, href: '/programs/business', image: '/images/programs-hq/business-training.jpg' },
 ];
@@ -28,7 +28,7 @@ export default function TrainingPage() {
 
       {/* Hero */}
       <section className="relative h-[300px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
-        <Image src="/images/heroes-hq/programs-hero.jpg" alt="Career training programs" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/hero/training-providers-hero.jpg" alt="Career training programs" fill className="object-cover" priority sizes="100vw" />
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-3xl md:text-5xl font-bold mb-4">Training Programs</h1>
@@ -51,7 +51,7 @@ export default function TrainingPage() {
               return (
                 <Link key={p.title} href={p.href} className="group bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg transition-all">
                   <div className="relative h-40">
-                    <Image src={p.image} alt={p.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
+                    <Image src={p.image} alt={p.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 100vw, 33vw" />
                   </div>
                   <div className="p-5">
                     <div className="flex items-center gap-2 mb-2">

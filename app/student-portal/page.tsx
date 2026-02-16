@@ -53,7 +53,7 @@ export default async function StudentPortalPage() {
       description: 'Access course materials, lectures, and assignments',
       href: '/lms/courses',
       color: 'blue',
-      image: '/images/trades/program-building-construction.jpg',
+      image: '/images/heroes/student-community.jpg',
     },
     {
       icon: Calendar,
@@ -61,7 +61,7 @@ export default async function StudentPortalPage() {
       description: 'View class schedule, deadlines, and upcoming events',
       href: '/student-portal/schedule',
       color: 'green',
-      image: '/images/healthcare/healthcare-professional-portrait-1.jpg',
+      image: '/images/heroes/student-courses.jpg',
     },
     {
       icon: BarChart3,
@@ -77,7 +77,7 @@ export default async function StudentPortalPage() {
       description: 'Connect with instructors and get support',
       href: '/lms/support',
       color: 'orange',
-      image: '/images/team-hq/team-meeting.jpg',
+      image: '/images/heroes/student-career.jpg',
     },
     {
       icon: Briefcase,
@@ -85,7 +85,7 @@ export default async function StudentPortalPage() {
       description: 'Resume help, job placement, and interview prep',
       href: '/career-services',
       color: 'teal',
-      image: '/images/business/tax-prep-certification.jpg',
+      image: '/images/heroes/student-progress.jpg',
     },
     {
       icon: FileText,
@@ -301,7 +301,7 @@ export default async function StudentPortalPage() {
                 className="bg-white border-2 border-gray-200 rounded-2xl overflow-hidden hover:border-brand-blue-600 hover:shadow-lg transition group"
               >
                 <div className="relative h-36">
-                  <Image src={link.image} alt={link.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <Image src={link.image} alt={link.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-black mb-2 group-hover:text-brand-blue-600 transition">

@@ -23,7 +23,7 @@ export default function EmployerPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/hero-images/employer-hero.jpg" alt="Employer partnership" fill className="object-cover" priority />
+        <Image src="/hero-images/employer-hero.jpg" alt="Employer partnership" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -45,12 +45,12 @@ export default function EmployerPage() {
             {[
               { step: '1', title: 'Tell Us Your Needs', desc: 'Submit your hiring needs — roles, skills, and timeline.', image: '/images/heroes/workforce-partner-3.jpg' },
               { step: '2', title: 'We Train Candidates', desc: 'We recruit and train workers in your specific skill requirements.', image: '/images/homepage/training-program-collage.png' },
-              { step: '3', title: 'You Interview', desc: 'Meet pre-screened candidates. Only interview qualified people.', image: '/images/heroes-hq/career-services-hero.jpg' },
-              { step: '4', title: 'Hire & Save', desc: 'Hire with tax credits and wage reimbursements.', image: '/images/heroes-hq/employer-hero.jpg' },
+              { step: '3', title: 'You Interview', desc: 'Meet pre-screened candidates. Only interview qualified people.', image: '/images/employers/partnership-meeting.jpg' },
+              { step: '4', title: 'Hire & Save', desc: 'Hire with tax credits and wage reimbursements.', image: '/images/hub/employer.jpg' },
             ].map((item) => (
               <div key={item.step} className="flex sm:flex-col gap-4 sm:gap-0 rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-28 h-28 sm:w-full sm:h-[140px] flex-shrink-0 sm:flex-shrink">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                   <div className="absolute top-2 left-2 w-7 h-7 bg-brand-blue-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">{item.step}</div>
                 </div>
                 <div className="py-3 pr-3 sm:p-4 flex-1">
@@ -77,7 +77,7 @@ export default function EmployerPage() {
             ].map((item) => (
               <Link key={item.title} href={item.href} className="flex gap-4 bg-white rounded-xl border border-slate-200 p-4 hover:shadow-lg transition-shadow group">
                 <div className="relative w-20 h-20 sm:w-28 sm:h-28 rounded-lg overflow-hidden flex-shrink-0">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>

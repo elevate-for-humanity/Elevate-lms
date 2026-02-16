@@ -29,13 +29,13 @@ const features = [
   {
     title: 'Audit Logging',
     description: 'Complete audit trail of all data access and modifications.',
-    image: '/images/team-hq/team-meeting.jpg',
+    image: '/images/homepage/licensable-platform.jpg',
     items: ['Access logging', 'Change tracking', 'Export history', 'Compliance reports'],
   },
   {
     title: 'Consent Management',
     description: 'Digital consent forms and parent/guardian authorization workflows.',
-    image: '/images/business/tax-prep-certification.jpg',
+    image: '/images/homepage/licensable-platform.jpg',
     items: ['Digital consent forms', 'Parent authorization', 'Opt-out tracking', 'Consent expiration'],
   },
 ];
@@ -94,7 +94,7 @@ export default function FERPACompliancePage() {
       {/* Hero */}
       <section className="relative bg-brand-blue-700 text-white py-20 overflow-hidden">
         <div className="absolute inset-0">
-          <Image src="/images/technology/hero-program-cybersecurity.jpg" alt="FERPA" fill className="object-cover opacity-30" />
+          <Image src="/images/technology/hero-program-cybersecurity.jpg" alt="FERPA" fill sizes="100vw" className="object-cover opacity-30" />
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -145,7 +145,7 @@ export default function FERPACompliancePage() {
             {features.map((feature) => (
               <div key={feature.title} className="bg-white rounded-2xl overflow-hidden border-2 border-gray-200 hover:border-brand-blue-500 hover:shadow-xl transition-all group">
                 <div className="relative h-48">
-                  <Image src={feature.image} alt={feature.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" />
+                  <Image src={feature.image} alt={feature.title} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-cover group-hover:scale-105 transition-transform duration-300" />
                   <h3 className="absolute bottom-4 left-4 text-xl font-bold text-slate-900">{feature.title}</h3>
                 </div>
                 <div className="p-6">

@@ -62,7 +62,7 @@ export default function EmployerPortalLanding() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Apprentice Management" fill className="object-cover" />
+                <Image src="/images/healthcare/healthcare-programs-grid.jpg" alt="Apprentice Management" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Apprentice Management</h3>
@@ -71,7 +71,7 @@ export default function EmployerPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/healthcare/healthcare-professional-portrait-1.jpg" alt="Training Progress" fill className="object-cover" />
+                <Image src="/images/employers/employer-meeting.jpg" alt="Training Progress" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Training Progress</h3>
@@ -80,7 +80,7 @@ export default function EmployerPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/business/tax-prep-certification.jpg" alt="Documents" fill className="object-cover" />
+                <Image src="/images/homepage/employers.jpg" alt="Documents" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Documents</h3>
@@ -89,7 +89,7 @@ export default function EmployerPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/business/tax-prep-certification.jpg" alt="Payroll" fill className="object-cover" />
+                <Image src="/images/business/tax-prep-certification.jpg" alt="Payroll" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Payroll</h3>
@@ -98,7 +98,7 @@ export default function EmployerPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/team-hq/team-meeting.jpg" alt="Job Postings" fill className="object-cover" />
+                <Image src="/images/hub/employer.jpg" alt="Job Postings" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Job Postings</h3>
@@ -107,7 +107,7 @@ export default function EmployerPortalLanding() {
             </div>
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border">
               <div className="relative h-32">
-                <Image src="/images/business/handshake-1.jpg" alt="Company Profile" fill className="object-cover" />
+                <Image src="/images/business/handshake-1.jpg" alt="Company Profile" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <h3 className="text-lg font-bold text-slate-900 mb-2">Company Profile</h3>

@@ -32,7 +32,7 @@ export default function HealthcareProgramsPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/hero/hero-healthcare.jpg" alt="Healthcare Training Programs" fill className="object-cover" priority />
+        <Image src="/images/hero/hero-healthcare.jpg" alt="Healthcare Training Programs" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -99,7 +99,7 @@ export default function HealthcareProgramsPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row gap-5 items-start">
             <div className="relative w-full h-[200px] sm:w-72 sm:h-[280px] rounded-xl overflow-hidden flex-shrink-0">
-              <Image src="/images/healthcare/hero-programs-healthcare.jpg" alt="Healthcare training" fill className="object-cover" />
+              <Image src="/images/healthcare/hero-programs-healthcare.jpg" alt="Healthcare training" fill sizes="100vw" className="object-cover" />
             </div>
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>

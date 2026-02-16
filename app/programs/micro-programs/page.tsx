@@ -30,7 +30,7 @@ export default function MicroProgramsPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/hero/hero-certifications.jpg" alt="Micro Programs — Short-Term Certifications" fill className="object-cover" priority />
+        <Image src="/images/hero/hero-certifications.jpg" alt="Micro Programs — Short-Term Certifications" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -106,7 +106,7 @@ export default function MicroProgramsPage() {
               {
                 name: 'OSHA 10/30',
                 href: '/programs/skilled-trades',
-                img: '/images/trades/program-building-construction.jpg',
+                img: '/images/hero/training-providers-hero.jpg',
                 duration: '1–4 days',
                 desc: 'OSHA safety certification for construction and general industry. 10-hour and 30-hour courses available.',
               },

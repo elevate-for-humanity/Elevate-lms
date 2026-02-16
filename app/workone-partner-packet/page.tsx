@@ -228,7 +228,7 @@ export default function WorkOnePartnerPacketPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32">
-                <Image src="/images/programs-hq/business-training.jpg" alt="Referral" fill className="object-cover" />
+                <Image src="/images/programs-hq/business-training.jpg" alt="Referral" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">1</div>
@@ -241,7 +241,7 @@ export default function WorkOnePartnerPacketPage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32">
-                <Image src="/images/programs-hq/students-learning.jpg" alt="Enrollment" fill className="object-cover" />
+                <Image src="/images/homepage/employer-partnership.png" alt="Enrollment" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">2</div>
@@ -254,7 +254,7 @@ export default function WorkOnePartnerPacketPage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32">
-                <Image src="/images/programs-new/program-14.jpg" alt="Training" fill className="object-cover" />
+                <Image src="/images/programs-new/program-14.jpg" alt="Training" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">3</div>
@@ -267,7 +267,7 @@ export default function WorkOnePartnerPacketPage() {
 
             <div className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
               <div className="relative h-32">
-                <Image src="/images/programs-new/program-16.jpg" alt="Placement" fill className="object-cover" />
+                <Image src="/images/programs-new/program-16.jpg" alt="Placement" fill sizes="100vw" className="object-cover" />
               </div>
               <div className="p-6">
                 <div className="w-12 h-12 bg-teal-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-4 -mt-10 relative z-10 border-4 border-white">4</div>
@@ -310,7 +310,7 @@ export default function WorkOnePartnerPacketPage() {
             ].map((program, index) => (
               <div key={index} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-200">
                 <div className="relative h-40">
-                  <Image src={program.image} alt={program.title} fill className="object-cover" />
+                  <Image src={program.image} alt={program.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{program.title}</h3>
@@ -399,7 +399,7 @@ export default function WorkOnePartnerPacketPage() {
       {/* CTA with Background Image */}
       <section className="relative py-20">
         <div className="absolute inset-0">
-          <Image src="/images/employers/partnership-office-meeting.jpg" alt="Partnership" fill className="object-cover" />
+          <Image src="/images/employers/partnership-office-meeting.jpg" alt="Partnership" fill sizes="100vw" className="object-cover" />
           <div className="absolute inset-0 bg-teal-600/90" />
         </div>
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">

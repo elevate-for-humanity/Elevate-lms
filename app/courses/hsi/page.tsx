@@ -84,7 +84,7 @@ export default async function HsiPage() {
         ]}
       />
       {/* Hero Section */}
-      <section className="relative h-[500px] md:h-[600px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-[300px] md:h-[380px] flex items-center justify-center text-white overflow-hidden">
         <Image
           src="/images/programs-hq/skilled-trades-hero.jpg"
           alt="HSI Safety Training"

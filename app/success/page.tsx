@@ -41,7 +41,7 @@ export default async function SuccessStoriesPage() {
       {/* Hero */}
       <section className="relative w-full -mt-[72px]">
         <div className="relative min-h-[70vh] w-full overflow-hidden">
-          <Image src="/images/healthcare/hero-healthcare-professionals.jpg" alt="Success Stories" width={800} height={600} className="absolute inset-0 h-full w-full object-cover" quality={85} loading="lazy" />
+          <Image src="/images/heroes/success-story-1.jpg" alt="Success Stories" width={800} height={600} className="absolute inset-0 h-full w-full object-cover" quality={85} loading="lazy" />
           <div className="relative z-10 flex items-center justify-center min-h-[70vh]">
             <div className="container mx-auto px-4 text-center text-white">
               <h1 className="text-5xl md:text-6xl font-bold mb-6">

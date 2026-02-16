@@ -50,6 +50,18 @@ export const NAV_ITEMS = [
     ]
   },
   { 
+    name: 'Platform', 
+    href: '/store',
+    subItems: [
+      { name: 'Platform Overview', href: '/store' },
+      { name: 'Licensing', href: '/store/licensing' },
+      { name: 'Managed Platform', href: '/store/licensing/managed' },
+      { name: 'Enterprise Access', href: '/store/licensing/enterprise' },
+      { name: 'Demos', href: '/store/demos' },
+      { name: 'Add-Ons', href: '/store/add-ons' },
+    ]
+  },
+  { 
     name: 'Support', 
     href: '/support',
     subItems: [

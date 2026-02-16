@@ -45,9 +45,9 @@ export default async function SupportiveServicesPage() {
         <Breadcrumbs items={[{ label: "Workforce Board", href: "/workforce-board" }, { label: "Supportive Services" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
-          src="/images/healthcare/hero-healthcare-professionals.jpg"
+          src="/images/heroes/event-2.jpg"
           alt="Supportive Services"
           fill
           priority

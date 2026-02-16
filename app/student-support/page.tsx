@@ -56,7 +56,7 @@ export default function StudentSupportPage() {
 
       <div className="relative bg-green-800 text-white py-16">
         <Image
-          src="/images/heroes-hq/employer-hero.jpg"
+          src="/images/heroes/learners.jpg"
           alt="Student Support"
           fill
           className="object-cover opacity-30"

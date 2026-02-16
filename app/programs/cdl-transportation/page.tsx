@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     title: 'CDL & Transportation Programs | Indianapolis',
     description: 'CDL training, delivery driver, and logistics career programs.',
     url: `${SITE_URL}/programs/cdl-transportation`,
-    images: [{ url: `${SITE_URL}/images/trades/hero-program-cdl.jpg`, width: 1200, height: 630 }],
+    images: [{ url: `${SITE_URL}/images/programs-hq/hvac-technician.jpg`, width: 1200, height: 630 }],
   },
 };
 
@@ -30,7 +30,7 @@ export default function CDLTransportationPage() {
       </div>
 
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/trades/hero-program-cdl.jpg" alt="CDL & Transportation Programs" fill className="object-cover" priority />
+        <Image src="/images/programs-hq/cdl-trucking.jpg" alt="CDL & Transportation Programs" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -65,7 +65,7 @@ export default function CDLTransportationPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Link href="/programs/cdl-training" className="group">
               <div className="relative aspect-[3/2] rounded-xl overflow-hidden mb-2">
-                <Image src="/images/trades/hero-program-cdl.jpg" alt="CDL Training" fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="50vw" />
+                <Image src="/images/programs-hq/cdl-trucking.jpg" alt="CDL Training" fill className="object-cover group-hover:scale-105 transition-transform duration-500" sizes="50vw" />
               </div>
               <h3 className="font-bold text-slate-900 text-sm">CDL Training (Class A)</h3>
               <p className="text-slate-500 text-xs">4-8 weeks — $50K-$80K salary range</p>

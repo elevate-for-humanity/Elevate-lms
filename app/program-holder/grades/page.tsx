@@ -57,7 +57,7 @@ export default async function GradesPage() {
           <Breadcrumbs items={[{ label: "Program Holder", href: "/program-holder" }, { label: "Grades" }]} />
         </div>
       {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
           src="/images/programs-catalog-hero.jpg"
           alt="Grades"

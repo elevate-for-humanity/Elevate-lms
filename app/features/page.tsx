@@ -60,7 +60,7 @@ export default function FeaturesPage() {
 
       {/* Hero */}
       <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
-        <Image src="/images/heroes-hq/how-it-works-hero.jpg" alt="Platform features" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/gallery/image8.jpg" alt="Platform features" fill className="object-cover" priority sizes="100vw" />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
         <div className="absolute inset-0 flex items-end">
           <div className="max-w-6xl mx-auto px-4 w-full pb-10 sm:pb-14">
@@ -95,7 +95,7 @@ export default function FeaturesPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-10 items-center">
             <div className="relative h-[300px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/heroes-hq/programs-hero.jpg" alt="Self-service platform" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
+              <Image src="/images/heroes/programs-overview.jpg" alt="Self-service platform" fill className="object-cover" sizes="(max-width: 768px) 100vw, 50vw" />
             </div>
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 mb-4">Built for Self-Service</h2>

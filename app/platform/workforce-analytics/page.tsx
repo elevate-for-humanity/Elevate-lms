@@ -58,7 +58,7 @@ export default function WorkforceAnalyticsPage() {
 
       {/* Hero */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
-        <Image src="/hero-images/technology-hero.jpg" alt="Workforce Analytics" fill className="object-cover" priority />
+        <Image src="/hero-images/technology-hero.jpg" alt="Workforce Analytics" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-indigo-900/75" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
           <span className="text-indigo-200 font-medium text-sm uppercase tracking-wider">Platform Solutions</span>
@@ -144,7 +144,7 @@ export default function WorkforceAnalyticsPage() {
         <div className="max-w-6xl mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="relative h-[350px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/technology/hero-program-it-support.jpg" alt="Analytics dashboard" fill className="object-cover" />
+              <Image src="/images/technology/hero-program-it-support.jpg" alt="Analytics dashboard" fill sizes="100vw" className="object-cover" />
             </div>
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-6">Integrated With Your Workflow</h2>

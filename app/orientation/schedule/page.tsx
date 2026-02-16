@@ -102,7 +102,7 @@ export default function OrientationSchedulePage() {
             </div>
             <div className="relative h-80 rounded-2xl overflow-hidden shadow-lg">
               <Image
-                src="/images/programs-hq/students-learning.jpg"
+                src="/images/gallery/image7.jpg"
                 alt="Students in orientation session"
                 fill
                 className="object-cover"

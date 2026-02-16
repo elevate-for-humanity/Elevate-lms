@@ -1,5 +1,2 @@
 import { redirect } from 'next/navigation';
-
-export default function BarberDemoRedirect() {
-  redirect('/store/demo');
-}
+export default function DemoBarberRedirect() { redirect('/demo/learner'); }

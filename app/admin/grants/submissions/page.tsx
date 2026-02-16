@@ -132,7 +132,7 @@ export default async function GrantSubmissionsPage() {
         {/* Hero Section */}
         <section className="relative h-[400px] md:h-[500px] flex items-center justify-center text-white overflow-hidden">
           <Image
-            src="/images/heroes-hq/funding-hero.jpg"
+            src="/images/homepage/funded-programs-optimized.jpg"
             alt="Grant Submissions"
             fill
             className="object-cover"

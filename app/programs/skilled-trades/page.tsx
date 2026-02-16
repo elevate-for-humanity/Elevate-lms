@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     title: 'Skilled Trades Training | Indianapolis',
     description: 'HVAC, Electrical, Welding, Plumbing — hands-on training with real job placement.',
     url: `${SITE_URL}/programs/skilled-trades`,
-    images: [{ url: `${SITE_URL}/images/trades/hero-program-hvac.jpg`, width: 1200, height: 630 }],
+    images: [{ url: `${SITE_URL}/images/trades/program-cdl-overview.jpg`, width: 1200, height: 630 }],
   },
 };
 
@@ -31,7 +31,7 @@ export default function SkilledTradesPage() {
       </div>
 
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/trades/hero-program-hvac.jpg" alt="Skilled Trades Training" fill className="object-cover" priority />
+        <Image src="/images/trades/hero-program-hvac.jpg" alt="Skilled Trades Training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -76,7 +76,7 @@ export default function SkilledTradesPage() {
               { name: 'Electrical', href: '/programs/electrical', img: '/images/trades/hero-program-electrical.jpg', duration: '8-16 weeks' },
               { name: 'Welding', href: '/programs/welding', img: '/images/trades/hero-program-welding.jpg', duration: '8-12 weeks' },
               { name: 'Plumbing', href: '/programs/plumbing', img: '/images/trades/hero-program-plumbing.jpg', duration: '8-16 weeks' },
-              { name: 'CDL Training', href: '/programs/cdl-training', img: '/images/trades/hero-program-cdl.jpg', duration: '4-8 weeks' },
+              { name: 'CDL Training', href: '/programs/cdl-training', img: '/images/trades/program-building-technology.jpg', duration: '4-8 weeks' },
               { name: 'Carpentry', href: '/programs/carpentry', img: '/images/trades/hero-program-carpentry.jpg', duration: '8-12 weeks' },
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group">
@@ -95,7 +95,7 @@ export default function SkilledTradesPage() {
         <div className="max-w-5xl mx-auto px-4">
           <div className="flex flex-col sm:flex-row gap-5 items-start">
             <div className="relative w-full h-[200px] sm:w-72 sm:h-[280px] rounded-xl overflow-hidden flex-shrink-0">
-              <Image src="/images/trades/program-building-construction.jpg" alt="Trades training" fill className="object-cover" />
+              <Image src="/images/industries/skilled-trades.jpg" alt="Trades training" fill sizes="100vw" className="object-cover" />
             </div>
             <div>
               <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mb-3">What You&apos;ll Learn</h2>

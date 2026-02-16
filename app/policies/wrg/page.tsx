@@ -21,7 +21,7 @@ export default function WRGPage() {
 
       {/* Hero */}
       <section className="relative min-h-[350px] flex items-center overflow-hidden">
-        <Image src="/hero-images/federal-funded-hero.jpg" alt="Workforce Ready Grant" fill className="object-cover" priority />
+        <Image src="/hero-images/federal-funded-hero.jpg" alt="Workforce Ready Grant" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-green-900/70" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-16 w-full">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Workforce Ready Grant</h1>

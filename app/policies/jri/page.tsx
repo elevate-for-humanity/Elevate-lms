@@ -22,7 +22,7 @@ export default function JRIPage() {
 
       {/* Hero */}
       <section className="relative min-h-[350px] flex items-center overflow-hidden">
-        <Image src="/hero-images/jri-hero.jpg" alt="Justice Reinvestment Initiative" fill className="object-cover" priority />
+        <Image src="/hero-images/jri-hero.jpg" alt="Justice Reinvestment Initiative" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-slate-900/70" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-16 w-full">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Justice Reinvestment Initiative</h1>

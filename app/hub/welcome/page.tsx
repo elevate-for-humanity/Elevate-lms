@@ -44,7 +44,7 @@ export default async function HubWelcomePage() {
     {
       title: 'Members',
       description: 'Connect with fellow learners, mentors, and industry professionals.',
-      image: '/images/heroes-hq/success-hero.jpg',
+      image: '/images/hub/cta.jpg',
       href: '/hub/members',
     },
     {
@@ -70,7 +70,7 @@ export default async function HubWelcomePage() {
     {
       title: 'Compliance Documentation',
       description: 'All your hours, credentials, and progress are documented automatically. Ready for audits, certifications, and employer verification.',
-      image: '/images/heroes-hq/career-services-hero.jpg',
+      image: '/images/hero-new/hero-9.jpg',
     },
   ];
 
@@ -92,7 +92,7 @@ export default async function HubWelcomePage() {
       name: 'Tech Graduate',
       program: 'IT Support',
       quote: 'Having everything in one place - courses, certifications, job prep - made all the difference.',
-      image: '/images/heroes-hq/employer-hero.jpg',
+      image: '/images/heroes/about-mission.jpg',
     },
   ];
 
@@ -312,7 +312,7 @@ export default async function HubWelcomePage() {
               <div className="bg-white rounded-2xl p-8 shadow-sm border border-slate-200 h-full">
                 <div className="relative h-40 rounded-xl overflow-hidden mb-6">
                   <Image
-                    src="/images/heroes-hq/funding-hero.jpg"
+                    src="/images/getting-started-hero.jpg"
                     alt="Complete and succeed"
                     fill
                     className="object-cover"
@@ -330,7 +330,7 @@ export default async function HubWelcomePage() {
       <section className="relative py-20 px-4 sm:px-6 lg:px-8">
         <div className="absolute inset-0">
           <Image
-            src="/images/heroes-hq/programs-hero.jpg"
+            src="/images/heroes/career-services.jpg"
             alt="Team celebrating success"
             fill
             className="object-cover"

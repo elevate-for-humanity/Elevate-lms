@@ -173,7 +173,7 @@ export const CDL_COURSES: MockCourse[] = [
     lessons_count: 10,
     price: 0,
     category: 'Transportation',
-    image_url: '/images/trades/hero-program-cdl.jpg',
+    image_url: '/images/programs-hq/cdl-trucking.jpg',
     video_intro_url: '/videos/cdl-hero.mp4',
     is_active: true,
   },

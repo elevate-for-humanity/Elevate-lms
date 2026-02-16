@@ -56,7 +56,7 @@ export default function EmployerPortalPage() {
 
       {/* Hero */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
-        <Image src="/hero-images/employer-hero.jpg" alt="Employer Portal" fill className="object-cover" priority />
+        <Image src="/hero-images/employer-hero.jpg" alt="Employer Portal" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-orange-900/70" />
         <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
           <span className="text-orange-200 font-medium text-sm uppercase tracking-wider">Platform Solutions</span>
@@ -156,7 +156,7 @@ export default function EmployerPortalPage() {
               </div>
             </div>
             <div className="relative h-[400px] rounded-2xl overflow-hidden shadow-xl">
-              <Image src="/images/business/handshake-1.jpg" alt="Employer partnership" fill className="object-cover" />
+              <Image src="/images/business/handshake-1.jpg" alt="Employer partnership" fill sizes="100vw" className="object-cover" />
             </div>
           </div>
         </div>

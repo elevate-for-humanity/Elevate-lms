@@ -75,7 +75,7 @@ export default async function CalendarPage() {
       {/* Hero with image */}
       <section className="relative h-64 overflow-hidden">
         <Image
-          src="/images/trades/program-building-construction.jpg"
+          src="/images/hero-new/hero-6.jpg"
           alt="Calendar and Schedule"
           fill
           className="object-cover"

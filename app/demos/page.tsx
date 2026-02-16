@@ -36,7 +36,7 @@ const demos = [
     title: 'Employer Portal Demo',
     description: 'Learn how employers track sponsored employees, post jobs, and access workforce analytics.',
     duration: '10 min',
-    thumbnail: '/images/business/tax-prep-certification.jpg',
+    thumbnail: '/images/gallery/image6.jpg',
     features: [
       'Candidate search and filtering',
       'Job posting workflow',
@@ -70,7 +70,7 @@ const demos = [
     title: 'AI Course Builder',
     description: 'Watch how to create complete courses with AI-generated content, quizzes, and video lessons.',
     duration: '12 min',
-    thumbnail: '/images/trades/program-building-construction.jpg',
+    thumbnail: '/images/hero-new/hero-10.jpg',
     features: [
       'AI course generation',
       'Drag-and-drop lesson builder',

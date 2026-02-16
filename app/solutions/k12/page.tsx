@@ -28,7 +28,7 @@ export default function K12Page() {
 
       {/* Hero */}
       <section className="relative h-[300px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
-        <Image src="/images/programs-hq/students-learning.jpg" alt="K-12 career pathways" fill className="object-cover" priority sizes="100vw" />
+        <Image src="/images/gallery/image5.jpg" alt="K-12 career pathways" fill className="object-cover" priority sizes="100vw" />
         <div className="absolute inset-0 bg-black/50" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
           <h1 className="text-3xl md:text-5xl font-bold mb-4">K-12 Career Pathways</h1>

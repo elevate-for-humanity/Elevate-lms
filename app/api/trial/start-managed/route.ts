@@ -205,12 +205,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Failed to create organization', correlationId }, { status: 500 });
     }
 
-    // Create trial license
+    // Create trial license (managed_licenses table, separate from white-label licenses)
     const trialEndsAt = new Date();
     trialEndsAt.setDate(trialEndsAt.getDate() + TRIAL_DURATION_DAYS);
 
     const { data: license, error: licenseError } = await supabase
-      .from('licenses')
+      .from('managed_licenses')
       .insert({
         organization_id: org.id,
         status: 'active',

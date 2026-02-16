@@ -47,7 +47,7 @@ export default function EcosystemPage() {
 
       {/* Hero */}
       <section className="relative min-h-[450px] flex items-center overflow-hidden">
-        <Image src="/hero-images/pathways-hero.jpg" alt="Elevate Ecosystem" fill className="object-cover" priority />
+        <Image src="/hero-images/pathways-hero.jpg" alt="Elevate Ecosystem" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-brand-blue-900/70" />
         <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">The Elevate Ecosystem</h1>

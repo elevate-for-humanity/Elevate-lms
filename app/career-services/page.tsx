@@ -27,7 +27,7 @@ export default function CareerServicesPage() {
 
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/hero-images/career-services-hero.jpg" alt="Career services" fill className="object-cover" priority />
+        <Image src="/hero-images/career-services-hero.jpg" alt="Career services" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
@@ -48,11 +48,11 @@ export default function CareerServicesPage() {
               { title: 'Resume Building', desc: 'Work one-on-one with a career advisor to build a professional resume tailored to your industry. We format, proofread, and optimize for applicant tracking systems.', image: '/images/career-services/resume-workshop.jpg' },
               { title: 'Interview Preparation', desc: 'Practice with mock interviews, get feedback on your answers, and learn how to present yourself confidently. We cover behavioral, technical, and situational questions.', image: '/images/career-services/interview-prep.jpg' },
               { title: 'Job Fairs & Hiring Events', desc: 'Attend exclusive hiring events where our employer partners interview and hire on the spot. We host events monthly across Indiana.', image: '/images/career-services/job-fair.jpg' },
-              { title: 'Direct Employer Connections', desc: 'We match you with employers in your field who are actively hiring. Many of our graduates receive job offers before they finish training.', image: '/images/heroes-hq/employer-hero.jpg' },
+              { title: 'Direct Employer Connections', desc: 'We match you with employers in your field who are actively hiring. Many of our graduates receive job offers before they finish training.', image: '/images/heroes/event-1.jpg' },
             ].map((item) => (
               <div key={item.title} className="flex gap-4 sm:flex-col rounded-xl overflow-hidden border border-slate-200 bg-white">
                 <div className="relative w-28 h-28 sm:w-full sm:h-[180px] flex-shrink-0 sm:flex-shrink">
-                  <Image src={item.image} alt={item.title} fill className="object-cover" />
+                  <Image src={item.image} alt={item.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="py-3 pr-3 sm:p-5 flex-1">
                   <h3 className="font-bold text-slate-900 text-sm sm:text-base mb-1">{item.title}</h3>

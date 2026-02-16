@@ -35,7 +35,7 @@ export default function LiveChatPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative h-[500px] md:h-[600px] lg:h-[700px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-[300px] md:h-[380px] lg:h-[420px] flex items-center justify-center text-white overflow-hidden">
         <Image
           src="/images/heroes-hq/contact-hero.jpg"
           alt="Live Chat"

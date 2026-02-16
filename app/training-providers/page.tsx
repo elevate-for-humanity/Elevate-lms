@@ -24,12 +24,12 @@ const benefits = [
   {
     title: 'ETPL Listing Support',
     description: 'We help you get listed on the Eligible Training Provider List for WIOA funding.',
-    image: '/images/healthcare/healthcare-professional-portrait-1.jpg',
+    image: '/images/artlist/hero-training-8.jpg',
   },
   {
     title: 'Marketing Support',
     description: 'Your programs featured on our website and promoted to workforce partners.',
-    image: '/images/business/tax-prep-certification.jpg',
+    image: '/images/artlist/hero-training-7.jpg',
   },
   {
     title: 'Compliance Assistance',
@@ -39,12 +39,12 @@ const benefits = [
   {
     title: 'Employer Connections',
     description: 'Connect your graduates with our network of hiring employers.',
-    image: '/images/team-hq/team-meeting.jpg',
+    image: '/images/artlist/hero-training-7.jpg',
   },
   {
     title: 'Streamlined Enrollment',
     description: 'Our team handles eligibility verification and funding paperwork.',
-    image: '/images/trades/program-building-construction.jpg',
+    image: '/images/artlist/hero-training-4.jpg',
   },
 ];
 
@@ -65,7 +65,7 @@ const programTypes = [
   {
     name: 'Skilled Trades',
     examples: 'HVAC, Electrical, Plumbing, Welding',
-    image: '/images/trades/hero-program-hvac.jpg',
+    image: '/images/artlist/hero-training-4.jpg',
   },
   {
     name: 'Technology',
@@ -160,7 +160,7 @@ export default function TrainingProvidersPage() {
             {benefits.map((benefit) => (
               <div key={benefit.title} className="bg-white rounded-xl overflow-hidden shadow-sm border border-gray-100 hover:shadow-md transition">
                 <div className="relative h-36">
-                  <Image src={benefit.image} alt={benefit.title} fill className="object-cover" />
+                  <Image src={benefit.image} alt={benefit.title} fill sizes="100vw" className="object-cover" />
                 </div>
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{benefit.title}</h3>

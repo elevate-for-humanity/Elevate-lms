@@ -1,5 +1,2 @@
 import { redirect } from 'next/navigation';
-
-export default function StoreCategoriesPage() {
-  redirect('/store');
-}
+export default function CategoriesRedirect() { redirect('/store'); }

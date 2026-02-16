@@ -22,19 +22,14 @@ export default function HomeHeroVideo() {
       }
     };
 
-    video.addEventListener('canplay', playVideo, { once: true });
-    playVideo();
+    // Use loadeddata instead of canplay — fires as soon as first frame is ready
+    video.addEventListener('loadeddata', playVideo, { once: true });
 
-    const handleInteraction = () => playVideo();
-    document.addEventListener('click', handleInteraction, { once: true });
-    document.addEventListener('touchstart', handleInteraction, { once: true });
-    document.addEventListener('scroll', handleInteraction, { once: true });
+    // Also try immediately in case already loaded
+    if (video.readyState >= 2) playVideo();
 
     return () => {
-      video.removeEventListener('canplay', playVideo);
-      document.removeEventListener('click', handleInteraction);
-      document.removeEventListener('touchstart', handleInteraction);
-      document.removeEventListener('scroll', handleInteraction);
+      video.removeEventListener('loadeddata', playVideo);
     };
   }, []);
 
@@ -55,7 +50,7 @@ export default function HomeHeroVideo() {
         muted
         playsInline
         autoPlay
-        preload="auto"
+        preload="metadata"
       >
         <source src="/videos/hero-home-fast.mp4" type="video/mp4" />
       </video>

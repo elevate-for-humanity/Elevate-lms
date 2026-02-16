@@ -43,7 +43,7 @@ export default async function CoursedetailPage() {
         <Breadcrumbs items={[{ label: "Courses", href: "/courses" }, { label: "Coursedetail" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
+      <section className="relative h-[280px] md:h-[350px] lg:h-[400px] flex items-center justify-center text-white overflow-hidden">
         <Image
           src="/images/business/team-2.jpg"
           alt="Coursedetail"
@@ -142,7 +142,7 @@ export default async function CoursedetailPage() {
               </div>
               <div className="relative h-96 rounded-2xl overflow-hidden shadow-xl">
                 <Image
-                  src="/images/heroes-hq/programs-hero.jpg"
+                  src="/images/artlist/hero-training-4.jpg"
                   alt="Course detail"
                   fill
                   className="object-cover"

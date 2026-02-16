@@ -54,7 +54,7 @@ export default async function PartnerPortalPage() {
       {/* Hero */}
       <section className="relative h-[250px] md:h-[300px] flex items-center text-white overflow-hidden">
         <Image
-          src="/images/heroes-hq/employer-hero.jpg"
+          src="/images/employers/partnership-hiring-event.jpg"
           alt="Partner Portal"
           fill
           className="object-cover"

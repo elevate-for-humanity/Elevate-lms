@@ -15,7 +15,7 @@ const steps = [
     number: 1,
     title: 'Post Your Job',
     description: 'Create a job listing with requirements, pay rate, and benefits. Our team reviews and optimizes for WOTC-eligible candidates.',
-    image: '/images/heroes-hq/career-services-hero.jpg',
+    image: '/images/employers/partnership-handshake.jpg',
     tips: ['Include clear job requirements', 'Specify training provided', 'Highlight growth opportunities'],
   },
   {
@@ -29,14 +29,14 @@ const steps = [
     number: 3,
     title: 'Interview & Select',
     description: 'Schedule interviews through our platform. We provide interview guides and help coordinate schedules.',
-    image: '/images/heroes-hq/employer-hero.jpg',
+    image: '/images/employers/partnership-hiring-event.jpg',
     tips: ['Use structured interviews', 'Assess cultural fit', 'Discuss growth path'],
   },
   {
     number: 4,
     title: 'Complete WOTC Forms',
     description: 'We handle IRS Form 8850 and state forms. Just verify hire date and we submit within the 28-day deadline.',
-    image: '/images/heroes-hq/success-hero.jpg',
+    image: '/images/homepage/employers.jpg',
     tips: ['Sign forms within 28 days', 'Verify start date accuracy', 'Keep copies for records'],
   },
   {

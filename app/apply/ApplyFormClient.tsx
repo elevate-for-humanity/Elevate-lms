@@ -433,7 +433,7 @@ export default function ApplyFormClient() {
               />
 
               {status === 'error' && (
-                <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg" role="alert">
                   <p className="text-red-800">
                     Something went wrong. Please try again or contact us at
                     support center.

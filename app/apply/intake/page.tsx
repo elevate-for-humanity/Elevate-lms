@@ -101,7 +101,7 @@ export default function IntakePage() {
       <section className="py-12">
         <div className="max-w-2xl mx-auto px-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6">
+            <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg mb-6" role="alert">
               {error}
             </div>
           )}

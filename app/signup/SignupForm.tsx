@@ -39,9 +39,11 @@ function SignupFormContent() {
       return;
     }
 
-    // Validate password strength
-    if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters');
+    // Validate password strength (NIST 800-63B)
+    const { validatePassword } = await import('@/lib/auth/password-validation');
+    const passwordCheck = validatePassword(formData.password);
+    if (!passwordCheck.valid) {
+      setError(passwordCheck.errors[0]);
       setLoading(false);
       return;
     }
@@ -148,7 +150,7 @@ function SignupFormContent() {
       <h2 className="text-2xl font-bold text-center mb-6">Create Account</h2>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg" role="alert" aria-live="assertive" id="signup-error">
           <p className="text-red-800 text-sm">{error}</p>
         </div>
       )}

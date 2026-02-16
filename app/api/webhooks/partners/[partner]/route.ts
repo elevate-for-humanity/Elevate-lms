@@ -1,3 +1,4 @@
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -25,6 +26,8 @@ function getSupabaseClient() {
 }
 
 export async function POST(
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
   request: NextRequest,
   { params }: { params: Promise<{ partner: string }> }
 ) {

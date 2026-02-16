@@ -7,6 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabaseClients';
 import { withAuth } from '@/lib/with-auth';
 import { logger } from '@/lib/logger';
+import { logBulkExport } from '@/lib/audit/ferpa';
 
 export const GET = withAuth(
   async (req: NextRequest, user) => {
@@ -101,6 +102,9 @@ export const GET = withAuth(
           },
         });
       }
+
+      // Log FERPA-regulated bulk export
+      await logBulkExport(user.id, 'admin', 'enrollment', enrollments.length);
 
       // Default JSON format
       return NextResponse.json({ enrollments, count: enrollments.length });

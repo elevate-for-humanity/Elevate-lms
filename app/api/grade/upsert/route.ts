@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/server';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logStaffRecordAccess } from '@/lib/audit/ferpa';
 
 export async function POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'api');
@@ -83,6 +84,9 @@ export async function POST(req: Request) {
     logger.error('Failed to upsert grade:', error);
     return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });
   }
+
+  // FERPA: log grade update
+  await logStaffRecordAccess(user.id, profile.role, enrollmentId, 'grades', 'update', gradeItemId);
 
   return NextResponse.json({ ok: true });
 }

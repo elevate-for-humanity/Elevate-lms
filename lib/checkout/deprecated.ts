@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 
 /**
  * CHECKOUT CONSOLIDATION
@@ -23,6 +24,9 @@ export function createDeprecatedCheckoutHandler(
   defaultBody: Record<string, unknown>
 ) {
   return async function handler(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
+
     const canonicalPath = forwardTo === 'learner' 
       ? CANONICAL_LEARNER_CHECKOUT 
       : CANONICAL_LICENSE_CHECKOUT;

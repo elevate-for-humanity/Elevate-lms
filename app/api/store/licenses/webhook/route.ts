@@ -1,3 +1,4 @@
+import { applyRateLimit } from '@/lib/api/withRateLimit';
 /**
  * DEPRECATED: Use /api/license/webhook instead
  * 
@@ -12,6 +13,8 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
 export async function POST(request: NextRequest) {
+    const rateLimited = await applyRateLimit(request, 'api');
+    if (rateLimited) return rateLimited;
   logger.warn('Deprecated webhook endpoint called', { 
     path: '/api/store/licenses/webhook',
     canonical: '/api/license/webhook'

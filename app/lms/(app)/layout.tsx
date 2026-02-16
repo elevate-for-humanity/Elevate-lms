@@ -9,6 +9,7 @@ import { LMSNavigation } from '@/components/lms/LMSNavigation';
 import { AIInstructorWidget } from '@/components/AIInstructorWidget';
 import { LogoStamp } from '@/components/layout/LogoBanner';
 import { canAccessRoute, getUnauthorizedRedirect } from '@/lib/auth/lms-routes';
+import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
 
 function LmsAppLayoutInner({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -64,6 +65,7 @@ function LmsAppLayoutInner({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-screen bg-slate-50">
+      <IdleTimeoutGuard />
       <LMSNavigation user={user} profile={profile} />
       <main>{children}</main>
       {/* Logo stamp for brand recognition */}

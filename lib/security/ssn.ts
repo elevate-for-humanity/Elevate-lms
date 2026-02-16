@@ -1,12 +1,20 @@
 import crypto from 'crypto';
 
-const SSN_SALT = process.env.SSN_SALT || 'elevate-ssn-salt-change-in-production';
+const SSN_SALT = process.env.SSN_SALT;
+
+if (!SSN_SALT && typeof window === 'undefined') {
+  // Server-side only: SSN_SALT is required for any SSN operations
+  console.error('[SECURITY] SSN_SALT environment variable is not set. SSN hashing will fail.');
+}
 
 /**
  * Hash an SSN for secure storage
  * Never store plain-text SSNs - always use this function
  */
 export function hashSSN(ssn: string): string {
+  if (!SSN_SALT) {
+    throw new Error('SSN_SALT environment variable is required for SSN operations.');
+  }
   const cleaned = ssn.replace(/\D/g, '');
   return crypto.createHash('sha256').update(cleaned + SSN_SALT).digest('hex');
 }

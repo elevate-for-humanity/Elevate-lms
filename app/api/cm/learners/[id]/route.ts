@@ -9,6 +9,7 @@ import { supabaseAdmin } from '@/lib/supabaseClients';
 import { getAuthUser } from '@/lib/auth';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logStaffRecordAccess } from '@/lib/audit/ferpa';
 
 export async function GET(
   req: NextRequest,
@@ -153,6 +154,9 @@ if (!supabaseAdmin) {
           : 'Unknown',
       });
     }
+
+    // FERPA: log case manager accessing student record
+    await logStaffRecordAccess(caseManagerId, 'case_manager', learnerId, 'student_record', 'view');
 
     return NextResponse.json({
       learner: {

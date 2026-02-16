@@ -8,6 +8,7 @@ import { requireApiAuth } from '@/lib/auth';
 import { createSupabaseClient } from '@/lib/supabase-api';
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { logStudentSelfAccess } from '@/lib/audit/ferpa';
 
 export async function GET(request: Request) {
   try {
@@ -82,6 +83,9 @@ export async function GET(request: Request) {
         completedAt: a.completed_at,
       })),
     };
+
+    // FERPA: log student self-access data export
+    await logStudentSelfAccess(user.id, 'student_record');
 
     // Log export event for audit trail
     const { error: auditError } = await supabase.from('account_export_events').insert({

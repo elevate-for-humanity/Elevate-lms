@@ -83,7 +83,7 @@ export default function SignInForm() {
         </div>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg" role="alert" aria-live="assertive">
             <p className="text-sm text-red-800">{error}</p>
           </div>
         )}

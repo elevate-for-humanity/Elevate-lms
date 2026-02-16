@@ -38,7 +38,7 @@ export async function POST(req: Request) {
     );
   } catch (err: any) {
     // Error logged
-    return NextResponse.json({ error: (err as Error).message }, { status: 400 });
+    return NextResponse.json({ error: 'Webhook processing failed.' }, { status: 400 });
   }
 
   if (event.type === 'checkout.session.completed') {

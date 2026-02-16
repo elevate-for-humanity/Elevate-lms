@@ -1,4 +1,4 @@
-import { Shield, Award, CheckCircle, DollarSign } from 'lucide-react';
+import { Shield, Award, DollarSign } from 'lucide-react';
 
 interface ComplianceBadgesProps {
   showDOL?: boolean;
@@ -56,7 +56,7 @@ export function ComplianceBadges({
 
       {showJobPlacement && (
         <div className="flex items-center gap-2 px-4 py-2 bg-orange-50 border border-orange-200 rounded-full">
-          <CheckCircle className="w-4 h-4 text-orange-700" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <span className="text-sm font-semibold text-orange-900">Job Placement</span>
         </div>
       )}

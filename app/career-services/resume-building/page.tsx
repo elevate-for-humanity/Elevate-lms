@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   FileText,
-  CheckCircle,
+
   Target,
   ArrowRight,
   Download,
@@ -154,15 +154,8 @@ export default function ResumeBuildingPage() {
                     <p className="text-gray-600">{section.description}</p>
                   </div>
                   <div className="md:w-2/3">
-                    <p className="text-sm font-semibold text-gray-700 mb-3">Tips:</p>
-                    <ul className="space-y-2">
-                      {section.tips.map((tip, tipIndex) => (
-                        <li key={tipIndex} className="flex items-start">
-                          <CheckCircle className="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
-                          <span className="text-gray-600">{tip}</span>
-                        </li>
-                      ))}
-                    </ul>
+                    <p className="text-sm font-semibold text-gray-700 mb-2">Tips:</p>
+                    <p className="text-gray-600 leading-relaxed">{section.tips.join('. ')}.</p>
                   </div>
                 </div>
               </div>
@@ -276,32 +269,11 @@ export default function ResumeBuildingPage() {
               Most companies use software to screen resumes before a human sees them. Here is how to get through:
             </p>
 
-            <div className="grid md:grid-cols-2 gap-4">
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-700">Use standard section headings</span>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-700">Include keywords from the job posting</span>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-700">Use a simple, clean format</span>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-700">Avoid tables, graphics, and headers/footers</span>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-700">Save as .docx or .pdf (check job posting)</span>
-              </div>
-              <div className="flex items-start">
-                <CheckCircle className="w-5 h-5 text-brand-blue-600 mr-2 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-700">Spell out acronyms at least once</span>
-              </div>
-            </div>
+            <p className="text-gray-700 leading-relaxed">
+              Use standard section headings (Experience, Education, Skills) and include keywords from the job posting. 
+              Keep the format simple and clean — avoid tables, graphics, and headers/footers that ATS software cannot read. 
+              Save your resume as .docx or .pdf depending on what the job posting requests. Spell out acronyms at least once so the system can match them.
+            </p>
           </div>
         </div>
       </section>

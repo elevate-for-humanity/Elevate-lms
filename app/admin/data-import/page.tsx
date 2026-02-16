@@ -11,13 +11,12 @@ import {
   GraduationCap,
   Building2,
   Download,
-  CheckCircle,
   AlertCircle,
   Loader2,
   ArrowRight,
   Eye,
   X,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 type ImportType = 'students' | 'courses' | 'enrollments' | 'employers';
 
@@ -417,7 +416,7 @@ export default function DataImportPage() {
           }`}>
             <div className="flex items-start gap-3">
               {result.success ? (
-                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               ) : (
                 <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0" />
               )}

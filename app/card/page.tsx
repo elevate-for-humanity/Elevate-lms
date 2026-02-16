@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
-import { CreditCard, Shield, Smartphone, DollarSign, CheckCircle } from 'lucide-react';
+import { CreditCard, Shield, Smartphone, DollarSign, Circle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Elevate Card | Elevate For Humanity',
@@ -43,7 +43,7 @@ export default async function CardPage() {
               { icon: DollarSign, title: 'Fast Deposits', desc: 'Get your money up to 2 days faster than traditional banks' },
               { icon: Shield, title: 'Secure', desc: 'Protected by bank-level security and fraud monitoring' },
               { icon: Smartphone, title: 'Mobile App', desc: 'Check your balance and transactions anytime' },
-              { icon: CheckCircle, title: 'No Fees', desc: 'No monthly fees or minimum balance requirements' },
+              { icon: Circle, title: 'No Fees', desc: 'No monthly fees or minimum balance requirements' },
             ].map((feature, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border flex items-start gap-4">
                 <feature.icon className="w-8 h-8 text-green-600 flex-shrink-0" />

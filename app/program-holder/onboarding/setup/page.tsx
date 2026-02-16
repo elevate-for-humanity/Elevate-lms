@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useState } from 'react';
-import { Upload, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, FileText, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 
@@ -72,7 +72,7 @@ export default function ProgramHolderSetup() {
                       : 'bg-gray-300 text-black'
                   }`}
                 >
-                  {step > s ? <CheckCircle size={20} /> : s}
+                  {step > s ? <span className="text-slate-400 flex-shrink-0">•</span> : s}
                 </div>
                 {s < 5 && (
                   <div
@@ -268,7 +268,7 @@ export default function ProgramHolderSetup() {
                 </label>
                 {formData.syllabusFile && (
                   <div className="mt-4 flex items-center justify-center gap-2 text-green-600">
-                    <CheckCircle size={20} />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{formData.syllabusFile.name}</span>
                   </div>
                 )}
@@ -451,7 +451,7 @@ export default function ProgramHolderSetup() {
                   </label>
                   {formData.bankDocument && (
                     <div className="mt-3 flex items-center justify-center gap-2 text-green-600">
-                      <CheckCircle size={20} />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span>{formData.bankDocument.name}</span>
                     </div>
                   )}

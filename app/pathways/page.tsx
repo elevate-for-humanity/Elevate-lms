@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, CheckCircle, Clock, DollarSign, Award } from 'lucide-react';
+import { ArrowRight, Clock, DollarSign, Award, Circle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -72,7 +72,7 @@ export default function PathwaysPage() {
               { icon: Clock, title: 'Fast-Track Training', desc: 'Complete programs in weeks, not years' },
               { icon: DollarSign, title: 'Funding Available', desc: 'WIOA and other funding options' },
               { icon: Award, title: 'Industry Certifications', desc: 'Earn credentials employers want' },
-              { icon: CheckCircle, title: 'Job Placement', desc: 'Career services and employer connections' },
+              { icon: Circle, title: 'Job Placement', desc: 'Career services and employer connections' },
             ].map((item, i) => (
               <div key={i} className="text-center">
                 <div className="w-16 h-16 bg-brand-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">

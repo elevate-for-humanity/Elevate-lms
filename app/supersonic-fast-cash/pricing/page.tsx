@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Phone, CheckCircle, ArrowRight, HelpCircle } from 'lucide-react';
+import { Phone, ArrowRight, HelpCircle } from 'lucide-react';
 
 export const metadata = {
   title: 'Pricing | Supersonic Fast Cash LLC',
@@ -115,7 +115,7 @@ export default function PricingPage() {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-gray-700 text-sm">{feature}</span>
                     </li>
                   ))}
@@ -153,7 +153,7 @@ export default function PricingPage() {
               'Email support',
             ].map((item, idx) => (
               <div key={idx} className="flex items-center gap-3 bg-gray-50 p-4 rounded-lg border border-gray-200">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}
@@ -185,11 +185,11 @@ export default function PricingPage() {
               </div>
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Same-day funding available
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Subject to bank approval
                 </li>
               </ul>
@@ -205,11 +205,11 @@ export default function PricingPage() {
               </div>
               <ul className="space-y-2 text-sm text-gray-700">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-blue-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Terms disclosed before funding
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-blue-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Deducted from refund
                 </li>
               </ul>

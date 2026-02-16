@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CheckCircle, DollarSign, Award, Users, BookOpen, ArrowRight } from 'lucide-react';
+import { DollarSign, Award, Users, BookOpen, ArrowRight } from 'lucide-react';
 import { ReactNode } from 'react';
 
 /**
@@ -248,7 +248,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-green-50 rounded-2xl p-8">
               <h3 className="text-xl font-bold text-green-900 mb-4 flex items-center gap-2">
-                <CheckCircle className="w-6 h-6" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Ideal Candidates
               </h3>
               <ul className="space-y-3">
@@ -307,7 +307,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
             </div>
             <div>
               <h3 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <CheckCircle className="w-5 h-5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Compliance & Readiness
               </h3>
               <ul className="space-y-2">
@@ -362,7 +362,7 @@ export function ProgramPageContract({ config }: { config: ProgramPageConfig }) {
                 <ul className="space-y-2">
                   {config.credential.usedFor.map((item, i) => (
                     <li key={i} className="flex items-start gap-2 text-gray-700">
-                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       {item}
                     </li>
                   ))}

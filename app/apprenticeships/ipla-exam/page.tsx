@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import React from 'react';
 
 import { useState } from 'react';
-import { Calendar, CreditCard, CheckCircle, Award } from 'lucide-react';
+import { Calendar, CreditCard, Award } from 'lucide-react';
 import { loadStripe } from '@stripe/stripe-js';
 
 const stripePromise = loadStripe(
@@ -100,19 +100,19 @@ export default function IPLAExamSignup() {
               <h3 className="font-bold text-lg mb-3">What's Included</h3>
               <ul className="space-y-2 text-black">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>State licensing exam fee</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Testing center access</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Official score report</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Certificate upon passing</span>
                 </li>
               </ul>

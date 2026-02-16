@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { DollarSign, CheckCircle, FileText, Phone, ArrowRight, Shield, Clock, Users, Calculator } from 'lucide-react';
+import { DollarSign, FileText, Phone, ArrowRight, Shield, Clock, Users, Calculator } from 'lucide-react';
 import { FinancialAidCalculator } from '@/components/FinancialAidCalculator';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -175,7 +175,7 @@ export default function FinancialAidPage() {
                       <ul className="space-y-1">
                         {option.eligibility.map((req) => (
                           <li key={req} className="flex items-center gap-2 text-sm text-gray-600">
-                            <CheckCircle className="w-4 h-4 text-green-500" />
+                            <span className="text-slate-400 flex-shrink-0">•</span>
                             {req}
                           </li>
                         ))}

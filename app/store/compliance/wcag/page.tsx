@@ -92,43 +92,15 @@ export default function WCAGCompliancePage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative bg-brand-blue-700 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image src="/images/technology/hero-programs-technology.jpg" alt="WCAG" fill sizes="100vw" className="object-cover opacity-30" />
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/technology/hero-programs-technology.jpg" alt="WCAG" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <span className="inline-block bg-brand-blue-600 text-white text-sm font-bold px-4 py-1 rounded-full mb-4">
-                Accessibility
-              </span>
-              <h1 className="text-4xl sm:text-5xl font-black mb-6">WCAG 2.1 Level AA</h1>
-              <p className="text-xl text-brand-blue-100 mb-8">
-                Make your platform accessible to everyone with screen reader support, keyboard navigation, and automated accessibility auditing.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link href="#pricing" className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-50 transition">
-                  View Pricing
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link href="/store/demo" className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-brand-blue-500 transition border border-brand-blue-500">
-                  Request Demo
-                </Link>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: Eye, label: 'Screen Readers' },
-                { icon: Keyboard, label: 'Keyboard Nav' },
-                { icon: Volume2, label: 'Captions' },
-                { icon: Monitor, label: 'High Contrast' },
-              ].map((item) => (
-                <div key={item.label} className="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
-                  <item.icon className="w-8 h-8 mx-auto mb-2 text-brand-blue-300" />
-                  <p className="text-sm font-medium">{item.label}</p>
-                </div>
-              ))}
-            </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">WCAG 2.1 Level AA</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Make your platform accessible to everyone with screen reader support, keyboard navigation, and automated accessibility auditing.</p>
           </div>
         </div>
       </section>

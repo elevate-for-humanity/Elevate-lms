@@ -10,12 +10,11 @@ import {
   TrendingUp,
   Calendar,
   Clock,
-  CheckCircle,
   AlertCircle,
   ArrowRight,
   Download,
   RefreshCw,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface DashboardStats {
   totalClients: number;
@@ -106,7 +105,7 @@ export default function SupersonicAdminDashboard() {
             <div className="text-sm text-gray-600">Pending Returns</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border">
-            <CheckCircle className="w-8 h-8 text-green-600 mb-2" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <div className="text-2xl font-bold text-gray-900">{stats.completedReturns}</div>
             <div className="text-sm text-gray-600">Completed</div>
           </div>

@@ -10,9 +10,8 @@ import {
   Users,
   Building2,
   GraduationCap,
-  CheckCircle,
   ArrowRight,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: {
@@ -101,24 +100,15 @@ export default async function OnboardingPage() {
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start text-sm">
-                  <CheckCircle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
-                    size={16}
-                  />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Access 30+ training programs</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <CheckCircle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
-                    size={16}
-                  />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Free for eligible participants</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <CheckCircle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
-                    size={16}
-                  />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Earn industry certifications</span>
                 </li>
               </ul>
@@ -145,24 +135,15 @@ export default async function OnboardingPage() {
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start text-sm">
-                  <CheckCircle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
-                    size={16}
-                  />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Enroll and manage students</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <CheckCircle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
-                    size={16}
-                  />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Track student progress</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <CheckCircle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
-                    size={16}
-                  />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Generate compliance reports</span>
                 </li>
               </ul>
@@ -189,24 +170,15 @@ export default async function OnboardingPage() {
               </p>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-start text-sm">
-                  <CheckCircle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
-                    size={16}
-                  />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Access trained candidates</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <CheckCircle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
-                    size={16}
-                  />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Custom training programs</span>
                 </li>
                 <li className="flex items-start text-sm">
-                  <CheckCircle
-                    className="text-brand-green-600 mr-2 flex-shrink-0 mt-0.5"
-                    size={16}
-                  />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Workforce development</span>
                 </li>
               </ul>

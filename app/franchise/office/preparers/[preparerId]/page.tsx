@@ -22,9 +22,8 @@ import {
   Edit,
   Save,
   Loader2,
-  CheckCircle,
-  XCircle
-} from 'lucide-react';
+  XCircle,
+CheckCircle, } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -401,10 +400,10 @@ export default function PreparerDetailPage() {
                     </div>
                     <div className="flex gap-2">
                       {preparer.is_efin_authorized && (
-                        <Badge variant="outline"><CheckCircle className="h-3 w-3 mr-1" />EFIN</Badge>
+                        <Badge variant="outline"><span className="text-slate-400 flex-shrink-0">•</span>EFIN</Badge>
                       )}
                       {preparer.is_ero_authorized && (
-                        <Badge variant="outline"><CheckCircle className="h-3 w-3 mr-1" />ERO</Badge>
+                        <Badge variant="outline"><span className="text-slate-400 flex-shrink-0">•</span>ERO</Badge>
                       )}
                     </div>
                   </>
@@ -525,7 +524,7 @@ export default function PreparerDetailPage() {
             <CardContent className="space-y-4">
               {preparer.status === 'pending' && (
                 <Button className="w-full justify-start" onClick={() => updateStatus('active')}>
-                  <CheckCircle className="mr-2 h-4 w-4" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Activate Preparer
                 </Button>
               )}
@@ -537,7 +536,7 @@ export default function PreparerDetailPage() {
               )}
               {preparer.status === 'suspended' && (
                 <Button className="w-full justify-start" onClick={() => updateStatus('active')}>
-                  <CheckCircle className="mr-2 h-4 w-4" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Reactivate Preparer
                 </Button>
               )}

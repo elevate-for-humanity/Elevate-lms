@@ -177,7 +177,7 @@ export function ProgressTrackingDashboard() {
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${
                     milestone.completed ? 'bg-green-500 text-white' : 'bg-gray-300 text-black'
                   }`}>
-                    {milestone.completed ? '✓' : index + 1}
+                    {milestone.completed ? '•' : index + 1}
                   </div>
                   <div className="flex-1">
                     <p className={`font-medium ${milestone.completed ? 'text-black' : 'text-black'}`}>

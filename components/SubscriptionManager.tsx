@@ -8,7 +8,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
-import { CheckCircle, X, CreditCard, Calendar, AlertCircle } from 'lucide-react';
+import { X, CreditCard, Calendar, AlertCircle } from 'lucide-react';
 
 interface Plan {
   id: string;
@@ -248,7 +248,7 @@ export function SubscriptionManager() {
                 <ul className="space-y-3 mb-6">
                   {plan.features.map((feature, index) => (
                     <li key={index} className="flex items-start gap-2">
-                      <CheckCircle className="text-green-600 flex-shrink-0 mt-0.5" size={18} />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}
@@ -288,7 +288,7 @@ export function SubscriptionManager() {
               >
                 <div className="flex items-center gap-4">
                   <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="text-green-600" size={20} />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>
                     <div className="font-semibold">

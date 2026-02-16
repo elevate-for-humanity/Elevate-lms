@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { 
-  CheckCircle, Clock, Award, ArrowRight, Heart, 
+  Clock, Award, ArrowRight, Heart, 
   Users, Shield, Phone, Calendar, Building, Briefcase
 } from 'lucide-react';
 
@@ -292,20 +292,10 @@ export default function CPRFirstAidPage() {
                 We come to your location. Perfect for businesses, schools, churches, and organizations 
                 needing to train multiple people.
               </p>
-              <ul className="space-y-3 mb-8">
-                {[
-                  'Minimum 6 participants',
-                  'Discounted group rates',
-                  'Flexible scheduling',
-                  'All equipment provided',
-                  'Certificates issued same day',
-                ].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-brand-blue-200" />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-brand-blue-100 mb-8 leading-relaxed">
+                Group training requires a minimum of 6 participants and is available at discounted rates. 
+                We work around your schedule, provide all equipment, and issue certificates the same day the class is completed.
+              </p>
               <Link href="/employers" className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-full font-bold text-lg hover:bg-white transition-all">
                 Request Group Training <ArrowRight className="w-5 h-5" />
               </Link>

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle, Circle, Building, FileText, Settings } from 'lucide-react';
+import { Circle, Building, FileText, Settings } from 'lucide-react';
 import LicenseeOnboardingForm from './LicenseeOnboardingForm';
 
 export const metadata: Metadata = {
@@ -99,7 +99,7 @@ export default async function LicenseeOnboardingPage() {
                         : 'bg-gray-100 text-gray-400'
                   }`}>
                     {step.completed ? (
-                      <CheckCircle className="w-6 h-6" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
                       <step.icon className="w-5 h-5" />
                     )}
@@ -149,7 +149,7 @@ export default async function LicenseeOnboardingPage() {
                   <div key={type} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                     <div className="flex items-center gap-3">
                       {accepted ? (
-                        <CheckCircle className="w-5 h-5 text-green-600" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       ) : (
                         <Circle className="w-5 h-5 text-gray-400" />
                       )}

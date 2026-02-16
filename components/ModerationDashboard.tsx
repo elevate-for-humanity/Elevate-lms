@@ -6,15 +6,14 @@ import { useState, useEffect } from 'react';
 import {
   Shield,
   AlertTriangle,
-  CheckCircle,
   XCircle,
   Flag,
   Eye,
   Trash2,
   MessageSquare,
   Filter,
-  TrendingUp
-} from 'lucide-react';
+  TrendingUp,
+CheckCircle, } from 'lucide-react';
 
 interface ModerationReport {
   id: string;
@@ -177,7 +176,7 @@ export default function ModerationDashboard() {
                 <p className="text-sm text-black">Approved</p>
                 <p className="text-2xl font-bold text-green-600">{stats.approvedReports}</p>
               </div>
-              <CheckCircle className="w-8 h-8 text-green-400" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
           </div>
 
@@ -284,7 +283,7 @@ export default function ModerationDashboard() {
                         className="text-green-600 hover:text-green-800"
                         title="Approve"
                       >
-                        <CheckCircle className="w-5 h-5" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       </button>
                       <button
                         onClick={() => handleReview(report.id, 'remove')}

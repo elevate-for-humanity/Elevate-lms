@@ -3,12 +3,11 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
-  CheckCircle,
   Download,
   Mail,
   ArrowRight,
   Package,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Order Successful | Elevate for Humanity',
@@ -86,7 +85,7 @@ export default async function StoreSuccessPage({
       <div className="max-w-3xl mx-auto px-4 py-16">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-bold mb-2">Thank You for Your Order!</h1>
           <p className="text-gray-600 mb-8">

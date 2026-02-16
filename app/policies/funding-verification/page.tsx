@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CheckCircle, ArrowRight, Phone, Mail, Shield, AlertCircle } from 'lucide-react';
+import { ArrowRight, Phone, Mail, Shield, AlertCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Funding Verification Policy | Elevate for Humanity',
@@ -59,7 +59,7 @@ export default function FundingVerificationPage() {
               {fundingSources.map((source, i) => (
                 <div key={i} className="bg-gray-50 rounded-xl p-5 border">
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <div>
                       <h3 className="font-bold text-gray-900 mb-1">{source.title}</h3>
                       <p className="text-gray-600 text-sm">{source.description}</p>

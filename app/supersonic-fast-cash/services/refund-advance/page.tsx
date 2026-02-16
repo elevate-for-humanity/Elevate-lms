@@ -5,12 +5,11 @@ import {
   DollarSign,
   Clock,
   Shield,
-  CheckCircle,
   ArrowRight,
   CreditCard,
   Zap,
   BadgeCheck,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Refund Advance | Supersonic Fast Cash',

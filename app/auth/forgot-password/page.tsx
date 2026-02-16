@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { Mail, ArrowLeft } from 'lucide-react';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
@@ -54,7 +54,7 @@ export default function ForgotPasswordPage() {
           <div className="bg-white rounded-lg shadow-lg p-8">
             {sent ? (
               <div className="text-center">
-                <CheckCircle2 className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Check Your Email</h1>
                 <p className="text-gray-600 mb-6">
                   We sent a password reset link to <strong>{email}</strong>. Click the link in the email to set a new password.

@@ -43,20 +43,16 @@ export default async function PartnersPage() {
       </div>
       
       {/* Hero Section */}
-      <section className="relative bg-slate-800 text-white py-20 md:py-28">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/heroes/workforce-partner-1.jpg"
-            alt="Partners background"
-            fill
-            className="object-cover"
-          />
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes/workforce-partner-1.jpg" alt="Partners background" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="relative max-w-6xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-6">Our Partners</h1>
-          <p className="text-xl text-slate-300 max-w-3xl mx-auto">
-            We collaborate with government agencies, employers, and training providers to deliver free, funded career training.
-          </p>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Our Partners</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">We collaborate with government agencies, employers, and training providers to deliver free, funded career training.</p>
+          </div>
         </div>
       </section>
 

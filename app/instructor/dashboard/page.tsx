@@ -13,8 +13,7 @@ import {
   Award,
   TrendingUp,
   Clock,
-  CheckCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Instructor Dashboard | Elevate For Humanity',
@@ -118,7 +117,7 @@ export default async function ProgramHolderDashboard() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-slate-200">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 rounded-full bg-brand-green-100 flex items-center justify-center">
-                <CheckCircle className="text-brand-green-600" size={24} />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <p className="text-base md:text-lg font-bold text-black">

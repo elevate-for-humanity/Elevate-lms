@@ -3,7 +3,7 @@
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { BookOpen, Upload, CheckCircle, AlertCircle } from 'lucide-react';
+import { BookOpen, Upload, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface License {
@@ -142,7 +142,7 @@ export default function CreateCoursePage() {
               {message.includes('Error') ? (
                 <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
               ) : (
-                <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               )}
               <span>{message}</span>
             </div>

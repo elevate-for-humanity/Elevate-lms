@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Hub | Elevate for Humanity',
@@ -98,48 +98,26 @@ export default async function HubWelcomePage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section - Full Width Image */}
-      <section className="relative min-h-[70vh] flex items-center">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/heroes-hq/team-hero.jpg"
-            alt="Students collaborating and learning together"
-            fill
-            className="object-cover"
-            priority
-          />
+      {/* Hero Section */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes-hq/team-hero.jpg" alt="Students collaborating and learning together" fill className="object-cover" priority sizes="100vw" />
         </div>
-        
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="max-w-2xl">
-            <p className="text-green-400 font-semibold mb-4 text-lg">Your Command Center</p>
-            
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-              Everything You Need<br />
-              <span className="text-green-400">In One Place</span>
-            </h1>
-            
-            <p className="text-xl text-slate-300 mb-8 leading-relaxed">
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Everything You Need In One Place</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto mb-6">
               Track your enrollment, monitor progress, connect with peers, and see exactly what the system is doing to help you succeed. The Hub is your personalized dashboard for career success.
             </p>
-
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/login?redirect=/hub"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors text-lg"
-              >
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link href="/login?redirect=/hub" className="inline-flex items-center gap-2 px-8 py-4 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors text-lg">
                 Sign In to Your Hub
                 <ArrowRight className="w-5 h-5" />
               </Link>
-              <Link
-                href="/apply"
-                className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 backdrop-blur text-white font-semibold rounded-lg hover:bg-white/20 transition-colors border border-white/30 text-lg"
-              >
+              <Link href="/apply" className="inline-flex items-center gap-2 px-8 py-4 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-600 transition-colors border border-slate-500 text-lg">
                 Apply for a Program
               </Link>
             </div>
-
-
           </div>
         </div>
       </section>
@@ -175,15 +153,15 @@ export default async function HubWelcomePage() {
                   <p className="text-lg text-slate-600 mb-6 leading-relaxed">{feature.description}</p>
                   <ul className="space-y-3">
                     <li className="flex items-center gap-3 text-slate-700">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span>Real-time updates</span>
                     </li>
                     <li className="flex items-center gap-3 text-slate-700">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span>Automated tracking</span>
                     </li>
                     <li className="flex items-center gap-3 text-slate-700">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span>No manual entry required</span>
                     </li>
                   </ul>
@@ -327,21 +305,11 @@ export default async function HubWelcomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/heroes/career-services.jpg"
-            alt="Team celebrating success"
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-green-900/90" />
-        </div>
-        
-        <div className="relative max-w-4xl mx-auto text-center">
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-green-900">
+        <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Questions? Contact Us</h2>
           <p className="text-xl text-green-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of learners who are using the Hub to track their progress and achieve their career goals.
+            Use the Hub to track your progress and achieve your career goals.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link

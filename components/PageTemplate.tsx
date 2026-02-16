@@ -72,36 +72,18 @@ export function PageTemplate({
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-[400px] md:h-[500px] lg:h-[600px] flex items-center justify-center text-white overflow-hidden">
-        <ClickableImage
-          src={heroImage}
-          alt={heroImageAlt || title}
-          fill
-          priority
-          sizes="100vw"
-          objectFit="cover"
-        />
-        <div className="absolute inset-0 bg-zinc-900 /80 /80" />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            {title}
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-gray-100">
-            {description}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link
-              href={ctaPrimaryHref}
-              className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-            >
-              {ctaPrimaryText}
-            </Link>
-            <Link
-              href={ctaSecondaryHref}
-              className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
-            >
-              {ctaSecondaryText}
-            </Link>
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <ClickableImage src={heroImage} alt={heroImageAlt || title} fill priority sizes="100vw" objectFit="cover" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{title}</h1>
+            <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">{description}</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href={ctaPrimaryHref} className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-lg text-lg font-semibold transition-colors">{ctaPrimaryText}</Link>
+              <Link href={ctaSecondaryHref} className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors">{ctaSecondaryText}</Link>
+            </div>
           </div>
         </div>
       </section>
@@ -143,19 +125,7 @@ export function PageTemplate({
                       <ul className="space-y-3">
                         {section.bullets.map((bullet, i) => (
                           <li key={i} className="flex items-start">
-                            <svg
-                              className="w-6 h-6 text-green-600 mr-2 flex-shrink-0 mt-1"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M5 13l4 4L19 7"
-                              />
-                            </svg>
+                            <span className="text-slate-400 flex-shrink-0">•</span>
                             <span>{bullet}</span>
                           </li>
                         ))}

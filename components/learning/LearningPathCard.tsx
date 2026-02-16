@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { BookOpen, Clock, TrendingUp, CheckCircle } from "lucide-react";
+import { BookOpen, Clock, TrendingUp } from "lucide-react";
 
 interface LearningPathCardProps {
   id: string;
@@ -49,7 +49,7 @@ export function LearningPathCard({
         </div>
         {enrolled && (
           <div className="ml-4">
-            <CheckCircle className="w-6 h-6 text-green-400" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
         )}
       </div>

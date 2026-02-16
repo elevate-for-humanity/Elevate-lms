@@ -60,12 +60,7 @@ export default function EmployerProgramsPage() {
           fill
           className="object-cover opacity-20"
         />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <h1 className="text-4xl font-bold text-white mb-4">Employer Programs</h1>
-            <p className="text-xl text-brand-blue-200">Tax credits, apprenticeships, and workforce incentives</p>
-          </div>
-        </div>
+        
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

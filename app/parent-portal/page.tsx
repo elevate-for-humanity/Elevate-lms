@@ -9,11 +9,10 @@ import {
   MessageSquare,
   Calendar,
   Bell,
-  CheckCircle,
   ArrowRight,
   Eye,
   Shield,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';

@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Shield, Award, CheckCircle, ExternalLink } from 'lucide-react';
+import { Shield, Award, ExternalLink, CheckCircle, } from 'lucide-react';
 
 interface CredentialBadgeProps {
   variant?: 'compact' | 'full' | 'inline';
@@ -75,7 +75,7 @@ export function CredentialBadges({
               >
                 <cred.icon className={`w-4 h-4 text-${cred.color}-600`} />
                 <span className="font-medium text-gray-900">{cred.shortName}</span>
-                <CheckCircle className="w-3 h-3 text-green-500" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
             ))}
           </div>
@@ -149,7 +149,7 @@ export function CredentialBadgeStrip({ className = '' }: { className?: string })
         </span>
         <span className="text-gray-300">|</span>
         <span className="inline-flex items-center gap-1 text-gray-700">
-          <CheckCircle className="w-4 h-4 text-purple-600" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           WIOA
         </span>
       </div>

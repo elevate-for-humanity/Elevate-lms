@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertCircle, CheckCircle, FileText } from 'lucide-react';
+import { AlertCircle, FileText } from 'lucide-react';
 import { TIER3_INTERNAL_PLAN, REFUND_POLICY } from '@/lib/stripe/tuition-config';
 
 interface PaymentDisclosureProps {
@@ -204,7 +204,7 @@ export function PaymentDisclosure({
               : 'bg-slate-200 text-slate-400 cursor-not-allowed'
           }`}
         >
-          {allAcknowledged && <CheckCircle className="w-5 h-5" />}
+          {allAcknowledged && <span className="text-slate-400 flex-shrink-0">•</span>}
           I Agree & Continue
         </button>
       </div>

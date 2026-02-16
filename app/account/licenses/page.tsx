@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Key, Calendar, CheckCircle, AlertCircle } from 'lucide-react';
+import { Key, Calendar, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
@@ -72,7 +72,7 @@ export default async function AccountLicensesPage() {
                   <div className="flex items-center gap-2">
                     {license.status === 'active' ? (
                       <span className="flex items-center gap-1 text-green-600 text-sm">
-                        <CheckCircle className="w-4 h-4" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         Active
                       </span>
                     ) : (

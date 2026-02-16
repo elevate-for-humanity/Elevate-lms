@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { SignMOUForm } from './SignMOUForm';
-import { FileText, Shield, CheckCircle } from 'lucide-react';
+import { FileText, Shield } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,7 +75,7 @@ export default async function SignMOUPage() {
             </p>
           </div>
           <div className="bg-white rounded-lg p-4 border border-slate-200">
-            <CheckCircle className="text-brand-green-600 mb-2" size={24} />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <h3 className="font-semibold text-black text-sm">
               Secure Process
             </h3>

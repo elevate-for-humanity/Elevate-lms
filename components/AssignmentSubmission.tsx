@@ -6,7 +6,7 @@ import { useState, useRef } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
-import { Upload, File, X, CheckCircle, AlertCircle, FileText, Image as ImageIcon, Video } from 'lucide-react';
+import { Upload, File, X, AlertCircle, FileText, Image as ImageIcon, Video } from 'lucide-react';
 
 interface UploadedFile {
   id: string;
@@ -169,7 +169,7 @@ export function AssignmentSubmission({
       <Card className="border-2 border-green-600">
         <CardContent className="p-12 text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-12 h-12 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h2 className="text-3xl font-bold mb-4">Assignment Submitted!</h2>
           <p className="text-black mb-6">

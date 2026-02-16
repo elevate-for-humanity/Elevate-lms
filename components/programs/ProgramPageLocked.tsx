@@ -1,14 +1,13 @@
 import Image from 'next/image';
 import { Button } from '@/components/locked/Button';
 import {
-  CheckCircle,
   Clock,
   DollarSign,
   Award,
   Shield,
   Users,
   ArrowRight,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 /**
  * LOCKED Program Page Template
@@ -74,7 +73,7 @@ export function ProgramPageLocked({
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/60" />
+        
 
         <div className="relative z-10">
           <h1 className="text-4xl md:text-5xl font-bold">{name}</h1>
@@ -115,7 +114,7 @@ export function ProgramPageLocked({
                 key={index}
                 className="flex items-start gap-4 bg-white p-6 rounded-lg border border-slate-200"
               >
-                <CheckCircle className="h-10 w-10 text-green-600 flex-shrink-0 mt-1" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <p className="text-lg text-black font-semibold">
                   {outcome}
                 </p>

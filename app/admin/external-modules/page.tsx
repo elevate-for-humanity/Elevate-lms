@@ -11,11 +11,10 @@ import Image from 'next/image';
 
 import {
   ExternalLink,
-  CheckCircle,
   Clock,
   XCircle,
   AlertCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export default function ExternalModulesPage() {
   const supabase = createClient();
@@ -276,7 +275,7 @@ export default function ExternalModulesPage() {
                     <div className="flex items-center gap-2">
                       {module.status === 'active' && (
                         <span className="flex items-center gap-1 text-brand-green-600 text-sm font-medium">
-                          <CheckCircle className="h-4 w-4" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                           Active
                         </span>
                       )}

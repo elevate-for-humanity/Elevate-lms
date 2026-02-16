@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { 
   DollarSign, 
   Clock, 
-  CheckCircle, 
+  
   AlertCircle,
   ArrowRight,
   HelpCircle,
@@ -78,7 +78,7 @@ export default function CashAdvancePage() {
             </div>
 
             <div className="bg-gray-50 rounded-xl p-6 border border-gray-200 text-center">
-              <CheckCircle className="w-8 h-8 text-brand-blue-600 mx-auto mb-3" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <h3 className="font-semibold text-gray-900 mb-2">Repayment</h3>
               <p className="text-2xl font-bold text-brand-blue-600 mb-1">Automatic</p>
               <p className="text-sm text-gray-500">From your refund</p>
@@ -190,19 +190,19 @@ export default function CashAdvancePage() {
             </p>
             <ul className="grid sm:grid-cols-2 gap-2 text-gray-700 text-sm">
               <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Expected refund amount
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Tax return accuracy
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Filing history
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Identity verification
               </li>
             </ul>

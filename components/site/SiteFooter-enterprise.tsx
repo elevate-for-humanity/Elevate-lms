@@ -195,15 +195,15 @@ export default function SiteFooterEnterprise() {
               <h4 className="font-bold text-black mb-3">Credentials</h4>
               <ul className="space-y-2 text-black text-sm">
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
+                  <span className="text-green-600 font-bold">•</span>
                   <span>DOL Registered Apprenticeship Sponsor</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
+                  <span className="text-green-600 font-bold">•</span>
                   <span>ETPL Approved Provider (Indiana DWD)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-green-600 font-bold">✓</span>
+                  <span className="text-green-600 font-bold">•</span>
                   <span>1,500+ graduates since 2020</span>
                 </li>
               </ul>

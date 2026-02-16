@@ -161,7 +161,7 @@ export default function OrchestratorAdmin() {
                   {diagnose.token.error ? (
                     <span>❌ {JSON.stringify(diagnose.token.error)}</span>
                   ) : (
-                    <span>✅ Valid</span>
+                    <span>• Valid</span>
                   )}
                 </div>
               </div>
@@ -179,7 +179,7 @@ export default function OrchestratorAdmin() {
                     </span>
                   ) : (
                     <span>
-                      ✅{' '}
+                      •{' '}
                       {Array.isArray(diagnose.resources.kv)
                         ? diagnose.resources.kv.length
                         : 0}{' '}
@@ -202,7 +202,7 @@ export default function OrchestratorAdmin() {
                     </span>
                   ) : (
                     <span>
-                      ✅{' '}
+                      •{' '}
                       {Array.isArray(diagnose.resources.r2)
                         ? diagnose.resources.r2.length
                         : 0}{' '}
@@ -223,7 +223,7 @@ export default function OrchestratorAdmin() {
                     </span>
                   ) : (
                     <span>
-                      ✅{' '}
+                      •{' '}
                       {Array.isArray(diagnose.resources.workers)
                         ? diagnose.resources.workers.length
                         : 0}{' '}

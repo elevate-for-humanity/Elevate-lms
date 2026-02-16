@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { CheckCircle, XCircle, AlertCircle, ArrowRight, Phone, MapPin } from 'lucide-react';
+import { XCircle, AlertCircle, ArrowRight, Phone, MapPin } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Check Eligibility (Before WorkOne) | Elevate for Humanity',
@@ -63,7 +63,7 @@ export default function CheckEligibilityPage() {
           {/* You May Qualify */}
           <div className="mb-10">
             <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-              <CheckCircle className="w-7 h-7 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               You may be a good fit if you:
             </h2>
             <ul className="space-y-4">
@@ -75,7 +75,7 @@ export default function CheckEligibilityPage() {
                 'Are interested in training that leads directly to employment',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3 bg-green-50 p-4 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-800">{item}</span>
                 </li>
               ))}

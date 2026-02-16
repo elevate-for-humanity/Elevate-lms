@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import Link from 'next/link';
-import { BookOpen, Clock, Trophy, ChevronRight, ArrowRight, Play, Download, Plus, CheckCircle, Calendar } from 'lucide-react';
+import { BookOpen, Clock, Trophy, ChevronRight, ArrowRight, Play, Download, Plus, Calendar } from 'lucide-react';
 
 const COURSES = [
   { id: 1, name: 'CDL Pre-Trip Inspection', progress: 100, status: 'Completed', grade: 'A' },
@@ -94,7 +94,7 @@ export default function DemoLearnerPage() {
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-medium text-gray-900 text-sm">{c.name}</span>
-                    {c.status === 'Completed' && <CheckCircle className="w-3.5 h-3.5 text-green-500" />}
+                    {c.status === 'Completed' && <span className="text-slate-400 flex-shrink-0">•</span>}
                   </div>
                   <div className="text-xs text-gray-400 mt-0.5">
                     {c.status === 'Completed' ? `Grade: ${c.grade}` : c.nextLesson ? `Next: ${c.nextLesson}` : 'Ready to start'}
@@ -165,7 +165,7 @@ export default function DemoLearnerPage() {
                 <div className="flex items-center gap-3">
                   <span className="text-sm font-semibold text-gray-900">{h.hours}h</span>
                   {h.approved ? (
-                    <CheckCircle className="w-4 h-4 text-green-500" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : (
                     <Clock className="w-4 h-4 text-amber-500" />
                   )}

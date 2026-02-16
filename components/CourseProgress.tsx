@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, Circle } from 'lucide-react';
+import { Circle } from 'lucide-react';
 
 interface CourseProgressProps {
   current: number;
@@ -27,7 +27,7 @@ export function CourseProgress({ current, total, className = '' }: CourseProgres
       </div>
       {percentage === 100 && (
         <div className="flex items-center gap-2 mt-2 text-brand-orange-600 text-sm font-medium">
-          <CheckCircle className="w-4 h-4" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <span>Course completed!</span>
         </div>
       )}
@@ -44,7 +44,7 @@ export function LessonProgressIndicator({ completed, current }: LessonProgressIn
   if (completed) {
     return (
       <div className="flex items-center justify-center w-6 h-6 rounded-full bg-brand-orange-500 text-white">
-        <CheckCircle className="w-4 h-4" />
+        <span className="text-slate-400 flex-shrink-0">•</span>
       </div>
     );
   }

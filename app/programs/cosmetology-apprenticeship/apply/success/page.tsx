@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle, Phone, Mail, ArrowRight } from 'lucide-react';
+import { Phone, Mail, ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Application Submitted | Cosmetology Apprenticeship',
@@ -13,7 +13,7 @@ export default function ApplicationSuccessPage() {
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-8 h-8 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
 
           <h1 className="text-2xl font-bold text-gray-900 mb-3">

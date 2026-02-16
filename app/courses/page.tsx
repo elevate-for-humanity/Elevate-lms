@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
-  Clock, Users, Star, ArrowRight, CheckCircle, Play, 
+  Clock, Users, Star, ArrowRight, Play, 
   GraduationCap, Briefcase, Award, BookOpen, Sparkles 
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';

@@ -48,7 +48,7 @@ export function ReportProduct({ productId }: { productId: string }) {
   if (sent) {
     return (
       <div className="text-sm text-green-600">
-        ✓ Report submitted. Thank you.
+        • Report submitted. Thank you.
       </div>
     );
   }

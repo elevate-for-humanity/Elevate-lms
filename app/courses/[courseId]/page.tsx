@@ -40,7 +40,7 @@ export async function generateMetadata({
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, Users, Award, BookOpen, Play, CheckCircle } from 'lucide-react';
+import { Clock, Users, Award, BookOpen, Play } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default async function CourseDetailPage({
@@ -94,70 +94,11 @@ export default async function CourseDetailPage({
         ]}
       />
       {/* Hero Section */}
-      <section className="relative h-[400px] w-full overflow-hidden">
-        {course.cover_image_url ? (
-          <Image
-            src={course.cover_image_url}
-            alt={course.title}
-            fill
-            className="object-cover"
-            priority
-          />
-        ) : (
-          <div className="absolute inset-0 bg-brand-blue-700" />
-        )}
-
-        <div className="relative h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4">
-              {course.title}
-            </h1>
-            <p className="text-xl text-white mb-8">{course.description}</p>
-
-            <div className="flex flex-wrap gap-6 text-white mb-8">
-              {course.duration && (
-                <div className="flex items-center gap-2">
-                  <Clock className="h-5 w-5" />
-                  <span>{course.duration}</span>
-                </div>
-              )}
-              {lessons && (
-                <div className="flex items-center gap-2">
-                  <BookOpen className="h-5 w-5" />
-                  <span>{lessons.length} Lessons</span>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
-                <span>Self-paced</span>
-              </div>
-            </div>
-
-            {enrollment ? (
-              <Link
-                href={`/courses/${courseId}/learn`}
-                className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors"
-              >
-                <Play className="h-5 w-5" />
-                Continue Learning
-              </Link>
-            ) : (
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href={user ? `/courses/${courseId}/enroll` : '/login'}
-                  className="inline-flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-8 py-4 rounded-xl text-lg font-bold transition-colors"
-                >
-                  ⚡ {user ? 'Enroll Now - Instant Access' : 'Sign In to Enroll'}
-                </Link>
-                {course.price && course.price > 0 && (
-                  <div className="flex items-center gap-2 text-white">
-                    <span className="text-3xl font-black">${course.price}</span>
-                    <span className="text-sm opacity-90">one-time payment</span>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
+      {/* Hero */}
+      <section className="bg-slate-900 py-16">
+        <div className="max-w-5xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">{course.title}</h1>
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto">{course.description}</p>
         </div>
       </section>
 
@@ -199,7 +140,7 @@ export default async function CourseDetailPage({
                         )}
                       </div>
                       {enrollment && (
-                        <CheckCircle className="h-10 w-10 text-green-600" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       )}
                     </div>
                   </div>

@@ -4,9 +4,9 @@ import Link from 'next/link';
 import { loadCaseFile } from '@/lib/case-file/loader';
 import { 
   User, FileText, GraduationCap, Briefcase, Shield, 
-  Clock, CheckCircle, AlertCircle, XCircle, ChevronRight,
+  Clock, AlertCircle, XCircle, ChevronRight,
   Phone, Mail, MapPin, Calendar,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Participant Case File | Staff Portal',
@@ -235,7 +235,7 @@ export default async function CaseFilePage({ params }: { params: Promise<{ id: s
                   <div className="flex items-center gap-2">
                     {cred.verified && (
                       <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs flex items-center gap-1">
-                        <CheckCircle className="w-3 h-3" /> Verified
+                        <span className="text-slate-400 flex-shrink-0">•</span> Verified
                       </span>
                     )}
                     {cred.verificationUrl && (

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  ArrowLeft, BookOpen, CheckCircle, Clock, Play,
+  ArrowLeft, BookOpen, Clock, Play,
   FileText, Award, AlertCircle, Loader2, Lock,
   ChevronRight, Scissors, TrendingUp, Target
 } from 'lucide-react';
@@ -94,7 +94,7 @@ export default function StateBoardPrepPage() {
         <div className={`rounded-xl p-4 ${isEligible ? 'bg-green-500/20' : 'bg-amber-500/20'}`}>
           <div className="flex items-center gap-3">
             {isEligible ? (
-              <CheckCircle className="w-6 h-6 text-green-400" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             ) : (
               <AlertCircle className="w-6 h-6 text-amber-400" />
             )}
@@ -169,7 +169,7 @@ export default function StateBoardPrepPage() {
                     <div className="flex items-start gap-4">
                       <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colors.bg}`}>
                         {progress === 100 ? (
-                          <CheckCircle className={`w-5 h-5 ${colors.text}`} />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                         ) : (
                           <BookOpen className={`w-5 h-5 ${colors.text}`} />
                         )}
@@ -230,7 +230,7 @@ export default function StateBoardPrepPage() {
                     }`}>
                       {test.completed ? (
                         test.score && test.score >= test.passingScore ? (
-                          <CheckCircle className="w-6 h-6 text-green-400" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                         ) : (
                           <AlertCircle className="w-6 h-6 text-red-400" />
                         )

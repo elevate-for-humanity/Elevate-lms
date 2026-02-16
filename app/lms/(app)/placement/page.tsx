@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Briefcase, FileText, Users, Calendar, CheckCircle, Building2 } from 'lucide-react';
+import { Briefcase, FileText, Users, Calendar, Building2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Job Placement | LMS',
@@ -125,7 +125,7 @@ export default async function PlacementPage() {
               <h3 className="font-semibold mb-4">Your Placement Status</h3>
               {placements.map((placement: any) => (
                 <div key={placement.id} className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
                     <p className="font-medium">{placement.company}</p>
                     <p className="text-sm text-gray-600">{placement.position}</p>

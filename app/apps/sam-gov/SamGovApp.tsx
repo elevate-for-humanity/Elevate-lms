@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { 
   Building2, Bell, Settings, Plus, Upload, Download, RefreshCw,
-  CheckCircle, Clock, AlertTriangle, ChevronRight, X, FileText
+  Clock, AlertTriangle, ChevronRight, X, FileText
 } from 'lucide-react';
 
 interface Props {
@@ -103,7 +103,7 @@ export function SamGovApp({ user, subscription, entities: initialEntities, docum
               <div className="bg-white rounded-xl p-6 border">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-500 text-sm">Active</span>
-                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <p className="text-3xl font-bold text-green-600">{entities.filter(e => e.registration_status === 'active').length}</p>
               </div>

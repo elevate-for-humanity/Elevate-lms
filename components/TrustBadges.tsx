@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Shield, Award, CheckCircle, Lock } from 'lucide-react';
+import { Shield, Award, Lock } from 'lucide-react';
 
 export function TrustBadges() {
   return (
@@ -27,7 +27,7 @@ export function TrustBadges() {
           {/* WIOA Approved */}
           <div className="flex flex-col items-center text-center p-4">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-3">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <div className="text-sm font-semibold text-black">WIOA</div>
             <div className="text-xs text-black">Approved Provider</div>

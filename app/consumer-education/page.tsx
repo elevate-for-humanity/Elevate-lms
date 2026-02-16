@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { BookOpen, Shield, DollarSign, FileText, CheckCircle, ArrowRight,
+import { BookOpen, Shield, DollarSign, FileText, ArrowRight,
   Phone
 } from 'lucide-react';
 
@@ -30,15 +30,16 @@ export default function ConsumerEducationPage() {
         </div>
       </div>
 
-      <section className="relative min-h-[400px] flex items-center overflow-hidden">
-        <Image src="/hero-images/how-it-works-hero.jpg" alt="Consumer Education" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-brand-blue-900/70" />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Consumer Education</h1>
-          <p className="text-xl text-brand-blue-100 mb-8">Free resources to help you make informed decisions about education, finances, and career</p>
-          <Link href="/programs" className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-brand-blue-50 transition">
-            Explore Programs
-          </Link>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/hero-images/how-it-works-hero.jpg" alt="Consumer Education" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Consumer Education</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Free resources to help you make informed decisions about education, finances, and career</p>
+          </div>
         </div>
       </section>
 
@@ -63,7 +64,7 @@ export default function ConsumerEducationPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {['Transparent Information', 'No Hidden Fees', 'Student-First Approach'].map((item, i) => (
               <div key={i} className="flex items-center gap-2 justify-center">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}

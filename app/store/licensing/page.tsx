@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Server, Code, ArrowRight, CheckCircle } from 'lucide-react';
+import { Server, Code, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { RedirectNotice } from '@/components/store/RedirectNotice';
 
@@ -141,7 +141,7 @@ export default function StoreLicensesPage() {
                 <ul className="space-y-3 mb-8 flex-grow">
                   {lic.included.map((item) => (
                     <li key={item} className="flex items-start gap-2 text-sm">
-                      <CheckCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${lic.popular ? 'text-brand-red-400' : 'text-brand-red-600'}`} />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className={lic.popular ? 'text-slate-900/90' : 'text-slate-800'}>{item}</span>
                     </li>
                   ))}

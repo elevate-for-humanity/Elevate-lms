@@ -51,9 +51,7 @@ export default function CareersApplyPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="max-w-md mx-auto px-6 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h1>
           <p className="text-gray-600 mb-6">Thank you for applying. We will contact you within 48 hours.</p>
@@ -74,16 +72,7 @@ export default function CareersApplyPage() {
       <section className="relative h-[300px] w-full overflow-hidden">
         <Image src="/images/heroes/alumni.jpg" alt="Apply for Career" fill sizes="100vw" className="object-cover" quality={85} priority />
         
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="max-w-4xl mx-auto px-6 text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Apply Now
-            </h1>
-            <p className="text-xl">
-              Start your career with Supersonic Fast Cash
-            </p>
-          </div>
-        </div>
+        
       </section>
 
       {/* Application Form */}

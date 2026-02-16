@@ -14,8 +14,7 @@ import {
   AlertTriangle,
   Loader2,
   FileText,
-  CheckCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 export default function DataSettingsPage() {
@@ -181,7 +180,7 @@ export default function DataSettingsPage() {
                 accreditation requirements. Transcripts and certificates are kept permanently.
               </p>
               <div className="flex items-center gap-2 text-sm text-green-600">
-                <CheckCircle className="w-4 h-4" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Your data is securely stored and encrypted</span>
               </div>
             </div>

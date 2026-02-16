@@ -6,14 +6,13 @@ import {
   ChevronRight,
   Plus,
   Clock,
-  CheckCircle,
   XCircle,
   AlertCircle,
   User,
   FileText,
   Calendar,
   Filter,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Access Requests | FERPA Portal',
@@ -194,7 +193,7 @@ export default async function FerpaRequestsPage() {
           <div className="bg-white rounded-lg shadow-sm p-4 border border-gray-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <p className="text-2xl font-bold text-gray-900">{(requests?.length || 0) - pendingCount - reviewCount}</p>

@@ -3,7 +3,6 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import {
   Check,
-  CheckCircle,
   XCircle,
   Users,
   Shield,
@@ -11,7 +10,7 @@ import {
   DollarSign,
   FileText,
   AlertCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -390,27 +389,27 @@ export default async function ProgramHolderLicensePage() {
               </h3>
               <ul className="space-y-2 text-sm text-green-800">
                 <li>
-                  <CheckCircle className="w-5 h-5 inline-block" /> Located in
+                  <span className="text-slate-400 flex-shrink-0">•</span> Located in
                   Indiana (for now - expanding soon)
                 </li>
                 <li>
-                  <CheckCircle className="w-5 h-5 inline-block" /> Clean
+                  <span className="text-slate-400 flex-shrink-0">•</span> Clean
                   compliance history
                 </li>
                 <li>
-                  <CheckCircle className="w-5 h-5 inline-block" /> Quality
+                  <span className="text-slate-400 flex-shrink-0">•</span> Quality
                   training programs
                 </li>
                 <li>
-                  <CheckCircle className="w-5 h-5 inline-block" /> Professional
+                  <span className="text-slate-400 flex-shrink-0">•</span> Professional
                   references
                 </li>
                 <li>
-                  <CheckCircle className="w-5 h-5 inline-block" /> Financial
+                  <span className="text-slate-400 flex-shrink-0">•</span> Financial
                   stability
                 </li>
                 <li>
-                  <CheckCircle className="w-5 h-5 inline-block" /> Programs
+                  <span className="text-slate-400 flex-shrink-0">•</span> Programs
                   align with our approvals
                 </li>
               </ul>

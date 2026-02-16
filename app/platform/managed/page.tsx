@@ -5,11 +5,10 @@ import {
   Headphones,
   Clock,
   BarChart3,
-  CheckCircle,
   Server,
   RefreshCw,
   Lock,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -102,7 +101,7 @@ export default function ManagedPlatformPage() {
           <div className="grid sm:grid-cols-2 gap-4">
             {includedFeatures.map((f) => (
               <div key={f} className="flex items-start gap-3 p-4 bg-slate-50 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-900 font-medium">{f}</span>
               </div>
             ))}
@@ -157,7 +156,7 @@ export default function ManagedPlatformPage() {
                 <ul className="mt-6 space-y-3">
                   {tier.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm">
-                      <CheckCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${tier.popular ? 'text-brand-red-400' : 'text-brand-red-600'}`} />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className={tier.popular ? 'text-white/90' : 'text-slate-800'}>{f}</span>
                     </li>
                   ))}

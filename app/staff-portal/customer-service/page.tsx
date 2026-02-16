@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
-import { Ticket, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Ticket, AlertCircle, Clock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -112,7 +112,7 @@ export default async function CustomerServicePage() {
             </h2>
             {!tickets || tickets.length === 0 ? (
               <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8 text-center">
-                <CheckCircle className="h-12 w-12 text-green-500 mx-auto mb-3" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <p className="text-black">No active tickets</p>
               </div>
             ) : (

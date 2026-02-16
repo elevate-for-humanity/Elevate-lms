@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Award, Shield, CheckCircle } from 'lucide-react';
+import { Award, Shield } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Credentials & Certifications | Elevate for Humanity',
@@ -33,13 +33,7 @@ export default function CredentialsPage() {
       {/* Hero */}
       <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
         <Image src="/images/hero/hero-certifications.jpg" alt="Industry certifications" fill className="object-cover" priority sizes="100vw" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-6xl mx-auto px-4 w-full pb-10 sm:pb-14">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Credentials & Certifications</h1>
-            <p className="text-lg text-white/90 max-w-2xl">Industry-recognized credentials that employers require. Earn yours in weeks, not years.</p>
-          </div>
-        </div>
+        
       </section>
 
       {/* Credentials Grid */}
@@ -81,7 +75,7 @@ export default function CredentialsPage() {
                   'Funding may cover all certification and exam fees',
                 ].map((item) => (
                   <div key={item} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <p className="text-slate-700">{item}</p>
                   </div>
                 ))}

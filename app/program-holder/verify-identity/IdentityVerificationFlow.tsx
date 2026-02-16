@@ -8,12 +8,11 @@ import { createBrowserClient } from '@supabase/ssr';
 import {
   Shield,
   Upload,
-  CheckCircle,
   Clock,
   AlertCircle,
   FileText,
   Camera,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface IdentityVerificationFlowProps {
   userId: string;
@@ -243,15 +242,15 @@ export default function IdentityVerificationFlow({
               </p>
               <ul className="text-sm text-black space-y-2 mb-6">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Instant results
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Secure \u0026 encrypted
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   No document upload needed
                 </li>
               </ul>
@@ -412,7 +411,7 @@ export default function IdentityVerificationFlow({
                 </label>
                 {uploadedDocs.id && (
                   <div className="mt-3 flex items-center justify-center gap-2 text-green-600">
-                    <CheckCircle size={20} />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-sm">{uploadedDocs.id.name}</span>
                   </div>
                 )}
@@ -446,7 +445,7 @@ export default function IdentityVerificationFlow({
                 </label>
                 {uploadedDocs.ssn && (
                   <div className="mt-3 flex items-center justify-center gap-2 text-green-600">
-                    <CheckCircle size={20} />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-sm">{uploadedDocs.ssn.name}</span>
                   </div>
                 )}

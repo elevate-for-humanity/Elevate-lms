@@ -66,51 +66,15 @@ export default async function PaymentPage() {
                 </p>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center">
-                    <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Instant enrollment
                   </li>
                   <li className="flex items-center">
-                    <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     No additional fees
                   </li>
                   <li className="flex items-center">
-                    <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Credit/debit cards accepted
                   </li>
                 </ul>
@@ -131,51 +95,15 @@ export default async function PaymentPage() {
                 </p>
                 <ul className="space-y-3 mb-6">
                   <li className="flex items-center">
-                    <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     4 interest-free payments
                   </li>
                   <li className="flex items-center">
-                    <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Instant approval at checkout
                   </li>
                   <li className="flex items-center">
-                    <svg
-                      className="w-5 h-5 text-brand-green-600 mr-2"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Klarna, Afterpay, or Zip
                   </li>
                 </ul>
@@ -200,21 +128,15 @@ export default async function PaymentPage() {
                   </p>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       $1,743 setup fee + weekly payments
                     </li>
                     <li className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       Total program: $4,980
                     </li>
                     <li className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       WIOA funding may cover full cost
                     </li>
                   </ul>

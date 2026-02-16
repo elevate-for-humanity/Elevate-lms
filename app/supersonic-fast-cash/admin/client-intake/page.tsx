@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import {
   Users,
   FileText,
-  CheckCircle,
   Clock,
   AlertCircle,
   ExternalLink,
@@ -14,7 +13,7 @@ import {
   RefreshCw,
   Search,
   Filter,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface Client {
   id: string;
@@ -131,7 +130,7 @@ export default function ClientIntakeDashboard() {
               <span className="text-sm font-medium text-black">
                 Completed
               </span>
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <div className="text-3xl font-bold">
               {clients.filter((c) => c.status === 'completed').length}
@@ -278,7 +277,7 @@ export default function ClientIntakeDashboard() {
                         }`}
                       >
                         {client.status === 'completed' && (
-                          <CheckCircle className="w-3 h-3" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                         )}
                         {client.status === 'review' && (
                           <AlertCircle className="w-3 h-3" />

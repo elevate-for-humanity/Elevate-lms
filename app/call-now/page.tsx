@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle, MessageSquare, FileText, HelpCircle, Briefcase, GraduationCap, DollarSign } from 'lucide-react';
+import { ArrowRight, MessageSquare, FileText, HelpCircle, Briefcase, GraduationCap, DollarSign } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Get Started | Elevate For Humanity',
@@ -89,7 +89,7 @@ export default function GetStartedPage() {
               'Enroll and start training',
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-2 justify-center">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}

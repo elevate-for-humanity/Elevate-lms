@@ -25,7 +25,7 @@ const slides = [
     cta2: "See Programs",
   },
   {
-    image: "/images/students-new/student-17.jpg",
+    image: "/images/programs-hq/students-learning.jpg",
     title: "Earn $35K-$65K After Training",
     subtitle: "High-Demand Careers in Healthcare, Trades & Tech",
     description: "Job placement support • Industry credentials • Soft skills training",

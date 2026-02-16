@@ -28,16 +28,16 @@ export default function EducatorHubPage() {
         </div>
       </div>
 
-      <section className="relative min-h-[400px] flex items-center overflow-hidden">
-        <Image src="/hero-images/how-it-works-hero.jpg" alt="Educator Hub" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-teal-900/70" />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
-          <BookOpen className="w-16 h-16 mx-auto mb-6 text-white/80" />
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Educator Hub</h1>
-          <p className="text-xl text-teal-100 mb-8">Everything you need to create impactful learning experiences</p>
-          <Link href="/instructor/dashboard" className="inline-flex items-center gap-2 bg-white text-teal-600 px-8 py-4 rounded-full font-bold hover:bg-teal-50">
-            Go to Instructor Dashboard <ArrowRight className="w-5 h-5" />
-          </Link>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/hero-images/how-it-works-hero.jpg" alt="Educator Hub" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Educator Hub</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Everything you need to create impactful learning experiences</p>
+          </div>
         </div>
       </section>
 

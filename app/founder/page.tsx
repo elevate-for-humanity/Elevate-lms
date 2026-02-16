@@ -5,14 +5,14 @@ import Image from 'next/image';
 import { 
   Shield, 
   Award, 
-  CheckCircle, 
+  Circle,
   Building, 
   Heart, 
   Users, 
   Briefcase,
   GraduationCap,
   ArrowRight,
-  Star
+  Star,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
 
 const credentials = [
   { icon: Shield, title: 'DOL Registered', desc: 'Apprenticeship Sponsor', color: 'blue' },
-  { icon: CheckCircle, title: 'WIOA Approved', desc: 'Training Provider', color: 'green' },
+  { icon: Circle, title: 'WIOA Approved', desc: 'Training Provider', color: 'green' },
   { icon: Building, title: 'Indiana DWD', desc: 'INTraining Provider', color: 'blue' },
   { icon: GraduationCap, title: 'Indiana DOE', desc: 'State Recognized', color: 'indigo' },
   { icon: Heart, title: 'JRI Approved', desc: 'Justice Programs', color: 'red' },
@@ -173,7 +173,7 @@ export default function FounderPage() {
                 <div className="grid sm:grid-cols-2 gap-3">
                   {achievements.map((achievement, i) => (
                     <div key={i} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-slate-700 text-sm">{achievement}</span>
                     </div>
                   ))}
@@ -256,7 +256,7 @@ export default function FounderPage() {
                 <h3 className="text-xl font-bold text-slate-900 mb-3">{org.name}</h3>
                 <p className="text-slate-600 text-sm mb-4">{org.desc}</p>
                 <div className="flex items-center gap-2 text-green-600 text-sm font-semibold">
-                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   {org.status}
                 </div>
               </div>

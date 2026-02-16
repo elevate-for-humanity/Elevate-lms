@@ -46,21 +46,15 @@ export default function EcosystemPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[450px] flex items-center overflow-hidden">
-        <Image src="/hero-images/pathways-hero.jpg" alt="Elevate Ecosystem" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-brand-blue-900/70" />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">The Elevate Ecosystem</h1>
-          <p className="text-xl text-brand-blue-100 mb-8 max-w-2xl mx-auto">
-            A connected network of learners, employers, training providers, and workforce boards working together to transform careers and communities.
-          </p>
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/partners/join" className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-brand-blue-50 transition">
-              Join the Network
-            </Link>
-            <Link href="/programs" className="px-8 py-4 bg-brand-blue-500 text-white font-bold rounded-lg hover:bg-brand-blue-400 transition">
-              Explore Programs
-            </Link>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/hero-images/pathways-hero.jpg" alt="Elevate Ecosystem" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">The Elevate Ecosystem</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">A connected network of learners, employers, training providers, and workforce boards working together to transform careers and communities.</p>
           </div>
         </div>
       </section>

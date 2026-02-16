@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Building2, Users, BarChart3, FileText, ArrowRight, CheckCircle, Shield } from 'lucide-react';
+import { Building2, Users, BarChart3, FileText, ArrowRight, Shield } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Client Portal | Elevate For Humanity',
@@ -107,7 +107,7 @@ export default function ClientPortalPage() {
               <ul className="space-y-4">
                 {benefits.map((benefit) => (
                   <li key={benefit} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{benefit}</span>
                   </li>
                 ))}

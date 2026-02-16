@@ -65,17 +65,7 @@ export default async function DrugTestingTrainingPage() {
           className="object-cover" 
           priority 
         />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-6xl mx-auto px-4 text-white">
-            <Link href="/drug-testing" className="inline-flex items-center gap-2 text-brand-blue-200 hover:text-white mb-4">
-              <ArrowLeft className="w-4 h-4" /> Back to Drug Testing Services
-            </Link>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">Drug Testing Training Courses</h1>
-            <p className="text-xl text-brand-blue-100 max-w-2xl">
-              DOT and non-DOT certified training. Online courses with immediate certification.
-            </p>
-          </div>
-        </div>
+        
       </section>
 
       {/* Partner Badge */}

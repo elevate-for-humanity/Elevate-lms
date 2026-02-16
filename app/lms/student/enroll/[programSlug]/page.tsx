@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { CheckCircle, Clock, Award, ArrowRight } from 'lucide-react';
+import { Clock, Award, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -78,7 +78,7 @@ export default async function EnrollProgramPage({ params }: Props) {
                       </div>
                     </div>
                     <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-lg">
-                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <div>
                         <p className="text-sm text-gray-500">Cost</p>
                         <p className="font-medium text-green-600">Free with WIOA</p>

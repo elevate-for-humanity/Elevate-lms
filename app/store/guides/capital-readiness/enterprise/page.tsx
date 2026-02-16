@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowLeft, Building2, Shield, Globe, Users, FileCheck, Scale, Briefcase, CheckCircle2, AlertTriangle, Clock, DollarSign } from "lucide-react";
+import { ArrowLeft, Building2, Shield, Globe, Users, FileCheck, Scale, Briefcase, AlertTriangle, Clock, DollarSign } from "lucide-react";
 
 export default function EnterpriseCapitalReadinessPage() {
   return (
@@ -65,7 +65,7 @@ export default function EnterpriseCapitalReadinessPage() {
                     "Federal program administrators"
                   ].map((item, i) => (
                     <li key={i} className="flex items-start gap-3 text-gray-300">
-                      <CheckCircle2 className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       {item}
                     </li>
                   ))}
@@ -281,7 +281,7 @@ export default function EnterpriseCapitalReadinessPage() {
                     <ul className="grid md:grid-cols-2 gap-2">
                       {phase.tasks.map((task, j) => (
                         <li key={j} className="flex items-center gap-2 text-gray-300 text-sm">
-                          <CheckCircle2 className="w-4 h-4 text-green-400 flex-shrink-0" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                           {task}
                         </li>
                       ))}
@@ -348,7 +348,7 @@ export default function EnterpriseCapitalReadinessPage() {
                 <ul className="space-y-2 mb-4">
                   {stakeholder.responsibilities.map((resp, j) => (
                     <li key={j} className="flex items-start gap-2 text-gray-300 text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-cyan-400 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       {resp}
                     </li>
                   ))}
@@ -463,7 +463,7 @@ export default function EnterpriseCapitalReadinessPage() {
                 <ul className="space-y-2">
                   {pricing.includes.map((item, j) => (
                     <li key={j} className="flex items-center gap-2 text-gray-300 text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       {item}
                     </li>
                   ))}

@@ -10,12 +10,11 @@ import {
   Calendar,
   MessageSquare,
   AlertCircle,
-  CheckCircle,
   Clock,
   Settings,
   Trash2,
-  Check
-} from 'lucide-react';
+  Check,
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Notifications | Student Portal',

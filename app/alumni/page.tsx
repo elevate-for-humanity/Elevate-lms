@@ -63,7 +63,7 @@ export default function AlumniPage() {
               Elevate Alumni Network
             </h1>
             <p className="text-xl text-brand-blue-100 mb-8">
-              Join thousands of graduates who have transformed their careers. Access exclusive job opportunities, networking events, and continued learning resources.
+              Graduates across Indiana have transformed their careers. Access exclusive job opportunities, networking events, and continued learning resources.
             </p>
             <div className="flex flex-wrap gap-4">
               <Link

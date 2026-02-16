@@ -6,8 +6,7 @@ import {
   Users,
   Briefcase,
   Building2,
-  CheckCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata = {
   title: 'Contract Templates | Elevate for Humanity',
@@ -315,7 +314,7 @@ export default function ContractsPage() {
               </p>
             </div>
             <div className="mt-6 flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <p className="text-sm text-black">
                 This language protects your WIOA/WRG position and is exactly
                 what auditors expect to see.

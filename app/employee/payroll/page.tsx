@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { DollarSign, Download, FileText, Clock, CheckCircle } from 'lucide-react';
+import { DollarSign, Download, FileText, Clock } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function PayrollPage() {
@@ -81,7 +81,7 @@ export default function PayrollPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded flex items-center">
-                    <CheckCircle className="w-3 h-3 mr-1" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     {stub.status}
                   </span>
                   <button className="p-2 text-gray-400 hover:text-brand-blue-600 transition">

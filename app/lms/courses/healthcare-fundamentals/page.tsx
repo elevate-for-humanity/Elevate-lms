@@ -6,13 +6,12 @@ import {
   Clock,
   Award,
   Users,
-  CheckCircle,
   ArrowRight,
   Video,
   FileText,
   Star,
   Calendar,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -261,7 +260,7 @@ export default function HealthcareFundamentalsCoursePage() {
 
           <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
             <div className="flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <h3 className="font-bold text-black mb-1">
                   Medical Terminology
@@ -273,7 +272,7 @@ export default function HealthcareFundamentalsCoursePage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <h3 className="font-bold text-black mb-1">Anatomy Basics</h3>
                 <p className="text-black text-sm">
@@ -283,7 +282,7 @@ export default function HealthcareFundamentalsCoursePage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <h3 className="font-bold text-black mb-1">Patient Care</h3>
                 <p className="text-black text-sm">
@@ -293,7 +292,7 @@ export default function HealthcareFundamentalsCoursePage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <h3 className="font-bold text-black mb-1">Infection Control</h3>
                 <p className="text-black text-sm">
@@ -303,7 +302,7 @@ export default function HealthcareFundamentalsCoursePage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <h3 className="font-bold text-black mb-1">Documentation</h3>
                 <p className="text-black text-sm">
@@ -313,7 +312,7 @@ export default function HealthcareFundamentalsCoursePage() {
             </div>
 
             <div className="flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <h3 className="font-bold text-black mb-1">Safety Procedures</h3>
                 <p className="text-black text-sm">

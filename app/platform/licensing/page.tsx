@@ -185,7 +185,7 @@ export default function PlatformLicensingPage() {
               {
                 step: '2',
                 title: 'Technical Walkthrough',
-                description: 'Schedule a call to review the platform, discuss customization needs, and scope the deployment.',
+                description: 'Meet with our team to review the platform, discuss customization needs, and scope the deployment.',
               },
               {
                 step: '3',

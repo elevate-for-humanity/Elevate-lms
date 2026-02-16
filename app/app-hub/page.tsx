@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { 
   Smartphone, Download, Star, Shield, Bell, 
-  Wifi, Clock, CheckCircle, Apple, Play
+  Wifi, Clock, Apple, Play
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -154,7 +154,7 @@ export default function AppHubPage() {
                 </div>
                 <div className="flex gap-2">
                   <span className="flex-1 flex items-center justify-center gap-2 bg-brand-blue-600 text-white py-2 rounded-lg text-sm">
-                    <CheckCircle className="w-4 h-4" /> Mobile Web Ready
+                    <span className="text-slate-400 flex-shrink-0">•</span> Mobile Web Ready
                   </span>
                 </div>
               </div>

@@ -8,10 +8,9 @@ import {
   Briefcase,
   Users,
   ArrowRight,
-  CheckCircle,
   Phone,
   MapPin,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -184,7 +183,7 @@ export default function CommunityServicesPage() {
                     <ul className="space-y-3 mb-6">
                       {service.benefits.map((benefit) => (
                         <li key={benefit} className="flex items-center gap-3">
-                          <CheckCircle className={`w-5 h-5 ${colors.text}`} />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                           <span className="text-gray-700">{benefit}</span>
                         </li>
                       ))}

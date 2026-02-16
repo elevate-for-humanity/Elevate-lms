@@ -2,13 +2,13 @@
 
 import React from 'react';
 
-import { BadgeCheck, GraduationCap, Briefcase, Landmark, Users } from "lucide-react";
+import { GraduationCap, Briefcase, Landmark, Users } from "lucide-react";
 
 type Item = { icon: React.ReactNode; label: string; sub?: string };
 
 const items: Item[] = [
   { icon: <Landmark className="h-4 w-4" />, label: "WIOA-aligned", sub: "Workforce-ready pathways" },
-  { icon: <BadgeCheck className="h-4 w-4" />, label: "Registered Apprenticeship", sub: "RAPIDS partners" },
+  { icon: <span className="text-slate-400 flex-shrink-0">•</span>, label: "Registered Apprenticeship", sub: "RAPIDS partners" },
   { icon: <GraduationCap className="h-4 w-4" />, label: "ETPL-friendly", sub: "Clear outcomes & credentials" },
   { icon: <Briefcase className="h-4 w-4" />, label: "Career services", sub: "Coaching & job search" },
   { icon: <Users className="h-4 w-4" />, label: "Employer partnerships", sub: "OJT & reimbursement" },

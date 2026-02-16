@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   ArrowLeft, Mail, Calendar, Clock, TrendingUp,
-  Award, CheckCircle, AlertCircle, Loader2, Share2,
+  Award, AlertCircle, Loader2, Share2,
   Scissors, BookOpen, ChevronRight
 } from 'lucide-react';
 
@@ -163,7 +163,7 @@ export default function WeeklySummaryPage() {
           <h2 className="text-white font-medium mb-4">Approval Status</h2>
           <div className="grid grid-cols-2 gap-4">
             <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 text-center">
-              <CheckCircle className="w-6 h-6 text-green-400 mx-auto mb-2" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <p className="text-2xl font-bold text-white">{summary.approvedHours}</p>
               <p className="text-green-400 text-sm">Approved</p>
             </div>
@@ -222,7 +222,7 @@ export default function WeeklySummaryPage() {
             </div>
             {summary.milestonesReached.map((milestone, index) => (
               <div key={index} className="flex items-center gap-2 text-white">
-                <CheckCircle className="w-4 h-4 text-amber-400" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>{milestone}</span>
               </div>
             ))}

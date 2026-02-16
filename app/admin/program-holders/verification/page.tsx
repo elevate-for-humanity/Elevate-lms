@@ -5,13 +5,12 @@ import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
 import {
-  CheckCircle,
   XCircle,
   Clock,
   FileText,
   Download,
   Eye,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Program Holder Verification | Admin',
@@ -138,7 +137,7 @@ export default async function ProgramHolderVerificationPage() {
                   }
                 </p>
               </div>
-              <CheckCircle className="w-12 h-12 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
           </div>
 

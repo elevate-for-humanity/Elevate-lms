@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
   Award, 
-  CheckCircle, 
+  
   Users, 
   Briefcase, 
   FileText, 
@@ -40,88 +40,73 @@ export default function WorkOnePartnerPacketPage() {
       </div>
 
       {/* Hero Section with Video */}
-      <section className="relative min-h-[650px] flex items-center overflow-hidden">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="none"
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        >
-          <source src="https://cms-artifacts.artlist.io/content/generated-video-v1/video__2/generated-video-acfed647-8bb1-44ed-8505-876b1d573896.mp4?Expires=2083808563&Key-Pair-Id=K2ZDLYDZI2R1DF&Signature=BO~IkvikD0UAyMYmWQoBNskXM7I8fMAXUJW3T-zgJh1jg78q3LhNDpFOLhVcCpTBW1Rscp0c0YXEi-CQ29NDjSUKoclWTKq4q-bPLNxXgOpKLYxr5B5X3LzzDQQYnq5ilkgAvEZ~VzT3P8HEixv9WPRLFnAd5V3f~829SadfMPddUPxQZDZc29hrBn-Kxv-EKfugudcZ3depV1X-T1F5UxzvRMqFCXxjfT658RlSt0IupI0LxtywFYkChqJQmH6A~2JBncMUPerBqqt0Gdyp4ettIltCFvBX70ai6784jneJJrWcBJ0l7GyJPx1WBPAqjAdnCeJwyPC2Spp3~u93pQ__" type="video/mp4" />
-        </video>
-        
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="flex flex-wrap items-center gap-3 mb-6">
-                <div className="px-4 py-2 bg-green-500/20 backdrop-blur-sm border border-green-400/30 rounded-full">
-                  <span className="text-sm font-bold text-green-300">Registered Apprenticeship Sponsor</span>
-                </div>
-                <div className="px-4 py-2 bg-brand-blue-500/20 backdrop-blur-sm border border-brand-blue-400/30 rounded-full">
-                  <span className="text-sm font-bold text-brand-blue-300">ETPL Approved</span>
-                </div>
-                <div className="px-4 py-2 bg-brand-blue-500/20 backdrop-blur-sm border border-brand-blue-400/30 rounded-full">
-                  <span className="text-sm font-bold text-brand-blue-300">WIOA | WRG Eligible</span>
-                </div>
-              </div>
-
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-                WorkOne Partner Packet
-              </h1>
-              <p className="text-xl text-white/90 mb-4 leading-relaxed">
-                Everything WorkOne regions need to refer participants to our ETPL-approved 
-                training programs and registered apprenticeships.
-              </p>
-              <p className="text-lg text-white/80 mb-8 leading-relaxed">
-                We handle enrollment, training delivery, and outcome reporting with full 
-                transparency. Our team provides dedicated support for case managers and 
-                ensures all WIOA performance requirements are met.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-teal-700 rounded-lg font-bold hover:bg-gray-100 transition-colors"
-                >
-                  <Phone className="w-5 h-5 mr-2" />
-                  Contact Us
-                </Link>
-                <PrintButton />
-              </div>
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="none"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          >
+            <source src="https://cms-artifacts.artlist.io/content/generated-video-v1/video__2/generated-video-acfed647-8bb1-44ed-8505-876b1d573896.mp4?Expires=2083808563&Key-Pair-Id=K2ZDLYDZI2R1DF&Signature=BO~IkvikD0UAyMYmWQoBNskXM7I8fMAXUJW3T-zgJh1jg78q3LhNDpFOLhVcCpTBW1Rscp0c0YXEi-CQ29NDjSUKoclWTKq4q-bPLNxXgOpKLYxr5B5X3LzzDQQYnq5ilkgAvEZ~VzT3P8HEixv9WPRLFnAd5V3f~829SadfMPddUPxQZDZc29hrBn-Kxv-EKfugudcZ3depV1X-T1F5UxzvRMqFCXxjfT658RlSt0IupI0LxtywFYkChqJQmH6A~2JBncMUPerBqqt0Gdyp4ettIltCFvBX70ai6784jneJJrWcBJ0l7GyJPx1WBPAqjAdnCeJwyPC2Spp3~u93pQ__" type="video/mp4" />
+          </video>
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
+              <span className="px-4 py-2 bg-green-500/20 border border-green-400/30 rounded-full text-sm font-bold text-green-300">Registered Apprenticeship Sponsor</span>
+              <span className="px-4 py-2 bg-brand-blue-500/20 border border-brand-blue-400/30 rounded-full text-sm font-bold text-brand-blue-300">ETPL Approved</span>
+              <span className="px-4 py-2 bg-brand-blue-500/20 border border-brand-blue-400/30 rounded-full text-sm font-bold text-brand-blue-300">WIOA | WRG Eligible</span>
             </div>
+            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">WorkOne Partner Packet</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto mb-6">
+              Everything WorkOne regions need to refer participants to our ETPL-approved training programs and registered apprenticeships. We handle enrollment, training delivery, and outcome reporting with full transparency.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-white text-teal-700 rounded-lg font-bold hover:bg-gray-100 transition-colors">
+                <Phone className="w-5 h-5 mr-2" />
+                Contact Us
+              </Link>
+              <PrintButton />
+            </div>
+          </div>
+        </div>
+      </section>
 
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-              <h3 className="text-xl font-bold text-white mb-6">Organization Overview</h3>
-              <div className="space-y-4">
-                <div className="flex items-start gap-3">
-                  <Building2 className="w-5 h-5 text-teal-300 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-white">Organization Type</div>
-                    <div className="text-white/80 text-sm">Registered Apprenticeship Sponsor & Workforce Intermediary</div>
-                  </div>
+      {/* Organization Overview */}
+      <section className="py-12 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-white rounded-2xl p-8 border border-slate-200">
+            <h3 className="text-xl font-bold text-slate-900 mb-6">Organization Overview</h3>
+            <div className="grid sm:grid-cols-2 gap-6">
+              <div className="flex items-start gap-3">
+                <Building2 className="w-5 h-5 text-teal-600 flex-shrink-0 mt-1" />
+                <div>
+                  <div className="font-semibold text-slate-900">Organization Type</div>
+                  <div className="text-slate-600 text-sm">Registered Apprenticeship Sponsor & Workforce Intermediary</div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <Shield className="w-5 h-5 text-teal-300 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-white">Federal Oversight</div>
-                    <div className="text-white/80 text-sm">U.S. Department of Labor</div>
-                  </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Shield className="w-5 h-5 text-teal-600 flex-shrink-0 mt-1" />
+                <div>
+                  <div className="font-semibold text-slate-900">Federal Oversight</div>
+                  <div className="text-slate-600 text-sm">U.S. Department of Labor</div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <Target className="w-5 h-5 text-teal-300 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-white">State Alignment</div>
-                    <div className="text-white/80 text-sm">Indiana Department of Workforce Development</div>
-                  </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Target className="w-5 h-5 text-teal-600 flex-shrink-0 mt-1" />
+                <div>
+                  <div className="font-semibold text-slate-900">State Alignment</div>
+                  <div className="text-slate-600 text-sm">Indiana Department of Workforce Development</div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <Award className="w-5 h-5 text-teal-300 flex-shrink-0 mt-1" />
-                  <div>
-                    <div className="font-semibold text-white">ETPL Status</div>
-                    <div className="text-white/80 text-sm">Approved Training Provider - All Indiana Regions</div>
-                  </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Award className="w-5 h-5 text-teal-600 flex-shrink-0 mt-1" />
+                <div>
+                  <div className="font-semibold text-slate-900">ETPL Status</div>
+                  <div className="text-slate-600 text-sm">Approved Training Provider - All Indiana Regions</div>
                 </div>
               </div>
             </div>
@@ -173,28 +158,28 @@ export default function WorkOnePartnerPacketPage() {
                 <h3 className="text-xl font-bold text-gray-900 mb-6">What Makes Us Different</h3>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <div>
                       <div className="font-semibold text-gray-900">Employer-Driven Model</div>
                       <div className="text-gray-600 text-sm">Training aligned with actual job requirements</div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <div>
                       <div className="font-semibold text-gray-900">Compliance Built-In</div>
                       <div className="text-gray-600 text-sm">WIOA, FERPA, ADA, EEO compliant from day one</div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <div>
                       <div className="font-semibold text-gray-900">Outcome-Focused</div>
                       <div className="text-gray-600 text-sm">Employment and wage gains, not just completions</div>
                     </div>
                   </div>
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-1" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <div>
                       <div className="font-semibold text-gray-900">Automated Reporting</div>
                       <div className="text-gray-600 text-sm">Real-time data for case managers and funders</div>
@@ -365,7 +350,7 @@ export default function WorkOnePartnerPacketPage() {
                 <div className="grid grid-cols-2 gap-3">
                   {['WIOA Title I (Adult)', 'WIOA Title I (DW)', 'WIOA Title I (Youth)', 'WRG (Workforce Ready Grant)', 'SNAP E&T', 'TANF', 'TAA', 'Veterans Benefits'].map((source, index) => (
                     <div key={index} className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-gray-700 text-sm">{source}</span>
                     </div>
                   ))}
@@ -396,13 +381,9 @@ export default function WorkOnePartnerPacketPage() {
         </div>
       </section>
 
-      {/* CTA with Background Image */}
-      <section className="relative py-20">
-        <div className="absolute inset-0">
-          <Image src="/images/employers/partnership-office-meeting.jpg" alt="Partnership" fill sizes="100vw" className="object-cover" />
-          <div className="absolute inset-0 bg-teal-600/90" />
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+      {/* CTA */}
+      <section className="py-20 bg-teal-600">
+        <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">Ready to Refer Participants?</h2>
           <p className="text-xl text-white/90 mb-8">
             Contact our WorkOne liaison to set up your referral process or request additional information.

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Users, Search, Mail, GraduationCap, Clock, CheckCircle } from 'lucide-react';
+import { Users, Search, Mail, GraduationCap, Clock } from 'lucide-react';
 import { safeFormatDate } from '@/lib/format-utils';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -110,7 +110,7 @@ export default async function InstructorStudentsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-4">
             <div className="flex items-center gap-3">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="text-2xl font-bold">{completedStudents.length}</div>
                 <div className="text-sm text-gray-600">Completed</div>

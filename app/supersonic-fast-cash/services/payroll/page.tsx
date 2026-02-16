@@ -8,7 +8,6 @@ import {
   FileText,
   Shield,
   Clock,
-  CheckCircle,
   TrendingUp,
   Calendar,
   AlertCircle,
@@ -17,7 +16,7 @@ import {
   Phone,
   Mail,
   Calculator,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -335,32 +334,6 @@ export default async function PayrollPage() {
           quality={85}
           priority
         />
-        
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="max-w-4xl mx-auto px-6 text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Professional Payroll Services
-            </h1>
-            <p className="text-xl mb-6">
-              Accurate, compliant payroll processing so you can focus on your
-              business
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 text-white/90">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5" />
-                <span>Direct Deposit</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5" />
-                <span>Tax Filing</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5" />
-                <span>Full Compliance</span>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Services */}
@@ -389,7 +362,7 @@ export default async function PayrollPage() {
                       key={idx}
                       className="flex items-start gap-2 text-sm text-gray-600"
                     >
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -459,7 +432,7 @@ export default async function PayrollPage() {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-gray-600">{feature}</span>
                     </li>
                   ))}
@@ -533,7 +506,7 @@ export default async function PayrollPage() {
                       key={idx}
                       className="flex items-start gap-2 text-sm text-gray-600"
                     >
-                      <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span>{item}</span>
                     </li>
                   ))}

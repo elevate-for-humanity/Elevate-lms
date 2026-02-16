@@ -9,10 +9,9 @@ import {
   TrendingUp,
   Shield,
   Zap,
-  CheckCircle,
   ArrowRight,
   Phone,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 
 
@@ -191,7 +190,7 @@ export default function SolutionsPage() {
                   <ul className="space-y-3 mb-8">
                     {solution.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-2">
-                        <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         <span className="text-sm text-black">
                           {feature}
                         </span>

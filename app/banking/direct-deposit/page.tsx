@@ -5,13 +5,12 @@ import Image from 'next/image';
 import {
   Zap,
   Shield,
-  CheckCircle,
   Clock,
   Building,
   ArrowRight,
   AlertCircle,
   FileText,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Direct Deposit - Get Your Refund Faster | Elevate for Humanity',
@@ -81,7 +80,7 @@ export default function DirectDepositPage() {
               <p className="text-sm text-gray-600">FDIC insured and encrypted transfers</p>
             </div>
             <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-              <CheckCircle className="w-10 h-10 text-green-600 mx-auto mb-3" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <h3 className="font-bold text-gray-900 mb-2">No Fees</h3>
               <p className="text-sm text-gray-600">Direct deposit is completely free</p>
             </div>
@@ -163,7 +162,7 @@ export default function DirectDepositPage() {
                   </div>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-6 h-6 text-green-600 mr-3 flex-shrink-0 mt-1" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
                     <p className="font-semibold text-gray-900">Account Type</p>
                     <p className="text-sm text-gray-600">Checking or Savings designation</p>

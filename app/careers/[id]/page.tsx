@@ -3,7 +3,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Upload, CheckCircle, Briefcase, MapPin, Clock } from 'lucide-react';
+import { ArrowLeft, Upload, Briefcase, MapPin, Clock } from 'lucide-react';
 
 export default function CareerApplicationPage({ params }: { params: { id: string } }) {
   const [formData, setFormData] = useState({
@@ -40,7 +40,7 @@ export default function CareerApplicationPage({ params }: { params: { id: string
         <div className="max-w-2xl mx-auto px-4 text-center">
           <div className="bg-white rounded-2xl shadow-lg p-12">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h1 className="text-3xl font-bold text-gray-900 mb-4">Application Submitted!</h1>
             <p className="text-gray-600 mb-8">

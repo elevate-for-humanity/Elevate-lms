@@ -13,7 +13,7 @@
  * - Dashboard (when status is pending)
  */
 
-import { Clock, CheckCircle, Users, FileText, Calendar } from 'lucide-react';
+import { Clock, Users, FileText, Calendar } from 'lucide-react';
 
 interface EnrollmentExpectationsProps {
   variant?: 'banner' | 'card' | 'inline' | 'compact';
@@ -68,7 +68,7 @@ export function EnrollmentExpectations({
               status="pending"
             />
             <TimelineStep 
-              icon={<CheckCircle className="w-4 h-4" />}
+              icon={<span className="text-slate-400 flex-shrink-0">•</span>}
               title="Funding Confirmation"
               description="WIOA/WRG approval"
               status="pending"

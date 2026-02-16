@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { Button } from '@/components/ui/Button';
-import { ArrowLeft, CheckCircle, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -94,7 +94,7 @@ export default async function EmployerBenefitsPage() {
                 },
               ].map((benefit, index) => (
                 <div key={index} className="flex gap-4">
-                  <CheckCircle className="h-10 w-10 text-orange-600 flex-shrink-0 mt-1" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-semibold text-lg mb-1">
                       {benefit.title}

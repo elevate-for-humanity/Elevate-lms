@@ -233,7 +233,7 @@ export function AdaptiveLearningPath() {
               <div className="space-y-2">
                 {path.courses.slice(0, 3).map((course) => (
                   <div key={course.id} className="flex items-center gap-2 text-sm">
-                    {course.recommended && <span className="text-green-500">✓</span>}
+                    {course.recommended && <span className="text-green-500">•</span>}
                     <span className="text-black">{course.title}</span>
                     <span className={`px-2 py-0.5 rounded text-xs ${
                       course.difficulty === 'beginner' ? 'bg-brand-blue-100 text-brand-blue-700' :
@@ -298,7 +298,7 @@ export function AdaptiveLearningPath() {
 
                       {course.recommended && (
                         <div className="flex items-center gap-2 text-sm text-green-700">
-                          <span>✓</span>
+                          <span>•</span>
                           <span className="font-medium">Highly recommended for you</span>
                         </div>
                       )}

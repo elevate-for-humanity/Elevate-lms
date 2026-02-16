@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, CheckCircle, ArrowLeft, Truck, FileCheck, AlertTriangle, Users } from 'lucide-react';
+import { Phone, ArrowLeft, Truck, FileCheck, AlertTriangle, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'DOT Drug & Alcohol Testing | Drug Testing Services',
@@ -186,7 +186,7 @@ export default function DotTestingPage() {
               <div className="grid gap-3">
                 {whoNeedsDot.map((item) => (
                   <div key={item.role} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <div>
                       <div className="font-medium text-gray-900">{item.role}</div>
                       <div className="text-sm text-gray-600">{item.desc}</div>
@@ -242,7 +242,7 @@ export default function DotTestingPage() {
                   <ul className="space-y-1 mb-4">
                     {test.includes.slice(0, 4).map((item, idx) => (
                       <li key={idx} className="flex items-start gap-2 text-xs text-gray-700">
-                        <CheckCircle className="w-3 h-3 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         {item}
                       </li>
                     ))}
@@ -310,7 +310,7 @@ export default function DotTestingPage() {
                   'Affordable monthly rates',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     {item}
                   </li>
                 ))}

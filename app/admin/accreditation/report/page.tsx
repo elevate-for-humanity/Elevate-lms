@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Download, Calendar, CheckCircle, AlertTriangle, Clock, ArrowLeft } from 'lucide-react';
+import { Download, Calendar, AlertTriangle, Clock, ArrowLeft } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Accreditation Report | Admin',
@@ -91,7 +91,7 @@ export default function AccreditationReportPage() {
                 </div>
                 <div className="w-16 text-right font-bold text-gray-900">{cat.score}%</div>
                 {cat.status === 'compliant' ? (
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <AlertTriangle className="w-5 h-5 text-yellow-600" />
                 )}

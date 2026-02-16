@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useState } from 'react';
-import { Mail, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, AlertCircle } from 'lucide-react';
 
 export default function NewsletterSignup() {
   const [email, setEmail] = useState('');
@@ -123,7 +123,7 @@ export default function NewsletterSignup() {
               }`}
             >
               {status === 'success' ? (
-                <CheckCircle className="w-5 h-5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               ) : (
                 <AlertCircle className="w-5 h-5" />
               )}

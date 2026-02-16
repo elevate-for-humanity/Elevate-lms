@@ -10,13 +10,12 @@ import {
   Plus, 
   ArrowLeft,
   Calendar,
-  CheckCircle,
   Loader2,
   AlertCircle,
   FileText,
   Download,
-  ClipboardList
-} from 'lucide-react';
+  ClipboardList,
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface Apprentice {
@@ -249,7 +248,7 @@ export default function BarberPartnerPage() {
         
         {success && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3 text-green-700">
-            <CheckCircle className="w-5 h-5" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             {success}
           </div>
         )}

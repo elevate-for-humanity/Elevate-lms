@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation';
 import { 
   Sparkles, 
   Loader2, 
-  CheckCircle, 
+  
   BookOpen, 
   Clock, 
   Target,
@@ -128,7 +128,7 @@ Include Assignments: ${formData.includeAssignments}
         {success && (
           <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
             <div className="flex items-start gap-4">
-              <CheckCircle className="w-8 h-8 text-green-600 flex-shrink-0" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div className="flex-1">
                 <h2 className="text-xl font-semibold text-green-900 mb-2">Course Generated Successfully!</h2>
                 <p className="text-green-700 mb-4">{success.outline.title}</p>

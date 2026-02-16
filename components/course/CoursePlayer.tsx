@@ -10,9 +10,8 @@ import {
   Maximize,
   ChevronLeft,
   ChevronRight,
-  CheckCircle,
   Lock,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface Lesson {
   id: number;
@@ -194,7 +193,7 @@ export function CoursePlayer() {
               <div className="flex items-start gap-3">
                 <div className="mt-1">
                   {lesson.completed ? (
-                    <CheckCircle className="h-5 w-5 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : lesson.locked ? (
                     <Lock className="h-5 w-5 text-gray-400" />
                   ) : (

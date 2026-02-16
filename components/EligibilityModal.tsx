@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { X, CheckCircle, AlertCircle } from 'lucide-react';
+import { X, AlertCircle } from 'lucide-react';
 
 interface EligibilityModalProps {
   isOpen: boolean;
@@ -57,7 +57,7 @@ export function EligibilityModal({ isOpen, onClose, onContinue }: EligibilityMod
               'Are seeking employment or higher wages',
             ].map((item, i) => (
               <li key={i} className="flex items-center gap-2 text-gray-700">
-                <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 {item}
               </li>
             ))}

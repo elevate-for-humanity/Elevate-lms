@@ -5,13 +5,12 @@ import Image from 'next/image';
 import {
   DollarSign,
   Shield,
-  CheckCircle,
   Clock,
   ArrowRight,
   AlertCircle,
   Zap,
   FileText,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Refund Advance Loan - Get Up to $6,000 Today | Elevate for Humanity',
@@ -89,7 +88,7 @@ export default function RefundAdvancePage() {
               <p className="text-sm text-gray-600">Get your money within hours</p>
             </div>
             <div className="bg-white rounded-lg p-6 text-center shadow-sm">
-              <CheckCircle className="w-10 h-10 text-brand-blue-600 mx-auto mb-3" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <h3 className="font-bold text-gray-900 mb-2">Auto Repayment</h3>
               <p className="text-sm text-gray-600">Repaid from your IRS refund</p>
             </div>
@@ -242,24 +241,24 @@ export default function RefundAdvancePage() {
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-green-50 rounded-xl p-6 border border-green-200">
               <h3 className="text-xl font-bold text-green-800 mb-4 flex items-center">
-                <CheckCircle className="w-6 h-6 mr-2" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 What You Need
               </h3>
               <ul className="space-y-3">
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700">Valid government-issued ID</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700">Social Security card or ITIN</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700">W-2s, 1099s, or other income documents</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="w-5 h-5 text-green-600 mr-2 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700">Expected refund of at least $1,000</span>
                 </li>
               </ul>

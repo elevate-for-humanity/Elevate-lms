@@ -127,7 +127,7 @@ export function CoursePrerequisiteManagement() {
 
                 <div>
                   {course.status === 'completed' && (
-                    <div className="text-green-600 text-3xl">✓</div>
+                    <div className="text-green-600 text-3xl">•</div>
                   )}
                   {course.status === 'available' && (
                     <Button size="sm">Start Course</Button>

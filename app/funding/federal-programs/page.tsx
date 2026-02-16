@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CheckCircle2, Building2 } from 'lucide-react';
+import { Building2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding/federal-programs' },
@@ -51,14 +51,16 @@ export default function FederalProgramsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[300px] md:h-[350px] flex items-center justify-center text-white overflow-hidden">
-        <Image src="/images/homepage/funded-programs-optimized.jpg" alt="Federal funding programs" fill className="object-cover" priority sizes="100vw" />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">Federal Funding Programs</h1>
-          <p className="text-lg md:text-xl text-gray-100">
-            Federal workforce development programs that may cover the cost of your career training.
-          </p>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/homepage/funded-programs-optimized.jpg" alt="Federal funding programs" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Federal Funding Programs</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Federal workforce development programs that may cover the cost of your career training.</p>
+          </div>
         </div>
       </section>
 
@@ -76,15 +78,8 @@ export default function FederalProgramsPage() {
               </div>
               <p className="text-gray-700 mb-4">{p.desc}</p>
               <div>
-                <h3 className="text-sm font-semibold text-gray-900 mb-2">Who May Be Eligible:</h3>
-                <ul className="space-y-2">
-                  {p.eligible.map((e) => (
-                    <li key={e} className="flex items-start gap-2 text-gray-600 text-sm">
-                      <CheckCircle2 className="w-4 h-4 text-brand-green-600 mt-0.5 flex-shrink-0" />
-                      {e}
-                    </li>
-                  ))}
-                </ul>
+                <h3 className="text-sm font-semibold text-gray-900 mb-1">Who May Be Eligible:</h3>
+                <p className="text-gray-600 text-sm">{p.eligible.join('. ')}.</p>
               </div>
             </div>
           ))}

@@ -3,7 +3,7 @@ import { createPublicClient } from '@/lib/supabase/public';
 import Link from 'next/link';
 import { 
   ArrowRight, 
-  CheckCircle, 
+  
   Building2, 
   Users, 
   Briefcase,
@@ -90,60 +90,35 @@ export default async function LicensePage() {
       </div>
 
       {/* HERO BANNER */}
-      <section className="relative bg-slate-800 overflow-hidden">
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-            backgroundSize: '40px 40px'
-          }} />
-        </div>
+      <section className="bg-slate-900 py-12 sm:py-16">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4 sm:mb-6">
+            License the Elevate LMS + Workforce Hub
+          </h1>
+          <p className="text-base sm:text-xl text-slate-300 mb-6 sm:mb-8 leading-relaxed max-w-3xl mx-auto">
+            Self-operating workforce infrastructure that runs the entire learner lifecycle — from application to credential — without staff. Built for funded training, employer pipelines, and apprenticeships.
+          </p>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-20 lg:py-28">
-          <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-            <div>
-              <h1 className="text-2xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight mb-4 sm:mb-6">
-                License the Elevate LMS + Workforce Hub
-              </h1>
-              <p className="text-base sm:text-xl text-slate-300 mb-6 sm:mb-8 leading-relaxed">
-                Self-operating workforce infrastructure that runs the entire learner lifecycle — from application to credential — without staff. Built for funded training, employer pipelines, and apprenticeships.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6 sm:mb-8">
-                <Link
-                  href={ROUTES.schedule}
-                  className="inline-flex items-center justify-center gap-2 bg-orange-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-orange-700 transition text-sm sm:text-lg"
-                >
-                  <Calendar className="w-5 h-5" />
-                  Schedule Demo
-                </Link>
-                <Link
-                  href={ROUTES.licensePricing}
-                  className="inline-flex items-center justify-center gap-2 bg-white/10 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-white/20 transition text-sm sm:text-lg"
-                >
-                  View Pricing
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-              </div>
-
-              <p className="text-slate-400 text-sm">
-                Starting at ${startingPrice.toLocaleString()}/year
-              </p>
-            </div>
-
-            <div className="hidden lg:block">
-              <div className="bg-white/5 backdrop-blur rounded-2xl p-8 border border-white/10">
-                <h3 className="text-white font-semibold mb-4">Platform Highlights</h3>
-                <ul className="space-y-3">
-                  {features.slice(0, 4).map((feature, index) => (
-                    <li key={index} className="flex items-center gap-3 text-slate-300">
-                      <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                      {feature.title}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-6">
+            <Link
+              href={ROUTES.schedule}
+              className="inline-flex items-center justify-center gap-2 bg-orange-600 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-orange-700 transition text-sm sm:text-lg"
+            >
+              <Calendar className="w-5 h-5" />
+              Schedule Demo
+            </Link>
+            <Link
+              href={ROUTES.licensePricing}
+              className="inline-flex items-center justify-center gap-2 bg-white/10 text-white px-6 sm:px-8 py-3 sm:py-4 rounded-lg font-semibold hover:bg-white/20 transition text-sm sm:text-lg"
+            >
+              View Pricing
+              <ArrowRight className="w-5 h-5" />
+            </Link>
           </div>
+
+          <p className="text-slate-400 text-sm">
+            Starting at ${startingPrice.toLocaleString()}/year
+          </p>
         </div>
       </section>
 
@@ -176,23 +151,23 @@ export default async function LicensePage() {
           <div className="max-w-2xl mx-auto">
             <ul className="space-y-4">
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Automated enrollment orchestration</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Rules-based progress and hour tracking</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Automated nudges and interventions</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Auto-generated compliance and outcome reports</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Credential issuance with public verification</span>
               </li>
             </ul>
@@ -228,7 +203,7 @@ export default async function LicensePage() {
                 <ul className="space-y-3 mb-8">
                   {tier.features?.map((feature: string, i: number) => (
                     <li key={i} className="flex items-start gap-2">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-gray-700">{feature}</span>
                     </li>
                   ))}
@@ -259,7 +234,7 @@ export default async function LicensePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {governanceFeatures.map((feature, index) => (
               <div key={index} className="flex items-start gap-3 bg-gray-50 rounded-lg p-5 border">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{feature}</span>
               </div>
             ))}

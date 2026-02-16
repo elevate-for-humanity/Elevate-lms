@@ -4,12 +4,11 @@ import { useState } from 'react';
 import {
   AlertCircle,
   Camera,
-  CheckCircle,
   File,
   Loader2,
   Smartphone,
   Upload,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface ManualIDUploadFormProps {
   userId: string;
@@ -100,7 +99,7 @@ export default function ManualIDUploadForm({
       <div className="bg-white rounded-lg shadow-lg p-8">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-            <CheckCircle className="text-green-600" size={32} />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h2 className="text-2xl font-bold text-green-900 mb-2">
             Documents Uploaded Successfully!
@@ -136,7 +135,7 @@ export default function ManualIDUploadForm({
         <div className="mt-4 p-4 bg-green-50 border-l-4 border-green-400">
           <p className="text-sm text-green-900">
             <strong>
-              <CheckCircle className="w-5 h-5 inline-block" /> FREE
+              <span className="text-slate-400 flex-shrink-0">•</span> FREE
             </strong>{' '}
             - No cost for manual verification
             <br />
@@ -180,7 +179,7 @@ export default function ManualIDUploadForm({
             >
               {idFrontFile ? (
                 <>
-                  <CheckCircle className="text-green-600 mb-2" size={32} />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <p className="text-sm font-medium text-black">
                     {idFrontFile.name}
                   </p>
@@ -220,7 +219,7 @@ export default function ManualIDUploadForm({
             >
               {idBackFile ? (
                 <>
-                  <CheckCircle className="text-green-600 mb-2" size={32} />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <p className="text-sm font-medium text-black">
                     {idBackFile.name}
                   </p>
@@ -262,7 +261,7 @@ export default function ManualIDUploadForm({
             >
               {selfieFile ? (
                 <>
-                  <CheckCircle className="text-green-600 mb-2" size={32} />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <p className="text-sm font-medium text-black">
                     {selfieFile.name}
                   </p>

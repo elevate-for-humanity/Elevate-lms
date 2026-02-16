@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import Link from 'next/link';
-import { Users, GraduationCap, DollarSign, FileText, ChevronRight, ArrowRight, Search, CheckCircle, Clock, Eye, ThumbsUp, Download } from 'lucide-react';
+import { Users, GraduationCap, DollarSign, FileText, ChevronRight, ArrowRight, Search, Clock, Eye, ThumbsUp, Download } from 'lucide-react';
 
 const APPRENTICES = [
   { id: 1, name: 'Marcus Johnson', program: 'CDL Commercial Driving', hours: 680, total: 2000, wage: '$18.50/hr', status: 'On Track', pendingHours: 8 },
@@ -122,7 +122,7 @@ export default function DemoEmployerPage() {
                             <ThumbsUp className="w-3 h-3" /> Approve {a.pendingHours}h
                           </button>
                         ) : a.pendingHours > 0 && approvedHours.has(a.id) ? (
-                          <span className="text-xs text-green-600 flex items-center gap-1"><CheckCircle className="w-3 h-3" /> Approved</span>
+                          <span className="text-xs text-green-600 flex items-center gap-1"><span className="text-slate-400 flex-shrink-0">•</span> Approved</span>
                         ) : (
                           <button onClick={() => showToast(`Viewing ${a.name}'s profile`)} className="text-xs border text-gray-600 px-3 py-1.5 rounded-lg hover:bg-gray-50 transition flex items-center gap-1">
                             <Eye className="w-3 h-3" /> View

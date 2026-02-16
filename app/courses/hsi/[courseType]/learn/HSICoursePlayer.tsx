@@ -4,7 +4,7 @@ import React from 'react';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle, ArrowLeft, ExternalLink } from 'lucide-react';
+import { ArrowLeft, ExternalLink } from 'lucide-react';
 import { AIInstructorWidget } from '@/components/AIInstructorWidget';
 
 interface HSICoursePlayerProps {
@@ -162,7 +162,7 @@ export function HSICoursePlayer({
         <div className="bg-brand-green-600 text-white px-6 py-4 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <CheckCircle className="w-6 h-6" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-semibold">Course Complete!</div>
                 <div className="text-sm text-green-100">

@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import React from 'react';
 
 import { useState, useRef, useEffect } from 'react';
-import { Bell, CheckCircle, Award, BookOpen, AlertCircle } from 'lucide-react';
+import { Bell, Award, BookOpen, AlertCircle, CheckCircle, } from 'lucide-react';
 
 const defaultNotifications = [
   {

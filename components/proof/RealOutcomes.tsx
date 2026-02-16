@@ -176,7 +176,7 @@ export function RealOutcomes() {
                   {formatDate(metrics.lastUpdated)}
                 </div>
                 <div>
-                  <strong>Verified:</strong> {metrics.verified ? 'Yes ✓' : 'No'}
+                  <strong>Verified:</strong> {metrics.verified ? 'Yes •' : 'No'}
                 </div>
                 <div className="mt-3 pt-3 border-t border-slate-700">
                   <a

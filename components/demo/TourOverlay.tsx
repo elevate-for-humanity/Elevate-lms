@@ -7,7 +7,7 @@ import {
   X, 
   ChevronRight, 
   ChevronLeft, 
-  CheckCircle, 
+  
   Play,
   ExternalLink,
   User,
@@ -250,7 +250,7 @@ export function TourOverlay({ tourId: propTourId, stepNumber: propStepNumber }: 
             >
               {isLastStep ? (
                 <>
-                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   {currentStep.next_button_label}
                 </>
               ) : (

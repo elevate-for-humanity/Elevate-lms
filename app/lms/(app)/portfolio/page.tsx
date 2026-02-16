@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Briefcase, Award, FileText, Plus, ExternalLink, 
-  Download, Share2, Eye, Calendar, CheckCircle, Trophy, Flame, Star
+  Download, Share2, Eye, Calendar, Trophy, Flame, Star
 } from 'lucide-react';
 import { StreakTracker } from '@/components/gamification/StreakTracker';
 import { PointsDisplay } from '@/components/gamification/PointsDisplay';
@@ -113,7 +113,7 @@ export default async function PortfolioPage() {
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-brand-blue-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">
@@ -200,7 +200,7 @@ export default async function PortfolioPage() {
             <div className="bg-white rounded-xl shadow-sm border mt-6">
               <div className="p-6 border-b">
                 <h2 className="font-semibold text-gray-900 flex items-center gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Completed Courses
                 </h2>
               </div>
@@ -229,7 +229,7 @@ export default async function PortfolioPage() {
                 </div>
               ) : (
                 <div className="p-12 text-center">
-                  <CheckCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <h3 className="font-medium text-gray-900 mb-2">No completed courses</h3>
                   <p className="text-gray-600 text-sm">
                     Your completed courses will appear here
@@ -268,19 +268,19 @@ export default async function PortfolioPage() {
               <h2 className="font-semibold text-gray-900 mb-4">Portfolio Tips</h2>
               <ul className="space-y-3 text-sm text-gray-700">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-blue-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Add descriptions to your certificates explaining what you learned</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-blue-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Include projects that demonstrate your skills</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-blue-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Share your portfolio link on LinkedIn and resumes</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-blue-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Keep your portfolio updated as you complete new courses</span>
                 </li>
               </ul>

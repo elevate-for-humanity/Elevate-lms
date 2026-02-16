@@ -6,13 +6,12 @@ import {
   FileText, 
   Award, 
   ArrowRight, 
-  CheckCircle,
   Download,
   Users,
   TrendingUp,
   Shield,
-  Building2
-} from 'lucide-react';
+  Building2,
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -209,7 +208,7 @@ export default function GuidesPage() {
                       <ul className="grid sm:grid-cols-2 gap-2">
                         {guide.features.map((feature) => (
                           <li key={feature} className="flex items-start gap-2 text-sm text-slate-600">
-                            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                            <span className="text-slate-400 flex-shrink-0">•</span>
                             {feature}
                           </li>
                         ))}

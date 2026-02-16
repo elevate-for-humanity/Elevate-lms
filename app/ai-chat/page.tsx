@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { 
   MessageSquare, Bot, Sparkles, Clock, BookOpen, 
-  HelpCircle, ArrowRight, CheckCircle, Zap, Phone
+  HelpCircle, ArrowRight, Zap, Phone
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -134,15 +134,15 @@ export default function AIChatPage() {
                   </p>
                   <ul className="mt-2 space-y-2 text-gray-600 text-sm">
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span><strong>CNA (Certified Nursing Assistant)</strong> - Entry-level, high demand</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span><strong>CPR/First Aid</strong> - Required for most healthcare roles</span>
                     </li>
                     <li className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span><strong>Phlebotomy</strong> - Quick certification, good pay</span>
                     </li>
                   </ul>

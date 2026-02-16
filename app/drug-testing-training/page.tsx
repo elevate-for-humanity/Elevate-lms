@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import Link from 'next/link';
-import { Phone, GraduationCap, Award, Users, CheckCircle } from 'lucide-react';
+import { Phone, GraduationCap, Award, Users } from 'lucide-react';
 
 
 export const metadata: Metadata = {
@@ -195,7 +195,7 @@ export default async function DrugTestingTrainingPage() {
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-brand-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <h3 className="font-bold mb-2">DOT Compliant</h3>
               <p className="text-sm text-black">

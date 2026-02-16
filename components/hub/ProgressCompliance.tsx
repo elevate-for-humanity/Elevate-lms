@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { 
-  CheckCircle, 
+  
   Clock, 
   AlertTriangle, 
   FileCheck,
   TrendingUp,
-  Calendar
-} from 'lucide-react';
+  Calendar,
+CheckCircle, } from 'lucide-react';
 
 interface ProgressData {
   totalHours: number;

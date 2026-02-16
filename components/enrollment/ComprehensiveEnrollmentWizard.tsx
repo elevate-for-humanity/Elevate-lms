@@ -4,7 +4,6 @@ import React from 'react';
 
 import { useState, useEffect } from 'react';
 import {
-  CheckCircle,
   ChevronRight,
   ChevronLeft,
   Upload,
@@ -17,8 +16,8 @@ import {
   Loader2,
   Save,
   Eye,
-  EyeOff
-} from 'lucide-react';
+  EyeOff,
+CheckCircle, } from 'lucide-react';
 import SignatureCanvas from 'react-signature-canvas';
 import { useRef } from 'react';
 
@@ -399,7 +398,7 @@ export default function ComprehensiveEnrollmentWizard({
                       'bg-gray-200 text-gray-500'
                     }`}>
                       {currentStep > step.id ? (
-                        <CheckCircle className="w-6 h-6" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       ) : (
                         <StepIcon className="w-6 h-6" />
                       )}
@@ -707,7 +706,7 @@ export default function ComprehensiveEnrollmentWizard({
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-5 h-5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Complete Enrollment
                 </>
               )}

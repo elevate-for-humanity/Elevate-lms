@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, Mail, CheckCircle, Loader2, Building2, ArrowRight } from 'lucide-react';
+import { Phone, Mail, Loader2, Building2, ArrowRight } from 'lucide-react';
 
 export default function BarberShopPartnerPage() {
   const [loading, setLoading] = useState(false);
@@ -50,7 +50,7 @@ export default function BarberShopPartnerPage() {
       <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-2xl shadow-lg p-8 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-8 h-8 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Thank You!</h1>
           <p className="text-gray-700 mb-6">
@@ -77,27 +77,16 @@ export default function BarberShopPartnerPage() {
         <Breadcrumbs items={[{ label: "Partners", href: "/partners" }, { label: "Barber Shop" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 px-4">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/barber/gallery-1.jpg"
-            alt="Barber shop interior"
-            fill
-            className="object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-black/50" />
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/barber/gallery-1.jpg" alt="Barber shop interior" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="relative z-10 max-w-4xl mx-auto text-center text-white">
-          <span className="inline-block bg-brand-orange-500 px-4 py-1 rounded-full text-sm font-semibold mb-4">
-            Partner Program
-          </span>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">
-            Become a Barber Shop Partner
-          </h1>
-          <p className="text-xl text-white mb-6">
-            Host apprentices at your shop and help train the next generation of barbers.
-          </p>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Become a Barber Shop Partner</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Host apprentices at your shop and help train the next generation of barbers.</p>
+          </div>
         </div>
       </section>
 
@@ -367,29 +356,29 @@ export default function BarberShopPartnerPage() {
               <div className="grid sm:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <p className="text-gray-800">Licensed barbershop in Indiana</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <p className="text-gray-800">At least one licensed barber on staff</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <p className="text-gray-800">Willingness to mentor apprentices</p>
                   </div>
                 </div>
                 <div className="space-y-4">
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <p className="text-gray-800">Commitment to 2,000 training hours</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <p className="text-gray-800">Safe, professional work environment</p>
                   </div>
                   <div className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <p className="text-gray-800">Current business license and insurance</p>
                   </div>
                 </div>

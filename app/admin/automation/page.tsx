@@ -8,7 +8,7 @@ import {
   Mail, 
   Bell, 
   Clock, 
-  CheckCircle, 
+  
   XCircle, 
   RefreshCw,
   Calendar,
@@ -148,7 +148,7 @@ export default async function AutomationLogPage() {
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-lg ${log.status === 'sent' ? 'bg-green-100' : log.status === 'failed' ? 'bg-red-100' : 'bg-yellow-100'}`}>
                           {log.status === 'sent' ? (
-                            <CheckCircle className="w-4 h-4 text-green-600" />
+                            <span className="text-slate-400 flex-shrink-0">•</span>
                           ) : log.status === 'failed' ? (
                             <XCircle className="w-4 h-4 text-red-600" />
                           ) : (
@@ -193,7 +193,7 @@ export default async function AutomationLogPage() {
                     <div className="flex items-start justify-between">
                       <div className="flex items-center gap-3">
                         <div className="p-2 rounded-lg bg-green-100">
-                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                         </div>
                         <div>
                           <p className="font-medium text-gray-900 text-sm">

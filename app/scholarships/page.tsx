@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
-  CheckCircle, Clock, DollarSign, Award, ArrowRight, 
+  Clock, DollarSign, Award, ArrowRight, 
   GraduationCap, Users, FileText, Calendar, Heart, Star
 } from 'lucide-react';
 
@@ -208,7 +208,7 @@ export default function ScholarshipsPage() {
                   <ul className="space-y-1">
                     {option.eligibility.map((item, j) => (
                       <li key={j} className="flex items-center gap-2 text-sm text-slate-600">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         {item}
                       </li>
                     ))}
@@ -235,21 +235,21 @@ export default function ScholarshipsPage() {
               </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-bold text-slate-900">Covers Everything</h3>
                     <p className="text-slate-600">Tuition, books, supplies, uniforms, certification exams</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-bold text-slate-900">Support Services</h3>
                     <p className="text-slate-600">Transportation, childcare, work clothes assistance</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-bold text-slate-900">No Repayment</h3>
                     <p className="text-slate-600">This is a grant, not a loan. Nothing to pay back.</p>
@@ -278,7 +278,7 @@ export default function ScholarshipsPage() {
                 ].map((item, i) => (
                   <li key={i} className="flex items-center gap-3 text-slate-700">
                     <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     </div>
                     {item}
                   </li>

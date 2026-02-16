@@ -4,7 +4,6 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   ArrowRight,
-  CheckCircle,
   Users,
   Shield,
   AlertCircle,
@@ -16,7 +15,7 @@ import {
   Calculator,
   Phone,
   MapPin,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: {
@@ -155,19 +154,19 @@ export default function TaxServicesPage() {
 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">No cost - completely free service</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">IRS-certified volunteer preparers</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">EITC, Child Tax Credit, Education Credits</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">E-file with direct deposit</span>
                   </li>
                 </ul>
@@ -215,19 +214,19 @@ export default function TaxServicesPage() {
 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Same-day refund advances available</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Business & self-employment returns</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Complex tax situations welcome</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Multiple locations & online filing</span>
                   </li>
                 </ul>

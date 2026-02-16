@@ -80,18 +80,15 @@ export default function ServicesPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[50vh] min-h-[350px]">
-        <Image
-          src="/images/heroes/hero-homepage.jpg"
-          alt="Support Services"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <h1 className="text-4xl md:text-5xl font-bold text-white text-center">
-            Support Services
-          </h1>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes/hero-homepage.jpg" alt="Support Services" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Support Services</h1>
+          </div>
         </div>
       </section>
 

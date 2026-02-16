@@ -8,11 +8,10 @@ import {
   GraduationCap,
   Briefcase,
   TrendingUp,
-  CheckCircle,
   Shield,
   Award,
   Phone,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -176,19 +175,19 @@ export default async function DonatePage() {
               <h3 className="font-semibold mb-4">Why Donate?</h3>
               <div className="space-y-3">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <p className="text-gray-600">100% of donations fund training programs</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <p className="text-gray-600">Tax-deductible 501(c)(3) organization</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <p className="text-gray-600">Direct impact on underserved communities</p>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <p className="text-gray-600">Transparent reporting on fund usage</p>
                 </div>
               </div>

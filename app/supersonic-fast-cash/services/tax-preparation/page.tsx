@@ -1,7 +1,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FileText, DollarSign, Clock, CheckCircle } from 'lucide-react';
+import { FileText, DollarSign, Clock } from 'lucide-react';
 
 
 export const metadata = {
@@ -21,19 +21,6 @@ export default function TaxPreparationPage() {
 {/* Hero */}
       <section className="relative h-[400px] w-full overflow-hidden">
         <Image src="/images/heroes-hq/tax-refund-hero.jpg" alt="Tax Preparation" fill sizes="100vw" className="object-cover" quality={85} priority />
-        
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="max-w-4xl mx-auto px-6 text-center">
-            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
-                Tax Preparation Services
-              </h1>
-              <p className="text-xl text-gray-700">
-                Professional tax filing for individuals and families
-              </p>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Content */}
@@ -47,21 +34,21 @@ export default function TaxPreparationPage() {
               </p>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-green-600 mt-1 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-semibold mb-1">W-2 and 1099 Income</h3>
                     <p className="text-black">Employment and contract income</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-green-600 mt-1 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-semibold mb-1">Itemized Deductions</h3>
                     <p className="text-black">Maximize your tax savings</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-6 h-6 text-green-600 mt-1 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
                     <h3 className="font-semibold mb-1">Tax Credits</h3>
                     <p className="text-black">EITC, Child Tax Credit, and more</p>
@@ -76,15 +63,15 @@ export default function TaxPreparationPage() {
               </p>
               <div className="space-y-4 mb-6">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Free initial consultation</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Transparent pricing - no hidden fees</span>
                 </div>
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Maximum refund guarantee</span>
                 </div>
               </div>

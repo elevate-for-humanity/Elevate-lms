@@ -68,38 +68,39 @@ export default function ProgramPageLayout({
 }: ProgramPageProps) {
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Banner with Full-Width Image */}
-      <section className="relative h-[600px] flex items-center">
-        <div className="absolute inset-0">
-          <Image
-            src={heroImage}
-            alt={heroImageAlt}
-            fill
-            className="object-cover brightness-75"
-            priority
-            quality={90}
-            sizes="100vw"
-          />
-        </div>
+      {/* Hero Banner — image only */}
+      <section className="relative h-[350px] sm:h-[400px]">
+        <Image
+          src={heroImage}
+          alt={heroImageAlt}
+          fill
+          className="object-cover"
+          priority
+          quality={90}
+          sizes="100vw"
+        />
+      </section>
 
-        <div className="relative container mx-auto px-4 py-20">
+      {/* Title + CTA below hero */}
+      <section className="py-10 sm:py-14 bg-white">
+        <div className="container mx-auto px-4">
           <div className="max-w-3xl">
-            <h1 className="text-6xl md:text-7xl font-extrabold mb-6 text-white drop-shadow-2xl leading-tight">
+            <h1 className="text-4xl md:text-5xl font-extrabold mb-4 text-slate-900 leading-tight">
               {title}
             </h1>
-            <p className="text-2xl md:text-3xl mb-10 text-white/95 drop-shadow-lg leading-relaxed">
+            <p className="text-xl md:text-2xl mb-8 text-slate-600 leading-relaxed">
               {subtitle}
             </p>
             <div className="flex flex-wrap gap-4">
               <Link
                 href={ctaPrimary.href}
-                className="bg-brand-orange-600 text-white px-10 py-5 rounded-full font-bold hover:bg-brand-orange-700 text-xl shadow-2xl transition-all hover:scale-105"
+                className="bg-brand-orange-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-orange-700 text-lg transition-all"
               >
                 {ctaPrimary.text}
               </Link>
               <Link
                 href={ctaSecondary.href}
-                className="bg-white text-black px-10 py-5 rounded-full font-bold hover:bg-slate-100 text-xl shadow-2xl transition-all hover:scale-105"
+                className="bg-slate-100 text-slate-900 px-8 py-4 rounded-lg font-bold hover:bg-slate-200 text-lg transition-all"
               >
                 {ctaSecondary.text}
               </Link>
@@ -153,11 +154,7 @@ export default function ProgramPageLayout({
                   {certifications.map((cert, index) => (
                     <div key={index} className="flex items-start bg-white rounded-xl p-4 shadow-sm">
                       <div className="flex-shrink-0 w-8 h-8 bg-green-500 rounded-full flex items-center justify-center mr-4">
-                        <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor"
-viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3}
-d="M5 13l4 4L19 7" />
-                        </svg>
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       </div>
                       <span className="text-lg font-medium text-black">{cert}</span>
                     </div>

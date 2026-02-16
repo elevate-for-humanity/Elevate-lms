@@ -5,14 +5,13 @@ import Link from 'next/link';
 import {
   Trophy,
   XCircle,
-  CheckCircle,
   ArrowLeft,
   RotateCcw,
   Home,
   Clock,
   Target,
   Award,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -262,7 +261,7 @@ export default async function QuizResultsPage({ params }: Props) {
                         </p>
                       </div>
                       {answer.is_correct ? (
-                        <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       ) : (
                         <XCircle className="w-6 h-6 text-red-500 flex-shrink-0" />
                       )}

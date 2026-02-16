@@ -4,13 +4,12 @@ import { Metadata } from 'next';
 import {
   ChevronRight,
   Shield,
-  CheckCircle,
   RefreshCw,
   CreditCard,
   Lock,
   MessageCircle,
   HelpCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Buyer Protection | Marketplace',

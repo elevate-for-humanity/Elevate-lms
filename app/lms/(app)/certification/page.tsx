@@ -6,11 +6,10 @@ import {
   Award,
   Download,
   Calendar,
-  CheckCircle,
   Clock,
   ExternalLink,
   FileText,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Certifications | LMS',
@@ -243,7 +242,7 @@ export default async function CertificationPage() {
 
           {/* Verification */}
           <div className="bg-indigo-50 border border-indigo-200 rounded-xl p-6">
-            <CheckCircle className="w-8 h-8 text-indigo-600 mb-3" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <h3 className="font-semibold mb-2">Verify a Certificate</h3>
             <p className="text-sm text-gray-600 mb-4">
               Employers can verify certificates using the credential ID.

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { 
-  CheckCircle, 
+  
   XCircle, 
   Settings, 
   RefreshCw, 
@@ -63,7 +63,7 @@ export default function SalesforceIntegrationPage() {
             }`}>
               {isConfigured ? (
                 <>
-                  <CheckCircle className="w-5 h-5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="font-medium">Connected</span>
                 </>
               ) : (
@@ -182,7 +182,7 @@ export default function SalesforceIntegrationPage() {
           ) : (
             <div className="p-6">
               <div className="flex items-center gap-3 text-green-700 bg-green-50 rounded-lg p-4 mb-6">
-                <CheckCircle className="w-6 h-6" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium">Salesforce is connected!</p>
                   <p className="text-sm text-green-600">Your LMS data will sync automatically.</p>

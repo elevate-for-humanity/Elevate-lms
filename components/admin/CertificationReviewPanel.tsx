@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { 
-  CheckCircle, 
+  
   XCircle, 
   Clock, 
   FileText, 
@@ -115,7 +115,7 @@ export function CertificationReviewPanel({
       >
         <div className="flex items-center gap-4">
           {/* Status Icon */}
-          {submission.status === 'approved' && <CheckCircle className="w-5 h-5 text-green-600" />}
+          {submission.status === 'approved' && <span className="text-slate-400 flex-shrink-0">•</span>}
           {submission.status === 'rejected' && <XCircle className="w-5 h-5 text-red-600" />}
           {submission.status === 'pending_review' && <Clock className="w-5 h-5 text-amber-600" />}
 
@@ -224,7 +224,7 @@ export function CertificationReviewPanel({
                 disabled={processing === submission.id}
                 className="flex-1 bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
               >
-                <CheckCircle className="w-4 h-4" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 {processing === submission.id ? 'Processing...' : 'Approve'}
               </button>
               <button
@@ -273,7 +273,7 @@ export function CertificationReviewPanel({
         <div className="space-y-4">
           {pending.length === 0 ? (
             <div className="bg-white border border-slate-200 rounded-xl p-8 text-center">
-              <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <h3 className="font-medium text-slate-900 mb-2">All caught up!</h3>
               <p className="text-slate-600">No certifications pending review.</p>
             </div>

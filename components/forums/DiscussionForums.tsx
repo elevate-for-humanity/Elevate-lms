@@ -22,8 +22,7 @@ import {
   Plus,
   Send,
   ArrowLeft,
-  CheckCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import Link from 'next/link';
 import { PolicyReference } from '@/components/compliance/PolicyReference';
 import { POLICIES } from '@/lib/policies';

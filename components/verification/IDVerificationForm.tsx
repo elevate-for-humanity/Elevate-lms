@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Camera, Upload, CheckCircle, AlertCircle } from 'lucide-react';
+import { Camera, Upload, AlertCircle } from 'lucide-react';
 
 export function IDVerificationForm() {
   const router = useRouter();
@@ -110,7 +110,7 @@ export function IDVerificationForm() {
     return (
       <div className="max-w-2xl mx-auto p-8 bg-green-50 border-2 border-green-600 rounded-lg">
         <div className="flex items-center gap-4 mb-4">
-          <CheckCircle className="w-12 h-12 text-green-600" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <div>
             <h2 className="text-2xl font-bold text-green-900">
               Verification Submitted!
@@ -381,7 +381,7 @@ export function IDVerificationForm() {
               </label>
               {files.idFront && (
                 <p className="mt-2 text-sm text-green-600 font-semibold">
-                  ✓ {files.idFront.name}
+                  • {files.idFront.name}
                 </p>
               )}
             </div>
@@ -409,7 +409,7 @@ export function IDVerificationForm() {
               </label>
               {files.idBack && (
                 <p className="mt-2 text-sm text-green-600 font-semibold">
-                  ✓ {files.idBack.name}
+                  • {files.idBack.name}
                 </p>
               )}
             </div>
@@ -439,7 +439,7 @@ export function IDVerificationForm() {
               </label>
               {files.selfie && (
                 <p className="mt-2 text-sm text-green-600 font-semibold">
-                  ✓ {files.selfie.name}
+                  • {files.selfie.name}
                 </p>
               )}
             </div>

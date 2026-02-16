@@ -11,11 +11,10 @@ import {
   CreditCard,
   GraduationCap,
   Users,
-  CheckCircle,
   ArrowRight,
   Search,
   Filter,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
@@ -401,7 +400,7 @@ export default async function TutorialsPage() {
                   <div className="space-y-2 mb-4">
                     {tutorial.steps.slice(0, 3).map((step, index) => (
                       <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
-                        <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         <span>{step}</span>
                       </div>
                     ))}

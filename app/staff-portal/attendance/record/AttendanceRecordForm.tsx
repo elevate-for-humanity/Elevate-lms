@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Search, CheckCircle, XCircle, Clock, Users, Save } from 'lucide-react';
+import { Search, XCircle, Clock, Users, Save } from 'lucide-react';
 
 interface Student {
   id: string;
@@ -111,7 +111,7 @@ export default function AttendanceRecordForm({ students, date, staffId }: Props)
           <p className="text-sm text-gray-500">Total Students</p>
         </div>
         <div className="bg-white rounded-lg p-4 border">
-          <CheckCircle className="w-6 h-6 text-green-500 mb-1" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <p className="text-2xl font-bold">{presentCount}</p>
           <p className="text-sm text-gray-500">Present</p>
         </div>

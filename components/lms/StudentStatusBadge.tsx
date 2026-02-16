@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, AlertCircle, Clock } from 'lucide-react';
+import { AlertCircle, Clock } from 'lucide-react';
 
 interface StudentStatusBadgeProps {
   status: 'on_track' | 'needs_action' | 'at_risk' | string;
@@ -19,7 +19,7 @@ export function StudentStatusBadge({
     switch (status) {
       case 'on_track':
         return {
-          icon: <CheckCircle className={size === 'sm' ? 'w-4 h-4' : size === 'lg' ? 'w-6 h-6' : 'w-5 h-5'} />,
+          icon: <span className="text-slate-400 flex-shrink-0">•</span>,
           text: 'On Track',
           color: 'text-green-600',
           bgColor: 'bg-green-600',

@@ -7,11 +7,10 @@ import {
   Award,
   DollarSign,
   Clock,
-  CheckCircle,
   ArrowRight,
   Phone,
   Building2,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
 import EmployerPartners from '@/components/EmployerPartners';
 
@@ -207,7 +206,7 @@ export default function EmployersPage() {
                     'Contribute to the profession',
                   ].map((item, i) => (
                     <li key={i} className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-orange-400" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span>{item}</span>
                     </li>
                   ))}

@@ -13,11 +13,10 @@ import {
   ArrowLeft,
   DollarSign,
   Users,
-  CheckCircle,
   Clock,
   Loader2,
-  Download
-} from 'lucide-react';
+  Download,
+CheckCircle, } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -475,7 +474,7 @@ export default function PayoutsPage() {
                         payout.status === 'approved' ? 'secondary' :
                         'outline'
                       }>
-                        {payout.status === 'paid' && <CheckCircle className="h-3 w-3 mr-1" />}
+                        {payout.status === 'paid' && <span className="text-slate-400 flex-shrink-0">•</span>}
                         {payout.status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
                         {payout.status}
                       </Badge>

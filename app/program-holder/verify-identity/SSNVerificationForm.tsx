@@ -3,12 +3,11 @@
 import { useState } from 'react';
 import {
   AlertCircle,
-  CheckCircle,
   Loader2,
   Lock,
   XCircle,
   Zap,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface SSNVerificationFormProps {
   userId: string;
@@ -97,7 +96,7 @@ export default function SSNVerificationForm({
         <div className="mt-4 p-4 bg-brand-blue-50 border-l-4 border-brand-blue-400">
           <p className="text-sm text-brand-blue-900">
             <strong>
-              <CheckCircle className="w-5 h-5 inline-block" /> FREE Service
+              <span className="text-slate-400 flex-shrink-0">•</span> FREE Service
             </strong>{' '}
             - No cost to verify your SSN
             <br />
@@ -124,7 +123,7 @@ export default function SSNVerificationForm({
         >
           <div className="flex items-start gap-3">
             {result.verified ? (
-              <CheckCircle className="text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             ) : (
               <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" />
             )}
@@ -135,7 +134,7 @@ export default function SSNVerificationForm({
                 }`}
               >
                 {result.verified
-                  ? '<CheckCircle className="w-5 h-5 inline-block" /> SSN Verified Successfully'
+                  ? '<span className="text-slate-400 flex-shrink-0">•</span> SSN Verified Successfully'
                   : '<XCircle className="w-5 h-5 inline-block" /> Verification Failed'}
               </p>
               <p

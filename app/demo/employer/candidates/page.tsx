@@ -1,5 +1,5 @@
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
-import { CheckCircle, Star } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 const candidates = [
   { name: 'Lisa Thompson', program: 'CNA Training', completion: '100%', credentials: ['CNA Certification', 'CPR/BLS'], available: 'Immediately', match: 95 },
@@ -28,7 +28,7 @@ export default function DemoCandidatesPage() {
             <div className="flex flex-wrap gap-2 mb-3">
               {c.credentials.map((cr) => (
                 <span key={cr} className="flex items-center gap-1 bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
-                  <CheckCircle className="w-3 h-3 text-green-500" /> {cr}
+                  <span className="text-slate-400 flex-shrink-0">•</span> {cr}
                 </span>
               ))}
             </div>

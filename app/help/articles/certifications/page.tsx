@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Award, CheckCircle, FileText, Download } from 'lucide-react';
+import { Award, FileText, Download } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -55,7 +55,7 @@ export default function CertificationsHelpPage() {
 
           <div className="grid md:grid-cols-3 gap-6 mb-8">
             <div className="bg-brand-blue-50 rounded-lg p-6">
-              <CheckCircle className="w-8 h-8 text-brand-blue-600 mb-3" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <h3 className="font-semibold mb-2">Earn Certificates</h3>
               <p className="text-sm text-gray-600">Complete courses and pass assessments to earn industry-recognized credentials.</p>
             </div>

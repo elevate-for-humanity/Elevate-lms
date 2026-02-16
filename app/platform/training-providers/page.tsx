@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
-  GraduationCap, DollarSign, Users, BarChart, CheckCircle, ArrowRight,
+  GraduationCap, DollarSign, Users, BarChart, ArrowRight,
   Shield, Globe,
 } from 'lucide-react';
 
@@ -55,22 +55,15 @@ export default function TrainingProvidersPage() {
       <div class="max-w-6xl mx-auto px-4 pb-2"><p class="text-sm text-slate-600 font-medium">Part of the <a href="/platform" class="text-brand-red-600 hover:underline">Elevate Workforce Operating System</a></p></div>
 
       {/* Hero */}
-      <section className="relative min-h-[450px] flex items-center overflow-hidden">
-        <Image src="/hero-images/programs-hero.jpg" alt="Training Provider Solutions" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-teal-900/70" />
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
-          <span className="text-teal-200 font-medium text-sm uppercase tracking-wider">Platform Solutions</span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 mt-2">For Training Providers</h1>
-          <p className="text-xl text-teal-100 max-w-2xl mb-8">
-            Grow your training business, reach funded learners, and let the platform handle compliance and reporting.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/partners/join" className="px-8 py-4 bg-white text-teal-700 font-bold rounded-lg hover:bg-teal-50 transition">
-              Become a Provider
-            </Link>
-            <Link href="/contact" className="px-8 py-4 bg-teal-500 text-white font-bold rounded-lg hover:bg-teal-400 transition">
-              Request Demo
-            </Link>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/hero-images/programs-hero.jpg" alt="Training Provider Solutions" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">For Training Providers</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Grow your training business, reach funded learners, and let the platform handle compliance and reporting.</p>
           </div>
         </div>
       </section>
@@ -153,7 +146,7 @@ export default function TrainingProvidersPage() {
                   'Dedicated partner success manager',
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-teal-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </div>
                 ))}

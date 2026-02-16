@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export default function IntakePage() {
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ export default function IntakePage() {
       <div className="min-h-screen bg-white">
         <div className="max-w-2xl mx-auto px-4 py-16 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-8 h-8 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-bold text-slate-900 mb-4">Application Received</h1>
           <p className="text-lg text-slate-600 mb-2">

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { 
-  CheckCircle, 
+  
   Clock, 
   Upload, 
   ExternalLink, 
@@ -108,7 +108,7 @@ export function CertificationTracker({ programId, userId }: CertificationTracker
 
   const getStatusIcon = (status: Certification['status']) => {
     switch (status) {
-      case 'completed': return <CheckCircle className="w-5 h-5 text-green-600" />;
+      case 'completed': return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'pending_review': return <Clock className="w-5 h-5 text-amber-600" />;
       case 'in_progress': return <AlertCircle className="w-5 h-5 text-brand-blue-600" />;
       default: return <div className="w-5 h-5 rounded-full border-2 border-slate-300" />;

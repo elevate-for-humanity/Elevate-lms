@@ -6,7 +6,6 @@ import React from 'react';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle } from 'lucide-react';
 
 export function HandbookAcknowledgeButton({ userId }: { userId: string }) {
   const [loading, setLoading] = useState(false);
@@ -70,7 +69,7 @@ export function HandbookAcknowledgeButton({ userId }: { userId: string }) {
       disabled={loading}
       className="px-6 py-3 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
     >
-      <CheckCircle className="w-5 h-5" />
+      <span className="text-slate-400 flex-shrink-0">•</span>
       {loading ? 'Processing...' : 'I Acknowledge'}
     </button>
   );

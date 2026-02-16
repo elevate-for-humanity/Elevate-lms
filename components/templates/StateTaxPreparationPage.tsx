@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { CheckCircle, MapPin, Phone, Calendar } from 'lucide-react';
+import { MapPin, Phone, Calendar } from 'lucide-react';
 import { StateConfig, getOtherStates } from '@/config/states';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -63,7 +63,7 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
           <div className="grid md:grid-cols-2 gap-6">
             {state.taxPreparation.features.map((item) => (
               <div key={item} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}
@@ -80,19 +80,19 @@ export default function StateTaxPreparationPage({ state }: StateTaxPreparationPa
           <div className="bg-white p-8 rounded-xl shadow-sm">
             <ul className="space-y-4">
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Households earning $64,000 or less annually</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Persons with disabilities</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Limited English speaking taxpayers</span>
               </li>
               <li className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Senior citizens (60+)</span>
               </li>
             </ul>

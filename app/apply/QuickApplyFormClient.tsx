@@ -5,7 +5,7 @@ import React from 'react';
 // app/apply/QuickApplyFormClient.tsx
 
 import { useState } from 'react';
-import { Loader2, ArrowRight, CheckCircle2, Calendar } from 'lucide-react';
+import { Loader2, ArrowRight, Calendar } from 'lucide-react';
 
 type ProgramOption =
   | 'barber'
@@ -151,7 +151,7 @@ Preferred Contact: ${form.preferredContact}`,
       <div className="space-y-6">
         <div className="text-center py-8">
           <div className="w-20 h-20 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle2 className="w-12 h-12 text-brand-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h2 className="text-3xl font-bold text-black mb-3">
             Application Received!

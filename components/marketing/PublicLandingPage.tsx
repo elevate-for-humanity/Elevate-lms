@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export interface LandingPageConfig {
   breadcrumbs: { label: string; href?: string }[];
@@ -48,18 +48,19 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
       </div>
 
       {/* Hero */}
-      <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
-        <Image src={config.hero.image} alt={config.hero.title} fill className="object-cover" priority sizes="100vw" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-6xl mx-auto px-4 w-full pb-10 sm:pb-14">
+      <section className="relative w-full">
+        <div className="relative h-[300px] sm:h-[380px] overflow-hidden">
+          <Image src={config.hero.image} alt={config.hero.title} fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
             {config.hero.tag && (
               <p className={`font-semibold text-sm mb-2 uppercase tracking-wide ${config.hero.tagColor || 'text-brand-blue-300'}`}>
                 {config.hero.tag}
               </p>
             )}
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">{config.hero.title}</h1>
-            <p className="text-lg text-white/90 max-w-2xl">{config.hero.subtitle}</p>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">{config.hero.title}</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">{config.hero.subtitle}</p>
           </div>
         </div>
       </section>
@@ -94,7 +95,7 @@ export default function PublicLandingPage({ config }: { config: LandingPageConfi
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {config.features.items.map((item) => (
                 <div key={item} className="flex items-start gap-3 bg-white rounded-xl p-5 border border-slate-200">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <p className="text-slate-700">{item}</p>
                 </div>
               ))}

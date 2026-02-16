@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Store, CheckCircle } from 'lucide-react';
+import { Store } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function SellerRegisterPage() {
@@ -19,7 +19,7 @@ export default function SellerRegisterPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
-          <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h1>
           <p className="text-gray-600 mb-6">We will review your seller application and get back to you within 2-3 business days.</p>
           <Link href="/" className="text-brand-blue-600 font-medium">Return to Home</Link>

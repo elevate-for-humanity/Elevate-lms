@@ -32,7 +32,6 @@ export default function BarberApprenticeshipPage() {
 
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
         <Image src="/images/barber-hero-new.jpg" alt="Barber Apprenticeship Program" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
             <span className="inline-block bg-brand-red-600 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Earn While You Learn</span>
@@ -101,36 +100,19 @@ export default function BarberApprenticeshipPage() {
           <div className="grid sm:grid-cols-2 gap-6 mb-8">
             <div className="bg-white rounded-xl border border-slate-200 p-6">
               <h3 className="font-bold text-slate-900 text-lg mb-3">Shop Requirements</h3>
-              <ul className="space-y-2">
-                {[
-                  'Indiana-licensed barbershop in good standing',
-                  'Supervising barber with active license (2+ years)',
-                  'Workers\' compensation insurance',
-                  'Physical shop location in Indiana',
-                  'Willingness to sign MOU',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
-                    <span className="text-green-600 mt-0.5">✓</span> {item}
-                  </li>
-                ))}
-              </ul>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                Your barbershop must hold an active Indiana license in good standing. The supervising barber needs an active license with at least two years of experience. 
+                You will need workers&apos; compensation insurance and a physical shop location in Indiana. 
+                Both parties sign a Memorandum of Understanding (MOU) before the apprenticeship begins.
+              </p>
             </div>
 
             <div className="bg-white rounded-xl border border-slate-200 p-6">
               <h3 className="font-bold text-slate-900 text-lg mb-3">What We Provide</h3>
-              <ul className="space-y-2">
-                {[
-                  'USDOL/RAPIDS registration and compliance',
-                  'Coordinated classroom instruction',
-                  'Official apprenticeship records',
-                  'Ongoing support and site visits',
-                  'Completion certificates',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-2 text-sm text-slate-700">
-                    <span className="text-green-600 mt-0.5">✓</span> {item}
-                  </li>
-                ))}
-              </ul>
+              <p className="text-sm text-slate-700 leading-relaxed">
+                Elevate handles all USDOL and RAPIDS registration and compliance paperwork. We coordinate the required classroom instruction hours, 
+                maintain official apprenticeship records, conduct ongoing support visits to your shop, and issue completion certificates when the apprentice finishes the program.
+              </p>
             </div>
           </div>
 
@@ -150,10 +132,10 @@ export default function BarberApprenticeshipPage() {
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6">How It Works</h2>
           <div className="space-y-3">
             {[
-              { step: '1', title: 'Complete Intake', desc: 'Submit the funding & eligibility intake form.' },
-              { step: '2', title: 'Get Matched', desc: 'Paired with a licensed barber instructor at a real shop.' },
-              { step: '3', title: 'Earn While You Learn', desc: 'Get paid while completing your 1,500 training hours.' },
-              { step: '4', title: 'Get Licensed', desc: 'Pass the Indiana State Board barber exam.' },
+              { step: '1', title: 'Complete Intake', desc: 'Submit the funding and eligibility intake form online. You will answer questions about your background, work history, and funding eligibility (WIOA, JRI, or self-pay). No documents are needed at this stage — just your basic information.' },
+              { step: '2', title: 'Get Matched', desc: 'Once approved, our team pairs you with a licensed barber instructor at a partner barbershop near you. You will meet your instructor, tour the shop, and agree on a training schedule that works for both of you.' },
+              { step: '3', title: 'Earn While You Learn', desc: 'You complete 1,500 on-the-job training hours at the shop plus required classroom instruction. Apprentices are paid during training. The full program takes approximately 18 months depending on your schedule.' },
+              { step: '4', title: 'Get Licensed', desc: 'After completing all required hours and coursework, you sit for the Indiana State Board barber exam. We provide exam prep materials and practice tests. Once you pass, you receive your Indiana barber license and can work independently or open your own shop.' },
             ].map((s) => (
               <div key={s.step} className="flex items-start gap-4 bg-slate-50 rounded-lg p-4">
                 <div className="w-8 h-8 bg-brand-red-600 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">{s.step}</div>
@@ -163,6 +145,27 @@ export default function BarberApprenticeshipPage() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Eligibility & Funding Info */}
+          <div className="mt-10 bg-slate-50 rounded-xl p-6">
+            <h3 className="font-bold text-slate-900 text-lg mb-3">Eligibility and Funding</h3>
+            <p className="text-sm text-slate-700 leading-relaxed mb-3">
+              You must be at least 16 years old and have a valid government-issued ID. No prior barbering experience is required. 
+              A high school diploma or GED is preferred but not mandatory for all funding sources.
+            </p>
+            <p className="text-sm text-slate-700 leading-relaxed mb-3">
+              <strong>JRI (Justice Reinvestment Initiative):</strong> If you are justice-involved (currently on probation, parole, or recently released), 
+              JRI funding may cover your entire apprenticeship at no cost. JRI also provides supportive services like transportation assistance and work supplies.
+            </p>
+            <p className="text-sm text-slate-700 leading-relaxed mb-3">
+              <strong>WIOA:</strong> Adults and dislocated workers who meet income guidelines or are receiving public assistance may qualify for WIOA funding, 
+              which covers tuition, books, supplies, and in some cases transportation and childcare.
+            </p>
+            <p className="text-sm text-slate-700 leading-relaxed">
+              <strong>Self-Pay:</strong> If you do not qualify for funding, the program cost is available on request. Payment plans are available. 
+              Contact us or submit the intake form to find out which funding you qualify for — there is no obligation.
+            </p>
           </div>
         </div>
       </section>

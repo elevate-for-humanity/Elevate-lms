@@ -9,12 +9,11 @@ import {
   User,
   Phone,
   Mail,
-  CheckCircle,
   ArrowRight,
   ArrowLeft,
   Sparkles,
   Loader2,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface Service {
   id: string;
@@ -148,7 +147,7 @@ export default function BookAppointmentPage() {
       <div className="min-h-screen bg-pink-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-xl">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-2xl font-bold mb-4">Appointment Requested!</h1>
           <p className="text-gray-600 mb-6">
@@ -205,7 +204,7 @@ export default function BookAppointmentPage() {
                   step >= s ? 'bg-brand-blue-600 text-white' : 'bg-gray-200 text-gray-500'
                 }`}
               >
-                {step > s ? <CheckCircle className="w-5 h-5" /> : s}
+                {step > s ? <span className="text-slate-400 flex-shrink-0">•</span> : s}
               </div>
               <span className={`text-sm ${step >= s ? 'text-brand-blue-600 font-medium' : 'text-gray-500'}`}>
                 {s === 1 ? 'Service' : s === 2 ? 'Date & Time' : 'Your Info'}

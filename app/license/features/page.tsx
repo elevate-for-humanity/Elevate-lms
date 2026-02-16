@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { CheckCircle, Calendar, Users, BookOpen, BarChart, Settings, Shield, Zap } from 'lucide-react';
+import { Calendar, Users, BookOpen, BarChart, Settings, Shield, Zap } from 'lucide-react';
 import { ROUTES } from '@/lib/pricing';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -134,7 +134,7 @@ export default async function FeaturesPage() {
                   <ul className="space-y-3">
                     {category.features.map((feature, i) => (
                       <li key={i} className="flex items-center gap-3">
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         <span>{feature}</span>
                       </li>
                     ))}
@@ -156,23 +156,23 @@ export default async function FeaturesPage() {
           <div className="max-w-2xl mx-auto">
             <ul className="space-y-4">
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Automated enrollment orchestration</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Rules-based progress and hour tracking</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Automated nudges and interventions</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Auto-generated compliance and outcome reports</span>
               </li>
               <li className="flex items-start gap-3 bg-white/5 rounded-lg p-4 border border-white/10">
-                <CheckCircle className="w-6 h-6 text-green-400 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-200 text-lg">Credential issuance with public verification</span>
               </li>
             </ul>

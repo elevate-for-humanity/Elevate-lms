@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { CheckCircle, Clock, Database, Shield } from 'lucide-react';
+import { Clock, Database, Shield } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Disaster Recovery Test Report | Elevate for Humanity',
@@ -29,7 +29,7 @@ export default function DisasterRecoveryTestPage() {
         {/* Test Result Banner */}
         <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-8">
           <div className="flex items-center gap-3">
-            <CheckCircle className="w-8 h-8 text-green-600 flex-shrink-0" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <div>
               <h2 className="text-2xl font-bold text-green-800 m-0">Test Result: SUCCESS</h2>
               <p className="text-green-700 m-0">All recovery objectives met. No production data impacted.</p>
@@ -153,23 +153,23 @@ export default function DisasterRecoveryTestPage() {
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Validation Results</h2>
         <div className="space-y-3 mb-6">
           <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-black">All database tables restored successfully</span>
           </div>
           <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-black">Row counts match production baseline</span>
           </div>
           <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-black">Foreign key relationships intact</span>
           </div>
           <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-black">Application successfully connected to restored database</span>
           </div>
           <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-black">No production data impacted during test</span>
           </div>
         </div>

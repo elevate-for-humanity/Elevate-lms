@@ -348,7 +348,7 @@ export default async function CommunityPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Connect?</h2>
           <p className="text-brand-blue-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of learners and professionals who are supporting each other on their career journeys.
+            Connect with learners and professionals who support each other on their career journeys.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

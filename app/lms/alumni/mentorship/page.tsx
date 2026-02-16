@@ -41,19 +41,15 @@ export default async function MentorshipPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero */}
-      <section className="relative h-64 overflow-hidden">
-        <Image
-          src="/images/compare-programs-hero.jpg"
-          alt="Mentorship Program"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-brand-blue-900/60" />
-        <div className="relative z-10 h-full flex items-center">
-          <div className="max-w-6xl mx-auto px-4 w-full">
-            <h1 className="text-4xl font-bold text-white mb-2">Mentorship Program</h1>
-            <p className="text-xl text-brand-blue-100">Connect with experienced professionals in your field</p>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/compare-programs-hero.jpg" alt="Mentorship Program" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Mentorship Program</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Connect with experienced professionals in your field</p>
           </div>
         </div>
       </section>

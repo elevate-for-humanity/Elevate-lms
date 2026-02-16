@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { UserPlus, Mail, Phone, CheckCircle, XCircle } from 'lucide-react';
+import { UserPlus, Mail, Phone, XCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Pending Applications | Program Holder Portal',
@@ -129,7 +129,7 @@ export default async function PendingStudentsPage() {
               </div>
               <div className="bg-white rounded-lg shadow-sm border p-6">
                 <div className="flex items-center gap-3 mb-2">
-                  <CheckCircle className="h-11 w-11 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <h3 className="text-sm font-medium text-black">
                     This Week
                   </h3>

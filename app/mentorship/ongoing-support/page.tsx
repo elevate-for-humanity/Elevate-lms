@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, CheckCircle, ArrowRight, MessageSquare, Calendar, Shield } from 'lucide-react';
+import { Heart, ArrowRight, MessageSquare, Calendar, Shield } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Ongoing Support Mentorship | Elevate for Humanity',
@@ -74,7 +74,7 @@ export default function OngoingSupportPage() {
               'Long-term career planning support',
             ].map((item, i) => (
               <div key={i} className="bg-white rounded-lg p-4 flex items-center shadow-sm">
-                <CheckCircle className="w-5 h-5 text-teal-600 mr-3 flex-shrink-0" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}

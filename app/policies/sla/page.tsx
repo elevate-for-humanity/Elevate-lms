@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Clock, Shield, CheckCircle, AlertTriangle, CreditCard } from 'lucide-react';
+import { Clock, Shield, AlertTriangle, CreditCard } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Service Level Agreement | Elevate for Humanity',
@@ -99,19 +99,19 @@ export default function SLAPage() {
         <div className="bg-gray-50 rounded-lg p-6 mb-6">
           <ul className="space-y-3 text-black m-0 list-none p-0">
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Credits apply <strong>only to future invoices</strong></span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Credits are <strong>non-cumulative</strong> and capped at 10% per billing cycle</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Credits must be <strong>requested within 30 days</strong> of the affected period</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Credits do <strong>not apply to one-time fees</strong> or third-party services</span>
             </li>
           </ul>

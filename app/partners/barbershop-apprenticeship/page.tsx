@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import {
-  CheckCircle,
   XCircle,
   ArrowRight,
   Building2,
@@ -17,7 +16,7 @@ import {
   HelpCircle,
   Briefcase,
   ClipboardCheck,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Barbershop Partner Program | Indiana Barber Apprenticeship | Elevate for Humanity',
@@ -178,7 +177,7 @@ export default function BarbershopPartnerPage() {
           <div className="grid md:grid-cols-2 gap-4">
             {eligibilityItems.map((item, i) => (
               <div key={i} className="flex items-start gap-3 p-4 bg-gray-50 rounded-lg">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}
@@ -209,7 +208,7 @@ export default function BarbershopPartnerPage() {
               <ul className="space-y-3">
                 {sponsorResponsibilities.map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-1" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700 text-sm">{item}</span>
                   </li>
                 ))}
@@ -229,7 +228,7 @@ export default function BarbershopPartnerPage() {
               <ul className="space-y-3">
                 {shopResponsibilities.map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-1" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700 text-sm">{item}</span>
                   </li>
                 ))}
@@ -398,27 +397,27 @@ export default function BarbershopPartnerPage() {
               <h3 className="font-bold text-gray-900 mb-3">The MOU Covers:</h3>
               <ul className="grid md:grid-cols-2 gap-2 text-sm text-gray-700">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Supervision requirements
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Compensation obligations
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Hour verification process
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Safety and workplace standards
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Communication protocols
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Termination procedures
                 </li>
               </ul>

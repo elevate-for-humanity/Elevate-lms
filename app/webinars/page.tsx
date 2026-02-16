@@ -33,16 +33,16 @@ export default function WebinarsPage() {
         </div>
       </div>
 
-      <section className="relative min-h-[400px] flex items-center overflow-hidden">
-        <Image src="/hero-images/how-it-works-hero.jpg" alt="Webinars" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-slate-900/70" />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 py-20 text-center">
-          <Video className="w-16 h-16 mx-auto mb-6 text-white/80" />
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Live Webinars</h1>
-          <p className="text-xl text-slate-200 mb-8">Learn from experts, ask questions, and connect with the community</p>
-          <Link href="/contact" className="px-8 py-4 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-100 transition">
-            Request a Topic
-          </Link>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/hero-images/how-it-works-hero.jpg" alt="Webinars" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Live Webinars</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Learn from experts, ask questions, and connect with the community</p>
+          </div>
         </div>
       </section>
 

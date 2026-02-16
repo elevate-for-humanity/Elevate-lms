@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function LicensingRequestPage() {
@@ -44,7 +44,7 @@ export default function LicensingRequestPage() {
       <div className="min-h-screen bg-slate-50 py-20">
         <div className="max-w-xl mx-auto px-6 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-8 h-8 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-black text-gray-900 mb-4">Request Received</h1>
           <p className="text-lg text-gray-600 mb-8">

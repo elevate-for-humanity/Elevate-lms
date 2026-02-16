@@ -10,8 +10,7 @@ import {
   BarChart3,
   Users,
   Server,
-  CheckCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {

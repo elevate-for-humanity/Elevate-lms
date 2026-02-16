@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { Users, Target, Clock, DollarSign, Award, CheckCircle, ArrowRight, Building2 } from 'lucide-react';
+import { Users, Target, Clock, DollarSign, Award, ArrowRight, Building2, CheckCircle, } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -120,38 +120,19 @@ export default async function TalentPipelinePage() {
         <Breadcrumbs items={[{ label: "Employers", href: "/employers" }, { label: "Talent Pipeline" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative bg-slate-800 text-white py-20 md:py-28">
-        <div className="absolute inset-0 opacity-20">
-          <Image
-            src="/images/hero/hero-career-services.jpg"
-            alt="Talent pipeline"
-            fill
-            className="object-cover"
-            priority
-          />
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/hero/hero-career-services.jpg" alt="Talent pipeline" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="relative max-w-6xl mx-auto px-6">
-          <div className="max-w-3xl">
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-              Build Your Talent Pipeline
-            </h1>
-            <p className="text-xl md:text-2xl text-slate-300 mb-8">
-              Access pre-trained, certified candidates ready to work. No recruitment fees, 
-              no hassle—just qualified talent for your open positions.
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-6 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Build Your Talent Pipeline</h1>
+            <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">
+              Access pre-trained, certified candidates ready to work. No recruitment fees, no hassle—just qualified talent for your open positions.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/contact"
-                className="px-8 py-4 bg-orange-600 text-white font-bold rounded-full hover:bg-orange-700 transition-all text-center"
-              >
-                Start Building Your Pipeline
-              </Link>
-              <Link
-                href="/employers/post-job"
-                className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white hover:text-slate-900 transition-all text-center"
-              >
-                Post a Job Now
-              </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/contact" className="px-8 py-4 bg-orange-600 text-white font-bold rounded-lg hover:bg-orange-700 transition-colors">Start Building Your Pipeline</Link>
+              <Link href="/employers/post-job" className="px-8 py-4 bg-slate-700 text-white font-bold rounded-lg hover:bg-slate-600 transition-colors border border-slate-500">Post a Job Now</Link>
             </div>
           </div>
         </div>
@@ -251,7 +232,7 @@ export default async function TalentPipelinePage() {
                 <ul className="space-y-2">
                   {industry.roles.map((role) => (
                     <li key={role} className="text-gray-600 flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-orange-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       {role}
                     </li>
                   ))}
@@ -278,19 +259,19 @@ export default async function TalentPipelinePage() {
               </p>
               <ul className="space-y-3">
                 <li className="flex items-center gap-3 text-slate-300">
-                  <CheckCircle className="w-5 h-5 text-orange-500" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   No placement fees
                 </li>
                 <li className="flex items-center gap-3 text-slate-300">
-                  <CheckCircle className="w-5 h-5 text-orange-500" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   No training costs passed to employers
                 </li>
                 <li className="flex items-center gap-3 text-slate-300">
-                  <CheckCircle className="w-5 h-5 text-orange-500" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Eligible for employer training grants
                 </li>
                 <li className="flex items-center gap-3 text-slate-300">
-                  <CheckCircle className="w-5 h-5 text-orange-500" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   On-the-job training reimbursement available
                 </li>
               </ul>

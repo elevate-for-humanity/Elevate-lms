@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle, Clock, Lock, Loader2, PartyPopper, MessageCircle, FileText } from 'lucide-react';
+import { Clock, Lock, Loader2, PartyPopper, MessageCircle, FileText } from 'lucide-react';
 
 interface EnrollmentStatus {
   status: string;
@@ -142,7 +142,7 @@ function EnrollConfirmationContent() {
             {/* Completed steps */}
             <div className="flex items-center gap-4">
               <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <p className="font-medium text-gray-900">Application Submitted</p>
@@ -152,7 +152,7 @@ function EnrollConfirmationContent() {
 
             <div className="flex items-center gap-4">
               <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle className="w-5 h-5 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <p className="font-medium text-gray-900">Payment Received</p>

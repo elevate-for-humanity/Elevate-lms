@@ -4,7 +4,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { FileText, Users, CheckCircle, Clock, ChevronRight } from 'lucide-react';
+import { FileText, Users, Clock, ChevronRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Assignments | Instructor',
@@ -133,7 +133,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
 
                       <div className="flex items-center gap-6 text-sm text-slate-500">
                         <span className="flex items-center gap-1">
-                          <CheckCircle className="w-4 h-4" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                           {assignment.max_points || 100} pts
                         </span>
                         <span className="flex items-center gap-1">
@@ -141,7 +141,7 @@ export default async function InstructorAssignmentsPage({ params }: { params: Pa
                           {totalSubmissions} submission{totalSubmissions !== 1 ? 's' : ''}
                         </span>
                         <span className="flex items-center gap-1">
-                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                           {totalGraded} graded
                         </span>
                         {assignment.due_date && (

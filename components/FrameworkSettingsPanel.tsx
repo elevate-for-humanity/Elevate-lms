@@ -75,7 +75,7 @@ export function FrameworkSettingsPanel() {
           }}
         >
           {validation.isValid
-            ? '✅ Configuration Valid'
+            ? '• Configuration Valid'
             : '❌ Configuration Issues'}
         </h3>
         {validation.errors.length > 0 && (

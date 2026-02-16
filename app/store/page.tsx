@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowRight, Zap, Users, FileCheck, Building2, GraduationCap, BarChart3, Shield, CheckCircle } from 'lucide-react';
+import { ArrowRight, Zap, Users, FileCheck, Building2, GraduationCap, BarChart3, Shield } from 'lucide-react';
 import StoreDemoVideo from './StoreDemoVideo';
 
 export const metadata: Metadata = {
@@ -110,7 +110,7 @@ export default function StorePage() {
               { title: 'Grant Reporting', desc: 'Automated reports for WIOA, state workforce grants, and institutional funders.' },
             ].map((item) => (
               <div key={item.title} className="flex gap-3 p-4 bg-white rounded-lg border border-slate-200">
-                <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <h3 className="font-bold text-slate-900 text-sm">{item.title}</h3>
                   <p className="text-slate-600 text-sm">{item.desc}</p>
@@ -141,7 +141,7 @@ export default function StorePage() {
               <ul className="space-y-2 mb-6">
                 {['Admin, Student & Employer portals', 'Your logo, colors, and domain', 'WIOA compliance & PIRL reporting', 'Automated credential issuance', 'Onboarding & data migration', 'Email & phone support'].map(f => (
                   <li key={f} className="flex items-start gap-2 text-sm text-slate-700">
-                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     {f}
                   </li>
                 ))}
@@ -162,7 +162,7 @@ export default function StorePage() {
               <ul className="space-y-2 mb-6">
                 {['Everything in Managed', 'Self-hosted on your servers', 'Full source code access', '40 hours implementation support', 'Annual updates & patches', 'Volume licensing available'].map(f => (
                   <li key={f} className="flex items-start gap-2 text-sm text-slate-700">
-                    <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     {f}
                   </li>
                 ))}

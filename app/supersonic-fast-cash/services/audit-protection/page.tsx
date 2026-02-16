@@ -3,14 +3,13 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import {
   Shield,
-  CheckCircle,
   ArrowRight,
   FileText,
   Users,
   Phone,
   AlertTriangle,
   Scale,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Audit Protection | Supersonic Fast Cash',
@@ -168,7 +167,7 @@ export default function AuditProtectionPage() {
               <ul className="space-y-4">
                 {whatsCovered.map((item, idx) => (
                   <li key={idx} className="flex items-center gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700 font-medium">{item}</span>
                   </li>
                 ))}

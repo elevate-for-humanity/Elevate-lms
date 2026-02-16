@@ -17,16 +17,7 @@ export default function ProfessionalTaxPage() {
       <section className="relative h-[400px] w-full overflow-hidden">
         <Image src="/images/pathways/business-hero.jpg" alt="Professional Tax Services" width={800} height={600} className="absolute inset-0 w-full h-full object-cover" quality={85} loading="lazy" />
         
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="max-w-4xl mx-auto px-6 text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Professional Tax Services
-            </h1>
-            <p className="text-xl">
-              Expert tax preparation for complex returns
-            </p>
-          </div>
-        </div>
+        
       </section>
 
       {/* Content */}

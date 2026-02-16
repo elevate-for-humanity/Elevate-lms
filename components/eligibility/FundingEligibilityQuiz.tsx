@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle, XCircle, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
+import { XCircle, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 
 interface Question {
   id: string;
@@ -174,7 +174,7 @@ export function FundingEligibilityQuiz() {
         <div className={`p-8 rounded-2xl text-center mb-8 ${isEligible ? 'bg-green-50 border-2 border-green-200' : 'bg-amber-50 border-2 border-amber-200'}`}>
           {isEligible ? (
             <>
-              <CheckCircle className="w-20 h-20 text-green-500 mx-auto mb-4" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <h2 className="text-3xl font-bold text-green-800 mb-2">You Likely Qualify!</h2>
               <p className="text-green-700 text-lg">
                 Based on your answers, you may be eligible for <strong>{eligiblePrograms.length}</strong> funding program{eligiblePrograms.length > 1 ? 's' : ''}
@@ -198,7 +198,7 @@ export function FundingEligibilityQuiz() {
             <div className="space-y-3">
               {eligiblePrograms.map((program) => (
                 <div key={program.name} className="bg-white border border-slate-200 rounded-xl p-4 flex items-start gap-4">
-                  <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <div>
                     <h4 className="font-semibold text-slate-900">{program.name}</h4>
                     <p className="text-sm text-slate-600">{program.description}</p>

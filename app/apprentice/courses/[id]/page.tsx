@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, PlayCircle, CheckCircle, Clock, BookOpen } from 'lucide-react';
+import { ArrowLeft, PlayCircle, Clock, BookOpen } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -178,7 +178,7 @@ export default async function ApprenticeCourseDetailPage({
                 {Math.round(totalMinutes / 60)}h {totalMinutes % 60}m total
               </span>
               <span className="flex items-center gap-1">
-                <CheckCircle className="w-4 h-4" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 {completedCount} completed
               </span>
             </div>
@@ -221,7 +221,7 @@ export default async function ApprenticeCourseDetailPage({
                       }`}
                     >
                       {module.completed ? (
-                        <CheckCircle className="w-5 h-5" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       ) : (
                         <span className="font-bold">{module.order_index}</span>
                       )}
@@ -243,7 +243,7 @@ export default async function ApprenticeCourseDetailPage({
                     <div>
                       {module.completed ? (
                         <span className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
-                          <CheckCircle className="w-4 h-4" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                           Complete
                         </span>
                       ) : isCurrent ? (

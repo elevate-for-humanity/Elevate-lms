@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Clock, Calendar, User, CheckCircle, Loader2, AlertCircle, Building2, Users, FileText } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, User, Loader2, AlertCircle, Building2, Users, FileText } from 'lucide-react';
 
 interface Apprentice {
   id: string;
@@ -127,7 +127,7 @@ export default function ShopLogHoursPage() {
       <main className="px-4 py-6">
         {success ? (
           <div className="bg-green-500/20 border border-green-500/30 rounded-xl p-6 text-center">
-            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <h2 className="text-white font-bold text-xl mb-2">Hours Logged!</h2>
             <p className="text-green-200">Training hours have been recorded and submitted.</p>
           </div>
@@ -169,7 +169,7 @@ export default function ShopLogHoursPage() {
                       {apprentice.name}
                     </span>
                     {selectedApprentice === apprentice.id && (
-                      <CheckCircle className="w-5 h-5 text-white ml-auto" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     )}
                   </button>
                 ))}
@@ -266,7 +266,7 @@ export default function ShopLogHoursPage() {
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-5 h-5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Submit Hours
                 </>
               )}

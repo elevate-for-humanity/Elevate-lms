@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { 
-  CheckCircle, 
+  
   XCircle, 
   AlertTriangle, 
   Database, 
@@ -392,7 +392,7 @@ export default async function SystemStatusPage() {
               <div>
                 <h3 className="text-sm font-medium text-gray-500 mb-2">Primary Canonical Domain</h3>
                 <div className="flex items-center gap-2 p-3 bg-green-50 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="font-mono text-green-700">{canonicalConfig.primaryDomain}</span>
                 </div>
               </div>
@@ -467,7 +467,7 @@ export default async function SystemStatusPage() {
                         cap.status === 'partial' ? 'bg-yellow-100 text-yellow-700' :
                         'bg-red-100 text-red-700'
                       }`}>
-                        {cap.status === 'active' ? <CheckCircle className="w-3 h-3" /> :
+                        {cap.status === 'active' ? <span className="text-slate-400 flex-shrink-0">•</span> :
                          cap.status === 'partial' ? <AlertTriangle className="w-3 h-3" /> :
                          <XCircle className="w-3 h-3" />}
                         {cap.status.charAt(0).toUpperCase() + cap.status.slice(1)}
@@ -527,7 +527,7 @@ export default async function SystemStatusPage() {
                   dbStatus.tables.includes(table) ? 'bg-green-50' : 'bg-red-50'
                 }`}>
                   {dbStatus.tables.includes(table) ? (
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : (
                     <XCircle className="w-4 h-4 text-red-600" />
                   )}
@@ -552,7 +552,7 @@ export default async function SystemStatusPage() {
                   configured ? 'bg-green-50' : 'bg-yellow-50'
                 }`}>
                   {configured ? (
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : (
                     <AlertTriangle className="w-4 h-4 text-yellow-600" />
                   )}
@@ -586,7 +586,7 @@ export default async function SystemStatusPage() {
                   <tr key={idx} className="hover:bg-gray-50">
                     <td className="px-5 py-4">
                       <span className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-600" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         <span className="text-xs font-medium text-green-700 bg-green-100 px-2 py-1 rounded">Active</span>
                       </span>
                     </td>

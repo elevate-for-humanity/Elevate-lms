@@ -1,6 +1,6 @@
 'use client';
 
-import { Shield, CheckCircle, Clock, Database, Lock, FileText } from 'lucide-react';
+import { Shield, Clock, Database, Lock, FileText } from 'lucide-react';
 
 /**
  * System Status Panel - Institutional Signals
@@ -86,7 +86,7 @@ export function SystemStatusPanel({
                 {item.value}
               </span>
               {item.status === 'active' && (
-                <CheckCircle className="w-4 h-4 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               )}
               {item.status === 'production' && (
                 <span className="px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded">

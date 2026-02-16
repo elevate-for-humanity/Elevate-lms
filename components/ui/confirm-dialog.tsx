@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { AlertTriangle, Trash2, CheckCircle } from 'lucide-react';
+import { AlertTriangle, Trash2, CheckCircle, } from 'lucide-react';
 
 interface ConfirmDialogProps {
   open: boolean;

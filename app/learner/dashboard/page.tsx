@@ -5,7 +5,6 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   Clock,
-  CheckCircle,
   Play,
   MessageSquare,
   Bell,
@@ -17,7 +16,7 @@ import {
   HelpCircle,
   GraduationCap,
   Award,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Learner Dashboard | Elevate LMS',
@@ -178,7 +177,7 @@ export default async function LearnerDashboardPage() {
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Completed</p>

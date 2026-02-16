@@ -7,14 +7,13 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import {
-  CheckCircle,
   DollarSign,
   Eye,
   Package,
   Save,
   Sparkles,
   XCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 export default function StoreBuilderPage() {
@@ -430,7 +429,7 @@ export default function StoreBuilderPage() {
                     <div className="text-xs text-black mb-1">Demo</div>
                     <div className="text-xs text-black">
                       {product.demo.enabled
-                        ? '<CheckCircle className="w-5 h-5 inline-block" /> Enabled'
+                        ? '<span className="text-slate-400 flex-shrink-0">•</span> Enabled'
                         : '<XCircle className="w-5 h-5 inline-block" /> Disabled'}
                     </div>
                   </div>
@@ -478,73 +477,25 @@ export default function StoreBuilderPage() {
                   </p>
                   <ul className="space-y-4">
                     <li className="flex items-start">
-                      <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-black">
                         Funded training - no tuition, no hidden costs
                       </span>
                     </li>
                     <li className="flex items-start">
-                      <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-black">
                         Industry-recognized certifications that employers value
                       </span>
                     </li>
                     <li className="flex items-start">
-                      <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-black">
                         Job placement assistance and career support
                       </span>
                     </li>
                     <li className="flex items-start">
-                      <svg
-                        className="w-6 h-6 text-brand-green-600 mr-3 flex-shrink-0 mt-1"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-black">
                         Flexible scheduling for working adults
                       </span>

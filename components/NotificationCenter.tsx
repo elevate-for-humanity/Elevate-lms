@@ -74,7 +74,7 @@ export function NotificationCenter() {
 
   const getIcon = (type: string) => {
     switch (type) {
-      case 'success': return '✓';
+      case 'success': return '•';
       case 'warning': return '⚠️';
       case 'error': return '✕';
       default: return 'ℹ️';

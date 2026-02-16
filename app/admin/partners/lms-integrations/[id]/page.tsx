@@ -7,7 +7,6 @@ import {
   Globe,
   Key,
   RefreshCw,
-  CheckCircle,
   XCircle,
   AlertCircle,
   Settings,
@@ -17,7 +16,7 @@ import {
   Edit,
   Trash2,
   ExternalLink,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -126,7 +125,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
                   statusColors[provider.status] || 'bg-gray-100 text-gray-800'
                 }`}>
                   {provider.status === 'active' ? (
-                    <CheckCircle className="w-3 h-3" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : (
                     <XCircle className="w-3 h-3" />
                   )}
@@ -271,7 +270,7 @@ export default async function LMSIntegrationDetailPage({ params }: Props) {
                         log.status === 'error' ? 'bg-red-100' : 'bg-yellow-100'
                       }`}>
                         {log.status === 'success' ? (
-                          <CheckCircle className="w-4 h-4 text-green-600" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                         ) : log.status === 'error' ? (
                           <XCircle className="w-4 h-4 text-red-600" />
                         ) : (

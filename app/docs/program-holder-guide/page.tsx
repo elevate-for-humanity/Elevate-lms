@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { BookOpen, ArrowLeft, CheckCircle, Users, FileText, Settings, BarChart3 } from 'lucide-react';
+import { BookOpen, ArrowLeft, Users, FileText, Settings, BarChart3 } from 'lucide-react';
 
 const sections = [
   { icon: Users, title: 'Managing Students', items: ['Add new students', 'Track enrollment status', 'Monitor progress', 'Generate reports'] },
@@ -46,7 +46,7 @@ export default function ProgramHolderGuidePage() {
               <ul className="space-y-2">
                 {section.items.map((item, j) => (
                   <li key={j} className="flex items-center gap-2 text-gray-600">
-                    <CheckCircle className="w-4 h-4 text-green-500" /> {item}
+                    <span className="text-slate-400 flex-shrink-0">•</span> {item}
                   </li>
                 ))}
               </ul>

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import ProgramHeroBanner from '@/components/ProgramHeroBanner';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
-  CheckCircle, Clock, DollarSign, Award, ArrowRight, 
+  Clock, DollarSign, Award, ArrowRight, 
   Thermometer, Users, BookOpen, Wrench, Phone, Zap, Wind, Shield
 } from 'lucide-react';
 
@@ -165,43 +165,19 @@ export default function HVACTechnicianPage() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-black text-slate-900 mb-6">Why Choose HVAC?</h2>
-              <div className="space-y-4">
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900">Year-Round Demand</h3>
-                    <p className="text-slate-600">Heating in winter, cooling in summer. Work never stops.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900">Excellent Pay</h3>
-                    <p className="text-slate-600">Experienced techs earn $60K-$80K+ with overtime.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900">Job Security</h3>
-                    <p className="text-slate-600">Every building needs HVAC. Cannot be outsourced.</p>
-                  </div>
-                </div>
-                <div className="flex items-start gap-4">
-                  <div className="w-10 h-10 bg-brand-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                    <CheckCircle className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-slate-900">Business Ownership</h3>
-                    <p className="text-slate-600">Many techs start their own companies within 5 years.</p>
-                  </div>
-                </div>
+              <div className="space-y-4 text-slate-700 leading-relaxed">
+                <p>
+                  <strong>Year-Round Demand:</strong> Heating systems run all winter and cooling systems run all summer. HVAC technicians work year-round with consistent demand regardless of the economy.
+                </p>
+                <p>
+                  <strong>Excellent Pay:</strong> Entry-level HVAC technicians in Indiana start around $35,000-$45,000. Experienced technicians with EPA certification and specializations earn $60,000-$80,000 or more, especially with overtime during peak seasons.
+                </p>
+                <p>
+                  <strong>Job Security:</strong> Every residential, commercial, and industrial building needs HVAC. This work cannot be outsourced or automated. The Bureau of Labor Statistics projects 6% job growth through 2032.
+                </p>
+                <p>
+                  <strong>Business Ownership:</strong> Many HVAC technicians start their own service companies within 5 years. With an EPA certification and a contractor license, you can run your own business with relatively low startup costs.
+                </p>
               </div>
             </div>
             <div className="relative h-80 lg:h-96 rounded-2xl overflow-hidden shadow-2xl">
@@ -277,20 +253,11 @@ export default function HVACTechnicianPage() {
           <h2 className="text-3xl md:text-4xl font-black mb-4">Eligibility Requirements</h2>
           <p className="text-slate-600 mb-8">Most adults qualify for free training through WIOA funding</p>
           
-          <div className="grid sm:grid-cols-2 gap-4 max-w-2xl mx-auto mb-8">
-            {[
-              '18+ years old',
-              'High school diploma or GED',
-              'Valid driver\'s license',
-              'Ability to lift 50+ lbs',
-              'Pass background check',
-              'Basic math skills',
-            ].map((item, i) => (
-              <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
-                <span className="font-medium text-slate-700">{item}</span>
-              </div>
-            ))}
+          <div className="max-w-2xl mx-auto mb-8 bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+            <p className="text-slate-700 leading-relaxed">
+              You must be at least 18 years old with a high school diploma or GED. A valid driver&apos;s license is required since HVAC work involves traveling to job sites. 
+              You should be able to lift 50 pounds or more and pass a background check. Basic math skills (fractions, measurements, and simple calculations) are needed for the coursework.
+            </p>
           </div>
           
           <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105">

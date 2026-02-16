@@ -1,6 +1,5 @@
 "use client";
 
-import { CheckCircle } from 'lucide-react';
 
 interface WhatYouWillLearnProps {
   items: string[];
@@ -19,7 +18,7 @@ export function WhatYouWillLearn({
       <ul className="grid md:grid-cols-2 gap-4">
         {items.map((item, index) => (
           <li key={index} className="flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-brand-orange-600 mt-0.5 flex-shrink-0" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-black text-sm leading-relaxed">{item}</span>
           </li>
         ))}

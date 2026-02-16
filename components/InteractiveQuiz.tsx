@@ -5,7 +5,7 @@ import React from 'react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { XCircle } from 'lucide-react';
 
 interface QuizQuestion {
   id: string;
@@ -89,7 +89,7 @@ export function InteractiveQuiz({ questions, onComplete }: InteractiveQuizProps)
                 <div className="flex items-center justify-between">
                   <span>{option}</span>
                   {showFeedback && index === question.correctAnswer && (
-                    <CheckCircle className="text-green-600" size={20} />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   )}
                   {showFeedback && selectedAnswer === index && !isCorrect && (
                     <XCircle className="text-brand-orange-600" size={20} />
@@ -103,7 +103,7 @@ export function InteractiveQuiz({ questions, onComplete }: InteractiveQuizProps)
         {showFeedback && (
           <div className={`p-4 rounded-lg ${isCorrect ? 'bg-green-50 border border-green-200' : 'bg-red-50 border border-red-200'}`}>
             <p className={`font-semibold mb-2 ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>
-              {isCorrect ? '✓ Correct!' : '✗ Incorrect'}
+              {isCorrect ? '• Correct!' : '✗ Incorrect'}
             </p>
             <p className="text-sm text-black">{question.explanation}</p>
           </div>

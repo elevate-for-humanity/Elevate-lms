@@ -6,14 +6,13 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import {
-  CheckCircle,
   XCircle,
   FileText,
   Download,
   Eye,
   AlertCircle,
   ArrowLeft,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import Link from 'next/link';
 
 interface Document {
@@ -366,7 +365,7 @@ export default function VerificationReviewForm({
                         : 'bg-green-50 text-green-700 hover:bg-green-100'
                     }`}
                   >
-                    <CheckCircle className="w-5 h-5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Approve & Verify
                   </button>
 

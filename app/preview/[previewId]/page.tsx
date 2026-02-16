@@ -7,7 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
   GraduationCap, Users, Award, ArrowRight, 
-  Clock, BarChart3, CheckCircle, Star,
+  Clock, BarChart3, Star,
   Menu, X, Lock, Play, ChevronRight,
   BookOpen, Trophy, Briefcase, Mail, Phone, MapPin
 } from 'lucide-react';
@@ -372,51 +372,33 @@ export default function PreviewPage() {
         </header>
 
         {/* Hero Section */}
-        <section className="relative overflow-hidden">
-          {/* Background Image */}
-          <div className="absolute inset-0 z-0">
-            <img 
-              src={images.hero}
-              alt="Hero background"
-              className="w-full h-full object-cover"
-            />
-            <div 
-              className="absolute inset-0"
-              style={{ 
-                background: `linear-gradient(135deg, ${colors.primary}ee 0%, ${colors.secondary}dd 100%)`,
-              }}
-            />
+        <section className="relative w-full">
+          <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+            <img src={images.hero} alt="Hero background" className="absolute inset-0 w-full h-full object-cover" />
           </div>
-          
-          {/* Hero Content */}
-          <div className="relative z-10 max-w-5xl mx-auto px-4 py-24 md:py-32 text-center">
-            <h1 
-              className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-tight"
-              style={{ fontFamily: `${fonts.heading}, sans-serif`, color: colors.textOnPrimary }}
-            >
-              {homepage.heroTitle}
-            </h1>
-            <p 
-              className="text-xl md:text-2xl mb-10 opacity-90 max-w-3xl mx-auto leading-relaxed"
-              style={{ color: colors.textOnPrimary }}
-            >
-              {homepage.heroSubtitle}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button
-                className={`px-8 py-4 font-bold text-lg transition-all hover:scale-105 hover:shadow-xl ${buttonRadius}`}
-                style={{ backgroundColor: colors.accent, color: '#ffffff' }}
+          <div className="py-10" style={{ backgroundColor: colors.primary }}>
+            <div className="max-w-5xl mx-auto px-4 text-center">
+              <h1
+                className="text-3xl md:text-4xl lg:text-5xl font-black mb-4 leading-tight"
+                style={{ fontFamily: `${fonts.heading}, sans-serif`, color: colors.textOnPrimary }}
               >
-                {homepage.heroCtaText}
-                <ArrowRight className="inline-block ml-2 w-5 h-5" />
-              </button>
-              <button
-                className={`px-8 py-4 font-bold text-lg border-2 transition-all hover:bg-white/20 ${buttonRadius}`}
-                style={{ borderColor: 'rgba(255,255,255,0.5)', color: colors.textOnPrimary, backgroundColor: 'rgba(255,255,255,0.1)' }}
+                {homepage.heroTitle}
+              </h1>
+              <p
+                className="text-lg md:text-xl mb-8 opacity-90 max-w-3xl mx-auto leading-relaxed"
+                style={{ color: colors.textOnPrimary }}
               >
-                Watch Video
-                <Play className="inline-block ml-2 w-5 h-5" />
-              </button>
+                {homepage.heroSubtitle}
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  className={`px-8 py-4 font-bold text-lg transition-all hover:scale-105 hover:shadow-xl ${buttonRadius}`}
+                  style={{ backgroundColor: colors.accent, color: '#ffffff' }}
+                >
+                  {homepage.heroCtaText}
+                  <ArrowRight className="inline-block ml-2 w-5 h-5" />
+                </button>
+              </div>
             </div>
           </div>
         </section>

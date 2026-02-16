@@ -6,7 +6,6 @@ import {
   DollarSign,
   Users,
   TrendingUp,
-  CheckCircle,
   ArrowRight,
   MapPin,
   Briefcase,
@@ -15,7 +14,7 @@ import {
   BarChart3,
   Zap,
   Star,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Become a Multi-Site Partner | Supersonic Fast Cash',
@@ -232,7 +231,7 @@ export default function MultiSitePage() {
               <ul className="space-y-3">
                 {whatYouGet.map((item, idx) => (
                   <li key={idx} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}

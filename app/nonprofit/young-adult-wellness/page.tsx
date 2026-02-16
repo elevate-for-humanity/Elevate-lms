@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
-import { Sparkles, Calendar, CheckCircle, ArrowRight } from 'lucide-react';
+import { Sparkles, Calendar, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -105,7 +105,7 @@ export default async function YoungAdultWellnessPage() {
           <div className="grid md:grid-cols-2 gap-6">
             {displayServices.map((service: any, index: number) => (
               <div key={index} className="bg-teal-50 rounded-xl p-6">
-                <CheckCircle className="w-6 h-6 text-teal-600 mb-3" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <h3 className="font-bold text-lg mb-2">{service.title}</h3>
                 <p className="text-gray-600">{service.description}</p>
               </div>

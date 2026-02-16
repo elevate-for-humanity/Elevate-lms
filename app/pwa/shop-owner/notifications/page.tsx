@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  ArrowLeft, Bell, CheckCircle, Clock, Users, 
+  ArrowLeft, Bell, Clock, Users, 
   AlertCircle, FileText, Trash2, Check, Loader2, 
   BellOff, Building2
 } from 'lucide-react';

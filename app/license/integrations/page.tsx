@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Zap, Database, Mail, Award, Calendar, ArrowRight, CheckCircle, AlertCircle, ArrowRightLeft } from 'lucide-react';
+import { Zap, Database, Mail, Award, Calendar, ArrowRight, AlertCircle, ArrowRightLeft } from 'lucide-react';
 import { INTEGRATIONS, DISCLAIMERS, ROUTES } from '@/lib/pricing';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -152,15 +152,15 @@ export default async function IntegrationsPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-slate-600">
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>Works with Salesforce Sales Cloud and Service Cloud</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>Custom object mapping available</span>
                   </li>
                   <li className="flex items-start gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>Implementation support included with Enterprise licenses</span>
                   </li>
                 </ul>

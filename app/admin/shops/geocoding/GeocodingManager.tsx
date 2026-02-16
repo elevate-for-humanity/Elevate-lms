@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { MapPin, RefreshCw, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { MapPin, RefreshCw, XCircle, Loader2 } from 'lucide-react';
 
 interface Shop {
   id: string;
@@ -172,7 +172,7 @@ export default function GeocodingManager({ shops }: Props) {
                 <td className="px-4 py-3">
                   {results[shop.id] === 'success' ? (
                     <span className="flex items-center gap-1 text-green-600 text-sm">
-                      <CheckCircle className="w-4 h-4" /> Done
+                      <span className="text-slate-400 flex-shrink-0">•</span> Done
                     </span>
                   ) : results[shop.id] === 'error' ? (
                     <span className="flex items-center gap-1 text-red-600 text-sm">

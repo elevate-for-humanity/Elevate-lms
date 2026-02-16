@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from 'react';
-import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
+import { XCircle, AlertCircle, Info, X } from 'lucide-react';
 
 export type ToastType = 'success' | 'error' | 'warning' | 'info';
 
@@ -27,7 +27,7 @@ export const Toast: React.FC<ToastProps> = ({
   }, [duration, onClose]);
 
   const icons = {
-    success: <CheckCircle className="h-5 w-5" />,
+    success: <span className="text-slate-400 flex-shrink-0">•</span>,
     error: <XCircle className="h-5 w-5" />,
     warning: <AlertCircle className="h-5 w-5" />,
     info: <Info className="h-5 w-5" />,

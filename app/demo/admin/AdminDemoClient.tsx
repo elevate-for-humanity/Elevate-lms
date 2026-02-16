@@ -4,8 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import {
   Users, GraduationCap, DollarSign, TrendingUp, ArrowRight,
-  CheckCircle, Clock, AlertTriangle, ChevronRight, Search,
-  Bell, Eye, Mail, XCircle, BarChart3
+  Clock, AlertTriangle, ChevronRight, Search,
+  Bell, Eye, Mail, XCircle, BarChart3, Circle,
 } from 'lucide-react';
 
 const PERIODS = ['This Week', 'This Month', 'This Quarter', 'This Year'] as const;
@@ -98,7 +98,7 @@ export default function AdminDemoClient({ students, programs, metrics, recentAct
           { label: 'Completed', value: m.completed, icon: GraduationCap, color: 'text-green-600 bg-green-50', link: '/demo/admin/outcomes' },
           { label: 'Placed', value: m.placed, icon: TrendingUp, color: 'text-purple-600 bg-purple-50', link: '/demo/admin/outcomes' },
           { label: 'Funding', value: m.funding, icon: DollarSign, color: 'text-amber-600 bg-amber-50', link: '/demo/admin/funding' },
-          { label: 'Compliance', value: `${m.compliance}%`, icon: CheckCircle, color: 'text-emerald-600 bg-emerald-50', link: '/demo/admin/compliance' },
+          { label: 'Compliance', value: `${m.compliance}%`, icon: Circle, color: 'text-emerald-600 bg-emerald-50', link: '/demo/admin/compliance' },
         ].map(stat => (
           <Link key={stat.label} href={stat.link} className="bg-white rounded-xl border p-4 hover:shadow-md transition group">
             <div className={`p-2 rounded-lg ${stat.color} w-fit mb-2`}>

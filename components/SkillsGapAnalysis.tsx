@@ -125,15 +125,15 @@ export default function SkillsGapAnalysis() {
               </p>
               <div className="flex gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>Real-time analysis</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>Personalized recommendations</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>Track progress</span>
                 </div>
               </div>

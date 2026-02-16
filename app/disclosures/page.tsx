@@ -16,7 +16,7 @@ import {
   ArrowRight,
   Phone,
   Mail,
-  CheckCircle
+  CheckCircle,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -160,7 +160,7 @@ export default function DisclosuresPage() {
                     'Indiana DWD Partner'
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-gray-700">{item}</span>
                     </div>
                   ))}

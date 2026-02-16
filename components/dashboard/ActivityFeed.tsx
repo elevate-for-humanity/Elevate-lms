@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, Award, BookOpen, TrendingUp } from 'lucide-react';
+import { Award, BookOpen, TrendingUp, CheckCircle, } from 'lucide-react';
 
 const activities = [
   {

@@ -7,10 +7,9 @@ import {
   Award, 
   ExternalLink, 
   Download,
-  CheckCircle,
   Clock,
-  Shield
-} from 'lucide-react';
+  Shield,
+CheckCircle, } from 'lucide-react';
 
 interface Credential {
   id: string;

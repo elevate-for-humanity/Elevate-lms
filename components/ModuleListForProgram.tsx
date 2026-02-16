@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/client';
 import { 
   Video, FileText, BookOpen, HelpCircle, Users, 
   Eye, EyeOff, GripVertical, Loader2, Plus, 
-  ExternalLink, Clock, CheckCircle 
+  ExternalLink, Clock 
 } from 'lucide-react';
 
 interface CourseModule {

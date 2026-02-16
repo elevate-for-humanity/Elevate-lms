@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle, Mail, Clock, ArrowRight } from 'lucide-react';
+import { Mail, Clock, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -21,7 +21,7 @@ export default function PartnerOnboardingSuccessPage() {
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           
           <h1 className="text-2xl font-bold text-slate-900 mb-2">

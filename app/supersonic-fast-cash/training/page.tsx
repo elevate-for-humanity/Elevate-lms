@@ -46,16 +46,7 @@ export default async function TrainingPage() {
           priority
         />
         
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="max-w-4xl mx-auto px-6 text-center text-white">
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">
-              Tax Preparer Training
-            </h1>
-            <p className="text-xl">
-              Become an PTIN-credentialed tax professional
-            </p>
-          </div>
-        </div>
+        
       </section>
 
       {/* Training Overview */}

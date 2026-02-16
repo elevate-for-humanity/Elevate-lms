@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useState } from 'react';
-import { CreditCard, DollarSign, CheckCircle } from 'lucide-react';
+import { CreditCard, DollarSign } from 'lucide-react';
 
 interface ProgramPaymentOptionsProps {
   programName: string;
@@ -66,7 +66,7 @@ export default function ProgramPaymentOptions({
       {/* Funding Priority Message */}
       <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
         <p className="text-sm text-brand-blue-900 font-semibold mb-2">
-          ✅ Check Free Funding First!
+          • Check Free Funding First!
         </p>
         <p className="text-sm text-black">
           Most students qualify for 100% FREE training through WIOA, WRG, or
@@ -110,7 +110,7 @@ export default function ProgramPaymentOptions({
               </div>
             </div>
             {paymentMethod === 'full' && (
-              <CheckCircle className="w-6 h-6 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             )}
           </div>
         </button>
@@ -141,7 +141,7 @@ export default function ProgramPaymentOptions({
               </div>
             </div>
             {paymentMethod === 'stripe' && (
-              <CheckCircle className="w-6 h-6 text-brand-blue-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             )}
           </div>
         </button>
@@ -172,7 +172,7 @@ export default function ProgramPaymentOptions({
               </div>
             </div>
             {paymentMethod === 'bnpl' && (
-              <CheckCircle className="w-6 h-6 text-purple-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             )}
           </div>
         </button>
@@ -193,19 +193,19 @@ export default function ProgramPaymentOptions({
       {/* Additional Info */}
       <div className="mt-6 space-y-3 text-sm text-black">
         <p className="flex items-start gap-2">
-          <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <span>Secure payment processing via Stripe</span>
         </p>
         <p className="flex items-start gap-2">
-          <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <span>Start training immediately after payment</span>
         </p>
         <p className="flex items-start gap-2">
-          <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <span>All materials and certifications included</span>
         </p>
         <p className="flex items-start gap-2">
-          <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <span>Job placement assistance included</span>
         </p>
       </div>

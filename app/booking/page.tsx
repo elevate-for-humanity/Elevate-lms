@@ -101,20 +101,16 @@ export default async function BookingPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[350px] flex items-center">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/images/programs-hq/training-classroom.jpg)' }}
-        />
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 text-white">
-          <div className="flex items-center gap-3 mb-4">
-            <Calendar className="w-10 h-10" />
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/programs-hq/training-classroom.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Book an Appointment</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Schedule a consultation, campus tour, or advising session with our team.</p>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Book an Appointment</h1>
-          <p className="text-xl text-slate-200 max-w-2xl">
-            Schedule a consultation, campus tour, or advising session with our team.
-          </p>
         </div>
       </section>
 

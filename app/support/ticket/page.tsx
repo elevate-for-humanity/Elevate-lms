@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Send, CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Send, AlertCircle, Loader2 } from 'lucide-react';
 
 const categories = [
   { value: 'enrollment', label: 'Enrollment & Admissions' },
@@ -75,7 +75,7 @@ function SubmitTicketContent() {
         <div className="max-w-2xl mx-auto px-6">
           <div className="bg-white rounded-2xl p-8 shadow-sm text-center">
             <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h1 className="text-3xl font-bold text-black mb-4">Ticket Submitted!</h1>
             <p className="text-gray-600 mb-2">Your ticket number is:</p>

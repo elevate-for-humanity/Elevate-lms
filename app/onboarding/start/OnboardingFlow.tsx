@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useState } from 'react';
-import { CheckCircle2, Circle, Lock, FileText, DollarSign } from 'lucide-react';
+import { Circle, Lock, FileText, DollarSign } from 'lucide-react';
 
 interface OnboardingFlowProps {
   user: any;
@@ -51,7 +51,7 @@ export default function OnboardingFlow({
                 {roleNames[profile.role]} Onboarding
               </h1>
               <p className="text-black mt-1">
-                Complete all steps to access your dashboard
+                Complete all steps to get started
               </p>
             </div>
             <div className="text-right">
@@ -103,7 +103,7 @@ export default function OnboardingFlow({
                       }`}
                     >
                       {isComplete ? (
-                        <CheckCircle2 className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       ) : isCurrent ? (
                         <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                       ) : (
@@ -141,7 +141,7 @@ export default function OnboardingFlow({
                   }`}
                 >
                   {payrollComplete ? (
-                    <CheckCircle2 className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : currentStep === documents.length ? (
                     <Circle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
                   ) : (
@@ -263,7 +263,7 @@ function DocumentStep({
     return (
       <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-8">
         <div className="text-center">
-          <CheckCircle2 className="w-16 h-16 text-brand-green-600 mx-auto mb-4" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <h2 className="text-2xl font-bold text-black mb-2">
             {document.title}
           </h2>
@@ -395,7 +395,7 @@ function PayrollSetupStep({
 
       {currentStatus === 'PENDING' || currentStatus === 'ACTIVE' ? (
         <div className="text-center py-8">
-          <CheckCircle2 className="w-16 h-16 text-brand-green-600 mx-auto mb-4" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <h3 className="text-lg font-semibold text-black mb-2">
             Payroll Setup Complete
           </h3>

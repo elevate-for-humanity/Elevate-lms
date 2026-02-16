@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
-  FileText, Search, Filter, Clock, CheckCircle, XCircle,
+  FileText, Search, Filter, Clock, XCircle,
   Eye, MessageSquare, Calendar, Star, MapPin, ChevronRight
 } from 'lucide-react';
 

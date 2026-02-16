@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { CheckCircle, DollarSign, Phone } from 'lucide-react';
+import { DollarSign, Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -99,7 +99,7 @@ export default async function PublicAssistancePage() {
           <ul className="space-y-4">
             {benefits.map((benefit, index) => (
               <li key={index} className="flex items-start gap-3">
-                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{benefit}</span>
               </li>
             ))}
@@ -111,19 +111,19 @@ export default async function PublicAssistancePage() {
           <h2 className="text-2xl font-bold mb-6">Required Documents</h2>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Proof of public assistance (award letter, benefit statement, or EBT card)</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Valid government-issued ID</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Proof of Indiana residency</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Social Security card</span>
             </li>
           </ul>

@@ -7,7 +7,7 @@ import {
   Clock, 
   MapPin, 
   AlertTriangle, 
-  CheckCircle, 
+  
   Coffee, 
   LogOut,
   Loader2,
@@ -475,7 +475,7 @@ export default function TimeclockPage() {
             }`}>
               <div className="flex items-center">
                 {geofence.withinGeofence ? (
-                  <CheckCircle className="w-5 h-5 mr-2 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <AlertTriangle className="w-5 h-5 mr-2 text-red-600" />
                 )}
@@ -585,7 +585,7 @@ export default function TimeclockPage() {
           {shift.clockOutAt && (
             <div className="mt-6 p-4 bg-green-50 rounded-lg">
               <div className="flex items-center">
-                <CheckCircle className="w-5 h-5 mr-2 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-sm font-medium text-green-700">
                   Shift complete! Clocked out at {new Date(shift.clockOutAt).toLocaleTimeString()}
                 </span>

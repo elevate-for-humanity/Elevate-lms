@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle, BookOpen, FileText, CreditCard, Calendar, User, ArrowRight } from 'lucide-react';
+import { BookOpen, FileText, CreditCard, Calendar, User, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -169,7 +169,7 @@ export default async function LearnerOnboardingPage() {
       <div className="max-w-4xl mx-auto px-4 py-8">
         {allComplete ? (
           <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8 text-center">
-            <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <h2 className="text-2xl font-bold text-green-900 mb-2">Onboarding Complete!</h2>
             <p className="text-green-700 mb-4">
               You're all set to begin your training. Head to your dashboard to get started.
@@ -208,7 +208,7 @@ export default async function LearnerOnboardingPage() {
                     isComplete ? 'bg-green-100' : 'bg-gray-100'
                   }`}>
                     {isComplete ? (
-                      <CheckCircle className="w-6 h-6 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
                       <span className="text-gray-500 font-semibold">{index + 1}</span>
                     )}

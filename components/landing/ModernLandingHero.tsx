@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 interface ModernLandingHeroProps {
   badge?: string;
@@ -57,7 +57,7 @@ export default function ModernLandingHero({
         <div className="space-y-3 mb-8">
           {features.map((feature, index) => (
             <div key={index} className="flex items-center gap-3">
-              <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="text-black">{feature}</span>
             </div>
           ))}

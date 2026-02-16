@@ -4,7 +4,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Clock, Save, AlertCircle, CheckCircle, Building, Award } from 'lucide-react';
+import { ArrowLeft, Clock, Save, AlertCircle, Building, Award } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -95,7 +95,7 @@ export default function LogApprenticeHoursPage() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="max-w-md w-full bg-white rounded-xl shadow-lg p-8 text-center">
-          <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Hours Logged!</h1>
           <p className="text-gray-600 mb-4">Your apprenticeship hours have been submitted for approval.</p>
           <p className="text-sm text-gray-500">Redirecting...</p>

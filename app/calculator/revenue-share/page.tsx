@@ -8,8 +8,7 @@ import {
   DollarSign,
   TrendingUp,
   FileText,
-  CheckCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function RevenueShareCalculator() {
@@ -110,23 +109,23 @@ export default function RevenueShareCalculator() {
                 </h3>
                 <ul className="text-sm text-brand-blue-800 space-y-1">
                   <li>
-                    <CheckCircle className="w-5 h-5 inline-block" /> Professional Tax Software
+                    <span className="text-slate-400 flex-shrink-0">•</span> Professional Tax Software
                     Software (unlimited)
                   </li>
                   <li>
-                    <CheckCircle className="w-5 h-5 inline-block" /> All
+                    <span className="text-slate-400 flex-shrink-0">•</span> All
                     training and support
                   </li>
                   <li>
-                    <CheckCircle className="w-5 h-5 inline-block" /> Marketing
+                    <span className="text-slate-400 flex-shrink-0">•</span> Marketing
                     materials
                   </li>
                   <li>
-                    <CheckCircle className="w-5 h-5 inline-block" /> No
+                    <span className="text-slate-400 flex-shrink-0">•</span> No
                     per-return fees
                   </li>
                   <li>
-                    <CheckCircle className="w-5 h-5 inline-block" /> No monthly
+                    <span className="text-slate-400 flex-shrink-0">•</span> No monthly
                     software costs
                   </li>
                 </ul>

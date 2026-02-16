@@ -8,9 +8,8 @@ import {
   FileText,
   Users,
   DollarSign,
-  CheckCircle,
   AlertCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Suboffice Onboarding | Partner with Elevate for Humanity',
@@ -72,7 +71,7 @@ export default function SubofficeOnboardingPage() {
             <h3 className="text-2xl font-bold mb-6">Revenue Share Structure</h3>
             <div className="space-y-4">
               <div className="flex items-start">
-                <CheckCircle className="w-6 h-6 mr-3 flex-shrink-0 mt-1" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <strong>40/60 Split:</strong> Main office gets 40%, you keep
                   60% of base tax prep fee
@@ -86,7 +85,7 @@ export default function SubofficeOnboardingPage() {
                 </div>
               </div>
               <div className="flex items-start">
-                <CheckCircle className="w-6 h-6 mr-3 flex-shrink-0 mt-1" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <strong>Software Included:</strong> Professional tax software, training,
                   and support included - NO extra costs to you
@@ -238,7 +237,7 @@ export default function SubofficeOnboardingPage() {
             {/* Step 5 */}
             <div className="bg-white p-8 rounded-lg shadow-md">
               <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-red-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <h3 className="text-xl font-bold text-black mb-3 text-center">
                 Step 5: Training

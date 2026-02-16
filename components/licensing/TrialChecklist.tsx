@@ -15,7 +15,7 @@ import {
   Shield,
   ArrowRight,
   Sparkles,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 /**
  * Trial Checklist for Organizations (Managed License Buyers)
@@ -244,7 +244,7 @@ export function TrialChecklist({
         >
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-brand-blue-100 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="w-5 h-5 text-brand-blue-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <div className="text-left">
               <p className="font-semibold text-slate-900">Trial Setup Progress</p>
@@ -323,7 +323,7 @@ export function TrialChecklist({
                     }`}
                   >
                     {phaseCompleted === phaseTotal ? (
-                      <CheckCircle2 className="w-5 h-5" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
                       phase
                     )}
@@ -364,7 +364,7 @@ export function TrialChecklist({
                           }`}
                         >
                           {isComplete ? (
-                            <CheckCircle2 className="w-5 h-5 text-green-700" />
+                            <span className="text-slate-400 flex-shrink-0">•</span>
                           ) : (
                             <Icon className="w-4 h-4 text-slate-400" />
                           )}

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { BookOpen, Award, BarChart3, Users, Play, ArrowRight, CheckCircle } from 'lucide-react';
+import { BookOpen, Award, BarChart3, Users, Play, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -72,7 +72,7 @@ export default function LMSPortalPublicPage() {
               <p className="text-slate-600">Connect with fellow students, join study groups, and participate in forums.</p>
             </div>
             <div className="bg-slate-50 rounded-xl p-6">
-              <CheckCircle className="w-10 h-10 text-teal-600 mb-4" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <h3 className="text-xl font-bold mb-2">Assessments</h3>
               <p className="text-slate-600">Test your knowledge with quizzes and practical assessments.</p>
             </div>

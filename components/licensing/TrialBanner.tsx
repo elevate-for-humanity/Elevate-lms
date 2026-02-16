@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Clock, ArrowRight, X, CheckCircle2, Circle } from 'lucide-react';
+import { Clock, ArrowRight, X, Circle } from 'lucide-react';
 
 interface TrialBannerProps {
   expiresAt: Date;
@@ -151,7 +151,7 @@ export function TrialBanner({
                     }`}
                   >
                     {isComplete ? (
-                      <CheckCircle2 className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
                       <Circle className="w-5 h-5 text-slate-400 flex-shrink-0 mt-0.5" />
                     )}

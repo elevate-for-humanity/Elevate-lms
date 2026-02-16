@@ -115,7 +115,7 @@ export default function AboutPage() {
         <div className="bg-green-500 rounded-2xl p-8 text-center text-white">
           <h2 className="text-2xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-green-100 mb-6">
-            Join thousands of learners who are transforming their careers.
+            Learners across Indiana are transforming their careers.
           </p>
           <div className="flex items-center justify-center gap-4">
             <Link 

@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { FileText, DollarSign, Building, Calculator, Shield, Clock, CheckCircle } from 'lucide-react';
+import { FileText, DollarSign, Building, Calculator, Shield, Clock } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -138,36 +138,6 @@ export default async function ServicesPage() {
           quality={85}
           priority
         />
-        
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-7xl mx-auto px-6 w-full">
-            <div className="max-w-3xl">
-              <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-8 shadow-2xl">
-                <h1 className="text-4xl md:text-5xl font-bold mb-4 text-gray-900">
-                  Professional Tax Services
-                </h1>
-                <p className="text-xl text-gray-700 mb-8">
-                  From simple returns to complex business taxes, we provide expert
-                  service at competitive prices
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link
-                    href="/supersonic-fast-cash/book-appointment"
-                    className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 text-white font-semibold rounded-lg hover:bg-orange-600 transition-colors"
-                  >
-                    Schedule Consultation
-                  </Link>
-                  <Link
-                    href="/support"
-                    className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-600 text-white font-semibold rounded-lg hover:bg-brand-blue-700 transition-colors"
-                  >
-                    Call Get Help Online
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Services Grid */}
@@ -195,7 +165,7 @@ export default async function ServicesPage() {
                       key={idx}
                       className="flex items-start gap-2 text-sm text-black"
                     >
-                      <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       {feature}
                     </li>
                   ))}

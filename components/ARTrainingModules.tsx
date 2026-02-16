@@ -143,15 +143,15 @@ export function ARTrainingModules() {
               </p>
               <div className="flex gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>Works on mobile & tablet</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>No special equipment needed</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>Track your progress</span>
                 </div>
               </div>
@@ -191,7 +191,7 @@ export function ARTrainingModules() {
                     <ul className="space-y-1">
                       {module.features.slice(0, 3).map((feature, idx) => (
                         <li key={idx} className="text-xs text-black flex items-start">
-                          <span className="text-green-500 mr-1">✓</span>
+                          <span className="text-green-500 mr-1">•</span>
                           {feature}
                         </li>
                       ))}
@@ -304,7 +304,7 @@ export function ARTrainingModules() {
                     <ul className="space-y-2">
                       {selectedModuleData.features.map((feature, idx) => (
                         <li key={idx} className="text-sm text-black flex items-start">
-                          <span className="text-green-500 mr-2">✓</span>
+                          <span className="text-green-500 mr-2">•</span>
                           {feature}
                         </li>
                       ))}

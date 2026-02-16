@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Settings, CheckCircle, BookOpen, ShoppingCart, Code, Shield } from 'lucide-react';
+import { Settings, BookOpen, ShoppingCart, Code, Shield } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -92,7 +92,7 @@ export default function OperationalControlsPage() {
           <div className="space-y-3">
             {contentControls.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}
@@ -110,7 +110,7 @@ export default function OperationalControlsPage() {
           <div className="space-y-3">
             {lmsControls.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}
@@ -128,7 +128,7 @@ export default function OperationalControlsPage() {
           <div className="space-y-3">
             {storeControls.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}
@@ -150,7 +150,7 @@ export default function OperationalControlsPage() {
             <div className="grid md:grid-cols-2 gap-3">
               {deploymentChecks.map((item, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-sm text-slate-700">{item}</span>
                 </div>
               ))}

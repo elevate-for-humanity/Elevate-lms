@@ -145,51 +145,15 @@ export default async function IntegrationsPage() {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>Free training for eligible participants</span>
                   </li>
                   <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>Industry-standard certifications</span>
                   </li>
                   <li className="flex items-start">
-                    <svg
-                      className="w-6 h-6 text-brand-green-600 mr-2 flex-shrink-0 mt-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>Career support and job placement</span>
                   </li>
                 </ul>

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
-import { X, ChevronRight, ChevronLeft, Sparkles, CheckCircle } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 type TourStep = {
@@ -274,7 +274,7 @@ export function OnboardingTour({
                     </>
                   ) : (
                     <>
-                      <CheckCircle className="w-4 h-4" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       Get Started
                     </>
                   )}

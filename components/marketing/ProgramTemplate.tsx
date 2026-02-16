@@ -3,14 +3,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {
   ArrowRight,
-  CheckCircle,
   Clock,
   DollarSign,
   Users,
   Award,
   Briefcase,
   GraduationCap,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface ProgramData {
@@ -180,7 +179,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
                 className="flex items-start gap-4 p-6 bg-slate-50 rounded-xl border border-slate-200"
               >
                 <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                  <CheckCircle size={20} className="text-brand-orange-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <div>
                   <h3 className="font-bold text-black mb-1">
@@ -322,7 +321,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.schedule.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-brand-orange-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -340,7 +339,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.requirements.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-brand-blue-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -360,7 +359,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
               <ul className="space-y-2 text-sm text-black">
                 {program.support.map((item, index) => (
                   <li key={index} className="flex items-center gap-2">
-                    <CheckCircle size={16} className="text-purple-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}

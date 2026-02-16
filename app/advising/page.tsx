@@ -84,19 +84,7 @@ export default function AdvisingPage() {
         {isSubmitted ? (
           <section className="rounded-2xl bg-green-50 p-8 shadow-sm ring-1 ring-green-200 text-center">
             <div className="w-16 h-16 bg-brand-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg
-                className="w-8 h-8 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h2 className="text-2xl font-bold text-black mb-2">
               Request Submitted!
@@ -118,7 +106,7 @@ export default function AdvisingPage() {
         ) : (
           <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
             <h2 className="text-sm font-semibold text-black">
-              Schedule a call or visit
+              Schedule a meeting or visit
             </h2>
             <p className="mt-2 text-xs text-black">
               Complete this form and a member of our team will reach out to you

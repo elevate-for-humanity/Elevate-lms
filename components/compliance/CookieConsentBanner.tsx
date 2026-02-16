@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import React from 'react';
 
 import { useState, useEffect } from 'react';
-import { Cookie, X, Settings, Shield, CheckCircle } from 'lucide-react';
+import { Cookie, X, Settings, Shield } from 'lucide-react';
 import Link from 'next/link';
 
 interface CookiePreferences {
@@ -211,7 +211,7 @@ export default function CookieConsentBanner() {
                       </p>
                     </div>
                     <div className="ml-4">
-                      <CheckCircle className="w-6 h-6 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     </div>
                   </div>
                 </div>

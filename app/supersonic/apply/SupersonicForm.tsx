@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { DollarSign, CheckCircle, Upload, AlertCircle, ChevronRight, ChevronLeft } from 'lucide-react';
+import { DollarSign, Upload, AlertCircle, ChevronRight, ChevronLeft } from 'lucide-react';
 
 interface Props {
   userId?: string;
@@ -101,7 +101,7 @@ export default function SupersonicForm({ userId, existingProfile }: Props) {
             <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
               step >= s ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500'
             }`}>
-              {step > s ? <CheckCircle className="w-5 h-5" /> : s}
+              {step > s ? <span className="text-slate-400 flex-shrink-0">•</span> : s}
             </div>
             {s < 3 && <div className={`w-16 h-1 ${step > s ? 'bg-orange-500' : 'bg-gray-200'}`} />}
           </div>

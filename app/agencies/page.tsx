@@ -8,13 +8,12 @@ import {
   TrendingUp,
   FileCheck,
   Phone,
-  CheckCircle,
   DollarSign,
   Building2,
   Users,
   Award,
   ArrowRight,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'For Agencies | Government-Aligned Workforce Infrastructure',
@@ -108,36 +107,6 @@ export default async function AgenciesPage() {
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-slate-800/30" />
-
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
-            <div className="max-w-2xl text-white">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
-                Government-Aligned
-                <br />
-                Workforce Infrastructure
-              </h1>
-              <p className="text-xl md:text-2xl mb-8">
-                DOL registered. ETPL approved. WIOA compliant. Ready to license.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/license/demo"
-                  className="bg-orange-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-orange-700 transition text-center"
-                >
-                  Schedule Demo
-                </Link>
-                <Link
-                  href="/license"
-                  className="bg-white/10 backdrop-blur text-white px-8 py-4 rounded-lg font-bold hover:bg-white/20 transition text-center"
-                >
-                  View Licensing Options
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Compliance Features */}
@@ -173,7 +142,7 @@ export default async function AgenciesPage() {
               <ul className="space-y-3">
                 {platformFeatures.map((feature, index) => (
                   <li key={index} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{feature}</span>
                   </li>
                 ))}
@@ -217,7 +186,7 @@ export default async function AgenciesPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {governanceFeatures.map((feature, index) => (
               <div key={index} className="flex items-start gap-3 bg-white rounded-lg p-5 shadow-sm border">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{feature}</span>
               </div>
             ))}

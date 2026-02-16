@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle, Clock, FileText, Building, Briefcase } from 'lucide-react';
+import { Clock, FileText, Building, Briefcase, Circle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Employer Onboarding | Elevate For Humanity',
@@ -17,7 +17,7 @@ const steps = [
   { title: 'Company Profile', description: 'Complete your company information', icon: Building, status: 'complete' },
   { title: 'Hiring Needs', description: 'Tell us about your workforce needs', icon: Briefcase, status: 'current' },
   { title: 'Portal Access', description: 'Get access to the employer portal', icon: FileText, status: 'pending' },
-  { title: 'Start Hiring', description: 'Connect with qualified candidates', icon: CheckCircle, status: 'pending' },
+  { title: 'Start Hiring', description: 'Connect with qualified candidates', icon: Circle, status: 'pending' },
 ];
 
 export default async function EmployerOnboardingPage() {
@@ -45,7 +45,7 @@ export default async function EmployerOnboardingPage() {
                 step.status === 'complete' ? 'bg-green-100' : step.status === 'current' ? 'bg-brand-blue-100' : 'bg-gray-100'
               }`}>
                 {step.status === 'complete' ? (
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : step.status === 'current' ? (
                   <Clock className="w-6 h-6 text-brand-blue-600" />
                 ) : (

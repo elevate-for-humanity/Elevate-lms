@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
-import { PlayCircle, CheckCircle, Clock, Award, BookOpen } from 'lucide-react';
+import { PlayCircle, Clock, Award, BookOpen } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -123,7 +123,7 @@ export default async function StaffTrainingPage() {
 
           <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
             <div className="flex items-center justify-between mb-2">
-              <CheckCircle className="h-11 w-11 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="text-3xl font-bold text-black">
                 {completedModules}
               </span>
@@ -225,7 +225,7 @@ export default async function StaffTrainingPage() {
                       )}
                     </div>
                     {module.isCompleted && (
-                      <CheckCircle className="h-10 w-10 text-green-600 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     )}
                   </div>
 

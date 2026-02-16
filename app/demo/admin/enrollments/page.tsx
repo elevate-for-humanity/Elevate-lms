@@ -3,7 +3,7 @@
 import { useState, Fragment } from 'react';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { DEMO_STUDENTS } from '@/lib/demo/sandbox-data';
-import { Search, Filter, Download, ChevronDown, ChevronUp, CheckCircle, Clock, AlertTriangle, XCircle, Mail, Phone } from 'lucide-react';
+import { Search, Filter, Download, ChevronDown, ChevronUp, Clock, AlertTriangle, XCircle, Mail, Phone } from 'lucide-react';
 
 export default function DemoEnrollmentsPage() {
   const [search, setSearch] = useState('');
@@ -35,8 +35,8 @@ export default function DemoEnrollmentsPage() {
 
   const statusIcon = (status: string) => {
     switch (status) {
-      case 'active': return <CheckCircle className="w-3.5 h-3.5 text-green-500" />;
-      case 'completed': return <CheckCircle className="w-3.5 h-3.5 text-purple-500" />;
+      case 'active': return <span className="text-slate-400 flex-shrink-0">•</span>;
+      case 'completed': return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'pending': return <Clock className="w-3.5 h-3.5 text-amber-500" />;
       case 'at_risk': return <AlertTriangle className="w-3.5 h-3.5 text-red-500" />;
       default: return <XCircle className="w-3.5 h-3.5 text-gray-400" />;

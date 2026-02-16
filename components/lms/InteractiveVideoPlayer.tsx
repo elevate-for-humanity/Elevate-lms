@@ -383,7 +383,7 @@ export default function InteractiveVideoPlayer({
                 >
                   <p className="font-semibold mb-2">
                     {quizAnswer === currentQuiz.correctAnswer
-                      ? '✓ Correct!'
+                      ? '• Correct!'
                       : '✗ Incorrect'}
                   </p>
                   {currentQuiz.explanation && (

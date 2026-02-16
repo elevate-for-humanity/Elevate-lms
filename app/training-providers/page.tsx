@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckCircle, Phone, ArrowRight } from 'lucide-react';
+import { Phone, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -220,7 +220,7 @@ export default function TrainingProvidersPage() {
                 {requirements.map((req, index) => (
                   <li key={index} className="flex items-start gap-4">
                     <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     </div>
                     <span className="text-gray-700 text-lg">{req}</span>
                   </li>

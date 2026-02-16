@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { CheckCircle, ArrowRight, Phone, Mail, Calendar } from 'lucide-react';
+import { ArrowRight, Phone, Mail, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -81,7 +81,7 @@ export default async function ThankyouPage() {
       <section className="py-20 bg-white">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-12 h-12 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
             Thank You!
@@ -148,7 +148,7 @@ export default async function ThankyouPage() {
             >
               <Calendar className="w-8 h-8 text-brand-blue-600" />
               <div>
-                <div className="font-semibold">Schedule a Call</div>
+                <div className="font-semibold">Schedule a Meeting</div>
                 <div className="text-gray-600">Book an appointment</div>
               </div>
             </Link>

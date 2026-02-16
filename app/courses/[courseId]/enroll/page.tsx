@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { CheckCircle, Clock, Award, CreditCard } from 'lucide-react';
+import { Clock, Award, CreditCard } from 'lucide-react';
 
 
 
@@ -77,7 +77,7 @@ export default function CourseEnrollPage({
             <div className="space-y-6">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="h-10 w-10 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <div>
                   <h3 className="font-bold text-black mb-1">
@@ -165,15 +165,15 @@ export default function CourseEnrollPage({
 
             <div className="mt-6 space-y-3 text-sm text-black">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Secure payment via Stripe</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Instant access after payment</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>30-day money-back guarantee</span>
               </div>
             </div>

@@ -5,7 +5,7 @@ import {
   Building2, 
   DollarSign, 
   Layout, 
-  CheckCircle, 
+  
   Clock, 
   FileText, 
   Users, 
@@ -16,10 +16,10 @@ import {
   Shield,
   Settings,
   ChevronRight,
-  Star,
+  Star, Circle,
   TrendingUp,
   Folder,
-  Globe
+  Globe,
 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
@@ -122,7 +122,7 @@ function SamGovScreenshot({ variant }: { variant: string }) {
         {/* Stats Row */}
         <div className="grid grid-cols-4 gap-4 mb-6">
           {[
-            { label: 'SAM Status', value: 'Active', icon: CheckCircle, color: 'green' },
+            { label: 'SAM Status', value: 'Active', icon: Circle, color: 'green' },
             { label: 'UEI Number', value: 'XKLT7YH2ABC1', icon: Building2, color: 'blue' },
             { label: 'CAGE Code', value: '8ABC1', icon: Shield, color: 'purple' },
             { label: 'Expires In', value: '287 days', icon: Calendar, color: 'orange' },
@@ -157,7 +157,7 @@ function SamGovScreenshot({ variant }: { variant: string }) {
                     item.status === 'complete' ? 'bg-green-100' : 'bg-gray-100'
                   }`}>
                     {item.status === 'complete' ? (
-                      <CheckCircle className="w-4 h-4 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
                       <span className="text-xs font-bold text-gray-400">{i + 1}</span>
                     )}
@@ -176,7 +176,7 @@ function SamGovScreenshot({ variant }: { variant: string }) {
             <div className="space-y-3">
               <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                 <div className="flex items-center gap-2 mb-1">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-xs font-medium text-green-800">All Clear</span>
                 </div>
                 <p className="text-xs text-green-700">No action required</p>
@@ -391,7 +391,7 @@ function WebsiteBuilderScreenshot({ variant }: { variant: string }) {
                 {['No Cost Training', 'Job Placement', 'Flexible Schedule'].map((f, i) => (
                   <div key={i} className="text-center">
                     <div className="w-10 h-10 bg-brand-blue-100 rounded-full mx-auto mb-2 flex items-center justify-center">
-                      <CheckCircle className="w-5 h-5 text-brand-blue-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     </div>
                     <p className="text-xs font-medium">{f}</p>
                   </div>

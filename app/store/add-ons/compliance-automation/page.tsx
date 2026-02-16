@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { 
   Shield, 
   ArrowRight, 
-  CheckCircle,
   FileText,
   Clock,
   AlertTriangle,
@@ -14,8 +13,8 @@ import {
   Bell,
   Lock,
   Award,
-  Users
-} from 'lucide-react';
+  Users,
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 const features = [
@@ -169,7 +168,7 @@ export default function ComplianceAutomationPage() {
                 <ul className="space-y-2">
                   {area.items.map((item) => (
                     <li key={item} className="flex items-center gap-2 text-sm text-slate-600">
-                      <CheckCircle className="w-4 h-4 text-emerald-500 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       {item}
                     </li>
                   ))}

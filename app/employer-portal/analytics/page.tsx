@@ -6,8 +6,8 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
   BarChart3, TrendingUp, TrendingDown, Users, Briefcase,
-  Eye, Clock, CheckCircle, ArrowRight, Download
-} from 'lucide-react';
+  Eye, Clock, ArrowRight, Download,
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Analytics | Employer Portal | Elevate For Humanity',

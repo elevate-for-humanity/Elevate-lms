@@ -1,4 +1,4 @@
-import { Award, CheckCircle, Building2 } from 'lucide-react';
+import { Award, Building2 } from 'lucide-react';
 
 interface CredentialsOutcomesProps {
   programName: string;
@@ -21,7 +21,7 @@ export function CredentialsOutcomes({
       <div className="space-y-4">
         {/* Institutional Certificate */}
         <div className="flex items-start gap-3">
-          <CheckCircle className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <div>
             <p className="text-black font-medium">
               Certificate of Completion issued by Elevate for Humanity Career & Training Institute
@@ -35,7 +35,7 @@ export function CredentialsOutcomes({
         {/* Partner Certifications */}
         {partnerCertifications.length > 0 && (
           <div className="flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-green-600 mt-1 flex-shrink-0" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <div>
               <p className="text-black font-medium">
                 Preparation for third-party industry certifications

@@ -5,7 +5,7 @@ import React from 'react';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Bell, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { Bell, Send, AlertCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 export const dynamic = 'force-dynamic';
 
@@ -253,7 +253,7 @@ export default function NotificationsPage() {
                 >
                   <div className="flex items-start space-x-3">
                     {result.success ? (
-                      <CheckCircle className="w-5 h-5 text-brand-green-600 mt-0.5" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
                       <AlertCircle className="w-5 h-5 text-brand-orange-600 mt-0.5" />
                     )}

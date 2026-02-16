@@ -2,7 +2,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { useState, useEffect } from 'react';
-import { Video, Play, Loader2, CheckCircle, XCircle, RefreshCw } from 'lucide-react';
+import { Video, Play, Loader2, XCircle, RefreshCw } from 'lucide-react';
 
 interface GenerationStatus {
   total: number;
@@ -218,7 +218,7 @@ export default function VideoGeneratorPage() {
                 {results.map((result, i) => (
                   <div key={i} className="flex items-center gap-3 px-4 py-3">
                     {result.success ? (
-                      <CheckCircle className="w-5 h-5 text-green-500" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
                       <XCircle className="w-5 h-5 text-red-500" />
                     )}

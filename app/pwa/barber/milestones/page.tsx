@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  ArrowLeft, Award, Trophy, Star, Lock, CheckCircle,
+  ArrowLeft, Award, Trophy, Star, Lock,
   Clock, Scissors, BookOpen, TrendingUp, Loader2,
   Sparkles, Target, Medal, Crown
 } from 'lucide-react';
@@ -192,7 +192,7 @@ export default function MilestonesPage() {
                         <div className="flex items-center gap-2">
                           <h3 className="text-white font-medium">{milestone.title}</h3>
                           {milestone.unlocked && (
-                            <CheckCircle className="w-4 h-4 text-green-400" />
+                            <span className="text-slate-400 flex-shrink-0">•</span>
                           )}
                         </div>
                         <p className="text-slate-400 text-sm">{milestone.description}</p>
@@ -249,7 +249,7 @@ export default function MilestonesPage() {
                     <div className="flex items-center gap-2">
                       <h3 className="text-white font-medium">{achievement.title}</h3>
                       {achievement.unlocked && (
-                        <CheckCircle className="w-4 h-4 text-green-400" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       )}
                     </div>
                     <p className="text-slate-400 text-sm">{achievement.description}</p>

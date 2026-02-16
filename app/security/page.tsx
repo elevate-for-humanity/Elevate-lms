@@ -8,11 +8,10 @@ import {
   FileCheck,
   AlertTriangle,
   Mail,
-  CheckCircle,
   Server,
   Key,
   Phone,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -159,7 +158,7 @@ export default async function SecurityPage() {
             <ul className="space-y-4">
               {dataProtection.map((item, index) => (
                 <li key={index} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700">{item}</span>
                 </li>
               ))}

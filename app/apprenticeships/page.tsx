@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
-  DollarSign, CheckCircle, Briefcase, Building2, ArrowRight, 
+  DollarSign, Briefcase, Building2, ArrowRight, 
   Users, Clock, Award, GraduationCap, Zap, Phone 
 } from 'lucide-react';
 
@@ -250,7 +250,7 @@ export default function ApprenticeshipsPage() {
               'Committed to learning',
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-xl shadow-sm border border-slate-200">
-                <CheckCircle className="w-6 h-6 text-green-500" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="font-medium text-slate-700">{item}</span>
               </div>
             ))}

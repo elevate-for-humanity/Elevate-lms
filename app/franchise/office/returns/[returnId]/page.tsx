@@ -14,11 +14,10 @@ import {
   FileText,
   User,
   DollarSign,
-  CheckCircle,
   Clock,
   AlertCircle,
-  Download
-} from 'lucide-react';
+  Download,
+CheckCircle, } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -119,7 +118,7 @@ export default function ReturnDetailPage() {
 
   function getStatusIcon(status: string) {
     switch (status) {
-      case 'accepted': return <CheckCircle className="h-4 w-4" />;
+      case 'accepted': return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'rejected': return <AlertCircle className="h-4 w-4" />;
       case 'pending_ero': return <Clock className="h-4 w-4" />;
       default: return <Clock className="h-4 w-4" />;
@@ -170,7 +169,7 @@ export default function ReturnDetailPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${returnData.created_at ? 'bg-green-500 text-white' : 'bg-muted'}`}>
-                <CheckCircle className="h-4 w-4" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <p className="text-sm font-medium">Created</p>
@@ -182,7 +181,7 @@ export default function ReturnDetailPage() {
             <div className="flex-1 h-1 bg-muted mx-4" />
             <div className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${returnData.ero_signed_at ? 'bg-green-500 text-white' : 'bg-muted'}`}>
-                {returnData.ero_signed_at ? <CheckCircle className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
+                {returnData.ero_signed_at ? <span className="text-slate-400 flex-shrink-0">•</span> : <Clock className="h-4 w-4" />}
               </div>
               <div>
                 <p className="text-sm font-medium">ERO Signed</p>
@@ -194,7 +193,7 @@ export default function ReturnDetailPage() {
             <div className="flex-1 h-1 bg-muted mx-4" />
             <div className="flex items-center gap-2">
               <div className={`w-8 h-8 rounded-full flex items-center justify-center ${returnData.submitted_at ? 'bg-green-500 text-white' : 'bg-muted'}`}>
-                {returnData.submitted_at ? <CheckCircle className="h-4 w-4" /> : <Clock className="h-4 w-4" />}
+                {returnData.submitted_at ? <span className="text-slate-400 flex-shrink-0">•</span> : <Clock className="h-4 w-4" />}
               </div>
               <div>
                 <p className="text-sm font-medium">Submitted</p>
@@ -209,7 +208,7 @@ export default function ReturnDetailPage() {
                 returnData.status === 'accepted' ? 'bg-green-500 text-white' : 
                 returnData.status === 'rejected' ? 'bg-red-500 text-white' : 'bg-muted'
               }`}>
-                {returnData.status === 'accepted' ? <CheckCircle className="h-4 w-4" /> : 
+                {returnData.status === 'accepted' ? <span className="text-slate-400 flex-shrink-0">•</span> : 
                  returnData.status === 'rejected' ? <AlertCircle className="h-4 w-4" /> : 
                  <Clock className="h-4 w-4" />}
               </div>

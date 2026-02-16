@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { 
-  ArrowLeft, QrCode, Camera, CheckCircle, 
+  ArrowLeft, QrCode, Camera, 
   Clock, MapPin, AlertCircle, Loader2, LogOut,
   Keyboard
 } from 'lucide-react';
@@ -157,7 +157,7 @@ function CheckInContent() {
           {/* Active Session Card */}
           <div className="bg-green-500 rounded-2xl p-6 text-center">
             <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-10 h-10 text-white" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">You're Checked In!</h2>
             <div className="flex items-center justify-center gap-2 text-green-100 mb-4">

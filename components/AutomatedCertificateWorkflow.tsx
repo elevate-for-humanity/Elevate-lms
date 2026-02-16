@@ -79,15 +79,15 @@ export function AutomatedCertificateWorkflow() {
               <h2 className="text-2xl font-bold mb-4">Automation Rules</h2>
               <div className="space-y-3">
                 <div className="p-4 bg-green-50 rounded">
-                  <p className="font-semibold text-green-900">✓ Au on course completion</p>
+                  <p className="font-semibold text-green-900">• Au on course completion</p>
                   <p className="text-sm text-green-700">Certificates created automatically when students finish</p>
                 </div>
                 <div className="p-4 bg-brand-blue-50 rounded">
-                  <p className="font-semibold text-brand-blue-900">✓ Email delivery enabled</p>
+                  <p className="font-semibold text-brand-blue-900">• Email delivery enabled</p>
                   <p className="text-sm text-brand-blue-700">Certificates sent via email with verification link</p>
                 </div>
                 <div className="p-4 bg-purple-50 rounded">
-                  <p className="font-semibold text-purple-900">✓ Blockchain verification</p>
+                  <p className="font-semibold text-purple-900">• Blockchain verification</p>
                   <p className="text-sm text-purple-700">All certificates recorded on blockchain</p>
                 </div>
               </div>

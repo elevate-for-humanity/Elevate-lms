@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { 
   TrendingUp, Users, Award, Briefcase, GraduationCap, 
-  DollarSign, CheckCircle, ArrowRight, MapPin, BarChart3 
+  DollarSign, ArrowRight, MapPin, BarChart3 
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -196,19 +196,19 @@ export default function IndianaOutcomesPage() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Data Methodology</h2>
           <ul className="space-y-2 text-slate-700 text-sm">
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Completion rates measured at program end date, including extensions</span>
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Employment tracked via employer verification and UI wage records at 6-month intervals</span>
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Wage data reflects annualized earnings from primary employment</span>
             </li>
             <li className="flex items-start gap-2">
-              <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Credential attainment includes state licenses, industry certifications, and apprenticeship completions</span>
             </li>
           </ul>

@@ -1,6 +1,6 @@
 'use client';
 
-import { CheckCircle, Clock, FileText, Users, Shield } from 'lucide-react';
+import { Clock, FileText, Users, Shield } from 'lucide-react';
 
 interface BookingConfirmationProps {
   meetingTime?: string;
@@ -26,7 +26,7 @@ export function BookingConfirmation({
       {/* Success Header */}
       <div className="text-center mb-8">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-          <CheckCircle className="w-8 h-8 text-green-600" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
         </div>
         <h1 className="text-2xl font-bold text-gray-900 mb-2">You're Booked</h1>
         {meetingTime && (

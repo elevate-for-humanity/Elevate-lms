@@ -410,7 +410,7 @@ className="text-white hover:text-red-100 transition-colors">
                       <ul className="space-y-1">
                         {project.achievements.map((achievement, idx) => (
                           <li key={idx} className="text-xs text-black flex items-start">
-                            <span className="text-green-500 mr-1">✓</span>
+                            <span className="text-green-500 mr-1">•</span>
                             {achievement}
                           </li>
                         ))}

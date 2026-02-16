@@ -4,7 +4,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Upload, FileText, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Upload, FileText, AlertCircle, X } from 'lucide-react';
 
 interface RequiredDocument {
   id: string;
@@ -176,7 +176,7 @@ export default function DocumentsPage() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center px-4">
         <div className="text-center">
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h2 className="text-2xl font-bold text-gray-900 mb-2">Documents Received</h2>
           <p className="text-gray-600">Your enrollment is being activated.</p>
@@ -211,7 +211,7 @@ export default function DocumentsPage() {
                     doc.uploaded ? 'bg-green-100' : 'bg-gray-100'
                   }`}>
                     {doc.uploaded ? (
-                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
                       <FileText className="w-5 h-5 text-gray-400" />
                     )}

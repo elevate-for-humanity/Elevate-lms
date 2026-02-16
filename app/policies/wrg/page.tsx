@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { CheckCircle, ArrowRight, Phone, Mail, DollarSign } from 'lucide-react';
+import { ArrowRight, Phone, Mail, DollarSign } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Workforce Ready Grant Policy | Elevate for Humanity',
@@ -20,12 +20,16 @@ export default function WRGPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[350px] flex items-center overflow-hidden">
-        <Image src="/hero-images/federal-funded-hero.jpg" alt="Workforce Ready Grant" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-green-900/70" />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 py-16 w-full">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Workforce Ready Grant</h1>
-          <p className="text-xl text-green-100">Indiana tuition assistance for high-demand career training</p>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/hero-images/federal-funded-hero.jpg" alt="Workforce Ready Grant" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Ready Grant</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Indiana tuition assistance for high-demand career training</p>
+          </div>
         </div>
       </section>
 
@@ -65,7 +69,7 @@ export default function WRGPage() {
                   'Maintaining satisfactory academic progress',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}
@@ -82,7 +86,7 @@ export default function WRGPage() {
                   'Stackable credentials toward further education',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}

@@ -12,10 +12,9 @@ import {
   MessageCircle,
   Users,
   Clock,
-  CheckCircle,
   TrendingUp,
   ExternalLink,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export default function LiveChatPage() {
   const router = useRouter();
@@ -266,7 +265,7 @@ export default function LiveChatPage() {
             </div>
             <div>
               • <strong>Tawk.to</strong>: FREE - Recommended for most use cases
-              <CheckCircle className="w-5 h-5 inline-block" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
           </div>
         </div>
@@ -338,7 +337,7 @@ interface FeatureItemProps {
 function FeatureItem({ title, description }: FeatureItemProps) {
   return (
     <div className="flex items-start space-x-3">
-      <CheckCircle className="w-5 h-5 text-brand-green-600 mt-0.5 flex-shrink-0" />
+      <span className="text-slate-400 flex-shrink-0">•</span>
       <div>
         <div className="font-medium text-black">{title}</div>
         <div className="text-sm text-black">{description}</div>

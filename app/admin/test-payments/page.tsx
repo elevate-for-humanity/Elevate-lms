@@ -5,7 +5,7 @@ import React from 'react';
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { CreditCard, CheckCircle, XCircle, DollarSign } from 'lucide-react';
+import { CreditCard, XCircle, DollarSign } from 'lucide-react';
 
 export default function TestPaymentsPage() {
   const [stripeConfigured, setStripeConfigured] = useState(false);
@@ -75,7 +75,7 @@ export default function TestPaymentsPage() {
                 </span>
                 {stripeConfigured ? (
                   <span className="flex items-center gap-1 text-sm text-brand-green-600 font-medium">
-                    <CheckCircle className="w-4 h-4" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Configured
                   </span>
                 ) : (
@@ -90,7 +90,7 @@ export default function TestPaymentsPage() {
                   Checkout Endpoint
                 </span>
                 <span className="flex items-center gap-1 text-sm text-brand-green-600 font-medium">
-                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Available
                 </span>
               </div>
@@ -99,7 +99,7 @@ export default function TestPaymentsPage() {
                   Webhook Handler
                 </span>
                 <span className="flex items-center gap-1 text-sm text-brand-green-600 font-medium">
-                  <CheckCircle className="w-4 h-4" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Configured
                 </span>
               </div>
@@ -114,7 +114,7 @@ export default function TestPaymentsPage() {
           </h2>
           <div className="space-y-3">
             <div className="flex items-start gap-3 p-3 bg-green-50 rounded border border-green-200">
-              <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-green-900">
                   Stripe Checkout Integration
@@ -125,7 +125,7 @@ export default function TestPaymentsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-green-50 rounded border border-green-200">
-              <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-green-900">
                   Webhook Processing
@@ -136,7 +136,7 @@ export default function TestPaymentsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-green-50 rounded border border-green-200">
-              <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-green-900">
                   Subscription Management
@@ -167,7 +167,7 @@ export default function TestPaymentsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-brand-blue-50 rounded border border-brand-blue-200">
-              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-brand-blue-900">
                   Funding Source Tracking
@@ -179,7 +179,7 @@ export default function TestPaymentsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-brand-blue-50 rounded border border-brand-blue-200">
-              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-brand-blue-900">
                   Tuition Amount Tracking
@@ -191,7 +191,7 @@ export default function TestPaymentsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-brand-blue-50 rounded border border-brand-blue-200">
-              <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-brand-blue-900">
                   RAPIDS Integration

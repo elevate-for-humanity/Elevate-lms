@@ -253,7 +253,7 @@ export function QuizBuilder() {
                             <ul className="space-y-1 text-sm">
                               {q.options.map((opt, i) => (
                                 <li key={i} className={`${q.correctAnswer === i ? 'text-green-600 font-semibold' : 'text-black'}`}>
-                                  {q.correctAnswer === i && '✓ '}{opt}
+                                  {q.correctAnswer === i && '• '}{opt}
                                 </li>
                               ))}
                             </ul>

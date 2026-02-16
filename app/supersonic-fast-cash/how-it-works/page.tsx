@@ -3,9 +3,9 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
-  FileText, Upload, Calculator, Clock, CheckCircle, 
-  DollarSign, Shield, Phone, ArrowRight, Zap
-} from 'lucide-react';
+  FileText, Upload, Calculator, Clock, 
+  DollarSign, Shield, Phone, ArrowRight, Zap,
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'How It Works | SupersonicFastCash Tax Preparation',
@@ -163,7 +163,7 @@ export default function HowItWorksPage() {
                   <ul className="space-y-2">
                     {step.details.map((detail, i) => (
                       <li key={i} className="flex items-center gap-3">
-                        <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         <span className="text-gray-700">{detail}</span>
                       </li>
                     ))}
@@ -217,19 +217,19 @@ export default function HowItWorksPage() {
               </p>
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>0% APR - No interest charges</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>No credit check required</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Funds available same day</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-300" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Repaid automatically from your refund</span>
                 </li>
               </ul>

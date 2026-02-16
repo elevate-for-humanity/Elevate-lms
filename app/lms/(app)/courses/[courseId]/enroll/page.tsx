@@ -8,10 +8,9 @@ import {
   BookOpen,
   Clock,
   Award,
-  CheckCircle,
   Users,
   Shield,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import EnrollmentForm from './EnrollmentForm';
 
 export const dynamic = 'force-dynamic';
@@ -210,23 +209,23 @@ export default async function CourseEnrollPage({ params }: Props) {
                   <h3 className="font-semibold text-slate-900 mb-3">What&apos;s included:</h3>
                   <ul className="space-y-2">
                     <li className="flex items-center gap-2 text-sm text-slate-600">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       Full course access
                     </li>
                     <li className="flex items-center gap-2 text-sm text-slate-600">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       Downloadable resources
                     </li>
                     <li className="flex items-center gap-2 text-sm text-slate-600">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       Quizzes & assessments
                     </li>
                     <li className="flex items-center gap-2 text-sm text-slate-600">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       Certificate upon completion
                     </li>
                     <li className="flex items-center gap-2 text-sm text-slate-600">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       Lifetime access
                     </li>
                   </ul>

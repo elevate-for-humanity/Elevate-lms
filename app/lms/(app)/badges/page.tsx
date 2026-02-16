@@ -15,9 +15,8 @@ import {
   Zap,
   Heart,
   Users,
-  CheckCircle,
   Lock,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: {
@@ -244,7 +243,7 @@ export default async function BadgesPage() {
         {earnedCount > 0 && (
           <div className="mb-8">
             <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               Earned Badges
             </h2>
             <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">

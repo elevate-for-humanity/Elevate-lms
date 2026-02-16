@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Clock, DollarSign, TrendingUp, ArrowRight, CheckCircle, Briefcase } from 'lucide-react';
+import { Clock, DollarSign, TrendingUp, ArrowRight, Briefcase } from 'lucide-react';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
 
 export interface VisualProgramData {
@@ -93,7 +93,7 @@ export function ProgramPageVisual({ program }: Props) {
             </div>
             {program.fundingType === 'funded' && (
               <div className="flex items-center gap-2 bg-green-500/20 backdrop-blur px-4 py-2 rounded-full border border-green-400/50">
-                <CheckCircle className="w-5 h-5 text-green-400" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-green-300 font-medium">Free for Eligible</span>
               </div>
             )}
@@ -145,7 +145,7 @@ export function ProgramPageVisual({ program }: Props) {
                   {section.points.map((point, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <div className="w-6 h-6 bg-brand-blue-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                        <CheckCircle className="w-4 h-4 text-brand-blue-600" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       </div>
                       <span className="text-slate-700 text-lg">{point}</span>
                     </div>
@@ -202,7 +202,7 @@ export function ProgramPageVisual({ program }: Props) {
                 className="flex items-center gap-3 bg-slate-50 rounded-xl p-4"
               >
                 <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <span className="text-slate-700 font-medium">{req}</span>
               </div>

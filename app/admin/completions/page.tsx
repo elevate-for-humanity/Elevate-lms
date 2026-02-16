@@ -165,9 +165,7 @@ export default async function CompletionsPage() {
                 <div key={completion.id} className="p-4 flex items-center justify-between hover:bg-gray-50">
                   <div className="flex items-center gap-4">
                     <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
-                      <svg className="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">{completion.profiles?.full_name || 'Unknown'}</p>

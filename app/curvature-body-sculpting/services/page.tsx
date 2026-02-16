@@ -9,10 +9,9 @@ import {
   Shield,
   Zap,
   ArrowRight,
-  CheckCircle,
   Clock,
   Calendar,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Services | Curvature Body Sculpting | Body Contouring & Wellness',
@@ -147,28 +146,16 @@ export default function ServicesPage() {
         <Breadcrumbs items={[{ label: "Curvature Body Sculpting", href: "/curvature-body-sculpting" }, { label: "Services" }]} />
       </div>
 {/* Hero */}
-      <section className="relative py-20 min-h-[400px] flex items-center">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/beauty/program-beauty-training.jpg"
-            alt="Body Sculpting Services"
-            fill
-            className="object-cover"
-            priority
-          />
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/beauty/program-beauty-training.jpg" alt="Body Sculpting Services" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="relative max-w-6xl mx-auto px-4 text-center text-white">
-          <h1 className="text-4xl md:text-5xl font-black mb-6">Our Services</h1>
-          <p className="text-xl text-pink-100 max-w-2xl mx-auto mb-8">
-            Non-invasive body sculpting and wellness treatments to help you look and feel your best
-          </p>
-          <Link
-            href="/curvature-body-sculpting/book-appointment"
-            className="inline-flex items-center gap-2 px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-pink-50 transition"
-          >
-            <Calendar className="w-5 h-5" />
-            Book Free Consultation
-          </Link>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Our Services</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Non-invasive body sculpting and wellness treatments to help you look and feel your best</p>
+          </div>
         </div>
       </section>
 
@@ -206,7 +193,7 @@ export default function ServicesPage() {
                       <ul className="grid grid-cols-2 gap-2">
                         {service.benefits.map((benefit) => (
                           <li key={benefit} className="flex items-center gap-2 text-sm text-gray-600">
-                            <CheckCircle className={`w-4 h-4 ${colors.text}`} />
+                            <span className="text-slate-400 flex-shrink-0">•</span>
                             {benefit}
                           </li>
                         ))}

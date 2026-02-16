@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
-import { CheckCircle, Clock, XCircle, FileText, ArrowRight } from 'lucide-react';
+import { Clock, XCircle, FileText, ArrowRight } from 'lucide-react';
 
 interface Application {
   id: string;
@@ -77,7 +77,7 @@ export default function ApplicationStatusPage() {
     switch (status) {
       case 'approved':
         return {
-          icon: <CheckCircle className="w-20 h-20 text-green-500" />,
+          icon: <span className="text-slate-400 flex-shrink-0">•</span>,
           title: 'Application Approved!',
           bgColor: 'bg-green-50',
           borderColor: 'border-green-200',

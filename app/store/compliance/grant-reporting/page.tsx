@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Home, ChevronRight, CheckCircle, FileText, BarChart3, Calendar, Download } from 'lucide-react';
+import { ArrowRight, Home, ChevronRight, FileText, BarChart3, Calendar, Download } from 'lucide-react';
 import AvatarGuide from '@/components/AvatarGuide';
 
 export const metadata: Metadata = {
@@ -88,43 +88,15 @@ export default function GrantReportingPage() {
       </nav>
 
       {/* Hero */}
-      <section className="relative bg-red-600 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image src="/images/homepage/funded-programs.jpg" alt="Grant Reporting" fill sizes="100vw" className="object-cover opacity-30" />
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/homepage/funded-programs.jpg" alt="Grant Reporting" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <span className="inline-block bg-red-600 text-white text-sm font-bold px-4 py-1 rounded-full mb-4">
-                Reporting Tools
-              </span>
-              <h1 className="text-4xl sm:text-5xl font-black mb-6">Grant Reporting Made Easy</h1>
-              <p className="text-xl text-orange-100 mb-8">
-                Automated data collection, customizable templates, and one-click exports for all your federal and state grant reporting needs.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link href="#pricing" className="inline-flex items-center gap-2 bg-white text-orange-600 px-6 py-3 rounded-lg font-bold hover:bg-orange-50 transition">
-                  View Pricing
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link href="/store/demo" className="inline-flex items-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-orange-400 transition border border-orange-400">
-                  Request Demo
-                </Link>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              {[
-                { icon: FileText, label: 'Custom Templates' },
-                { icon: BarChart3, label: 'Outcome Tracking' },
-                { icon: Calendar, label: 'Scheduled Reports' },
-                { icon: Download, label: 'One-Click Export' },
-              ].map((item) => (
-                <div key={item.label} className="bg-white/10 backdrop-blur rounded-xl p-4 text-center">
-                  <item.icon className="w-8 h-8 mx-auto mb-2 text-orange-200" />
-                  <p className="text-sm font-medium">{item.label}</p>
-                </div>
-              ))}
-            </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Grant Reporting Made Easy</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Automated data collection, customizable templates, and one-click exports for all your federal and state grant reporting needs.</p>
           </div>
         </div>
       </section>
@@ -149,7 +121,7 @@ export default function GrantReportingPage() {
                   <ul className="space-y-2">
                     {feature.items.map((item) => (
                       <li key={item} className="flex items-center gap-2 text-sm text-black">
-                        <CheckCircle className="w-4 h-4 text-orange-600 flex-shrink-0" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         {item}
                       </li>
                     ))}
@@ -202,7 +174,7 @@ export default function GrantReportingPage() {
                 <ul className="space-y-3 mb-8">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-center gap-2 text-sm text-black">
-                      <CheckCircle className="w-4 h-4 text-orange-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       {f}
                     </li>
                   ))}

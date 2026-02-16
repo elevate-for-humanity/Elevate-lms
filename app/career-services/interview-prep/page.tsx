@@ -4,7 +4,7 @@ import Image from 'next/image';
 import {
   Users,
   Video,
-  CheckCircle,
+
   MessageSquare,
   Target,
   ArrowRight,
@@ -219,13 +219,14 @@ export default function InterviewPrepPage() {
             Top Interview Tips
           </h2>
 
-          <div className="grid md:grid-cols-2 gap-4">
-            {tips.map((tip, index) => (
-              <div key={index} className="bg-white rounded-lg p-4 flex items-start shadow-sm">
-                <CheckCircle className="w-6 h-6 text-green-600 mr-3 flex-shrink-0 mt-0.5" />
-                <p className="text-gray-700">{tip}</p>
-              </div>
-            ))}
+          <div className="bg-white rounded-xl p-6 shadow-sm">
+            <p className="text-gray-700 leading-relaxed">
+              Research the company thoroughly before your interview so you can speak to their mission and recent work. 
+              Prepare 3 to 5 questions to ask the interviewer — this shows genuine interest. Practice your answers out loud, not just in your head, 
+              and use specific examples from your experience. Dress professionally even for video interviews. 
+              Arrive 10 to 15 minutes early (or log in early for virtual interviews) and bring copies of your resume and a notepad. 
+              After the interview, follow up with a thank-you email within 24 hours.
+            </p>
           </div>
         </div>
       </section>

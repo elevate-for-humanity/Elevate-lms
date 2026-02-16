@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { CheckCircle, DollarSign, Phone, Users } from 'lucide-react';
+import { DollarSign, Phone, Users } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -132,7 +132,7 @@ export default async function LowIncomePage() {
           <div className="grid md:grid-cols-2 gap-3">
             {additionalQualifiers.map((qualifier, index) => (
               <div key={index} className="flex items-center gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{qualifier}</span>
               </div>
             ))}

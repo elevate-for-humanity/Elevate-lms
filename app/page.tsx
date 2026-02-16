@@ -20,19 +20,18 @@ export default function HomePage() {
     <main className="min-h-screen bg-white">
 
       {/* ===== HERO ===== */}
-      <section className="relative h-[75vh] min-h-[520px] max-h-[720px]">
-        <HomeHeroVideo />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-black/25 to-transparent z-20" />
-        <div className="absolute inset-0 z-30 flex items-center">
-          <div className="max-w-7xl mx-auto px-6 sm:px-12 w-full">
-            <div className="max-w-2xl">
-              <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold text-white leading-[1.05]">
-                Limitless<br />Opportunities
-              </h1>
-              <p className="text-lg sm:text-xl text-white/90 mt-4 leading-relaxed max-w-xl">
-                Free career training in healthcare, skilled trades, CDL, technology, and barbering. Funded by WIOA, state grants, and employer partnerships across Indiana.
-              </p>
-            </div>
+      <section className="relative">
+        <div className="relative h-[60vh] min-h-[400px] max-h-[600px]">
+          <HomeHeroVideo />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-6 text-center">
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white leading-[1.05]">
+              Limitless Opportunities
+            </h1>
+            <p className="text-lg sm:text-xl text-slate-300 mt-4 leading-relaxed max-w-2xl mx-auto">
+              Free career training in healthcare, skilled trades, CDL, technology, and barbering. Funded by WIOA, state grants, and employer partnerships across Indiana.
+            </p>
           </div>
         </div>
       </section>
@@ -56,33 +55,33 @@ export default function HomePage() {
           <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
             Choose your path below. Each option takes you directly to the information you need — no phone calls required.
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
                 href: '/programs',
-                image: '/images/heroes/hero-students.jpg',
-                alt: 'Students in hands-on training',
+                image: '/images/artlist/cropped/hero-training-3-square.jpg',
+                alt: 'Students in a hands-on training session',
                 label: 'I want to train',
                 desc: 'Browse programs in healthcare, trades, CDL, tech, and barbering. See schedules, requirements, and how to enroll.',
               },
               {
                 href: '/funding',
-                image: '/images/heroes/hero-federal-funding.jpg',
-                alt: 'Funding and financial aid resources',
+                image: '/images/heroes-hq/funding-hero.jpg',
+                alt: 'Workforce funding and financial aid',
                 label: 'I need funding',
                 desc: 'Most programs are 100% free. Check eligibility for WIOA, Workforce Ready Grant, JRI, and other funding sources.',
               },
               {
                 href: '/employer',
-                image: '/images/heroes/hero-employers.jpg',
-                alt: 'Employer meeting with trained candidates',
+                image: '/images/business-vibrant.jpg',
+                alt: 'Employer reviewing candidate profiles',
                 label: 'I&apos;m an employer',
                 desc: 'Hire credentialed graduates, access WOTC tax credits up to $9,600/hire, and get OJT wage reimbursements.',
               },
               {
                 href: '/store',
-                image: '/images/heroes/lms-dashboard.jpg',
-                alt: 'Platform dashboard on office screens',
+                image: '/images/homepage/schools-nonprofits.jpg',
+                alt: 'Training school using the Elevate platform',
                 label: 'I run a school',
                 desc: 'License the Elevate platform for your organization. White-label LMS with enrollment, compliance, and reporting.',
               },
@@ -90,12 +89,12 @@ export default function HomePage() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col items-center gap-3 p-5 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
+                className="flex flex-col items-center gap-4 p-5 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
               >
-                <div className="relative w-14 h-14 rounded-full overflow-hidden flex-shrink-0">
-                  <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="56px" />
+                <div className="relative w-full aspect-square rounded-lg overflow-hidden">
+                  <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                 </div>
-                <span className="font-semibold text-slate-900 group-hover:text-brand-blue-600">{item.label}</span>
+                <span className="font-semibold text-lg text-slate-900 group-hover:text-brand-blue-600">{item.label}</span>
                 <span className="text-sm text-slate-500">{item.desc}</span>
               </Link>
             ))}
@@ -108,9 +107,9 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
             {[
-              { title: 'Career Opportunities', desc: 'We offer certification programs in healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking, IT/cybersecurity, and barbering. Most programs are 4-16 weeks and include hands-on training.', href: '/programs', image: '/images/hero/hero-hands-on-training.jpg' },
-              { title: 'Funding Available', desc: 'Most students pay nothing. WIOA covers tuition, books, and supplies. The Workforce Ready Grant funds high-demand certifications. JRI provides paid apprenticeships for justice-involved individuals. Check your eligibility online in minutes.', href: '/funding', image: '/images/homepage/funded-programs.jpg' },
-              { title: 'Hire Our Graduates', desc: 'Employers: our graduates hold industry-recognized credentials and are ready to work. Access WOTC tax credits (up to $9,600/hire), OJT wage reimbursements (50-75% of wages), and post jobs directly to our candidate pool.', href: '/employer', image: '/images/heroes/employer-partner-1.jpg' },
+              { title: 'Career Opportunities', desc: 'We offer certification programs in healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking, IT/cybersecurity, and barbering. Most programs are 4-16 weeks and include hands-on training.', href: '/programs', image: '/images/efh/programs/trades.jpg' },
+              { title: 'Funding Available', desc: 'Most students pay nothing. WIOA covers tuition, books, and supplies. The Workforce Ready Grant funds high-demand certifications. JRI provides paid apprenticeships for justice-involved individuals. Check your eligibility online in minutes.', href: '/funding', image: '/images/highlights/government-certified.jpg' },
+              { title: 'Hire Our Graduates', desc: 'Employers: our graduates hold industry-recognized credentials and are ready to work. Access WOTC tax credits (up to $9,600/hire), OJT wage reimbursements (50-75% of wages), and post jobs directly to our candidate pool.', href: '/employer', image: '/images/business-hero-new.jpg' },
             ].map((card) => (
               <Link key={card.title} href={card.href} className="group block">
                 <div className="relative aspect-[3/2] rounded-lg overflow-hidden">
@@ -180,10 +179,10 @@ export default function HomePage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
-              { title: 'Register', desc: 'Sign up at indianacareerconnect.com to determine funding eligibility.', href: '/funding', image: '/images/heroes/hero-state-funding.jpg' },
-              { title: 'Choose a Program', desc: 'Pick the career path that fits your goals and schedule.', href: '/programs', image: '/images/heroes-hq/programs-hero.jpg' },
-              { title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works', image: '/images/artlist/hero-training-2.jpg' },
-              { title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services', image: '/images/heroes/success-story-1.jpg' },
+              { title: 'Register', desc: 'Sign up at indianacareerconnect.com to determine funding eligibility.', href: '/funding', image: '/images/workforce-1.jpg' },
+              { title: 'Choose a Program', desc: 'Pick the career path that fits your goals and schedule.', href: '/programs', image: '/images/Content_PATHWAY_TRADES.jpg' },
+              { title: 'Complete Training', desc: 'Hands-on classes, real experience, earn your certification.', href: '/how-it-works', image: '/images/workforce-2.jpg' },
+              { title: 'Get Hired', desc: 'Our employer partners are actively hiring graduates.', href: '/career-services', image: '/images/workforce-3.jpg' },
             ].map((step) => (
               <div key={step.title} className="text-center">
                 <Image
@@ -208,10 +207,10 @@ export default function HomePage() {
       <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <Image
-            src="/images/heroes-hq/jri-hero.jpg"
-            alt="Earn while you learn"
+            src="/images/hero-banner-new.jpg"
+            alt="Students in funded training programs"
             width={1400}
-            height={933}
+            height={788}
             sizes="(max-width: 768px) 100vw, 960px"
             className="w-full h-auto rounded-lg mb-10"
           />
@@ -222,10 +221,10 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/heroes/cash-bills.jpg' },
-              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost.', href: '/funding/state-programs', image: '/images/programs-hq/students-learning.jpg' },
-              { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/funding/funding-jri-program-v2.jpg' },
-              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/heroes/career-services.jpg', external: true },
+              { label: 'WIOA', desc: 'Covers tuition, books, and supplies for eligible adults and dislocated workers.', href: '/funding/federal-programs', image: '/images/community-healthcare-worker.jpg' },
+              { label: 'Workforce Ready Grant', desc: 'Indiana state grant covering high-demand certification programs at no cost.', href: '/funding/state-programs', image: '/images/facility-hero.jpg' },
+              { label: 'JRI (Justice Reinvestment)', desc: 'Paid apprenticeships and training for justice-involved individuals.', href: '/funding/jri', image: '/images/funding/funding-jri-program.jpg' },
+              { label: 'Indiana Career Connect', desc: 'Register to check your eligibility and apply for funding.', href: 'https://indianacareerconnect.com', image: '/images/homepage/government-agencies.jpg', external: true },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
                 <Image src={item.image} alt={item.label} width={600} height={400} className="w-full h-auto" />
@@ -283,8 +282,8 @@ export default function HomePage() {
       <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
         <div className="max-w-6xl mx-auto px-6">
           <Image
-            src="/images/heroes-hq/employer-hero.jpg"
-            alt="Hire our graduates"
+            src="/images/efh-building-tech-hero.jpg"
+            alt="Employer partners hiring trained graduates"
             width={1600}
             height={1067}
             sizes="(max-width: 768px) 100vw, 960px"
@@ -297,10 +296,10 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. They are background-checked, drug-tested, and ready to start working on day one.', href: '/career-services', image: '/images/heroes/success-story-2.jpg' },
-              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives you up to $9,600 per qualifying hire. We help you identify eligible candidates and file the paperwork before the 28-day deadline.', href: '/employer', image: '/images/heroes/employer-partner-2.jpg' },
-              { label: 'OJT Reimbursement', desc: 'On-the-Job Training funding reimburses 50-75% of a new hire\'s wages during their training period. You train them your way while the workforce board covers most of the cost.', href: '/ojt-and-funding', image: '/images/hero-new/hero-2.jpg' },
-              { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/programs-hq/business-training.jpg' },
+              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. They are background-checked, drug-tested, and ready to start working on day one.', href: '/career-services', image: '/images/artlist/cropped/hero-training-1-wide.jpg' },
+              { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives you up to $9,600 per qualifying hire. We help you identify eligible candidates and file the paperwork before the 28-day deadline.', href: '/employer', image: '/images/Content_PATHWAY_BUSINESS.jpg' },
+              { label: 'OJT Reimbursement', desc: 'On-the-Job Training funding reimburses 50-75% of a new hire\'s wages during their training period. You train them your way while the workforce board covers most of the cost.', href: '/ojt-and-funding', image: '/images/artlist/cropped/hero-training-5-wide.jpg' },
+              { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/artlist/cropped/hero-training-8-wide.jpg' },
             ].map((item) => (
               <div key={item.label} className="rounded-xl overflow-hidden border border-slate-200">
                 <div className="relative aspect-[3/2]">

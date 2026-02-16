@@ -9,11 +9,10 @@ import {
   Award, 
   Briefcase, 
   Heart,
-  CheckCircle,
   ArrowRight,
   Building2,
-  GraduationCap
-} from 'lucide-react';
+  GraduationCap,
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: {
@@ -35,48 +34,21 @@ export default function FundingImpactPage() {
       </div>
 
       {/* Hero Section with Video Background */}
-      <section className="relative min-h-[600px] flex items-center overflow-hidden">
-        {/* Video Background */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="none"
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        >
-          <source src="https://cms-artifacts.artlist.io/content/generated-video-v1/video__2/generated-video-acfed647-8bb1-44ed-8505-876b1d573896.mp4?Expires=2083808563&Key-Pair-Id=K2ZDLYDZI2R1DF&Signature=BO~IkvikD0UAyMYmWQoBNskXM7I8fMAXUJW3T-zgJh1jg78q3LhNDpFOLhVcCpTBW1Rscp0c0YXEi-CQ29NDjSUKoclWTKq4q-bPLNxXgOpKLYxr5B5X3LzzDQQYnq5ilkgAvEZ~VzT3P8HEixv9WPRLFnAd5V3f~829SadfMPddUPxQZDZc29hrBn-Kxv-EKfugudcZ3depV1X-T1F5UxzvRMqFCXxjfT658RlSt0IupI0LxtywFYkChqJQmH6A~2JBncMUPerBqqt0Gdyp4ettIltCFvBX70ai6784jneJJrWcBJ0l7GyJPx1WBPAqjAdnCeJwyPC2Spp3~u93pQ__" type="video/mp4" />
-        </video>
-        {/* Overlay */}
-        
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-20">
-          <div className="max-w-3xl">
-            <div className="flex items-center gap-3 mb-6">
-              <TrendingUp className="w-10 h-10 text-white" />
-              <span className="text-white/80 text-lg font-medium">Workforce Development</span>
-            </div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-              The Impact of Federal Workforce Funding
-            </h1>
-            <p className="text-xl text-white/90 mb-8 leading-relaxed">
-              Every dollar invested in workforce development creates ripple effects across 
-              families, employers, and communities. See how WIOA, WRG, and other federal 
-              programs are transforming lives in Indiana.
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <video autoPlay muted loop playsInline preload="none" className="absolute inset-0 w-full h-full object-cover pointer-events-none">
+            <source src="https://cms-artifacts.artlist.io/content/generated-video-v1/video__2/generated-video-acfed647-8bb1-44ed-8505-876b1d573896.mp4?Expires=2083808563&Key-Pair-Id=K2ZDLYDZI2R1DF&Signature=BO~IkvikD0UAyMYmWQoBNskXM7I8fMAXUJW3T-zgJh1jg78q3LhNDpFOLhVcCpTBW1Rscp0c0YXEi-CQ29NDjSUKoclWTKq4q-bPLNxXgOpKLYxr5B5X3LzzDQQYnq5ilkgAvEZ~VzT3P8HEixv9WPRLFnAd5V3f~829SadfMPddUPxQZDZc29hrBn-Kxv-EKfugudcZ3depV1X-T1F5UxzvRMqFCXxjfT658RlSt0IupI0LxtywFYkChqJQmH6A~2JBncMUPerBqqt0Gdyp4ettIltCFvBX70ai6784jneJJrWcBJ0l7GyJPx1WBPAqjAdnCeJwyPC2Spp3~u93pQ__" type="video/mp4" />
+          </video>
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">The Impact of Federal Workforce Funding</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto mb-6">
+              Every dollar invested in workforce development creates ripple effects across families, employers, and communities. See how WIOA, WRG, and other federal programs are transforming lives in Indiana.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/apply"
-                className="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-100 transition-colors"
-              >
-                Apply for Free Training
-              </Link>
-              <Link
-                href="/wioa-eligibility"
-                className="inline-flex items-center justify-center px-8 py-4 bg-indigo-700 text-white rounded-lg font-bold hover:bg-indigo-600 transition-colors border-2 border-white/30"
-              >
-                Check Your Eligibility
-              </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/apply" className="inline-flex items-center justify-center px-8 py-4 bg-white text-indigo-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">Apply for Free Training</Link>
+              <Link href="/wioa-eligibility" className="inline-flex items-center justify-center px-8 py-4 bg-indigo-700 text-white rounded-lg font-bold hover:bg-indigo-600 transition-colors border-2 border-white/30">Check Your Eligibility</Link>
             </div>
           </div>
         </div>
@@ -432,15 +404,15 @@ export default function FundingImpactPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Reduced reliance on public assistance
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Improved child outcomes
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Generational wealth building
                   </li>
                 </ul>
@@ -467,15 +439,15 @@ export default function FundingImpactPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Pre-screened, trained candidates
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Reduced hiring costs
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Lower turnover rates
                   </li>
                 </ul>
@@ -502,15 +474,15 @@ export default function FundingImpactPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Increased tax revenue
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Local spending boost
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Reduced social service costs
                   </li>
                 </ul>
@@ -520,18 +492,9 @@ export default function FundingImpactPage() {
         </div>
       </section>
 
-      {/* CTA with Background Image */}
-      <section className="relative py-20">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/heroes-hq/success-stories-hero.jpg"
-            alt="Success stories"
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-indigo-600/90" />
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+      {/* CTA */}
+      <section className="py-20 bg-indigo-600">
+        <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Be Part of the Impact
           </h2>

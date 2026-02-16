@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Activity, AlertCircle, CheckCircle, Database, Server, TrendingUp, Users, Zap } from 'lucide-react';
+import { Activity, AlertCircle, Database, Server, TrendingUp, Users, Zap } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 interface SystemStatus {
@@ -95,7 +95,7 @@ export default function MonitoringDashboard() {
     switch (status) {
       case 'healthy':
       case 'pass':
-        return <CheckCircle className="h-5 w-5" />;
+        return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'degraded':
       case 'warn':
         return <AlertCircle className="h-5 w-5" />;
@@ -350,7 +350,7 @@ export default function MonitoringDashboard() {
           
           {errors.length === 0 ? (
             <div className="text-center py-8 text-gray-500">
-              <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-2" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <p>No recent errors - system running smoothly!</p>
             </div>
           ) : (

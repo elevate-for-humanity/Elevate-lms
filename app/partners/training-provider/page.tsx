@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckCircle2, Building2, Shield, Users, BarChart3 } from 'lucide-react';
+import { Building2, Shield, Users, BarChart3 } from 'lucide-react';
 
 export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/partners/training-provider' },
@@ -26,12 +26,16 @@ export default function TrainingProviderPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative h-[300px] md:h-[350px] flex items-center justify-center text-white overflow-hidden">
-        <Image src="/images/employers/partnership-meeting.jpg" alt="Training provider partnership" fill className="object-cover" priority sizes="100vw" />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
-          <h1 className="text-3xl md:text-5xl font-bold mb-4">Training Provider Partnership</h1>
-          <p className="text-lg text-gray-100">Join our network of approved training providers and receive funded student referrals.</p>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/employers/partnership-meeting.jpg" alt="Training provider partnership" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Training Provider Partnership</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Join our network of approved training providers and receive funded student referrals.</p>
+          </div>
         </div>
       </section>
 
@@ -42,7 +46,7 @@ export default function TrainingProviderPage() {
           <ul className="space-y-4">
             {REQUIREMENTS.map((r) => (
               <li key={r} className="flex items-start gap-3">
-                <CheckCircle2 className="w-5 h-5 text-brand-green-600 mt-0.5 flex-shrink-0" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{r}</span>
               </li>
             ))}

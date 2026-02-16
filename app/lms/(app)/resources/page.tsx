@@ -16,11 +16,10 @@ import {
   DollarSign,
   Phone,
   Clock,
-  CheckCircle,
   Video,
   Users,
   HelpCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import ContentLibrary from '@/components/ContentLibrary';
 
 export const metadata: Metadata = {

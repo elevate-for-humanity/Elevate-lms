@@ -386,10 +386,10 @@ export default function FunderAnalytics() {
                   <CardTitle>WIOA Compliance Notes</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 text-sm">
-                  <p>✅ PIRL data collection active for all participants</p>
-                  <p>✅ Performance metrics tracked per DOL requirements</p>
-                  <p>✅ Quarterly reporting ready for export</p>
-                  <p>✅ Follow-up tracking at 2nd and 4th quarter post-exit</p>
+                  <p>• PIRL data collection active for all participants</p>
+                  <p>• Performance metrics tracked per DOL requirements</p>
+                  <p>• Quarterly reporting ready for export</p>
+                  <p>• Follow-up tracking at 2nd and 4th quarter post-exit</p>
                 </CardContent>
               </Card>
             )}

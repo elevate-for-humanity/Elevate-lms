@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { DollarSign, CheckCircle, Users, Building2, ArrowRight, Shield, GraduationCap } from 'lucide-react';
+import { DollarSign, Users, Building2, ArrowRight, Shield, GraduationCap } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Grants & Scholarships | Get Your Training Paid For | Elevate For Humanity',
@@ -105,7 +105,7 @@ export default function GrantsPage() {
                         'Were recently laid off',
                       ].map((item, i) => (
                         <li key={i} className="flex items-center gap-2 text-slate-700 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-500" /> {item}
+                          <span className="text-slate-400 flex-shrink-0">•</span> {item}
                         </li>
                       ))}
                     </ul>
@@ -137,7 +137,7 @@ export default function GrantsPage() {
                         'Enroll in an eligible high-demand program',
                       ].map((item, i) => (
                         <li key={i} className="flex items-center gap-2 text-slate-700 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-500" /> {item}
+                          <span className="text-slate-400 flex-shrink-0">•</span> {item}
                         </li>
                       ))}
                     </ul>
@@ -166,7 +166,7 @@ export default function GrantsPage() {
                         'Want to gain skills for a better job',
                       ].map((item, i) => (
                         <li key={i} className="flex items-center gap-2 text-slate-700 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-500" /> {item}
+                          <span className="text-slate-400 flex-shrink-0">•</span> {item}
                         </li>
                       ))}
                     </ul>
@@ -198,7 +198,7 @@ export default function GrantsPage() {
                         'You\'re ready to take the next step',
                       ].map((item, i) => (
                         <li key={i} className="flex items-center gap-2 text-slate-700 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-500" /> {item}
+                          <span className="text-slate-400 flex-shrink-0">•</span> {item}
                         </li>
                       ))}
                     </ul>

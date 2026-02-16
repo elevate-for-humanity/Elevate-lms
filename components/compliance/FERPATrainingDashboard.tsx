@@ -9,14 +9,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import {
   Users,
-  CheckCircle,
   Clock,
   AlertCircle,
   Download,
   Mail,
   FileText,
-  Award
-} from 'lucide-react';
+  Award,
+CheckCircle, } from 'lucide-react';
 
 interface TrainingRecord {
   id: string;
@@ -172,7 +171,7 @@ export default function FERPATrainingDashboard({
           <div className="bg-white rounded-xl shadow-sm p-6 border border-slate-200">
             <div className="flex items-center justify-between mb-4">
               <div className="p-3 bg-green-100 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
             </div>
             <div className="text-3xl font-bold text-green-600">{completedCount}</div>

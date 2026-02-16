@@ -36,32 +36,25 @@ export function VisualProgramTemplate({ program, slug }: VisualProgramTemplatePr
         </div>
       </div>
 
-      {/* HERO - Full-width photo with program title */}
-      <section className="relative h-[60vh] min-h-[400px] max-h-[600px]">
-        <Image
-          src={images.hero}
-          alt={program.name || program.heroTitle || 'Program'}
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="absolute bottom-0 left-0 right-0 p-6 md:p-12">
-          <div className="max-w-5xl mx-auto">
-            <h1 className="text-3xl md:text-5xl font-bold text-white mb-3">
+      {/* HERO */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src={images.hero} alt={program.name || program.heroTitle || 'Program'} fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
               {program.name || program.heroTitle}
             </h1>
-            <p className="text-white/90 text-sm md:text-base mb-4 max-w-2xl">
+            <p className="text-lg text-slate-300 mb-6 max-w-2xl mx-auto">
               Eligibility approval is required before enrollment. Start your application to check eligibility.
             </p>
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href={`/apply?program=${slug}`}
-                className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition shadow-lg"
-              >
-                Check Eligibility
-              </Link>
-            </div>
+            <Link
+              href={`/apply?program=${slug}`}
+              className="bg-brand-blue-600 hover:bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Check Eligibility
+            </Link>
           </div>
         </div>
       </section>

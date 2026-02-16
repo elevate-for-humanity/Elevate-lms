@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
-import { BookOpen, Clock, Award, CheckCircle, PlayCircle, ArrowLeft } from 'lucide-react';
+import { BookOpen, Clock, Award, PlayCircle, ArrowLeft } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -132,19 +132,19 @@ export default async function CourseDetailPage({ params }: { params: Promise<{ c
               
               <ul className="space-y-2 mb-6">
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Lifetime access</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Certificate of completion</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Practice exercises</span>
                 </li>
                 <li className="flex items-center gap-2 text-sm">
-                  <CheckCircle className="w-4 h-4 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Quiz assessments</span>
                 </li>
               </ul>

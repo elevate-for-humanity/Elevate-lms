@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
-  CheckCircle, ArrowRight, Code, Layout, Database,
+  ArrowRight, Code, Layout, Database,
   Globe, GitBranch, Palette, Server, Smartphone,
 } from 'lucide-react';
 
@@ -61,14 +61,15 @@ export default function WebDevelopmentPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative h-[50vh] min-h-[400px] max-h-[500px]">
-        <Image src="/hero-images/technology-hero.jpg" alt="Web Development Training" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-purple-900/60" />
-        <div className="absolute bottom-0 left-0 right-0 p-8">
-          <div className="max-w-7xl mx-auto">
-            <span className="text-purple-200 font-medium text-sm uppercase tracking-wider">Technology Programs</span>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-2 mt-2">Web Development</h1>
-            <p className="text-xl text-white/90">Full-Stack Development Bootcamp</p>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/hero-images/technology-hero.jpg" alt="Web Development Training" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Web Development</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Full-Stack Development Bootcamp</p>
           </div>
         </div>
       </section>
@@ -177,7 +178,7 @@ export default function WebDevelopmentPage() {
               <div className="space-y-3">
                 {projectPortfolio.map((project, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">{project}</span>
                   </div>
                 ))}
@@ -221,7 +222,7 @@ export default function WebDevelopmentPage() {
                   'Reliable internet access',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}
@@ -237,7 +238,7 @@ export default function WebDevelopmentPage() {
                   'Career support included after graduation',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-purple-500 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </li>
                 ))}

@@ -2,7 +2,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CreditCard, CheckCircle, DollarSign } from 'lucide-react';
+import { CreditCard, DollarSign } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Payment Options | Elevate for Humanity',
@@ -116,19 +116,19 @@ export default function PayPage() {
           <h3 className="text-lg font-bold text-black mb-4">All Payments Include:</h3>
           <div className="grid md:grid-cols-2 gap-3">
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="text-black">Secure payment via Stripe</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="text-black">Instant enrollment confirmation</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="text-black">All materials included</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="text-black">Job placement assistance</span>
             </div>
           </div>

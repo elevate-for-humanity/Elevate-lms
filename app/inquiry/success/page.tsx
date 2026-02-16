@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { CheckCircle, Mail } from 'lucide-react';
+import { Mail } from 'lucide-react';
 
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export default function InquirySuccessPage() {
     <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12 px-4">
       <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
         <div className="flex justify-center mb-6">
-          <CheckCircle className="w-16 h-16 text-green-500" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
         </div>
         
         <h1 className="text-2xl font-bold text-gray-900 mb-4">

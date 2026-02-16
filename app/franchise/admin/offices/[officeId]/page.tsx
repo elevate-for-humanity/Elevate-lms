@@ -20,10 +20,9 @@ import {
   Edit,
   Save,
   Loader2,
-  CheckCircle,
   XCircle,
-  AlertTriangle
-} from 'lucide-react';
+  AlertTriangle,
+CheckCircle, } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -598,7 +597,7 @@ export default function AdminOfficeDetailPage() {
             <CardContent className="space-y-4">
               {office.status === 'pending' && (
                 <Button className="w-full justify-start" onClick={() => updateStatus('active')}>
-                  <CheckCircle className="mr-2 h-4 w-4" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Activate Office
                 </Button>
               )}
@@ -610,7 +609,7 @@ export default function AdminOfficeDetailPage() {
               )}
               {office.status === 'suspended' && (
                 <Button className="w-full justify-start" onClick={() => updateStatus('active')}>
-                  <CheckCircle className="mr-2 h-4 w-4" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Reactivate Office
                 </Button>
               )}

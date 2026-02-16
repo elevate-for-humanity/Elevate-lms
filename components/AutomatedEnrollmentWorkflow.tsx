@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase/client';
-import { CheckCircle, Circle, Loader2, AlertCircle, Clock, Users, TrendingUp, Zap } from 'lucide-react';
+import { Circle, Loader2, AlertCircle, Clock, Users, TrendingUp, Zap } from 'lucide-react';
 
 interface WorkflowStep {
   id: string;
@@ -303,7 +303,7 @@ export default function AutomatedEnrollmentWorkflow({
 
   const getStatusIcon = (status: WorkflowStep['status']) => {
     switch (status) {
-      case 'completed': return <CheckCircle className="w-5 h-5 text-green-500" />;
+      case 'completed': return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'in_progress': return <Loader2 className="w-5 h-5 text-brand-blue-500 animate-spin" />;
       case 'failed': return <AlertCircle className="w-5 h-5 text-red-500" />;
       case 'skipped': return <Circle className="w-5 h-5 text-gray-400" />;

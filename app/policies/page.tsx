@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { 
-  FileText, 
+  FileText, Circle, 
   Shield, 
   Clock, 
   AlertTriangle, 
@@ -11,10 +11,9 @@ import {
   Users, 
   Scale,
   BookOpen,
-  CheckCircle,
   Building,
   Gavel,
-  Phone
+  Phone,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -32,7 +31,7 @@ const policies = [
       { name: 'Service Level Agreement', href: '/policies/sla', icon: Clock, description: 'Uptime targets and service credits' },
       { name: 'Incident Response Policy', href: '/policies/incident-response', icon: AlertTriangle, description: 'How we handle security and operational incidents' },
       { name: 'Disaster Recovery Policy', href: '/policies/disaster-recovery', icon: Shield, description: 'Business continuity and data recovery procedures' },
-      { name: 'Disaster Recovery Test Report', href: '/policies/disaster-recovery-test', icon: CheckCircle, description: 'Latest DR drill results and documentation' },
+      { name: 'Disaster Recovery Test Report', href: '/policies/disaster-recovery-test', icon: Circle, description: 'Latest DR drill results and documentation' },
       { name: 'Response Time SLA', href: '/policies/response-sla', icon: Clock, description: 'Support response time commitments' },
     ]
   },
@@ -48,7 +47,7 @@ const policies = [
   {
     category: 'Terms & Agreements',
     items: [
-      { name: 'Terms of Service', href: '/policies/terms', icon: FileText, description: 'Platform usage terms' },
+      { name: 'Terms of Service', href: '/policies/terms', icon: FileText, Circle, description: 'Platform usage terms' },
       { name: 'Acceptable Use Policy', href: '/policies/acceptable-use', icon: Users, description: 'Guidelines for platform use' },
       { name: 'Copyright Policy', href: '/policies/copyright', icon: Scale, description: 'Intellectual property guidelines' },
     ]
@@ -59,7 +58,7 @@ const policies = [
       { name: 'Academic Integrity', href: '/policies/academic-integrity', icon: BookOpen, description: 'Honesty and ethics in learning' },
       { name: 'Student Code of Conduct', href: '/policies/student-code', icon: Users, description: 'Expected student behavior' },
       { name: 'Attendance Policy', href: '/policies/attendance', icon: Clock, description: 'Attendance requirements' },
-      { name: 'Progress Policy', href: '/policies/progress', icon: CheckCircle, description: 'Academic progress standards' },
+      { name: 'Progress Policy', href: '/policies/progress', icon: Circle, description: 'Academic progress standards' },
       { name: 'Grievance Policy', href: '/policies/grievance', icon: Gavel, description: 'How to file complaints' },
     ]
   },
@@ -67,7 +66,7 @@ const policies = [
     category: 'Admissions & Enrollment',
     items: [
       { name: 'Admissions Policy', href: '/policies/admissions', icon: Building, description: 'Enrollment requirements' },
-      { name: 'Credential Verification', href: '/policies/credentials', icon: CheckCircle, description: 'How we verify credentials' },
+      { name: 'Credential Verification', href: '/policies/credentials', icon: Circle, description: 'How we verify credentials' },
       { name: 'Revocation Policy', href: '/policies/revocation', icon: AlertTriangle, description: 'Credential revocation procedures' },
     ]
   },
@@ -77,7 +76,7 @@ const policies = [
       { name: 'Federal Compliance', href: '/policies/federal-compliance', icon: Building, description: 'Federal regulatory compliance' },
       { name: 'WIOA Policy', href: '/policies/wioa', icon: Scale, description: 'Workforce Innovation and Opportunity Act' },
       { name: 'AI Usage Policy', href: '/policies/ai-usage', icon: Shield, description: 'How we use AI responsibly' },
-      { name: 'Content Policy', href: '/policies/content', icon: FileText, description: 'Content standards and moderation' },
+      { name: 'Content Policy', href: '/policies/content', icon: FileText, Circle, description: 'Content standards and moderation' },
       { name: 'Community Guidelines', href: '/policies/community-guidelines', icon: Users, description: 'Community standards' },
     ]
   },

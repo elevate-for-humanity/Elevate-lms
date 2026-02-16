@@ -1,11 +1,10 @@
 import React from 'react';
 import {
-  CheckCircle,
   Clock,
   FileCheck,
   GraduationCap,
   Phone,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface Step {
   number: number;
@@ -36,7 +35,7 @@ const STEPS: Step[] = [
     title: 'Check Eligibility',
     duration: '1 week',
     description: 'We handle all funding paperwork and eligibility verification',
-    icon: <CheckCircle className="h-10 w-10" />,
+    icon: <span className="text-slate-400 flex-shrink-0">•</span>,
   },
   {
     number: 4,

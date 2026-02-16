@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Metadata } from 'next';
-import { Play, Clock, CheckCircle, Lock, ArrowRight } from 'lucide-react';
+import { Play, Clock, Lock, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -119,7 +119,7 @@ export default async function MyCoursesPage() {
                         {purchase.course?.duration_hours} hours
                       </span>
                       <span className="flex items-center gap-1 text-green-600">
-                        <CheckCircle className="w-4 h-4" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         Purchased
                       </span>
                     </div>

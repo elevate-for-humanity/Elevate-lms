@@ -9,8 +9,7 @@ import {
   Scale,
   ClipboardCheck,
   ArrowRight,
-  CheckCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -79,10 +78,10 @@ export default function EnterprisePage() {
                 <Server className="w-6 h-6 text-brand-red-600" /> Managed Platform
               </h3>
               <ul className="space-y-3 text-slate-800">
-                <li className="flex items-start gap-2"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /> We host, operate, and update it</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /> Zero engineering burden</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /> Monthly subscription pricing</li>
-                <li className="flex items-start gap-2"><CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" /> Best for most organizations</li>
+                <li className="flex items-start gap-2"><span className="text-slate-400 flex-shrink-0">•</span> We host, operate, and update it</li>
+                <li className="flex items-start gap-2"><span className="text-slate-400 flex-shrink-0">•</span> Zero engineering burden</li>
+                <li className="flex items-start gap-2"><span className="text-slate-400 flex-shrink-0">•</span> Monthly subscription pricing</li>
+                <li className="flex items-start gap-2"><span className="text-slate-400 flex-shrink-0">•</span> Best for most organizations</li>
               </ul>
               <Link href="/platform/managed" className="mt-6 inline-flex items-center gap-1 text-brand-red-600 font-semibold hover:underline">
                 View Managed Platform <ArrowRight className="w-4 h-4" />
@@ -112,7 +111,7 @@ export default function EnterprisePage() {
               <ul className="space-y-3">
                 {includedItems.map((item) => (
                   <li key={item} className="flex items-start gap-2 text-slate-800">
-                    <CheckCircle className="w-5 h-5 text-brand-red-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     {item}
                   </li>
                 ))}

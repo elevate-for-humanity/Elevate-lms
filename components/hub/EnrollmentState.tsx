@@ -4,15 +4,15 @@ import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import { 
-  CheckCircle, 
+  
   Clock, 
   AlertTriangle, 
   ArrowRight,
   BookOpen,
   Award,
   Briefcase,
-  FileCheck
-} from 'lucide-react';
+  FileCheck,
+CheckCircle, } from 'lucide-react';
 
 type EnrollmentStatus = 'applied' | 'enrolled' | 'in_progress' | 'at_risk' | 'completed' | 'graduated';
 

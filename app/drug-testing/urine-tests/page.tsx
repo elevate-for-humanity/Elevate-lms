@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, CheckCircle, ArrowLeft, Clock, Beaker } from 'lucide-react';
+import { Phone, ArrowLeft, Clock, Beaker } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Urine Drug Tests | Drug Testing Services',
@@ -189,7 +189,7 @@ export default function UrineTestsPage() {
                       <ul className="grid md:grid-cols-2 gap-2">
                         {test.includes.map((item, idx) => (
                           <li key={idx} className="flex items-start gap-2 text-gray-700">
-                            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                            <span className="text-slate-400 flex-shrink-0">•</span>
                             <span className="text-sm">{item}</span>
                           </li>
                         ))}

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, Home, ChevronRight, CheckCircle, Download, FileText, Users, BarChart3, Shield } from 'lucide-react';
+import { ArrowRight, Home, ChevronRight, Download, FileText, Users, BarChart3, Shield, CheckCircle, } from 'lucide-react';
 import AvatarGuide from '@/components/AvatarGuide';
 
 export const metadata: Metadata = {
@@ -137,55 +137,43 @@ export default function WIOACompliancePage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative bg-green-700 text-white py-20 overflow-hidden">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/heroes/hero-federal-funding.jpg"
-            alt="WIOA Compliance"
-            fill
-            className="object-cover opacity-30"
-          />
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes/hero-federal-funding.jpg" alt="WIOA Compliance" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <span className="inline-block bg-green-600 text-white text-sm font-bold px-4 py-1 rounded-full mb-4">
-                Compliance Tools
-              </span>
-              <h1 className="text-4xl sm:text-5xl font-black mb-6">
-                WIOA Compliance Made Simple
-              </h1>
-              <p className="text-xl text-green-100 mb-8">
-                Complete toolkit for Workforce Innovation and Opportunity Act compliance. 
-                Automated tracking, reporting, and PIRL exports for workforce development programs.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link href="#pricing" className="inline-flex items-center gap-2 bg-white text-green-700 px-6 py-3 rounded-lg font-bold hover:bg-green-50 transition">
-                  View Pricing
-                  <ArrowRight className="w-5 h-5" />
-                </Link>
-                <Link href="/store/demo" className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-500 transition border border-green-500">
-                  Request Demo
-                </Link>
-              </div>
-            </div>
-            <div className="relative">
-              <div className="bg-white/10 backdrop-blur rounded-2xl p-6">
-                <h3 className="text-lg font-bold mb-4">WIOA Primary Indicators</h3>
-                <div className="grid grid-cols-2 gap-4">
-                  {metrics.map((metric) => (
-                    <div key={metric.label} className="bg-white/10 rounded-lg p-3">
-                      <metric.icon className="w-5 h-5 text-green-300 mb-2" />
-                      <p className="text-sm text-green-200">{metric.label}</p>
-                      <p className="text-xl font-bold">{metric.target}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <span className="inline-block bg-green-600 text-white text-sm font-bold px-4 py-1 rounded-full mb-4">Compliance Tools</span>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">WIOA Compliance Made Simple</h1>
+            <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">
+              Complete toolkit for Workforce Innovation and Opportunity Act compliance. Automated tracking, reporting, and PIRL exports for workforce development programs.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link href="#pricing" className="inline-flex items-center gap-2 bg-white text-green-700 px-6 py-3 rounded-lg font-bold hover:bg-green-50 transition">
+                View Pricing <ArrowRight className="w-5 h-5" />
+              </Link>
+              <Link href="/store/demo" className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-bold hover:bg-green-500 transition border border-green-500">
+                Request Demo
+              </Link>
             </div>
           </div>
         </div>
+      </section>
 
+      {/* WIOA Metrics */}
+      <section className="py-12 bg-green-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <h3 className="text-lg font-bold text-slate-900 mb-4 text-center">WIOA Primary Indicators</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {metrics.map((metric) => (
+              <div key={metric.label} className="bg-white rounded-lg p-4 border border-green-200 text-center">
+                <metric.icon className="w-5 h-5 text-green-600 mb-2 mx-auto" />
+                <p className="text-sm text-slate-600">{metric.label}</p>
+                <p className="text-xl font-bold text-slate-900">{metric.target}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* Features Grid */}
@@ -213,7 +201,7 @@ export default function WIOACompliancePage() {
                   <ul className="space-y-2">
                     {feature.items.map((item) => (
                       <li key={item} className="flex items-center gap-2 text-sm text-black">
-                        <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         {item}
                       </li>
                     ))}
@@ -275,7 +263,7 @@ export default function WIOACompliancePage() {
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-2 text-sm text-black">
-                        <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         {feature}
                       </li>
                     ))}

@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
-import { Building, MapPin, Users, Globe, Phone, Mail, Edit, Camera, Award, Briefcase, CheckCircle, AlertCircle } from 'lucide-react';
+import { Building, MapPin, Users, Globe, Phone, Mail, Edit, Camera, Award, Briefcase, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
@@ -151,7 +151,7 @@ export default async function CompanyProfilePage() {
                   )}
                   {companyData.verified ? (
                     <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full flex items-center gap-1">
-                      <CheckCircle className="w-4 h-4" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       Verified
                     </span>
                   ) : (
@@ -216,7 +216,7 @@ export default async function CompanyProfilePage() {
                 <p className="text-sm text-gray-600">WOTC Credits</p>
               </div>
               <div className="bg-white rounded-xl shadow-sm p-6 text-center">
-                <CheckCircle className="w-8 h-8 text-orange-600 mx-auto mb-2" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <p className="text-2xl font-bold text-gray-900">{stats.avgTimeToHire}</p>
                 <p className="text-sm text-gray-600">Avg. Time to Hire</p>
               </div>
@@ -229,7 +229,7 @@ export default async function CompanyProfilePage() {
                 <div className="grid md:grid-cols-3 gap-4">
                   {companyData.benefits.map((benefit: string, index: number) => (
                     <div key={index} className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-gray-700">{benefit}</span>
                     </div>
                   ))}

@@ -7,12 +7,11 @@ import {
   Award,
   Download,
   Share2,
-  CheckCircle,
   Calendar,
   User,
   BookOpen,
   ExternalLink,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -80,7 +79,7 @@ export default async function CertificateViewPage({ params }: Props) {
         {/* Verification Badge */}
         <div className="flex items-center justify-center gap-2 mb-8">
           <div className="flex items-center gap-2 px-4 py-2 bg-green-100 text-green-800 rounded-full">
-            <CheckCircle className="w-5 h-5" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="font-semibold">Verified Certificate</span>
           </div>
         </div>
@@ -173,7 +172,7 @@ export default async function CertificateViewPage({ params }: Props) {
           </div>
           <div className="bg-white rounded-xl border border-slate-200 p-6">
             <h3 className="font-semibold text-slate-900 mb-4 flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               Verification
             </h3>
             <p className="text-slate-600 text-sm mb-4">

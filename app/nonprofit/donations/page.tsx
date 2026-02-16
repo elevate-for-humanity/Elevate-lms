@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Heart, Users, TrendingUp, Gift, CheckCircle } from 'lucide-react';
+import { Heart, Users, TrendingUp, Gift } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -222,11 +222,11 @@ export default async function DonationsPage() {
             </p>
             <ul className="space-y-2">
               <li className="flex items-center gap-2 text-gray-600">
-                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 You will receive a receipt for your records
               </li>
               <li className="flex items-center gap-2 text-gray-600">
-                <CheckCircle className="w-5 h-5 text-green-500" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 100% of donations go to programs and services
               </li>
             </ul>

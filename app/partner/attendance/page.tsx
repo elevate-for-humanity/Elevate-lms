@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { Calendar, Users, CheckCircle, Plus } from 'lucide-react';
+import { Calendar, Users, Plus } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -81,7 +81,7 @@ export default async function PartnerAttendancePage() {
           </div>
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-2">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="text-sm text-gray-600">Avg Attendance Rate</span>
             </div>
             <p className="text-3xl font-bold text-gray-900">

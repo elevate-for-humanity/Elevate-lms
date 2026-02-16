@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { 
-  CheckCircle, 
+  
   BookOpen, 
   Award, 
   Clock, 
@@ -176,7 +176,7 @@ export default function CapitalReadinessCoursePage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {outcomes.map((outcome, index) => (
                 <div key={index} className="flex items-start gap-4 bg-white rounded-xl p-6 shadow-sm">
-                  <CheckCircle className="w-6 h-6 text-emerald-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-slate-700">{outcome}</span>
                 </div>
               ))}

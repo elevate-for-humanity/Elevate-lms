@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   Building2, Users, Clock, Plus, ChevronRight, 
   Bell, Settings, TrendingUp, FileText,
-  AlertCircle, Loader2, LogIn, UserPlus, Scissors, CheckCircle, QrCode
+  AlertCircle, Loader2, LogIn, UserPlus, Scissors, QrCode
 } from 'lucide-react';
 
 interface Apprentice {
@@ -187,7 +187,7 @@ function Dashboard({
           
           <Link href="/pwa/shop-owner/approve-hours" className="flex items-center gap-4 bg-amber-500/20 border border-amber-500/30 rounded-xl p-4 active:opacity-80">
             <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-white" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Approve Hours</p>

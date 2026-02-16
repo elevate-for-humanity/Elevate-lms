@@ -104,14 +104,7 @@ export default async function ProductDetailPage({ params }: Props) {
                   priority
                 />
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="text-center">
-                    <div className="w-24 h-24 bg-brand-blue-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <ShoppingCart className="w-12 h-12 text-brand-blue-400" />
-                    </div>
-                    <p className="text-brand-blue-400 font-medium">Meri-Go-Round</p>
-                  </div>
-                </div>
+                <div className="w-full h-full bg-slate-200 flex items-center justify-center text-slate-400 text-4xl">•</div>
               )}
             </div>
           </div>

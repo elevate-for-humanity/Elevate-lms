@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { 
   Clock, 
-  CheckCircle, 
+  
   AlertCircle,
   Calendar,
   User,
@@ -122,7 +122,7 @@ export default function HoursTracker() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6 border-b border-gray-100">
               <div className="bg-green-50 rounded-lg p-4">
                 <div className="flex items-center gap-2 text-green-700 mb-1">
-                  <CheckCircle className="w-5 h-5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-sm font-medium">Verified Hours</span>
                 </div>
                 <p className="text-3xl font-bold text-green-800">
@@ -205,7 +205,7 @@ export default function HoursTracker() {
                           <td className="py-3">
                             {entry.verified ? (
                               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
-                                <CheckCircle className="w-3 h-3" />
+                                <span className="text-slate-400 flex-shrink-0">•</span>
                                 Verified
                               </span>
                             ) : (

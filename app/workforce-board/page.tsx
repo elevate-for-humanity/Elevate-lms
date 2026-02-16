@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
@@ -139,15 +139,15 @@ export default async function WorkforceBoardPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-6 text-white/90 mb-8">
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-400" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Real-Time Data</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-400" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>WIOA Compliant</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-400" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Audit Ready</span>
             </div>
           </div>

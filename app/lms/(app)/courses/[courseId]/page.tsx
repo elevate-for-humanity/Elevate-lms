@@ -10,7 +10,6 @@ import {
   Clock,
   BookOpen,
   Award,
-  CheckCircle,
   Lock,
   ChevronRight,
   Users,
@@ -19,7 +18,7 @@ import {
   Video,
   MessageSquare,
   Bot,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { DiscussionForum } from '@/components/DiscussionForum';
 import AIInstructor from '@/components/AIInstructor';
 import AvatarCourseGuide from '@/components/AvatarCourseGuide';
@@ -234,7 +233,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                     </Link>
                   ) : (
                     <div className="text-center py-3 bg-green-100 text-green-800 rounded-xl font-semibold">
-                      <CheckCircle className="w-5 h-5 inline mr-2" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       Course Completed!
                     </div>
                   )}
@@ -296,7 +295,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                               : 'bg-brand-blue-100 text-brand-blue-600'
                           }`}>
                             {isCompleted ? (
-                              <CheckCircle className="w-5 h-5" />
+                              <span className="text-slate-400 flex-shrink-0">•</span>
                             ) : lesson.content_type === 'video' ? (
                               <Video className="w-5 h-5" />
                             ) : (
@@ -386,19 +385,19 @@ export default async function CoursePage({ params }: { params: Params }) {
               <h3 className="font-semibold text-slate-900 mb-4">What You&apos;ll Learn</h3>
               <ul className="space-y-3">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-slate-600">Industry-relevant skills</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-slate-600">Hands-on practical experience</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-slate-600">Professional certification</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-slate-600">Career-ready knowledge</span>
                 </li>
               </ul>

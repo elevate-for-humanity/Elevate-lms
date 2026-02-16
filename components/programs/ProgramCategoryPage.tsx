@@ -6,7 +6,7 @@ import { useEffect, useState, useRef } from 'react';
 import { Breadcrumbs } from '@/components/seo/Breadcrumbs';
 import PathwayDisclosure from '@/components/PathwayDisclosure';
 import HeroAvatarGuide from '@/components/HeroAvatarGuide';
-import { Clock, ArrowRight, CheckCircle } from 'lucide-react';
+import { Clock, ArrowRight } from 'lucide-react';
 
 interface Program {
   title: string;
@@ -165,7 +165,7 @@ export default function ProgramCategoryPage({
             <div className="flex flex-wrap justify-center gap-4 sm:gap-8">
               {highlights.map((highlight, index) => (
                 <div key={index} className="flex items-center gap-2">
-                  <CheckCircle className={`w-5 h-5 ${colors.text}`} />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-slate-700 font-medium">{highlight}</span>
                 </div>
               ))}

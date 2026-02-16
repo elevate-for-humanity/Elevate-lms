@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Upload, FileText, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Upload, FileText, AlertCircle, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface UploadedFile {
@@ -174,7 +174,7 @@ export default function CosmetologyDocumentsPage() {
                     <p className="text-sm text-slate-500">{doc.description}</p>
                   </div>
                   {governmentId?.status === 'complete' && (
-                    <CheckCircle className="w-6 h-6 text-green-500" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   )}
                 </div>
 

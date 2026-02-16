@@ -2,7 +2,7 @@
 
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { BookOpen, Clock, Award, DollarSign, CheckCircle, Users } from 'lucide-react';
+import { BookOpen, Clock, Award, DollarSign, Users } from 'lucide-react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -71,40 +71,20 @@ export default function ProgramCoursesPage() {
         ]}
       />
       {/* Hero Banner */}
-      <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-        <img
-          src="/images/artlist/hero-training-6.jpg"
-          alt="Professional training courses and certification programs"
-          className="absolute inset-0 w-full h-full object-cover"
-        />
-        
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center text-white">
-          <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full mb-6">
-            <BookOpen className="w-5 h-5" />
-            <span className="text-sm font-bold uppercase tracking-wide">
-              {programName} Program
-            </span>
-          </div>
-          
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight mb-6">
-            Available Courses
-          </h1>
-          
-          <p className="text-xl md:text-2xl mb-8 max-w-3xl mx-auto">
-            Choose a course to start your learning journey. Get certified and advance your career.
-          </p>
-          
-          <div className="flex flex-wrap gap-4 justify-center">
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-3 rounded-full">
-              <span className="font-semibold">Industry-Recognized Credentials</span>
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <img src="/images/artlist/hero-training-6.jpg" alt="Professional training courses and certification programs" className="absolute inset-0 w-full h-full object-cover" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-6 text-center">
+            <div className="inline-flex items-center gap-2 bg-slate-700 px-4 py-2 rounded-full mb-4">
+              <BookOpen className="w-5 h-5 text-slate-300" />
+              <span className="text-sm font-bold uppercase tracking-wide text-slate-300">{programName} Program</span>
             </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-3 rounded-full">
-              <span className="font-semibold">Expert Instructors</span>
-            </div>
-            <div className="bg-white/10 backdrop-blur-md border border-white/20 px-6 py-3 rounded-full">
-              <span className="font-semibold">Job Placement Support</span>
-            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Available Courses</h1>
+            <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">
+              Choose a course to start your learning journey. Get certified and advance your career.
+            </p>
           </div>
         </div>
       </section>
@@ -255,7 +235,7 @@ export default function ProgramCoursesPage() {
                     >
                       {course.price === 0 ? (
                         <>
-                          <CheckCircle className="w-5 h-5" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                           Enroll Free
                         </>
                       ) : (

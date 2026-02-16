@@ -7,13 +7,12 @@ import {
   MapPin,
   Clock,
   DollarSign,
-  CheckCircle,
   ArrowRight,
   GraduationCap,
   Heart,
   Users,
   Star,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Careers | Curvature Body Sculpting | Join Our Team',
@@ -268,7 +267,7 @@ export default function CurvatureCareersPage() {
                       <ul className="space-y-1">
                         {position.requirements.map((req, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                            <CheckCircle className="w-4 h-4 text-gray-400 flex-shrink-0 mt-0.5" />
+                            <span className="text-slate-400 flex-shrink-0">•</span>
                             {req}
                           </li>
                         ))}
@@ -279,7 +278,7 @@ export default function CurvatureCareersPage() {
                       <ul className="space-y-1">
                         {position.benefits.map((benefit, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                            <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                            <span className="text-slate-400 flex-shrink-0">•</span>
                             {benefit}
                           </li>
                         ))}

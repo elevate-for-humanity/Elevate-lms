@@ -11,7 +11,6 @@ import {
   Award,
   TrendingUp,
   Clock,
-  CheckCircle,
   Video,
   MessageSquare,
   Briefcase,
@@ -28,7 +27,7 @@ import {
   HelpCircle,
   Info,
   AlertTriangle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import AnnouncementsFeed from './AnnouncementsFeed';
 import EnrollmentDashboard from './EnrollmentDashboard';
 import StudentProgressWidget from './StudentProgressWidget';
@@ -241,15 +240,15 @@ export default async function StudentPortalPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-white/90 mb-8">
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>24/7 Course Access</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Real-Time Grades</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Career Support</span>
             </div>
           </div>
@@ -440,7 +439,7 @@ export default async function StudentPortalPage() {
             Questions? Contact Us
           </h2>
           <p className="text-xl text-white/90 mb-8">
-            Join thousands of students building successful careers through our programs
+            Students are building successful careers through our programs
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

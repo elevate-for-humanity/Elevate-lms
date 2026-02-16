@@ -8,7 +8,6 @@ import {
   BadgeCheck,
   Calculator,
   Calendar,
-  CheckCircle,
   Clock,
   CreditCard,
   DollarSign,
@@ -20,7 +19,7 @@ import {
   Users,
   Zap,
   ArrowRight,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export default function SupersonicFastCashPage() {
   return (
@@ -33,85 +32,15 @@ export default function SupersonicFastCashPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[600px] flex items-center overflow-hidden">
-        {/* Image Background */}
-        <Image
-          src="/images/heroes-hq/tax-refund-hero.jpg"
-          alt="Tax Refund Services"
-          fill
-          className="object-cover"
-          priority
-        />
-        
-
-        {/* Animated background accents */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute top-20 left-10 w-72 h-72 bg-red-500/20 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-20 right-10 w-96 h-96 bg-brand-blue-500/20 rounded-full blur-3xl animate-pulse delay-1000" />
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes-hq/tax-refund-hero.jpg" alt="Tax Refund Services" fill className="object-cover" priority sizes="100vw" />
         </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="text-center">
-            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white uppercase tracking-tight leading-none mb-8">
-              Get Your Tax Refund
-              <span className="block text-transparent bg-clip-text bg-slate-700 animate-pulse">
-                TODAY!
-              </span>
-            </h1>
-
-            <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-100 mb-12">
-              Up to <span className="text-red-400">$7,500</span> in Just{' '}
-              <span className="text-red-400">15 Minutes</span>
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-6 justify-center mb-16">
-              <Link
-                href="/supersonic-fast-cash/apply"
-                className="group px-12 py-6 bg-slate-700 text-white text-xl sm:text-2xl font-black rounded-2xl hover:from-blue-700 hover:to-blue-800 shadow-2xl hover:shadow-blue-500/50 uppercase transform hover:scale-105 transition-all duration-300"
-              >
-                <span className="flex items-center justify-center gap-3">
-                  💵 Get Cash Now
-                  <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                </span>
-              </Link>
-              <Link
-                href="/supersonic-fast-cash/diy-taxes"
-                className="group px-12 py-6 bg-white text-brand-blue-900 text-xl sm:text-2xl font-black rounded-2xl hover:bg-gray-50 shadow-2xl uppercase transform hover:scale-105 transition-all duration-300"
-              >
-                <span className="flex flex-col items-center justify-center gap-1">
-                  <span className="flex items-center gap-3">
-                    <FileText className="w-6 h-6" />
-                    File Yourself
-                    <ArrowRight className="w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                  </span>
-                  <span className="text-xs font-normal normal-case text-gray-500">Secure login required</span>
-                </span>
-              </Link>
-            </div>
-
-            {/* Key Benefits */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-                <DollarSign className="w-12 h-12 mx-auto mb-3 text-green-400" />
-                <div className="font-black text-xl text-white mb-1">Up to $7,500</div>
-                <div className="text-gray-300 text-sm">Same Day Cash</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-                <Clock className="w-12 h-12 mx-auto mb-3 text-brand-blue-400" />
-                <div className="font-black text-xl text-white mb-1">15 Minutes</div>
-                <div className="text-gray-300 text-sm">Fast Approval</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-                <Shield className="w-12 h-12 mx-auto mb-3 text-brand-blue-400" />
-                <div className="font-black text-xl text-white mb-1">0% Interest</div>
-                <div className="text-gray-300 text-sm">No Hidden Fees</div>
-              </div>
-              <div className="bg-white/10 backdrop-blur-lg p-6 rounded-2xl text-center border border-white/20 hover:bg-white/20 transition-all transform hover:scale-105">
-                <BadgeCheck className="w-12 h-12 mx-auto mb-3 text-yellow-400" />
-                <div className="font-black text-xl text-white mb-1">PTIN-Credentialed</div>
-                <div className="text-gray-300 text-sm">Licensed Pros</div>
-              </div>
-            </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Get Your Tax Refund <span className="block text-transparent bg-clip-text bg-slate-700 animate-pulse"> TODAY! </span></h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Up to <span className="text-red-400">$7,500</span> in Just{' '} <span className="text-red-400">15 Minutes</span></p>
           </div>
         </div>
       </section>
@@ -382,7 +311,7 @@ export default function SupersonicFastCashPage() {
               href="/supersonic-fast-cash/training"
               className="flex items-center gap-3 bg-gray-50 p-4 rounded-xl hover:bg-gray-100 transition-colors"
             >
-              <BadgeCheck className="w-8 h-8 text-orange-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span className="font-semibold text-gray-900">Tax Training</span>
             </Link>
             <Link

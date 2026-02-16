@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { 
   Play, 
-  CheckCircle, 
+  
   Clock, 
   ChevronRight,
   Download,
@@ -100,7 +100,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
                     : 'bg-gray-700 text-white hover:bg-gray-600'
                 }`}
               >
-                <CheckCircle className="w-5 h-5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 {completedModules.includes(currentModule?.id) ? 'Completed' : 'Mark Complete'}
               </button>
 
@@ -153,7 +153,7 @@ export function CoursePlayer({ course, modules }: CoursePlayerProps) {
               >
                 <div className="flex-shrink-0 mt-0.5">
                   {completedModules.includes(module.id) ? (
-                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : (
                     <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center text-xs font-medium ${
                       currentModuleIndex === index ? 'border-white' : 'border-gray-500'

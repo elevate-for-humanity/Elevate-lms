@@ -4,11 +4,10 @@ import Link from 'next/link';
 import Image from 'next/image';
 import {
   ExternalLink,
-  CheckCircle,
   Clock,
   Award,
   ShoppingBag,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
@@ -194,7 +193,7 @@ export default async function NrfPage() {
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-8 h-8 text-brand-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <h3 className="text-lg font-semibold mb-2">Funded</h3>
               <p className="text-black">
@@ -241,7 +240,7 @@ export default async function NrfPage() {
                     <span>Certificate: {course.certificate}</span>
                   </div>
                   <div className="flex items-center gap-2 text-sm font-semibold text-brand-green-600">
-                    <CheckCircle className="w-4 h-4" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{course.price}</span>
                   </div>
                 </div>

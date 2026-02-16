@@ -110,15 +110,15 @@ export function BlockchainCredentialVerification() {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>Immutable records</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>Instant verification</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="text-green-600">✓</span>
+                  <span className="text-green-600">•</span>
                   <span>Globally accessible</span>
                 </div>
               </div>
@@ -170,7 +170,7 @@ export function BlockchainCredentialVerification() {
               {verificationResult && (
                 <div className="mt-8 p-6 bg-green-50 border-2 border-green-500 rounded-lg">
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="text-4xl text-2xl md:text-3xl lg:text-4xl">✅</div>
+                    <div className="text-4xl text-2xl md:text-3xl lg:text-4xl">•</div>
                     <div>
                       <h3 className="text-xl font-bold text-green-900">Credential Verified</h3>
                       <p className="text-sm text-green-700">This credential is authentic and valid</p>

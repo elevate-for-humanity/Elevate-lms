@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { CheckCircle, ArrowRight, Mail, Phone, Calendar } from 'lucide-react';
+import { ArrowRight, Mail, Phone, Calendar } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -70,7 +70,7 @@ export default async function ApplicationSuccessPage({
         "Thank you for your interest in partnering with us. We'll review your application and contact you soon.",
       nextSteps: [
         'Our team will review your organization details',
-        "We'll schedule a call to discuss partnership opportunities",
+        "We'll reach out to discuss partnership opportunities",
         'You will receive information about licensing options',
         'Access to partner portal upon approval',
       ],
@@ -121,7 +121,7 @@ export default async function ApplicationSuccessPage({
         {/* Success Icon */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
-            <CheckCircle className="w-12 h-12 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
             {currentRole.title}
@@ -195,7 +195,7 @@ export default async function ApplicationSuccessPage({
             className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
           >
             <Calendar className="w-5 h-5" />
-            Schedule a call with our team
+            Schedule a meeting with our team
           </Link>
         </div>
       </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { CheckCircle, AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2 } from 'lucide-react';
 
 export default function SupportForm() {
   const [subject, setSubject] = useState('');
@@ -40,7 +40,7 @@ export default function SupportForm() {
   if (status === 'success') {
     return (
       <div className="bg-white rounded-xl shadow-sm border p-8 text-center">
-        <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+        <span className="text-slate-400 flex-shrink-0">•</span>
         <h3 className="text-xl font-bold text-gray-900 mb-2">Request Submitted</h3>
         <p className="text-gray-600 mb-6">
           We've received your support request and will respond within 24 hours.

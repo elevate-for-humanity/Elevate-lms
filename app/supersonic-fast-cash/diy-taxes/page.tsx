@@ -10,8 +10,7 @@ import {
   Calculator,
   FileText,
   DollarSign,
-  CheckCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 const SOFTWARE_VERSION = '2026.1.0';
 
@@ -295,7 +294,7 @@ export default function DIYTaxesPage() {
                     }`}
                   >
                     {currentStep > step.id ? (
-                      <CheckCircle className="w-6 h-6" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
                       step.id
                     )}
@@ -541,7 +540,7 @@ export default function DIYTaxesPage() {
                         }`}
                       >
                         {taxReturn.filingStatus === status.value && (
-                          <CheckCircle className="w-4 h-4 text-white" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                         )}
                       </div>
                       <div>
@@ -878,7 +877,7 @@ export default function DIYTaxesPage() {
                       }`}
                     >
                       {taxReturn.deductionType === 'standard' && (
-                        <CheckCircle className="w-4 h-4 text-white" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       )}
                     </div>
                     <div>
@@ -912,7 +911,7 @@ export default function DIYTaxesPage() {
                       }`}
                     >
                       {taxReturn.deductionType === 'itemized' && (
-                        <CheckCircle className="w-4 h-4 text-white" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                       )}
                     </div>
                     <div>

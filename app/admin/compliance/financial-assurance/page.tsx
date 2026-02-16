@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { 
-  Shield, AlertTriangle, CheckCircle, Clock, FileText, 
+  Shield, AlertTriangle, Clock, FileText, 
   Calendar, DollarSign, Building2, Plus, Download, Bell
 } from 'lucide-react';
 
@@ -178,7 +178,7 @@ export default async function FinancialAssurancePage() {
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <div className="flex items-center gap-3">
               <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Active</p>
@@ -316,21 +316,21 @@ export default async function FinancialAssurancePage() {
             <div className="space-y-3">
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700">Indiana ETPL Surety Bond</span>
                 </div>
                 <span className="text-sm text-green-600 font-medium">Compliant</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700">General Liability Insurance</span>
                 </div>
                 <span className="text-sm text-green-600 font-medium">Compliant</span>
               </div>
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-500" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700">Workers Compensation</span>
                 </div>
                 <span className="text-sm text-green-600 font-medium">Compliant</span>

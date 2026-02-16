@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { GraduationCap, Users, Calendar, ArrowRight, CheckCircle } from 'lucide-react';
+import { GraduationCap, Users, Calendar, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 const programs = [
@@ -91,7 +91,7 @@ export default function RiseFoundationProgramsPage() {
                 <div className="flex flex-wrap gap-2">
                   {program.eligibility.map((req, idx) => (
                     <span key={idx} className="flex items-center gap-1 text-xs bg-gray-100 px-2 py-1 rounded">
-                      <CheckCircle className="w-3 h-3 text-green-500" /> {req}
+                      <span className="text-slate-400 flex-shrink-0">•</span> {req}
                     </span>
                   ))}
                 </div>

@@ -7,7 +7,6 @@ import Link from 'next/link';
 import {
   Users,
   FileText,
-  CheckCircle,
   Clock,
   TrendingUp,
   Award,
@@ -17,7 +16,7 @@ import {
   DollarSign,
   BarChart3,
   Shield,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'FERPA Portal | Student Privacy & Records Management',
@@ -191,15 +190,15 @@ export default async function FERPAPortal() {
               </div>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   View student records
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Update information
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Access history
                 </li>
               </ul>
@@ -224,15 +223,15 @@ export default async function FERPAPortal() {
               </div>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Student access requests
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Parent/guardian requests
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Third-party disclosures
                 </li>
               </ul>
@@ -261,15 +260,15 @@ export default async function FERPAPortal() {
               </div>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Compliance monitoring
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Privacy audits
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Training & policies
                 </li>
               </ul>
@@ -296,15 +295,15 @@ export default async function FERPAPortal() {
               </div>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Access logs
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Disclosure tracking
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Compliance metrics
                 </li>
               </ul>
@@ -331,15 +330,15 @@ export default async function FERPAPortal() {
               </div>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Consent forms
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Release forms
                 </li>
                 <li className="flex items-center gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Policy templates
                 </li>
               </ul>

@@ -4,13 +4,12 @@ import { useState } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import {
-  CheckCircle,
   XCircle,
   FileText,
   User,
   Calendar,
   AlertCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface Props {
   document: any;
@@ -179,9 +178,7 @@ export function DocumentReviewForm({ document, adminId }: Props) {
                   : 'border-slate-300 hover:border-green-600'
               }`}
             >
-              <CheckCircle
-                className={`w-6 h-6 ${action === 'approve' ? 'text-green-600' : 'text-slate-400'}`}
-              />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div className="text-left">
                 <p
                   className={`font-bold ${action === 'approve' ? 'text-green-900' : 'text-black'}`}

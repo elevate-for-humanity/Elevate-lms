@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowRight, CheckCircle, MapPin } from 'lucide-react';
+import { ArrowRight, MapPin } from 'lucide-react';
 import { StateConfig, getOtherStates } from '@/config/states';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -23,41 +23,26 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden">
-        <Image
-          src="/images/healthcare/healthcare-professional-portrait-1.jpg"
-          alt={`Career Training in ${state.name}`}
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-green-900/70" />
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
-          <div className="flex items-center gap-2 text-green-200 mb-4">
-            <MapPin className="w-5 h-5" />
-            <span className="text-sm font-medium uppercase tracking-wider">
-              Serving All of {state.name}
-            </span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-black text-white mb-6">
-            {state.careerTraining.headline}
-          </h1>
-          <p className="text-xl text-green-100 mb-8 max-w-3xl">
-            {state.careerTraining.description}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link 
-              href="/programs" 
-              className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-lg font-bold transition-colors"
-            >
-              Explore Programs <ArrowRight className="ml-2 w-5 h-5" />
-            </Link>
-            <Link 
-              href="/how-it-works" 
-              className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 text-white border-2 border-white/30 rounded-lg text-lg font-bold transition-colors"
-            >
-              How It Works
-            </Link>
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/healthcare/healthcare-professional-portrait-1.jpg" alt={`Career Training in ${state.name}`} fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <div className="flex items-center gap-2 text-green-300 mb-4 justify-center">
+              <MapPin className="w-5 h-5" />
+              <span className="text-sm font-medium uppercase tracking-wider">Serving All of {state.name}</span>
+            </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">{state.careerTraining.headline}</h1>
+            <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">{state.careerTraining.description}</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/programs" className="inline-flex items-center justify-center px-8 py-4 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-lg font-bold transition-colors">
+                Explore Programs <ArrowRight className="ml-2 w-5 h-5" />
+              </Link>
+              <Link href="/how-it-works" className="inline-flex items-center justify-center px-8 py-4 bg-slate-700 hover:bg-slate-600 text-white border border-slate-500 rounded-lg text-lg font-bold transition-colors">
+                How It Works
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -74,7 +59,7 @@ export default function StateCareerTrainingPage({ state }: StateCareerTrainingPa
           <div className="grid md:grid-cols-2 gap-6">
             {state.careerTraining.features.map((item) => (
               <div key={item} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{item}</span>
               </div>
             ))}

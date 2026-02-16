@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Shield, Database, Clock, CheckCircle } from 'lucide-react';
+import { Shield, Database, Clock } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Disaster Recovery Policy | Elevate for Humanity',
@@ -66,19 +66,19 @@ export default function DisasterRecoveryPage() {
         <div className="bg-gray-50 rounded-lg p-6 mb-6">
           <ul className="space-y-3 text-black m-0 list-none p-0">
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span><strong>Automated daily backups</strong> via Supabase infrastructure</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span><strong>Point-in-time recovery (PITR)</strong> capability</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span><strong>7-day retention</strong> for backup snapshots</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span><strong>Encrypted at rest</strong> using AES-256</span>
             </li>
           </ul>
@@ -88,15 +88,15 @@ export default function DisasterRecoveryPage() {
         <div className="bg-gray-50 rounded-lg p-6 mb-6">
           <ul className="space-y-3 text-black m-0 list-none p-0">
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span><strong>Version controlled</strong> in GitHub with full history</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span><strong>Immutable deployments</strong> via Netlify</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span><strong>Instant rollback</strong> to previous deployments</span>
             </li>
           </ul>
@@ -106,11 +106,11 @@ export default function DisasterRecoveryPage() {
         <div className="bg-gray-50 rounded-lg p-6 mb-6">
           <ul className="space-y-3 text-black m-0 list-none p-0">
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span><strong>Redundant storage</strong> via Supabase Storage (S3-compatible)</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span><strong>Multi-region replication</strong> for uploaded files</span>
             </li>
           </ul>
@@ -163,7 +163,7 @@ export default function DisasterRecoveryPage() {
 
         <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 mb-6">
           <div className="flex items-center gap-3 mb-3">
-            <CheckCircle className="w-6 h-6 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <h3 className="text-lg font-bold text-green-800 m-0">Latest DR Test: Passed</h3>
           </div>
           <p className="text-black mb-3">

@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { FileText, Upload, CheckCircle, Clock, XCircle } from 'lucide-react';
+import { FileText, Upload, Clock, XCircle } from 'lucide-react';
 
 export const metadata: Metadata = {
   robots: { index: false, follow: false },
@@ -60,7 +60,7 @@ export default async function ProgramHolderDocumentsPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'pending':
         return <Clock className="w-5 h-5 text-yellow-600" />;
       case 'rejected':

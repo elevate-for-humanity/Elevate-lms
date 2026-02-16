@@ -96,7 +96,7 @@ export function InstructorBio({
               <ul className="space-y-1">
                 {credentials.map((cred, idx) => (
                   <li key={idx} className="text-sm text-black flex items-start gap-2">
-                    <span className="text-emerald-500 mt-1">✓</span>
+                    <span className="text-emerald-500 mt-1">•</span>
                     {cred}
                   </li>
                 ))}

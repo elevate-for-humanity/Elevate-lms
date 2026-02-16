@@ -149,7 +149,7 @@ export default function StudentEngagementAnalytics() {
           </Card>
 
           <Card className="p-6   ">
-            <h3 className="font-bold mb-2">✓ Success</h3>
+            <h3 className="font-bold mb-2">• Success</h3>
             <p className="text-sm text-black">
               Engagement rate increased 3% this month. Video content is driving participation.
             </p>

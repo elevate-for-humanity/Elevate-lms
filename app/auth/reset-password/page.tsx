@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Lock, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { Lock, Eye, EyeOff } from 'lucide-react';
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState('');
@@ -66,7 +66,7 @@ export default function ResetPasswordPage() {
           <div className="bg-white rounded-lg shadow-lg p-8">
             {success ? (
               <div className="text-center">
-                <CheckCircle2 className="w-12 h-12 text-brand-green-600 mx-auto mb-4" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <h1 className="text-2xl font-bold text-gray-900 mb-2">Password Updated</h1>
                 <p className="text-gray-600 mb-6">
                   Your password has been changed. Redirecting to login...

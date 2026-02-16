@@ -8,7 +8,7 @@ import {
   Mic, 
   Sparkles, 
   Play, 
-  CheckCircle, 
+  
   Clock,
   ArrowRight,
   ArrowLeft,
@@ -231,7 +231,7 @@ export default function CreateCourseContentPage() {
                                 }`}
                               >
                                 {module.video_url ? (
-                                  <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                                  <span className="text-slate-400 flex-shrink-0">•</span>
                                 ) : (
                                   <div className="w-4 h-4 rounded-full border-2 border-gray-300 flex-shrink-0" />
                                 )}
@@ -272,7 +272,7 @@ export default function CreateCourseContentPage() {
 
                   {selectedModule.video_url && (
                     <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
-                      <CheckCircle className="w-6 h-6 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <div className="flex-1">
                         <p className="font-medium text-green-900">Video Generated</p>
                         <p className="text-sm text-green-700">This module has a video ready.</p>

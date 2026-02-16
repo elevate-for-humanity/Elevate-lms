@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { 
   DollarSign, Search, Filter, Plus, Building2, Calendar,
-  MoreVertical, TrendingUp, ArrowRight, CheckCircle
+  MoreVertical, TrendingUp, ArrowRight
 } from 'lucide-react';
 
 export const metadata: Metadata = {

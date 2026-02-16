@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'DOL Registered Apprenticeship Programs | Elevate for Humanity',
@@ -39,14 +39,7 @@ export default function DOLFundingPage() {
       {/* Hero */}
       <section className="relative h-[300px] sm:h-[380px] overflow-hidden">
         <Image src="/images/trades/program-welding-training.jpg" alt="DOL Registered Apprenticeship" fill className="object-cover" priority sizes="100vw" />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/25 to-transparent" />
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-6xl mx-auto px-4 w-full pb-10 sm:pb-14">
-            <p className="text-brand-blue-300 font-semibold text-sm mb-2 uppercase tracking-wide">U.S. Department of Labor</p>
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-2">Registered Apprenticeship</h1>
-            <p className="text-lg text-white/90 max-w-2xl">Earn while you learn. Get paid during training and graduate with a nationally recognized credential.</p>
-          </div>
-        </div>
+        
       </section>
 
       {/* What Is It */}
@@ -75,14 +68,14 @@ export default function DOLFundingPage() {
       {/* Benefits */}
       <section className="py-14 sm:py-20 bg-slate-50">
         <div className="max-w-6xl mx-auto px-4">
-          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-10">Apprenticeship Benefits</h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {benefits.map((b) => (
-              <div key={b} className="flex items-start gap-3 bg-white rounded-xl p-5 border border-slate-200">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <p className="text-slate-700">{b}</p>
-              </div>
-            ))}
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 text-center mb-6">Apprenticeship Benefits</h2>
+          <div className="max-w-3xl mx-auto bg-white rounded-xl p-6 border border-slate-200">
+            <p className="text-slate-700 leading-relaxed">
+              Registered Apprenticeships let you earn wages during training through paid on-the-job learning. 
+              You receive industry-recognized credentials upon completion that are portable and nationally recognized. 
+              Experienced professionals provide structured mentorship throughout the program. 
+              Funding may cover full tuition for eligible participants, and the apprenticeship creates a direct pathway to full-time employment with the training employer.
+            </p>
           </div>
         </div>
       </section>

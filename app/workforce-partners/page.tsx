@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Users, MapPin, Phone, CheckCircle, ArrowRight, Handshake, Award, FileText } from 'lucide-react';
+import { Users, MapPin, Phone, ArrowRight, Handshake, Award, FileText } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Workforce Partners | WorkOne & Community Organizations | Elevate For Humanity',
@@ -150,7 +150,7 @@ export default function WorkforcePartnersPage() {
                   'Real-time enrollment and progress updates',
                 ].map((item, i) => (
                   <li key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}

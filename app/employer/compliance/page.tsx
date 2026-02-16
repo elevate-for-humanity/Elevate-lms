@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
-  Shield, FileText, DollarSign, Users, CheckCircle, Download,
+  Shield, FileText, DollarSign, Users, Download,
   AlertCircle, Clock, ArrowRight, BarChart,
 } from 'lucide-react';
 
@@ -157,12 +157,12 @@ export default async function EmployerCompliancePage() {
           {/* Quick Checklist */}
           <div className="bg-white rounded-xl shadow-sm border p-6">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-green-600" /> Compliance Checklist
+              <span className="text-slate-400 flex-shrink-0">•</span> Compliance Checklist
             </h2>
             <div className="space-y-3">
               {quickChecklist.map((item, i) => (
                 <div key={i} className="flex items-start gap-3 p-2">
-                  <CheckCircle className="w-5 h-5 text-gray-300 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-sm text-gray-700">{item}</span>
                 </div>
               ))}

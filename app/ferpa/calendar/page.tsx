@@ -7,9 +7,8 @@ import {
   Calendar,
   Clock,
   AlertCircle,
-  CheckCircle,
   Plus,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Calendar | FERPA Portal',
@@ -213,7 +212,7 @@ export default async function FerpaCalendarPage() {
                             </div>
                           </div>
                           {event.status === 'completed' && (
-                            <CheckCircle className="w-5 h-5 text-green-600" />
+                            <span className="text-slate-400 flex-shrink-0">•</span>
                           )}
                         </div>
                       </div>

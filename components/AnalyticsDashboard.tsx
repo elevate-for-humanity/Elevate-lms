@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { TrendingUp, Users, BookOpen, Award, Clock, Target, DollarSign, CheckCircle } from 'lucide-react';
+import { TrendingUp, Users, BookOpen, Award, Clock, Target, DollarSign, CheckCircle, } from 'lucide-react';
 
 interface AnalyticsData {
   totalStudents: number;

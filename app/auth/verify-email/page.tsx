@@ -5,7 +5,7 @@ import React from 'react';
 
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Mail, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, AlertCircle } from 'lucide-react';
 
 export default function VerifyEmailPage() {
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>(
@@ -64,7 +64,7 @@ export default function VerifyEmailPage() {
 
         {status === 'sent' && (
           <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <div>
               <p className="text-sm font-medium text-green-900">
                 Verification email sent!

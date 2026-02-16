@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, GraduationCap, Briefcase, FileText, CheckCircle, ChevronRight, ChevronLeft, Upload } from 'lucide-react';
+import { User, GraduationCap, Briefcase, FileText, ChevronRight, ChevronLeft, Upload, CheckCircle, } from 'lucide-react';
 import EnrollmentDocumentStep from '@/components/enrollment/EnrollmentDocumentStep';
 
 interface Program {
@@ -153,7 +153,7 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
               currentStep > step.id ? 'bg-green-500 text-white' :
               currentStep === step.id ? 'bg-orange-500 text-white' : 'bg-gray-200 text-gray-500'
             }`}>
-              {currentStep > step.id ? <CheckCircle className="w-5 h-5" /> : <step.icon className="w-5 h-5" />}
+              {currentStep > step.id ? <span className="text-slate-400 flex-shrink-0">•</span> : <step.icon className="w-5 h-5" />}
             </div>
             <span className={`ml-2 text-sm hidden sm:block ${currentStep === step.id ? 'font-medium text-gray-900' : 'text-gray-500'}`}>
               {step.name}
@@ -348,7 +348,7 @@ export default function StudentAddForm({ programs, fundingTypes, staffId }: Prop
                   <ul className="text-sm text-gray-600 space-y-1">
                     {uploadedDocuments.map(doc => (
                       <li key={doc.id} className="flex items-center gap-2">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         {doc.file_name} ({doc.document_type})
                       </li>
                     ))}

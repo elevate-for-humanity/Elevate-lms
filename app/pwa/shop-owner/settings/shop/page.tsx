@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, Building2, MapPin, Phone, Mail, 
-  FileText, Save, Loader2, AlertCircle, CheckCircle
+  FileText, Save, Loader2, AlertCircle
 } from 'lucide-react';
 
 interface ShopDetails {
@@ -136,7 +136,7 @@ export default function ShopDetailsPage() {
 
         {success && (
           <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 flex items-start gap-3">
-            <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0 mt-0.5" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <p className="text-green-200 text-sm">Changes saved successfully</p>
           </div>
         )}

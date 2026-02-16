@@ -4,7 +4,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { 
-  Users, FileText, CheckCircle, Clock, Star,
+  Users, FileText, Clock, Star,
   AlertCircle, ChevronRight, Eye
 } from 'lucide-react';
 import PeerReviewSystem from '@/components/PeerReviewSystem';
@@ -77,7 +77,7 @@ export default async function PeerReviewPage() {
           <div className="bg-white rounded-xl p-6 shadow-sm border">
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <div className="text-2xl font-bold text-gray-900">0</div>
@@ -139,7 +139,7 @@ export default async function PeerReviewPage() {
             </div>
             <div className="p-6">
               <div className="text-center py-8">
-                <CheckCircle className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <h3 className="font-medium text-gray-900 mb-2">No submissions yet</h3>
                 <p className="text-gray-600 text-sm mb-4">
                   Submit assignments in your courses to receive peer feedback

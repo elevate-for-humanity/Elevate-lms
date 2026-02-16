@@ -1,5 +1,5 @@
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
-import { FileText, Download, CheckCircle, Clock } from 'lucide-react';
+import { FileText, Download, Clock } from 'lucide-react';
 
 const docs = [
   { name: 'OJT Agreement — Marcus Johnson', type: 'Contract', signed: true, date: 'Jun 1, 2025' },
@@ -27,7 +27,7 @@ export default function DemoDocumentsPage() {
             </div>
             <div className="flex items-center gap-3">
               {d.signed ? (
-                <span className="flex items-center gap-1 text-green-600 text-xs font-semibold"><CheckCircle className="w-3.5 h-3.5" /> Signed</span>
+                <span className="flex items-center gap-1 text-green-600 text-xs font-semibold"><span className="text-slate-400 flex-shrink-0">•</span> Signed</span>
               ) : (
                 <span className="flex items-center gap-1 text-amber-600 text-xs font-semibold"><Clock className="w-3.5 h-3.5" /> Awaiting</span>
               )}

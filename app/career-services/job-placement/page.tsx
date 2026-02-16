@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { Briefcase, Building2, TrendingUp, ArrowRight, Users, Target, Award, Search, Handshake, CheckCircle } from 'lucide-react';
+import { Briefcase, Building2, TrendingUp, ArrowRight, Users, Target, Award, Search, Handshake } from 'lucide-react';
 import { CareerHero } from '../components/CareerHero';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -60,23 +60,9 @@ export default function JobPlacementPage() {
               <Briefcase className="w-6 h-6 text-brand-orange-600" />
             </div>
             <h3 className="text-xl font-bold text-black mb-3">Direct Employer Connections</h3>
-            <p className="text-gray-600 mb-4">
-              Access our employer network actively seeking qualified candidates.
+            <p className="text-gray-600">
+              We maintain relationships with pre-vetted hiring partners across Central Indiana. Our graduates get access to exclusive job postings and direct referrals to hiring managers — not just online applications. Employers in our network have agreed to interview qualified Elevate graduates as a priority.
             </p>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Pre-vetted hiring partners</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Exclusive job postings</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Direct referrals to hiring managers</span>
-              </li>
-            </ul>
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-orange-600 transition">
@@ -84,23 +70,9 @@ export default function JobPlacementPage() {
               <Target className="w-6 h-6 text-brand-blue-600" />
             </div>
             <h3 className="text-xl font-bold text-black mb-3">Personalized Job Matching</h3>
-            <p className="text-gray-600 mb-4">
-              We match your skills, goals, and preferences to the right opportunities.
+            <p className="text-gray-600">
+              Your career coach reviews your skills, certifications, location preferences, schedule needs, and long-term career goals. We then match you with open positions that fit — not just any job, but the right job for your situation and ambitions.
             </p>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Skills-based matching</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Location and schedule preferences</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Career goals alignment</span>
-              </li>
-            </ul>
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-brand-orange-600 transition">
@@ -108,23 +80,9 @@ export default function JobPlacementPage() {
               <Handshake className="w-6 h-6 text-brand-green-600" />
             </div>
             <h3 className="text-xl font-bold text-black mb-3">Interview Coordination</h3>
-            <p className="text-gray-600 mb-4">
-              We facilitate connections and prepare you for success.
+            <p className="text-gray-600">
+              We handle interview scheduling with employers, prepare you with company-specific coaching so you know what to expect, and follow up with the employer after your interview. If you need transportation or professional attire, we can help with that too.
             </p>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Interview scheduling assistance</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Company-specific preparation</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Follow-up support</span>
-              </li>
-            </ul>
           </div>
         </div>
 
@@ -334,90 +292,40 @@ export default function JobPlacementPage() {
         <div className="grid md:grid-cols-2 gap-8">
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-black mb-4">Employer Relationships</h3>
-            <p className="text-gray-600 mb-4">
-              We don't just post job listings. We build long-term partnerships with employers 
-              who understand our training and trust our graduates.
+            <p className="text-gray-600">
+              We don&apos;t just post job listings. We build long-term partnerships with employers 
+              who understand our training and trust our graduates. Our team meets regularly with 
+              hiring managers to understand their needs, workplace culture, and open positions. 
+              This means when we refer you, the employer already knows the quality of training you received.
             </p>
-            <ul className="space-y-2 text-gray-600">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Regular employer engagement and feedback</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Understanding of employer needs and culture</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Direct access to hiring managers</span>
-              </li>
-            </ul>
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-black mb-4">Personalized Matching</h3>
-            <p className="text-gray-600 mb-4">
-              We take time to understand your unique situation, goals, and preferences to 
-              find opportunities that truly fit.
+            <p className="text-gray-600">
+              Every graduate gets one-on-one career coaching. We assess your skills, interests, 
+              transportation situation, schedule constraints, and salary expectations. Then we 
+              match you with positions that actually work for your life — not just any open role.
             </p>
-            <ul className="space-y-2 text-gray-600">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>One-on-one career coaching</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Skills and interest assessment</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Location and schedule flexibility</span>
-              </li>
-            </ul>
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-black mb-4">Ongoing Support</h3>
-            <p className="text-gray-600 mb-4">
-              Our support doesn't end when you get hired. We stay connected to ensure your 
-              success and help you advance in your career.
+            <p className="text-gray-600">
+              Our support doesn&apos;t end when you get hired. We do 90-day check-ins after placement 
+              to make sure things are going well. If you need help advancing, switching roles, or 
+              negotiating a raise, our career coaches are available to alumni at no cost — for life.
             </p>
-            <ul className="space-y-2 text-gray-600">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>90-day check-ins after placement</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Career advancement coaching</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Lifetime alumni services</span>
-              </li>
-            </ul>
           </div>
 
           <div className="bg-white border-2 border-gray-200 rounded-2xl p-8">
             <h3 className="text-2xl font-bold text-black mb-4">No Cost to You</h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600">
               All job placement services are completely free for our students and alumni. 
-              No fees, no commissions, no hidden costs.
+              There are no placement fees, no commissions, and no hidden costs. You can use 
+              our job search support as many times as you need — whether you are looking for 
+              your first job after training or exploring new opportunities years later.
             </p>
-            <ul className="space-y-2 text-gray-600">
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Free for all graduates</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>No placement fees or commissions</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                <span>Unlimited job search support</span>
-              </li>
-            </ul>
           </div>
         </div>
       </section>

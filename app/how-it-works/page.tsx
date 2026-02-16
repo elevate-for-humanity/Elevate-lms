@@ -24,7 +24,6 @@ export default function HowItWorksPage() {
       {/* Hero */}
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
         <Image src="/hero-images/how-it-works-hero.jpg" alt="How Elevate works" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
             <h1 className="text-2xl sm:text-4xl font-bold text-white mb-2">How It Works</h1>

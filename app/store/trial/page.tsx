@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Clock, Shield, CheckCircle, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowRight, Clock, Shield, Loader2, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { DemoTrialFunnelEvents } from '@/lib/analytics/events';
 
@@ -76,7 +76,7 @@ export default function TrialPage() {
         <section className="py-16 sm:py-20">
           <div className="max-w-2xl mx-auto px-4 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-10 h-10 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h1 className="text-3xl font-black text-slate-900 mb-3">Your trial is live.</h1>
             <p className="text-lg text-slate-800 mb-2">

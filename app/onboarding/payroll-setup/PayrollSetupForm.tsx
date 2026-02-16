@@ -12,7 +12,7 @@ import {
   Upload,
   CheckCircle2,
   AlertCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface PayrollSetupFormProps {
   user: any;
@@ -116,7 +116,7 @@ export default function PayrollSetupForm({
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8 text-center">
-          <CheckCircle2 className="w-16 h-16 text-brand-green-600 mx-auto mb-4" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <h2 className="text-2xl font-bold text-black mb-2">
             Payroll Setup Complete!
           </h2>
@@ -312,7 +312,7 @@ export default function PayrollSetupForm({
             >
               {taxIdUploaded ? (
                 <div className="flex items-center justify-center gap-3 text-green-700">
-                  <CheckCircle2 className="w-6 h-6" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="font-medium">W-9 Uploaded</span>
                 </div>
               ) : (

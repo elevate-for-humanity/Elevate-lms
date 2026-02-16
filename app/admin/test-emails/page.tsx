@@ -5,7 +5,7 @@ import React from 'react';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Mail, Send, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, Send, AlertCircle } from 'lucide-react';
 
 export default function TestEmailsPage() {
   const [loading, setLoading] = useState(false);
@@ -82,7 +82,7 @@ export default function TestEmailsPage() {
           >
             <div className="flex items-center gap-2">
               {result.success ? (
-                <CheckCircle className="w-5 h-5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               ) : (
                 <AlertCircle className="w-5 h-5" />
               )}
@@ -186,7 +186,7 @@ export default function TestEmailsPage() {
           </h2>
           <div className="space-y-3 text-sm">
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded">
-              <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-black">
                   Student Application
@@ -197,7 +197,7 @@ export default function TestEmailsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded">
-              <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-black">
                   Shop Partner Application
@@ -208,7 +208,7 @@ export default function TestEmailsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded">
-              <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-black">Contact Form</div>
                 <div className="text-black">
@@ -217,7 +217,7 @@ export default function TestEmailsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded">
-              <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-black">License Request</div>
                 <div className="text-black">
@@ -226,7 +226,7 @@ export default function TestEmailsPage() {
               </div>
             </div>
             <div className="flex items-start gap-3 p-3 bg-gray-50 rounded">
-              <CheckCircle className="w-5 h-5 text-brand-green-600 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-black">Partner Inquiry</div>
                 <div className="text-black">

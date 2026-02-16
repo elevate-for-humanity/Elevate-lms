@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
 import { DEMO_STUDENTS } from '@/lib/demo/sandbox-data';
-import { Search, CheckCircle, XCircle, Eye, ChevronDown, ChevronUp, Filter } from 'lucide-react';
+import { Search, XCircle, Eye, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 
 const applicants = DEMO_STUDENTS.filter((s: any) => s.status === 'pending' || s.status === 'active').map((s: any, i: number) => ({
   ...s,
@@ -139,7 +139,7 @@ export default function DemoApplicationsPage() {
                     onClick={() => handleAction(s.id, 'approved', s.full_name)}
                     className="inline-flex items-center gap-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold px-4 py-2 rounded-lg transition"
                   >
-                    <CheckCircle className="w-3.5 h-3.5" /> Approve & Enroll
+                    <span className="text-slate-400 flex-shrink-0">•</span> Approve & Enroll
                   </button>
                   <button
                     onClick={() => handleAction(s.id, 'rejected', s.full_name)}

@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { FundingBadge } from './FundingBadge';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';
 import HeroAvatarGuide from '@/components/HeroAvatarGuide';
-import { ArrowRight, Briefcase, TrendingUp, Clock, DollarSign, CheckCircle } from 'lucide-react';
+import { ArrowRight, Briefcase, TrendingUp, Clock, DollarSign } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export type OutcomeItem = string | { title: string; description: string; image?: string };
@@ -181,19 +181,19 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Fill out basic information and career goals</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Upload ID and proof of residency</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Schedule your enrollment appointment</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Get approved within 24-48 hours</span>
                   </li>
                 </ul>
@@ -218,19 +218,19 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Attend instructor-led classroom sessions</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Complete hands-on clinical practice</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Pass skills assessments and exams</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-purple-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Earn your state certification</span>
                   </li>
                 </ul>
@@ -255,19 +255,19 @@ export function ProgramPageTemplate({ program }: ProgramPageTemplateProps) {
                 </p>
                 <ul className="space-y-3">
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Professional resume and cover letter</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Mock interviews and coaching</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">Direct introductions to hiring employers</span>
                   </li>
                   <li className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">90-day post-employment support</span>
                   </li>
                 </ul>

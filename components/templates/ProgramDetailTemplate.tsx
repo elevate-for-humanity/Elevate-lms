@@ -4,7 +4,7 @@ import { HeroSection } from '@/components/sections/HeroSection';
 import { AtAGlanceSection } from '@/components/sections/AtAGlanceSection';
 import { WhoThisIsForSection } from '@/components/sections/WhoThisIsForSection';
 import { CTASection } from '@/components/sections/CTASection';
-import { CheckCircle, Award, Briefcase } from 'lucide-react';
+import { Award, Briefcase } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export interface ProgramDetailData {
@@ -99,7 +99,7 @@ export function ProgramDetailTemplate({ data }: ProgramDetailTemplateProps) {
               <ul className="space-y-4">
                 {data.highlights.map((highlight, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-black">{highlight}</span>
                   </li>
                 ))}
@@ -123,7 +123,7 @@ export function ProgramDetailTemplate({ data }: ProgramDetailTemplateProps) {
               <ul className="space-y-4">
                 {data.whatYouLearn.map((item, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-black">{item}</span>
                   </li>
                 ))}
@@ -145,7 +145,7 @@ export function ProgramDetailTemplate({ data }: ProgramDetailTemplateProps) {
               <ul className="space-y-4">
                 {data.outcomes.map((outcome, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-black">{outcome}</span>
                   </li>
                 ))}
@@ -171,7 +171,7 @@ export function ProgramDetailTemplate({ data }: ProgramDetailTemplateProps) {
               <ul className="space-y-4">
                 {data.fundingOptions.map((option, index) => (
                   <li key={index} className="flex items-start gap-3">
-                    <CheckCircle className="w-6 h-6 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-black">{option}</span>
                   </li>
                 ))}

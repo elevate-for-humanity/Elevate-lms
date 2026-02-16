@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { StateConfig, getOtherStates } from '@/config/states';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Heart, Briefcase, DollarSign, Home, Users, Bus, ArrowRight, CheckCircle, Phone } from 'lucide-react';
+import { Heart, Briefcase, DollarSign, Home, Users, Bus, ArrowRight, Phone } from 'lucide-react';
 
 interface StateCommunityServicesPageProps {
   state: StateConfig;
@@ -32,24 +32,19 @@ export default function StateCommunityServicesPage({ state }: StateCommunityServ
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden">
-        <Image src="/hero-images/services-hero.jpg" alt={`Community Services in ${state.name}`} fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-green-900/70" />
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
-          <span className="text-green-200 font-medium text-sm uppercase tracking-wider">Community Services</span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 mt-2">
-            {state.communityServices.headline}
-          </h1>
-          <p className="text-xl text-green-100 max-w-2xl mb-8">
-            {state.communityServices.description}
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/contact" className="px-8 py-4 bg-white text-green-700 font-bold rounded-lg hover:bg-green-50 transition">
-              Get Help Now
-            </Link>
-            <Link href={`/career-training-${state.slug}`} className="px-8 py-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-400 transition">
-              Career Training
-            </Link>
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/hero-images/services-hero.jpg" alt={`Community Services in ${state.name}`} fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <span className="text-green-300 font-medium text-sm uppercase tracking-wider">Community Services</span>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3 mt-2">{state.communityServices.headline}</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto mb-6">{state.communityServices.description}</p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link href="/contact" className="px-8 py-4 bg-white text-green-700 font-bold rounded-lg hover:bg-green-50 transition">Get Help Now</Link>
+              <Link href={`/career-training-${state.slug}`} className="px-8 py-4 bg-green-600 text-white font-bold rounded-lg hover:bg-green-500 transition">Career Training</Link>
+            </div>
           </div>
         </div>
       </section>
@@ -84,7 +79,7 @@ export default function StateCommunityServicesPage({ state }: StateCommunityServ
           <div className="flex flex-wrap gap-3 justify-center">
             {state.majorCities.map((city) => (
               <span key={city} className="flex items-center gap-2 px-4 py-2 bg-white rounded-full text-gray-700 text-sm font-medium shadow-sm">
-                <CheckCircle className="w-4 h-4 text-green-600" /> {city}
+                <span className="text-slate-400 flex-shrink-0">•</span> {city}
               </span>
             ))}
           </div>

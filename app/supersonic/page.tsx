@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Zap, Rocket, Target, TrendingUp, Clock, Award, ArrowRight, CheckCircle,
+import { Zap, Rocket, Target, TrendingUp, Clock, Award, ArrowRight,
   Phone
 } from 'lucide-react';
 
@@ -109,13 +109,13 @@ export default function SupersonicPage() {
               </div>
               <ul className="space-y-2 mb-6">
                 <li className="flex items-center gap-2 text-gray-300 text-sm">
-                  <CheckCircle className="w-4 h-4 text-green-400" /> Full curriculum coverage
+                  <span className="text-slate-400 flex-shrink-0">•</span> Full curriculum coverage
                 </li>
                 <li className="flex items-center gap-2 text-gray-300 text-sm">
-                  <CheckCircle className="w-4 h-4 text-green-400" /> Hands-on training included
+                  <span className="text-slate-400 flex-shrink-0">•</span> Hands-on training included
                 </li>
                 <li className="flex items-center gap-2 text-gray-300 text-sm">
-                  <CheckCircle className="w-4 h-4 text-green-400" /> Job placement assistance
+                  <span className="text-slate-400 flex-shrink-0">•</span> Job placement assistance
                 </li>
               </ul>
               <Link href={`/supersonic/programs/${program.name.toLowerCase().replace(' ', '-')}`} className="block text-center bg-brand-blue-600 text-white py-3 rounded-lg hover:bg-brand-blue-700 transition-colors">

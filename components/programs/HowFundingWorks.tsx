@@ -21,16 +21,16 @@ export function HowFundingWorks({ programSlug }: HowFundingWorksProps) {
         <p className="text-zinc-900 font-semibold mb-3">You will:</p>
         <ul className="space-y-2 text-zinc-700">
           <li className="flex items-start">
-            <span className="text-green-600 font-bold mr-2">✓</span>
+            <span className="text-green-600 font-bold mr-2">•</span>
             Submit an inquiry to let us know your goals
           </li>
           <li className="flex items-start">
-            <span className="text-green-600 font-bold mr-2">✓</span>
+            <span className="text-green-600 font-bold mr-2">•</span>
             Meet with a WorkOne advisor to determine funding eligibility (WIOA,
             WRG, JRI, Apprenticeship, or other)
           </li>
           <li className="flex items-start">
-            <span className="text-green-600 font-bold mr-2">✓</span>
+            <span className="text-green-600 font-bold mr-2">•</span>
             Return to complete your checklist so we can finalize enrollment
           </li>
         </ul>

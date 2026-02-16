@@ -36,32 +36,6 @@ export default function HealthcarePage() {
 {/* Hero Section */}
       <section className="relative h-[450px] md:h-[500px] w-full overflow-hidden">
         <Image src="/images/healthcare/cpr-group-training-session.jpg" alt="Healthcare Programs" width={800} height={600} className="absolute inset-0 w-full h-full object-cover" quality={85} loading="lazy" />
-        
-
-        <div className="absolute inset-0 flex items-center justify-center text-center px-4">
-          <div className="max-w-4xl w-full">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-white uppercase tracking-wide">
-              HEALTHCARE PROGRAMS
-            </h1>
-            <p className="text-xl sm:text-2xl md:text-3xl font-semibold text-white mb-8">
-              Start Your Career in Healthcare - Funded Training
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center max-w-md sm:max-w-none mx-auto">
-              <Link
-                href="/apply"
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-md bg-orange-500 px-8 py-4 text-lg font-bold text-white shadow-lg hover:bg-orange-600 transition-all transform hover:scale-105 uppercase"
-              >
-                Apply Now
-              </Link>
-              <Link
-                href="/contact"
-                className="w-full sm:w-auto inline-flex items-center justify-center rounded-md border-2 border-white bg-transparent px-8 py-4 text-lg font-bold text-white hover:bg-white hover:text-red-900 transition-all transform hover:scale-105 uppercase"
-              >
-                Learn More
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Programs Grid */}
@@ -134,19 +108,7 @@ export default function HealthcarePage() {
               <ul className="space-y-4">
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>
                     <h3 className="font-bold text-black mb-1">
@@ -160,19 +122,7 @@ export default function HealthcarePage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>
                     <h3 className="font-bold text-black mb-1">Good Pay</h3>
@@ -183,19 +133,7 @@ export default function HealthcarePage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>
                     <h3 className="font-bold text-black mb-1">
@@ -209,19 +147,7 @@ export default function HealthcarePage() {
                 </li>
                 <li className="flex items-start gap-3">
                   <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <svg
-                      className="w-4 h-4 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   </div>
                   <div>
                     <h3 className="font-bold text-black mb-1">

@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, AlertCircle, XCircle } from 'lucide-react';
+import { Clock, AlertCircle, XCircle, CheckCircle, } from 'lucide-react';
 
 type MOUStatusBadgeProps = {
   status: string;
@@ -93,7 +93,7 @@ export function MOUStatusAlert({
   if (status === 'fully_executed') {
     return (
       <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-        <CheckCircle2 className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
+        <span className="text-slate-400 flex-shrink-0">•</span>
         <div>
           <p className="font-medium text-green-900">MOU Fully Executed</p>
           <p className="text-sm text-green-700 mt-1">

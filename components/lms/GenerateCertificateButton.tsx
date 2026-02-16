@@ -90,7 +90,7 @@ export function GenerateCertificateButton({
       )}
       {message && (
         <div className="elevate-card bg-green-50 border-green-200 p-3">
-          <p className="text-sm text-green-800 font-medium">✓ {message}</p>
+          <p className="text-sm text-green-800 font-medium">• {message}</p>
         </div>
       )}
       {error && (

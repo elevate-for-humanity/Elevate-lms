@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Link from 'next/link';
 import { 
   Heart, Users, Shield, Target, ArrowRight, 
-  CheckCircle, GraduationCap 
+  GraduationCap 
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -98,7 +98,7 @@ export default function MissionPage() {
             <ul className="space-y-3">
               {populations.map((pop, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-slate-700">{pop}</span>
                 </li>
               ))}

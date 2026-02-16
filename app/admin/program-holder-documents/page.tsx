@@ -7,13 +7,12 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 import {
   FileText,
-  CheckCircle,
   XCircle,
   Clock,
   Download,
   User,
   Building2,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface Document {
@@ -128,7 +127,7 @@ export default function AdminProgramHolderDocuments() {
     if (doc.approved) {
       return (
         <span className="inline-flex items-center gap-1 px-3 py-2 rounded-full text-sm font-medium bg-green-100 text-green-800">
-          <CheckCircle size={16} />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           Approved
         </span>
       );
@@ -315,7 +314,7 @@ export default function AdminProgramHolderDocuments() {
                           disabled={processing}
                           className="px-4 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition flex items-center gap-2"
                         >
-                          <CheckCircle size={16} />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                           Approve
                         </button>
                         <button

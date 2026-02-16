@@ -47,27 +47,27 @@ export default function Pathways() {
           <h3 className="text-2xl font-bold text-black mb-6">What You Get</h3>
           <div className="grid md:grid-cols-2 gap-6 text-lg text-black">
             <div className="flex items-start gap-3">
-              <span className="text-green-600 font-bold text-xl">✓</span>
+              <span className="text-green-600 font-bold text-xl">•</span>
               <span>Training programs tied to real careers with employer demand</span>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-green-600 font-bold text-xl">✓</span>
+              <span className="text-green-600 font-bold text-xl">•</span>
               <span>Industry-recognized credentials employers trust</span>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-green-600 font-bold text-xl">✓</span>
+              <span className="text-green-600 font-bold text-xl">•</span>
               <span>Funding options that reduce or eliminate tuition costs</span>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-green-600 font-bold text-xl">✓</span>
+              <span className="text-green-600 font-bold text-xl">•</span>
               <span>Clear steps from enrollment to certification to employment</span>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-green-600 font-bold text-xl">✓</span>
+              <span className="text-green-600 font-bold text-xl">•</span>
               <span>Support and guidance throughout your training journey</span>
             </div>
             <div className="flex items-start gap-3">
-              <span className="text-green-600 font-bold text-xl">✓</span>
+              <span className="text-green-600 font-bold text-xl">•</span>
               <span>Connection to job opportunities after completion</span>
             </div>
           </div>

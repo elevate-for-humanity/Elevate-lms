@@ -7,11 +7,10 @@ import {
   ExternalLink, 
   ArrowRight, 
   AlertCircle,
-  CheckCircle,
   Clock,
   GraduationCap,
-  Building2
-} from 'lucide-react';
+  Building2,
+CheckCircle, } from 'lucide-react';
 
 type Enrollment = {
   source_table: string;
@@ -84,7 +83,7 @@ export default function EnrollmentDashboard() {
   const getStatusIcon = (status: string) => {
     switch (status.toLowerCase()) {
       case 'completed':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
+        return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'active':
       case 'enrolled':
       case 'in_progress':

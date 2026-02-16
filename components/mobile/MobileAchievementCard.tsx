@@ -95,7 +95,7 @@ export default function MobileAchievementCard({
       {/* Unlocked Badge */}
       {unlocked && (
         <div className="absolute top-2 right-2 px-2 py-2 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full">
-          ✓ Unlocked
+          • Unlocked
         </div>
       )}
     </div>

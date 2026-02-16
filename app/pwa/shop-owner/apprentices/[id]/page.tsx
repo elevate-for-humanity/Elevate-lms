@@ -4,9 +4,9 @@ import { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { 
   ArrowLeft, Clock, TrendingUp, Award, Calendar,
-  Mail, Phone, AlertTriangle, CheckCircle, Loader2, AlertCircle,
-  Building2, Users, FileText
-} from 'lucide-react';
+  Mail, Phone, AlertTriangle, Loader2, AlertCircle,
+  Building2, Users, FileText,
+CheckCircle, } from 'lucide-react';
 
 interface WeeklyData {
   weekEnding: string;
@@ -246,7 +246,7 @@ export default function ApprenticeDetailPage({ params }: { params: Promise<{ id:
                     </p>
                   </div>
                   {milestone.achieved && (
-                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   )}
                 </div>
               </div>

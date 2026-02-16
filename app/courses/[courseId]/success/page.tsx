@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { generateMetadata } from '@/lib/seo/metadata';
 import Link from 'next/link';
-import { CheckCircle, Play, BookOpen } from 'lucide-react';
+import { Play, BookOpen } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +42,7 @@ export default async function EnrollmentSuccessPage({
         {/* Success Message */}
         <div className="bg-white rounded-2xl border-2 border-green-500 p-8 shadow-xl text-center">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
-            <CheckCircle className="h-12 w-12 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           
           <h1 className="text-4xl font-black text-black mb-4">

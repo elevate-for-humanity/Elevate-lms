@@ -10,11 +10,10 @@ import {
   Mail,
   Phone,
   FileText,
-  CheckCircle,
   ArrowLeft,
   Upload,
   Loader2,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 const positions = [
   { id: 'body-sculpting-tech', name: 'Body Sculpting Technician' },
@@ -52,7 +51,7 @@ function ApplyPageContent() {
       <div className="min-h-screen bg-pink-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl p-8 max-w-md w-full text-center shadow-xl">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-2xl font-bold mb-4">Application Submitted!</h1>
           <p className="text-gray-600 mb-6">

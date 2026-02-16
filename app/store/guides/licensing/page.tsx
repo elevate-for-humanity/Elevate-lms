@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ArrowRight, AlertTriangle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Licensing Guide | Elevate LMS Platform',
@@ -75,15 +75,15 @@ export default function LicensingGuidePage() {
             </p>
             <ul className="mt-4 space-y-2">
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Enter organization details</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Accept license agreement</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Complete payment</span>
               </li>
             </ul>
@@ -100,15 +100,15 @@ export default function LicensingGuidePage() {
             </p>
             <ul className="mt-4 space-y-2">
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Admin account credentials</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Organization subdomain (yourorg.elevateforhumanity.org)</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Onboarding checklist</span>
               </li>
             </ul>
@@ -141,15 +141,15 @@ export default function LicensingGuidePage() {
             </p>
             <ul className="mt-4 space-y-2">
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Create courses from scratch</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Import existing content (SCORM, video, documents)</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Use our course templates</span>
               </li>
             </ul>
@@ -214,19 +214,19 @@ export default function LicensingGuidePage() {
             </p>
             <ul className="mt-4 space-y-2">
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Email support (24-48 hour response)</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>99.9% uptime SLA</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Automatic security updates</span>
               </li>
               <li className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>Daily backups</span>
               </li>
             </ul>

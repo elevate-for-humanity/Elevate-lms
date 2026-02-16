@@ -3,7 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import {
-  Building, BarChart, Users, FileText, CheckCircle, ArrowRight,
+  Building, BarChart, Users, FileText, ArrowRight,
   Shield, Globe, Clock, Target,
 } from 'lucide-react';
 
@@ -48,22 +48,15 @@ export default function WorkforceBoardsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[450px] flex items-center overflow-hidden">
-        <Image src="/hero-images/wioa-hero.jpg" alt="Workforce Board Solutions" fill sizes="100vw" className="object-cover" priority />
-        <div className="absolute inset-0 bg-brand-blue-900/75" />
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
-          <span className="text-brand-blue-200 font-medium text-sm uppercase tracking-wider">Platform Solutions</span>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 mt-2">Workforce Board Solutions</h1>
-          <p className="text-xl text-brand-blue-100 max-w-2xl mb-8">
-            Streamline WIOA compliance, maximize participant outcomes, and simplify DOL reporting.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/contact" className="px-8 py-4 bg-white text-brand-blue-700 font-bold rounded-lg hover:bg-brand-blue-50 transition">
-              Request Demo
-            </Link>
-            <Link href="/store/compliance/wioa" className="px-8 py-4 bg-brand-blue-500 text-white font-bold rounded-lg hover:bg-brand-blue-400 transition">
-              View WIOA Tools
-            </Link>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/hero-images/wioa-hero.jpg" alt="Workforce Board Solutions" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Board Solutions</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Streamline WIOA compliance, maximize participant outcomes, and simplify DOL reporting.</p>
           </div>
         </div>
       </section>
@@ -74,7 +67,7 @@ export default function WorkforceBoardsPage() {
           <div className="flex flex-wrap gap-4 justify-center">
             {['WIOA Compliant', 'DOL Reporting', 'FERPA Secure', 'Real-time Analytics', 'Audit-Ready'].map((item, i) => (
               <span key={i} className="flex items-center gap-2 px-4 py-2 bg-white rounded-full text-brand-blue-700 text-sm font-medium shadow-sm">
-                <CheckCircle className="w-4 h-4" /> {item}
+                <span className="text-slate-400 flex-shrink-0">•</span> {item}
               </span>
             ))}
           </div>
@@ -118,7 +111,7 @@ export default function WorkforceBoardsPage() {
                 <div className="space-y-2">
                   {area.items.map((item, j) => (
                     <div key={j} className="flex items-center gap-2">
-                      <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-gray-700 text-sm">{item}</span>
                     </div>
                   ))}
@@ -148,7 +141,7 @@ export default function WorkforceBoardsPage() {
                   'Budget monitoring and fiscal reporting',
                 ].map((item, i) => (
                   <div key={i} className="flex items-start gap-3">
-                    <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span className="text-gray-700">{item}</span>
                   </div>
                 ))}

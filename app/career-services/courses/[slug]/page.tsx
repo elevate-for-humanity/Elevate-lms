@@ -7,7 +7,7 @@ import {
   Play, 
   Clock, 
   Award, 
-  CheckCircle, 
+  
   Star, 
   Users,
   Download,
@@ -172,7 +172,7 @@ export default async function CourseDetailPage({
           <div className="grid md:grid-cols-2 gap-4">
             {sortedFeatures.map((feature: any, index: number) => (
               <div key={index} className="flex items-start gap-3 bg-white p-4 rounded-lg">
-                <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{feature.feature}</span>
               </div>
             ))}
@@ -260,7 +260,7 @@ export default async function CourseDetailPage({
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Improve Your Career?</h2>
           <p className="text-brand-blue-100 mb-8">
-            Join thousands of professionals who have accelerated their careers with our courses.
+            Professionals across Indiana have accelerated their careers with our courses.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

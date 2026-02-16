@@ -103,7 +103,7 @@ export default function ApplyPage() {
               'Career advancement opportunities',
             ].map((item, i) => (
               <div key={i} className="flex items-center gap-3 bg-green-50 p-3 rounded-lg">
-                <span className="text-green-600 font-bold">✓</span>
+                <span className="text-green-600 font-bold">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}

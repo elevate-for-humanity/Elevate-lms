@@ -3,7 +3,7 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, CheckCircle } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 export default function BarberApprenticeshipInquiryPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,7 +53,7 @@ export default function BarberApprenticeshipInquiryPage() {
       <div className="min-h-screen bg-gray-50 py-12 px-4">
         <div className="max-w-md mx-auto bg-white rounded-xl shadow-sm p-8 text-center">
           <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Inquiry Received!</h1>
           <p className="text-gray-600 mb-6">

@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
-  CheckCircle, 
+  
   XCircle, 
   Clock, 
   DollarSign, 
@@ -225,13 +225,13 @@ export function ProgramPageTemplate({
             {/* Included */}
             <div className="bg-green-50 border-2 border-green-200 rounded-2xl p-8">
               <h3 className="text-xl font-bold text-green-900 mb-6 flex items-center gap-2">
-                <CheckCircle className="w-6 h-6" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Included in Program
               </h3>
               <ul className="space-y-4">
                 {included.map((item, i) => (
                   <li key={i} className="flex items-start gap-3 text-green-900">
-                    <CheckCircle className="w-5 h-5 flex-shrink-0 mt-0.5 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}

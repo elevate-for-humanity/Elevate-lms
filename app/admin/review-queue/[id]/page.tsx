@@ -4,7 +4,6 @@ import { redirect, notFound } from 'next/navigation';
 import Link from 'next/link';
 import {
   FileText,
-  CheckCircle,
   XCircle,
   RefreshCw,
   ArrowLeft,
@@ -14,7 +13,7 @@ import {
   Download,
   Building2,
   MapPin,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { ReviewActions } from './ReviewActions';
 
 export const metadata: Metadata = {

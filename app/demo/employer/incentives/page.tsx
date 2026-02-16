@@ -1,5 +1,5 @@
 import { DemoPageShell } from '@/components/demo/DemoPageShell';
-import { DollarSign, CheckCircle, Clock } from 'lucide-react';
+import { DollarSign, Clock } from 'lucide-react';
 
 const incentives = [
   { type: 'OJT Reimbursement', apprentice: 'Marcus Johnson', amount: '$4,625', status: 'Paid', date: 'Jan 15, 2026' },
@@ -19,7 +19,7 @@ export default function DemoIncentivesPage() {
           <div className="text-2xl font-bold text-gray-900">$18,425</div>
         </div>
         <div className="bg-white rounded-xl border p-4">
-          <div className="flex items-center gap-2 mb-1"><CheckCircle className="w-4 h-4 text-green-600" /><span className="text-xs text-gray-500">Paid Out</span></div>
+          <div className="flex items-center gap-2 mb-1"><span className="text-slate-400 flex-shrink-0">•</span><span className="text-xs text-gray-500">Paid Out</span></div>
           <div className="text-2xl font-bold text-gray-900">$13,025</div>
         </div>
         <div className="bg-white rounded-xl border p-4">

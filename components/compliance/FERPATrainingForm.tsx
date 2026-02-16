@@ -8,13 +8,12 @@ import { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import SignatureCanvas from 'react-signature-canvas';
 import {
-  CheckCircle,
   FileText,
   Shield,
   AlertCircle,
   Download,
-  RefreshCw
-} from 'lucide-react';
+  RefreshCw,
+CheckCircle, } from 'lucide-react';
 
 interface FERPATrainingFormProps {
   user: any;
@@ -271,7 +270,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
             <div className="text-center">
-              <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <h1 className="text-3xl font-bold text-black mb-4">
                 Training Already Completed
               </h1>
@@ -416,7 +415,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
         {step === 2 && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
             <div className="flex items-center gap-3 mb-6">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <h1 className="text-3xl font-bold text-black">
                 FERPA Assessment Quiz
               </h1>
@@ -506,7 +505,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
             {/* Score Display */}
             <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
               <div className="text-center">
-                <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <h2 className="text-2xl font-bold text-black mb-2">
                   Assessment Passed!
                 </h2>
@@ -717,7 +716,7 @@ export default function FERPATrainingForm({ user, existingTraining }: FERPATrain
         {step === 4 && (
           <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
             <div className="text-center">
-              <CheckCircle className="w-20 h-20 text-green-600 mx-auto mb-6" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <h1 className="text-3xl font-bold text-black mb-4">
                 Training Complete!
               </h1>

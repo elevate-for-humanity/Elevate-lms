@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Clock, Calendar, CheckCircle, Loader2, Scissors, BookOpen, TrendingUp } from 'lucide-react';
+import { ArrowLeft, Clock, Calendar, Loader2, Scissors, BookOpen, TrendingUp } from 'lucide-react';
 
 export default function LogHoursPage() {
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -59,7 +59,7 @@ export default function LogHoursPage() {
       <main className="px-4 py-6">
         {success ? (
           <div className="bg-green-500/20 border border-green-500/30 rounded-xl p-6 text-center">
-            <CheckCircle className="w-16 h-16 text-green-400 mx-auto mb-4" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <h2 className="text-white font-bold text-xl mb-2">Hours Logged!</h2>
             <p className="text-green-200">Your training hours have been recorded.</p>
           </div>
@@ -143,7 +143,7 @@ export default function LogHoursPage() {
                 </>
               ) : (
                 <>
-                  <CheckCircle className="w-5 h-5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   Log {hours || '0'} Hours
                 </>
               )}

@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Badge } from '@/components/ui/Badge';
 import { Progress } from '@/components/ui/Progress';
-import { CheckCircle } from 'lucide-react';
 export function ApplicationForm() {
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -92,7 +91,7 @@ export function ApplicationForm() {
     return (
       <Card className="max-w-2xl mx-auto">
         <CardContent className="p-12 text-center">
-          <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-6" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <h2 className="text-3xl font-bold text-black mb-4">
             Application Submitted!
           </h2>

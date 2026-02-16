@@ -138,7 +138,7 @@ export default function ExternalModuleLauncher({
           {uploadSuccess ? (
             <div className="text-center py-8">
               <div className="text-green-500 text-5xl mb-4 text-3xl md:text-4xl lg:text-5xl">
-                ✓
+                •
               </div>
               <p className="text-white font-medium mb-2">
                 Certificate Uploaded!

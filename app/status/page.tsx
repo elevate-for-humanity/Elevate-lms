@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { CheckCircle, Activity, Clock, AlertTriangle } from 'lucide-react';
+import { Activity, Clock, AlertTriangle } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Platform Status | Elevate for Humanity',
@@ -23,7 +23,7 @@ const services = [
 
 function StatusIcon({ status }: { status: string }) {
   if (status === 'operational') {
-    return <CheckCircle className="w-5 h-5 text-green-500" />;
+    return <span className="text-slate-400 flex-shrink-0">•</span>;
   }
   if (status === 'degraded') {
     return <AlertTriangle className="w-5 h-5 text-yellow-500" />;
@@ -70,7 +70,7 @@ export default function StatusPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
             {allOperational ? (
-              <CheckCircle className="w-10 h-10" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             ) : (
               <AlertTriangle className="w-10 h-10" />
             )}

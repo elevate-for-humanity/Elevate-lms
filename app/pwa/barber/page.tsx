@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { 
   Scissors, Clock, BookOpen, Award, Calendar, 
   ChevronRight, Plus, User, Bell, Settings,
-  TrendingUp, CheckCircle, AlertCircle, Loader2,
+  TrendingUp, AlertCircle, Loader2,
   LogIn, UserPlus, Star
 } from 'lucide-react';
 
@@ -199,7 +199,7 @@ function Dashboard({ apprentice, onLogout }: { apprentice: ApprenticeData; onLog
           
           <Link href="/pwa/barber/checkin" className="flex items-center gap-4 bg-green-500/20 border border-green-500/30 rounded-xl p-4 active:opacity-80">
             <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center">
-              <CheckCircle className="w-6 h-6 text-white" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <div className="flex-1">
               <p className="text-white font-medium">Check In</p>

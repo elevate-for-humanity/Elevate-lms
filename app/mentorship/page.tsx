@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { Users, MessageSquare, Calendar, Star, CheckCircle, ArrowRight,
+import { Users, MessageSquare, Calendar, Star, ArrowRight,
   Phone
 } from 'lucide-react';
 
@@ -48,7 +48,7 @@ export default function MentorshipPage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {benefits.map((benefit, i) => (
               <div key={i} className="bg-white rounded-xl p-6 shadow-sm border flex items-start gap-3">
-                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{benefit}</span>
               </div>
             ))}

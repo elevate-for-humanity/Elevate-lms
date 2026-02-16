@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { CheckCircle } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,7 +31,7 @@ export default async function StaffApplicationSuccess() {
     <div className="min-h-screen bg-slate-50 flex items-center justify-center px-4">
       <div className="max-w-2xl w-full bg-white border border-slate-200 rounded-lg p-8 text-center">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 text-green-700 mb-4">
-          <CheckCircle className="w-10 h-10" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
         </div>
         <h1 className="text-3xl font-bold text-black mb-3">
           Application Submitted!

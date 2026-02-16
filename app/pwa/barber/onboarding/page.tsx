@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  ArrowLeft, CheckCircle, Circle, ChevronRight, 
+  ArrowLeft, Circle, ChevronRight, 
   User, FileText, Building2, BookOpen, Clock,
   Award, Bell, Loader2, Sparkles, Scissors, TrendingUp
 } from 'lucide-react';
@@ -201,7 +201,7 @@ export default function OnboardingPage() {
                         step.completed ? 'bg-green-500' : 'bg-slate-700'
                       }`}>
                         {step.completed ? (
-                          <CheckCircle className="w-5 h-5 text-white" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                         ) : (
                           <span className="text-slate-400 font-medium">{index + 1}</span>
                         )}

@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { DollarSign, Clock, CheckCircle, Search, FileText, TrendingUp, Plus } from 'lucide-react';
+import { DollarSign, Clock, Search, FileText, TrendingUp, Plus, Circle, } from 'lucide-react';
 import { createClient } from '@/lib/supabase/server';
 
 export const dynamic = 'force-dynamic';
@@ -43,7 +43,7 @@ export default async function WOTCAdminPage() {
     { label: 'Total Credits', value: `$${totalCredits.toLocaleString()}`, icon: DollarSign, color: 'green' },
     { label: 'Active Applications', value: activeCount.toString(), icon: FileText, color: 'blue' },
     { label: 'Pending Review', value: pendingCount.toString(), icon: Clock, color: 'yellow' },
-    { label: 'Approved This Month', value: approvedThisMonth.toString(), icon: CheckCircle, color: 'blue' },
+    { label: 'Approved This Month', value: approvedThisMonth.toString(), icon: Circle, color: 'blue' },
   ];
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -163,7 +163,7 @@ export default async function WOTCAdminPage() {
                         app.status === 'denied' ? 'bg-red-100 text-red-700' :
                         'bg-gray-100 text-gray-700'
                       }`}>
-                        {app.status === 'approved' && <CheckCircle className="w-4 h-4" />}
+                        {app.status === 'approved' && <span className="text-slate-400 flex-shrink-0">•</span>}
                         {app.status === 'pending_review' && <Clock className="w-4 h-4" />}
                         {app.status === 'submitted' && <TrendingUp className="w-4 h-4" />}
                         {app.status.replace('_', ' ')}

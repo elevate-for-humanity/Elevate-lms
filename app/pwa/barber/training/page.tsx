@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  BookOpen, Play, ChevronRight, ChevronLeft, CheckCircle,
+  BookOpen, Play, ChevronRight, ChevronLeft,
   Lock, Clock, FileText, Video, Award, Search, Loader2, AlertCircle
 } from 'lucide-react';
 
@@ -70,7 +70,7 @@ function ModuleCard({ module, onSelect, apprenticeHours }: {
           {module.locked ? (
             <Lock className="w-6 h-6 text-slate-500" />
           ) : progress === 100 ? (
-            <CheckCircle className="w-6 h-6 text-green-400" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           ) : (
             <BookOpen className="w-6 h-6 text-brand-blue-400" />
           )}
@@ -146,7 +146,7 @@ function ChapterItem({ chapter, onComplete }: {
         {completing ? (
           <Loader2 className="w-5 h-5 text-slate-400 animate-spin" />
         ) : chapter.completed ? (
-          <CheckCircle className="w-5 h-5 text-green-400" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
         ) : (
           <TypeIcon className={`w-5 h-5 ${typeColor}`} />
         )}

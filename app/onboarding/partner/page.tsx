@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle, Clock, FileText, Building, Users } from 'lucide-react';
+import { Clock, FileText, Building, Users, Circle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Partner Onboarding | Elevate For Humanity',
@@ -17,7 +17,7 @@ const steps = [
   { title: 'Organization Profile', description: 'Complete your organization details', icon: Building, status: 'complete' },
   { title: 'MOU Agreement', description: 'Review and sign the memorandum of understanding', icon: FileText, status: 'current' },
   { title: 'Portal Training', description: 'Learn to use the partner portal', icon: Users, status: 'pending' },
-  { title: 'Go Live', description: 'Start enrolling students', icon: CheckCircle, status: 'pending' },
+  { title: 'Go Live', description: 'Start enrolling students', icon: Circle, status: 'pending' },
 ];
 
 export default async function PartnerOnboardingPage() {
@@ -45,7 +45,7 @@ export default async function PartnerOnboardingPage() {
                 step.status === 'complete' ? 'bg-green-100' : step.status === 'current' ? 'bg-brand-blue-100' : 'bg-gray-100'
               }`}>
                 {step.status === 'complete' ? (
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : step.status === 'current' ? (
                   <Clock className="w-6 h-6 text-brand-blue-600" />
                 ) : (

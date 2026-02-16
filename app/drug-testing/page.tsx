@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, CheckCircle, ArrowRight, Clock, MapPin, Shield, Beaker, Truck, Building2, Users } from 'lucide-react';
+import { Phone, ArrowRight, Clock, MapPin, Shield, Beaker, Truck, Building2, Users } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Drug Testing Services | Elevate for Humanity',
@@ -102,7 +102,7 @@ export default function DrugTestingLandingPage() {
         <div className="relative z-10 max-w-6xl mx-auto px-6 py-20">
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 bg-green-500 px-4 py-2 rounded-full text-white text-sm font-bold mb-6">
-              <CheckCircle className="w-4 h-4" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               Same-Day Appointments Available
             </div>
             
@@ -252,7 +252,7 @@ export default function DrugTestingLandingPage() {
                   'Dedicated account manager',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-gray-700">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     {item}
                   </li>
                 ))}
@@ -295,7 +295,7 @@ export default function DrugTestingLandingPage() {
                   'SAP referrals available',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-gray-300">
-                    <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     {item}
                   </li>
                 ))}

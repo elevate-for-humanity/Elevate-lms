@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Calendar, Plus, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
+import { Calendar, Plus, XCircle, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export default function TimeOffPage() {
@@ -20,7 +20,7 @@ export default function TimeOffPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'Approved':
-        return <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded flex items-center"><CheckCircle className="w-3 h-3 mr-1" />{status}</span>;
+        return <span className="bg-green-100 text-green-700 text-xs font-medium px-2 py-1 rounded flex items-center"><span className="text-slate-400 flex-shrink-0">•</span>{status}</span>;
       case 'Pending':
         return <span className="bg-yellow-100 text-yellow-700 text-xs font-medium px-2 py-1 rounded flex items-center"><AlertCircle className="w-3 h-3 mr-1" />{status}</span>;
       case 'Denied':

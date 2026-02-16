@@ -1,5 +1,5 @@
 import { APPRENTICESHIP } from '@/lib/compliance/apprenticeship';
-import { Award, CheckCircle } from 'lucide-react';
+import { Award } from 'lucide-react';
 
 export function ApprenticeshipBadge() {
   const cfg = APPRENTICESHIP.IN;
@@ -23,28 +23,28 @@ export function ApprenticeshipBadge() {
 
       <div className="space-y-2">
         <div className="flex items-start gap-2">
-          <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <div className="text-sm text-black">
             <strong>State:</strong> {cfg.state}
           </div>
         </div>
 
         <div className="flex items-start gap-2">
-          <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <div className="text-sm text-black">
             <strong>Sponsor:</strong> {cfg.sponsorName}
           </div>
         </div>
 
         <div className="flex items-start gap-2">
-          <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <div className="text-sm text-black">
             <strong>Program:</strong> {cfg.programName}
           </div>
         </div>
 
         <div className="flex items-start gap-2">
-          <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <div className="text-sm text-black">
             <strong>Pathway:</strong> Earn & Learn (Paid On-the-Job Training)
           </div>
@@ -52,14 +52,14 @@ export function ApprenticeshipBadge() {
 
         {cfg.registrationNumber ? (
           <div className="flex items-start gap-2">
-            <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <div className="text-sm text-black">
               <strong>USDOL Program #:</strong> {cfg.registrationNumber}
             </div>
           </div>
         ) : (
           <div className="flex items-start gap-2">
-            <CheckCircle className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <div className="text-sm text-black">
               Registered with the U.S. Department of Labor (RAPIDS)
             </div>

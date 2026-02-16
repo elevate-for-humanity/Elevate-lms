@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { CheckCircle, ArrowRight, Download, Phone, Mail, Clock } from 'lucide-react';
+import { ArrowRight, Download, Phone, Mail, Clock } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Application Received | Barbershop Partner | Elevate for Humanity',
@@ -18,7 +18,7 @@ export default function ThankYouPage() {
 <section className="py-20">
         <div className="max-w-2xl mx-auto px-4 text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Application Received!</h1>
           <p className="text-lg text-gray-600 mb-8">

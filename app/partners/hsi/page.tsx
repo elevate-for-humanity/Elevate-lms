@@ -8,13 +8,12 @@ import Link from 'next/link';
 
 import {
   ExternalLink,
-  CheckCircle,
   Clock,
   Award,
   Users,
   Phone,
   Mail,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title:
@@ -82,33 +81,33 @@ export default function HSIPage() {
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div className="text-black">
                 Industry-recognized certifications
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div className="text-black">
                 Hands-on training with real equipment
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div className="text-black">Experienced instructors</div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div className="text-black">
                 Small class sizes (max 12 students)
               </div>
             </div>
 
             <div className="bg-white p-6 rounded-xl shadow-sm flex items-start gap-3">
-              <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0 mt-1" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div className="text-black">
                 Traditional and blended learning options
               </div>

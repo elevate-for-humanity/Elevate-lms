@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { Upload, FileText, CheckCircle, AlertCircle, X, Loader2 } from 'lucide-react';
+import { Upload, FileText, AlertCircle, X, Loader2 } from 'lucide-react';
 
 interface UploadedDocument {
   id: string;
@@ -176,7 +176,7 @@ export default function EnrollmentDocumentStep({
                   }`}
                 >
                   {uploaded ? (
-                    <CheckCircle className="w-6 h-6 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : (
                     <FileText className="w-6 h-6 text-gray-400" />
                   )}
@@ -271,7 +271,7 @@ export default function EnrollmentDocumentStep({
 
       {allRequiredUploaded && (
         <div className="p-4 bg-green-50 border border-green-200 rounded-lg flex items-center gap-3">
-          <CheckCircle className="w-6 h-6 text-green-600" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <div>
             <p className="font-medium text-green-900">
               All required documents uploaded

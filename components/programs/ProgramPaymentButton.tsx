@@ -45,7 +45,7 @@ export function ProgramPaymentButton({
         </div>
         {etplProgramId && (
           <div className="text-sm text-green-600 mt-2">
-            ✓ ETPL Approved - Funding Available
+            • ETPL Approved - Funding Available
           </div>
         )}
       </div>
@@ -89,15 +89,15 @@ export function ProgramPaymentButton({
       <div className="mt-6 pt-6 border-t border-slate-200">
         <div className="text-sm text-black space-y-2">
           <div className="flex items-center gap-2">
-            <span className="text-green-600">✓</span>
+            <span className="text-green-600">•</span>
             <span>Secure payment via Stripe</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-green-600">✓</span>
+            <span className="text-green-600">•</span>
             <span>30-day money-back guarantee</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-green-600">✓</span>
+            <span className="text-green-600">•</span>
             <span>Instant access after payment</span>
           </div>
           {partnerUrl && (

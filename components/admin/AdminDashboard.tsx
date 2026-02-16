@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs';
 import { Button } from '@/components/ui/Button';
 import {
   Users, GraduationCap, Briefcase, DollarSign, TrendingUp, TrendingDown,
-  AlertCircle, CheckCircle, Clock, MapPin, FileText, Download
+  AlertCircle, Clock, MapPin, FileText, Download
 } from 'lucide-react';
 import ProgramAnalytics from '@/components/reporting/ProgramAnalytics';
 import SiteAnalytics from '@/components/reporting/SiteAnalytics';
@@ -139,7 +139,7 @@ export default function AdminDashboard() {
               <div className="mt-2">
                 {metrics.completionRate >= 70 ? (
                   <div className="flex items-center text-sm text-green-600">
-                    <CheckCircle className="mr-1 h-4 w-4" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Above target (70%)
                   </div>
                 ) : (
@@ -165,7 +165,7 @@ export default function AdminDashboard() {
               <div className="mt-2">
                 {metrics.placementRate >= 60 ? (
                   <div className="flex items-center text-sm text-green-600">
-                    <CheckCircle className="mr-1 h-4 w-4" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Above target (60%)
                   </div>
                 ) : (
@@ -253,7 +253,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Completion Target</span>
                 {metrics.completionRate >= 70 ? (
-                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <AlertCircle className="h-5 w-5 text-brand-orange-600" />
                 )}
@@ -261,7 +261,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Placement Target</span>
                 {metrics.placementRate >= 60 ? (
-                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <AlertCircle className="h-5 w-5 text-brand-orange-600" />
                 )}
@@ -269,7 +269,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <span className="text-sm text-muted-foreground">Retention Target</span>
                 {metrics.retentionRate >= 75 ? (
-                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <AlertCircle className="h-5 w-5 text-brand-orange-600" />
                 )}

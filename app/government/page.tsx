@@ -3,7 +3,7 @@ import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Building2, Users, FileText, Shield, CheckCircle, Award, Briefcase, Phone, Mail, TrendingUp, Target, Handshake, BarChart3 } from 'lucide-react';
+import { Building2, Users, FileText, Shield, Award, Briefcase, Phone, Mail, TrendingUp, Target, Handshake, BarChart3 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,83 +45,37 @@ export default async function GovernmentPage() {
       </div>
 
       {/* Hero Section with Video Background */}
-      <section className="relative min-h-[650px] flex items-center overflow-hidden">
-        {/* Video Background */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="none"
-          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-        >
-          <source src="https://cms-artifacts.artlist.io/content/generated-video-v1/video__2/generated-video-acfed647-8bb1-44ed-8505-876b1d573896.mp4?Expires=2083808563&Key-Pair-Id=K2ZDLYDZI2R1DF&Signature=BO~IkvikD0UAyMYmWQoBNskXM7I8fMAXUJW3T-zgJh1jg78q3LhNDpFOLhVcCpTBW1Rscp0c0YXEi-CQ29NDjSUKoclWTKq4q-bPLNxXgOpKLYxr5B5X3LzzDQQYnq5ilkgAvEZ~VzT3P8HEixv9WPRLFnAd5V3f~829SadfMPddUPxQZDZc29hrBn-Kxv-EKfugudcZ3depV1X-T1F5UxzvRMqFCXxjfT658RlSt0IupI0LxtywFYkChqJQmH6A~2JBncMUPerBqqt0Gdyp4ettIltCFvBX70ai6784jneJJrWcBJ0l7GyJPx1WBPAqjAdnCeJwyPC2Spp3~u93pQ__" type="video/mp4" />
-        </video>
-        {/* Overlay */}
-        
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="flex items-center gap-3 mb-6">
-                <Building2 className="w-10 h-10 text-white" />
-                <span className="text-white/80 text-lg font-medium">Government Partners</span>
-              </div>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-                Workforce Solutions for Government Agencies
-              </h1>
-              <p className="text-xl text-white/90 mb-4 leading-relaxed">
-                Partner with an ETPL-approved, WIOA-compliant training provider to deliver 
-                high-quality workforce development programs that meet federal requirements 
-                and produce measurable outcomes.
-              </p>
-              <p className="text-lg text-white/80 mb-8 leading-relaxed">
-                Elevate for Humanity has served over 2,500 participants through government-funded 
-                programs, achieving a 92% credential attainment rate and 78% employment rate. 
-                We specialize in serving priority populations including veterans, justice-involved 
-                individuals, and low-income adults seeking career advancement.
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-gray-100 transition-colors"
-                >
-                  Schedule a Meeting
-                </Link>
-                <Link
-                  href="/workone-partner-packet"
-                  className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-700 text-white rounded-lg font-bold hover:bg-brand-blue-600 transition-colors border-2 border-white/30"
-                >
-                  View Partner Packet
-                </Link>
-              </div>
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <video autoPlay muted loop playsInline preload="none" className="absolute inset-0 w-full h-full object-cover pointer-events-none">
+            <source src="https://cms-artifacts.artlist.io/content/generated-video-v1/video__2/generated-video-acfed647-8bb1-44ed-8505-876b1d573896.mp4?Expires=2083808563&Key-Pair-Id=K2ZDLYDZI2R1DF&Signature=BO~IkvikD0UAyMYmWQoBNskXM7I8fMAXUJW3T-zgJh1jg78q3LhNDpFOLhVcCpTBW1Rscp0c0YXEi-CQ29NDjSUKoclWTKq4q-bPLNxXgOpKLYxr5B5X3LzzDQQYnq5ilkgAvEZ~VzT3P8HEixv9WPRLFnAd5V3f~829SadfMPddUPxQZDZc29hrBn-Kxv-EKfugudcZ3depV1X-T1F5UxzvRMqFCXxjfT658RlSt0IupI0LxtywFYkChqJQmH6A~2JBncMUPerBqqt0Gdyp4ettIltCFvBX70ai6784jneJJrWcBJ0l7GyJPx1WBPAqjAdnCeJwyPC2Spp3~u93pQ__" type="video/mp4" />
+          </video>
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Solutions for Government Agencies</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto mb-6">
+              Partner with an ETPL-approved, WIOA-compliant training provider to deliver high-quality workforce development programs that meet federal requirements and produce measurable outcomes.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 bg-white text-brand-blue-600 rounded-lg font-bold hover:bg-gray-100 transition-colors">Schedule a Meeting</Link>
+              <Link href="/workone-partner-packet" className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-700 text-white rounded-lg font-bold hover:bg-brand-blue-600 transition-colors border-2 border-white/30">View Partner Packet</Link>
             </div>
-            <div className="hidden lg:block">
-              <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
-                <h3 className="text-xl font-bold text-white mb-6">Our Credentials</h3>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-400" />
-                    <span className="text-white">ETPL Approved Provider</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-400" />
-                    <span className="text-white">WIOA Title I Compliant</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-400" />
-                    <span className="text-white">Registered Apprenticeship Sponsor</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-400" />
-                    <span className="text-white">WRG Eligible Programs</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <CheckCircle className="w-6 h-6 text-green-400" />
-                    <span className="text-white">DOL Oversight Compliant</span>
-                  </div>
-                </div>
-              </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Credentials */}
+      <section className="py-12 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-white rounded-2xl p-8 border border-slate-200">
+            <h3 className="text-xl font-bold text-slate-900 mb-6">Our Credentials</h3>
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="flex items-center gap-3"><span className="text-slate-400">•</span><span className="text-slate-700">ETPL Approved Provider</span></div>
+              <div className="flex items-center gap-3"><span className="text-slate-400">•</span><span className="text-slate-700">WIOA Title I Compliant</span></div>
+              <div className="flex items-center gap-3"><span className="text-slate-400">•</span><span className="text-slate-700">Registered Apprenticeship Sponsor</span></div>
+              <div className="flex items-center gap-3"><span className="text-slate-400">•</span><span className="text-slate-700">WRG Eligible Programs</span></div>
+              <div className="flex items-center gap-3"><span className="text-slate-400">•</span><span className="text-slate-700">DOL Oversight Compliant</span></div>
             </div>
           </div>
         </div>
@@ -164,15 +118,15 @@ export default async function GovernmentPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     WIOA Title I Adult & Dislocated Worker
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Youth Programs (OSY & ISY)
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Rapid Response Services
                   </li>
                 </ul>
@@ -200,15 +154,15 @@ export default async function GovernmentPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Department of Workforce Development
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Department of Education
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Vocational Rehabilitation
                   </li>
                 </ul>
@@ -236,15 +190,15 @@ export default async function GovernmentPage() {
                 </p>
                 <ul className="space-y-2 text-sm text-gray-600">
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     DOL Apprenticeship Programs
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Reentry Programs (JRI)
                   </li>
                   <li className="flex items-center gap-2">
-                    <CheckCircle className="w-4 h-4 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     Veterans Programs (GI Bill, VR&E)
                   </li>
                 </ul>
@@ -552,18 +506,9 @@ export default async function GovernmentPage() {
         </div>
       </section>
 
-      {/* CTA with Background Image */}
-      <section className="relative py-20">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/employers/partnership-office-meeting.jpg"
-            alt="Partnership"
-            fill
-            className="object-cover"
-          />
-          <div className="absolute inset-0 bg-brand-blue-600/90" />
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto px-4 text-center">
+      {/* CTA */}
+      <section className="py-20 bg-brand-blue-600">
+        <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
             Ready to Partner?
           </h2>

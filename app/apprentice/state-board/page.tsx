@@ -7,7 +7,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import { 
   Award, 
-  CheckCircle, 
+  
   Clock, 
   AlertTriangle,
   ExternalLink,
@@ -94,7 +94,7 @@ export default async function StateBoardExamPage() {
           <div className="bg-green-500 rounded-2xl p-6 text-white">
             <div className="flex items-center gap-4 mb-4">
               <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-10 h-10" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <h2 className="text-2xl font-bold">You're Ready!</h2>
@@ -130,7 +130,7 @@ export default async function StateBoardExamPage() {
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 {hoursComplete ? (
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <Clock className="w-6 h-6 text-amber-500" />
                 )}
@@ -156,7 +156,7 @@ export default async function StateBoardExamPage() {
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 {miladyComplete ? (
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <Clock className="w-6 h-6 text-amber-500" />
                 )}
@@ -185,7 +185,7 @@ export default async function StateBoardExamPage() {
             <div className="p-4 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 {skillsVerified ? (
-                  <CheckCircle className="w-6 h-6 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <Clock className="w-6 h-6 text-slate-400" />
                 )}
@@ -207,7 +207,7 @@ export default async function StateBoardExamPage() {
             {/* Exam Fee */}
             <div className="p-4 flex items-center justify-between bg-green-50">
               <div className="flex items-center gap-4">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <div className="font-semibold text-black">State Board Exam Fee</div>
                   <div className="text-sm text-slate-500">

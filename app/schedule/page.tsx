@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Calendar, Video, ArrowLeft, CheckCircle, Send } from 'lucide-react';
+import { Calendar, Video, ArrowLeft, Send } from 'lucide-react';
 import { ROUTES } from '@/lib/pricing';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -158,7 +158,7 @@ export default function SchedulePage() {
               /* Post-Submit View */
               <div className="p-8 text-center">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <h2 className="text-2xl font-bold text-slate-900 mb-4">Thanks! You're all set.</h2>
                 <p className="text-slate-600 mb-8">You can join the demo now or wait for a follow-up.</p>

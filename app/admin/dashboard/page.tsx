@@ -10,11 +10,10 @@ import {
   Building2,
   TrendingUp,
   AlertTriangle,
-  CheckCircle,
   FileText,
   Shield,
   ArrowRight,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { SystemStatusPanel } from '@/components/admin/SystemStatusPanel';
 import ModerationDashboard from '@/components/ModerationDashboard';
@@ -600,14 +599,14 @@ export default async function AdminDashboardOrchestrated() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-              <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="text-sm font-medium text-green-900">Audit Logging</div>
                 <div className="text-xs text-green-700">Enabled</div>
               </div>
             </div>
             <div className="flex items-center gap-3 p-4 bg-green-50 rounded-lg border border-green-200">
-              <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="text-sm font-medium text-green-900">Route Access</div>
                 <div className="text-xs text-green-700">Role-gated</div>

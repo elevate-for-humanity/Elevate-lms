@@ -202,7 +202,7 @@ export default function MicroCredentialsBadges() {
                   {badge.requirements.map((req, idx) => (
                     <li key={idx} className="text-xs text-black flex items-start">
                       <span className={`mr-2 ${badge.earnedDate ? 'text-green-500' : 'text-gray-400'}`}>
-                        {badge.earnedDate ? '✓' : '○'}
+                        {badge.earnedDate ? '•' : '○'}
                       </span>
                       {req}
                     </li>
@@ -213,7 +213,7 @@ export default function MicroCredentialsBadges() {
               {badge.earnedDate && (
                 <div className="mb-4 p-3 bg-green-50 rounded">
                   <p className="text-sm text-green-700 font-semibold">
-                    ✓ Earned on {new Date(badge.earnedDate).toLocaleDateString()}
+                    • Earned on {new Date(badge.earnedDate).toLocaleDateString()}
                   </p>
                   <p className="text-xs text-green-600 mt-1">Issued by {badge.issuer}</p>
                 </div>

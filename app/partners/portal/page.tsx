@@ -52,22 +52,16 @@ export default async function PartnerPortalPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <section className="relative h-[250px] md:h-[300px] flex items-center text-white overflow-hidden">
-        <Image
-          src="/images/employers/partnership-hiring-event.jpg"
-          alt="Partner Portal"
-          fill
-          className="object-cover"
-          priority
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="relative z-10 max-w-5xl mx-auto px-4 w-full">
-          <p className="text-brand-blue-200 text-sm font-medium mb-1">Partner Portal</p>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">Welcome, {displayName}</h1>
-          {profile?.organization && (
-            <p className="text-gray-200 text-lg">{profile.organization}</p>
-          )}
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/employers/partnership-hiring-event.jpg" alt="Partner Portal" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Welcome, {displayName}</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">{profile.organization}</p>
+          </div>
         </div>
       </section>
 

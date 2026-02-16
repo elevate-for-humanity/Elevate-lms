@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Phone, CheckCircle, ArrowLeft, Building2, Users, Shield, Clock, BarChart3 } from 'lucide-react';
+import { Phone, ArrowLeft, Building2, Users, Shield, Clock, BarChart3, CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Employer Drug Testing Programs | Drug Testing Services',
@@ -148,7 +148,7 @@ export default function EmployerProgramsPage() {
                 <ul className="space-y-2">
                   {program.features.map((feature, idx) => (
                     <li key={idx} className="flex items-center gap-2 text-gray-700">
-                      <CheckCircle className="w-4 h-4 text-green-500 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}
@@ -280,7 +280,7 @@ export default function EmployerProgramsPage() {
                   'Audit support',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3 text-gray-700">
-                    <CheckCircle className="w-5 h-5 text-orange-500 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     {item}
                   </li>
                 ))}

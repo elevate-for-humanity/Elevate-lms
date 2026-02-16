@@ -2,7 +2,7 @@
 
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { useState, useEffect } from 'react';
-import { CheckCircle, AlertCircle, Loader2, Database } from 'lucide-react';
+import { AlertCircle, Loader2, Database } from 'lucide-react';
 import Link from 'next/link';
 
 interface SchemaCheck {
@@ -85,7 +85,7 @@ export default function MonitoringSetupPage() {
           }`}>
             <div className="flex items-center gap-4 mb-4">
               {result.status === 'ready' ? (
-                <CheckCircle className="h-11 w-11 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               ) : (
                 <AlertCircle className="h-11 w-11 text-yellow-600" />
               )}
@@ -118,7 +118,7 @@ export default function MonitoringSetupPage() {
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-black">Table Exists</h3>
                 {result.checks.tableExists ? (
-                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <AlertCircle className="h-5 w-5 text-red-600" />
                 )}
@@ -135,7 +135,7 @@ export default function MonitoringSetupPage() {
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-black">Can Query</h3>
                 {result.checks.canQuery ? (
-                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <AlertCircle className="h-5 w-5 text-red-600" />
                 )}
@@ -152,7 +152,7 @@ export default function MonitoringSetupPage() {
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-black">Can Insert</h3>
                 {result.checks.canInsert ? (
-                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <AlertCircle className="h-5 w-5 text-red-600" />
                 )}
@@ -169,7 +169,7 @@ export default function MonitoringSetupPage() {
               <div className="flex items-center justify-between mb-2">
                 <h3 className="font-bold text-black">Required Columns</h3>
                 {Object.values(result.checks.requiredColumns).every(v => v) ? (
-                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <AlertCircle className="h-5 w-5 text-yellow-600" />
                 )}
@@ -178,7 +178,7 @@ export default function MonitoringSetupPage() {
                 {Object.entries(result.checks.requiredColumns).map(([col, exists]) => (
                   <div key={col} className="flex items-center gap-2">
                     {exists ? (
-                      <CheckCircle className="h-3 w-3 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
                       <AlertCircle className="h-3 w-3 text-red-600" />
                     )}

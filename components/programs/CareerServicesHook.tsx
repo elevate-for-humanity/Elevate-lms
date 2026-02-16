@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { FileText, Users, Calendar, ArrowRight, X, CheckCircle, AlertCircle } from 'lucide-react';
+import { FileText, Users, Calendar, ArrowRight, X, AlertCircle } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface CareerServicesHookProps {
@@ -156,7 +156,7 @@ Notes: ${formData.get('notes') || 'None'}
             {submitted ? (
               <div className="text-center py-8">
                 <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="w-8 h-8 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-2">Request Submitted!</h3>
                 <p className="text-gray-600">

@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Mail, Phone, MapPin, Clock, Send, AlertCircle, Loader2, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, AlertCircle, Loader2 } from 'lucide-react';
 import PageAvatar from '@/components/PageAvatar';
 import Turnstile from '@/components/Turnstile';
-import CallTextButton from '@/components/CallTextButton';
+import { ZOOM_MEETING_URL } from '@/lib/config/zoom';
+
 import FeedbackWidget from '@/components/FeedbackWidget';
 
 const contactInfo = [
@@ -114,7 +115,7 @@ export default function ContactPage() {
             
             {formState === 'success' ? (
               <div className="bg-green-50 border border-green-200 rounded-xl p-8 text-center">
-                <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-4" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <h3 className="text-xl font-semibold text-gray-900 mb-2">Message Sent!</h3>
                 <p className="text-gray-600 mb-4">
                   Thank you for contacting us. We&apos;ll get back to you within 24 hours.
@@ -256,29 +257,118 @@ export default function ContactPage() {
           </div>
           
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Visit Our Campus</h2>
-            <div className="relative rounded-xl h-80 overflow-hidden mb-6">
-              <Image
-                src="/images/misc/contact-map.jpg"
-                alt="Campus"
-                fill
-                className="object-cover"
-              />
+            {/* Schedule a Meeting */}
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Schedule a Meeting</h2>
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+              <p className="text-gray-600 mb-5">
+                Pick a date and time that works for you. Once you submit, you and our team will receive a calendar invite with a Zoom link by email.
+              </p>
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const fd = new FormData(e.currentTarget);
+                  const date = fd.get('meetingDate') as string;
+                  const time = fd.get('meetingTime') as string;
+                  const name = fd.get('meetingName') as string;
+                  const email = fd.get('meetingEmail') as string;
+                  const topic = fd.get('meetingTopic') as string;
+
+                  if (!date || !time || !name || !email) return;
+
+                  // Build Google Calendar event URL
+                  const startDT = `${date.replace(/-/g, '')}T${time.replace(':', '')}00`;
+                  const endH = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
+                  const endDT = `${date.replace(/-/g, '')}T${endH}${time.split(':')[1]}00`;
+                  const details = `Meeting with ${name} (${email})%0A%0ATopic: ${encodeURIComponent(topic || 'General inquiry')}%0A%0AZoom Link: ${ZOOM_MEETING_URL}`;
+                  const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Elevate for Humanity — Meeting')}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)},${encodeURIComponent('elevate4humanityedu@gmail.com')}&location=Zoom`;
+
+                  window.open(calUrl, '_blank');
+                }}
+                className="space-y-4"
+              >
+                <div>
+                  <label htmlFor="meetingName" className="block text-sm font-medium text-gray-700 mb-1">Your Name <span className="text-red-500">*</span></label>
+                  <input type="text" id="meetingName" name="meetingName" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" />
+                </div>
+                <div>
+                  <label htmlFor="meetingEmail" className="block text-sm font-medium text-gray-700 mb-1">Your Email <span className="text-red-500">*</span></label>
+                  <input type="email" id="meetingEmail" name="meetingEmail" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label htmlFor="meetingDate" className="block text-sm font-medium text-gray-700 mb-1">Date <span className="text-red-500">*</span></label>
+                    <input type="date" id="meetingDate" name="meetingDate" required min={new Date().toISOString().split('T')[0]} className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500" />
+                  </div>
+                  <div>
+                    <label htmlFor="meetingTime" className="block text-sm font-medium text-gray-700 mb-1">Time <span className="text-red-500">*</span></label>
+                    <select id="meetingTime" name="meetingTime" required className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500">
+                      <option value="">Select...</option>
+                      <option value="09:00">9:00 AM</option>
+                      <option value="09:30">9:30 AM</option>
+                      <option value="10:00">10:00 AM</option>
+                      <option value="10:30">10:30 AM</option>
+                      <option value="11:00">11:00 AM</option>
+                      <option value="11:30">11:30 AM</option>
+                      <option value="12:00">12:00 PM</option>
+                      <option value="12:30">12:30 PM</option>
+                      <option value="13:00">1:00 PM</option>
+                      <option value="13:30">1:30 PM</option>
+                      <option value="14:00">2:00 PM</option>
+                      <option value="14:30">2:30 PM</option>
+                      <option value="15:00">3:00 PM</option>
+                      <option value="15:30">3:30 PM</option>
+                      <option value="16:00">4:00 PM</option>
+                      <option value="16:30">4:30 PM</option>
+                      <option value="17:00">5:00 PM</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="meetingTopic" className="block text-sm font-medium text-gray-700 mb-1">What do you need help with?</label>
+                  <select id="meetingTopic" name="meetingTopic" className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-blue-500 focus:border-brand-blue-500">
+                    <option value="General inquiry">General inquiry</option>
+                    <option value="Enrollment help">Enrollment help</option>
+                    <option value="Funding and financial aid">Funding and financial aid</option>
+                    <option value="Program information">Program information</option>
+                    <option value="Employer partnership">Employer partnership</option>
+                    <option value="Orientation">Orientation</option>
+                    <option value="Career services">Career services</option>
+                    <option value="Technical support">Technical support</option>
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                >
+                  Book Meeting via Google Calendar
+                </button>
+              </form>
             </div>
+
+            {/* Zoom for Virtual Meetings */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+              <h3 className="font-semibold text-gray-900 mb-2">Virtual Meetings via Zoom</h3>
+              <p className="text-gray-600 mb-4">
+                All scheduled meetings include a Zoom link. You can also join our open office hours for quick questions without an appointment.
+              </p>
+              <a
+                href={ZOOM_MEETING_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-700 transition-colors"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor"><path d="M4 3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-3l4 3V6l-4 3V5a2 2 0 0 0-2-2H4zm0 2h10v10H4V5z"/></svg>
+                Join Zoom Meeting
+              </a>
+            </div>
+
+            {/* Campus Info */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h3 className="font-semibold text-gray-900 mb-2">Elevate for Humanity</h3>
               <p className="text-gray-600">Indianapolis, Indiana</p>
               <p className="text-gray-600">Central Indiana Region</p>
-              <p className="text-gray-600 mt-4">Multiple training locations available</p>
-              <div className="mt-4 pt-4 border-t">
-                <a
-                  href="/support"
-                  className="inline-flex items-center gap-2 text-brand-blue-600 font-medium hover:underline"
-                >
-                  <Phone className="w-4 h-4" />
-                  Call Get Help Online
-                </a>
-              </div>
+              <p className="text-gray-600 mt-4">Multiple training locations available. In-person visits are by appointment only — use the calendar above to schedule.</p>
             </div>
           </div>
         </div>
@@ -309,9 +399,15 @@ export default function ContactPage() {
         </div>
       </div>
 
-      {/* Call/Text Button */}
+      {/* Email Contact */}
       <div className="max-w-4xl mx-auto px-4 py-8 flex justify-center">
-        <CallTextButton variant="both" size="lg" />
+        <a
+          href="mailto:elevate4humanityedu@gmail.com"
+          className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-lg font-semibold hover:bg-slate-800 transition-colors"
+        >
+          <Mail className="w-5 h-5" />
+          Email Us Directly
+        </a>
       </div>
 
       {/* Feedback Widget */}

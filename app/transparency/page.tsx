@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckCircle, FileText } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -143,7 +143,7 @@ export default function TransparencyPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               {accreditations.map((item) => (
                 <div key={item} className="flex items-center gap-3">
-                  <CheckCircle className="w-6 h-6 text-green-500 flex-shrink-0" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="font-medium">{item}</span>
                 </div>
               ))}

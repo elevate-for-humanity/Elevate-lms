@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Award, CheckCircle, ArrowRight, Shield, Clock, Users } from 'lucide-react';
+import { Award, ArrowRight, Shield, Clock, Users, Circle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -76,7 +76,7 @@ export default function CertificationsPage() {
           <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">Why Certifications Matter</h2>
           <div className="grid md:grid-cols-3 gap-8">
             {[
-              { icon: CheckCircle, title: 'Employer Recognition', desc: 'Certifications prove your skills to employers' },
+              { icon: Circle, title: 'Employer Recognition', desc: 'Certifications prove your skills to employers' },
               { icon: Users, title: 'Higher Earnings', desc: 'Certified professionals earn 15-20% more' },
               { icon: Shield, title: 'Career Advancement', desc: 'Required for many positions and promotions' },
             ].map((item, i) => (

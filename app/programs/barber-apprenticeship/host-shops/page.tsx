@@ -31,34 +31,6 @@ export default function HostShopsPage() {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-slate-800/30" />
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-5xl mx-auto px-6 pb-12 w-full">
-            <div className="inline-block bg-brand-blue-800 text-white text-sm font-semibold px-4 py-1 rounded-full mb-4">
-              Partner Opportunity
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
-              Become a Host Barbershop
-            </h1>
-            <p className="text-xl text-white/90 max-w-2xl mb-6">
-              Train the next generation of barbers through our USDOL Registered Apprenticeship program.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/forms/host-shop-inquiry"
-                className="bg-white text-gray-900 px-8 py-4 rounded-lg font-bold text-lg transition hover:bg-gray-100"
-              >
-                General Inquiry
-              </Link>
-              <Link
-                href="/portal/partner/enroll/host-shop"
-                className="bg-red-600 hover:bg-red-700 text-white px-8 py-4 rounded-lg font-bold text-lg transition shadow-lg"
-              >
-                Enroll as a Host Shop
-              </Link>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Why Partner - Visual Benefits */}
@@ -89,13 +61,13 @@ export default function HostShopsPage() {
               </p>
               <ul className="space-y-2 text-black">
                 <li className="flex items-center gap-2">
-                  <span className="text-green-600 font-bold">✓</span> Extra hands during busy hours
+                  <span className="text-green-600 font-bold">•</span> Extra hands during busy hours
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-green-600 font-bold">✓</span> Pre-screened, committed learners
+                  <span className="text-green-600 font-bold">•</span> Pre-screened, committed learners
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-green-600 font-bold">✓</span> Potential future employees
+                  <span className="text-green-600 font-bold">•</span> Potential future employees
                 </li>
               </ul>
             </div>
@@ -113,13 +85,13 @@ export default function HostShopsPage() {
               </p>
               <ul className="space-y-2 text-black">
                 <li className="flex items-center gap-2">
-                  <span className="text-brand-blue-600 font-bold">✓</span> Digital hour tracking system
+                  <span className="text-brand-blue-600 font-bold">•</span> Digital hour tracking system
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-brand-blue-600 font-bold">✓</span> State board compliance handled
+                  <span className="text-brand-blue-600 font-bold">•</span> State board compliance handled
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-brand-blue-600 font-bold">✓</span> Simple attendance verification
+                  <span className="text-brand-blue-600 font-bold">•</span> Simple attendance verification
                 </li>
               </ul>
             </div>
@@ -153,13 +125,13 @@ export default function HostShopsPage() {
               </p>
               <ul className="space-y-2 text-black">
                 <li className="flex items-center gap-2">
-                  <span className="text-amber-600 font-bold">✓</span> Train barbers your way
+                  <span className="text-amber-600 font-bold">•</span> Train barbers your way
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-amber-600 font-bold">✓</span> First pick of new talent
+                  <span className="text-amber-600 font-bold">•</span> First pick of new talent
                 </li>
                 <li className="flex items-center gap-2">
-                  <span className="text-amber-600 font-bold">✓</span> Recognition as a training shop
+                  <span className="text-amber-600 font-bold">•</span> Recognition as a training shop
                 </li>
               </ul>
             </div>
@@ -185,7 +157,7 @@ export default function HostShopsPage() {
                 'Carry appropriate business insurance',
               ].map((item, i) => (
                 <li key={i} className="flex items-start gap-3">
-                  <span className="text-green-600 font-bold text-xl">✓</span>
+                  <span className="text-green-600 font-bold text-xl">•</span>
                   <span className="text-black text-lg">{item}</span>
                 </li>
               ))}
@@ -224,19 +196,19 @@ export default function HostShopsPage() {
               <h3 className="font-bold text-xl mb-6 text-white">What We Handle</h3>
               <ul className="space-y-4 text-white">
                 <li className="flex items-start gap-3">
-                  <span className="font-bold text-xl">✓</span>
+                  <span className="font-bold text-xl">•</span>
                   <span className="text-lg">Apprenticeship structure & framework</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="font-bold text-xl">✓</span>
+                  <span className="font-bold text-xl">•</span>
                   <span className="text-lg">Related instruction (Milady curriculum)</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="font-bold text-xl">✓</span>
+                  <span className="font-bold text-xl">•</span>
                   <span className="text-lg">Documentation & compliance</span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <span className="font-bold text-xl">✓</span>
+                  <span className="font-bold text-xl">•</span>
                   <span className="text-lg">Completion verification</span>
                 </li>
               </ul>

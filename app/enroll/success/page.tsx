@@ -2,13 +2,12 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import {
-  CheckCircle,
   Mail,
   Phone,
   Calendar,
   ArrowRight,
   PartyPopper,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import ConfettiWrapper from '@/components/ConfettiWrapper';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -91,7 +90,7 @@ export default async function EnrollSuccessPage() {
         {/* Success Icon */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-20 h-20 bg-green-600 rounded-full mb-6 animate-bounce">
-            <CheckCircle className="w-12 h-12 text-white" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
           <h1 className="text-4xl font-bold text-black mb-4">
             <PartyPopper className="w-8 h-8 inline-block mr-2" aria-hidden="true" />

@@ -62,7 +62,7 @@ export default function UniversalMarketingPage({
           priority
           quality={100}
         />
-        <div className="absolute inset-0    " />
+        
 
         <div className="relative h-full flex items-center">
           <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">

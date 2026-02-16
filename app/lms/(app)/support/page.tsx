@@ -14,9 +14,8 @@ import {
   Search,
   ChevronRight,
   Clock,
-  CheckCircle,
-  PenSquare
-} from 'lucide-react';
+  PenSquare,
+CheckCircle, } from 'lucide-react';
 import { SupportForm } from './SupportForm';
 
 export const metadata: Metadata = {

@@ -5,13 +5,12 @@ import { useState } from 'react';
 import {
   Search,
   TrendingUp,
-  CheckCircle,
   Clock,
   AlertCircle,
   Calendar,
   ExternalLink,
   RefreshCw,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface RefundStatus {
   status: string;
@@ -82,7 +81,7 @@ export default function RefundTrackerPage() {
       case 'submitted':
         return <TrendingUp className="w-12 h-12 text-brand-blue-200" />;
       case 'accepted':
-        return <CheckCircle className="w-12 h-12 text-green-200" />;
+        return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'action_required':
         return <AlertCircle className="w-12 h-12 text-red-200" />;
       default:
@@ -182,20 +181,20 @@ export default function RefundTrackerPage() {
               <h3 className="font-semibold mb-3">When to Check:</h3>
               <ul className="space-y-2 text-sm text-black">
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>
                     <strong>E-filed:</strong> 24 hours after IRS accepts your
                     return
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>
                     <strong>Paper filed:</strong> 4 weeks after mailing
                   </span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <CheckCircle className="w-4 h-4 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>
                     <strong>Amended return:</strong> 3 weeks after filing
                   </span>
@@ -264,7 +263,7 @@ export default function RefundTrackerPage() {
                 <div className="flex gap-4">
                   <div className="flex flex-col items-center">
                     <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                      <CheckCircle className="w-6 h-6 text-white" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     </div>
                     <div className="w-0.5 h-full bg-green-600 mt-2"></div>
                   </div>
@@ -287,7 +286,7 @@ export default function RefundTrackerPage() {
                           : 'bg-gray-300'
                       }`}
                     >
-                      <CheckCircle className="w-6 h-6 text-white" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     </div>
                     <div
                       className={`w-0.5 h-full mt-2 ${

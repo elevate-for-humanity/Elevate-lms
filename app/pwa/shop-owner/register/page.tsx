@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, Building2, MapPin, Phone, Mail, 
-  CheckCircle, Loader2, AlertCircle, ChevronRight
+  Loader2, AlertCircle, ChevronRight
 } from 'lucide-react';
 
 type Step = 'info' | 'details' | 'confirm' | 'success';
@@ -107,19 +107,19 @@ export default function ShopOwnerRegisterPage() {
             </p>
             <ul className="space-y-2 text-sm text-slate-300">
               <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Train apprentices at your shop
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Access to Milady curriculum
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Digital hour tracking & compliance
               </li>
               <li className="flex items-center gap-2">
-                <CheckCircle className="w-4 h-4 text-green-400" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Support from Elevate team
               </li>
             </ul>
@@ -370,7 +370,7 @@ export default function ShopOwnerRegisterPage() {
               </>
             ) : (
               <>
-                <CheckCircle className="w-5 h-5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 Submit Application
               </>
             )}
@@ -385,7 +385,7 @@ export default function ShopOwnerRegisterPage() {
     <div className="min-h-screen bg-slate-900 flex items-center justify-center p-6">
       <div className="text-center max-w-md">
         <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
-          <CheckCircle className="w-10 h-10 text-white" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
         </div>
         <h1 className="text-2xl font-bold text-white mb-4">Application Submitted!</h1>
         <p className="text-slate-400 mb-8">

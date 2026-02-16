@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { ArrowLeft, Search, CheckCircle, XCircle, Code, Zap } from 'lucide-react';
+import { ArrowLeft, Search, XCircle, Code, Zap } from 'lucide-react';
 import { QuickSummary } from '@/app/governance/_content/QuickSummary';
 
 export const metadata: Metadata = {
@@ -128,7 +128,7 @@ export default function SupersonicSeoIndexingPage() {
           <div className="space-y-3">
             {allowedContent.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}

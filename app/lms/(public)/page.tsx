@@ -96,7 +96,7 @@ export default async function LmsPublicPage() {
             Ready to Start Learning?
           </h2>
           <p className="mt-4 text-lg text-zinc-700 max-w-3xl">
-            Join thousands of students who are building better careers through
+            Students across Indiana are building better careers through
             our free training programs. 100% funded - no tuition, no hidden
             costs.
           </p>

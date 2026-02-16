@@ -482,7 +482,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
           priority
           quality={100}
         />
-        <div className="absolute inset-0    " />
+        
 
         <div className="relative h-full flex items-center">
           <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
@@ -567,7 +567,7 @@ export function AutoPolishedPage({ route, label, section }: AutoPolishedPageProp
               <ul className="space-y-3 text-black">
                 {config.bullets.map((b) => (
                   <li key={b} className="flex gap-3">
-                    <span className="text-orange-500 font-bold">✓</span>
+                    <span className="text-orange-500 font-bold">•</span>
                     <span>{b}</span>
                   </li>
                 ))}

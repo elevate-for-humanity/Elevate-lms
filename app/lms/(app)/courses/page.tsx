@@ -105,23 +105,11 @@ export default async function InteractiveCoursesPage() {
           <Breadcrumbs items={[{ label: "LMS", href: "/lms/dashboard" }, { label: "Courses" }]} />
         </div>
       {/* Video Hero */}
-      <section className="relative h-[300px] md:h-[400px] flex items-center justify-center text-white overflow-hidden">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/student-portal-hero.mp4" type="video/mp4" />
-        </video>
-        
-        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Interactive Courses</h1>
-          <p className="text-xl text-white/90 max-w-2xl mx-auto">
-            Engaging lessons with quizzes, assignments, and hands-on activities
-          </p>
+      {/* Hero */}
+      <section className="bg-slate-900 py-16">
+        <div className="max-w-5xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Interactive Courses</h1>
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto">Engaging lessons with quizzes, assignments, and hands-on activities</p>
         </div>
       </section>
 

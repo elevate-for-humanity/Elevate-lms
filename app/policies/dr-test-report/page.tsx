@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { CheckCircle, Calendar, Database, Clock, Shield } from 'lucide-react';
+import { Calendar, Database, Clock, Shield } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Disaster Recovery Test Report | Elevate for Humanity',
@@ -22,7 +22,7 @@ export default function DRTestReportPage() {
           <div className="mb-8">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
               <div>
                 <h1 className="text-3xl font-bold text-black">Disaster Recovery Test Report</h1>

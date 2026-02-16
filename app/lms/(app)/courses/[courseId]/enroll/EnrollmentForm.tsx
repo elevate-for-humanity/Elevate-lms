@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, CheckCircle, CreditCard } from 'lucide-react';
+import { Loader2, CreditCard } from 'lucide-react';
 
 interface Props {
   courseId: string;
@@ -126,7 +126,7 @@ export default function EnrollmentForm({ courseId, courseName, price, userEmail,
           </>
         ) : isFree ? (
           <>
-            <CheckCircle className="w-5 h-5" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             Enroll Now - Free
           </>
         ) : (

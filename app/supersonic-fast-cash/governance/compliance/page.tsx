@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { ArrowLeft, Scale, CheckCircle, AlertTriangle, Zap } from 'lucide-react';
+import { ArrowLeft, Scale, AlertTriangle, Zap } from 'lucide-react';
 import { QuickSummary } from '@/app/governance/_content/QuickSummary';
 import { SupersonicScopeSection } from '@/app/governance/_content/SupersonicScopeSection';
 
@@ -126,28 +126,28 @@ export default function SupersonicCompliancePage() {
             </h2>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Clear and Conspicuous</p>
                   <p className="text-slate-600 text-sm">Disclosures are presented in plain language, visible without scrolling or clicking where possible.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Timely</p>
                   <p className="text-slate-600 text-sm">Disclosures are presented before the user commits to a transaction or action.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Accurate</p>
                   <p className="text-slate-600 text-sm">All claims are supportable and aligned with authoritative documents.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Complete</p>
                   <p className="text-slate-600 text-sm">Material terms, conditions, and limitations are disclosed, not hidden.</p>

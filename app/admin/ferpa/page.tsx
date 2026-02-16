@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
-  Shield, FileText, Users, AlertTriangle, CheckCircle, 
+  Shield, FileText, Users, AlertTriangle, 
   Clock, Download, Eye, Search, Filter
 } from 'lucide-react';
 
@@ -166,15 +166,15 @@ export default async function AdminFerpaPage() {
               <h2 className="font-semibold text-gray-900 mb-4">Annual Compliance</h2>
               <div className="space-y-3">
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700 text-sm">Annual FERPA notice sent</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700 text-sm">Staff training completed</span>
                 </div>
                 <div className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-gray-700 text-sm">Directory opt-out period closed</span>
                 </div>
                 <div className="flex items-center gap-3">

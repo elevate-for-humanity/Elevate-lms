@@ -30,7 +30,7 @@ import {
   CheckCircle2,
   Code,
   ExternalLink,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface AdminRoute {
   name: string;
@@ -688,7 +688,7 @@ export default function AdminPortalMapPage() {
       case 'active':
         return (
           <span className="inline-flex items-center gap-1 px-2 py-2 text-xs font-medium text-green-700 bg-brand-green-100 rounded-full">
-            <CheckCircle2 className="w-3 h-3" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             Active
           </span>
         );

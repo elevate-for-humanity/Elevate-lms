@@ -99,20 +99,7 @@ export default function SearchPage() {
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-black/10" />
-        <div className="absolute inset-0 flex items-end">
-          <div className="max-w-6xl mx-auto px-4 w-full pb-10 sm:pb-14">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3">
-              Find Programs & Resources
-            </h1>
-            <p className="text-lg text-white/90 max-w-2xl mb-4">
-              Workforce training, certifications, funding, and career services — all in one place.
-            </p>
-            <p className="text-sm text-white/70">
-              Tip: Press <kbd className="px-1.5 py-0.5 bg-white/20 rounded text-xs font-mono">Ctrl+K</kbd> anywhere on the site to search instantly.
-            </p>
-          </div>
-        </div>
+        
       </section>
 
       {/* Program Cards with Images */}

@@ -4,9 +4,9 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   FileText, Download, Clock, Users, 
-  Building2, ChevronRight, ChevronDown, CheckCircle,
-  AlertTriangle, TrendingUp, Loader2, AlertCircle
-} from 'lucide-react';
+  Building2, ChevronRight, ChevronDown,
+  AlertTriangle, TrendingUp, Loader2, AlertCircle,
+CheckCircle, } from 'lucide-react';
 
 type ReportPeriod = 'week' | 'month' | 'quarter' | 'year';
 type ReportType = 'hours' | 'compliance' | 'progress';

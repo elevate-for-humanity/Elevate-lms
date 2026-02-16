@@ -4,7 +4,7 @@ import React from 'react';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle, ArrowLeft, ExternalLink, AlertCircle } from 'lucide-react';
+import { ArrowLeft, ExternalLink, AlertCircle } from 'lucide-react';
 import { AIInstructorWidget } from '@/components/AIInstructorWidget';
 
 interface UniversalCoursePlayerProps {
@@ -130,7 +130,7 @@ export function UniversalCoursePlayer({
                       disabled={loading}
                       className="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
                     >
-                      {loading ? 'Processing...' : '✓ Mark as Complete'}
+                      {loading ? 'Processing...' : '• Mark as Complete'}
                     </button>
                   </div>
                 </div>
@@ -166,7 +166,7 @@ export function UniversalCoursePlayer({
                     disabled={loading}
                     className="px-6 py-3 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
                   >
-                    {loading ? 'Processing...' : '✓ I\'ve Completed the Course'}
+                    {loading ? 'Processing...' : '• I\'ve Completed the Course'}
                   </button>
                 </div>
               </div>
@@ -191,7 +191,7 @@ export function UniversalCoursePlayer({
         <div className="bg-green-600 text-white px-6 py-4 shadow-lg">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <CheckCircle className="w-6 h-6" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-semibold">Course Complete!</div>
                 <div className="text-sm text-green-100">

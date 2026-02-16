@@ -9,7 +9,6 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import {
-  CheckCircle,
   ChevronLeft,
   ChevronRight,
   FileText,
@@ -17,7 +16,7 @@ import {
   BookOpen,
   Download,
   ClipboardList,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { QuizSystem } from '@/components/lms/QuizSystem';
 import { NoteTaking } from '@/components/NoteTaking';
 import DigitalBinder from '@/components/DigitalBinder';
@@ -325,7 +324,7 @@ export default function LessonPage() {
                   }`}
                 >
                   {lessonDone ? (
-                    <CheckCircle className="w-5 h-5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : (
                     <span className="text-sm font-bold">{idx + 1}</span>
                   )}
@@ -530,7 +529,7 @@ export default function LessonPage() {
             <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                  <CheckCircle className="w-7 h-7 text-green-600" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-green-900">Course Completed!</h3>

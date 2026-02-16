@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Plug, CheckCircle, XCircle, Settings } from 'lucide-react';
+import { Plug, XCircle, Settings } from 'lucide-react';
 
 export default function IntegrationsPage() {
   const supabase = createClient();
@@ -104,7 +104,7 @@ export default function IntegrationsPage() {
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">
             <div className="flex items-center gap-3 mb-2">
-              <CheckCircle className="h-11 w-11 text-brand-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <p className="text-sm text-black">Active</p>
             </div>
             <p className="text-3xl font-bold text-brand-green-600">
@@ -141,7 +141,7 @@ export default function IntegrationsPage() {
                     </p>
                   </div>
                   {integration.is_active ? (
-                    <CheckCircle className="h-10 w-10 text-brand-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : (
                     <XCircle className="h-10 w-10 text-black" />
                   )}

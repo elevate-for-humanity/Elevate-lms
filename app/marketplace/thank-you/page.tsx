@@ -93,19 +93,7 @@ function MarketplaceThankYouContent() {
 <div className="max-w-2xl mx-auto">
         <div className="bg-white rounded-lg shadow-md p-8 text-center mb-6">
           <div className="w-16 h-16 bg-brand-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg
-              className="w-8 h-8 text-brand-green-600"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M5 13l4 4L19 7"
-              />
-            </svg>
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
 
           <h1 className="text-3xl font-bold mb-2">Purchase Complete!</h1>

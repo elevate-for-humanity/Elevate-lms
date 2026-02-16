@@ -84,20 +84,16 @@ export default async function NetworkingEventsPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/images/career-services/networking-hero.jpg)' }}
-        />
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 text-white">
-          <Link href="/career-services" className="text-teal-200 hover:text-white mb-4 inline-block">
-            ← Career Services
-          </Link>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Networking Events</h1>
-          <p className="text-xl text-teal-100 max-w-2xl">
-            Connect with employers, build professional relationships, and discover job opportunities.
-          </p>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/career-services/networking-hero.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Networking Events</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Connect with employers, build professional relationships, and discover job opportunities.</p>
+          </div>
         </div>
       </section>
 

@@ -10,7 +10,6 @@ export const metadata: Metadata = {
 
 import { Suspense } from 'react';
 import Link from 'next/link';
-import { CheckCircle } from 'lucide-react';
 
 function SuccessContent({
   searchParams,
@@ -23,7 +22,7 @@ function SuccessContent({
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="max-w-2xl w-full bg-white shadow-lg rounded-lg p-8 md:p-12">
         <div className="text-center">
-          <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-6" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
 
           <h1 className="text-3xl font-bold text-black mb-4">
             Payment Successful!

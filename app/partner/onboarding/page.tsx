@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { 
   Building2, User, Mail, Phone, MapPin, 
-  FileText, Users, CheckCircle, ArrowRight, 
+  FileText, Users, ArrowRight, 
   ArrowLeft, Loader2, AlertCircle, Upload, X,
 } from 'lucide-react';
 import { 
@@ -192,7 +192,7 @@ export default function PartnerOnboardingPage() {
               <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
                 s < step ? 'bg-green-500 text-white' : s === step ? 'bg-brand-blue-600 text-white' : 'bg-slate-700 text-slate-400'
               }`}>
-                {s < step ? <CheckCircle className="w-5 h-5" /> : s}
+                {s < step ? <span className="text-slate-400 flex-shrink-0">•</span> : s}
               </div>
               {s < 5 && <div className={`w-8 h-1 ${s < step ? 'bg-green-500' : 'bg-slate-700'}`} />}
             </div>
@@ -424,7 +424,7 @@ export default function PartnerOnboardingPage() {
             ) : (
               <button onClick={handleSubmit} disabled={isSubmitting || !formData.agreedToTerms}
                 className="flex items-center gap-2 px-8 py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 disabled:opacity-50">
-                {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</> : <>Submit Application <CheckCircle className="w-5 h-5" /></>}
+                {isSubmitting ? <><Loader2 className="w-5 h-5 animate-spin" /> Submitting...</> : <>Submit Application <span className="text-slate-400 flex-shrink-0">•</span></>}
               </button>
             )}
           </div>

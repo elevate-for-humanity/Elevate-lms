@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, ExternalLink, CheckCircle, Calendar } from 'lucide-react';
+import { Shield, ExternalLink, Calendar } from 'lucide-react';
 
 /**
  * Verified Credentials Component
@@ -61,7 +61,7 @@ export function VerifiedCredentials() {
             >
               <div className="flex items-start justify-between mb-4">
                 <Shield className="h-10 w-10 text-green-600 flex-shrink-0" />
-                <CheckCircle className="h-5 w-5 text-green-600" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               </div>
 
               <h3 className="font-bold text-black mb-2">{cred.agency}</h3>

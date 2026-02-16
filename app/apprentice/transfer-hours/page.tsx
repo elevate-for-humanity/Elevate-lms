@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, Clock, FileText, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowRight, Clock, FileText, AlertCircle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -38,7 +38,7 @@ export default async function TransferHoursPage() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case 'approved':
-        return <CheckCircle className="w-5 h-5 text-green-500" />;
+        return <span className="text-slate-400 flex-shrink-0">•</span>;
       case 'denied':
         return <AlertCircle className="w-5 h-5 text-red-500" />;
       default:
@@ -143,19 +143,19 @@ export default async function TransferHoursPage() {
           <h3 className="font-semibold mb-4">Required Documentation</h3>
           <ul className="space-y-3">
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Employment verification letter from previous employer</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Pay stubs or W-2 forms showing dates of employment</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Training certificates or completion records</span>
             </li>
             <li className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Job description or duties performed</span>
             </li>
           </ul>

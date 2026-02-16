@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { 
-  CheckCircle, 
+  
   Play, 
   Clock, 
   ShoppingCart,
@@ -134,7 +134,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                     <ul className="space-y-2">
                       {sortedFeatures(bundle.features || []).map((f, i) => (
                         <li key={i} className="flex items-center gap-2">
-                          <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                           <span>{f.feature}</span>
                         </li>
                       ))}
@@ -153,7 +153,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                   >
                     {cart.includes(bundle.id) ? (
                       <>
-                        <CheckCircle className="w-5 h-5" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         Added to Cart
                       </>
                     ) : (
@@ -247,7 +247,7 @@ export function CareerCoursesClient({ courses, bundle }: CareerCoursesClientProp
                         >
                           {cart.includes(course.id) ? (
                             <>
-                              <CheckCircle className="w-4 h-4" />
+                              <span className="text-slate-400 flex-shrink-0">•</span>
                               Added
                             </>
                           ) : (

@@ -39,19 +39,15 @@ export default async function SuccessStoriesPage() {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="relative w-full -mt-[72px]">
-        <div className="relative min-h-[70vh] w-full overflow-hidden">
-          <Image src="/images/heroes/success-story-1.jpg" alt="Success Stories" width={800} height={600} className="absolute inset-0 h-full w-full object-cover" quality={85} loading="lazy" />
-          <div className="relative z-10 flex items-center justify-center min-h-[70vh]">
-            <div className="container mx-auto px-4 text-center text-white">
-              <h1 className="text-5xl md:text-6xl font-bold mb-6">
-                Success Stories
-              </h1>
-              <p className="text-xl md:text-2xl text-orange-100 max-w-3xl mx-auto">
-                Real outcomes from students who transformed their lives through
-                workforce training.
-              </p>
-            </div>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes/success-story-1.jpg" alt="Success Stories" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Success Stories</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Real outcomes from students who transformed their lives through workforce training.</p>
           </div>
         </div>
       </section>
@@ -164,7 +160,7 @@ export default async function SuccessStoriesPage() {
             Ready to Write Your Success Story?
           </h2>
           <p className="text-xl text-orange-100 mb-8 max-w-2xl mx-auto">
-            Join thousands of students who have transformed their lives through
+            Students across Indiana have transformed their lives through
             our training programs.
           </p>
           <Link href="/apply">

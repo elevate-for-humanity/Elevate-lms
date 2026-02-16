@@ -7,7 +7,7 @@ import React, { useEffect } from 'react';
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { CheckCircle, AlertCircle } from 'lucide-react';
+import { AlertCircle } from 'lucide-react';
 
 interface Placement {
   id: string;
@@ -283,7 +283,7 @@ export function ShopReportForm({ placements: initialPlacements }: { placements: 
             }`}
           >
             {message.type === 'success' ? (
-              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             ) : (
               <AlertCircle className="w-5 h-5 text-brand-orange-600 mt-0.5" />
             )}

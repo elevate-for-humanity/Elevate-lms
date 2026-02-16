@@ -73,19 +73,19 @@ export function ElevateChatWidget() {
               </p>
               <ul className="text-xs text-black space-y-2 mb-4">
                 <li className="flex items-start gap-2">
-                  <span className="text-orange-500">✓</span>
+                  <span className="text-orange-500">•</span>
                   <span>Finding 100% FREE training programs</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-orange-500">✓</span>
+                  <span className="text-orange-500">•</span>
                   <span>Checking your funding eligibility (WIOA, WRG)</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-orange-500">✓</span>
+                  <span className="text-orange-500">•</span>
                   <span>Starting your application</span>
                 </li>
                 <li className="flex items-start gap-2">
-                  <span className="text-orange-500">✓</span>
+                  <span className="text-orange-500">•</span>
                   <span>Answering questions about programs</span>
                 </li>
               </ul>

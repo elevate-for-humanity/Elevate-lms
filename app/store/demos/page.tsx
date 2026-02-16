@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Play, Shield, GraduationCap, Briefcase, BarChart3, ArrowRight, CheckCircle } from 'lucide-react';
+import { Play, Shield, GraduationCap, Briefcase, BarChart3, ArrowRight } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -110,7 +110,7 @@ export default function StoreDemosPage() {
                   <ul className="space-y-2 mb-6">
                     {demo.highlights.map((h) => (
                       <li key={h} className="flex items-start gap-2 text-slate-700 text-sm">
-                        <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         {h}
                       </li>
                     ))}

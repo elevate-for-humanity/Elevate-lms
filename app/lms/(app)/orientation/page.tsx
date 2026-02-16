@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const dynamic = 'force-dynamic';
 import { requireRole } from '@/lib/auth/require-role';
 import ProgramOrientationVideo from '@/components/student/ProgramOrientationVideo';
-import { CheckCircle, Book, Users, Award, Briefcase } from 'lucide-react';
+import { Book, Users, Award, Briefcase } from 'lucide-react';
 import Link from 'next/link';
 
 export const metadata = {
@@ -47,7 +47,7 @@ export default async function OrientationPage() {
         {isCompleted && (
           <div className="bg-green-50 border border-green-200 rounded-xl p-6 mb-8">
             <div className="flex items-center gap-3">
-              <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <h3 className="font-bold text-green-900 mb-1">
                   Orientation Completed
@@ -100,38 +100,38 @@ export default async function OrientationPage() {
               </h2>
               <ul className="space-y-3">
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-black">
                     How our Free training for eligible participants work
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-black">
                     Available programs in healthcare, skilled trades, and
                     business
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-black">
                     Funding options (WIOA, WRG, employer-sponsored)
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-black">
                     Support services (childcare, transportation, tools)
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-black">
                     Job placement assistance and career services
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span className="text-black">
                     How to succeed in your training program
                   </span>

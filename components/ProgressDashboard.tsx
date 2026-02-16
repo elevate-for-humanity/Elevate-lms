@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useState, useEffect } from 'react';
-import { TrendingUp, Award, Clock, Target, BookOpen, CheckCircle } from 'lucide-react';
+import { TrendingUp, Award, Clock, Target, BookOpen, CheckCircle, } from 'lucide-react';
 
 interface ProgressData {
   overall_progress: number;

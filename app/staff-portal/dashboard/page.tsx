@@ -4,7 +4,7 @@ export const dynamic = 'force-dynamic';
 import { createClient } from '@/lib/supabase/server';
 import { requireRole } from '@/lib/auth/require-role';
 import Link from 'next/link';
-import { Users, BookOpen, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { Users, BookOpen, AlertCircle, Clock } from 'lucide-react';
 import { safeFormatDate } from '@/lib/format-utils';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -238,7 +238,7 @@ export default async function StaffDashboard() {
               {(atRiskCount || 0) === 0 && (pendingEnrollments || 0) === 0 && (
                 <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
                   <div className="flex items-center gap-2 text-green-900 font-semibold">
-                    <CheckCircle className="h-5 w-5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     All Caught Up!
                   </div>
                   <div className="text-sm text-green-800 mt-1">

@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Scale, CheckCircle, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Scale, AlertTriangle } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -107,28 +107,28 @@ export default function CompliancePage() {
             </h2>
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Clear and Conspicuous</p>
                   <p className="text-slate-600 text-sm">Disclosures are presented in plain language, visible without scrolling or clicking where possible.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Timely</p>
                   <p className="text-slate-600 text-sm">Disclosures are presented before the user commits to a transaction or action.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Accurate</p>
                   <p className="text-slate-600 text-sm">All claims are supportable and aligned with authoritative documents.</p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div>
                   <p className="font-medium text-slate-900">Complete</p>
                   <p className="text-slate-600 text-sm">Material terms, conditions, and limitations are disclosed, not hidden.</p>

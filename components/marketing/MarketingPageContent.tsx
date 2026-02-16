@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { sanitizeHtml } from '@/lib/sanitize';
 import type { MarketingPage, MarketingSection } from '@/lib/api/marketing';
 
@@ -24,7 +24,7 @@ export function MarketingPageContent({ page }: MarketingPageContentProps) {
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 bg-black/50" />
+        
         <div className="relative z-10 max-w-7xl mx-auto px-6 text-white">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
             {page.title}
@@ -92,7 +92,7 @@ function FeaturesSection({ section }: { section: MarketingSection }) {
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature, idx) => (
             <div key={idx} className="bg-white rounded-xl p-6 shadow-sm">
-              <CheckCircle className="w-8 h-8 text-green-600 mb-4" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <p className="text-gray-700">{feature}</p>
             </div>
           ))}

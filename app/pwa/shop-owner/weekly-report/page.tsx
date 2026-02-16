@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
   ArrowLeft, Calendar, Clock, Users, TrendingUp,
-  CheckCircle, AlertCircle, Download, Share2, Loader2,
+  AlertCircle, Download, Share2, Loader2,
   Building2, FileText, ChevronRight, ChevronDown
 } from 'lucide-react';
 
@@ -133,7 +133,7 @@ export default function ShopWeeklyReportPage() {
         <div className={`${status.bg} border ${status.border} rounded-xl p-4`}>
           <div className="flex items-center gap-3">
             {report.complianceStatus === 'compliant' ? (
-              <CheckCircle className={`w-6 h-6 ${status.text}`} />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             ) : (
               <AlertCircle className={`w-6 h-6 ${status.text}`} />
             )}
@@ -252,7 +252,7 @@ export default function ShopWeeklyReportPage() {
             href="/pwa/shop-owner/approve-hours"
             className="flex items-center gap-4 bg-amber-600 rounded-xl p-4"
           >
-            <CheckCircle className="w-6 h-6 text-white" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <span className="text-white font-medium flex-1">Approve Pending Hours</span>
             <span className="bg-white/20 px-2 py-1 rounded text-white text-sm">
               {report.totalPending} hrs

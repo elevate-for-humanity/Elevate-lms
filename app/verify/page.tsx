@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { CheckCircle, XCircle, Search, Award, Calendar, User, Building2 } from 'lucide-react';
+import { XCircle, Search, Award, Calendar, User, Building2 } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Verify Certificate | Elevate for Humanity',
@@ -136,7 +136,7 @@ export default async function VerifyPage({
                 {/* Valid Certificate */}
                 <div className="bg-green-50 border-b border-green-200 p-6">
                   <div className="flex items-center gap-3">
-                    <CheckCircle className="w-8 h-8 text-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <div>
                       <h2 className="text-xl font-bold text-green-800">Certificate Verified</h2>
                       <p className="text-green-700">This certificate is authentic and valid.</p>

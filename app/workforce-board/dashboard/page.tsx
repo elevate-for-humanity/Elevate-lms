@@ -8,7 +8,6 @@ import {
   FileText,
   BarChart3,
   Shield,
-  CheckCircle,
   AlertTriangle,
   DollarSign,
   Award,
@@ -19,7 +18,7 @@ import {
   GraduationCap,
   ArrowUpRight,
   ArrowDownRight,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -243,7 +242,7 @@ export default async function WorkforceBoardDashboard() {
               </div>
             ) : (
               <div className="text-center py-8 text-gray-500">
-                <CheckCircle className="w-12 h-12 mx-auto mb-2 text-green-500" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <p>No at-risk participants</p>
               </div>
             )}
@@ -329,7 +328,7 @@ export default async function WorkforceBoardDashboard() {
         <div className="mt-8 bg-slate-700 rounded-xl border border-green-200 p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
-              <CheckCircle className="w-8 h-8 text-green-600 mr-3" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <h3 className="font-semibold text-gray-900">Compliance Status: Good Standing</h3>
                 <p className="text-sm text-gray-600">All required reports submitted. Next audit: Q2 2026</p>

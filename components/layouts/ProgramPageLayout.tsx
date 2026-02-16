@@ -72,7 +72,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
           priority
           quality={100}
         />
-        <div className="absolute inset-0    " />
+        
 
         <div className="relative h-full flex items-center">
           <div className="mx-auto max-w-7xl px-6 lg:px-8 w-full">
@@ -251,7 +251,7 @@ export function ProgramPageLayout(props: ProgramPageLayoutProps) {
           <ul className="space-y-2 text-sm text-black">
             {outcomes.map((item) => (
               <li key={item} className="flex gap-2">
-                <span className="mt-[3px] text-green-500">✔</span>
+                <span className="mt-[3px] text-green-500">•</span>
                 <span>{item}</span>
               </li>
             ))}

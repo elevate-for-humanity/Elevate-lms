@@ -16,7 +16,7 @@ export default function SocialMediaHighlight() {
             Follow Our Journey
           </h2>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
-            See daily success stories, training updates, and community impact. Join thousands following our mission to elevate communities.
+            See daily success stories, training updates, and community impact. Follow our mission to elevate communities.
           </p>
         </div>
 

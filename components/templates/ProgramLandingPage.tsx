@@ -161,7 +161,7 @@ export default function ProgramLandingPage({
           <h3 className="text-sm font-semibold text-black">Funding & Support</h3>
           <ul className="mt-2 space-y-1">
             {fundingOptions.map((option, idx) => (
-              <li key={idx}>✔ {option}</li>
+              <li key={idx}>• {option}</li>
             ))}
           </ul>
           {fundingNote && (

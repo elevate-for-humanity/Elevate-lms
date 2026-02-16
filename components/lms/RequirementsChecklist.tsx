@@ -1,7 +1,7 @@
 "use client";
 
 import Link from 'next/link';
-import { CheckCircle, Clock, Upload, FileText, Calendar } from 'lucide-react';
+import { Clock, Upload, FileText, Calendar } from 'lucide-react';
 
 interface Requirement {
   id: string;
@@ -31,7 +31,7 @@ export function RequirementsChecklist({ requirements, enrollmentId }: Requiremen
       case 'course':
         return <FileText className="w-5 h-5" />;
       default:
-        return <CheckCircle className="w-5 h-5" />;
+        return <span className="text-slate-400 flex-shrink-0">•</span>;
     }
   };
 
@@ -124,14 +124,14 @@ export function RequirementsChecklist({ requirements, enrollmentId }: Requiremen
           >
             <div className={`flex-shrink-0 mt-0.5 ${iconColor}`}>
               {isCompleted ? (
-                <CheckCircle className="w-5 h-5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               ) : (
                 getRequirementIcon(req.requirement_type)
               )}
             </div>
             <div className="flex-1">
               <h3 className="font-semibold text-black mb-1">
-                {isCompleted && '✓ '}
+                {isCompleted && '• '}
                 {req.title}
               </h3>
               {req.description && (

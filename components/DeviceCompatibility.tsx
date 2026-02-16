@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useState, useEffect } from 'react';
-import { CheckCircle2, XCircle, AlertCircle, Smartphone } from 'lucide-react';
+import { XCircle, AlertCircle, Smartphone } from 'lucide-react';
 
 interface CompatibilityCheck {
   name: string;
@@ -274,7 +274,7 @@ export default function DeviceCompatibility() {
             <div key={index} className="px-6 py-4 flex items-start gap-3">
               <div className="flex-shrink-0 mt-0.5">
                 {check.supported ? (
-                  <CheckCircle2 size={20} className="text-green-500" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                 ) : (
                   <XCircle size={20} className="text-red-500" />
                 )}

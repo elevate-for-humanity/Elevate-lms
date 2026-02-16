@@ -98,24 +98,25 @@ export default async function TeamPage() {
         </div>
       </div>
 
-      {/* Hero */}
+      {/* Hero — image only, no text overlay */}
       <section className="relative h-[300px] overflow-hidden">
         <Image
-          src="/images/heroes/about-team.jpg"
-          alt="Our Team"
+          src="/images/about-team-new.jpg"
+          alt="Elevate for Humanity Team"
           fill
           className="object-cover"
           priority
         />
-        <div className="absolute inset-0 flex items-center">
-          <div className="max-w-6xl mx-auto px-4 w-full">
-            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 sm:mb-4">
-              Our Team
-            </h1>
-            <p className="text-base sm:text-lg md:text-xl text-slate-200 max-w-2xl">
-              Meet the dedicated professionals transforming lives through education and career training.
-            </p>
-          </div>
+      </section>
+
+      <section className="py-10 bg-white">
+        <div className="max-w-6xl mx-auto px-4 text-center">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 mb-3">
+            Our Team
+          </h1>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Meet the dedicated professionals behind Elevate for Humanity.
+          </p>
         </div>
       </section>
 
@@ -125,7 +126,7 @@ export default async function TeamPage() {
           {members.length > 0 ? (
             <div className="space-y-10 sm:space-y-12 md:space-y-16">
               {members.map((member: any) => (
-                <div key={member.id} className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start">
+                <div key={member.id} id={`member-${member.id}`} className="grid md:grid-cols-3 gap-6 sm:gap-8 items-start scroll-mt-24">
                   <div className="md:col-span-1">
                     <div className="relative w-full aspect-square max-w-[300px] mx-auto rounded-xl overflow-hidden shadow-lg">
                       <Image

@@ -111,19 +111,7 @@ export default function LessonSidebar({
                     <div className="flex-shrink-0 mt-0.5">
                       {isCompleted ? (
                         <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center">
-                          <svg
-                            className="w-4 h-4 text-white"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M5 13l4 4L19 7"
-                            />
-                          </svg>
+                          <span className="text-slate-400 flex-shrink-0">•</span>
                         </div>
                       ) : (
                         <div

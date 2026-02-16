@@ -84,7 +84,7 @@ function CheckoutSuccessContent() {
                 1
               </div>
               <div>
-                <h3 className="font-bold text-gray-900">Access your dashboard</h3>
+                <h3 className="font-bold text-gray-900">Your dashboard is ready</h3>
                 <p className="text-sm text-gray-600">
                   Start exploring the platform immediately.
                 </p>

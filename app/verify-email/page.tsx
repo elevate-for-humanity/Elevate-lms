@@ -4,7 +4,7 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import { createClient } from '@/lib/supabase/client';
-import { Mail, CheckCircle, AlertCircle } from 'lucide-react';
+import { Mail, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 export default function VerifyEmailPage() {
@@ -69,7 +69,7 @@ export default function VerifyEmailPage() {
 
         <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4 mb-6">
           <h2 className="font-semibold text-brand-blue-900 mb-2 flex items-center">
-            <CheckCircle className="w-5 h-5 mr-2" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             Next Steps:
           </h2>
           <ol className="text-sm text-brand-blue-800 space-y-2 ml-7">
@@ -82,7 +82,7 @@ export default function VerifyEmailPage() {
         {resent && (
           <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
             <p className="text-green-800 text-sm flex items-center">
-              <CheckCircle className="w-5 h-5 mr-2" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               Verification email sent! Check your inbox.
             </p>
           </div>

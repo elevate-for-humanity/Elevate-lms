@@ -8,11 +8,10 @@ import {
   Mail,
   TrendingUp,
   Calendar,
-  CheckCircle,
   Clock,
   DollarSign,
   Target,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata = {
   title: 'CRM Hub | Admin Dashboard',

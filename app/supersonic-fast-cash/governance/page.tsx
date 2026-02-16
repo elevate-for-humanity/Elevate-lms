@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import { 
   FileText, Shield, Scale, Search, Settings, Mail, 
-  ArrowRight, Building2, CheckCircle, Zap
+  ArrowRight, Building2, Zap
 } from 'lucide-react';
 import { QuickSummary } from '@/app/governance/_content/QuickSummary';
 
@@ -133,7 +133,7 @@ export default function SupersonicGovernancePage() {
           <div className="space-y-3">
             {highlights.map((item, index) => (
               <div key={index} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-slate-700">{item}</span>
               </div>
             ))}

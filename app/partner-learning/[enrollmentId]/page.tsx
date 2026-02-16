@@ -7,10 +7,9 @@ import {
   ExternalLink, 
   Mail, 
   Clock, 
-  CheckCircle,
-  AlertCircle,
+  AlertCircle, Circle,
   Building2,
-  BookOpen
+  BookOpen,
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -61,13 +60,13 @@ export default async function PartnerLearningPage({ params }: Props) {
   const getStatusInfo = (status: string) => {
     switch (status?.toLowerCase()) {
       case 'completed':
-        return { icon: CheckCircle, color: 'text-green-600 bg-green-50', label: 'Completed' };
+        return { icon: Circle, color: 'text-green-600 bg-green-50', label: 'Completed' };
       case 'active':
       case 'enrolled':
       case 'in_progress':
         return { icon: Clock, color: 'text-brand-blue-600 bg-brand-blue-50', label: 'In Progress' };
       case 'pending':
-        return { icon: AlertCircle, color: 'text-amber-600 bg-amber-50', label: 'Pending Setup' };
+        return { icon: AlertCircle, Circle, color: 'text-amber-600 bg-amber-50', label: 'Pending Setup' };
       default:
         return { icon: Clock, color: 'text-gray-600 bg-gray-50', label: status || 'Unknown' };
     }

@@ -115,37 +115,15 @@ export default async function RiseFoundationPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[500px] flex items-center">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/images/rise-foundation/hero.jpg)' }}
-        />
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-20 text-white">
-          <div className="flex items-center gap-2 mb-4">
-            <Heart className="w-8 h-8 text-pink-400" />
-            <span className="text-pink-200 font-medium">The Rise Foundation — A DBA of Selfish Inc. 501(c)(3)</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Community Support Starts Here
-          </h1>
-          <p className="text-xl text-brand-blue-100 max-w-2xl mb-8">
-            Free VITA tax preparation, mental wellness support, trauma recovery, and community education. 
-            Serving Indiana families with compassion and dignity.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link
-              href="/rise-foundation/get-involved"
-              className="inline-flex items-center justify-center gap-2 bg-pink-500 text-white px-8 py-4 rounded-xl font-bold hover:bg-pink-600"
-            >
-              Get Support <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/donate"
-              className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-xl font-bold hover:bg-gray-100"
-            >
-              <Heart className="w-5 h-5" /> Donate
-            </Link>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/rise-foundation/hero.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Community Support Starts Here</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Free VITA tax preparation, mental wellness support, trauma recovery, and community education. Serving Indiana families with compassion and dignity.</p>
           </div>
         </div>
       </section>

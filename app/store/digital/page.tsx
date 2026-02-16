@@ -31,94 +31,31 @@ export default function StoreDigitalPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Digital" }]} />
       </div>
 {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden bg-amber-900">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-        >
-          <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home.mp4" type="video/mp4" />
-        </video>
-        
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-slate-900 rounded-full text-sm font-bold mb-6 border border-white/20">
-                <Sparkles className="w-4 h-4" />
-                AI-Powered Tools & Resources
-              </div>
-
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 leading-tight mb-6">
-                Digital Resources
-                <span className="block text-blue-300">For Training Providers</span>
-              </h1>
-
-              <p className="text-xl text-indigo-100 mb-8 leading-relaxed">
-                Everything you need to start, grow, and scale your workforce training business. 
-                AI assistants, compliance tools, marketing templates, and business guides.
-              </p>
-
-              <div className="flex flex-wrap gap-4 mb-8">
-                <Link
-                  href="#ai-tools"
-                  className="inline-flex items-center gap-2 bg-white text-indigo-900 px-6 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-all"
-                >
-                  <Zap className="w-5 h-5" />
-                  View AI Tools
-                </Link>
-                <Link
-                  href="#demos"
-                  className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-slate-900 px-6 py-3 rounded-xl font-bold hover:bg-white/20 transition-all border border-white/20"
-                >
-                  <Play className="w-5 h-5" />
-                  Watch Demos
-                </Link>
-              </div>
-
-              <div className="flex flex-wrap gap-6 text-slate-900/80 text-sm">
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span>Instant access</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span>Cancel anytime</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Check className="w-5 h-5 text-green-400" />
-                  <span>24/7 support</span>
-                </div>
-              </div>
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover" >
+            <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-slate-700 rounded-full text-sm font-bold mb-4">
+              <Sparkles className="w-4 h-4 text-slate-300" />
+              <span className="text-slate-300">AI-Powered Tools & Resources</span>
             </div>
-
-            <div className="hidden lg:grid grid-cols-2 gap-4">
-              <div className="space-y-4">
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <Shield className="w-10 h-10 text-blue-400 mb-3" />
-                  <h3 className="font-bold text-slate-900 mb-1">SAM.gov Assistant</h3>
-                  <p className="text-sm text-indigo-200">Federal registration made easy</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <Sparkles className="w-10 h-10 text-blue-400 mb-3" />
-                  <h3 className="font-bold text-slate-900 mb-1">AI Studio</h3>
-                  <p className="text-sm text-indigo-200">Generate videos & content</p>
-                </div>
-              </div>
-              <div className="space-y-4 mt-8">
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <DollarSign className="w-10 h-10 text-green-400 mb-3" />
-                  <h3 className="font-bold text-slate-900 mb-1">Grants Navigator</h3>
-                  <p className="text-sm text-indigo-200">Find & apply for funding</p>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6 border border-white/20">
-                  <Users className="w-10 h-10 text-amber-400 mb-3" />
-                  <h3 className="font-bold text-slate-900 mb-1">AI Tutor</h3>
-                  <p className="text-sm text-indigo-200">24/7 student support</p>
-                </div>
-              </div>
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">
+              Digital Resources <span className="text-blue-300">For Training Providers</span>
+            </h1>
+            <p className="text-lg text-slate-300 mb-6 max-w-3xl mx-auto">
+              Everything you need to start, grow, and scale your workforce training business. AI assistants, compliance tools, marketing templates, and business guides.
+            </p>
+            <div className="flex flex-wrap gap-4 justify-center">
+              <Link href="#ai-tools" className="inline-flex items-center gap-2 bg-white text-indigo-900 px-6 py-3 rounded-xl font-bold hover:bg-indigo-50 transition-all">
+                <Zap className="w-5 h-5" /> View AI Tools
+              </Link>
+              <Link href="#demos" className="inline-flex items-center gap-2 bg-slate-700 text-white px-6 py-3 rounded-xl font-bold hover:bg-slate-600 transition-all border border-slate-500">
+                <Play className="w-5 h-5" /> Watch Demos
+              </Link>
             </div>
           </div>
         </div>

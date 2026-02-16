@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { Heart, Users, TrendingUp, MessageSquare, Calendar, CheckCircle, Phone } from 'lucide-react';
+import { Heart, Users, TrendingUp, MessageSquare, Calendar, Phone } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -91,20 +91,16 @@ export default async function OngoingSupportPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center">
-        <div 
-          className="absolute inset-0 bg-cover bg-center"
-          style={{ backgroundImage: 'url(/images/heroes/event-2.jpg)' }}
-        />
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 text-white">
-          <Link href="/career-services" className="text-pink-200 hover:text-white mb-4 inline-block">
-            ← Career Services
-          </Link>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Ongoing Support</h1>
-          <p className="text-xl text-pink-100 max-w-2xl">
-            Your success is our success. Career support doesn't end at graduation—we're here for the long haul.
-          </p>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes/event-2.jpg" alt="Hero image" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Ongoing Support</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Your success is our success. Career support doesn't end at graduation—we're here for the long haul.</p>
+          </div>
         </div>
       </section>
 
@@ -141,14 +137,7 @@ export default async function OngoingSupportPage() {
                     <service.icon className="w-10 h-10 text-pink-600 mb-4" />
                     <h3 className="font-semibold text-lg mb-2">{service.title}</h3>
                     <p className="text-gray-600 text-sm mb-4">{service.description}</p>
-                    <ul className="space-y-2">
-                      {service.features.map((feature) => (
-                        <li key={feature} className="flex items-center gap-2 text-sm text-gray-500">
-                          <CheckCircle className="w-4 h-4 text-pink-500" />
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
+                    <p className="text-sm text-gray-500">{service.features.join('. ')}.</p>
                   </div>
                 ))}
               </div>
@@ -157,14 +146,7 @@ export default async function OngoingSupportPage() {
             {/* Benefits */}
             <div className="bg-white rounded-xl shadow-sm border p-6">
               <h2 className="text-xl font-semibold mb-4">Alumni Benefits</h2>
-              <div className="grid md:grid-cols-2 gap-3">
-                {benefits.map((benefit) => (
-                  <div key={benefit} className="flex items-center gap-2">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-                    <span className="text-gray-600">{benefit}</span>
-                  </div>
-                ))}
-              </div>
+              <p className="text-gray-600 leading-relaxed">{benefits.join('. ')}.</p>
             </div>
 
             {/* Support History */}

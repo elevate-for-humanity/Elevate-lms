@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
-import { CheckCircle, Calendar, HelpCircle } from 'lucide-react';
+import { Calendar, HelpCircle } from 'lucide-react';
 import { LICENSE_TIERS, DISCLAIMERS, ROUTES, PLATFORM_FEATURES } from '@/lib/pricing';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
@@ -114,9 +114,7 @@ export default async function PricingPage() {
                 <ul className="space-y-3 mb-8">
                   {tier.features?.map((feature: string, i: number) => (
                     <li key={i} className="flex items-start gap-2">
-                      <CheckCircle className={`w-5 h-5 flex-shrink-0 ${
-                        tier.featured ? 'text-orange-200' : 'text-green-500'
-                      }`} />
+                      <span className={`flex-shrink-0 ${tier.featured ? 'text-orange-200' : 'text-slate-400'}`}>•</span>
                       <span className={tier.featured ? 'text-white' : ''}>{feature}</span>
                     </li>
                   ))}
@@ -147,7 +145,7 @@ export default async function PricingPage() {
           <div className="grid md:grid-cols-3 gap-6">
             {PLATFORM_FEATURES.slice(0, 6).map((feature: any, index: number) => (
               <div key={index} className="bg-white rounded-lg p-6 shadow-sm">
-                <CheckCircle className="w-8 h-8 text-green-500 mb-3" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <h3 className="font-semibold mb-2">{feature.name}</h3>
                 <p className="text-gray-600 text-sm">{feature.description}</p>
               </div>

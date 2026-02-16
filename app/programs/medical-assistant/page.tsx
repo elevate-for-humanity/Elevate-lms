@@ -123,46 +123,11 @@ export default function MedicalAssistantProgramPage() {
       </div>
 
       {/* Hero */}
-      <section className="relative bg-rose-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('/images/patterns/grid.svg')] opacity-10" />
-        
-        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
-          <div className="max-w-2xl">
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
-              <FundingBadge type="funded" />
-              
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold mt-6 mb-6 leading-tight">
-                Become a Certified
-                <span className="text-rose-300"> Medical Assistant</span>
-              </h1>
-              
-              <p className="text-xl text-rose-100 mb-8 leading-relaxed">
-                Launch your healthcare career helping patients and supporting physicians. 
-                Learn clinical and administrative skills for one of the <strong className="text-white">fastest-growing healthcare roles.</strong>
-              </p>
-
-              <div className="flex flex-wrap gap-4 mb-10">
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <Clock className="w-4 h-4 text-rose-300" />16-20 Weeks
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <DollarSign className="w-4 h-4 text-green-400" />$0 with WIOA Funding
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur rounded-full text-sm">
-                  <TrendingUp className="w-4 h-4 text-rose-300" />14% Job Growth
-                </span>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link href="/apply?program=medical-assistant" className="inline-flex items-center justify-center px-8 py-4 bg-rose-500 hover:bg-rose-400 text-white font-semibold rounded-full transition-all transform hover:scale-105 shadow-lg shadow-rose-500/30">
-                  Check Your Eligibility<ArrowRight className="w-5 h-5 ml-2" />
-                </Link>
-                <Link href="#curriculum" className="inline-flex items-center justify-center px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur text-white font-semibold rounded-full transition-all">
-                  <Play className="w-5 h-5 mr-2" />View Curriculum
-                </Link>
-              </div>
-            </motion.div>
-          </div>
+      {/* Hero */}
+      <section className="bg-slate-900 py-16">
+        <div className="max-w-5xl mx-auto px-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">Become a Certified <span className="text-rose-300"> Medical Assistant</span></h1>
+          <p className="text-xl text-slate-300 max-w-3xl mx-auto">Launch your healthcare career helping patients and supporting physicians. Learn clinical and administrative skills for one of the <strong className="text-white">fastest-growing healthcare roles.</strong></p>
         </div>
       </section>
 

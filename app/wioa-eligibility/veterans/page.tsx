@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import Image from 'next/image';
-import { CheckCircle, Shield, Award, Briefcase, Phone } from 'lucide-react';
+import { Shield, Award, Briefcase, Phone, CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -79,19 +79,16 @@ export default async function VeteransPage() {
         </div>
       </div>
 
-      <section className="relative h-[400px] flex items-center justify-center text-white overflow-hidden">
-        <Image
-          src="/hero-images/about-hero.jpg"
-          alt="Veterans Priority Services"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-slate-900/70" />
-        <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-          <Shield className="w-16 h-16 mx-auto mb-4" />
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">WIOA Priority for Veterans</h1>
-          <p className="text-xl">Expedited services and priority enrollment for those who served</p>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/hero-images/about-hero.jpg" alt="Veterans Priority Services" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">WIOA Priority for Veterans</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Expedited services and priority enrollment for those who served</p>
+          </div>
         </div>
       </section>
 
@@ -132,7 +129,7 @@ export default async function VeteransPage() {
           <ul className="space-y-3">
             {qualifications.map((qual, index) => (
               <li key={index} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{qual}</span>
               </li>
             ))}
@@ -145,7 +142,7 @@ export default async function VeteransPage() {
           <ul className="space-y-3">
             {requiredDocuments.map((doc, index) => (
               <li key={index} className="flex items-start gap-3">
-                <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span className="text-gray-700">{doc}</span>
               </li>
             ))}

@@ -5,7 +5,6 @@ import Image from 'next/image';
 import { 
   BarChart3, 
   ArrowRight, 
-  CheckCircle,
   TrendingUp,
   Users,
   Target,
@@ -14,8 +13,8 @@ import {
   Activity,
   Download,
   Bell,
-  Zap
-} from 'lucide-react';
+  Zap,
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 const features = [

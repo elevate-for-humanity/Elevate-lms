@@ -5,7 +5,7 @@ import React from 'react';
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Upload, FileText, CheckCircle, AlertCircle, X } from 'lucide-react';
+import { Upload, FileText, AlertCircle, X } from 'lucide-react';
 
 interface UploadedFile {
   name: string;
@@ -235,7 +235,7 @@ export default function DocumentUploadPage() {
                     <div className="text-sm text-black">Uploading...</div>
                   )}
                   {file.status === 'success' && (
-                    <CheckCircle className="w-5 h-5 text-brand-green-600" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   )}
                   {file.status === 'error' && (
                     <AlertCircle className="w-5 h-5 text-brand-orange-600" />

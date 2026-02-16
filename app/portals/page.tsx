@@ -10,8 +10,7 @@ import {
   ArrowRight,
   Shield,
   Clock,
-  CheckCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
@@ -125,7 +124,7 @@ export default function PortalsPage() {
               <span>24/7 Availability</span>
             </div>
             <div className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-brand-blue-400" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <span>Real-Time Updates</span>
             </div>
           </div>

@@ -12,12 +12,11 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import {
   Building2,
-  CheckCircle,
   Clock,
   XCircle,
   FileText,
   Users,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export default async function AdminShopsPage() {
   const supabase = await createClient();
@@ -154,7 +153,7 @@ export default async function AdminShopsPage() {
 
           <div className="bg-white rounded-xl shadow-md border border-slate-200 p-6">
             <div className="flex items-center gap-3">
-              <CheckCircle className="w-8 h-8 text-brand-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="text-2xl font-bold text-black">
                   {shopsWithDocs.filter((s) => s.docsComplete).length}

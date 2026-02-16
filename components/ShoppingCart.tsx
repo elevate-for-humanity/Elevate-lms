@@ -253,7 +253,7 @@ export function ShoppingCart() {
                 </div>
                 {discount > 0 && (
                   <div className="mt-2 text-sm text-green-600">
-                    ✓ Promo code applied!
+                    • Promo code applied!
                   </div>
                 )}
               </div>

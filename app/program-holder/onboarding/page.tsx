@@ -7,11 +7,10 @@ import {
   Users,
   BarChart,
   MessageSquare,
-  CheckCircle,
   Video,
   FileText,
   HelpCircle,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const dynamic = 'force-dynamic';
@@ -108,49 +107,34 @@ export default async function ProgramHolderOnboarding() {
             </p>
             <ul className="space-y-3 text-black">
               <li className="flex items-start">
-                <CheckCircle
-                  className="text-brand-green-600 mr-3 flex-shrink-0 mt-1"
-                  size={20}
-                />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>
                   <strong>Enrolling students</strong> in approved training
                   programs
                 </span>
               </li>
               <li className="flex items-start">
-                <CheckCircle
-                  className="text-brand-green-600 mr-3 flex-shrink-0 mt-1"
-                  size={20}
-                />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>
                   <strong>Tracking student progress</strong> through the
                   platform
                 </span>
               </li>
               <li className="flex items-start">
-                <CheckCircle
-                  className="text-brand-green-600 mr-3 flex-shrink-0 mt-1"
-                  size={20}
-                />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>
                   <strong>Providing support</strong> to students during their
                   training
                 </span>
               </li>
               <li className="flex items-start">
-                <CheckCircle
-                  className="text-brand-green-600 mr-3 flex-shrink-0 mt-1"
-                  size={20}
-                />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>
                   <strong>Reporting outcomes</strong> and completion data
                 </span>
               </li>
               <li className="flex items-start">
-                <CheckCircle
-                  className="text-brand-green-600 mr-3 flex-shrink-0 mt-1"
-                  size={20}
-                />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <span>
                   <strong>Maintaining compliance</strong> with program
                   requirements
@@ -205,7 +189,7 @@ export default async function ProgramHolderOnboarding() {
               </div>
               <h3 className="text-lg font-bold mb-3">Access Dashboard</h3>
               <p className="text-black mb-4">
-                Once approved, log in to access your dashboard and start
+                Once approved, log in to your dashboard and start
                 enrolling students.
               </p>
               <Link

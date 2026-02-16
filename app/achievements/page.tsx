@@ -11,9 +11,8 @@ import {
   BookOpen,
   Clock,
   Users,
-  CheckCircle,
-  Lock
-} from 'lucide-react';
+  Lock,
+CheckCircle, } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {

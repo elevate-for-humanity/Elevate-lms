@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import {
   ShoppingBag, Store, CreditCard, TrendingUp, Shield,
-  Users, Zap, Award, CheckCircle, ArrowRight, Star
+  Users, Zap, Award, ArrowRight, Star
 } from 'lucide-react';
 
 export const metadata = {
@@ -147,7 +147,7 @@ export default function MarketplaceLanding() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
           <p className="text-xl text-black mb-8">
-            Join thousands of buyers and sellers in our marketplace today
+            Browse and purchase workforce tools and resources
           </p>
           <div className="flex gap-4 justify-center">
             <Link

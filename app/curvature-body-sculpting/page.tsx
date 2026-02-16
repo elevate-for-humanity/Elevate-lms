@@ -6,7 +6,6 @@ import {
   Sparkles,
   Heart,
   Star,
-  CheckCircle,
   ArrowRight,
   Phone,
   MapPin,
@@ -15,7 +14,7 @@ import {
   Award,
   Users,
   Calendar,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 import Testimonials from './components/Testimonials';
 
 export const metadata: Metadata = {
@@ -275,19 +274,19 @@ export default function CurvatureBodySculptingPage() {
               </p>
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Paid training provided</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Competitive pay + commission</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Career advancement opportunities</span>
                 </li>
                 <li className="flex items-center gap-3">
-                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <span>Flexible scheduling</span>
                 </li>
               </ul>

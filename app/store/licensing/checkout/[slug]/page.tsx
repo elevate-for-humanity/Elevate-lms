@@ -13,7 +13,7 @@ import {
   useElements,
 } from '@stripe/react-stripe-js';
 import { getProductBySlug } from '@/app/data/store-products';
-import { ArrowLeft, Lock, CheckCircle, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Lock, AlertCircle } from 'lucide-react';
 import Link from 'next/link';
 
 const stripePromise = loadStripe(
@@ -245,7 +245,7 @@ export default function LicenseCheckoutPage() {
 
             <div className="bg-brand-blue-50 border border-brand-blue-200 rounded-lg p-4">
               <div className="flex items-start gap-2">
-                <CheckCircle className="w-5 h-5 text-brand-blue-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 <div className="text-sm text-brand-blue-900">
                   <p className="font-semibold mb-1">What happens next:</p>
                   <ul className="space-y-1 text-brand-blue-800">

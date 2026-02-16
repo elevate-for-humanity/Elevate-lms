@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { 
   Shield, Clock, Trash2, Lock, FileText, 
-  Database, Eye, AlertTriangle, CheckCircle 
+  Database, Eye, AlertTriangle 
 } from 'lucide-react';
 
 export const metadata: Metadata = {
@@ -119,7 +119,7 @@ export default function DataGovernancePage() {
 
           <div className="space-y-4">
             <div className="flex items-start gap-3">
-              <CheckCircle className="w-5 h-5 text-green-600 mt-0.5" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
               <div>
                 <div className="font-medium text-slate-900">Eligible for Deletion</div>
                 <div className="text-slate-600 text-sm">

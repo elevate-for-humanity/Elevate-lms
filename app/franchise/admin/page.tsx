@@ -15,10 +15,9 @@ import {
   DollarSign, 
   TrendingUp,
   AlertCircle,
-  CheckCircle,
   Clock,
-  BarChart3
-} from 'lucide-react';
+  BarChart3,
+CheckCircle, } from 'lucide-react';
 import Link from 'next/link';
 
 interface FranchiseStats {
@@ -282,7 +281,7 @@ export default function FranchiseAdminDashboard() {
                 {stats?.pendingReturns || 0}
               </Badge>
               <Badge variant="default" className="text-xs bg-green-500">
-                <CheckCircle className="h-3 w-3 mr-1" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
                 {stats?.acceptedReturns || 0}
               </Badge>
               <Badge variant="destructive" className="text-xs">

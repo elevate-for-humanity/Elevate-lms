@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  ArrowLeft, Clock, CheckCircle, XCircle, User,
+  ArrowLeft, Clock, XCircle, User,
   Loader2, AlertCircle, Building2, Users, FileText
 } from 'lucide-react';
 
@@ -145,7 +145,7 @@ export default function ApproveHoursPage() {
       <main className="px-4 py-6 space-y-4">
         {entries.length === 0 ? (
           <div className="bg-slate-800 rounded-xl p-8 text-center">
-            <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <h2 className="text-xl font-bold text-white mb-2">All Caught Up!</h2>
             <p className="text-slate-400">No pending hours to approve</p>
           </div>
@@ -184,7 +184,7 @@ export default function ApproveHoursPage() {
                     <Loader2 className="w-5 h-5 animate-spin" />
                   ) : (
                     <>
-                      <CheckCircle className="w-5 h-5" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       Approve
                     </>
                   )}

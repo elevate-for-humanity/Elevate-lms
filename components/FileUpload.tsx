@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useState } from 'react';
-import { Upload, X, FileText, CheckCircle } from 'lucide-react';
+import { Upload, X, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 interface FileUploadProps {
@@ -88,7 +88,7 @@ export function FileUpload({ label, accept = '*', maxSize = 10, onUpload }: File
               <div className="text-sm text-brand-orange-600">Uploading...</div>
             )}
             {uploaded && (
-              <CheckCircle className="h-5 w-5 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             )}
             <Button
               variant="ghost"

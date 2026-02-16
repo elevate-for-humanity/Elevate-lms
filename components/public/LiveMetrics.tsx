@@ -9,10 +9,9 @@ import {
   Award,
   TrendingUp,
   Activity,
-  CheckCircle,
   Clock,
   BarChart3,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 interface Metrics {
   totalUsers: number;
@@ -168,10 +167,10 @@ export function LiveMetrics() {
     <div className="space-y-8">
       {/* Verification Badge */}
       <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
-        <CheckCircle className="h-10 w-10 text-green-600 flex-shrink-0" />
+        <span className="text-slate-400 flex-shrink-0">•</span>
         <div>
           <p className="text-sm font-semibold text-green-900">
-            ✓ Live Data Verified
+            • Live Data Verified
           </p>
           <p className="text-xs text-green-700">
             Real-time metrics from production database • Last updated:{' '}
@@ -269,7 +268,7 @@ export function LiveMetrics() {
           <strong>Data Source:</strong> {metrics.dataSource} •
           <strong> Updated:</strong>{' '}
           {new Date(metrics.lastUpdated).toLocaleString()} •
-          <strong> Verified:</strong> {metrics.verified ? '✓ Yes' : '✗ No'}
+          <strong> Verified:</strong> {metrics.verified ? '• Yes' : '✗ No'}
         </p>
       </div>
     </div>

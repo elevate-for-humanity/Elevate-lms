@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { SignatureCanvas } from '@/components/SignatureCanvas';
-import { CheckCircle, Circle, AlertTriangle, FileText, Pen } from 'lucide-react';
+import { Circle, AlertTriangle, FileText, Pen } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface Agreement {
@@ -159,7 +159,7 @@ export default function AgreementSigningForm({
   if (pendingAgreements.length === 0) {
     return (
       <div className="text-center py-8">
-        <CheckCircle className="w-16 h-16 text-green-600 mx-auto mb-4" />
+        <span className="text-slate-400 flex-shrink-0">•</span>
         <h3 className="text-xl font-bold text-gray-900 mb-2">All Agreements Signed</h3>
         <p className="text-gray-600">You have already accepted all required agreements.</p>
       </div>
@@ -198,7 +198,7 @@ export default function AgreementSigningForm({
                 >
                   <div className="flex items-center gap-3">
                     {isReviewed ? (
-                      <CheckCircle className="w-5 h-5 text-green-600" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                     ) : (
                       <Circle className="w-5 h-5 text-gray-400" />
                     )}

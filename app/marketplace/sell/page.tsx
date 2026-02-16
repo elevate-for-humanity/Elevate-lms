@@ -10,9 +10,8 @@ import {
   BookOpen,
   Video,
   FileText,
-  CheckCircle,
   ArrowRight,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Sell on Marketplace | Elevate',
@@ -174,7 +173,7 @@ export default async function SellOnMarketplacePage() {
                   <ul className="space-y-2">
                     {type.examples.map((example, i) => (
                       <li key={i} className="flex items-center gap-2 text-sm text-gray-500">
-                        <CheckCircle className="w-4 h-4 text-green-500" />
+                        <span className="text-slate-400 flex-shrink-0">•</span>
                         {example}
                       </li>
                     ))}

@@ -21,31 +21,15 @@ export default function EmployerPortalLanding() {
       </div>
 
       {/* Hero with Image */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden">
-        <Image
-          src="/images/business/handshake-1.jpg"
-          alt="Employer Portal"
-          fill
-          className="object-cover"
-          priority
-        />
-        <div className="absolute inset-0 bg-green-900/70" />
-        <div className="relative z-10 max-w-6xl mx-auto px-4 py-20 w-full">
-          <div className="flex items-center gap-3 mb-6">
-            <Building2 className="w-10 h-10 text-white" />
-            <span className="text-green-200 font-medium">Employer Portal</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">Employer Partner Portal</h1>
-          <p className="text-xl text-green-100 max-w-2xl mb-8">
-            Manage your apprentices, track their training progress, and access employer resources.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/login?redirect=/employer-portal" className="px-8 py-4 bg-white text-green-600 font-bold rounded-lg hover:bg-green-50">
-              Sign In
-            </Link>
-            <Link href="/onboarding/employer" className="px-8 py-4 bg-green-500 text-white font-bold rounded-lg hover:bg-green-400">
-              Employer Onboarding
-            </Link>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/business/handshake-1.jpg" alt="Employer Portal" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Employer Partner Portal</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Manage your apprentices, track their training progress, and access employer resources.</p>
           </div>
         </div>
       </section>

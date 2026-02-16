@@ -98,7 +98,7 @@ export default function EnrollmentCounter() {
             Live Enrollment Data
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
-            Join Thousands of Students
+            Enroll Today
           </h2>
           <p className="text-xl text-white/90 max-w-3xl mx-auto">
             Real people, real-time. Watch as students enroll and start their journey to a better career.
@@ -279,7 +279,7 @@ export default function EnrollmentCounter() {
           </div>
 
           <p className="mt-6 text-white/60 text-sm">
-            ✓ No application fee  ✓ Financial aid available  ✓ Start in weeks, not months
+            • No application fee  • Financial aid available  • Start in weeks, not months
           </p>
         </motion.div>
       </div>

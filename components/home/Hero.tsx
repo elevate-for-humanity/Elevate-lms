@@ -70,19 +70,19 @@ export function Hero() {
 
           <div className="flex flex-wrap gap-6 text-xs text-black pt-4 border-t border-slate-200">
             <div>
-              <p className="font-bold text-black text-sm">✓ Fully Funded Training</p>
+              <p className="font-bold text-black text-sm">• Fully Funded Training</p>
               <p>WIOA • WRG • JRI • OJT • WEX</p>
             </div>
             <div>
-              <p className="font-bold text-black text-sm">✓ Career Coach Support</p>
+              <p className="font-bold text-black text-sm">• Career Coach Support</p>
               <p>Navigate barriers, unlock funding</p>
             </div>
             <div>
-              <p className="font-bold text-black text-sm">✓ Real Job Connections</p>
+              <p className="font-bold text-black text-sm">• Real Job Connections</p>
               <p>Employer partners who hire</p>
             </div>
             <div>
-              <p className="font-bold text-black text-sm">✓ Hands-On Learning</p>
+              <p className="font-bold text-black text-sm">• Hands-On Learning</p>
               <p>Real shops, labs, clinics, workplaces</p>
             </div>
           </div>

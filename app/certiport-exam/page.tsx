@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
-import { Award, CheckCircle, Lock, ArrowRight, Shield, MapPin, Clock } from 'lucide-react';
+import { Award, Lock, ArrowRight, Shield, MapPin, Clock } from 'lucide-react';
 import { CERTIPORT_EXAMS } from '@/lib/partners/certiport';
 
 type FundingStatus = 'funded' | 'self_pay' | 'loading';
@@ -128,7 +128,7 @@ function CertiportExamContent() {
         <div className="max-w-2xl mx-auto">
           <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <CheckCircle className="w-8 h-8 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             </div>
             <h1 className="text-2xl font-bold mb-2">Your Exam Voucher</h1>
             <p className="text-slate-600 mb-6">Present this code at the testing center.</p>

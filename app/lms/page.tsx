@@ -6,7 +6,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import AvatarVideoOverlay from '@/components/AvatarVideoOverlay';
 import {
-  BookOpen, Play, Award, Bell, Settings, ChevronRight, CheckCircle,
+  BookOpen, Play, Award, Bell, Settings, ChevronRight,
   Target, Calendar, MessageSquare, BarChart3, Clock,
 } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
@@ -267,7 +267,7 @@ export default async function LMSPage() {
                 </div>
               ) : (
                 <div className="text-center py-8">
-                  <CheckCircle className="w-10 h-10 mx-auto mb-3 text-green-400" />
+                  <span className="text-slate-400 flex-shrink-0">•</span>
                   <p className="text-slate-500">No upcoming assignments</p>
                 </div>
               )}
@@ -283,7 +283,7 @@ export default async function LMSPage() {
                 <div className="space-y-4">
                   {typedActivity.map((activity) => (
                     <div key={activity.id} className="flex items-start gap-3">
-                      <CheckCircle className="w-5 h-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <span className="text-slate-400 flex-shrink-0">•</span>
                       <div>
                         <p className="text-sm font-medium text-slate-900">{activity.lesson?.title}</p>
                         <p className="text-xs text-slate-500">{new Date(activity.completed_at).toLocaleDateString()}</p>

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
-import { Zap, ArrowLeft, CheckCircle, ArrowRight } from 'lucide-react';
+import { Zap, ArrowLeft, ArrowRight } from 'lucide-react';
 
 const steps = [
   { num: 1, title: 'Create Your Account', desc: 'Sign up and verify your email to get started.', link: '/register' },
@@ -50,7 +50,7 @@ export default function QuickstartPage() {
         </div>
         <div className="mt-8 bg-green-50 border border-green-200 rounded-xl p-6">
           <div className="flex items-center gap-3 mb-2">
-            <CheckCircle className="w-6 h-6 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             <h3 className="font-semibold text-green-900">You are ready!</h3>
           </div>
           <p className="text-green-800">Once you complete these steps, you will have a fully functional training program ready to accept students.</p>

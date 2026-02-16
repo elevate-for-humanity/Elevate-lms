@@ -9,10 +9,9 @@ import {
   UserPlus, 
   BookOpen, 
   Clock, 
-  CheckCircle,
   AlertTriangle,
-  RefreshCw
-} from 'lucide-react';
+  RefreshCw,
+CheckCircle, } from 'lucide-react';
 
 interface AutomationEvent {
   id: string;

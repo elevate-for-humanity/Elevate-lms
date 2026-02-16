@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { 
-  ArrowLeft, Bell, CheckCircle, Clock, Award, 
+  ArrowLeft, Bell, Clock, Award, 
   AlertCircle, BookOpen, Calendar, Trash2, 
   Check, Loader2, BellOff
 } from 'lucide-react';
@@ -21,7 +21,7 @@ interface Notification {
 }
 
 const NOTIFICATION_ICONS: Record<NotificationType, React.ReactNode> = {
-  hours_approved: <CheckCircle className="w-5 h-5 text-green-400" />,
+  hours_approved: <span className="text-slate-400 flex-shrink-0">•</span>,
   hours_rejected: <AlertCircle className="w-5 h-5 text-red-400" />,
   milestone: <Award className="w-5 h-5 text-amber-400" />,
   reminder: <Clock className="w-5 h-5 text-brand-blue-400" />,

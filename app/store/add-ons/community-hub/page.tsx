@@ -8,11 +8,10 @@ import {
   Calendar,
   Star,
   ArrowRight,
-  CheckCircle,
   Zap,
   Shield,
   BarChart3,
-} from 'lucide-react';
+CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Community Hub Add-On | Build Engagement | Elevate Store',
@@ -116,23 +115,23 @@ export default function CommunityHubPage() {
               <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 border border-white/20">
                 <div className="space-y-4">
                   <div className="flex items-center gap-3 text-slate-900">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>One-time purchase</span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-900">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>Lifetime access</span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-900">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>Unlimited members</span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-900">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>Full source code access</span>
                   </div>
                   <div className="flex items-center gap-3 text-slate-900">
-                    <CheckCircle className="w-5 h-5 text-green-400" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>Integrates with your LMS</span>
                   </div>
                 </div>
@@ -205,7 +204,7 @@ export default function CommunityHubPage() {
                   'Direct messaging',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}
@@ -225,7 +224,7 @@ export default function CommunityHubPage() {
                   'API access',
                 ].map((item) => (
                   <li key={item} className="flex items-center gap-3">
-                    <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                     <span>{item}</span>
                   </li>
                 ))}

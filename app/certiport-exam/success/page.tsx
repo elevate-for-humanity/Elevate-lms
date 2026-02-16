@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { CheckCircle, Clock, MapPin, ArrowRight } from 'lucide-react';
+import { Clock, MapPin, ArrowRight, Circle, } from 'lucide-react';
 import { CERTIPORT_EXAMS } from '@/lib/partners/certiport';
 
 function SuccessContent() {
@@ -25,7 +25,7 @@ function SuccessContent() {
       <div className="max-w-lg w-full">
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
           <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-10 h-10 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
           </div>
 
           <h1 className="text-2xl font-bold text-slate-900 mb-2">
@@ -47,7 +47,7 @@ function SuccessContent() {
             <div className="space-y-3">
               {[
                 { icon: Clock, text: 'Voucher assigned within 1-2 business days' },
-                { icon: CheckCircle, text: 'You will receive an email with your voucher code' },
+                { icon: Circle, text: 'You will receive an email with your voucher code' },
                 { icon: MapPin, text: 'Schedule your exam at the Elevate testing center' },
               ].map((step, i) => (
                 <div key={i} className="flex items-start gap-3">

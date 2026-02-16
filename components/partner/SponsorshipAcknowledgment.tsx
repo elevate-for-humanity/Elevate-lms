@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { CheckCircle, Circle, AlertCircle, Loader2 } from 'lucide-react';
+import { Circle, AlertCircle, Loader2 } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 
 interface AcknowledgmentItem {
@@ -229,7 +229,7 @@ export function SponsorshipAcknowledgment({
           >
             <div className="flex items-start gap-3">
               {acknowledgments[item.key] ? (
-                <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0 mt-0.5" />
+                <span className="text-slate-400 flex-shrink-0">•</span>
               ) : (
                 <Circle className="w-6 h-6 text-slate-400 flex-shrink-0 mt-0.5" />
               )}
@@ -265,7 +265,7 @@ export function SponsorshipAcknowledgment({
 
       {allRequiredAcknowledged && (
         <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+          <span className="text-slate-400 flex-shrink-0">•</span>
           <div className="flex-1 text-sm text-green-800">
             <strong>All acknowledgments complete.</strong> You may now proceed
             to digital signature.

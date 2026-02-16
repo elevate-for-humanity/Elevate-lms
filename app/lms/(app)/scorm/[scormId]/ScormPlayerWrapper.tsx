@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { initializeScormAPI } from '@/lib/scorm/api';
 import { createClient } from '@/lib/supabase/client';
-import { CheckCircle, RotateCcw } from 'lucide-react';
+import { RotateCcw } from 'lucide-react';
 
 interface ScormPlayerWrapperProps {
   packageId: string;
@@ -209,7 +209,7 @@ export function ScormPlayerWrapper({
         )}
         {isCompleted && (
           <div className="flex items-center gap-1 text-green-600 text-sm font-medium">
-            <CheckCircle className="w-4 h-4" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             Complete
           </div>
         )}

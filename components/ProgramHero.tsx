@@ -24,47 +24,22 @@ export default function ProgramHero({
 }: ProgramHeroProps) {
   return (
     <>
-      {/* High-Quality Hero Banner */}
-      <section className="relative h-[400px] sm:h-[500px] md:h-[600px] w-full overflow-hidden">
-        {/* Hero Image - Maximum Quality */}
-        <div className="absolute inset-0">
-          <Image
-            src={imageSrc}
-            alt={imageAlt}
-            fill
-            className="object-cover"
-            priority
-            quality={100}
-            sizes="100vw"
-          />
-          {/* Subtle overlay for text readability */}
-          <div className="absolute inset-0    " />
+      {/* Hero Banner */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src={imageSrc} alt={imageAlt} fill className="object-cover" priority quality={100} sizes="100vw" />
         </div>
-
-        {/* Content */}
-        <div className="relative z-10 h-full flex items-center">
-          <div className="max-w-7xl mx-auto px-6 md:px-12 w-full">
-            <div className="max-w-4xl">
-              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 md:mb-8 tracking-tight drop-shadow-2xl">
-                {title}
-              </h1>
-              <p className="text-xl sm:text-2xl md:text-3xl text-white mb-8 md:mb-10 leading-relaxed drop-shadow-lg max-w-3xl">
-                {description}
-              </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  href="/apply"
-                  className="inline-flex items-center justify-center px-8 py-4 md:px-10 md:py-5 text-lg md:text-xl font-bold text-white bg-orange-500 rounded-full hover:bg-orange-600 transition-all hover:scale-105 shadow-2xl"
-                >
-                  Apply Now - Free Training
-                </Link>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center px-8 py-4 md:px-10 md:py-5 text-lg md:text-xl font-bold text-white bg-white/20 backdrop-blur-sm rounded-full hover:bg-white/30 transition-all hover:scale-105 border-2 border-white/50 shadow-2xl"
-                >
-                  Learn More
-                </Link>
-              </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-6 text-center">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3">{title}</h1>
+            <p className="text-lg md:text-xl text-slate-300 mb-6 max-w-3xl mx-auto">{description}</p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link href="/apply" className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-white bg-orange-500 rounded-lg hover:bg-orange-600 transition-colors">
+                Apply Now - Free Training
+              </Link>
+              <Link href="/contact" className="inline-flex items-center justify-center px-8 py-4 text-lg font-bold text-slate-300 bg-slate-700 rounded-lg hover:bg-slate-600 transition-colors border border-slate-500">
+                Learn More
+              </Link>
             </div>
           </div>
         </div>

@@ -9,14 +9,13 @@ import {
   Trash2, 
   Edit, 
   Copy, 
-  CheckCircle,
   ArrowLeft,
   Loader2,
   Calendar,
   Users,
   DollarSign,
-  Percent
-} from 'lucide-react';
+  Percent,
+CheckCircle, } from 'lucide-react';
 
 interface PromoCode {
   id: string;
@@ -376,7 +375,7 @@ export default function PromoCodesAdminPage() {
                             className="text-gray-400 hover:text-gray-600"
                           >
                             {copiedCode === promo.code ? (
-                              <CheckCircle className="w-4 h-4 text-green-500" />
+                              <span className="text-slate-400 flex-shrink-0">•</span>
                             ) : (
                               <Copy className="w-4 h-4" />
                             )}

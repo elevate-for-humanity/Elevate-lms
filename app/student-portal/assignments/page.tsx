@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import { Metadata } from 'next';
-import { FileText, Clock, CheckCircle, AlertCircle, Calendar } from 'lucide-react';
+import { FileText, Clock, AlertCircle, Calendar, CheckCircle, } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Assignments | Student Portal',

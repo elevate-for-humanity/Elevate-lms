@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
-import { FileText, Download, ChevronRight, BookOpen, Award, Users, Clock, CheckCircle, Settings } from 'lucide-react';
+import { FileText, Download, ChevronRight, BookOpen, Award, Users, Clock, Settings } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'LMS Governance and Course Standards | Elevate For Humanity',
@@ -113,7 +113,7 @@ export default function LMSStandardsPage() {
 
         <section id="creation" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <CheckCircle className="w-6 h-6 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             3. Course Creation Standards
           </h2>
           
@@ -217,7 +217,7 @@ export default function LMSStandardsPage() {
 
         <section id="quality" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-3">
-            <CheckCircle className="w-6 h-6 text-green-600" />
+            <span className="text-slate-400 flex-shrink-0">•</span>
             6. Quality Assurance
           </h2>
           

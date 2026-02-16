@@ -4,7 +4,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import React from 'react';
 
 import { useState } from 'react';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { XCircle } from 'lucide-react';
 
 export default function TestWebhookPage() {
   const [studentId, setStudentId] = useState('');
@@ -95,7 +95,7 @@ export default function TestWebhookPage() {
             >
               <h3 className="font-bold mb-2">
                 {result.success
-                  ? '<CheckCircle className="w-5 h-5 inline-block" /> Success!'
+                  ? '<span className="text-slate-400 flex-shrink-0">•</span> Success!'
                   : '<XCircle className="w-5 h-5 inline-block" /> Error'}
               </h3>
               <pre className="text-xs overflow-auto">

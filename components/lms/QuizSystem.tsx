@@ -3,7 +3,7 @@
 import React from 'react';
 
 import { useState } from 'react';
-import { CheckCircle, XCircle } from 'lucide-react';
+import { XCircle } from 'lucide-react';
 
 interface Question {
   id: string;
@@ -86,7 +86,7 @@ export function QuizSystem({
             className={`w-24 h-24 rounded-full flex items-center justify-center mx-auto mb-4 ${passed ? 'bg-green-100' : 'bg-red-100'}`}
           >
             {passed ? (
-              <CheckCircle className="w-12 h-12 text-green-600" />
+              <span className="text-slate-400 flex-shrink-0">•</span>
             ) : (
               <XCircle className="w-12 h-12 text-brand-orange-600" />
             )}
@@ -119,7 +119,7 @@ export function QuizSystem({
               >
                 <div className="flex items-start gap-3 mb-3">
                   {isCorrect ? (
-                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <span className="text-slate-400 flex-shrink-0">•</span>
                   ) : (
                     <XCircle className="w-5 h-5 text-brand-orange-600 flex-shrink-0 mt-0.5" />
                   )}

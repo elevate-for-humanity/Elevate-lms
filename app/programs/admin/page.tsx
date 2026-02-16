@@ -156,8 +156,7 @@ export default async function AdminPage() {
               Ready to Get Started?
             </h2>
             <p className="text-base md:text-lg text-brand-blue-100 mb-8">
-              Join thousands who have launched successful careers through our
-              programs.
+              Start your career in program administration and workforce development.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
               <Link

@@ -102,25 +102,25 @@ export default function LiveChatPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <StatCard
             title="Active Chats"
-            value="3"
+            value="0"
             icon={MessageCircle}
             color="blue"
           />
           <StatCard
             title="Avg Response Time"
-            value="2m 15s"
+            value="N/A"
             icon={Clock}
             color="green"
           />
           <StatCard
             title="Satisfaction Rate"
-            value="98%"
+            value="N/A"
             icon={CheckCircle}
             color="blue"
           />
           <StatCard
             title="Total Conversations"
-            value="1,247"
+            value="0"
             icon={TrendingUp}
             color="orange"
           />

@@ -392,12 +392,12 @@ export default function NotificationsPage() {
                   </div>
                   <div className="text-sm font-medium text-black">
                     {notification.targetAudience === 'all-students'
-                      ? '1,234'
+                      ? 'All students'
                       : notification.targetAudience === 'active-students'
-                        ? '856'
+                        ? 'Active students'
                         : notification.targetAudience === 'all-staff'
-                          ? '45'
-                          : '200+'}
+                          ? 'All staff'
+                          : 'Selected group'}
                   </div>
                 </div>
 

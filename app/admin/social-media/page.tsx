@@ -204,29 +204,29 @@ export default function SocialMediaPage() {
               name="Facebook"
               icon={Facebook}
               color="blue"
-              connected
-              followers="2,847"
+              connected={false}
+              followers="Not connected"
             />
             <PlatformCard
               name="Twitter"
               icon={Share2}
               color="sky"
-              connected
-              followers="1,234"
+              connected={false}
+              followers="Not connected"
             />
             <PlatformCard
               name="LinkedIn"
               icon={Linkedin}
               color="blue"
-              connected
-              followers="856"
+              connected={false}
+              followers="Not connected"
             />
             <PlatformCard
               name="Instagram"
               icon={Instagram}
               color="pink"
-              connected
-              followers="3,421"
+              connected={false}
+              followers="Not connected"
             />
           </div>
         </div>
@@ -512,7 +512,7 @@ function PlatformCard({
         )}
       </div>
       <h3 className="font-semibold text-black mb-1">{name}</h3>
-      <p className="text-sm text-black">{followers} followers</p>
+      <p className="text-sm text-black">{connected ? `${followers} followers` : followers}</p>
     </div>
   );
 }

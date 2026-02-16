@@ -20,6 +20,10 @@ export default async function InstructorAnalyticsPage() {
   const { count: totalStudents } = await supabase.from('enrollments').select('*', { count: 'exact', head: true }).eq('instructor_id', user.id);
   const { count: totalCourses } = await supabase.from('courses').select('*', { count: 'exact', head: true }).eq('instructor_id', user.id);
 
+  // Completion rate: completed enrollments / total enrollments for this instructor
+  const { count: completedEnrollments } = await supabase.from('enrollments').select('*', { count: 'exact', head: true }).eq('instructor_id', user.id).eq('status', 'completed');
+  const completionRate = (totalStudents && totalStudents > 0) ? Math.round(((completedEnrollments || 0) / totalStudents) * 100) : 0;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -31,8 +35,8 @@ export default async function InstructorAnalyticsPage() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Students</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">{totalStudents || 0}</p></div>
           <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Active Courses</h3><p className="text-3xl font-bold text-green-600 mt-2">{totalCourses || 0}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Avg. Rating</h3><p className="text-3xl font-bold text-yellow-600 mt-2">4.8</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Completion Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">87%</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Avg. Rating</h3><p className="text-3xl font-bold text-yellow-600 mt-2">N/A</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Completion Rate</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">{completionRate}%</p></div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Student Engagement</h2><StudentEngagementChart /></div>

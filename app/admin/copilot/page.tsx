@@ -43,26 +43,34 @@ export default async function CopilotPage() {
     redirect('/unauthorized');
   }
 
+  // Query real deployment status from copilot_deployments table
+  const { data: deployments } = await supabase
+    .from('copilot_deployments')
+    .select('copilot_type, status')
+    .order('created_at', { ascending: false });
+
+  const deploymentMap = new Map((deployments || []).map((d: any) => [d.copilot_type, d.status]));
+
   const copilotFeatures = [
     {
       name: 'AI Tutor',
       description: 'Personalized learning assistance',
-      status: 'active',
-      usage: '1,234 conversations',
+      status: deploymentMap.get('ai_tutor') || 'not_deployed',
+      usage: deploymentMap.has('ai_tutor') ? 'Deployed' : 'Not deployed',
       href: '/admin/copilot/tutor'
     },
     {
       name: 'Content Generator',
       description: 'Generate course content and quizzes',
-      status: 'active',
-      usage: '456 generations',
+      status: deploymentMap.get('admin_assistant') || 'not_deployed',
+      usage: deploymentMap.has('admin_assistant') ? 'Deployed' : 'Not deployed',
       href: '/admin/copilot/content'
     },
     {
       name: 'Analytics Assistant',
       description: 'AI-powered insights and reports',
-      status: 'inactive',
-      usage: 'Not deployed',
+      status: deploymentMap.get('support_bot') || 'not_deployed',
+      usage: deploymentMap.has('support_bot') ? 'Deployed' : 'Not deployed',
       href: '/admin/copilot/analytics'
     }
   ];

@@ -15,22 +15,34 @@ export const metadata: Metadata = {
   description: 'Manage FERPA compliance, student records access, and privacy controls.',
 };
 
-const complianceStats = [
-  { label: 'Active Consent Forms', value: '1,247', icon: FileText, color: 'green' },
-  { label: 'Pending Reviews', value: '23', icon: Clock, color: 'yellow' },
-  { label: 'Access Requests', value: '8', icon: Eye, color: 'blue' },
-  { label: 'Violations (YTD)', value: '0', icon: AlertTriangle, color: 'green' },
-];
-
-const recentActivity = [
-  { action: 'Consent form signed', student: 'John D.', date: '2 hours ago', status: 'complete' },
-  { action: 'Records access request', student: 'Sarah M.', date: '5 hours ago', status: 'pending' },
-  { action: 'Directory opt-out', student: 'Michael R.', date: '1 day ago', status: 'complete' },
-  { action: 'Third-party disclosure', student: 'Emily K.', date: '2 days ago', status: 'approved' },
-];
-
 export default async function AdminFerpaPage() {
   const supabase = await createClient();
+
+  // Query real counts from documents table (consent forms are documents)
+  const { count: consentCount } = await supabase.from('documents').select('*', { count: 'exact', head: true }).eq('document_type', 'consent');
+  const { count: pendingDocs } = await supabase.from('documents').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+  const { count: totalStudents } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('role', 'student');
+
+  const complianceStats = [
+    { label: 'Active Consent Forms', value: String(consentCount || 0), icon: FileText, color: 'green' },
+    { label: 'Pending Reviews', value: String(pendingDocs || 0), icon: Clock, color: 'yellow' },
+    { label: 'Student Records', value: String(totalStudents || 0), icon: Eye, color: 'blue' },
+    { label: 'Violations (YTD)', value: '0', icon: AlertTriangle, color: 'green' },
+  ];
+
+  // Query recent audit activity
+  const { data: auditLogs } = await supabase
+    .from('audit_logs')
+    .select('action, target_type, created_at, actor_id')
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  const recentActivity = (auditLogs || []).map((log: any) => ({
+    action: log.action || 'Activity',
+    student: log.target_type || 'Record',
+    date: log.created_at ? new Date(log.created_at).toLocaleDateString() : '',
+    status: 'complete',
+  }));
 
   if (!supabase) {
     return (

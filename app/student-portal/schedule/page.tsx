@@ -20,8 +20,9 @@ export default function StudentPortalSchedulePage() {
       
       <div className="flex gap-4 mb-6">
         <select className="border rounded-lg px-4 py-2">
-          <option>Fall 2024</option>
-          <option>Spring 2025</option>
+          <option>Spring 2026</option>
+          <option>Summer 2026</option>
+          <option>Fall 2026</option>
         </select>
         <button className="bg-brand-blue-600 text-white px-4 py-2 rounded-lg hover:bg-brand-blue-700">
           Export Calendar

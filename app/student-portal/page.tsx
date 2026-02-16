@@ -154,8 +154,8 @@ export default async function StudentPortalPage() {
     {
       icon: Phone,
       title: 'Call Student Services',
-      description: 'Get Help Online',
-      href: 'tel:support center',
+      description: '(317) 653-2678',
+      href: 'tel:+13176532678',
     },
     {
       icon: Mail,

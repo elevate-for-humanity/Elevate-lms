@@ -30,54 +30,14 @@ export default async function DealsPage() {
   }
 
   const pipelineStages = [
-    { name: 'Discovery', deals: 3, value: '$45,000', color: 'bg-brand-blue-500' },
-    { name: 'Proposal', deals: 4, value: '$120,000', color: 'bg-brand-blue-500' },
-    { name: 'Negotiation', deals: 2, value: '$85,000', color: 'bg-orange-500' },
-    { name: 'Closed Won', deals: 5, value: '$175,000', color: 'bg-green-500' },
+    { name: 'Discovery', deals: 0, value: '$0', color: 'bg-brand-blue-500' },
+    { name: 'Proposal', deals: 0, value: '$0', color: 'bg-brand-blue-500' },
+    { name: 'Negotiation', deals: 0, value: '$0', color: 'bg-orange-500' },
+    { name: 'Closed Won', deals: 0, value: '$0', color: 'bg-green-500' },
   ];
 
-  const deals = [
-    {
-      id: 1,
-      name: 'Workforce Board Partnership',
-      company: 'Indiana Workforce Development',
-      value: '$75,000',
-      stage: 'Negotiation',
-      closeDate: 'Jan 30, 2025',
-      owner: 'Admin User',
-      probability: 80,
-    },
-    {
-      id: 2,
-      name: 'Healthcare Training Contract',
-      company: 'Metro Health System',
-      value: '$50,000',
-      stage: 'Proposal',
-      closeDate: 'Feb 15, 2025',
-      owner: 'Sales Rep',
-      probability: 60,
-    },
-    {
-      id: 3,
-      name: 'CDL Training Program',
-      company: 'Swift Logistics',
-      value: '$35,000',
-      stage: 'Discovery',
-      closeDate: 'Mar 1, 2025',
-      owner: 'Admin User',
-      probability: 40,
-    },
-    {
-      id: 4,
-      name: 'Barber School Partnership',
-      company: 'Style Academy',
-      value: '$25,000',
-      stage: 'Closed Won',
-      closeDate: 'Jan 10, 2025',
-      owner: 'Sales Rep',
-      probability: 100,
-    },
-  ];
+  // Deals will be loaded from database when CRM module is configured
+  const deals: { id: number; name: string; company: string; value: string; stage: string; closeDate: string; owner: string; probability: number }[] = [];
 
   const getStageColor = (stage: string) => {
     switch (stage) {
@@ -166,6 +126,16 @@ export default async function DealsPage() {
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-4">
+            {deals.length === 0 && (
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+                <DollarSign className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">No deals yet</h3>
+                <p className="text-gray-500 mb-6">Create your first deal to start tracking your sales pipeline.</p>
+                <button className="px-6 py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors inline-flex items-center gap-2">
+                  <Plus className="w-4 h-4" /> Add Deal
+                </button>
+              </div>
+            )}
             {deals.map((deal) => (
               <div key={deal.id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
                 <div className="flex items-start justify-between">

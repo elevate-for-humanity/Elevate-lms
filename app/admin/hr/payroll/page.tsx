@@ -18,6 +18,8 @@ export default async function PayrollPage() {
   const { data: profile } = await supabase.from('profiles').select('*').eq('id', user.id).single();
   if (profile?.role !== 'admin' && profile?.role !== 'super_admin') redirect('/unauthorized');
 
+  const { count: staffCount } = await supabase.from('profiles').select('*', { count: 'exact', head: true }).in('role', ['admin', 'super_admin', 'instructor', 'staff']);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -29,10 +31,10 @@ export default async function PayrollPage() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">This Period</h3><p className="text-3xl font-bold text-green-600 mt-2">$45,230</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">YTD Total</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">$542K</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Employees</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">24</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Next Run</h3><p className="text-xl font-bold text-gray-900 mt-2">Jan 31</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">This Period</h3><p className="text-3xl font-bold text-green-600 mt-2">Not configured</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">YTD Total</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">Not configured</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Staff Accounts</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">{staffCount || 0}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Next Run</h3><p className="text-xl font-bold text-gray-900 mt-2">Not scheduled</p></div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border p-6"><h2 className="text-lg font-semibold mb-4">Payroll History</h2><p className="text-gray-500 text-center py-4">Payroll records will appear here</p></div>
       </div>

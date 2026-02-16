@@ -7,8 +7,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { withErrorHandling, APIErrors, ErrorCode } from '@/lib/api';
 import { createClient } from '@/lib/supabase/server';
 import { APIError } from '@/lib/api/api-error';
+import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { validatePassword } from '@/lib/auth/password-validation';
 
 export const POST = withErrorHandling(async (request: NextRequest) => {
+  // Rate limit signup to prevent account creation abuse
+  const rateLimited = await applyRateLimit(request, 'auth');
+  if (rateLimited) return rateLimited;
+
   const supabase = await createClient();
   
   // Parse request body
@@ -20,12 +26,14 @@ export const POST = withErrorHandling(async (request: NextRequest) => {
     throw APIErrors.validation('email and password', 'Email and password are required');
   }
 
-  if (password.length < 8) {
+  // Server-side password validation (NIST 800-63B)
+  const passwordCheck = validatePassword(password);
+  if (!passwordCheck.valid) {
     throw new APIError(
       ErrorCode.VAL_OUT_OF_RANGE,
       400,
-      'Password must be at least 8 characters',
-      { minLength: 8, actualLength: password.length }
+      passwordCheck.errors[0] || 'Password does not meet requirements',
+      { errors: passwordCheck.errors }
     );
   }
 

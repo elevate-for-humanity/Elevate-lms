@@ -1,0 +1,34 @@
+=== SECURITY HEADERS ANALYSIS ===
+
+Source: next.config.mjs headers() function (lines 483-700)
+Applied to: All non-static routes via catch-all source pattern
+
+| Header                    | Value                                                    | Status |
+|---------------------------|----------------------------------------------------------|--------|
+| Strict-Transport-Security | max-age=63072000; includeSubDomains; preload             | GOOD   |
+| X-Frame-Options           | SAMEORIGIN                                               | OK     |
+| X-Content-Type-Options    | nosniff                                                  | GOOD   |
+| X-XSS-Protection          | 1; mode=block                                            | OK (deprecated but harmless) |
+| Referrer-Policy           | origin-when-cross-origin                                 | OK     |
+| Permissions-Policy        | camera=(), microphone=(), geolocation=()                 | GOOD   |
+| Content-Security-Policy   | See below                                                | ISSUES |
+| X-DNS-Prefetch-Control    | on                                                       | OK     |
+
+CSP ANALYSIS:
+- default-src 'self' — GOOD
+- script-src: PRODUCTION uses 'unsafe-inline' — MEDIUM RISK (gov scans flag this)
+  - No nonce/hash strategy in place
+  - DEV uses 'unsafe-eval' 'unsafe-inline' — expected for dev
+- style-src: 'unsafe-inline' — MEDIUM (common but flagged by strict scanners)
+- img-src: Restricted to specific domains — GOOD (no wildcard *)
+- frame-ancestors: 'none' — GOOD (prevents clickjacking)
+- upgrade-insecure-requests — GOOD
+- base-uri 'self' — GOOD
+- form-action restricted to 'self' + stripe — GOOD
+
+ISSUES:
+1. 'unsafe-inline' in script-src (production) — gov scanners will flag this as HIGH
+   - Fix: Implement nonce-based CSP with Next.js
+2. 'unsafe-inline' in style-src — common but flagged
+   - Fix: Use CSS modules or nonce-based approach
+3. No report-uri or report-to directive — cannot monitor CSP violations

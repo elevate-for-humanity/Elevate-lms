@@ -8,6 +8,7 @@ import { getLicenseAccessMode } from '@/lib/licensing/billing-authority';
 import { reconcileTrialOnboarding } from '@/lib/trial/reconcile-onboarding';
 import AdminHeader from '@/components/admin/AdminHeader';
 import { DemoTourProvider } from '@/components/demo/DemoTourProvider';
+import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
 
 export const dynamic = 'force-dynamic';
 
@@ -110,6 +111,7 @@ export default async function AdminLayout({
   if (!context) {
     return (
       <DemoTourProvider>
+        <IdleTimeoutGuard />
         <AdminHeader />
         <div className="pt-16">{children}</div>
       </DemoTourProvider>
@@ -118,6 +120,7 @@ export default async function AdminLayout({
 
   return (
     <DemoTourProvider>
+      <IdleTimeoutGuard />
       <AdminLicenseWrapper
         license={context.license}
         userRole={context.userRole}

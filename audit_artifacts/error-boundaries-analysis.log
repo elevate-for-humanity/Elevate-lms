@@ -1,0 +1,34 @@
+=== ERROR BOUNDARIES ANALYSIS ===
+
+error.tsx files: 75
+not-found.tsx files: 1 (root only)
+
+Coverage:
+- Root app/error.tsx exists — catches unhandled errors globally — GOOD
+- 75 route groups have error.tsx — GOOD coverage for major sections
+- ~190 route groups MISSING error.tsx — these fall through to root error boundary
+
+Key protected areas:
+- app/admin/error.tsx — EXISTS
+- app/lms/error.tsx — EXISTS
+- app/instructor/error.tsx — EXISTS
+- app/staff-portal/error.tsx — EXISTS
+- app/workforce-board/error.tsx — EXISTS
+- app/student-portal/error.tsx — EXISTS
+- app/store/error.tsx — EXISTS
+- app/login/error.tsx — EXISTS
+
+Missing error.tsx in notable areas:
+- app/(auth)/ — auth flow errors fall to root
+- app/studio/ — dev studio errors fall to root
+- app/ai-studio/ — AI studio errors fall to root
+- app/compliance/ — compliance pages fall to root
+
+ASSESSMENT: MEDIUM — Root error boundary catches everything, but ~190 route groups
+lack specific error handling. For gov quality, each major section should have its own
+error boundary with appropriate messaging.
+
+Error message exposure:
+- Previous audit noted 394 routes expose error.message to clients
+- This leaks internal error details (stack traces, DB errors) to end users
+- Gov scanners flag this as information disclosure vulnerability

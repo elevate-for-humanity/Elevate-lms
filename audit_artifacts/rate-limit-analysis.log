@@ -1,0 +1,27 @@
+=== RATE LIMITING ANALYSIS ===
+
+Implementation: Upstash Redis-based sliding window (lib/rate-limit.ts)
+Fallback: In-memory rate limiter (lib/api/rate-limiter.ts)
+Wrapper: lib/api/with-rate-limit.ts
+
+CRITICAL: skipOnMissing defaults to TRUE
+  - If UPSTASH_REDIS_REST_URL/TOKEN not set, rate limiting is SILENTLY SKIPPED
+  - All 852 routes using applyRateLimit become unprotected if Redis is down
+
+Coverage:
+- 852/917 routes (93%) have rate limiting calls
+- 65 routes (7%) have NO rate limiting
+
+Notable unprotected routes:
+- app/api/admin/backup/route.ts — backup endpoint, no rate limit
+- app/api/admin/bulk/route.ts — bulk operations, no rate limit
+- app/api/auth/signup/route.ts — signup endpoint, no rate limit (abuse vector)
+- app/api/documents/upload/route.ts — file upload, no rate limit (DoS vector)
+- 17 cron routes — acceptable (should be protected by cron secret instead)
+- 10 webhook routes — acceptable (protected by signature verification)
+
+SEVERITY:
+- HIGH: auth/signup without rate limiting enables account creation abuse
+- HIGH: skipOnMissing=true means ALL rate limiting fails silently if Redis unavailable
+- MEDIUM: document upload without rate limiting enables storage abuse
+- LOW: admin routes without rate limiting (should be auth-protected anyway)

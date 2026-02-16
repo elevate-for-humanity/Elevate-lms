@@ -1,0 +1,299 @@
+./app/api/intake/application/route.ts:42:    type: z.enum(['id', 'ssn', 'diploma', 'transcript', 'resume', 'other']),
+./app/api/identity/verify-ssn/route.ts:14: * Website: https://www.ssa.gov/employer/ssnv.htm
+./app/api/identity/verify-ssn/route.ts:30:  const { ssn, firstName, lastName, dateOfBirth } = await request.json();
+./app/api/identity/verify-ssn/route.ts:33:  if (!ssn || !firstName || !lastName || !dateOfBirth) {
+./app/api/identity/verify-ssn/route.ts:42:    // Note: You need to register at https://www.ssa.gov/employer/ssnv.htm
+./app/api/identity/verify-ssn/route.ts:44:    const response = await fetch('https://www.ssa.gov/ssnvs/api/verify', {
+./app/api/identity/verify-ssn/route.ts:51:        ssn: ssn.replace(/\D/g, ''), // Remove non-digits
+./app/api/identity/verify-ssn/route.ts:62:      .from('ssn_verifications')
+./app/api/identity/verify-ssn/route.ts:65:        ssn_last_4: ssn.slice(-4), // Only store last 4 digits
+./app/api/identity/verify-ssn/route.ts:88:        ssn_verified: true,
+./app/api/identity/verify-ssn/route.ts:89:        ssn_verified_at: new Date().toISOString(),
+./app/api/hr/payroll/route.ts:239:        social_security_tax: taxes.socialSecurity,
+./app/api/supersonic-fast-cash/clients/route.ts:3:import { prepareSSNForStorage } from '@/lib/security/ssn';
+./app/api/supersonic-fast-cash/clients/route.ts:90:    const ssnData = body.ssn ? prepareSSNForStorage(body.ssn) : {};
+./app/api/supersonic-fast-cash/clients/route.ts:99:        ...ssnData, // ssn_hash and ssn_last4
+./app/api/supersonic-fast-cash/sync-jotform/route.ts:5:import { prepareSSNForStorage } from '@/lib/security/ssn';
+./app/api/supersonic-fast-cash/sync-jotform/route.ts:69:        const ssnData = clientData.ssn ? prepareSSNForStorage(clientData.ssn) : {};
+./app/api/supersonic-fast-cash/sync-jotform/route.ts:77:            ...ssnData, // ssn_hash and ssn_last4 instead of plain SSN
+./app/api/supersonic-fast-cash/sync-jotform/route.ts:103:            ssn: clientData.ssn,
+./app/api/supersonic-fast-cash/jotform-webhook/route.ts:7:import { prepareSSNForStorage } from '@/lib/security/ssn';
+./app/api/supersonic-fast-cash/jotform-webhook/route.ts:85:    const ssnData = clientData.ssn ? prepareSSNForStorage(clientData.ssn) : {};
+./app/api/supersonic-fast-cash/jotform-webhook/route.ts:92:        ...ssnData, // ssn_hash and ssn_last4 instead of plain SSN
+./app/api/supersonic-fast-cash/jotform-webhook/route.ts:119:        ssn: clientData.ssn,
+./app/api/supersonic-fast-cash/jotform-webhook/route.ts:185:        ssn: dep.ssn,
+./app/api/supersonic-fast-cash/file-return/route.ts:5:import { prepareSSNForStorage } from '@/lib/security/ssn';
+./app/api/supersonic-fast-cash/file-return/route.ts:46:  ssn: string;
+./app/api/supersonic-fast-cash/file-return/route.ts:53:  ssn: string;
+./app/api/supersonic-fast-cash/file-return/route.ts:86:    const ssnData = prepareSSNForStorage(taxReturn.ssn);
+./app/api/supersonic-fast-cash/file-return/route.ts:94:        ...ssnData, // ssn_hash and ssn_last4 instead of plain SSN
+./app/api/supersonic-fast-cash/file-return/route.ts:120:        ssn: taxReturn.ssn,
+./app/api/supersonic-fast-cash/file-return/route.ts:132:        ssn: taxReturn.spouseSSN,
+./app/api/supersonic-fast-cash/upload/route.ts:21:    const ssn = formData.get('ssn') as string;
+./app/api/supersonic-fast-cash/upload/route.ts:24:    if (!firstName || !lastName || !email || !phone || !ssn) {
+./app/api/supersonic-fast-cash/upload/route.ts:41:        ssn_last_4: ssn,
+./app/api/supersonic-fast-cash/upload/route.ts:67:            <p><strong>SSN Last 4:</strong> ${ssn}</p>
+./app/api/reports/wioa/route.ts:52:    'ssn_last4',
+./app/api/reports/wioa/route.ts:75:    r.ssn_last4,
+./app/api/reports/rapids/export/route.ts:28:  ssnLastFour: string;
+./app/api/reports/rapids/export/route.ts:289:        ssnLastFour: a.ssn_last_four || '****',
+./app/api/reports/rapids/export/route.ts:351:        a.ssnLastFour,
+./app/api/reports/rapids/export/route.ts:386:        a.ssnLastFour,
+./app/api/reports/rapids/export/route.ts:404:          a.ssnLastFour,
+./app/api/franchise/clients/route.ts:99:    if (!body.office_id || !body.first_name || !body.last_name || !body.ssn) {
+./app/api/franchise/clients/route.ts:101:        { error: 'Missing required fields: office_id, first_name, last_name, ssn' },
+./app/api/verification/submit/route.ts:48:    const ssnLast4 = formData.get('ssnLast4') as string;
+./app/api/verification/submit/route.ts:171:        ssn_last_4: ssnLast4 || null,
+./app/api/supersonic-cash/apply/route.ts:81:        ssn_last4: applicationData.ssn,
+./app/api/supersonic-cash/apply/route.ts:194:          ssn: application.ssn_last4,
+./app/api/analytics/reports/wioa/route.ts:52:    'ssn_last4',
+./app/api/analytics/reports/wioa/route.ts:75:    r.ssn_last4,
+./app/api/tax/calculate/route.ts:23:        ssn: '',
+./app/api/tax/validate/route.ts:17:        case 'ssn':
+./app/api/tax/validate/route.ts:20:            field: 'ssn'
+./app/api/tax/validate/route.ts:46:        ssn: '',
+./app/api/tax/file-return/route.ts:13:import { prepareSSNForStorage } from '@/lib/security/ssn';
+./app/api/tax/file-return/route.ts:49:        ssn: body.ssn,
+./app/api/tax/file-return/route.ts:69:        ssn: body.spouseSSN,
+./app/api/tax/file-return/route.ts:76:        ssn: dep.ssn,
+./app/api/tax/file-return/route.ts:175:    const ssnData = prepareSSNForStorage(body.ssn);
+./app/api/tax/file-return/route.ts:183:        ssn_hash: ssnData.ssn_hash,
+./app/api/tax/file-return/route.ts:184:        ssn_last4: ssnData.ssn_last4,
+./app/api/tax/file-return/route.ts:194:        onConflict: 'ssn_hash'
+./app/api/tax/file-return/route.ts:216:        taxpayer_ssn_hash: ssnData.ssn_hash,
+./app/api/tax/file-return/route.ts:261:          social_security_wages: w2.socialSecurityWages,
+./app/api/tax/file-return/route.ts:262:          social_security_tax: w2.socialSecurityTax,
+./app/api/tax/file-return/route.ts:275:        const depSsn = prepareSSNForStorage(dep.ssn);
+./app/api/tax/file-return/route.ts:281:          ssn_hash: depSsn.ssn_hash,
+./app/api/tax/file-return/route.ts:282:          ssn_last4: depSsn.ssn_last4,
+./app/dashboard/diy-taxes/page.tsx:55:    ssn: '',
+./app/dashboard/diy-taxes/page.tsx:123:            ssn: taxpayer.ssn,
+./app/dashboard/diy-taxes/page.tsx:222:            ssn: taxpayer.ssn,
+./app/dashboard/diy-taxes/page.tsx:358:                  <Label htmlFor="ssn">Social Security Number</Label>
+./app/dashboard/diy-taxes/page.tsx:360:                    id="ssn"
+./app/dashboard/diy-taxes/page.tsx:362:                    value={taxpayer.ssn}
+./app/dashboard/diy-taxes/page.tsx:363:                    onChange={(e) => setTaxpayer({ ...taxpayer, ssn: e.target.value })}
+./app/admin/reports/samples/page.tsx:27:    ssn_last4: '4521',
+./app/admin/reports/samples/page.tsx:163:                    <dd>***-**-{SAMPLE_ENROLLMENT.student.ssn_last4}</dd>
+./app/admin/wioa/verify/page.tsx:16:  ssn: '***-**-1234',
+./app/admin/wioa/verify/page.tsx:86:                  <p className="font-medium text-gray-900">{applicant.ssn}</p>
+./app/admin/barriers/page.tsx:66:    { name: 'Housing', icon: '🏠', description: 'Housing instability or homelessness' },
+./app/admin/wotc/new/page.tsx:74:                  name="ssn"
+./app/admin/wotc/actions.ts:21:    employee_ssn: formData.get('ssn') as string,
+./app/admin/wotc/actions.ts:64:    employee_ssn: formData.get('ssn') as string,
+./app/funding/wioa/page.tsx:246:                a second language, justice involvement, homelessness—WIOA is
+./app/supersonic-fast-cash/diy-taxes/page.tsx:21:  ssn: string;
+./app/supersonic-fast-cash/diy-taxes/page.tsx:49:    ssn: string;
+./app/supersonic-fast-cash/diy-taxes/page.tsx:115:    ssn: '',
+./app/supersonic-fast-cash/diy-taxes/page.tsx:230:          ssn: '',
+./app/supersonic-fast-cash/diy-taxes/page.tsx:372:                      value={taxReturn.ssn}
+./app/supersonic-fast-cash/diy-taxes/page.tsx:374:                        setTaxReturn({ ...taxReturn, ssn: e.target.value })
+./app/supersonic-fast-cash/diy-taxes/page.tsx:689:                            value={dependent.ssn}
+./app/supersonic-fast-cash/diy-taxes/page.tsx:692:                              newDependents[index].ssn = e.target.value;
+./app/supersonic-fast-cash/diy-taxes/page.tsx:1227:                      <strong>SSN:</strong> ***-**-{taxReturn.ssn.slice(-4)}
+./app/supersonic-fast-cash/upload-documents/page.tsx:17:      { id: 'social-security-card', name: 'Social Security Card', required: true, description: 'For you, spouse, and all dependents' },
+./app/supersonic-fast-cash/tax-tools/page.tsx:387:              href="https://www.irs.gov/businesses/small-businesses-self-employed/self-employment-tax-social-security-and-medicare-taxes"
+./app/tax-self-prep/start/TaxPrepForm.tsx:35:    ssn: existingDraft?.data?.ssn || '',
+./app/tax-self-prep/start/TaxPrepForm.tsx:222:                  <input type="text" value={formData.ssn}
+./app/tax-self-prep/start/TaxPrepForm.tsx:223:                    onChange={e => updateField('ssn', e.target.value)}
+./app/franchise/office/clients/[clientId]/page.tsx:40:  ssn_last_four: string;
+./app/franchise/office/clients/[clientId]/page.tsx:45:  spouse_ssn_last_four: string | null;
+./app/franchise/office/clients/[clientId]/page.tsx:201:              SSN: ***-**-{client.ssn_last_four} | Client since {new Date(client.client_since).toLocaleDateString()}
+./app/franchise/office/clients/[clientId]/page.tsx:377:                      {client.spouse_first_name} {client.spouse_last_name} (***-**-{client.spouse_ssn_last_four})
+./app/franchise/office/clients/page.tsx:28:  ssn_last_four: string;
+./app/franchise/office/clients/page.tsx:54:        c.ssn_last_four.includes(query)
+./app/franchise/office/clients/page.tsx:214:                        SSN: ***-**-{client.ssn_last_four}
+./app/franchise/office/clients/new/page.tsx:44:  const [ssn, setSSN] = useState('');
+./app/franchise/office/clients/new/page.tsx:136:    if (!firstName || !lastName || !ssn) {
+./app/franchise/office/clients/new/page.tsx:145:    const cleanSSN = ssn.replace(/\D/g, '');
+./app/franchise/office/clients/new/page.tsx:166:          ssn: cleanSSN,
+./app/franchise/office/clients/new/page.tsx:176:          spouse_ssn: hasSpouse ? spouseSSN.replace(/\D/g, '') : null,
+./app/franchise/office/clients/new/page.tsx:264:                value={ssn}
+./app/franchise/office/returns/page.tsx:39:    ssn_last_four: string;
+./app/franchise/office/returns/page.tsx:105:        client:franchise_clients(first_name, last_name, ssn_last_four)
+./app/franchise/office/returns/page.tsx:125:        r.client?.ssn_last_four?.includes(query) ||
+./app/franchise/office/returns/page.tsx:315:                        {ret.submission_id} | SSN: ***-**-{ret.client?.ssn_last_four}
+./app/franchise/office/returns/[returnId]/page.tsx:58:    ssn_last_four: string;
+./app/franchise/office/returns/[returnId]/page.tsx:89:          client:franchise_clients(id, first_name, last_name, ssn_last_four, email),
+./app/franchise/office/returns/[returnId]/page.tsx:252:                  <p className="font-medium">***-**-{returnData.client?.ssn_last_four}</p>
+./app/franchise/office/returns/new/page.tsx:28:  ssn_last_four: string;
+./app/franchise/office/returns/new/page.tsx:129:        .select('id, first_name, last_name, ssn_last_four, email')
+./app/franchise/office/returns/new/page.tsx:236:          ssn: '***-**-' + client.ssn_last_four, // Placeholder - real SSN from secure storage
+./app/franchise/office/returns/new/page.tsx:363:                      {client.first_name} {client.last_name} (***-**-{client.ssn_last_four})
+./app/programs/cna-certification/enroll/page.tsx:41:    ssn: '',
+./app/supersonic/apply/SupersonicForm.tsx:24:    ssn: '',
+./app/supersonic/apply/SupersonicForm.tsx:73:          ssn_last_four: formData.ssn.slice(-4),
+./app/scholarships/page.tsx:274:                  'Homeless or at risk of homelessness',
+./app/student-portal/onboarding/documents/page.tsx:40:    id: 'social_security_card',
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:38:    ssn?: File;
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:45:  const hasSsnDoc = documents.some((d) => d.document_type === 'ssn');
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:74:    if (!uploadedDocs.id || !uploadedDocs.ssn) {
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:98:      const ssnExt = uploadedDocs.ssn.name.split('.').pop();
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:99:      const ssnPath = `${userId}/ssn_${Date.now()}.${ssnExt}`;
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:100:      const { error: ssnUploadError } = await supabase.storage
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:102:        .upload(ssnPath, uploadedDocs.ssn);
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:104:      if (ssnUploadError) throw ssnUploadError;
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:117:          document_type: 'ssn',
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:118:          file_path: ssnPath,
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:119:          file_name: uploadedDocs.ssn.name,
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:434:                      ssn: e.target.files?.[0],
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:438:                  id="ssn-upload"
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:441:                  htmlFor="ssn-upload"
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:446:                {uploadedDocs.ssn && (
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:449:                    <span className="text-sm">{uploadedDocs.ssn.name}</span>
+./app/program-holder/verify-identity/IdentityVerificationFlow.tsx:466:            disabled={loading || !uploadedDocs.id || !uploadedDocs.ssn}
+./app/program-holder/verify-identity/SSNVerificationForm.tsx:22:    ssn: '',
+./app/program-holder/verify-identity/SSNVerificationForm.tsx:40:      const response = await fetch('/api/identity/verify-ssn', {
+./app/program-holder/verify-identity/SSNVerificationForm.tsx:159:            value={formData.ssn}
+./app/program-holder/verify-identity/SSNVerificationForm.tsx:163:                ssn: formatSSN(e.target.value),
+./app/program-holder/verify-identity/SSNVerificationForm.tsx:253:            href="https://www.ssa.gov/employer/ssnv.htm"
+./lib/security/ssn-helper.ts:16:export function encryptSSN(ssn: string): string {
+./lib/security/ssn-helper.ts:22:  let encrypted = cipher.update(ssn, 'utf8', 'hex');
+./lib/security/ssn-helper.ts:40:export function maskSSN(ssn: string): string {
+./lib/security/ssn-helper.ts:41:  const clean = ssn.replace(/\D/g, '');
+./lib/security/ssn-helper.ts:46:export function formatSSN(ssn: string): string {
+./lib/security/ssn-helper.ts:47:  const clean = ssn.replace(/\D/g, '');
+./lib/security/ssn-helper.ts:48:  if (clean.length !== 9) return ssn;
+./lib/security/ssn-helper.ts:52:export function validateSSN(ssn: string): boolean {
+./lib/security/ssn-helper.ts:53:  const clean = ssn.replace(/\D/g, '');
+./lib/security/ssn.ts:14:export function hashSSN(ssn: string): string {
+./lib/security/ssn.ts:18:  const cleaned = ssn.replace(/\D/g, '');
+./lib/security/ssn.ts:25:export function getSSNLast4(ssn: string): string {
+./lib/security/ssn.ts:26:  const cleaned = ssn.replace(/\D/g, '');
+./lib/security/ssn.ts:33:export function maskSSN(ssn: string): string {
+./lib/security/ssn.ts:34:  const last4 = getSSNLast4(ssn);
+./lib/security/ssn.ts:41:export function isValidSSN(ssn: string): boolean {
+./lib/security/ssn.ts:42:  const cleaned = ssn.replace(/\D/g, '');
+./lib/security/ssn.ts:50:export function prepareSSNForStorage(ssn: string): { ssn_hash: string; ssn_last4: string } {
+./lib/security/ssn.ts:52:    ssn_hash: hashSSN(ssn),
+./lib/security/ssn.ts:53:    ssn_last4: getSSNLast4(ssn),
+./lib/tax-software/schemas/schema-validator.ts:356:    const ssnElements = ['PrimarySSN', 'SpouseSSN', 'EmployeeSSN', 'DependentSSN'];
+./lib/tax-software/schemas/schema-validator.ts:358:    for (const elemName of ssnElements) {
+./lib/tax-software/schemas/schema-validator.ts:361:        const ssn = elements[i].textContent || '';
+./lib/tax-software/schemas/schema-validator.ts:363:        if (ssn && !/^\d{9}$/.test(ssn.replace(/-/g, ''))) {
+./lib/tax-software/mef/transmission.ts:305:  async getSubmissionsBySSN(ssnHash: string): Promise<MeFSubmission[]> {
+./lib/tax-software/mef/transmission.ts:311:      .eq('taxpayer_ssn_hash', ssnHash)
+./lib/tax-software/mef/xml-generator.ts:17:export function formatSSN(ssn: string): string {
+./lib/tax-software/mef/xml-generator.ts:18:  return ssn.replace(/\D/g, '');
+./lib/tax-software/mef/xml-generator.ts:67:        <PrimarySSN>${formatSSN(taxReturn.taxpayer.ssn)}</PrimarySSN>
+./lib/tax-software/mef/xml-generator.ts:68:        ${taxReturn.spouse ? `<SpouseSSN>${formatSSN(taxReturn.spouse.ssn)}</SpouseSSN>` : ''}
+./lib/tax-software/mef/xml-generator.ts:111:          <DependentSSN>${formatSSN(dep.ssn)}</DependentSSN>
+./lib/tax-software/mef/xml-generator.ts:229:      <EmployeeSSN>${formatSSN(taxReturn.taxpayer.ssn)}</EmployeeSSN>
+./lib/tax-software/validation/irs-rules.ts:19:  if (!taxReturn.taxpayer.ssn || taxReturn.taxpayer.ssn.replace(/\D/g, '').length !== 9) {
+./lib/tax-software/validation/irs-rules.ts:65:      if (!taxReturn.spouse.ssn || taxReturn.spouse.ssn.replace(/\D/g, '').length !== 9) {
+./lib/tax-software/validation/irs-rules.ts:87:      if (!dep.ssn || dep.ssn.replace(/\D/g, '').length !== 9) {
+./lib/tax-software/validation/irs-rules.ts:234:export function validateSSN(ssn: string): boolean {
+./lib/tax-software/validation/irs-rules.ts:235:  const cleaned = ssn.replace(/\D/g, '');
+./lib/tax-software/testing/ats-runner.ts:95:        ssn: '400-00-0001',
+./lib/tax-software/testing/ats-runner.ts:143:        ssn: '400-00-0002',
+./lib/tax-software/testing/ats-runner.ts:149:        ssn: '400-00-0003',
+./lib/tax-software/testing/ats-runner.ts:162:          ssn: '400-00-0004',
+./lib/tax-software/testing/ats-runner.ts:172:          ssn: '400-00-0005',
+./lib/tax-software/testing/ats-runner.ts:219:        ssn: '400-00-0006',
+./lib/tax-software/testing/ats-runner.ts:272:        ssn: '400-00-0007',
+./lib/tax-software/testing/ats-runner.ts:284:        ssn: '400-00-0008',
+./lib/tax-software/testing/irs-certification.ts:70:    ssn: data.ssn || '400-00-0000',
+./lib/tax-software/testing/irs-certification.ts:91:        ssn: '400-00-0001',
+./lib/tax-software/testing/irs-certification.ts:127:        ssn: '400-00-0002',
+./lib/tax-software/testing/irs-certification.ts:139:        ssn: '400-00-0003',
+./lib/tax-software/testing/irs-certification.ts:146:          ssn: '400-00-0004',
+./lib/tax-software/testing/irs-certification.ts:154:          ssn: '400-00-0005',
+./lib/tax-software/testing/irs-certification.ts:186:        ssn: '400-00-0006',
+./lib/tax-software/testing/irs-certification.ts:229:        ssn: '400-00-0007',
+./lib/tax-software/testing/irs-certification.ts:241:        ssn: '400-00-0008',
+./lib/tax-software/testing/irs-certification.ts:370:        ssn: '000-00-0000',
+./lib/tax-software/irs-monitor/scraper.ts:307:    const ssPattern = /social security[^$]*wage base[^$]*\$([0-9,]+)/gi;
+./lib/tax-software/types.ts:10:  ssn: string;
+./lib/tax-software/types.ts:30:  ssn: string;
+./lib/tax-software/types.ts:38:  ssn: string;
+./lib/onboarding-nda-template.ts:54:   • Names, contact information, social security numbers
+./lib/audit/ferpa.ts:21:  | 'ssn'
+./lib/audit/ferpa.ts:151:    recordType: 'ssn',
+./lib/workforce/wioa-compliance.ts:13:  ssn?: string; // Encrypted
+./lib/workforce/wioa-compliance.ts:252:    ssn: participant.ssn,
+./lib/franchise/return-service.ts:149:        taxpayer_ssn_hash: this.hashSSN(input.tax_return.taxpayer.ssn),
+./lib/franchise/return-service.ts:249:  private hashSSN(ssn: string): string {
+./lib/franchise/return-service.ts:250:    return crypto.createHash('sha256').update(ssn.replace(/\D/g, '')).digest('hex');
+./lib/franchise/client-service.ts:26:function encryptSSN(ssn: string): string {
+./lib/franchise/client-service.ts:30:  let encrypted = cipher.update(ssn.replace(/\D/g, ''), 'utf8', 'hex');
+./lib/franchise/client-service.ts:45:function getLastFour(ssn: string): string {
+./lib/franchise/client-service.ts:46:  const clean = ssn.replace(/\D/g, '');
+./lib/franchise/client-service.ts:60:    const cleanSSN = input.ssn.replace(/\D/g, '');
+./lib/franchise/client-service.ts:83:      ssn_encrypted: encryptSSN(cleanSSN),
+./lib/franchise/client-service.ts:84:      ssn_last_four: getLastFour(cleanSSN),
+./lib/franchise/client-service.ts:91:    if (input.spouse_ssn) {
+./lib/franchise/client-service.ts:92:      const cleanSpouseSSN = input.spouse_ssn.replace(/\D/g, '');
+./lib/franchise/client-service.ts:98:      clientData.spouse_ssn_encrypted = encryptSSN(cleanSpouseSSN);
+./lib/franchise/client-service.ts:99:      clientData.spouse_ssn_last_four = getLastFour(cleanSpouseSSN);
+./lib/franchise/client-service.ts:112:      ssn_encrypted: '[REDACTED]',
+./lib/franchise/client-service.ts:113:      spouse_ssn_encrypted: '[REDACTED]'
+./lib/franchise/client-service.ts:140:  async getClientWithSSN(clientId: string): Promise<TaxClient & { ssn: string; spouse_ssn?: string } | null> {
+./lib/franchise/client-service.ts:144:    const result: TaxClient & { ssn: string; spouse_ssn?: string } = {
+./lib/franchise/client-service.ts:146:      ssn: client.ssn_encrypted ? decryptSSN(client.ssn_encrypted) : ''
+./lib/franchise/client-service.ts:149:    if (client.spouse_ssn_encrypted) {
+./lib/franchise/client-service.ts:150:      result.spouse_ssn = decryptSSN(client.spouse_ssn_encrypted);
+./lib/franchise/client-service.ts:159:  async findClientBySSN(officeId: string, ssn: string): Promise<TaxClient | null> {
+./lib/franchise/client-service.ts:160:    const lastFour = getLastFour(ssn);
+./lib/franchise/client-service.ts:167:      .eq('ssn_last_four', lastFour);
+./lib/franchise/client-service.ts:173:      if (client.ssn_encrypted) {
+./lib/franchise/client-service.ts:174:        const decrypted = decryptSSN(client.ssn_encrypted);
+./lib/franchise/client-service.ts:175:        if (decrypted === ssn.replace(/\D/g, '')) {
+./lib/franchise/client-service.ts:267:    if (updates.ssn) {
+./lib/franchise/client-service.ts:268:      const cleanSSN = updates.ssn.replace(/\D/g, '');
+./lib/franchise/client-service.ts:272:      updateData.ssn_encrypted = encryptSSN(cleanSSN);
+./lib/franchise/client-service.ts:273:      updateData.ssn_last_four = getLastFour(cleanSSN);
+./lib/franchise/client-service.ts:279:    if (updates.spouse_ssn) {
+./lib/franchise/client-service.ts:280:      const cleanSpouseSSN = updates.spouse_ssn.replace(/\D/g, '');
+./lib/franchise/client-service.ts:284:      updateData.spouse_ssn_encrypted = encryptSSN(cleanSpouseSSN);
+./lib/franchise/client-service.ts:285:      updateData.spouse_ssn_last_four = getLastFour(cleanSpouseSSN);
+./lib/franchise/client-service.ts:298:      { ...current, ssn_encrypted: '[REDACTED]', spouse_ssn_encrypted: '[REDACTED]' },
+./lib/franchise/client-service.ts:299:      { ...data, ssn_encrypted: '[REDACTED]', spouse_ssn_encrypted: '[REDACTED]' }
+./lib/franchise/types.ts:92:  ssn_encrypted: string | null;
+./lib/franchise/types.ts:93:  ssn_last_four: string | null;
+./lib/franchise/types.ts:96:  spouse_ssn_encrypted: string | null;
+./lib/franchise/types.ts:97:  spouse_ssn_last_four: string | null;
+./lib/franchise/types.ts:252:  ssn: string; // Will be encrypted
+./lib/franchise/types.ts:255:  spouse_ssn?: string; // Will be encrypted
+./lib/integrations/jotform.ts:29:  ssn: string;
+./lib/integrations/jotform.ts:46:    ssn: string;
+./lib/integrations/jotform.ts:55:    ssn: string;
+./lib/integrations/jotform.ts:154:      ssn: this.getAnswer(answers, 'ssn', 'socialSecurity', 'social_security_number'),
+./lib/integrations/jotform.ts:183:        ssn: this.getAnswer(answers, 'spouseSSN', 'spouse_ssn'),
+./lib/integrations/jotform.ts:245:          ssn: '',
+./lib/integrations/supersonic-tax.ts:16:    ssn: string;
+./lib/integrations/supersonic-tax.ts:28:    ssn: string;
+./lib/validation.ts:101:  ssn: (value: string) => {
+./lib/validation.ts:102:    const ssnRegex = /^\d{3}-?\d{2}-?\d{4}$/;
+./lib/validation.ts:103:    if (!ssnRegex.test(value)) {
+./lib/compliance/wioa-reporting.ts:12:  ssn_last_4?: string;
+./lib/compliance/wioa-reporting.ts:235:    s.ssn_last_4 || '',
+./lib/compliance/rapids-integration.ts:12:  ssn: string;
+./lib/compliance/rapids-integration.ts:208:  if (!apprentice.ssn) errors.push('SSN is required');
+./lib/compliance/rapids-integration.ts:218:  if (apprentice.ssn && !/^\d{3}-\d{2}-\d{4}$/.test(apprentice.ssn)) {
+./lib/compliance/rapids-export.ts:149:        ssn_encrypted,
+./lib/compliance/rapids-export.ts:212:      profile.ssn_encrypted ? '***-**-****' : '', // SSN needs decryption
+./lib/compliance/rapids-export.ts:265:        ssn_encrypted
+./lib/compliance/rapids-export.ts:314:      profile.ssn_encrypted ? '***-**-****' : '',
+./lib/compliance/rapids-export.ts:349:        ssn_encrypted
+./lib/compliance/rapids-export.ts:389:      profile.ssn_encrypted ? '***-**-****' : '',
+./lib/compliance/rapids-export.ts:424:        ssn_encrypted
+./lib/compliance/rapids-export.ts:467:      profile.ssn_encrypted ? '***-**-****' : '',
+./lib/compliance/ui3-integration.ts:12:  ssn: string;
+./lib/compliance/ui3-integration.ts:42:    ssn_last_4?: string;
+./lib/compliance/ui3-integration.ts:43:    full_ssn?: string; // Encrypted, only for authorized requests
+./lib/compliance/ui3-integration.ts:93:      .eq('ssn_last_4', record.ssn.slice(-4))
+./lib/onboarding-complete-digital.ts:15:  ssn: string; // Encrypted in production
+./lib/onboarding-complete-digital.ts:409:Social Security Number: ${data.ssn}
+./lib/onboarding-complete-digital.ts:457:Social Security Number: ${data.ssn}
+./lib/onboarding-complete-digital.ts:552:Social Security Number: ${data.ssn}
+./lib/mou-template.ts:233:a. Participant personal information (names, contact details, social security numbers, employment history, criminal background, health information, and other personally identifiable information)
+./components/admin/VerificationReviewForm.tsx:96:          {verification.ssn_last_4 && (
+./components/admin/VerificationReviewForm.tsx:102:                  ***-**-{verification.ssn_last_4}
+./components/enrollment/ComprehensiveEnrollmentWizard.tsx:30:  ssn: string;
+./components/enrollment/ComprehensiveEnrollmentWizard.tsx:140:    ssn: '',
+./components/enrollment/ComprehensiveEnrollmentWizard.tsx:489:                      value={formData.ssn}
+./components/enrollment/ComprehensiveEnrollmentWizard.tsx:490:                      onChange={(e) => updateField('ssn', e.target.value)}
+./components/enrollment/RAPIDSDataCollection.tsx:12:  ssnLastFour?: string;
+./components/verification/IDVerificationForm.tsx:19:    ssnLast4: '',
+./components/verification/IDVerificationForm.tsx:206:              name="ssnLast4"
+./components/verification/IDVerificationForm.tsx:207:              value={formData.ssnLast4}

@@ -62,6 +62,13 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable. Please call 317-314-3757 for immediate assistance.' },
+        { status: 503 }
+      );
+    }
+
     // Generate reference number
     const referenceNumber = `EFH-${Date.now().toString(36).toUpperCase()}`;
 

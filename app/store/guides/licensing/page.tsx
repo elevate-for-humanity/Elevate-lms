@@ -50,7 +50,7 @@ export default function LicensingGuidePage() {
                 </Link>
               </div>
               <div className="bg-slate-100 border border-slate-200 rounded-xl p-6">
-                <h3 className="font-bold text-slate-900 mb-2">Source-Use (Enterprise Only)</h3>
+                <h3 className="font-bold text-slate-900 mb-2">Source-Use (Enterprise)</h3>
                 <ul className="text-sm text-slate-600 space-y-1">
                   <li>• Starting at $75,000</li>
                   <li>• Requires enterprise approval</li>

@@ -6,8 +6,8 @@ import { AlertTriangle, Check, X, Building2, Shield, ArrowRight, Ban } from 'luc
 import { LicenseDemo } from '@/components/store/LicenseDemo';
 
 export const metadata: Metadata = {
-  title: 'Restricted Source-Use License | Elevate for Humanity',
-  description: 'Enterprise-only internal deployment license. Source code access for internal use only. No ownership. No rebranding. No resale. No credentials.',
+  title: 'Enterprise Source-Use License | Elevate for Humanity',
+  description: 'Enterprise internal deployment license. Source code access for internal use.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/store/licensing/enterprise',
   },
@@ -23,13 +23,13 @@ export default function SourceUseLicensePage() {
       <section className="relative py-20 overflow-hidden bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative">
           <div className="text-center">
-            <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 rounded-full px-4 py-2 mb-6">
-              <Ban className="w-4 h-4 text-red-400" />
-              <span className="text-red-600 text-sm font-medium">Enterprise Only — Manual Approval Required</span>
+            <div className="inline-flex items-center gap-2 bg-brand-blue-50 border border-brand-blue-200 rounded-full px-4 py-2 mb-6">
+              <Building2 className="w-4 h-4 text-brand-blue-600" />
+              <span className="text-brand-blue-600 text-sm font-medium">Enterprise License</span>
             </div>
             
             <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-6">
-              Restricted Source-Use License
+              Enterprise Source-Use License
             </h1>
             
             <p className="text-xl text-slate-600 mb-4 max-w-2xl mx-auto">
@@ -64,7 +64,7 @@ export default function SourceUseLicensePage() {
             <div>
               <h3 className="text-red-400 font-bold mb-2">This License is Rare and Expensive</h3>
               <p className="text-red-700 text-sm mb-3">
-                The Restricted Source-Use License starts at <strong className="text-slate-900">$75,000</strong> and requires executive approval. 
+                The Enterprise Source-Use License starts at <strong className="text-slate-900">$75,000</strong>. 
                 It is designed only for organizations with legal or compliance requirements that prevent use of managed platforms.
               </p>
               <p className="text-red-700 text-sm">
@@ -104,29 +104,28 @@ export default function SourceUseLicensePage() {
               </ul>
             </div>
 
-            {/* What You Do NOT Get */}
-            <div className="bg-red-50 rounded-2xl p-8 border border-red-200">
-              <h2 className="text-xl font-bold text-slate-900 mb-6 flex items-center gap-2">
-                <X className="w-6 h-6 text-red-500" />
-                What You Do NOT Get
+            {/* License Scope */}
+            <div className="bg-slate-50 rounded-2xl p-8 border border-slate-200">
+              <h2 className="text-xl font-bold text-slate-900 mb-4 flex items-center gap-2">
+                <Shield className="w-5 h-5 text-slate-500" />
+                License Scope
               </h2>
-              <ul className="space-y-4">
+              <p className="text-slate-600 mb-6">
+                This license grants source code access for internal deployment. The following are available through our Managed Platform license instead:
+              </p>
+              <div className="grid sm:grid-cols-2 gap-3">
                 {[
-                  'Ownership of the software or IP',
-                  'Right to rebrand as your own platform',
-                  'Right to resell, sublicense, or distribute',
-                  'ETPL, WIOA, or any credential authority',
-                  'Compliance reporting capabilities',
-                  'Ongoing support or guaranteed updates',
-                  'White-label rights',
-                  'Managed hosting',
-                ].map((item) => (
-                  <li key={item} className="flex items-start gap-3 text-slate-700">
-                    <X className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                    {item}
-                  </li>
+                  { item: 'White-label branding', alt: 'Managed Platform' },
+                  { item: 'Managed hosting', alt: 'Managed Platform' },
+                  { item: 'Compliance reporting', alt: 'Managed Platform' },
+                  { item: 'Ongoing support & updates', alt: 'Managed Platform' },
+                ].map(({ item, alt }) => (
+                  <div key={item} className="flex items-start gap-3 text-slate-600 text-sm">
+                    <span className="text-slate-400 flex-shrink-0">•</span>
+                    <span>{item} — <Link href="/store/licensing/managed" className="text-brand-blue-600 hover:underline">{alt}</Link></span>
+                  </div>
                 ))}
-              </ul>
+              </div>
             </div>
           </div>
         </div>

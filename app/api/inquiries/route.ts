@@ -43,6 +43,13 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable. Please call 317-314-3757 for immediate assistance.' },
+        { status: 503 }
+      );
+    }
+
     // Parse name into first and last
     const nameParts = body.name.trim().split(' ');
     const firstName = nameParts[0] || 'Unknown';

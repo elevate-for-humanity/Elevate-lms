@@ -345,9 +345,9 @@ export default function ManagedPlatformPage() {
           </p>
           <Link
             href="/store/licensing/enterprise"
-            className="text-red-600 hover:text-red-700 text-sm font-medium"
+            className="text-brand-blue-600 hover:text-brand-blue-700 text-sm font-medium"
           >
-            View Restricted Source-Use License (Enterprise Only) →
+            View Enterprise Source-Use License →
           </Link>
         </div>
       </section>

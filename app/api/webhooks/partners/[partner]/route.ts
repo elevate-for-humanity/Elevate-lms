@@ -26,11 +26,11 @@ function getSupabaseClient() {
 }
 
 export async function POST(
-    const rateLimited = await applyRateLimit(request, 'api');
-    if (rateLimited) return rateLimited;
   request: NextRequest,
   { params }: { params: Promise<{ partner: string }> }
 ) {
+  const rateLimited = await applyRateLimit(request, 'api');
+  if (rateLimited) return rateLimited;
   const { partner: partnerName } = await params;
   const partner = partnerName as PartnerType;
 

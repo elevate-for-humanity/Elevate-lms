@@ -112,6 +112,35 @@ export async function proxy(request: NextRequest) {
   }
 
   // ============================================
+  // CORS: Block cross-origin API requests from unknown origins
+  // ============================================
+  if (pathname.startsWith('/api/')) {
+    const origin = request.headers.get('origin');
+    const allowedOrigins = [
+      process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org',
+      'https://elevateforhumanity.org',
+      'https://www.elevateforhumanity.org',
+    ];
+
+    if (request.method === 'OPTIONS') {
+      return new NextResponse(null, {
+        status: 204,
+        headers: {
+          'Access-Control-Allow-Origin': origin && allowedOrigins.includes(origin) ? origin : allowedOrigins[0],
+          'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+          'Access-Control-Max-Age': '86400',
+        },
+      });
+    }
+
+    const isWebhook = pathname.includes('/webhook');
+    if (!isWebhook && origin && !allowedOrigins.includes(origin)) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+  }
+
+  // ============================================
   // DOMAIN-BASED ROUTING
   // ============================================
 

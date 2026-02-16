@@ -14,6 +14,13 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
   const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
   if (!stripe) {
     return NextResponse.json(
       { error: 'Stripe not configured' },

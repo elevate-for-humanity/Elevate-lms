@@ -18,6 +18,13 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     const { error } = await supabase.from("applications").insert({
       name: data.get("name"),
       email: data.get("email"),

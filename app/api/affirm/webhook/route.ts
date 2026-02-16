@@ -53,6 +53,13 @@ export async function POST(request: NextRequest) {
 
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // Validate the order_id exists in our system before processing
     const { data: existingApp } = await supabase
       .from('applications')

@@ -74,43 +74,15 @@ export default function AddOnsPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative h-[50vh] min-h-[400px] flex items-center overflow-hidden">
-        <Image
-          src="/images/store/platform-hero.jpg"
-          alt="Platform Add-Ons"
-          fill
-          className="object-cover"
-          priority
-        />
-        
-        <div className="relative z-10 max-w-6xl mx-auto px-4 w-full">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-12 h-12 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
-              <Puzzle className="w-6 h-6 text-slate-900" />
-            </div>
-            <span className="text-blue-200 font-medium">Elevate Store</span>
-          </div>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 mb-4">
-            Platform Add-Ons
-          </h1>
-          <p className="text-xl text-blue-100 max-w-2xl mb-6">
-            Extend your workforce operating system with powerful features. 
-            One-time purchase, lifetime access, no recurring fees.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link 
-              href="#add-ons"
-              className="inline-flex items-center gap-2 bg-white text-blue-700 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
-            >
-              Browse Add-Ons
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link 
-              href="/contact"
-              className="inline-flex items-center gap-2 border-2 border-white text-slate-900 px-6 py-3 rounded-lg font-semibold hover:bg-white/10 transition-colors"
-            >
-              Request Custom Feature
-            </Link>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/store/platform-hero.jpg" alt="Platform Add-Ons" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Platform Add-Ons</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Extend your workforce operating system with powerful features. One-time purchase, lifetime access, no recurring fees.</p>
           </div>
         </div>
       </section>

@@ -25,7 +25,7 @@ export function MarketingPageContent({ page }: MarketingPageContentProps) {
           priority
         />
         
-        <div className="relative z-10 max-w-7xl mx-auto px-6 text-white">
+        <div className="relative max-w-7xl mx-auto px-6 text-white">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">
             {page.title}
           </h1>

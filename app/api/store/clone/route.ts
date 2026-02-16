@@ -45,6 +45,13 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // Validate license using hashed key lookup
     const licenseHash = hashLicenseKey(licenseKey);
     const { data: license, error: licenseError } = await supabase

@@ -86,51 +86,15 @@ export default function DrugTestingLandingPage() {
         <Breadcrumbs items={[{ label: "Drug Testing" }]} />
       </div>
 {/* Hero */}
-      <section className="relative min-h-[500px] flex items-center">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/healthcare/hero-programs-healthcare.jpg"
-            alt="Professional Drug Testing Services"
-            fill
-            className="object-cover"
-            priority
-            quality={90}
-          />
-          
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/healthcare/hero-programs-healthcare.jpg" alt="Professional Drug Testing Services" fill className="object-cover" priority sizes="100vw" />
         </div>
-        
-        <div className="relative z-10 max-w-6xl mx-auto px-6 py-20">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-green-500 px-4 py-2 rounded-full text-white text-sm font-bold mb-6">
-              <span className="text-slate-400 flex-shrink-0">•</span>
-              Same-Day Appointments Available
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Professional Drug Testing Services
-            </h1>
-            
-            <p className="text-xl text-white mb-8">
-              Fast, accurate, and affordable drug testing for employers and individuals. 
-              DOT and non-DOT options with nationwide collection sites.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4">
-              <a
-                href="/support"
-                className="inline-flex items-center justify-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition text-lg"
-              >
-                <Phone className="w-5 h-5" />
-                Get Help Online
-              </a>
-              <Link
-                href="#services"
-                className="inline-flex items-center justify-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-bold hover:bg-gray-100 transition text-lg"
-              >
-                View All Tests
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-            </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Professional Drug Testing Services</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Fast, accurate, and affordable drug testing for employers and individuals. DOT and non-DOT options with nationwide collection sites.</p>
           </div>
         </div>
       </section>

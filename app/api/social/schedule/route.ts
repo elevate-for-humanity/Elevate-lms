@@ -24,6 +24,13 @@ export async function GET(request: NextRequest) {
     }
     
     const adminClient = createAdminClient();
+
+    if (!adminClient) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
     const { data: posts, error } = await adminClient
       .from('social_posts')
       .select('*')

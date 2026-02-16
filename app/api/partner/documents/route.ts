@@ -92,6 +92,13 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
     const supabaseAdmin = createAdminClient();
+
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
     
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {

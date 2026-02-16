@@ -15,7 +15,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 export const metadata: Metadata = {
   title: 'Enterprise Source-Use Access | Elevate Workforce OS',
   description:
-    'Restricted source-use access for qualified enterprises requiring internal operation of the Workforce OS under strict contractual controls.',
+    'Enterprise source-use access for organizations requiring internal operation of the Workforce OS.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/platform/enterprise',
   },
@@ -39,7 +39,7 @@ const restrictions = [
 ];
 
 const includedItems = [
-  'Full source code access under restricted license',
+  'Full source code access under enterprise license',
   'Deployment documentation and architecture guides',
   'Security configuration templates',
   'Initial implementation support (40 hours)',
@@ -59,7 +59,7 @@ export default function EnterprisePage() {
       <section className="bg-slate-900 text-white py-16 sm:py-20">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="inline-flex items-center gap-2 bg-amber-500/20 text-amber-400 px-4 py-2 rounded-full text-sm font-bold mb-6">
-            <AlertTriangle className="w-4 h-4" /> Restricted Access — Qualification Required
+            <Building2 className="w-4 h-4" /> Enterprise License
           </div>
           <h1 className="text-4xl sm:text-5xl font-black tracking-tight">Enterprise Source-Use Access</h1>
           <p className="mt-6 text-lg sm:text-xl text-white/90 max-w-3xl mx-auto">

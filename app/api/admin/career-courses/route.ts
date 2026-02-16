@@ -28,6 +28,13 @@ const denied = await guardAdmin();
   try {
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     const { data: courses, error } = await supabase
       .from('career_courses')
       .select(`
@@ -60,6 +67,13 @@ export async function POST(req: Request) {
 
     if (action === 'sync-stripe') {
       const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
 
       // Get all courses without Stripe IDs
       const { data: courses, error } = await supabase

@@ -13,6 +13,13 @@ import { toErrorMessage } from '@/lib/safe';
 
 export async function POST(req: Request) {
   const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
   const body = await req.text();
   const sig = req.headers.get('stripe-signature');
 

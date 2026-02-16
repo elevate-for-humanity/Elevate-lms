@@ -20,6 +20,13 @@ export async function POST(req: Request) {
     const stripe = getStripe();
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // Fetch courses with Stripe price IDs
     const { data: courses, error } = await supabase
       .from('career_courses')

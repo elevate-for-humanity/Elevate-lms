@@ -27,6 +27,13 @@ export async function POST(request: Request) {
     }
 
     const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
     if (!supabase) {
       return NextResponse.json(
         { error: 'Database not configured' },

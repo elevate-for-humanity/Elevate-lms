@@ -42,6 +42,13 @@ export async function GET(req: Request) {
 
     const adminSupabase = createAdminClient();
 
+    if (!adminSupabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // Get ETPL metrics
     const { data: metrics, error } = await adminSupabase
       .from('etpl_metrics')

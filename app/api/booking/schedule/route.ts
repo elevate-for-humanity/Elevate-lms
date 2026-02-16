@@ -58,6 +58,13 @@ export async function POST(req: Request) {
       const { createAdminClient } = await import('@/lib/supabase/admin');
       const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
       const nameParts = data.name.trim().split(/\s+/);
       const firstName = nameParts[0] || '';
       const lastName = nameParts.slice(1).join(' ') || '';

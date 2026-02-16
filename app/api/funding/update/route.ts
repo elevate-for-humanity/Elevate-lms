@@ -26,6 +26,13 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // Get existing record for audit trail
     const { data: before } = await supabase
       .from('funding_cases')

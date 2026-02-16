@@ -73,7 +73,7 @@ export default function EnterpriseReviewPage() {
           Request Enterprise Review
         </h1>
         <p className="text-gray-400 mb-4">
-          Restricted Source-Use License — Starting at $75,000
+          Enterprise Source-Use License — Starting at $75,000
         </p>
         <p className="text-gray-500 mb-8 text-sm">
           This license grants internal use of source code only. It does not include ownership, 

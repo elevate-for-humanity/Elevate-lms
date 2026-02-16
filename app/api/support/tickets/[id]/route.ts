@@ -19,6 +19,13 @@ export async function GET(request: NextRequest, { params }: { params: Params }) 
     const { data: { user } } = await supabase.auth.getUser();
     
     const adminClient = createAdminClient();
+
+    if (!adminClient) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
     const { data: ticket, error } = await adminClient
       .from('support_tickets')
       .select('*, support_messages(id, message, created_at, is_staff, user_id)')

@@ -17,6 +17,13 @@ export async function GET(req: Request) {
 
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // Query audit snapshot view
     const { data, error }: any = await supabase.from('audit_snapshot').select('*');
 

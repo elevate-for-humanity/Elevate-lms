@@ -27,6 +27,13 @@ export async function POST(
 
     const adminClient = createAdminClient();
 
+    if (!adminClient) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // Get user's organization
     const { data: profile } = await adminClient
       .from('profiles')

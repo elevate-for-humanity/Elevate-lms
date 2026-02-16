@@ -44,6 +44,13 @@ const supabase = await createClient();
 
   const adminClient = createAdminClient();
 
+    if (!adminClient) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
   const { data: profile } = await adminClient
     .from('profiles')
     .select('organization_id')

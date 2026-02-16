@@ -24,6 +24,13 @@ export async function GET(req: Request) {
 
     const adminClient = createAdminClient();
 
+    if (!adminClient) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // Check if user is admin
     const { data: profile } = await adminClient
       .from('profiles')

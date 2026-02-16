@@ -39,6 +39,13 @@ export async function POST(req: NextRequest) {
 
   // Use service role for certificate writes (RLS restricts inserts to admin)
   const adminDb = createAdminClient();
+
+    if (!adminDb) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
   if (!adminDb) {
     return new Response('Server configuration error', { status: 500 });
   }

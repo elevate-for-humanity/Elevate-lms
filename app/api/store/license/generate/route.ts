@@ -159,6 +159,13 @@ export async function POST(req: Request) {
     // Use admin client for license operations
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // Get product configuration
     const config = getProductTier(productSlug);
 

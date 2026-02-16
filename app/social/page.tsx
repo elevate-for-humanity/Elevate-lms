@@ -249,68 +249,15 @@ export default function SocialMediaPage() {
       </div>
 
       {/* Hero Section with Animation */}
-      <section className="relative min-h-[500px] flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/social/social-hero.jpg"
-            alt="Connect with Elevate for Humanity"
-            fill
-            className="object-cover"
-            priority
-          />
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/social/social-hero.jpg" alt="Connect with Elevate for Humanity" fill className="object-cover" priority sizes="100vw" />
         </div>
-
-        <div className={`relative z-10 max-w-7xl mx-auto px-4 py-20 transition-all duration-1000 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          <div className="max-w-2xl">
-            <div className="flex items-center gap-2 mb-6">
-              <Share2 className="w-6 h-6 text-brand-blue-400" />
-              <span className="text-brand-blue-400 font-medium">Connect With Us</span>
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6">
-              Follow Our
-              <span className="block text-transparent bg-clip-text bg-slate-700">
-                Journey
-              </span>
-            </h1>
-            
-            <p className="text-xl text-slate-300 mb-8">
-              Stay connected with Elevate for Humanity. Get updates, success stories, 
-              tips, and inspiration across all our social platforms.
-            </p>
-
-            {/* Animated Stats */}
-            <div className="grid grid-cols-3 gap-6 mb-8">
-              <div className={`transition-all duration-700 delay-300 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                <p className="text-3xl font-bold text-white">{animatedStats.followers.toLocaleString()}+</p>
-                <p className="text-slate-400">Total Followers</p>
-              </div>
-              <div className={`transition-all duration-700 delay-500 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                <p className="text-3xl font-bold text-white">{animatedStats.posts}+</p>
-                <p className="text-slate-400">Posts Shared</p>
-              </div>
-              <div className={`transition-all duration-700 delay-700 ${isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                <p className="text-3xl font-bold text-white">{animatedStats.engagement}%</p>
-                <p className="text-slate-400">Engagement Rate</p>
-              </div>
-            </div>
-
-            {/* Quick Follow Buttons */}
-            <div className="flex flex-wrap gap-3">
-              {socialPlatforms.map((platform, index) => (
-                <a
-                  key={platform.name}
-                  href={platform.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`inline-flex items-center gap-2 px-5 py-3 ${platform.color} text-white rounded-full font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg`}
-                  style={{ transitionDelay: `${index * 100}ms` }}
-                >
-                  <platform.icon className="w-5 h-5" />
-                  {platform.name}
-                </a>
-              ))}
-            </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Follow Our <span className="block text-transparent bg-clip-text bg-slate-700"> Journey </span></h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Stay connected with Elevate for Humanity. Get updates, success stories, tips, and inspiration across all our social platforms.</p>
           </div>
         </div>
       </section>

@@ -75,7 +75,7 @@ export function ProgramPageLocked({
         />
         
 
-        <div className="relative z-10">
+        <div className="relative">
           <h1 className="text-4xl md:text-5xl font-bold">{name}</h1>
         </div>
       </section>

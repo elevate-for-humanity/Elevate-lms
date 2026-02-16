@@ -13,6 +13,13 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
     const { searchParams } = new URL(request.url);
     
     const category = searchParams.get('category');

@@ -27,6 +27,13 @@ const denied = await guardAdmin();
   try {
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     const { data: promoCodes, error } = await supabase
       .from('promo_codes')
       .select('*')
@@ -52,6 +59,13 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
     const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
 
     const { data, error } = await supabase
       .from('promo_codes')
@@ -92,6 +106,13 @@ const denied = await guardAdmin();
   try {
     const body = await req.json();
     const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
 
     const updateData: any = {};
     
@@ -140,6 +161,13 @@ const denied = await guardAdmin();
     }
 
     const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
 
     const { error } = await supabase
       .from('promo_codes')

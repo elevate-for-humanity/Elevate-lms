@@ -49,6 +49,13 @@ export async function POST(request: NextRequest) {
     if (licenseId) {
       try {
         const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
         if (!supabase) {
           logger.error('[webhook] Supabase client not available');
           return NextResponse.json({ received: true, warning: 'db_unavailable' });

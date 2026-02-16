@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import Link from 'next/link';
 import Image from 'next/image';
-import { AlertTriangle, Check, X, Building2, Shield, ArrowRight, Ban } from 'lucide-react';
+import { Info, Check, X, Building2, Shield, ArrowRight } from 'lucide-react';
 import { LicenseDemo } from '@/components/store/LicenseDemo';
 
 export const metadata: Metadata = {
@@ -56,21 +56,21 @@ export default function SourceUseLicensePage() {
         </div>
       </section>
 
-      {/* Warning Banner */}
-      <section className="py-8 bg-red-50 border-y border-red-200">
+      {/* Info Banner */}
+      <section className="py-8 bg-slate-50 border-y border-slate-200">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-start gap-4">
-            <AlertTriangle className="w-6 h-6 text-red-500 flex-shrink-0 mt-1" />
+            <Info className="w-6 h-6 text-brand-blue-500 flex-shrink-0 mt-1" />
             <div>
-              <h3 className="text-red-400 font-bold mb-2">This License is Rare and Expensive</h3>
-              <p className="text-red-700 text-sm mb-3">
-                The Enterprise Source-Use License starts at <strong className="text-slate-900">$75,000</strong>. 
-                It is designed only for organizations with legal or compliance requirements that prevent use of managed platforms.
+              <h3 className="text-slate-900 font-bold mb-2">Enterprise Pricing</h3>
+              <p className="text-slate-600 text-sm mb-3">
+                The Enterprise Source-Use License starts at <strong className="text-slate-900">$75,000</strong>.
+                It is designed for organizations that need to deploy on their own infrastructure.
               </p>
-              <p className="text-red-700 text-sm">
-                <strong>Most organizations should choose the{' '}
-                <Link href="/store/licensing/managed" className="underline hover:text-slate-900">Managed Platform License</Link> instead.</strong>{' '}
-                It includes hosting, support, updates, and costs significantly less.
+              <p className="text-slate-600 text-sm">
+                Looking for a faster start?{' '}
+                <Link href="/store/licensing/managed" className="text-brand-blue-600 font-semibold underline hover:text-brand-blue-700">Managed Platform License</Link>{' '}
+                includes hosting, support, and updates at a lower cost.
               </p>
             </div>
           </div>
@@ -154,8 +154,8 @@ export default function SourceUseLicensePage() {
           <div className="bg-white rounded-xl p-8 border border-slate-200 shadow-sm">
             <div className="space-y-6">
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-red-500 font-bold">1</span>
+                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-slate-500 font-bold">1</span>
                 </div>
                 <div>
                   <h3 className="text-slate-900 font-semibold mb-1">Internal Use Only</h3>
@@ -167,8 +167,8 @@ export default function SourceUseLicensePage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-red-500 font-bold">2</span>
+                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-slate-500 font-bold">2</span>
                 </div>
                 <div>
                   <h3 className="text-slate-900 font-semibold mb-1">Attribution Required</h3>
@@ -180,8 +180,8 @@ export default function SourceUseLicensePage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-red-500 font-bold">3</span>
+                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-slate-500 font-bold">3</span>
                 </div>
                 <div>
                   <h3 className="text-slate-900 font-semibold mb-1">No Credential Claims</h3>
@@ -193,8 +193,8 @@ export default function SourceUseLicensePage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-red-500 font-bold">4</span>
+                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-slate-500 font-bold">4</span>
                 </div>
                 <div>
                   <h3 className="text-slate-900 font-semibold mb-1">No Resale or Distribution</h3>
@@ -206,8 +206,8 @@ export default function SourceUseLicensePage() {
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="w-8 h-8 bg-red-500/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                  <span className="text-red-500 font-bold">5</span>
+                <div className="w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                  <span className="text-slate-500 font-bold">5</span>
                 </div>
                 <div>
                   <h3 className="text-slate-900 font-semibold mb-1">Updates Not Guaranteed</h3>
@@ -225,39 +225,31 @@ export default function SourceUseLicensePage() {
       {/* Pricing */}
       <section className="py-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-2xl p-8 border border-red-900/50 text-center">
-            <Building2 className="w-12 h-12 text-slate-600 mx-auto mb-4" />
+          <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center">
+            <Building2 className="w-12 h-12 text-brand-blue-600 mx-auto mb-4" />
             <h2 className="text-2xl font-bold text-slate-900 mb-2">Enterprise Pricing</h2>
             
             <div className="my-6">
               <span className="text-5xl font-black text-slate-900">$75,000</span>
-              <span className="text-slate-600 ml-2">minimum</span>
+              <span className="text-slate-600 ml-2">starting</span>
               <p className="text-slate-600 text-sm mt-2">
                 + 20% annual maintenance (optional but recommended)
               </p>
             </div>
             
-            <div className="bg-red-50 border border-red-800/50 rounded-xl p-6 mb-8 text-left">
-              <h4 className="text-red-400 font-semibold mb-3">Requirements</h4>
+            <div className="bg-slate-50 rounded-xl p-6 mb-8 text-left">
+              <h4 className="text-slate-900 font-semibold mb-3">What&apos;s Included</h4>
               <ul className="text-slate-700 text-sm space-y-2">
-                <li>• Executive approval required</li>
-                <li>• Signed legal agreement with restrictions</li>
-                <li>• Verified use case (compliance/legal necessity)</li>
-                <li>• No instant checkout — manual process only</li>
+                <li>• Full source code access for internal deployment</li>
+                <li>• 40 hours of implementation support</li>
+                <li>• Signed license agreement</li>
+                <li>• Annual updates and patches</li>
               </ul>
             </div>
 
-            <div className="bg-slate-50 rounded-xl p-6 mb-8">
-              <p className="text-slate-700 text-sm">
-                <strong className="text-slate-900">This license does not include</strong> managed hosting, 
-                platform authority, credential delegation, or shutdown guarantees. 
-                You are responsible for your own infrastructure and compliance.
-              </p>
-            </div>
-
             <Link
-              href="/contact?subject=Source-Use%20License%20Inquiry%20($75k+)"
-              className="inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-lg transition"
+              href="/contact?subject=Enterprise%20License%20Inquiry"
+              className="inline-flex items-center gap-2 bg-brand-blue-600 hover:bg-brand-blue-700 text-white font-bold px-8 py-4 rounded-lg transition"
             >
               Request Enterprise License
               <ArrowRight className="w-5 h-5" />
@@ -276,7 +268,7 @@ export default function SourceUseLicensePage() {
               <thead>
                 <tr className="border-b border-slate-200">
                   <th className="py-4 px-4 text-slate-600 font-medium">Feature</th>
-                  <th className="py-4 px-4 text-red-600 font-medium">Managed Platform</th>
+                  <th className="py-4 px-4 text-brand-blue-600 font-medium">Managed Platform</th>
                   <th className="py-4 px-4 text-slate-600 font-medium">Source-Use</th>
                 </tr>
               </thead>
@@ -306,7 +298,7 @@ export default function SourceUseLicensePage() {
           <div className="text-center mt-8">
             <Link
               href="/store/licensing/managed"
-              className="inline-flex items-center gap-2 text-red-600 hover:text-red-500 font-medium"
+              className="inline-flex items-center gap-2 text-brand-blue-600 hover:text-slate-500 font-medium"
             >
               <Shield className="w-5 h-5" />
               Most organizations should choose Managed Platform →
@@ -327,7 +319,7 @@ export default function SourceUseLicensePage() {
               { week: 'Ongoing', title: 'Annual Maintenance', desc: 'Quarterly security patches, annual compliance review, and email-based technical support.' },
             ].map((step) => (
               <div key={step.week} className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm">
-                <div className="text-red-600 text-xs font-bold uppercase tracking-wide mb-2">{step.week}</div>
+                <div className="text-brand-blue-600 text-xs font-bold uppercase tracking-wide mb-2">{step.week}</div>
                 <h3 className="text-slate-900 font-semibold mb-2">{step.title}</h3>
                 <p className="text-slate-600 text-sm">{step.desc}</p>
               </div>
@@ -361,7 +353,7 @@ export default function SourceUseLicensePage() {
           </div>
           <p className="text-center text-slate-600 text-sm mt-6">
             Security documentation and compliance certifications available under NDA.{' '}
-            <Link href="/contact?subject=Security%20Documentation%20Request" className="text-red-600 hover:text-red-700 underline">Request access</Link>
+            <Link href="/contact?subject=Security%20Documentation%20Request" className="text-brand-blue-600 hover:text-slate-700 underline">Request access</Link>
           </p>
         </div>
       </section>
@@ -381,11 +373,11 @@ export default function SourceUseLicensePage() {
           <div className="bg-white rounded-xl p-6 border border-slate-200 shadow-sm mb-8">
             <h4 className="text-slate-900 font-semibold mb-3">Governing Documents</h4>
             <ul className="text-slate-600 text-sm space-y-2">
-              <li>• <Link href="/terms-of-service" className="text-red-600 hover:text-red-700 underline">Terms of Service</Link></li>
-              <li>• <Link href="/privacy-policy" className="text-red-600 hover:text-red-700 underline">Privacy Policy</Link></li>
-              <li>• <Link href="/governance/data" className="text-red-600 hover:text-red-700 underline">Data Processing & Privacy</Link></li>
-              <li>• <Link href="/governance/security" className="text-red-600 hover:text-red-700 underline">Security Policy</Link></li>
-              <li>• <Link href="/accessibility" className="text-red-600 hover:text-red-700 underline">Accessibility Statement</Link></li>
+              <li>• <Link href="/terms-of-service" className="text-brand-blue-600 hover:text-slate-700 underline">Terms of Service</Link></li>
+              <li>• <Link href="/privacy-policy" className="text-brand-blue-600 hover:text-slate-700 underline">Privacy Policy</Link></li>
+              <li>• <Link href="/governance/data" className="text-brand-blue-600 hover:text-slate-700 underline">Data Processing & Privacy</Link></li>
+              <li>• <Link href="/governance/security" className="text-brand-blue-600 hover:text-slate-700 underline">Security Policy</Link></li>
+              <li>• <Link href="/accessibility" className="text-brand-blue-600 hover:text-slate-700 underline">Accessibility Statement</Link></li>
               <li>• Enterprise License Agreement (provided during procurement)</li>
             </ul>
           </div>

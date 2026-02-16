@@ -26,6 +26,13 @@ export async function POST(req: Request) {
   }
 
   const adminClient = createAdminClient();
+
+    if (!adminClient) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
   const body = (await req.json()) as Payload;
 
   if (!body?.id || !body?.patch) {

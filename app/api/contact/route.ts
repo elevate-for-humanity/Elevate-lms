@@ -75,6 +75,13 @@ export async function POST(req: Request) {
       // Only save if email provided
       if (demoData.email) {
         const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
         const nameParts = (demoData.name || '').trim().split(/\s+/);
         const firstName = nameParts[0] || '';
         const lastName = nameParts.slice(1).join(' ') || '';

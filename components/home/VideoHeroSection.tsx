@@ -77,7 +77,7 @@ export default function VideoHeroSection() {
       
 
       {/* Content */}
-      <div className="relative z-10 w-full pb-12 md:pb-16">
+      <div className="relative w-full pb-12 md:pb-16">
         <div className="max-w-7xl mx-auto px-4 md:px-6">
           {/* Headline with animation */}
           <h1 

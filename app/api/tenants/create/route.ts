@@ -25,6 +25,13 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // Create tenant
     const { data: tenant, error: tenantError } = await supabase
       .from('tenants')

@@ -96,50 +96,15 @@ export default function TrainingProvidersPage() {
         <Breadcrumbs items={[{ label: "Training Providers" }]} />
       </div>
 {/* Hero Section */}
-      <section className="relative min-h-[500px] flex items-center">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/learners/coaching-session.jpg"
-            alt="Training Providers Partnership"
-            fill
-            className="object-cover"
-            priority
-            quality={85}
-          />
-          
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/learners/coaching-session.jpg" alt="Training Providers Partnership" fill className="object-cover" priority sizes="100vw" />
         </div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-6 py-20">
-          <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur px-4 py-2 rounded-full text-white text-sm font-medium mb-6">
-              <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
-              Now Accepting Partners
-            </div>
-            
-            <h1 className="text-4xl md:text-5xl font-bold text-white mb-6">
-              Partner With Us to Deliver Workforce Training
-            </h1>
-            
-            <p className="text-xl text-brand-blue-100 mb-8">
-              Join our network of approved training providers. We connect you with WIOA-funded students, handle enrollment paperwork, and help you grow your program.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Link
-                href="/partners/training-provider"
-                className="inline-flex items-center justify-center gap-2 bg-white text-brand-blue-900 px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-50 transition"
-              >
-                Become a Partner
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <a
-                href="/support"
-                className="inline-flex items-center justify-center gap-2 bg-brand-blue-800 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition border border-brand-blue-600"
-              >
-                <Phone className="w-5 h-5" />
-                Call Get Help Online
-              </a>
-            </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Partner With Us to Deliver Workforce Training</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Join our network of approved training providers. We connect you with WIOA-funded students, handle enrollment paperwork, and help you grow your program.</p>
           </div>
         </div>
       </section>

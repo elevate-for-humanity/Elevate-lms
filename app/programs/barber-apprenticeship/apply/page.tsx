@@ -276,32 +276,18 @@ export default function BarberApprenticeshipApplyPage() {
   return (
     <main className="min-h-screen bg-white">
       {/* Video Hero */}
-      <section className="relative h-[40vh] min-h-[300px] flex items-center">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover"
-          poster="/hero-images/barber-hero.jpg"
-        >
-          <source src="/videos/barber-hero-final.mp4" type="video/mp4" />
-        </video>
-        
-        <div className="relative z-10 max-w-5xl mx-auto px-6 w-full">
-          <Link 
-            href="/programs/barber-apprenticeship" 
-            className="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm mb-4"
-          >
-            <ArrowLeft className="w-4 h-4" />
-            Back to Program
-          </Link>
-          <h1 className="text-4xl md:text-5xl font-bold text-white drop-shadow-lg">
-            Enroll & Pay
-          </h1>
-          <p className="text-xl text-white/90 mt-2 drop-shadow-md">
-            Barber Apprenticeship Program
-          </p>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <video autoPlay muted loop playsInline preload="none" className="absolute inset-0 w-full h-full object-cover">
+            <source src="/videos/barber-hero-final.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Enroll & Pay</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Barber Apprenticeship Program</p>
+          </div>
         </div>
       </section>
 

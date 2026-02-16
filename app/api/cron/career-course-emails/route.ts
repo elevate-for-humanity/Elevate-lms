@@ -20,6 +20,13 @@ export async function GET(req: Request) {
   }
 
   const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
   const results = { day3: 0, day7: 0, reengagement: 0, errors: [] as string[] };
 
   try {

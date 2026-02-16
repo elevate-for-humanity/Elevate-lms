@@ -111,60 +111,17 @@ export default async function WorkforceBoardPage() {
       </div>
 
       {/* Video Hero Section */}
-      <section className="relative h-[300px] md:h-[380px] flex items-center justify-center text-white overflow-hidden">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          className="absolute inset-0 w-full h-full object-cover"
-        >
-          <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/staff-portal-hero.mp4" type="video/mp4" />
-        </video>
-
-        <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
-          <Image
-            src="/logo.png"
-            alt="Elevate for Humanity"
-            width={120}
-            height={48}
-            className="brightness-0 invert mx-auto mb-6"
-          />
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6">
-            Workforce Board Portal
-          </h1>
-          <p className="text-xl md:text-2xl mb-8 text-white/90 max-w-3xl mx-auto">
-            Program oversight, performance metrics, and compliance monitoring in one place
-          </p>
-          <div className="flex flex-wrap justify-center gap-6 text-white/90 mb-8">
-            <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
-              <span>Real-Time Data</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
-              <span>WIOA Compliant</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-slate-400 flex-shrink-0">•</span>
-              <span>Audit Ready</span>
-            </div>
-          </div>
-          <div className="flex flex-wrap justify-center gap-4">
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 bg-white text-brand-blue-700 px-8 py-4 rounded-lg font-semibold text-lg hover:bg-brand-blue-50 transition shadow-lg"
-            >
-              Sign In to Portal
-              <ArrowRight className="w-5 h-5" />
-            </Link>
-            <Link
-              href="/contact"
-              className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur text-white px-8 py-4 rounded-lg font-semibold text-lg transition border border-white/30"
-            >
-              Apply for Access
-            </Link>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <video autoPlay muted loop playsInline preload="none" className="absolute inset-0 w-full h-full object-cover">
+            <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/staff-portal-hero.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Workforce Board Portal</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Program oversight, performance metrics, and compliance monitoring in one place</p>
           </div>
         </div>
       </section>

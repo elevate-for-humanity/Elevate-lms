@@ -45,6 +45,13 @@ export const POST = withRateLimit(
       const lastName = nameParts.slice(1).join(' ') || '';
 
       const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
     
       // Build insert object - only include pathway_slug/source if migration has been run
       const insertData: Record<string, any> = {

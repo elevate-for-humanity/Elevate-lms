@@ -100,39 +100,16 @@ export default function EmployerProgramsPage() {
         <Breadcrumbs items={[{ label: "Drug Testing", href: "/drug-testing" }, { label: "Employer Programs" }]} />
       </div>
 {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/courses/medical-assistant-10002419-cover.jpg"
-            alt="Employer Drug Testing Programs"
-            fill
-            className="object-cover"
-            priority
-          />
-          
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/courses/medical-assistant-10002419-cover.jpg" alt="Employer Drug Testing Programs" fill className="object-cover" priority sizes="100vw" />
         </div>
-        <div className="relative z-10 max-w-6xl mx-auto px-6 py-20">
-          <Link href="/drug-testing" className="inline-flex items-center gap-2 text-gray-300 hover:text-white mb-6 transition">
-            <ArrowLeft className="w-4 h-4" />
-            Back to Drug Testing
-          </Link>
-          <div className="flex items-center gap-4 mb-4">
-            <div className="w-16 h-16 bg-brand-blue-600 rounded-xl flex items-center justify-center">
-              <Building2 className="w-8 h-8 text-white" />
-            </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white">Employer Drug Testing Programs</h1>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Employer Drug Testing Programs</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Comprehensive drug testing solutions for businesses of all sizes. From startups to enterprises, we have a program that fits your needs.</p>
           </div>
-          <p className="text-xl text-gray-200 max-w-2xl mb-8">
-            Comprehensive drug testing solutions for businesses of all sizes. 
-            From startups to enterprises, we have a program that fits your needs.
-          </p>
-          <a
-            href="/support"
-            className="inline-flex items-center gap-2 bg-brand-blue-600 text-white px-8 py-4 rounded-lg font-bold hover:bg-brand-blue-700 transition text-lg"
-          >
-            <Phone className="w-5 h-5" />
-            Set Up Account
-          </a>
         </div>
       </section>
 

@@ -86,6 +86,13 @@ export async function POST(request: NextRequest) {
 
     // Store checkout context in DB (server-side, not URL params)
     const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
     const { data: context, error: contextError } = await supabase
       .from('checkout_contexts')
       .insert({

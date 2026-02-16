@@ -39,6 +39,13 @@ export async function GET(request: NextRequest) {
       .single();
     
     const adminClient = createAdminClient();
+
+    if (!adminClient) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
     const isAdmin = profile?.role && ['admin', 'super_admin', 'staff'].includes(profile.role);
     
     let query = adminClient

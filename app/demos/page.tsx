@@ -94,43 +94,15 @@ export default function DemosPage() {
         <Breadcrumbs items={[{ label: "Demos" }]} />
       </div>
 {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden">
-        <Image
-          src="/images/business/team-1.jpg"
-          alt="Product Demos"
-          fill
-          className="object-cover"
-          priority
-        />
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4 py-16 w-full">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-brand-blue-500 text-white px-4 py-2 rounded-full text-sm font-bold mb-6">
-              <Monitor className="w-4 h-4" />
-              Platform Demos
-            </div>
-            <h1 className="text-4xl md:text-5xl font-black text-white mb-6">
-              See Elevate in Action
-            </h1>
-            <p className="text-xl text-brand-blue-100 mb-8">
-              Watch demos of our training platform or schedule a personalized walkthrough 
-              with our team. See how we help organizations train their workforce.
-            </p>
-            <div className="flex flex-wrap gap-4">
-              <Link
-                href="/contact?type=demo"
-                className="inline-flex items-center gap-2 bg-white text-brand-blue-900 px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-50 transition-colors"
-              >
-                <Calendar className="w-5 h-5" />
-                Schedule Live Demo
-              </Link>
-              <Link
-                href="/store/demo"
-                className="inline-flex items-center gap-2 bg-brand-blue-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-blue-600 transition-colors border border-brand-blue-500"
-              >
-                Request Trial Access
-              </Link>
-            </div>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/business/team-1.jpg" alt="Product Demos" fill className="object-cover" priority sizes="100vw" />
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">See Elevate in Action</h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Watch demos of our training platform or schedule a personalized walkthrough with our team. See how we help organizations train their workforce.</p>
           </div>
         </div>
       </section>

@@ -73,6 +73,13 @@ export async function POST(req: Request) {
     if (!studentId) {
       // Use admin client to bypass RLS for public form submission
       const adminClient = createAdminClient();
+
+    if (!adminClient) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
       
       // Store as partner inquiry for now (can be migrated to dedicated applications table)
       const { data: inquiry, error: inquiryError } = await adminClient

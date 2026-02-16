@@ -19,6 +19,13 @@ export async function PATCH(req: Request, { params }: { params: Params }) {
 
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     const { data, error }: any = await supabase
       .from('employer_onboarding')
       .update({ status, notes })

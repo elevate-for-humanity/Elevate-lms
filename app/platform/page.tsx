@@ -54,7 +54,7 @@ const modules = [
   },
   {
     title: 'Enterprise Access',
-    desc: 'Restricted source-use deployments for qualified enterprises with dedicated technical teams.',
+    desc: 'Enterprise source-use deployments for organizations with dedicated technical teams.',
     href: '/platform/enterprise',
   },
   {

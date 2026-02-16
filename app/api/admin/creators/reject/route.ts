@@ -65,6 +65,13 @@ export async function POST(req: Request) {
     // 4. Use admin client to bypass RLS
     const adminSupabase = createAdminClient();
 
+    if (!adminSupabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // 5. Check if creator exists and get details
     const { data: creator, error: fetchError } = await adminSupabase
       .from('marketplace_creators')

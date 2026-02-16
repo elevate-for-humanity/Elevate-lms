@@ -64,6 +64,13 @@ export async function POST(req: Request) {
 
     // Save to database
     const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
     const { data, error }: any = await supabase
       .from('invoices')
       .insert([

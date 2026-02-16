@@ -29,6 +29,13 @@ export async function POST(request: Request) {
 
   // Save to Supabase for internal tracking
   const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
   const { error: dbError } = await supabase
     .from('customer_service_tickets')
     .insert({

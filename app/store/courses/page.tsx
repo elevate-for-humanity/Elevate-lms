@@ -31,49 +31,17 @@ export default function StoreCoursesPage() {
         <Breadcrumbs items={[{ label: "Store", href: "/store" }, { label: "Courses" }]} />
       </div>
 {/* Hero */}
-      <section className="relative min-h-[400px] flex items-center overflow-hidden bg-brand-blue-900">
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-30"
-        >
-          <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home.mp4" type="video/mp4" />
-        </video>
-        
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm text-slate-900 rounded-full text-sm font-bold mb-6 border border-white/20">
-              <Award className="w-4 h-4" />
-              Industry-Recognized Certifications
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight mb-6">
-              Certification Courses
-              <span className="block text-brand-blue-300">With Exam Vouchers</span>
-            </h1>
-
-            <p className="text-xl text-brand-blue-100 mb-8">
-              Get certified in Microsoft Office, Adobe Creative Suite, OSHA Safety, and more. 
-              Each course includes the certification exam voucher.
-            </p>
-
-            <div className="flex flex-wrap gap-6 text-slate-900/80 text-sm">
-              <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-400" />
-                <span>Exam voucher included</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-400" />
-                <span>Self-paced learning</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Check className="w-5 h-5 text-green-400" />
-                <span>Certificate on completion</span>
-              </div>
-            </div>
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <video autoPlay muted loop playsInline preload="none" className="absolute inset-0 w-full h-full object-cover">
+            <source src="https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev/videos/hero-home.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Certification Courses <span className="block text-brand-blue-300">With Exam Vouchers</span></h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Get certified in Microsoft Office, Adobe Creative Suite, OSHA Safety, and more. Each course includes the certification exam voucher.</p>
           </div>
         </div>
       </section>

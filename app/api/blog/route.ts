@@ -27,6 +27,13 @@ export async function GET(request: Request) {
 
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     // If slug is provided, get single post
     if (slug) {
       const { data: post, error } = await supabase

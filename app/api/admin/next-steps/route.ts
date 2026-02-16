@@ -39,6 +39,13 @@ const supabase = await createClient();
 
   const adminClient = createAdminClient();
 
+    if (!adminClient) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
   const url = new URL(req.url);
   const q = (url.searchParams.get('q') || '').trim();
   const status = (url.searchParams.get('status') || '').trim();

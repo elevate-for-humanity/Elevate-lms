@@ -33,6 +33,13 @@ const denied = await guardAdmin();
 
     const supabase = createAdminClient();
 
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
+
     const updateData: any = {};
     
     if (body.script !== undefined) updateData.script = body.script;

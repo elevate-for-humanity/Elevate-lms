@@ -18,6 +18,13 @@ export async function POST(req: Request) {
     if (rateLimited) return rateLimited;
 
   const supabase = createAdminClient();
+
+    if (!supabase) {
+      return NextResponse.json(
+        { error: 'Service temporarily unavailable.' },
+        { status: 503 }
+      );
+    }
   const identifier = getClientIdentifier(req.headers);
   const rateLimitResult = rateLimit(identifier, {
     limit: 10,

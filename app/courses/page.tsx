@@ -56,59 +56,15 @@ export default async function CoursesPage() {
       </div>
 
       {/* Hero Section */}
-      <section className="relative min-h-[600px] flex items-center overflow-hidden">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/heroes/hero-homepage.jpg"
-            alt="Career Training Courses"
-            fill
-            className="object-cover"
-            priority
-          />
+      {/* Hero */}
+      <section className="relative w-full">
+        <div className="relative h-[300px] md:h-[400px] w-full overflow-hidden">
+          <Image src="/images/heroes/hero-homepage.jpg" alt="Career Training Courses" fill className="object-cover" priority sizes="100vw" />
         </div>
-
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-green-600/20 border border-green-500/30 rounded-full mb-6">
-              <Sparkles className="w-5 h-5 text-green-400" />
-              <span className="text-green-400 font-semibold text-sm">100% WIOA Funded Training</span>
-            </div>
-
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white leading-tight mb-6">
-              Launch Your New Career
-              <span className="block text-green-400">In Weeks, Not Years</span>
-            </h1>
-
-            <p className="text-xl text-slate-300 mb-8 leading-relaxed">
-              Industry-recognized certifications in healthcare, skilled trades, technology, and more. 
-              Free for eligible Indiana residents through WIOA funding.
-            </p>
-
-            <div className="flex flex-wrap gap-4 mb-10">
-              <Link
-                href="/apply"
-                className="inline-flex items-center gap-2 bg-green-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-700 transition-all shadow-lg"
-              >
-                Apply Now - It&apos;s Free
-                <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link
-                href="#categories"
-                className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/20 transition-all border border-white/20"
-              >
-                <Play className="w-5 h-5" />
-                Browse Programs
-              </Link>
-            </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
-              {stats.map((stat) => (
-                <div key={stat.label} className="text-center">
-                  <div className="text-3xl font-black text-white">{stat.value}</div>
-                  <div className="text-sm text-slate-400">{stat.label}</div>
-                </div>
-              ))}
-            </div>
+        <div className="bg-slate-900 py-10">
+          <div className="max-w-5xl mx-auto px-4 text-center">
+            <h1 className="text-3xl md:text-4xl font-bold text-white mb-3">Launch Your New Career <span className="block text-green-400">In Weeks, Not Years</span></h1>
+            <p className="text-lg text-slate-300 max-w-3xl mx-auto">Industry-recognized certifications in healthcare, skilled trades, technology, and more. Free for eligible Indiana residents through WIOA funding.</p>
           </div>
         </div>
       </section>

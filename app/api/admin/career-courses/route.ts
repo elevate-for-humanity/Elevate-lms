@@ -95,7 +95,7 @@ export async function POST(req: Request) {
         try {
           // Create Stripe product
           const product = await stripe.products.create({
-            name: course.title,
+            name: course.course_name,
             description: course.description || undefined,
             metadata: {
               course_id: course.id,
@@ -124,14 +124,14 @@ export async function POST(req: Request) {
             .eq('id', course.id);
 
           results.push({
-            course: course.title,
+            course: course.course_name,
             product_id: product.id,
             price_id: price.id,
             status: 'success',
           });
         } catch (stripeError: any) {
           results.push({
-            course: course.title,
+            course: course.course_name,
             status: 'error',
             error: stripeError.message,
           });

@@ -120,7 +120,7 @@ export function CourseCatalog() {
   const filteredCourses = courses.filter(course => {
     const matchesCategory = selectedCategory === 'all' || course.category === selectedCategory;
     const matchesLevel = selectedLevel === 'all' || course.level === selectedLevel;
-    const matchesSearch = course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    const matchesSearch = course.course_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          course.description.toLowerCase().includes(searchQuery.toLowerCase());
     return matchesCategory && matchesLevel && matchesSearch;
   });
@@ -220,7 +220,7 @@ export function CourseCatalog() {
                   </span>
                 </div>
 
-                <h3 className="text-xl font-bold mb-2">{course.title}</h3>
+                <h3 className="text-xl font-bold mb-2">{course.course_name}</h3>
                 <p className="text-sm text-black mb-3">{course.description}</p>
 
                 <div className="flex items-center gap-4 text-sm text-black mb-3">

@@ -59,7 +59,7 @@ export async function POST(req: Request) {
   }
 
   const context = JSON.stringify({
-    title: course.title,
+    title: course.course_name,
     description: course.description,
     modules: course.modules,
   });

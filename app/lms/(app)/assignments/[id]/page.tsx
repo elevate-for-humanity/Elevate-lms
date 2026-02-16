@@ -104,7 +104,7 @@ export default async function AssignmentDetailPage({ params }: Props) {
                       href={`/lms/courses/${course.id}`}
                       className="text-brand-blue-600 hover:underline text-sm"
                     >
-                      {course.title}
+                      {course.course_name}
                     </Link>
                   )}
                 </div>

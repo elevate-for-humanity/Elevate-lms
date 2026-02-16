@@ -312,7 +312,7 @@ export default function CourseAuthoringTool() {
             <div className="flex-1">
               <input
                 type="text"
-                value={course.title}
+                value={course.course_name}
                 onChange={(
                   e: React.ChangeEvent<
                     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement

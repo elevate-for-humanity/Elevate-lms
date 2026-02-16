@@ -47,7 +47,7 @@ function CourseCard({ course }: { course: Course }) {
         {course.thumbnail_url ? (
           <Image
             src={course.thumbnail_url}
-            alt={course.title}
+            alt={course.course_name}
             fill
             className="object-cover"
             sizes="(max-width: 640px) 100vw, 50vw"
@@ -63,7 +63,7 @@ function CourseCard({ course }: { course: Course }) {
       <div className="flex flex-1 flex-col gap-2 p-4">
         <div className="flex items-start justify-between gap-2">
           <h3 className="line-clamp-2 text-sm font-semibold text-black">
-            {course.title}
+            {course.course_name}
           </h3>
           {course.program_type && (
             <span className="rounded-full bg-orange-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-orange-600">

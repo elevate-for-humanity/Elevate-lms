@@ -193,7 +193,7 @@ export async function GET(request: NextRequest) {
           : 0;
 
         byProgram.push({
-          programName: course.title,
+          programName: course.course_name,
           learners: learnerCount || 0,
           completionRate: Math.round(courseCompletionRate),
         });

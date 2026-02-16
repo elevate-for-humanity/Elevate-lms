@@ -110,7 +110,7 @@ export async function GET(request: NextRequest) {
 
         return {
           id: course.id,
-          title: course.title,
+          title: course.course_name,
           shortDescription: course.description?.substring(0, 100) || "No description available",
           thumbnailUrl: course.thumbnail_url,
           progressPercent,

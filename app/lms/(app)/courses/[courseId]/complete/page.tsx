@@ -78,7 +78,7 @@ export default async function CompleteCourse({ params }: { params: Params }) {
       ) : (
         <>
           <p className="mt-2 opacity-80">
-            Upload proof of completion for <b>{course.title}</b>
+            Upload proof of completion for <b>{course.course_name}</b>
           </p>
           <p className="mt-1 text-sm opacity-70">
             (Certificate PDF, screenshot, or completion code)

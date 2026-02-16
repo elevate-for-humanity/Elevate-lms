@@ -140,7 +140,7 @@ export async function POST(
     return NextResponse.json({
       success: true,
       courseId,
-      courseTitle: course.title,
+      courseTitle: course.course_name,
       completedAt: new Date().toISOString(),
       certificate: certificate
         ? {

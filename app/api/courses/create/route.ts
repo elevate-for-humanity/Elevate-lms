@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
       course: {
         id: course.id,
         slug: course.slug,
-        title: course.title,
+        title: course.course_name,
       },
     });
   } catch (error) { 

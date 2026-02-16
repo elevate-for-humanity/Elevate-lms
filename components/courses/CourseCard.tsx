@@ -22,7 +22,7 @@ export function CourseCard({ course }: Props) {
       <div className="relative aspect-[4/3] w-full">
         <Image
           src={coverSrc}
-          alt={course.title}
+          alt={course.course_name}
           fill
           sizes="(min-width: 1024px) 25vw, 50vw"
           className="object-cover transition group-hover:scale-105"
@@ -30,7 +30,7 @@ export function CourseCard({ course }: Props) {
       </div>
       <div className="flex flex-1 flex-col gap-2 p-4">
         <h3 className="text-base font-semibold text-black">
-          {course.title}
+          {course.course_name}
         </h3>
         <p className="line-clamp-3 text-sm text-black">
           {course.shortDescription}

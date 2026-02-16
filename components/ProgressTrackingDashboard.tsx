@@ -198,7 +198,7 @@ export function ProgressTrackingDashboard() {
               <div key={course.id} className="p-4 bg-gray-50 rounded-lg">
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex-1">
-                    <h4 className="text-lg font-bold mb-1">{course.title}</h4>
+                    <h4 className="text-lg font-bold mb-1">{course.course_name}</h4>
                     <p className="text-sm text-black">
                       {course.lessonsCompleted} of {course.totalLessons} lessons completed
                     </p>

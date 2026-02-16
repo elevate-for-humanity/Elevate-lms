@@ -39,8 +39,8 @@ export default async function InstructorCoursesPage() {
         
         if (user) {
           const { data, error: queryError } = await supabase
-            .from('courses')
-            .select('*, enrollments(count)')
+            .from('training_courses')
+            .select('*, training_enrollments(count)')
             .eq('instructor_id', user.id)
             .order('created_at', { ascending: false });
           

@@ -40,12 +40,12 @@ export async function generateMetadata({
 
   const { data: course } = await supabase
     .from('courses')
-    .select('title, description')
+    .select('course_name, description')
     .eq('id', courseId)
     .single();
 
   return {
-    title: course ? `${course.title} | Elevate LMS` : 'Course | Elevate LMS',
+    title: course ? `${course.course_name} | Elevate LMS` : 'Course | Elevate LMS',
     description: course?.description || 'View course details and lessons.',
   };
 }
@@ -157,10 +157,10 @@ export default async function CoursePage({ params }: { params: Params }) {
                 <ChevronRight className="w-4 h-4" />
                 <Link href="/lms/courses" className="hover:text-white">Courses</Link>
                 <ChevronRight className="w-4 h-4" />
-                <span className="text-white">{course.title}</span>
+                <span className="text-white">{course.course_name}</span>
               </nav>
 
-              <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.title}</h1>
+              <h1 className="text-3xl md:text-4xl font-bold mb-4">{course.course_name}</h1>
               
               {course.description && (
                 <p className="text-brand-blue-100 text-lg mb-6">{course.description}</p>
@@ -196,7 +196,7 @@ export default async function CoursePage({ params }: { params: Params }) {
                 <div className="relative h-40 rounded-xl overflow-hidden mb-4">
                   <Image
                     src={course.thumbnail_url}
-                    alt={course.title}
+                    alt={course.course_name}
                     fill
                     className="object-cover"
                   />

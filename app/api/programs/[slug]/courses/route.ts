@@ -58,7 +58,7 @@ export async function GET(
     // Transform courses to match expected format
     const transformedCourses = (courses || []).map(course => ({
       id: course.id,
-      title: course.title,
+      title: course.course_name,
       description: course.description || '',
       duration: course.duration_hours ? `${course.duration_hours} hours` : '8 weeks',
       lessons: course.duration_hours || 24,

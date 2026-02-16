@@ -160,7 +160,7 @@ export default async function InteractiveCoursesPage() {
                   <div className="relative h-44">
                     <Image
                       src={course.image}
-                      alt={course.title}
+                      alt={course.course_name}
                       fill
                       className="object-cover"
                     />
@@ -182,7 +182,7 @@ export default async function InteractiveCoursesPage() {
                     </div>
                   </div>
                   <div className="p-4">
-                    <h3 className="font-bold text-slate-900 mb-2">{course.title}</h3>
+                    <h3 className="font-bold text-slate-900 mb-2">{course.course_name}</h3>
                     <p className="text-slate-600 text-sm mb-3 line-clamp-2">{course.description}</p>
                     <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
                       <span className="flex items-center gap-1">

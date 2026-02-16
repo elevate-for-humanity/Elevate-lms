@@ -17,11 +17,18 @@ export default async function InstructorAnalyticsPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { count: totalStudents } = await supabase.from('enrollments').select('*', { count: 'exact', head: true }).eq('instructor_id', user.id);
-  const { count: totalCourses } = await supabase.from('courses').select('*', { count: 'exact', head: true }).eq('instructor_id', user.id);
+  // Get courses assigned to this instructor
+  const { data: myCourses } = await supabase.from('training_courses').select('id').eq('instructor_id', user.id);
+  const courseIds = (myCourses || []).map((c: any) => c.id);
+  const totalCourses = courseIds.length;
 
-  // Completion rate: completed enrollments / total enrollments for this instructor
-  const { count: completedEnrollments } = await supabase.from('enrollments').select('*', { count: 'exact', head: true }).eq('instructor_id', user.id).eq('status', 'completed');
+  // Get enrollment counts for those courses
+  const { count: totalStudents } = courseIds.length > 0
+    ? await supabase.from('training_enrollments').select('*', { count: 'exact', head: true }).in('course_id', courseIds)
+    : { count: 0 };
+  const { count: completedEnrollments } = courseIds.length > 0
+    ? await supabase.from('training_enrollments').select('*', { count: 'exact', head: true }).in('course_id', courseIds).eq('status', 'completed')
+    : { count: 0 };
   const completionRate = (totalStudents && totalStudents > 0) ? Math.round(((completedEnrollments || 0) / totalStudents) * 100) : 0;
 
   return (

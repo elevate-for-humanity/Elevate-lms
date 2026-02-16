@@ -100,7 +100,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       course: {
-        title: course.title,
+        title: course.course_name,
         subtitle: course.subtitle,
         partner: course.partner,
         estimatedWeeks: course.estimatedDurationWeeks,

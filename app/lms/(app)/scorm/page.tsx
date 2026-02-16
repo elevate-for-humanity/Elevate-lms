@@ -60,7 +60,7 @@ export default async function ScormPage() {
                 </div>
                 <h3 className="font-semibold text-slate-900 mb-1">{pkg.title}</h3>
                 <p className="text-sm text-slate-500 mb-3 line-clamp-2">{pkg.description || 'Interactive SCORM module'}</p>
-                {course && <p className="text-xs text-slate-400 mb-3">Course: {course.title}</p>}
+                {course && <p className="text-xs text-slate-400 mb-3">Course: {course.course_name}</p>}
                 {pkg.duration_minutes && <p className="text-xs text-slate-400 mb-3">{pkg.duration_minutes} min</p>}
                 {pct > 0 && !isCompleted && (
                   <div className="mb-3">

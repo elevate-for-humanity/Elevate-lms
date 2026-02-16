@@ -245,7 +245,7 @@ export default async function AnalyticsPage() {
                   {courseProgress.map((course) => (
                     <div key={course.id} className="p-4 bg-slate-50 rounded-xl">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-slate-900">{course.title}</h3>
+                        <h3 className="font-medium text-slate-900">{course.course_name}</h3>
                         <span className={`px-2 py-1 rounded text-xs font-medium ${
                           course.status === 'completed'
                             ? 'bg-green-100 text-green-700'

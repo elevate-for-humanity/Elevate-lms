@@ -160,7 +160,7 @@ export function ProgressDashboard({ userId }: { userId: string }) {
             <div key={course.id} className="border-b border-slate-200 pb-4 last:border-0">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex-1">
-                  <h4 className="font-medium text-black">{course.title}</h4>
+                  <h4 className="font-medium text-black">{course.course_name}</h4>
                   <p className="text-xs text-slate-500 mt-1">
                     Last accessed: {new Date(course.last_accessed).toLocaleDateString()}
                   </p>

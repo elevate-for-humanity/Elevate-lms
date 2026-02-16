@@ -197,8 +197,8 @@ export async function POST(request: NextRequest) {
             price_data: {
               currency: 'usd',
               product_data: {
-                name: course.title,
-                description: `Access to ${course.title}`,
+                name: course.course_name,
+                description: `Access to ${course.course_name}`,
               },
               unit_amount: courseAmount,
             },

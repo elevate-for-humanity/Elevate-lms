@@ -74,7 +74,7 @@ export async function POST(req: Request) {
         unit_amount: Math.round(course.price * 100), // Convert to cents
         currency: 'usd',
         product_data: {
-          name: course.title,
+          name: course.course_name,
           description: course.description || undefined,
         },
       });
@@ -103,7 +103,7 @@ export async function POST(req: Request) {
       metadata: {
         courseId: course.id,
         userId: user?.id || '',
-        courseTitle: course.title,
+        courseTitle: course.course_name,
       },
       automatic_tax: {
         enabled: true,

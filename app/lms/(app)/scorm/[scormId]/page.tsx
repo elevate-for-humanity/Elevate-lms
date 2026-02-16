@@ -92,7 +92,7 @@ export default async function ScormPage({ params }: Props) {
           >
             <ArrowLeft className="w-4 h-4" />
             <span className="hidden sm:inline">
-              {course ? course.title : 'Back to Courses'}
+              {course ? course.course_name : 'Back to Courses'}
             </span>
           </Link>
           <div className="h-5 w-px bg-slate-300" />

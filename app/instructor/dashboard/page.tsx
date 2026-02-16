@@ -45,19 +45,22 @@ export default async function ProgramHolderDashboard() {
     );
   }
 
-  // Fetch students assigned to this instructor
-  const { data: students } = await supabase
-    .from('enrollments')
-    .select(
-      `
-      *,
-      profiles (id, full_name, email),
-      programs (id, title, name, training_hours)
-    `
-    )
-    .eq('instructor_id', user.id)
-    .order('created_at', { ascending: false })
-    .limit(10);
+  // Fetch courses assigned to this instructor, then get their enrollments
+  const { data: myCourses } = await supabase
+    .from('training_courses')
+    .select('id')
+    .eq('instructor_id', user.id);
+
+  const courseIds = (myCourses || []).map((c: any) => c.id);
+
+  const { data: students } = courseIds.length > 0
+    ? await supabase
+        .from('training_enrollments')
+        .select(`*, profiles (id, full_name, email), programs (id, title, name, training_hours)`)
+        .in('course_id', courseIds)
+        .order('enrolled_at', { ascending: false })
+        .limit(10)
+    : { data: [] };
 
   // Calculate stats
   const totalStudents = students?.length || 0;

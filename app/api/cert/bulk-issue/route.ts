@@ -143,7 +143,7 @@ export async function POST(req: NextRequest) {
           course_id: course.id,
           serial: s,
           student_name: u.email ? u.email.split('@')[0] : 'Unknown',
-          course_name: course.title,
+          course_name: course.course_name,
           completion_date: new Date(issued_at).toISOString().split('T')[0],
           issued_at,
           expires_at,

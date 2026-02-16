@@ -76,7 +76,7 @@ export function ProgramCoursesTable({ summaries }: Props) {
                   group.courses.map((course) => (
                     <tr key={course.id} className="border-t border-slate-50">
                       <td className="px-4 py-2 text-xs font-medium text-black">
-                        {course.title}
+                        {course.course_name}
                       </td>
                       <td className="px-4 py-2 text-xs text-black">
                         {course.active_learners}

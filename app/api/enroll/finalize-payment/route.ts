@@ -133,11 +133,11 @@ export async function POST(req: Request) {
     if (paymentMode === 'sponsored') {
       // Elevate pays wholesale cost to partner
       amountCents = enrollment.course.wholesale_cost_cents || 0;
-      description = `Sponsored seat: ${enrollment.course.title}`;
+      description = `Sponsored seat: ${enrollment.course.course_name}`;
     } else if (paymentMode === 'self_pay') {
       // Student pays retail price
       amountCents = enrollment.course.retail_price_cents || 0;
-      description = `Enrollment: ${enrollment.course.title}`;
+      description = `Enrollment: ${enrollment.course.course_name}`;
     } else if (paymentMode === 'scholarship') {
       // No charge - mark as paid immediately
       const { error: updateError } = await supabase
@@ -250,7 +250,7 @@ export async function POST(req: Request) {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: enrollment.course.title,
+              name: enrollment.course.course_name,
               description: description,
             },
             unit_amount: amountCents,

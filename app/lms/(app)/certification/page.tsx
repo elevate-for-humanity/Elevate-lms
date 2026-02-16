@@ -132,7 +132,7 @@ export default async function CertificationPage() {
                         <div>
                           <h3 className="font-semibold">{cert.title}</h3>
                           {cert.course && (
-                            <p className="text-sm text-gray-500">{cert.course.title}</p>
+                            <p className="text-sm text-gray-500">{cert.course.course_name}</p>
                           )}
                           <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
                             <span className="flex items-center gap-1">

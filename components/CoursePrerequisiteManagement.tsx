@@ -88,7 +88,7 @@ export function CoursePrerequisiteManagement() {
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-bold">{course.title}</h3>
+                    <h3 className="text-xl font-bold">{course.course_name}</h3>
                     <span className={`px-3 py-2 rounded text-xs font-medium ${
                       course.status === 'completed' ? 'bg-green-100 text-green-700' :
                       course.status === 'available' ? 'bg-brand-blue-100 text-brand-blue-700' :

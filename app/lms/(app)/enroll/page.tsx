@@ -125,7 +125,7 @@ export default async function EnrollPage({ searchParams }: Props) {
                       <div className="relative h-40">
                         <Image
                           src={course.thumbnail_url}
-                          alt={course.title}
+                          alt={course.course_name}
                           fill
                           className="object-cover"
                         />
@@ -138,7 +138,7 @@ export default async function EnrollPage({ searchParams }: Props) {
 
                     <div className="p-5">
                       <h3 className="font-bold text-lg text-slate-900 mb-2 line-clamp-2">
-                        {course.title}
+                        {course.course_name}
                       </h3>
                       {course.description && (
                         <p className="text-slate-600 text-sm mb-4 line-clamp-2">

@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .single();
 
   return {
-    title: course ? `Enroll in ${course.title} | Elevate LMS` : 'Enroll | Elevate LMS',
+    title: course ? `Enroll in ${course.course_name} | Elevate LMS` : 'Enroll | Elevate LMS',
     description: 'Enroll in this course to start learning.',
   };
 }
@@ -121,7 +121,7 @@ export default async function CourseEnrollPage({ params }: Props) {
           <div className="lg:col-span-3">
             <div className="bg-white rounded-2xl border border-slate-200 p-8">
               <h1 className="text-2xl font-bold text-slate-900 mb-2">
-                Enroll in {course.title}
+                Enroll in {course.course_name}
               </h1>
               <p className="text-slate-600 mb-8">
                 Complete your enrollment to start learning immediately.
@@ -129,7 +129,7 @@ export default async function CourseEnrollPage({ params }: Props) {
 
               <EnrollmentForm 
                 courseId={courseId}
-                courseName={course.title}
+                courseName={course.course_name}
                 price={course.price || 0}
                 userEmail={profile?.email || user.email || ''}
                 userName={profile ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() : ''}
@@ -145,7 +145,7 @@ export default async function CourseEnrollPage({ params }: Props) {
                 <div className="relative h-40">
                   <Image
                     src={course.thumbnail_url}
-                    alt={course.title}
+                    alt={course.course_name}
                     fill
                     className="object-cover"
                   />
@@ -157,7 +157,7 @@ export default async function CourseEnrollPage({ params }: Props) {
               )}
 
               <div className="p-6">
-                <h2 className="font-bold text-lg text-slate-900 mb-4">{course.title}</h2>
+                <h2 className="font-bold text-lg text-slate-900 mb-4">{course.course_name}</h2>
 
                 {/* Price */}
                 <div className="mb-6">

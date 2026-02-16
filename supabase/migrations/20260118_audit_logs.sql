@@ -28,6 +28,7 @@ CREATE INDEX idx_audit_logs_created_at ON audit_logs(created_at DESC);
 ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
 
 -- Create policies
+DROP POLICY IF EXISTS "Admins can view audit logs" ON audit_logs;
 CREATE POLICY "Admins can view audit logs" ON audit_logs
   FOR SELECT
   USING (
@@ -38,6 +39,7 @@ CREATE POLICY "Admins can view audit logs" ON audit_logs
     )
   );
 
+DROP POLICY IF EXISTS "Users can create own audit logs" ON audit_logs;
 CREATE POLICY "Users can create own audit logs" ON audit_logs
   FOR INSERT
   WITH CHECK (actor_id = auth.uid() OR actor_id IS NULL);

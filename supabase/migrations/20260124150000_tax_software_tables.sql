@@ -1,3 +1,22 @@
+-- Pre-add columns to existing tables
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'mef_submissions') THEN
+    ALTER TABLE mef_submissions ADD COLUMN IF NOT EXISTS user_id UUID;
+    ALTER TABLE mef_submissions ADD COLUMN IF NOT EXISTS status TEXT;
+    ALTER TABLE mef_submissions ADD COLUMN IF NOT EXISTS tax_year INTEGER;
+    ALTER TABLE mef_submissions ADD COLUMN IF NOT EXISTS taxpayer_ssn_hash TEXT;
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'tax_clients') THEN
+    ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS ssn_hash TEXT;
+    ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS user_id UUID;
+  END IF;
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'tax_returns') THEN
+    ALTER TABLE tax_returns ADD COLUMN IF NOT EXISTS user_id UUID;
+    ALTER TABLE tax_returns ADD COLUMN IF NOT EXISTS status TEXT;
+    ALTER TABLE tax_returns ADD COLUMN IF NOT EXISTS tax_year INTEGER;
+  END IF;
+END $$;
+
 -- Supersonic Tax Software Database Schema
 -- Direct IRS MeF Integration Tables
 
@@ -40,7 +59,7 @@ CREATE TABLE IF NOT EXISTS mef_submissions (
 -- MeF Acknowledgments table - stores IRS responses
 CREATE TABLE IF NOT EXISTS mef_acknowledgments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  submission_id TEXT NOT NULL REFERENCES mef_submissions(submission_id) ON DELETE CASCADE,
+  submission_id TEXT NOT NULL,
   status TEXT NOT NULL, -- 'accepted' or 'rejected'
   dcn TEXT, -- Declaration Control Number
   accepted_at TIMESTAMPTZ,
@@ -53,7 +72,7 @@ CREATE TABLE IF NOT EXISTS mef_acknowledgments (
 -- MeF Errors table - detailed error logging
 CREATE TABLE IF NOT EXISTS mef_errors (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  submission_id TEXT NOT NULL REFERENCES mef_submissions(submission_id) ON DELETE CASCADE,
+  submission_id TEXT NOT NULL,
   error_code TEXT NOT NULL,
   error_category TEXT NOT NULL, -- 'reject' or 'alert'
   error_message TEXT NOT NULL,
@@ -69,7 +88,7 @@ CREATE TABLE IF NOT EXISTS tax_returns (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
   client_id UUID,
-  submission_id TEXT REFERENCES mef_submissions(submission_id),
+  submission_id TEXT,
   
   tax_year INTEGER NOT NULL,
   filing_status TEXT NOT NULL,
@@ -146,8 +165,8 @@ CREATE TABLE IF NOT EXISTS tax_clients (
 -- Tax Dependents table
 CREATE TABLE IF NOT EXISTS tax_dependents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tax_return_id UUID REFERENCES tax_returns(id) ON DELETE CASCADE,
-  client_id UUID REFERENCES tax_clients(id) ON DELETE CASCADE,
+  tax_return_id UUID,
+  client_id UUID,
   
   first_name TEXT NOT NULL,
   last_name TEXT NOT NULL,
@@ -166,7 +185,7 @@ CREATE TABLE IF NOT EXISTS tax_dependents (
 -- W2 Income table
 CREATE TABLE IF NOT EXISTS tax_w2_income (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tax_return_id UUID REFERENCES tax_returns(id) ON DELETE CASCADE,
+  tax_return_id UUID,
   
   employer_ein TEXT NOT NULL,
   employer_name TEXT NOT NULL,
@@ -199,7 +218,7 @@ CREATE TABLE IF NOT EXISTS tax_w2_income (
 -- 1099 Income table
 CREATE TABLE IF NOT EXISTS tax_1099_income (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tax_return_id UUID REFERENCES tax_returns(id) ON DELETE CASCADE,
+  tax_return_id UUID,
   
   form_type TEXT NOT NULL, -- 'INT', 'DIV', 'MISC', 'NEC', 'R', 'G'
   payer_name TEXT NOT NULL,
@@ -218,7 +237,7 @@ CREATE TABLE IF NOT EXISTS tax_1099_income (
 -- Schedule C Business Income table
 CREATE TABLE IF NOT EXISTS tax_schedule_c (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tax_return_id UUID REFERENCES tax_returns(id) ON DELETE CASCADE,
+  tax_return_id UUID,
   
   business_name TEXT NOT NULL,
   business_code TEXT NOT NULL, -- NAICS code
@@ -243,7 +262,7 @@ CREATE TABLE IF NOT EXISTS tax_schedule_c (
 -- Itemized Deductions table
 CREATE TABLE IF NOT EXISTS tax_itemized_deductions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  tax_return_id UUID REFERENCES tax_returns(id) ON DELETE CASCADE,
+  tax_return_id UUID,
   
   medical_expenses DECIMAL(12,2) DEFAULT 0,
   state_local_taxes DECIMAL(12,2) DEFAULT 0,
@@ -262,14 +281,25 @@ CREATE TABLE IF NOT EXISTS tax_itemized_deductions (
 );
 
 -- Indexes for performance
+ALTER TABLE mef_submissions ADD COLUMN IF NOT EXISTS user_id UUID;
 CREATE INDEX IF NOT EXISTS idx_mef_submissions_user ON mef_submissions(user_id);
+ALTER TABLE mef_submissions ADD COLUMN IF NOT EXISTS status TEXT;
 CREATE INDEX IF NOT EXISTS idx_mef_submissions_status ON mef_submissions(status);
+ALTER TABLE mef_submissions ADD COLUMN IF NOT EXISTS tax_year TEXT;
 CREATE INDEX IF NOT EXISTS idx_mef_submissions_tax_year ON mef_submissions(tax_year);
+ALTER TABLE mef_submissions ADD COLUMN IF NOT EXISTS taxpayer_ssn_hash TEXT;
+ALTER TABLE mef_submissions ADD COLUMN IF NOT EXISTS taxpayer_ssn_hash TEXT;
 CREATE INDEX IF NOT EXISTS idx_mef_submissions_ssn_hash ON mef_submissions(taxpayer_ssn_hash);
+ALTER TABLE tax_returns ADD COLUMN IF NOT EXISTS user_id UUID;
 CREATE INDEX IF NOT EXISTS idx_tax_returns_user ON tax_returns(user_id);
+ALTER TABLE tax_returns ADD COLUMN IF NOT EXISTS status TEXT;
 CREATE INDEX IF NOT EXISTS idx_tax_returns_status ON tax_returns(status);
+ALTER TABLE tax_returns ADD COLUMN IF NOT EXISTS tax_year TEXT;
 CREATE INDEX IF NOT EXISTS idx_tax_returns_year ON tax_returns(tax_year);
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS ssn_hash TEXT;
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS ssn_hash TEXT;
 CREATE INDEX IF NOT EXISTS idx_tax_clients_ssn_hash ON tax_clients(ssn_hash);
+ALTER TABLE mef_errors ADD COLUMN IF NOT EXISTS submission_id UUID;
 CREATE INDEX IF NOT EXISTS idx_mef_errors_submission ON mef_errors(submission_id);
 
 -- Enable RLS
@@ -287,30 +317,38 @@ ALTER TABLE tax_itemized_deductions ENABLE ROW LEVEL SECURITY;
 -- RLS Policies
 
 -- Users can view their own submissions
+DROP POLICY IF EXISTS "Users can view own submissions" ON mef_submissions;
 CREATE POLICY "Users can view own submissions" ON mef_submissions
   FOR SELECT USING (auth.uid() = user_id);
 
 -- Users can view their own tax returns
+DROP POLICY IF EXISTS "Users can view own tax returns" ON tax_returns;
 CREATE POLICY "Users can view own tax returns" ON tax_returns
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own tax returns" ON tax_returns;
 CREATE POLICY "Users can insert own tax returns" ON tax_returns
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own tax returns" ON tax_returns;
 CREATE POLICY "Users can update own tax returns" ON tax_returns
   FOR UPDATE USING (auth.uid() = user_id);
 
 -- Users can view their own client record
+DROP POLICY IF EXISTS "Users can view own client record" ON tax_clients;
 CREATE POLICY "Users can view own client record" ON tax_clients
   FOR SELECT USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can insert own client record" ON tax_clients;
 CREATE POLICY "Users can insert own client record" ON tax_clients
   FOR INSERT WITH CHECK (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update own client record" ON tax_clients;
 CREATE POLICY "Users can update own client record" ON tax_clients
   FOR UPDATE USING (auth.uid() = user_id);
 
 -- Admin policies for tax preparers
+DROP POLICY IF EXISTS "Admins can view all submissions" ON mef_submissions;
 CREATE POLICY "Admins can view all submissions" ON mef_submissions
   FOR SELECT USING (
     EXISTS (
@@ -320,6 +358,7 @@ CREATE POLICY "Admins can view all submissions" ON mef_submissions
     )
   );
 
+DROP POLICY IF EXISTS "Admins can insert submissions" ON mef_submissions;
 CREATE POLICY "Admins can insert submissions" ON mef_submissions
   FOR INSERT WITH CHECK (
     EXISTS (
@@ -329,6 +368,7 @@ CREATE POLICY "Admins can insert submissions" ON mef_submissions
     )
   );
 
+DROP POLICY IF EXISTS "Admins can update submissions" ON mef_submissions;
 CREATE POLICY "Admins can update submissions" ON mef_submissions
   FOR UPDATE USING (
     EXISTS (
@@ -338,6 +378,7 @@ CREATE POLICY "Admins can update submissions" ON mef_submissions
     )
   );
 
+DROP POLICY IF EXISTS "Admins can view all tax returns" ON tax_returns;
 CREATE POLICY "Admins can view all tax returns" ON tax_returns
   FOR ALL USING (
     EXISTS (
@@ -347,6 +388,7 @@ CREATE POLICY "Admins can view all tax returns" ON tax_returns
     )
   );
 
+DROP POLICY IF EXISTS "Admins can view all clients" ON tax_clients;
 CREATE POLICY "Admins can view all clients" ON tax_clients
   FOR ALL USING (
     EXISTS (
@@ -357,12 +399,15 @@ CREATE POLICY "Admins can view all clients" ON tax_clients
   );
 
 -- Service role bypass for API operations
+DROP POLICY IF EXISTS "Service role full access submissions" ON mef_submissions;
 CREATE POLICY "Service role full access submissions" ON mef_submissions
   FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
 
+DROP POLICY IF EXISTS "Service role full access acknowledgments" ON mef_acknowledgments;
 CREATE POLICY "Service role full access acknowledgments" ON mef_acknowledgments
   FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
 
+DROP POLICY IF EXISTS "Service role full access errors" ON mef_errors;
 CREATE POLICY "Service role full access errors" ON mef_errors
   FOR ALL USING (auth.jwt() ->> 'role' = 'service_role');
 

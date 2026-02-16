@@ -23,7 +23,7 @@ ALTER TABLE public.programs ADD COLUMN IF NOT EXISTS duration_weeks INTEGER;
 ALTER TABLE public.programs ADD COLUMN IF NOT EXISTS total_hours INTEGER;
 ALTER TABLE public.programs ADD COLUMN IF NOT EXISTS tuition DECIMAL(10,2);
 ALTER TABLE public.programs ADD COLUMN IF NOT EXISTS funding_eligible BOOLEAN DEFAULT true;
-ALTER TABLE public.programs ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'draft' CHECK (status IN ('draft', 'active', 'archived'));
+ALTER TABLE public.programs ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'draft';
 ALTER TABLE public.programs ADD COLUMN IF NOT EXISTS category TEXT;
 ALTER TABLE public.programs ADD COLUMN IF NOT EXISTS requirements JSONB;
 ALTER TABLE public.programs ADD COLUMN IF NOT EXISTS eligibility_rules JSONB;
@@ -37,7 +37,7 @@ CREATE TABLE IF NOT EXISTS public.intakes (
   source TEXT NOT NULL DEFAULT 'website',
   source_page TEXT,
   program_interest TEXT,
-  program_id UUID REFERENCES public.programs(id),
+  program_id UUID,
   full_name TEXT NOT NULL,
   email TEXT NOT NULL,
   phone TEXT,
@@ -50,15 +50,29 @@ CREATE TABLE IF NOT EXISTS public.intakes (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS source TEXT DEFAULT 'website';
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS source_page TEXT;
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS program_interest TEXT;
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS full_name TEXT;
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS email TEXT;
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS phone TEXT;
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS zip_code TEXT;
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'new';
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS assigned_to UUID;
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS converted_to_application_id UUID;
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS status TEXT;
 CREATE INDEX IF NOT EXISTS idx_intakes_status ON public.intakes(status);
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS program_id UUID;
 CREATE INDEX IF NOT EXISTS idx_intakes_program ON public.intakes(program_id);
+ALTER TABLE public.intakes ADD COLUMN IF NOT EXISTS email TEXT;
 CREATE INDEX IF NOT EXISTS idx_intakes_email ON public.intakes(email);
 
 -- ============ APPLICATIONS ============
 -- AT-03: Enrollment Application must create application record
 
 ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS intake_id UUID REFERENCES public.intakes(id);
-ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS program_id UUID REFERENCES public.programs(id);
+ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS program_id UUID;
 ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS full_name TEXT;
 ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS email TEXT;
 ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS phone TEXT;
@@ -70,7 +84,9 @@ ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS reviewed_at TIMESTAMPTZ
 ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS submitted_at TIMESTAMPTZ DEFAULT NOW();
 ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
+ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS status TEXT;
 CREATE INDEX IF NOT EXISTS idx_applications_status ON public.applications(status);
+ALTER TABLE public.applications ADD COLUMN IF NOT EXISTS program_id UUID;
 CREATE INDEX IF NOT EXISTS idx_applications_program ON public.applications(program_id);
 
 -- ============ COHORTS ============
@@ -78,7 +94,7 @@ CREATE INDEX IF NOT EXISTS idx_applications_program ON public.applications(progr
 
 CREATE TABLE IF NOT EXISTS public.cohorts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  program_id UUID NOT NULL REFERENCES public.programs(id),
+  program_id UUID NOT NULL,
   code TEXT NOT NULL UNIQUE,
   name TEXT NOT NULL,
   start_date DATE NOT NULL,
@@ -93,22 +109,35 @@ CREATE TABLE IF NOT EXISTS public.cohorts (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS program_id UUID;
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS code TEXT;
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS name TEXT;
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS max_capacity INTEGER DEFAULT 20;
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS current_enrollment INTEGER DEFAULT 0;
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'planned';
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS location TEXT;
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS instructor_id UUID;
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS program_id UUID;
 CREATE INDEX IF NOT EXISTS idx_cohorts_program ON public.cohorts(program_id);
+ALTER TABLE public.cohorts ADD COLUMN IF NOT EXISTS status TEXT;
 CREATE INDEX IF NOT EXISTS idx_cohorts_status ON public.cohorts(status);
 
 -- ============ ENROLLMENTS ============
 -- AT-07: Enrollment must be linked to cohort
 
-ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS application_id UUID REFERENCES public.applications(id);
-ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS cohort_id UUID REFERENCES public.cohorts(id);
-ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS program_id UUID REFERENCES public.programs(id);
-ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active' CHECK (status IN ('pending', 'active', 'completed', 'withdrawn', 'suspended'));
-ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS progress INTEGER DEFAULT 0;
-ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS hours_completed DECIMAL(6,2) DEFAULT 0;
-ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS at_risk BOOLEAN DEFAULT false;
-ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS enrolled_at TIMESTAMPTZ DEFAULT NOW();
-ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ;
-ALTER TABLE public.enrollments ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
+-- enrollments is a VIEW over training_enrollments — alter the real table
+ALTER TABLE public.training_enrollments ADD COLUMN IF NOT EXISTS application_id UUID;
+ALTER TABLE public.training_enrollments ADD COLUMN IF NOT EXISTS cohort_id UUID;
+ALTER TABLE public.training_enrollments ADD COLUMN IF NOT EXISTS program_id UUID;
+ALTER TABLE public.training_enrollments ADD COLUMN IF NOT EXISTS progress INTEGER DEFAULT 0;
+ALTER TABLE public.training_enrollments ADD COLUMN IF NOT EXISTS hours_completed DECIMAL(6,2) DEFAULT 0;
+ALTER TABLE public.training_enrollments ADD COLUMN IF NOT EXISTS at_risk BOOLEAN DEFAULT false;
+ALTER TABLE public.training_enrollments ADD COLUMN IF NOT EXISTS enrolled_at TIMESTAMPTZ DEFAULT NOW();
+ALTER TABLE public.training_enrollments ADD COLUMN IF NOT EXISTS completed_at TIMESTAMPTZ;
+ALTER TABLE public.training_enrollments ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
 
 -- ============ PARTNER ORGANIZATIONS ============
 -- Employers / Training Sites
@@ -135,6 +164,21 @@ CREATE TABLE IF NOT EXISTS public.partner_organizations (
 -- ============ PARTNER SITES ============
 -- AT-08: Partner Site Assignment
 
+-- Ensure partner_organizations columns exist
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS name TEXT;
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS type TEXT DEFAULT 'employer';
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS contact_name TEXT;
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS contact_email TEXT;
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS contact_phone TEXT;
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS city TEXT;
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS state TEXT;
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS zip_code TEXT;
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active';
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS agreement_signed BOOLEAN DEFAULT false;
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS agreement_date DATE;
+ALTER TABLE public.partner_organizations ADD COLUMN IF NOT EXISTS notes TEXT;
+
 CREATE TABLE IF NOT EXISTS public.partner_sites (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   partner_id UUID NOT NULL REFERENCES public.partner_organizations(id),
@@ -153,6 +197,19 @@ CREATE TABLE IF NOT EXISTS public.partner_sites (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS partner_id UUID;
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS name TEXT;
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS address TEXT;
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS city TEXT;
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS state TEXT;
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS zip_code TEXT;
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS capacity INTEGER DEFAULT 5;
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS current_apprentices INTEGER DEFAULT 0;
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS supervisor_name TEXT;
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS supervisor_phone TEXT;
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active';
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS programs_supported UUID[];
+ALTER TABLE public.partner_sites ADD COLUMN IF NOT EXISTS partner_id UUID;
 CREATE INDEX IF NOT EXISTS idx_partner_sites_partner ON public.partner_sites(partner_id);
 
 -- ============ APPRENTICE ASSIGNMENTS ============
@@ -160,8 +217,8 @@ CREATE INDEX IF NOT EXISTS idx_partner_sites_partner ON public.partner_sites(par
 
 CREATE TABLE IF NOT EXISTS public.apprentice_assignments (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  enrollment_id UUID NOT NULL REFERENCES public.enrollments(id),
-  site_id UUID NOT NULL REFERENCES public.partner_sites(id),
+  enrollment_id UUID NOT NULL,
+  site_id UUID NOT NULL,
   start_date DATE NOT NULL,
   end_date DATE,
   status TEXT DEFAULT 'active' CHECK (status IN ('pending', 'active', 'completed', 'terminated')),
@@ -172,7 +229,16 @@ CREATE TABLE IF NOT EXISTS public.apprentice_assignments (
   UNIQUE(enrollment_id, site_id, start_date)
 );
 
+ALTER TABLE public.apprentice_assignments ADD COLUMN IF NOT EXISTS enrollment_id UUID;
+ALTER TABLE public.apprentice_assignments ADD COLUMN IF NOT EXISTS site_id UUID;
+ALTER TABLE public.apprentice_assignments ADD COLUMN IF NOT EXISTS start_date DATE;
+ALTER TABLE public.apprentice_assignments ADD COLUMN IF NOT EXISTS end_date DATE;
+ALTER TABLE public.apprentice_assignments ADD COLUMN IF NOT EXISTS status TEXT DEFAULT 'active';
+ALTER TABLE public.apprentice_assignments ADD COLUMN IF NOT EXISTS supervisor_id UUID;
+ALTER TABLE public.apprentice_assignments ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE public.apprentice_assignments ADD COLUMN IF NOT EXISTS enrollment_id UUID;
 CREATE INDEX IF NOT EXISTS idx_apprentice_assignments_enrollment ON public.apprentice_assignments(enrollment_id);
+ALTER TABLE public.apprentice_assignments ADD COLUMN IF NOT EXISTS site_id UUID;
 CREATE INDEX IF NOT EXISTS idx_apprentice_assignments_site ON public.apprentice_assignments(site_id);
 
 -- ============ ATTENDANCE HOURS ============
@@ -181,8 +247,8 @@ CREATE INDEX IF NOT EXISTS idx_apprentice_assignments_site ON public.apprentice_
 
 CREATE TABLE IF NOT EXISTS public.attendance_hours (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  enrollment_id UUID NOT NULL REFERENCES public.enrollments(id),
-  assignment_id UUID REFERENCES public.apprentice_assignments(id),
+  enrollment_id UUID NOT NULL,
+  assignment_id UUID,
   cohort_id UUID REFERENCES public.cohorts(id),
   date DATE NOT NULL,
   hours_logged DECIMAL(4,2) NOT NULL CHECK (hours_logged > 0 AND hours_logged <= 12),
@@ -197,7 +263,20 @@ CREATE TABLE IF NOT EXISTS public.attendance_hours (
   UNIQUE(enrollment_id, date, type)
 );
 
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS enrollment_id UUID;
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS assignment_id UUID;
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS cohort_id UUID;
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS date DATE;
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS hours_logged DECIMAL(4,2);
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS type TEXT DEFAULT 'classroom';
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS logged_by UUID;
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS verified BOOLEAN DEFAULT false;
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS verified_by UUID;
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS verified_at TIMESTAMPTZ;
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS enrollment_id UUID;
 CREATE INDEX IF NOT EXISTS idx_attendance_hours_enrollment ON public.attendance_hours(enrollment_id);
+ALTER TABLE public.attendance_hours ADD COLUMN IF NOT EXISTS date TEXT;
 CREATE INDEX IF NOT EXISTS idx_attendance_hours_date ON public.attendance_hours(date);
 
 -- ============ DOCUMENT REQUIREMENTS ============
@@ -205,7 +284,7 @@ CREATE INDEX IF NOT EXISTS idx_attendance_hours_date ON public.attendance_hours(
 
 CREATE TABLE IF NOT EXISTS public.document_requirements (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  program_id UUID REFERENCES public.programs(id),
+  program_id UUID,
   name TEXT NOT NULL,
   description TEXT,
   required BOOLEAN DEFAULT true,
@@ -217,9 +296,15 @@ CREATE TABLE IF NOT EXISTS public.document_requirements (
 -- ============ DOCUMENTS ============
 -- AT-05: Files must be linked to student + application
 
-ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS enrollment_id UUID REFERENCES public.enrollments(id);
-ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS application_id UUID REFERENCES public.applications(id);
-ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS requirement_id UUID REFERENCES public.document_requirements(id);
+ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS enrollment_id UUID;
+ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS application_id UUID;
+ALTER TABLE public.document_requirements ADD COLUMN IF NOT EXISTS program_id UUID;
+ALTER TABLE public.document_requirements ADD COLUMN IF NOT EXISTS name TEXT;
+ALTER TABLE public.document_requirements ADD COLUMN IF NOT EXISTS description TEXT;
+ALTER TABLE public.document_requirements ADD COLUMN IF NOT EXISTS required BOOLEAN DEFAULT true;
+ALTER TABLE public.document_requirements ADD COLUMN IF NOT EXISTS due_stage TEXT DEFAULT 'enrollment';
+ALTER TABLE public.document_requirements ADD COLUMN IF NOT EXISTS document_type TEXT;
+ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS requirement_id UUID;
 ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS verification_status TEXT DEFAULT 'pending' CHECK (verification_status IN ('pending', 'verified', 'rejected'));
 ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS verified_by UUID REFERENCES public.profiles(id);
 ALTER TABLE public.documents ADD COLUMN IF NOT EXISTS verified_at TIMESTAMPTZ;
@@ -243,6 +328,17 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS actor_id UUID;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS actor_role TEXT;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS action TEXT;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS resource_type TEXT;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS resource_id UUID;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS before_state JSONB;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS after_state JSONB;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS ip_address TEXT;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS user_agent TEXT;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS notes TEXT;
+ALTER TABLE public.audit_logs ADD COLUMN IF NOT EXISTS actor_id UUID;
 CREATE INDEX IF NOT EXISTS idx_audit_logs_actor ON public.audit_logs(actor_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_resource ON public.audit_logs(resource_type, resource_id);
 CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON public.audit_logs(created_at DESC);
@@ -263,10 +359,12 @@ ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
 -- Public can create (lead capture)
 -- Admin can read/update all
 
+DROP POLICY IF EXISTS "intakes_public_insert" ON public.intakes;
 CREATE POLICY "intakes_public_insert" ON public.intakes
 FOR INSERT TO anon, authenticated
 WITH CHECK (true);
 
+DROP POLICY IF EXISTS "intakes_admin_all" ON public.intakes;
 CREATE POLICY "intakes_admin_all" ON public.intakes
 FOR ALL TO authenticated
 USING (
@@ -281,11 +379,13 @@ USING (
 -- AT-12: Role Enforcement
 
 -- Users can view their own applications
+DROP POLICY IF EXISTS "applications_own_read" ON public.applications;
 CREATE POLICY "applications_own_read" ON public.applications
 FOR SELECT TO authenticated
 USING (user_id = auth.uid() OR email = (SELECT email FROM public.profiles WHERE id = auth.uid()));
 
 -- Admin can do everything
+DROP POLICY IF EXISTS "applications_admin_all" ON public.applications;
 CREATE POLICY "applications_admin_all" ON public.applications
 FOR ALL TO authenticated
 USING (
@@ -299,6 +399,7 @@ USING (
 -- ============ COHORTS RLS ============
 
 -- Instructors can view assigned cohorts
+DROP POLICY IF EXISTS "cohorts_instructor_read" ON public.cohorts;
 CREATE POLICY "cohorts_instructor_read" ON public.cohorts
 FOR SELECT TO authenticated
 USING (
@@ -311,6 +412,7 @@ USING (
 );
 
 -- Admin can manage
+DROP POLICY IF EXISTS "cohorts_admin_all" ON public.cohorts;
 CREATE POLICY "cohorts_admin_all" ON public.cohorts
 FOR ALL TO authenticated
 USING (
@@ -324,17 +426,19 @@ USING (
 -- ============ PARTNER ORGANIZATIONS RLS ============
 
 -- Partners can view their own org
+DROP POLICY IF EXISTS "partner_orgs_own_read" ON public.partner_organizations;
 CREATE POLICY "partner_orgs_own_read" ON public.partner_organizations
 FOR SELECT TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM public.profiles
     WHERE profiles.id = auth.uid()
-    AND (profiles.role IN ('admin', 'super_admin') OR profiles.partner_org_id = partner_organizations.id)
+    AND (profiles.role IN ('admin', 'super_admin') OR false)
   )
 );
 
 -- Admin can manage
+DROP POLICY IF EXISTS "partner_orgs_admin_all" ON public.partner_organizations;
 CREATE POLICY "partner_orgs_admin_all" ON public.partner_organizations
 FOR ALL TO authenticated
 USING (
@@ -348,12 +452,13 @@ USING (
 -- ============ PARTNER SITES RLS ============
 
 -- Partners can view their own sites
+DROP POLICY IF EXISTS "partner_sites_own_read" ON public.partner_sites;
 CREATE POLICY "partner_sites_own_read" ON public.partner_sites
 FOR SELECT TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM public.profiles p
-    JOIN public.partner_organizations po ON p.partner_org_id = po.id
+    JOIN public.partner_organizations po ON false
     WHERE p.id = auth.uid()
     AND po.id = partner_sites.partner_id
   ) OR
@@ -365,6 +470,7 @@ USING (
 );
 
 -- Admin can manage
+DROP POLICY IF EXISTS "partner_sites_admin_all" ON public.partner_sites;
 CREATE POLICY "partner_sites_admin_all" ON public.partner_sites
 FOR ALL TO authenticated
 USING (
@@ -378,6 +484,7 @@ USING (
 -- ============ APPRENTICE ASSIGNMENTS RLS ============
 
 -- Students can view their own assignments
+DROP POLICY IF EXISTS "assignments_student_read" ON public.apprentice_assignments;
 CREATE POLICY "assignments_student_read" ON public.apprentice_assignments
 FOR SELECT TO authenticated
 USING (
@@ -389,12 +496,13 @@ USING (
 );
 
 -- Partners can view assignments at their sites
+DROP POLICY IF EXISTS "assignments_partner_read" ON public.apprentice_assignments;
 CREATE POLICY "assignments_partner_read" ON public.apprentice_assignments
 FOR SELECT TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM public.profiles p
-    JOIN public.partner_organizations po ON p.partner_org_id = po.id
+    JOIN public.partner_organizations po ON false
     JOIN public.partner_sites ps ON ps.partner_id = po.id
     WHERE p.id = auth.uid()
     AND ps.id = apprentice_assignments.site_id
@@ -402,6 +510,7 @@ USING (
 );
 
 -- Admin/Instructor can manage
+DROP POLICY IF EXISTS "assignments_admin_all" ON public.apprentice_assignments;
 CREATE POLICY "assignments_admin_all" ON public.apprentice_assignments
 FOR ALL TO authenticated
 USING (
@@ -417,6 +526,7 @@ USING (
 -- AT-10: Student can only read
 
 -- Students can view their own hours (READ ONLY)
+DROP POLICY IF EXISTS "hours_student_read" ON public.attendance_hours;
 CREATE POLICY "hours_student_read" ON public.attendance_hours
 FOR SELECT TO authenticated
 USING (
@@ -428,6 +538,7 @@ USING (
 );
 
 -- Instructors can log hours
+DROP POLICY IF EXISTS "hours_instructor_insert" ON public.attendance_hours;
 CREATE POLICY "hours_instructor_insert" ON public.attendance_hours
 FOR INSERT TO authenticated
 WITH CHECK (
@@ -439,6 +550,7 @@ WITH CHECK (
 );
 
 -- Admin/Instructor can update
+DROP POLICY IF EXISTS "hours_admin_update" ON public.attendance_hours;
 CREATE POLICY "hours_admin_update" ON public.attendance_hours
 FOR UPDATE TO authenticated
 USING (
@@ -450,6 +562,7 @@ USING (
 );
 
 -- Admin can delete
+DROP POLICY IF EXISTS "hours_admin_delete" ON public.attendance_hours;
 CREATE POLICY "hours_admin_delete" ON public.attendance_hours
 FOR DELETE TO authenticated
 USING (
@@ -463,6 +576,7 @@ USING (
 -- ============ AUDIT LOGS RLS ============
 -- AT-13: Admin can read all
 
+DROP POLICY IF EXISTS "audit_logs_admin_read" ON public.audit_logs;
 CREATE POLICY "audit_logs_admin_read" ON public.audit_logs
 FOR SELECT TO authenticated
 USING (
@@ -474,16 +588,19 @@ USING (
 );
 
 -- System can insert (via service role or triggers)
+DROP POLICY IF EXISTS "audit_logs_insert" ON public.audit_logs;
 CREATE POLICY "audit_logs_insert" ON public.audit_logs
 FOR INSERT TO authenticated
 WITH CHECK (true);
 
 -- ============ DOCUMENT REQUIREMENTS RLS ============
 
+DROP POLICY IF EXISTS "doc_requirements_read" ON public.document_requirements;
 CREATE POLICY "doc_requirements_read" ON public.document_requirements
 FOR SELECT TO authenticated
 USING (true);
 
+DROP POLICY IF EXISTS "doc_requirements_admin_all" ON public.document_requirements;
 CREATE POLICY "doc_requirements_admin_all" ON public.document_requirements
 FOR ALL TO authenticated
 USING (
@@ -500,7 +617,7 @@ USING (
 CREATE OR REPLACE FUNCTION update_enrollment_hours()
 RETURNS TRIGGER AS $$
 BEGIN
-  UPDATE public.enrollments
+  UPDATE public.training_enrollments
   SET hours_completed = (
     SELECT COALESCE(SUM(hours_logged), 0)
     FROM public.attendance_hours
@@ -554,9 +671,10 @@ $$ LANGUAGE plpgsql;
 -- ============ SEED DATA: BARBER + HVAC ============
 
 -- Insert Barber program if not exists
-INSERT INTO public.programs (code, title, description, duration_weeks, total_hours, tuition, funding_eligible, status, category)
+INSERT INTO public.programs (code, slug, title, description, duration_weeks, total_hours, tuition, funding_eligible, status, category)
 VALUES (
   'BARBER-2024',
+  'barber-2024',
   'Professional Barber Program',
   'State-licensed barber training program covering cutting, styling, shaving, and business management.',
   52,
@@ -568,9 +686,10 @@ VALUES (
 ) ON CONFLICT (code) DO NOTHING;
 
 -- Insert HVAC program if not exists
-INSERT INTO public.programs (code, title, description, duration_weeks, total_hours, tuition, funding_eligible, status, category)
+INSERT INTO public.programs (code, slug, title, description, duration_weeks, total_hours, tuition, funding_eligible, status, category)
 VALUES (
   'HVAC-2024',
+  'hvac-2024',
   'HVAC Technician Program',
   'Comprehensive HVAC training covering installation, maintenance, and repair of heating and cooling systems.',
   24,

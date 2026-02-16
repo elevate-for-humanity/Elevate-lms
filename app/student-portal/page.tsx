@@ -439,7 +439,7 @@ export default async function StudentPortalPage() {
             Questions? Contact Us
           </h2>
           <p className="text-xl text-white/90 mb-8">
-            Students are building successful careers through our programs
+            Need help with your enrollment, courses, or funding? We&apos;re here for you.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link

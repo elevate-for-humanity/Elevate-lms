@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS franchise_offices (
 CREATE TABLE IF NOT EXISTS franchise_preparers (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id),
-  office_id UUID NOT NULL REFERENCES franchise_offices(id) ON DELETE CASCADE,
+  office_id UUID NOT NULL,
   
   -- Personal info
   first_name VARCHAR(100) NOT NULL,
@@ -115,7 +115,7 @@ CREATE TABLE IF NOT EXISTS franchise_preparers (
 -- ============================================
 CREATE TABLE IF NOT EXISTS franchise_clients (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  office_id UUID NOT NULL REFERENCES franchise_offices(id) ON DELETE CASCADE,
+  office_id UUID NOT NULL,
   
   -- Personal info
   first_name VARCHAR(100) NOT NULL,
@@ -145,7 +145,7 @@ CREATE TABLE IF NOT EXISTS franchise_clients (
   spouse_ssn_last_four VARCHAR(4),
   
   -- Preferences
-  preferred_preparer_id UUID REFERENCES franchise_preparers(id),
+  preferred_preparer_id UUID,
   
   -- History
   client_since DATE DEFAULT CURRENT_DATE,
@@ -168,8 +168,8 @@ CREATE TABLE IF NOT EXISTS franchise_clients (
 -- ============================================
 CREATE TABLE IF NOT EXISTS franchise_ero_configs (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  office_id UUID NOT NULL REFERENCES franchise_offices(id) ON DELETE CASCADE,
-  ero_preparer_id UUID NOT NULL REFERENCES franchise_preparers(id),
+  office_id UUID NOT NULL,
+  ero_preparer_id UUID NOT NULL,
   
   -- ERO details
   efin VARCHAR(6) NOT NULL,
@@ -194,16 +194,16 @@ CREATE TABLE IF NOT EXISTS franchise_return_submissions (
   submission_id VARCHAR(50) UNIQUE NOT NULL,
   
   -- Relationships
-  office_id UUID NOT NULL REFERENCES franchise_offices(id),
-  preparer_id UUID NOT NULL REFERENCES franchise_preparers(id),
-  client_id UUID REFERENCES franchise_clients(id),
+  office_id UUID NOT NULL,
+  preparer_id UUID NOT NULL,
+  client_id UUID,
   
   -- Preparer info snapshot
   preparer_ptin VARCHAR(20) NOT NULL,
   preparer_name VARCHAR(255),
   
   -- ERO info
-  ero_id UUID REFERENCES franchise_preparers(id),
+  ero_id UUID,
   ero_signature JSONB,
   ero_signed_at TIMESTAMPTZ,
   
@@ -250,7 +250,7 @@ CREATE TABLE IF NOT EXISTS franchise_return_submissions (
 -- ============================================
 CREATE TABLE IF NOT EXISTS franchise_fee_schedules (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  office_id UUID NOT NULL REFERENCES franchise_offices(id) ON DELETE CASCADE,
+  office_id UUID NOT NULL,
   
   name VARCHAR(100) NOT NULL,
   is_default BOOLEAN DEFAULT FALSE,
@@ -302,8 +302,8 @@ CREATE TABLE IF NOT EXISTS franchise_fee_schedules (
 -- ============================================
 CREATE TABLE IF NOT EXISTS franchise_preparer_payouts (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  preparer_id UUID NOT NULL REFERENCES franchise_preparers(id),
-  office_id UUID NOT NULL REFERENCES franchise_offices(id),
+  preparer_id UUID NOT NULL,
+  office_id UUID NOT NULL,
   
   -- Period
   period_start DATE NOT NULL,
@@ -338,7 +338,7 @@ CREATE TABLE IF NOT EXISTS franchise_preparer_payouts (
 -- ============================================
 CREATE TABLE IF NOT EXISTS franchise_royalties (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  office_id UUID NOT NULL REFERENCES franchise_offices(id),
+  office_id UUID NOT NULL,
   
   -- Period
   period_start DATE NOT NULL,
@@ -382,7 +382,7 @@ CREATE TABLE IF NOT EXISTS franchise_audit_log (
   entity_id UUID,
   
   -- Context
-  office_id UUID REFERENCES franchise_offices(id),
+  office_id UUID,
   actor_id UUID REFERENCES auth.users(id),
   
   -- Details
@@ -403,33 +403,51 @@ CREATE TABLE IF NOT EXISTS franchise_audit_log (
 -- ============================================
 
 -- Offices
+ALTER TABLE franchise_offices ADD COLUMN IF NOT EXISTS owner_id UUID;
 CREATE INDEX IF NOT EXISTS idx_franchise_offices_owner ON franchise_offices(owner_id);
+ALTER TABLE franchise_offices ADD COLUMN IF NOT EXISTS status TEXT;
 CREATE INDEX IF NOT EXISTS idx_franchise_offices_status ON franchise_offices(status);
+ALTER TABLE franchise_offices ADD COLUMN IF NOT EXISTS office_code TEXT;
 CREATE INDEX IF NOT EXISTS idx_franchise_offices_code ON franchise_offices(office_code);
 
 -- Preparers
+ALTER TABLE franchise_preparers ADD COLUMN IF NOT EXISTS office_id UUID;
 CREATE INDEX IF NOT EXISTS idx_franchise_preparers_office ON franchise_preparers(office_id);
+ALTER TABLE franchise_preparers ADD COLUMN IF NOT EXISTS user_id UUID;
 CREATE INDEX IF NOT EXISTS idx_franchise_preparers_user ON franchise_preparers(user_id);
+ALTER TABLE franchise_preparers ADD COLUMN IF NOT EXISTS ptin TEXT;
 CREATE INDEX IF NOT EXISTS idx_franchise_preparers_ptin ON franchise_preparers(ptin);
+ALTER TABLE franchise_preparers ADD COLUMN IF NOT EXISTS status TEXT;
 CREATE INDEX IF NOT EXISTS idx_franchise_preparers_status ON franchise_preparers(status);
 
 -- Clients
+ALTER TABLE franchise_clients ADD COLUMN IF NOT EXISTS office_id UUID;
 CREATE INDEX IF NOT EXISTS idx_franchise_clients_office ON franchise_clients(office_id);
+ALTER TABLE franchise_clients ADD COLUMN IF NOT EXISTS ssn_hash TEXT;
 CREATE INDEX IF NOT EXISTS idx_franchise_clients_ssn_hash ON franchise_clients(ssn_hash);
 CREATE INDEX IF NOT EXISTS idx_franchise_clients_name ON franchise_clients(last_name, first_name);
 
 -- Return submissions
+ALTER TABLE franchise_return_submissions ADD COLUMN IF NOT EXISTS office_id UUID;
 CREATE INDEX IF NOT EXISTS idx_franchise_returns_office ON franchise_return_submissions(office_id);
+ALTER TABLE franchise_return_submissions ADD COLUMN IF NOT EXISTS preparer_id UUID;
 CREATE INDEX IF NOT EXISTS idx_franchise_returns_preparer ON franchise_return_submissions(preparer_id);
+ALTER TABLE franchise_return_submissions ADD COLUMN IF NOT EXISTS client_id UUID;
 CREATE INDEX IF NOT EXISTS idx_franchise_returns_client ON franchise_return_submissions(client_id);
+ALTER TABLE franchise_return_submissions ADD COLUMN IF NOT EXISTS status TEXT;
 CREATE INDEX IF NOT EXISTS idx_franchise_returns_status ON franchise_return_submissions(status);
+ALTER TABLE franchise_return_submissions ADD COLUMN IF NOT EXISTS tax_year TEXT;
 CREATE INDEX IF NOT EXISTS idx_franchise_returns_year ON franchise_return_submissions(tax_year);
+ALTER TABLE franchise_return_submissions ADD COLUMN IF NOT EXISTS created_at TEXT;
 CREATE INDEX IF NOT EXISTS idx_franchise_returns_created ON franchise_return_submissions(created_at);
 
 -- Audit log
+ALTER TABLE franchise_audit_log ADD COLUMN IF NOT EXISTS office_id UUID;
 CREATE INDEX IF NOT EXISTS idx_franchise_audit_office ON franchise_audit_log(office_id);
+ALTER TABLE franchise_audit_log ADD COLUMN IF NOT EXISTS actor_id UUID;
 CREATE INDEX IF NOT EXISTS idx_franchise_audit_actor ON franchise_audit_log(actor_id);
 CREATE INDEX IF NOT EXISTS idx_franchise_audit_entity ON franchise_audit_log(entity_type, entity_id);
+ALTER TABLE franchise_audit_log ADD COLUMN IF NOT EXISTS created_at TEXT;
 CREATE INDEX IF NOT EXISTS idx_franchise_audit_created ON franchise_audit_log(created_at);
 
 -- ============================================
@@ -447,6 +465,7 @@ ALTER TABLE franchise_royalties ENABLE ROW LEVEL SECURITY;
 ALTER TABLE franchise_audit_log ENABLE ROW LEVEL SECURITY;
 
 -- Offices: Admins see all, owners see their own
+DROP POLICY IF EXISTS "franchise_offices_admin" ON franchise_offices;
 CREATE POLICY franchise_offices_admin ON franchise_offices
   FOR ALL TO authenticated
   USING (
@@ -455,6 +474,7 @@ CREATE POLICY franchise_offices_admin ON franchise_offices
   );
 
 -- Preparers: Admins see all, office owners see their office's preparers, preparers see themselves
+DROP POLICY IF EXISTS "franchise_preparers_access" ON franchise_preparers;
 CREATE POLICY franchise_preparers_access ON franchise_preparers
   FOR ALL TO authenticated
   USING (
@@ -464,6 +484,7 @@ CREATE POLICY franchise_preparers_access ON franchise_preparers
   );
 
 -- Clients: Admins see all, office owners/preparers see their office's clients
+DROP POLICY IF EXISTS "franchise_clients_access" ON franchise_clients;
 CREATE POLICY franchise_clients_access ON franchise_clients
   FOR ALL TO authenticated
   USING (
@@ -473,6 +494,7 @@ CREATE POLICY franchise_clients_access ON franchise_clients
   );
 
 -- Returns: Similar to clients
+DROP POLICY IF EXISTS "franchise_returns_access" ON franchise_return_submissions;
 CREATE POLICY franchise_returns_access ON franchise_return_submissions
   FOR ALL TO authenticated
   USING (
@@ -482,6 +504,7 @@ CREATE POLICY franchise_returns_access ON franchise_return_submissions
   );
 
 -- Audit log: Admins see all, office owners see their office's logs
+DROP POLICY IF EXISTS "franchise_audit_access" ON franchise_audit_log;
 CREATE POLICY franchise_audit_access ON franchise_audit_log
   FOR SELECT TO authenticated
   USING (
@@ -490,6 +513,7 @@ CREATE POLICY franchise_audit_access ON franchise_audit_log
   );
 
 -- ERO configs: Office owners and admins
+DROP POLICY IF EXISTS "franchise_ero_configs_access" ON franchise_ero_configs;
 CREATE POLICY franchise_ero_configs_access ON franchise_ero_configs
   FOR ALL TO authenticated
   USING (
@@ -498,6 +522,7 @@ CREATE POLICY franchise_ero_configs_access ON franchise_ero_configs
   );
 
 -- Fee schedules: Office owners and admins
+DROP POLICY IF EXISTS "franchise_fee_schedules_access" ON franchise_fee_schedules;
 CREATE POLICY franchise_fee_schedules_access ON franchise_fee_schedules
   FOR ALL TO authenticated
   USING (
@@ -506,6 +531,7 @@ CREATE POLICY franchise_fee_schedules_access ON franchise_fee_schedules
   );
 
 -- Preparer payouts: Office owners and admins
+DROP POLICY IF EXISTS "franchise_preparer_payouts_access" ON franchise_preparer_payouts;
 CREATE POLICY franchise_preparer_payouts_access ON franchise_preparer_payouts
   FOR ALL TO authenticated
   USING (
@@ -515,6 +541,7 @@ CREATE POLICY franchise_preparer_payouts_access ON franchise_preparer_payouts
   );
 
 -- Royalties: Admins only (franchise-level data)
+DROP POLICY IF EXISTS "franchise_royalties_access" ON franchise_royalties;
 CREATE POLICY franchise_royalties_access ON franchise_royalties
   FOR ALL TO authenticated
   USING (
@@ -535,18 +562,22 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- Apply to all tables
+DROP TRIGGER IF EXISTS update_franchise_offices_updated_at ON franchise_offices;
 CREATE TRIGGER update_franchise_offices_updated_at
   BEFORE UPDATE ON franchise_offices
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_franchise_preparers_updated_at ON franchise_preparers;
 CREATE TRIGGER update_franchise_preparers_updated_at
   BEFORE UPDATE ON franchise_preparers
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_franchise_clients_updated_at ON franchise_clients;
 CREATE TRIGGER update_franchise_clients_updated_at
   BEFORE UPDATE ON franchise_clients
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
+DROP TRIGGER IF EXISTS update_franchise_return_submissions_updated_at ON franchise_return_submissions;
 CREATE TRIGGER update_franchise_return_submissions_updated_at
   BEFORE UPDATE ON franchise_return_submissions
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

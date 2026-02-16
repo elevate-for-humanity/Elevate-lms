@@ -24,7 +24,9 @@ CREATE TABLE IF NOT EXISTS search_index (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+ALTER TABLE search_index ADD COLUMN IF NOT EXISTS category TEXT;
 CREATE INDEX IF NOT EXISTS idx_search_index_category ON search_index(category);
+ALTER TABLE search_index ADD COLUMN IF NOT EXISTS is_active TEXT;
 CREATE INDEX IF NOT EXISTS idx_search_index_active ON search_index(is_active);
 
 -- ============================================
@@ -48,7 +50,9 @@ CREATE TABLE IF NOT EXISTS store_cards (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+ALTER TABLE store_cards ADD COLUMN IF NOT EXISTS tier TEXT;
 CREATE INDEX IF NOT EXISTS idx_store_cards_tier ON store_cards(tier);
+ALTER TABLE store_cards ADD COLUMN IF NOT EXISTS is_active TEXT;
 CREATE INDEX IF NOT EXISTS idx_store_cards_active ON store_cards(is_active);
 
 -- ============================================
@@ -83,6 +87,7 @@ CREATE TABLE IF NOT EXISTS guide_messages (
   UNIQUE(page_id, message_id)
 );
 
+ALTER TABLE guide_messages ADD COLUMN IF NOT EXISTS page_id TEXT;
 CREATE INDEX IF NOT EXISTS idx_guide_messages_page ON guide_messages(page_id);
 
 -- ============================================
@@ -101,6 +106,7 @@ CREATE TABLE IF NOT EXISTS product_recommendations (
   UNIQUE(source_product_id, target_product_id, recommendation_type)
 );
 
+ALTER TABLE product_recommendations ADD COLUMN IF NOT EXISTS source_product_id TEXT;
 CREATE INDEX IF NOT EXISTS idx_recommendations_source ON product_recommendations(source_product_id);
 
 -- ============================================
@@ -198,6 +204,7 @@ CREATE TABLE IF NOT EXISTS product_reviews (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+ALTER TABLE product_reviews ADD COLUMN IF NOT EXISTS product_id UUID;
 CREATE INDEX IF NOT EXISTS idx_reviews_product ON product_reviews(product_id);
 
 -- ============================================
@@ -384,13 +391,21 @@ DROP POLICY IF EXISTS "Public read coupons" ON coupons;
 DROP POLICY IF EXISTS "Public read reviews" ON product_reviews;
 
 CREATE POLICY "Public read search_index" ON search_index FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Public read store_cards" ON store_cards;
 CREATE POLICY "Public read store_cards" ON store_cards FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Public read page_guides" ON page_guides;
 CREATE POLICY "Public read page_guides" ON page_guides FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Public read guide_messages" ON guide_messages;
 CREATE POLICY "Public read guide_messages" ON guide_messages FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Public read recommendations" ON product_recommendations;
 CREATE POLICY "Public read recommendations" ON product_recommendations FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Public read sales_messages" ON avatar_sales_messages;
 CREATE POLICY "Public read sales_messages" ON avatar_sales_messages FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Public read categories" ON product_categories;
 CREATE POLICY "Public read categories" ON product_categories FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Public read coupons" ON coupons;
 CREATE POLICY "Public read coupons" ON coupons FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Public read reviews" ON product_reviews;
 CREATE POLICY "Public read reviews" ON product_reviews FOR SELECT USING (is_approved = true);
 
 -- Done

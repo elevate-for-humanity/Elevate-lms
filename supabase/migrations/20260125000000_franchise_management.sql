@@ -76,7 +76,7 @@ CREATE TABLE IF NOT EXISTS tax_preparers (
   ptin_expiration DATE,
   
   -- Office assignment
-  office_id UUID REFERENCES tax_offices(id),
+  office_id UUID,
   
   -- Certification/training
   certification_level VARCHAR(50), -- basic, intermediate, advanced, supervisor
@@ -122,9 +122,9 @@ CREATE TABLE IF NOT EXISTS tax_preparers (
 
 -- Extend mef_submissions to track preparer/office
 ALTER TABLE mef_submissions 
-ADD COLUMN IF NOT EXISTS office_id UUID REFERENCES tax_offices(id),
-ADD COLUMN IF NOT EXISTS preparer_id UUID REFERENCES tax_preparers(id),
-ADD COLUMN IF NOT EXISTS ero_id UUID REFERENCES tax_preparers(id), -- Who signed as ERO
+ADD COLUMN IF NOT EXISTS office_id UUID,
+ADD COLUMN IF NOT EXISTS preparer_id UUID,
+ADD COLUMN IF NOT EXISTS ero_id UUID, -- Who signed as ERO
 ADD COLUMN IF NOT EXISTS preparer_ptin VARCHAR(20),
 ADD COLUMN IF NOT EXISTS client_fee DECIMAL(10,2), -- What client paid
 ADD COLUMN IF NOT EXISTS franchise_fee DECIMAL(10,2), -- Fee to franchisor
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS tax_clients (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
   -- Office relationship
-  office_id UUID REFERENCES tax_offices(id) NOT NULL,
+  office_id UUID NOT NULL,
   
   -- Client info (encrypted SSN stored separately)
   first_name VARCHAR(100) NOT NULL,
@@ -168,14 +168,14 @@ CREATE TABLE IF NOT EXISTS tax_clients (
   spouse_ssn_last_four VARCHAR(4),
   
   -- Preferred preparer
-  preferred_preparer_id UUID REFERENCES tax_preparers(id),
+  preferred_preparer_id UUID,
   
   -- History
   client_since DATE DEFAULT CURRENT_DATE,
   returns_filed INTEGER DEFAULT 0,
   total_fees_paid DECIMAL(12,2) DEFAULT 0,
   last_return_date DATE,
-  last_return_id UUID REFERENCES mef_submissions(id),
+  last_return_id UUID,
   
   -- Status
   status VARCHAR(20) DEFAULT 'active', -- active, inactive, do_not_serve
@@ -185,6 +185,22 @@ CREATE TABLE IF NOT EXISTS tax_clients (
   updated_at TIMESTAMPTZ DEFAULT NOW(),
   notes TEXT
 );
+-- If table already exists from 20260124150000, add columns unique to this schema
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS office_id UUID;
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS filing_status VARCHAR(50);
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS dependents_count INTEGER DEFAULT 0;
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS ssn_encrypted TEXT;
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS ssn_last_four VARCHAR(4);
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS spouse_ssn_encrypted TEXT;
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS spouse_ssn_last_four VARCHAR(4);
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS preferred_preparer_id UUID;
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS client_since DATE DEFAULT CURRENT_DATE;
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS returns_filed INTEGER DEFAULT 0;
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS total_fees_paid DECIMAL(12,2) DEFAULT 0;
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS last_return_date DATE;
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS last_return_id UUID;
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS status VARCHAR(20) DEFAULT 'active';
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS notes TEXT;
 
 -- ============================================
 -- FEE SCHEDULE (per office customizable)
@@ -193,7 +209,7 @@ CREATE TABLE IF NOT EXISTS tax_clients (
 CREATE TABLE IF NOT EXISTS tax_fee_schedules (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
-  office_id UUID REFERENCES tax_offices(id),
+  office_id UUID,
   
   -- Fee structure
   name VARCHAR(100) NOT NULL, -- e.g., "Standard 2026", "Premium"
@@ -241,8 +257,8 @@ CREATE TABLE IF NOT EXISTS tax_fee_schedules (
 CREATE TABLE IF NOT EXISTS preparer_payouts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
-  preparer_id UUID REFERENCES tax_preparers(id) NOT NULL,
-  office_id UUID REFERENCES tax_offices(id) NOT NULL,
+  preparer_id UUID NOT NULL,
+  office_id UUID NOT NULL,
   
   -- Period
   period_start DATE NOT NULL,
@@ -276,7 +292,7 @@ CREATE TABLE IF NOT EXISTS preparer_payouts (
 CREATE TABLE IF NOT EXISTS franchise_royalties (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   
-  office_id UUID REFERENCES tax_offices(id) NOT NULL,
+  office_id UUID NOT NULL,
   
   -- Period
   period_start DATE NOT NULL,
@@ -318,8 +334,8 @@ CREATE TABLE IF NOT EXISTS tax_audit_log (
   
   -- Who
   user_id UUID REFERENCES auth.users(id),
-  preparer_id UUID REFERENCES tax_preparers(id),
-  office_id UUID REFERENCES tax_offices(id),
+  preparer_id UUID,
+  office_id UUID,
   
   -- What entity
   entity_type VARCHAR(50), -- submission, client, preparer, office
@@ -338,23 +354,35 @@ CREATE TABLE IF NOT EXISTS tax_audit_log (
 -- INDEXES
 -- ============================================
 
+ALTER TABLE tax_offices ADD COLUMN IF NOT EXISTS status TEXT;
 CREATE INDEX IF NOT EXISTS idx_tax_offices_status ON tax_offices(status);
+ALTER TABLE tax_offices ADD COLUMN IF NOT EXISTS owner_id UUID;
 CREATE INDEX IF NOT EXISTS idx_tax_offices_owner ON tax_offices(owner_id);
 
+ALTER TABLE tax_preparers ADD COLUMN IF NOT EXISTS office_id UUID;
 CREATE INDEX IF NOT EXISTS idx_tax_preparers_office ON tax_preparers(office_id);
+ALTER TABLE tax_preparers ADD COLUMN IF NOT EXISTS ptin TEXT;
 CREATE INDEX IF NOT EXISTS idx_tax_preparers_ptin ON tax_preparers(ptin);
+ALTER TABLE tax_preparers ADD COLUMN IF NOT EXISTS status TEXT;
 CREATE INDEX IF NOT EXISTS idx_tax_preparers_status ON tax_preparers(status);
 
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS office_id UUID;
 CREATE INDEX IF NOT EXISTS idx_tax_clients_office ON tax_clients(office_id);
+ALTER TABLE tax_clients ADD COLUMN IF NOT EXISTS ssn_last_four TEXT;
 CREATE INDEX IF NOT EXISTS idx_tax_clients_ssn_last_four ON tax_clients(ssn_last_four);
 CREATE INDEX IF NOT EXISTS idx_tax_clients_name ON tax_clients(last_name, first_name);
 
+ALTER TABLE mef_submissions ADD COLUMN IF NOT EXISTS office_id UUID;
 CREATE INDEX IF NOT EXISTS idx_mef_submissions_office ON mef_submissions(office_id);
+ALTER TABLE mef_submissions ADD COLUMN IF NOT EXISTS preparer_id UUID;
 CREATE INDEX IF NOT EXISTS idx_mef_submissions_preparer ON mef_submissions(preparer_id);
 
+ALTER TABLE tax_audit_log ADD COLUMN IF NOT EXISTS event_type TEXT;
 CREATE INDEX IF NOT EXISTS idx_audit_log_event ON tax_audit_log(event_type);
 CREATE INDEX IF NOT EXISTS idx_audit_log_entity ON tax_audit_log(entity_type, entity_id);
+ALTER TABLE tax_audit_log ADD COLUMN IF NOT EXISTS user_id UUID;
 CREATE INDEX IF NOT EXISTS idx_audit_log_user ON tax_audit_log(user_id);
+ALTER TABLE tax_audit_log ADD COLUMN IF NOT EXISTS created_at TEXT;
 CREATE INDEX IF NOT EXISTS idx_audit_log_created ON tax_audit_log(created_at);
 
 -- ============================================
@@ -370,6 +398,7 @@ ALTER TABLE franchise_royalties ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tax_audit_log ENABLE ROW LEVEL SECURITY;
 
 -- Franchise admin (you) can see everything
+DROP POLICY IF EXISTS "Franchise admin full access to offices" ON tax_offices;
 CREATE POLICY "Franchise admin full access to offices" ON tax_offices
   FOR ALL USING (
     EXISTS (
@@ -380,13 +409,16 @@ CREATE POLICY "Franchise admin full access to offices" ON tax_offices
   );
 
 -- Office owners can see their own office
+DROP POLICY IF EXISTS "Office owners can view own office" ON tax_offices;
 CREATE POLICY "Office owners can view own office" ON tax_offices
   FOR SELECT USING (owner_id = auth.uid());
 
+DROP POLICY IF EXISTS "Office owners can update own office" ON tax_offices;
 CREATE POLICY "Office owners can update own office" ON tax_offices
   FOR UPDATE USING (owner_id = auth.uid());
 
 -- Preparers: office owners and admins can manage
+DROP POLICY IF EXISTS "Admins full access to preparers" ON tax_preparers;
 CREATE POLICY "Admins full access to preparers" ON tax_preparers
   FOR ALL USING (
     EXISTS (
@@ -396,6 +428,7 @@ CREATE POLICY "Admins full access to preparers" ON tax_preparers
     )
   );
 
+DROP POLICY IF EXISTS "Office owners can manage their preparers" ON tax_preparers;
 CREATE POLICY "Office owners can manage their preparers" ON tax_preparers
   FOR ALL USING (
     EXISTS (
@@ -405,10 +438,12 @@ CREATE POLICY "Office owners can manage their preparers" ON tax_preparers
     )
   );
 
+DROP POLICY IF EXISTS "Preparers can view own record" ON tax_preparers;
 CREATE POLICY "Preparers can view own record" ON tax_preparers
   FOR SELECT USING (user_id = auth.uid());
 
 -- Clients: office staff can access their office's clients
+DROP POLICY IF EXISTS "Admins full access to clients" ON tax_clients;
 CREATE POLICY "Admins full access to clients" ON tax_clients
   FOR ALL USING (
     EXISTS (
@@ -418,6 +453,7 @@ CREATE POLICY "Admins full access to clients" ON tax_clients
     )
   );
 
+DROP POLICY IF EXISTS "Office staff can access office clients" ON tax_clients;
 CREATE POLICY "Office staff can access office clients" ON tax_clients
   FOR ALL USING (
     EXISTS (
@@ -435,6 +471,7 @@ CREATE POLICY "Office staff can access office clients" ON tax_clients
   );
 
 -- Audit log: admins only
+DROP POLICY IF EXISTS "Admins can view audit log" ON tax_audit_log;
 CREATE POLICY "Admins can view audit log" ON tax_audit_log
   FOR SELECT USING (
     EXISTS (
@@ -445,6 +482,7 @@ CREATE POLICY "Admins can view audit log" ON tax_audit_log
   );
 
 -- Anyone can insert audit log entries
+DROP POLICY IF EXISTS "Anyone can create audit entries" ON tax_audit_log;
 CREATE POLICY "Anyone can create audit entries" ON tax_audit_log
   FOR INSERT WITH CHECK (true);
 

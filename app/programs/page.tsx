@@ -192,9 +192,9 @@ export default async function ProgramsPage() {
       </section>
 
       {/* MARQUEE */}
-      <section className="py-3 bg-slate-900 overflow-hidden">
-        <div className="flex animate-marquee whitespace-nowrap">
-          {[...Array(3)].map((_, i) => (
+      <section className="py-3 bg-slate-900 overflow-hidden" aria-hidden="true">
+        <div className="flex animate-marquee whitespace-nowrap will-change-transform">
+          {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center gap-8 mx-4">
               {['Healthcare', 'Skilled Trades', 'Technology', 'CDL', 'Barbering', 'Business', 'Free Training'].map((text, j) => (
                 <span key={j} className="text-white/80 text-base font-medium flex items-center gap-4">

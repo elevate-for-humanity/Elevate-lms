@@ -60,7 +60,7 @@ export default function HomePage() {
             How can we help you?
           </h2>
           <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
-            Choose your path below. Each option takes you directly to the information you need — no phone calls required.
+            Choose your path below. Each option takes you directly to the information you need. Have questions? Call us at 317-314-3757.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -336,7 +336,7 @@ export default function HomePage() {
           </p>
           <div className="grid sm:grid-cols-2 gap-6 mb-10">
             {[
-              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by the program or employer.', href: '/career-services', image: '/images/heroes-hq/career-services-hero.jpg' },
+              { label: 'Pre-trained Candidates', desc: 'Every graduate holds an industry-recognized credential and has completed hands-on training. Background checks and drug screening are completed where required by employer or program.', href: '/career-services', image: '/images/heroes-hq/career-services-hero.jpg' },
               { label: 'WOTC Tax Credits', desc: 'The Work Opportunity Tax Credit gives you up to $9,600 per qualifying hire. We help you identify eligible candidates and file the paperwork before the 28-day deadline.', href: '/employer', image: '/images/programs-hq/business-training.jpg' },
               { label: 'OJT Reimbursement', desc: 'On-the-Job Training funding reimburses 50-75% of a new hire\'s wages during their training period. You train them your way while the workforce board covers most of the cost.', href: '/ojt-and-funding', image: '/images/heroes-hq/employer-hero.jpg' },
               { label: 'Post Jobs Online', desc: 'List your open positions directly on our job board. Our career services team matches your requirements with qualified graduates and sends you pre-screened candidates.', href: '/employer', image: '/images/artlist/cropped/hero-training-8-wide.jpg' },

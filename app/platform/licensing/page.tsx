@@ -303,7 +303,7 @@ export default function LicensingPage() {
               {
                 icon: Zap,
                 title: 'Deployment Capability',
-                desc: 'Proven deployment pipeline. Netlify, Vercel, or self-hosted. Database on Supabase or self-managed PostgreSQL. Your infrastructure, your choice.',
+                desc: 'Proven deployment pipeline on Netlify with Cloudflare CDN. Database on Supabase or self-managed PostgreSQL. Your infrastructure, your choice.',
               },
             ].map((item, i) => {
               const Icon = item.icon;

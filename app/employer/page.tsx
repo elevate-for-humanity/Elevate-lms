@@ -94,7 +94,7 @@ export default function EmployerPage() {
         <div className="max-w-4xl mx-auto px-4">
           <h2 className="text-xl sm:text-2xl font-bold text-slate-900 text-center mb-6 sm:mb-8">What You Get</h2>
           <div className="space-y-2 sm:space-y-0 sm:grid sm:grid-cols-3 sm:gap-3">
-            {['Pre-screened candidates', 'Skills-matched to your roles', 'No recruiting fees', 'Background checks included', 'Onboarding support', 'Ongoing retention help', 'Tax credit filing assistance', 'Dedicated account manager', 'Custom training programs'].map((item) => (
+            {['Pre-screened candidates', 'Skills-matched to your roles', 'No recruiting fees', 'Background checks available', 'Onboarding support', 'Ongoing retention help', 'Tax credit filing assistance', 'Dedicated account manager', 'Custom training programs'].map((item) => (
               <div key={item} className="flex items-center gap-3 bg-slate-50 rounded-lg px-4 py-3">
                 <span className="w-2 h-2 bg-brand-blue-600 rounded-full flex-shrink-0" />
                 <span className="text-slate-700 text-sm">{item}</span>

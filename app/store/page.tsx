@@ -13,6 +13,14 @@ export default function StorePage() {
   return (
     <div className="bg-white min-h-screen">
 
+      {/* ============ STUDENT REDIRECT NOTICE ============ */}
+      <div className="bg-brand-blue-50 border-b border-brand-blue-200 py-3 px-6 text-center text-sm text-brand-blue-800">
+        Looking for free career training? This page is for organizations licensing our platform.{' '}
+        <Link href="/programs" className="font-semibold underline hover:text-brand-blue-900">
+          Browse tuition-free training programs →
+        </Link>
+      </div>
+
       {/* ============ HERO — Video on the right, pitch on the left ============ */}
       <section className="py-12 sm:py-20">
         <div className="max-w-7xl mx-auto px-6">

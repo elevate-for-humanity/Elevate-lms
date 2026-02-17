@@ -196,7 +196,7 @@ export default function PrivacyPolicyPage() {
                 </div>
                 <div className="border-t border-slate-200 pt-3">
                   <p className="font-semibold text-slate-900">Service Providers</p>
-                  <p className="text-sm">Supabase (database), Stripe (payments), Netlify (hosting), Sentry (error monitoring) — bound by data processing agreements.</p>
+                  <p className="text-sm">Supabase (database), Stripe (payments), Netlify (hosting), Cloudflare (CDN/storage), Resend (email), Sentry (error monitoring), Google Analytics (analytics), OpenAI (AI features) — bound by data processing agreements.</p>
                 </div>
                 <div className="border-t border-slate-200 pt-3">
                   <p className="font-semibold text-slate-900">Rise Forward Foundation (Supportive Services)</p>
@@ -426,10 +426,30 @@ export default function PrivacyPolicyPage() {
                       <td className="p-3">Application forms</td>
                       <td className="p-3">Form submissions</td>
                     </tr>
-                    <tr>
+                    <tr className="border-b">
                       <td className="p-3 font-medium">Sentry</td>
                       <td className="p-3">Error monitoring</td>
                       <td className="p-3">Error logs (no PII)</td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="p-3 font-medium">Resend</td>
+                      <td className="p-3">Transactional email</td>
+                      <td className="p-3">Email address, name</td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="p-3 font-medium">Cloudflare</td>
+                      <td className="p-3">CDN, file storage, bot protection</td>
+                      <td className="p-3">IP address, uploaded documents</td>
+                    </tr>
+                    <tr className="border-b">
+                      <td className="p-3 font-medium">Google Analytics</td>
+                      <td className="p-3">Website analytics</td>
+                      <td className="p-3">Anonymized usage data, cookies (with consent)</td>
+                    </tr>
+                    <tr>
+                      <td className="p-3 font-medium">OpenAI</td>
+                      <td className="p-3">AI-assisted features (tutoring, content)</td>
+                      <td className="p-3">User prompts (no PII sent; inputs are anonymized)</td>
                     </tr>
                   </tbody>
                 </table>

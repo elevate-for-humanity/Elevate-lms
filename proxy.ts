@@ -68,7 +68,7 @@ const PARTNER_ROUTES = ['/partner/dashboard', '/partner/programs'];
 const PARTNER_ONBOARDING_ROUTES = ['/partner/documents', '/partner/onboarding'];
 
 // Routes that require authentication (any role)
-const AUTH_REQUIRED_ROUTES = ['/student', '/my-courses', '/my-progress', '/settings'];
+const AUTH_REQUIRED_ROUTES = ['/student', '/learner', '/my-courses', '/my-progress', '/settings'];
 
 // Routes that require onboarding completion
 const ONBOARDING_REQUIRED_ROUTES = ['/hub', '/lms', '/student-portal', '/my-courses', '/my-progress'];

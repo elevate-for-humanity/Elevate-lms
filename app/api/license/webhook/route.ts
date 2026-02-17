@@ -5,17 +5,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
 
 export async function POST(request: NextRequest) {
-  logger.info('[webhook] Request received');
-  
   let body: string;
   let signature: string | null;
-  
+
   try {
     body = await request.text();
     signature = request.headers.get('stripe-signature');
-    logger.info('[webhook] Body length:', body.length, 'Signature:', signature ? 'present' : 'missing');
   } catch (e) {
-    logger.error('[webhook] Failed to read request:', e);
+    logger.error('[license-webhook] Failed to read request:', e);
     return NextResponse.json({ error: 'Failed to read request' }, { status: 400 });
   }
 
@@ -26,62 +23,46 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event;
   try {
     const stripe = getStripe();
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
+    // Use dedicated license webhook secret, fall back to generic
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET_LICENSE
+      || process.env.STRIPE_WEBHOOK_SECRET
+      || '';
     event = stripe.webhooks.constructEvent(body, signature, webhookSecret);
-    logger.info('[webhook] Event verified:', event.type, event.id);
   } catch (err) {
-    logger.error('[webhook] Signature verification failed:', err);
+    logger.error('[license-webhook] Signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
   }
 
-  // Handle checkout.session.completed
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session;
-    logger.info('[webhook] Processing checkout session:', session.id);
-    logger.info('[webhook] Metadata:', JSON.stringify(session.metadata));
-    
     const licenseId = session.metadata?.license_id;
-    const tenantId = session.metadata?.tenant_id;
     const customerId = session.customer as string | null;
-    
-    logger.info('[webhook] License ID:', licenseId, 'Customer ID:', customerId);
-    
+
     if (licenseId) {
       try {
         const supabase = createAdminClient();
-
-    if (!supabase) {
-      return NextResponse.json(
-        { error: 'Service temporarily unavailable.' },
-        { status: 503 }
-      );
-    }
         if (!supabase) {
-          logger.error('[webhook] Supabase client not available');
+          logger.error('[license-webhook] Supabase client not available');
           return NextResponse.json({ received: true, warning: 'db_unavailable' });
         }
-        
+
         const updateData: Record<string, any> = {
           status: 'active',
           updated_at: new Date().toISOString(),
         };
         if (customerId) updateData.stripe_customer_id = customerId;
-        
-        logger.info('[webhook] Updating license with:', JSON.stringify(updateData));
-        
-        const { data, error } = await supabase
+
+        const { error } = await supabase
           .from('licenses')
           .update(updateData)
           .eq('id', licenseId)
           .select('id, stripe_customer_id, updated_at');
-        
+
         if (error) {
-          logger.error('[webhook] DB update error:', error);
-        } else {
-          logger.info('[webhook] License updated:', JSON.stringify(data));
+          logger.error('[license-webhook] DB update error:', error);
         }
       } catch (dbErr) {
-        logger.error('[webhook] DB operation failed:', dbErr);
+        logger.error('[license-webhook] DB operation failed:', dbErr);
       }
     }
   }

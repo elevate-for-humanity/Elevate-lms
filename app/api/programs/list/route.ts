@@ -20,7 +20,7 @@ export const GET = withErrorHandling(async (request: NextRequest) => {
     .order('id', { ascending: true });
 
   if (error) {
-    throw APIErrors.database(`Failed to fetch programs: ${error.message}`);
+    throw APIErrors.database('Failed to fetch programs');
   }
 
   return NextResponse.json({

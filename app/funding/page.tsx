@@ -10,6 +10,20 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/funding' },
   title: 'Funding & Financial Aid | Elevate For Humanity',
   description: 'Explore funding options for your career training — WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded training.',
+  openGraph: {
+    title: 'Funding & Financial Aid | Elevate for Humanity',
+    description: 'WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded career training.',
+    url: 'https://www.elevateforhumanity.org/funding',
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/heroes-hq/funding-hero.jpg', width: 1200, height: 630, alt: 'Career training funding options' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Funding & Financial Aid | Elevate for Humanity',
+    description: 'WIOA, WRG, JRI, payment plans, and more. Many students qualify for funded career training.',
+    images: ['/images/heroes-hq/funding-hero.jpg'],
+  },
 };
 
 export default function FundingPage() {

@@ -60,9 +60,47 @@ const EXCLUDED_PREFIXES = [
   '/preview',
   '/builder',
   '/studio',
+  '/onboarding',
+  '/franchise/admin',
+  '/franchise/office',
+  '/programs/admin',
+  '/creator',
+  '/instructor',
+  '/learner',
+  '/employer/dashboard',
+  '/employer/settings',
+  '/employer/shop',
+  '/employer-portal',
+  '/program-holder/dashboard',
+  '/program-holder/settings',
+  '/program-holder/onboarding',
+  '/program-holder/verify-identity',
+  '/partner/login',
+  '/partner/settings',
+  '/partner/dashboard',
+  '/partner/onboarding',
+  '/pwa',
+  '/shop/dashboard',
+  '/shop/checkout',
+  '/shop/onboarding',
+  '/client-portal',
+  '/workforce-board',
+  '/help/admin',
   // Separate domain — not part of this sitemap
   '/supersonic-fast-cash',
   '/supersonic',
+];
+
+// Segments that indicate private routes regardless of position
+const EXCLUDED_SEGMENTS = [
+  '/dashboard',
+  '/settings',
+  '/checkout',
+  '/onboarding',
+  '/login',
+  '/signup',
+  '/admin',
+  '/demo',
 ];
 
 // Priority mapping based on route patterns
@@ -138,7 +176,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
   
   // Filter out excluded routes and deduplicate
   const publicRoutes = [...new Set(allRoutes)]
-    .filter(route => !EXCLUDED_PREFIXES.some(prefix => route.startsWith(prefix)))
+    .filter(route => {
+      // Check prefix exclusions
+      if (EXCLUDED_PREFIXES.some(prefix => route.startsWith(prefix))) return false;
+      // Check segment exclusions (e.g. /programs/admin, /store/checkout)
+      const segments = route.split('/');
+      if (segments.some(seg => EXCLUDED_SEGMENTS.includes(`/${seg}`))) return false;
+      return true;
+    })
     .sort();
   
   // Generate sitemap entries — all routes belong to elevateforhumanity.org

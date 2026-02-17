@@ -140,3 +140,6 @@ certs/
 # ATS Evidence (large files)
 reports/ats-evidence/
 # Trigger rebuild
+audit_http.json
+audit_crawl.json
+artifacts/

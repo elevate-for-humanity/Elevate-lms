@@ -10,6 +10,20 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://www.elevateforhumanity.org/how-it-works' },
   title: 'How It Works | Elevate For Humanity',
   description: 'From registration to employment in 5 steps. See exactly how Elevate career training works.',
+  openGraph: {
+    title: 'How It Works | Elevate for Humanity',
+    description: 'From registration to employment in 5 steps. See exactly how Elevate career training works.',
+    url: 'https://www.elevateforhumanity.org/how-it-works',
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/heroes-hq/how-it-works-hero.jpg', width: 1200, height: 630, alt: 'How Elevate career training works' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'How It Works | Elevate for Humanity',
+    description: 'From registration to employment in 5 steps.',
+    images: ['/images/heroes-hq/how-it-works-hero.jpg'],
+  },
 };
 
 export default function HowItWorksPage() {

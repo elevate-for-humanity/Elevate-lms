@@ -11,6 +11,20 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/apply/student',
   },
+  openGraph: {
+    title: 'Apply for Free Career Training | Elevate for Humanity',
+    description: 'Apply for workforce training and career development programs. Most students begin training within 2-4 weeks.',
+    url: 'https://www.elevateforhumanity.org/apply/student',
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/heroes-hq/success-hero.jpg', width: 1200, height: 630, alt: 'Apply for career training' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Apply for Free Career Training | Elevate for Humanity',
+    description: 'Apply for workforce training programs. Most students begin within 2-4 weeks.',
+    images: ['/images/heroes-hq/success-hero.jpg'],
+  },
 };
 
 export default async function StudentApplicationPage({

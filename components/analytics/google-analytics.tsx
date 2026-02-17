@@ -38,12 +38,19 @@ export function GoogleAnalytics() {
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           
-          // Default consent mode - respect user preferences
+          // Default consent mode - deny until user accepts via cookie banner
           gtag('consent', 'default', {
-            'analytics_storage': 'granted',
+            'analytics_storage': 'denied',
             'ad_storage': 'denied',
             'wait_for_update': 500
           });
+          
+          // If user previously accepted, grant immediately
+          if (localStorage.getItem('cookie-consent') === 'accepted') {
+            gtag('consent', 'update', {
+              'analytics_storage': 'granted',
+            });
+          }
           
           gtag('config', '${GA_MEASUREMENT_ID}', {
             page_path: window.location.pathname,

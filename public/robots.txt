@@ -47,6 +47,17 @@ Disallow: /payment/
 # Internal pages
 Disallow: /onboarding/
 Disallow: /demo/
+Disallow: /franchise/admin/
+Disallow: /franchise/office/
+Disallow: /programs/admin/
+Disallow: /pwa/
+Disallow: /shop/dashboard
+Disallow: /shop/checkout
+Disallow: /client-portal/
+Disallow: /employer-portal/
+Disallow: /partner/login
+Disallow: /partner/settings
+Disallow: /partner/onboarding
 
 # Allow public pages explicitly
 Allow: /programs/
@@ -59,4 +70,3 @@ Allow: /lms/$
 
 # Crawl delay for politeness
 Crawl-delay: 1
-<!-- deploy trigger 20260213T170144 -->

@@ -3,8 +3,9 @@
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 import { logger } from '@/lib/logger';
+import { createBrowserClient } from '@/lib/supabase/client';
 import Image from 'next/image';
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   Upload,
   FileText,
@@ -69,6 +70,18 @@ export default function SmartUploadPage() {
   const [processing, setProcessing] = useState(false);
   const [isDragActive, setIsDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [userEmail, setUserEmail] = useState('');
+  const [userPhone, setUserPhone] = useState('');
+
+  useEffect(() => {
+    const supabase = createBrowserClient();
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        setUserEmail(data.user.email ?? '');
+        setUserPhone(data.user.user_metadata?.phone ?? '');
+      }
+    });
+  }, []);
 
   const handleFiles = useCallback(async (fileList: FileList | null) => {
     if (!fileList) return;
@@ -138,8 +151,8 @@ export default function SmartUploadPage() {
         'documentType',
         detectDocumentType(uploadedFile.file.name)
       );
-      formData.append('email', 'user@example.com'); // Get from auth or form
-      formData.append('phone', '314-3757'); // Get from auth or form
+      formData.append('email', userEmail);
+      formData.append('phone', userPhone);
 
       // Call OCR extraction API
       const response = await fetch('/api/supersonic-fast-cash/ocr-extract', {

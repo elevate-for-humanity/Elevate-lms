@@ -31,12 +31,6 @@ const BottomNav = dynamic(
   { ssr: false, loading: () => null }
 );
 
-// Cookie consent banner (separate from CookieConsent already in layout)
-const CookieBanner = dynamic(
-  () => import('@/components/CookieBanner').then(mod => ({ default: mod.CookieBanner })),
-  { ssr: false, loading: () => null }
-);
-
 // Search dialog - cmd+k global search
 const SearchDialog = dynamic(
   () => import('@/components/SearchDialog').then(mod => ({ default: mod.SearchDialog })),
@@ -161,8 +155,6 @@ export default function ClientWidgets() {
       <VersionGuard />
       <SentryInit />
 
-      {/* FundingToast disabled — replaced by CookieBanner */}
-      
       {/* Sticky Mobile CTA - Apply/Contact buttons on program pages */}
       {showStickyCTA && <StickyMobileCTA />}
 
@@ -175,7 +167,6 @@ export default function ClientWidgets() {
       {/* Deferred widgets - load after initial paint */}
       {showDeferredWidgets && (
         <>
-          <CookieBanner />
           <SearchDialog />
           <SecurityMonitor />
           <OfflineIndicator />

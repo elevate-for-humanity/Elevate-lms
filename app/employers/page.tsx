@@ -21,6 +21,20 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/employers',
   },
+  openGraph: {
+    title: 'For Employers | Elevate for Humanity',
+    description: 'Hire trained, certified candidates ready to work. Build apprenticeships, access talent pipelines, and grow your workforce.',
+    url: 'https://www.elevateforhumanity.org/employers',
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/heroes-hq/employer-hero.jpg', width: 1200, height: 630, alt: 'Employer partnerships' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'For Employers | Elevate for Humanity',
+    description: 'Hire trained, certified candidates. Build apprenticeships and access talent pipelines.',
+    images: ['/images/heroes-hq/employer-hero.jpg'],
+  },
 };
 
 export default function EmployersPage() {

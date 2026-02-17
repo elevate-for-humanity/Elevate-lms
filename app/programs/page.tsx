@@ -12,6 +12,20 @@ export const metadata: Metadata = {
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/programs',
   },
+  openGraph: {
+    title: 'Free Career Training Programs | Elevate for Humanity',
+    description: 'Explore free career training in healthcare, skilled trades, technology, CDL, barbering, and business. WIOA-funded programs available.',
+    url: 'https://www.elevateforhumanity.org/programs',
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/heroes-hq/programs-hero.jpg', width: 1200, height: 630, alt: 'Career training programs' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Free Career Training Programs | Elevate for Humanity',
+    description: 'Explore free career training in healthcare, skilled trades, technology, CDL, barbering, and business.',
+    images: ['/images/heroes-hq/programs-hero.jpg'],
+  },
 };
 import { PathwayBlock } from '@/components/PathwayBlock';
 import PathwayDisclosure from '@/components/compliance/PathwayDisclosure';

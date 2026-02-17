@@ -14,6 +14,20 @@ export const metadata: Metadata = {
   alternates: {
     canonical: `${SITE_URL}/about`,
   },
+  openGraph: {
+    title: 'About Elevate for Humanity',
+    description: 'A nonprofit workforce development organization providing free career training in Indianapolis, Indiana. Founded by Elizabeth Greene.',
+    url: `${SITE_URL}/about`,
+    siteName: 'Elevate for Humanity',
+    images: [{ url: '/images/heroes-hq/about-hero.jpg', width: 1200, height: 630, alt: 'About Elevate for Humanity' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'About Elevate for Humanity',
+    description: 'A nonprofit providing free career training in Indianapolis, Indiana.',
+    images: ['/images/heroes-hq/about-hero.jpg'],
+  },
 };
 
 export default function AboutPage() {

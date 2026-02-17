@@ -108,7 +108,7 @@ export default function EmployerPage() {
       <section className="py-8 sm:py-14 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Hiring Today</h2>
-          <p className="text-white/90 mb-6 text-sm">Submit your hiring needs and we will match you with trained candidates.</p>
+          <p className="text-white mb-6 text-sm">Submit your hiring needs and we will match you with trained candidates.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/apply/employer" className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">
               Submit Hiring Needs <ArrowRight className="w-4 h-4 inline ml-1" />

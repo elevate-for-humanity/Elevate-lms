@@ -122,7 +122,7 @@ export default function DieselMechanicPage() {
       <section className="py-8 sm:py-14 bg-brand-orange-500">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Start Your Diesel Mechanic Career</h2>
-          <p className="text-white/90 mb-6 text-sm">Trucks and heavy equipment need mechanics. Apply today.</p>
+          <p className="text-white mb-6 text-sm">Trucks and heavy equipment need mechanics. Apply today.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/apply?program=diesel-mechanic" className="bg-white text-brand-orange-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-orange-50 transition-colors text-center">
               Apply Now <ArrowRight className="w-4 h-4 inline ml-1" />

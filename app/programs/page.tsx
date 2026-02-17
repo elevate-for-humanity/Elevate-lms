@@ -280,7 +280,7 @@ export default async function ProgramsPage() {
       <section className="py-6 bg-brand-blue-600 overflow-hidden">
         <div className="flex animate-marquee-reverse whitespace-nowrap">
           {[...Array(4)].map((_, i) => (
-            <span key={i} className="text-4xl md:text-5xl font-black text-white/20 mx-6">
+            <span key={i} className="text-4xl md:text-5xl font-black text-white/70 mx-6">
               Free Training • Real Careers • No Debt • Job Placement • 
             </span>
           ))}
@@ -382,7 +382,7 @@ export default async function ProgramsPage() {
       <section className="py-16 lg:py-24 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Begin Your Journey Today</h2>
-          <p className="text-lg text-brand-blue-100 mb-8">Whether you&apos;re starting fresh or changing careers, we&apos;re here to help.</p>
+          <p className="text-lg text-white/90 mb-8">Whether you&apos;re starting fresh or changing careers, we&apos;re here to help.</p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link href="/apply" className="inline-flex items-center gap-2 bg-white text-brand-blue-600 px-8 py-4 rounded-full font-semibold text-lg hover:bg-brand-blue-50 transition-all">
               Check Eligibility
@@ -394,7 +394,7 @@ export default async function ProgramsPage() {
               Get Help Online
             </Link>
           </div>
-          <p className="text-brand-blue-200 text-sm mt-4">
+          <p className="text-white/80 text-sm mt-4">
             Enrollment is availability- and eligibility-based. A workforce advisor will confirm your placement and start date.
           </p>
         </div>

@@ -89,7 +89,7 @@ export default function HowItWorksPage() {
       <section className="py-8 sm:py-14 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready to Begin?</h2>
-          <p className="text-white/90 mb-6 text-sm">Start with step 1 — register at Indiana Career Connect.</p>
+          <p className="text-white mb-6 text-sm">Start with step 1 — register at Indiana Career Connect.</p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
               className="bg-white text-brand-blue-600 font-bold px-6 py-3 rounded-lg text-base hover:bg-brand-blue-50 transition-colors text-center">

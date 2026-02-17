@@ -123,7 +123,7 @@ export default function ContactClient() {
                     <h3 className="text-lg md:text-lg font-bold text-white mb-2 group-hover:text-brand-orange-300 transition">
                       {option.title}
                     </h3>
-                    <p className="text-white/90 text-sm leading-relaxed">
+                    <p className="text-white text-sm leading-relaxed">
                       {option.description}
                     </p>
                     <div className="mt-4 inline-flex items-center text-white font-bold group-hover:gap-2 transition-all">

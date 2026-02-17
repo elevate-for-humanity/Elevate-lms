@@ -77,7 +77,7 @@ export function PathwayBlock({ variant = 'light', className = '' }: PathwayBlock
           </div>
         </div>
 
-        <p className={`text-center text-xs mt-8 ${isDark ? 'text-gray-500' : 'text-gray-500'}`}>
+        <p className={`text-center text-xs mt-8 ${isDark ? 'text-slate-400' : 'text-gray-500'}`}>
           Third-party certifications and state licenses are issued by external credentialing bodies, not by Elevate for Humanity.
         </p>
       </div>

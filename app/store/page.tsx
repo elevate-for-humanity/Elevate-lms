@@ -133,7 +133,7 @@ export default function StorePage() {
               <h3 className="text-xl font-bold text-slate-900 mb-1">Managed Platform</h3>
               <div className="mb-4">
                 <span className="text-4xl font-black text-slate-900">$1,500</span>
-                <span className="text-slate-400">/mo</span>
+                <span className="text-slate-500">/mo</span>
               </div>
               <p className="text-slate-600 text-sm mb-6">
                 Full platform with your branding and domain. All three portals, compliance tools, reporting, and support. Onboarding included. Launch in two weeks.

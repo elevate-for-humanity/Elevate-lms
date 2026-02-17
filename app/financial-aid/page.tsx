@@ -86,7 +86,7 @@ export default function FinancialAidPage() {
             <div className="flex flex-wrap gap-4">
               <Link
                 href="/apply"
-                className="inline-flex items-center gap-2 bg-brand-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-green-700 transition-colors"
+                className="inline-flex items-center gap-2 bg-brand-green-700 text-white px-6 py-3 rounded-lg font-semibold hover:bg-brand-green-800 transition-colors"
               >
                 Check Your Eligibility
                 <ArrowRight className="w-4 h-4" />
@@ -225,15 +225,15 @@ export default function FinancialAidPage() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 lg:py-24 bg-brand-green-600 text-white">
+      <section className="py-16 lg:py-24 bg-brand-green-700 text-white">
         <div className="max-w-4xl mx-auto px-6 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Start Your New Career?</h2>
-          <p className="text-xl text-brand-green-100 mb-8">
+          <p className="text-xl text-white/90 mb-8">
             Apply today and find out if you qualify for free training. No obligation, no credit check.
           </p>
           <Link
             href="/apply"
-            className="inline-flex items-center gap-2 bg-white text-brand-green-600 px-8 py-4 rounded-lg font-semibold hover:bg-brand-green-50 transition-colors"
+            className="inline-flex items-center gap-2 bg-white text-brand-green-700 px-8 py-4 rounded-lg font-semibold hover:bg-brand-green-50 transition-colors"
           >
             Apply Now - It's Free
             <ArrowRight className="w-4 h-4" />

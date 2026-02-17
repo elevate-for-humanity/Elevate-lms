@@ -209,7 +209,7 @@ export default function WIOAEligibilityPage() {
       <section className="py-10 sm:py-14 bg-brand-blue-600">
         <div className="max-w-3xl mx-auto px-4 text-center">
           <h2 className="text-xl sm:text-2xl font-bold text-white mb-3">Ready to Get Started?</h2>
-          <p className="text-white/90 mb-6 text-sm sm:text-base">
+          <p className="text-white mb-6 text-sm sm:text-base">
             Register, schedule your WorkOne appointment, and start training in weeks.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

@@ -34,13 +34,13 @@ d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.0
               </h3>
               <p className="text-black mb-4 leading-relaxed">
                 Go to <a href="https://www.indianacareerconnect.com" target="_blank" rel="noopener noreferrer"
-className="text-brand-orange-600 font-semibold hover:underline">www.indianacareerconnect.com</a> and create your free account. This is the official portal for all WIOA-funded training programs in Indiana.
+className="text-brand-orange-700 font-semibold hover:underline">www.indianacareerconnect.com</a> and create your free account. This is the official portal for all WIOA-funded training programs in Indiana.
               </p>
               <a
                 href="https://www.indianacareerconnect.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block px-6 py-3 bg-brand-orange-600 text-white font-bold rounded-full hover:bg-brand-orange-700 transition-all"
+                className="inline-block px-6 py-3 bg-brand-orange-700 text-white font-bold rounded-full hover:bg-brand-orange-800 transition-all"
               >
                 Go to Indiana Career Connect →
               </a>
@@ -76,7 +76,7 @@ d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           {/* Step 3 */}
           <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 flex gap-6">
             <div className="flex-shrink-0">
-              <div className="w-16 h-16 bg-brand-orange-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-orange-700 rounded-full flex items-center justify-center text-white text-2xl font-bold">
                 3
               </div>
             </div>
@@ -103,7 +103,7 @@ d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           {/* Step 4 */}
           <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 flex gap-6">
             <div className="flex-shrink-0">
-              <div className="w-16 h-16 bg-brand-orange-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-orange-700 rounded-full flex items-center justify-center text-white text-2xl font-bold">
                 4
               </div>
             </div>
@@ -125,7 +125,7 @@ d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
           {/* Step 5 */}
           <div className="bg-white rounded-lg shadow-lg p-6 sm:p-8 flex gap-6">
             <div className="flex-shrink-0">
-              <div className="w-16 h-16 bg-brand-orange-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+              <div className="w-16 h-16 bg-brand-orange-700 rounded-full flex items-center justify-center text-white text-2xl font-bold">
                 5
               </div>
             </div>
@@ -156,21 +156,21 @@ d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
         </div>
 
         {/* Additional Help */}
-        <div className="mt-12 bg-brand-orange-600 rounded-lg p-8 text-center text-white">
+        <div className="mt-12 bg-brand-orange-700 rounded-lg p-8 text-center text-white">
           <h3 className="text-2xl font-bold mb-4">Need Help with the Process?</h3>
-          <p className="text-lg mb-6 max-w-2xl mx-auto">
+          <p className="text-lg mb-6 max-w-2xl mx-auto text-white">
             Our team can guide you through every step of the Indiana Career Connect process. We're here to make enrollment as easy as possible.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="mailto:info@elevateforhumanity.org"
-              className="inline-block px-8 py-4 bg-white text-brand-orange-600 font-bold rounded-full hover:bg-slate-50 transition-all"
+              className="inline-block px-8 py-4 bg-white text-brand-orange-700 font-bold rounded-full hover:bg-slate-50 transition-all"
             >
               Email Us
             </a>
             <Link
               href="/advising"
-              className="inline-block px-8 py-4 bg-transparent text-white font-bold rounded-full border-2 border-white hover:bg-white hover:text-brand-orange-600 transition-all"
+              className="inline-block px-8 py-4 bg-transparent text-white font-bold rounded-full border-2 border-white hover:bg-white hover:text-brand-orange-700 transition-all"
             >
               Schedule Advising Call
             </Link>
@@ -183,7 +183,7 @@ d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">📋</div>
             <h4 className="font-bold text-black mb-2">Eligibility Requirements</h4>
             <p className="text-sm text-black mb-4">Check if you qualify for WIOA funding</p>
-            <Link href="/wioa-eligibility" aria-label="Link" className="text-brand-orange-600 font-semibold hover:underline">
+            <Link href="/wioa-eligibility" aria-label="Link" className="text-brand-orange-700 font-semibold hover:underline">
               Learn More →
             </Link>
           </div>
@@ -195,7 +195,7 @@ d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               href="https://www.in.gov/dwd/workone-centers/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-brand-orange-600 font-semibold hover:underline"
+              className="text-brand-orange-700 font-semibold hover:underline"
             >
               Find Location →
             </a>
@@ -204,7 +204,7 @@ d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">💰</div>
             <h4 className="font-bold text-black mb-2">Funding Options</h4>
             <p className="text-sm text-black mb-4">Learn about WIOA, WRG, and JRI funding</p>
-            <Link href="/funding" aria-label="Link" className="text-brand-orange-600 font-semibold hover:underline">
+            <Link href="/funding" aria-label="Link" className="text-brand-orange-700 font-semibold hover:underline">
               View Options →
             </Link>
           </div>

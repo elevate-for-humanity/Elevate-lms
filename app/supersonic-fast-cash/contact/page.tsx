@@ -302,21 +302,21 @@ export default function ContactPage() {
               className="bg-white/10 backdrop-blur border-2 border-white/20 rounded-xl p-6 hover:bg-white/20 transition text-center"
             >
               <h3 className="text-xl font-bold mb-2">Book Appointment</h3>
-              <p className="text-white/90 text-sm">Schedule your tax preparation appointment</p>
+              <p className="text-white text-sm">Schedule your tax preparation appointment</p>
             </Link>
             <Link
               href="/supersonic-fast-cash/calculator"
               className="bg-white/10 backdrop-blur border-2 border-white/20 rounded-xl p-6 hover:bg-white/20 transition text-center"
             >
               <h3 className="text-xl font-bold mb-2">Estimate Refund</h3>
-              <p className="text-white/90 text-sm">Calculate your potential tax refund</p>
+              <p className="text-white text-sm">Calculate your potential tax refund</p>
             </Link>
             <Link
               href="/supersonic-fast-cash/locations"
               className="bg-white/10 backdrop-blur border-2 border-white/20 rounded-xl p-6 hover:bg-white/20 transition text-center"
             >
               <h3 className="text-xl font-bold mb-2">Find Location</h3>
-              <p className="text-white/90 text-sm">Find a Supersonic Fast Cash near you</p>
+              <p className="text-white text-sm">Find a Supersonic Fast Cash near you</p>
             </Link>
           </div>
         </div>

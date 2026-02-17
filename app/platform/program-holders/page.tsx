@@ -203,7 +203,7 @@ export default async function ProgramHolderLicensePage() {
               </div>
               <h3 className="text-xl font-bold mb-3">Total Value</h3>
               <div className="text-3xl font-bold mb-2">$300K - $650K</div>
-              <div className="text-white/90 text-sm mb-4">
+              <div className="text-white text-sm mb-4">
                 + 4-8 years saved getting these approvals yourself
               </div>
               <div className="text-sm">

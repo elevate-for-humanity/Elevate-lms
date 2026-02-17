@@ -97,7 +97,7 @@ viewBox="0 0 24 24">
 d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
           </svg>
           {/* Notification badge */}
-          <span className="absolute -top-1 -right-1 flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-brand-orange-500 text-[10px] sm:text-xs font-bold">
+          <span className="absolute -top-1 -right-1 flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-brand-orange-700 text-[10px] sm:text-xs font-bold">
             AI
           </span>
         </button>

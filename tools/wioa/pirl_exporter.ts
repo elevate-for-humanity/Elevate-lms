@@ -393,46 +393,62 @@ async function main() {
   if (cmd !== 'export') {
     console.error([
       'Usage:',
-      '  npx ts-node tools/wioa/pirl_exporter.ts init-schema [outPath]',
-      '  npx ts-node tools/wioa/pirl_exporter.ts export <schemaPath> <quarter> <outDir> <filePrefix>',
+      '  npx tsx tools/wioa/pirl_exporter.ts init-schema [outPath]',
+      '  npx tsx tools/wioa/pirl_exporter.ts export <schemaPath> <quarter> <outDir> <filePrefix> [--live]',
+      '',
+      'Flags:',
+      '  --live   Use real Supabase data via wioa_participants_for_quarter RPC',
+      '           Requires NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY env vars',
     ].join('\n'));
     process.exit(2);
   }
 
-  const [schemaPath, quarter, outDir, filePrefix] = args;
+  const useLive = args.includes('--live');
+  const positionalArgs = args.filter(a => !a.startsWith('--'));
+  const [schemaPath, quarter, outDir, filePrefix] = positionalArgs;
   if (!schemaPath || !quarter || !outDir || !filePrefix) {
     console.error('Missing required args: schemaPath quarter outDir filePrefix');
     process.exit(2);
   }
 
-  // Dummy adapter for testing — replace with supabase_adapter.ts in production
-  const adapter: PirlDataAdapter = {
-    async fetchParticipantsForQuarter() {
-      return [
-        {
-          uniqueIndividualIdentifier: 'EFH000000001',
-          elements: {
-            '100': 'EFH000000001',
-            '102': '1990-01-15',
-            '103': '46202',
-            '200': 0,
-            '300': 1,
-            '301': 0,
-            '400': 3,
-            '401': 12,
-            '900': '2025-07-01',
-            '901': '2025-09-30',
-            '923': 1,
-            '1000': 1,
-            '1002': '01',
-            '1010': '31-9011',
-            '1600': 9,
-            '1700': 0,
+  let adapter: PirlDataAdapter;
+
+  if (useLive) {
+    // Real adapter — queries Supabase via RPC
+    const { createSupabaseAdapter } = await import('./supabase_adapter');
+    adapter = createSupabaseAdapter();
+    console.log('Using LIVE Supabase adapter');
+  } else {
+    // Test adapter with sample data
+    console.log('Using TEST adapter (dummy data). Pass --live for real data.');
+    adapter = {
+      async fetchParticipantsForQuarter() {
+        return [
+          {
+            uniqueIndividualIdentifier: 'EFH000000001',
+            elements: {
+              '100': 'EFH000000001',
+              '102': '1990-01-15',
+              '103': '46202',
+              '200': 0,
+              '300': 1,
+              '301': 0,
+              '400': 3,
+              '401': 12,
+              '900': '2025-07-01',
+              '901': '2025-09-30',
+              '923': 1,
+              '1000': 1,
+              '1002': '01',
+              '1010': '31-9011',
+              '1600': 9,
+              '1700': 0,
+            },
           },
-        },
-      ];
-    },
-  };
+        ];
+      },
+    };
+  }
 
   const res = await exportQuarterlyPirl(adapter, {
     schemaPath,

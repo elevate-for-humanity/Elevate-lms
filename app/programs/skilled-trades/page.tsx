@@ -31,7 +31,7 @@ export default function SkilledTradesPage() {
       </div>
 
       <section className="relative h-[240px] sm:h-[320px] md:h-[400px]">
-        <Image src="/images/trades/hero-program-hvac.jpg" alt="Skilled Trades Training" fill sizes="100vw" className="object-cover" priority />
+        <Image src="/images/programs-hq/skilled-trades-hero.jpg" alt="Skilled Trades Training" fill sizes="100vw" className="object-cover" priority />
         <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-10">
           <div className="max-w-4xl mx-auto">
             <span className="inline-block bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">Funding Available</span>
@@ -75,7 +75,7 @@ export default function SkilledTradesPage() {
               { name: 'Electrical', href: '/programs/electrical', img: '/images/trades/hero-program-electrical.jpg', duration: '8-16 weeks' },
               { name: 'Welding', href: '/programs/welding', img: '/images/trades/hero-program-welding.jpg', duration: '8-12 weeks' },
               { name: 'Plumbing', href: '/programs/plumbing', img: '/images/trades/hero-program-plumbing.jpg', duration: '8-16 weeks' },
-              { name: 'CDL Training', href: '/programs/cdl-training', img: '/images/trades/program-building-technology.jpg', duration: '4-8 weeks' },
+              { name: 'CDL Training', href: '/programs/cdl-training', img: '/images/trades/program-cdl-commercial-driving.jpg', duration: '4-8 weeks' },
               { name: 'Carpentry', href: '/programs/carpentry', img: '/images/trades/hero-program-carpentry.jpg', duration: '8-12 weeks' },
             ].map((p) => (
               <Link key={p.name} href={p.href} className="group">

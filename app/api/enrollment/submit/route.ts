@@ -13,19 +13,42 @@ export async function POST(req: NextRequest) {
     const supabase = await createClient();
     const data = await req.json();
 
+    // Validate required fields
+    const missing: string[] = [];
+    if (!data.firstName?.trim()) missing.push('firstName');
+    if (!data.lastName?.trim()) missing.push('lastName');
+    if (!data.email?.trim()) missing.push('email');
+    if (!data.programId && !data.programName) missing.push('programId or programName');
+
+    if (missing.length > 0) {
+      return NextResponse.json(
+        { success: false, error: `Missing required fields: ${missing.join(', ')}` },
+        { status: 400 }
+      );
+    }
+
+    // Basic email format check
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(data.email.trim())) {
+      return NextResponse.json(
+        { success: false, error: 'Invalid email address' },
+        { status: 400 }
+      );
+    }
+
     const { data: enrollment, error } = await supabase
       .from('enrollments')
       .insert({
-        first_name: data.firstName,
-        last_name: data.lastName,
-        email: data.email,
-        phone: data.phone,
+        first_name: data.firstName.trim(),
+        last_name: data.lastName.trim(),
+        email: data.email.trim().toLowerCase(),
+        phone: data.phone?.trim() || null,
         program_id: data.programId,
         program_name: data.programName,
         funding_type: data.fundingType || 'wioa',
         status: 'pending',
         source: data.source || 'website',
-        notes: data.notes,
+        notes: data.notes || null,
         created_at: new Date().toISOString(),
       })
       .select()

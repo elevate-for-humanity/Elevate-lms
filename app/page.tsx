@@ -47,7 +47,7 @@ export default function HomePage() {
       </section>
 
       {/* ===== AUDIENCE QUICK LINKS ===== */}
-      <section className="py-12 sm:py-16 bg-slate-50 border-t border-slate-100">
+      <section className="py-10 sm:py-12 bg-slate-50 border-t border-slate-100">
         <div className="max-w-5xl mx-auto px-6">
           <h2 className="text-2xl sm:text-3xl font-bold text-center text-slate-900 mb-3">
             How can we help you?
@@ -89,9 +89,9 @@ export default function HomePage() {
               <Link
                 key={item.href}
                 href={item.href}
-                className="flex flex-col items-center gap-4 p-5 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
+                className="flex flex-col items-center gap-3 p-5 bg-white rounded-xl shadow-sm border border-slate-200 hover:border-brand-blue-400 hover:shadow-md transition-all text-center group"
               >
-                <div className="relative w-full aspect-square rounded-lg overflow-hidden">
+                <div className="relative w-full aspect-[4/3] rounded-lg overflow-hidden">
                   <Image src={item.image} alt={item.alt} fill className="object-cover" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw" />
                 </div>
                 <span className="font-semibold text-lg text-slate-900 group-hover:text-brand-blue-600">{item.label}</span>
@@ -103,9 +103,9 @@ export default function HomePage() {
       </section>
 
       {/* ===== 3-CARD VALUE PROPS ===== */}
-      <section className="py-16 sm:py-20">
+      <section className="py-10 sm:py-14">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {[
               { title: 'Career Opportunities', desc: 'We offer certification programs in healthcare (CNA, Medical Assistant, Phlebotomy), skilled trades (HVAC, Electrical, Welding, Plumbing), CDL trucking, IT/cybersecurity, and barbering. Most programs are 4-16 weeks and include hands-on training.', href: '/programs', image: '/images/efh/programs/trades.jpg' },
               { title: 'Funding Available', desc: 'Most students pay nothing. WIOA covers tuition, books, and supplies. The Workforce Ready Grant funds high-demand certifications. JRI provides paid apprenticeships for justice-involved individuals. Check your eligibility online in minutes.', href: '/funding', image: '/images/highlights/government-certified.jpg' },
@@ -118,10 +118,10 @@ export default function HomePage() {
                     alt={card.title}
                     fill
                     sizes="(max-width: 1024px) 100vw, 33vw"
-                    className="object-cover"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
-                <div className="pt-5">
+                <div className="pt-4">
                   <h3 className="text-xl md:text-2xl font-bold text-slate-900 mb-2">{card.title}</h3>
                   <p className="text-base text-slate-700 mb-3">{card.desc}</p>
                   <span className="inline-block bg-red-600 text-white font-semibold text-sm px-5 py-2.5 rounded-lg group-hover:bg-red-700 transition-colors">Learn More</span>
@@ -133,9 +133,9 @@ export default function HomePage() {
       </section>
 
       {/* ===== PROGRAMS ===== */}
-      <section className="py-16 sm:py-20 bg-white border-t border-slate-100">
+      <section className="py-10 sm:py-14 bg-white border-t border-slate-100">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="text-center mb-12">
+          <div className="text-center mb-10">
             <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">Programs & Pathways</h2>
             <p className="text-lg text-slate-700 max-w-2xl mx-auto">
               Industry-recognized certifications in high-demand fields. Start your new career in weeks.
@@ -145,15 +145,16 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {programs.map((program) => (
               <Link key={program.name} href={program.href} className="group">
-                <Image
-                  src={program.image}
-                  alt={program.name}
-                  width={800}
-                  height={600}
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                  className="w-full h-auto group-hover:opacity-90 transition-opacity duration-300"
-                />
-                <div className="pt-4">
+                <div className="relative aspect-[4/3] rounded-lg overflow-hidden">
+                  <Image
+                    src={program.image}
+                    alt={program.name}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="pt-3">
                   <h3 className="text-slate-900 font-bold text-lg sm:text-xl">{program.name}</h3>
                   <p className="text-slate-600 text-sm sm:text-base mt-1">{program.desc}</p>
                 </div>
@@ -161,7 +162,7 @@ export default function HomePage() {
             ))}
           </div>
 
-          <div className="text-center mt-10">
+          <div className="text-center mt-8">
             <Link href="/programs" className="inline-block bg-red-600 hover:bg-red-700 text-white text-lg font-bold px-10 py-4 rounded-lg transition-colors">
               View All Programs
             </Link>

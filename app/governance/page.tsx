@@ -20,6 +20,12 @@ export const metadata: Metadata = {
 
 const quickLinks = [
   {
+    title: 'Legal & Entity Information',
+    description: 'Corporate structure, partner relationships, and entity details',
+    href: '/governance/legal',
+    icon: Building2,
+  },
+  {
     title: 'Authoritative Documents',
     description: 'The seven governing documents that define platform operations',
     href: '/governance/authoritative-docs',
@@ -38,15 +44,15 @@ const quickLinks = [
     icon: Scale,
   },
   {
-    title: 'SEO & Indexing Governance',
-    description: 'How search visibility is controlled and enforced',
-    href: '/governance/seo-indexing',
+    title: 'Outcomes Methodology',
+    description: 'How we measure and report student outcomes',
+    href: '/outcomes',
     icon: Search,
   },
   {
-    title: 'Operational Controls',
-    description: 'Audits, CI gates, and deployment controls',
-    href: '/governance/operational-controls',
+    title: 'SEO & Indexing Governance',
+    description: 'How search visibility is controlled and enforced',
+    href: '/governance/seo-indexing',
     icon: Settings,
   },
   {
@@ -160,10 +166,16 @@ export default function GovernancePage() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Related Resources</h2>
           <div className="flex flex-wrap gap-3">
             <Link
-              href="/resources"
+              href="/governance/legal"
               className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-brand-blue-300 hover:text-brand-blue-600 transition-colors"
             >
-              Resource Library
+              Legal &amp; Entity Info
+            </Link>
+            <Link
+              href="/outcomes"
+              className="px-4 py-2 bg-white border border-slate-200 text-slate-700 rounded-lg text-sm font-medium hover:border-brand-blue-300 hover:text-brand-blue-600 transition-colors"
+            >
+              Outcomes Methodology
             </Link>
             <Link
               href="/privacy-policy"

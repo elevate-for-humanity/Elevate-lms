@@ -57,7 +57,7 @@ export default async function DashboardPage() {
         redirect('/employer/dashboard');
         break;
       default:
-        redirect('/student/dashboard');
+        redirect('/learner/dashboard');
     }
   } catch {
     redirect('/login?redirect=/dashboard');

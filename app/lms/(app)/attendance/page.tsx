@@ -16,8 +16,28 @@ export default async function AttendancePage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect('/login');
 
-  const { data: attendance } = await supabase.from('attendance').select('*, courses!inner(title)').eq('user_id', user.id).order('date', { ascending: false }).limit(30);
-  const presentCount = attendance?.filter((a: any) => a.status === 'present').length || 0;
+  // Get user's enrollments to find their attendance
+  const { data: enrollments } = await supabase
+    .from('enrollments')
+    .select('id, course_id, courses(title)')
+    .eq('user_id', user.id);
+
+  const enrollmentIds = enrollments?.map(e => e.id) || [];
+
+  const { data: attendance } = enrollmentIds.length > 0
+    ? await supabase
+        .from('attendance_hours')
+        .select('*')
+        .in('enrollment_id', enrollmentIds)
+        .order('date', { ascending: false })
+        .limit(50)
+    : { data: [] };
+
+  // Build enrollment lookup for course titles
+  const enrollmentMap = new Map(enrollments?.map(e => [e.id, e]) || []);
+
+  const totalHoursLogged = attendance?.reduce((sum: number, a: any) => sum + (a.hours_logged || 0), 0) || 0;
+  const verifiedCount = attendance?.filter((a: any) => a.verified).length || 0;
   const totalCount = attendance?.length || 0;
 
   return (
@@ -29,19 +49,43 @@ export default async function AttendancePage() {
           <p className="text-gray-600 mt-2">Track your course attendance</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Attendance Rate</h3><p className="text-3xl font-bold text-green-600 mt-2">{totalCount > 0 ? Math.round((presentCount / totalCount) * 100) : 0}%</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Classes Attended</h3><p className="text-3xl font-bold text-brand-blue-600 mt-2">{presentCount}</p></div>
-          <div className="bg-white rounded-lg shadow-sm border p-6"><h3 className="text-sm font-medium text-gray-500">Total Classes</h3><p className="text-3xl font-bold text-gray-900 mt-2">{totalCount}</p></div>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-sm font-medium text-gray-500">Total Hours Logged</h3>
+            <p className="text-3xl font-bold text-green-600 mt-2">{totalHoursLogged.toFixed(1)}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-sm font-medium text-gray-500">Verified Sessions</h3>
+            <p className="text-3xl font-bold text-brand-blue-600 mt-2">{verifiedCount}</p>
+          </div>
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <h3 className="text-sm font-medium text-gray-500">Total Sessions</h3>
+            <p className="text-3xl font-bold text-gray-900 mt-2">{totalCount}</p>
+          </div>
         </div>
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="p-4 border-b"><h2 className="font-semibold">Attendance History</h2></div>
           <div className="divide-y">
-            {attendance && attendance.length > 0 ? attendance.map((record: any) => (
+            {attendance && attendance.length > 0 ? attendance.map((record: any) => {
+              const enrollment = enrollmentMap.get(record.enrollment_id);
+              const courseTitle = (enrollment as any)?.courses?.title || 'Course';
+              return (
               <div key={record.id} className="p-4 flex items-center justify-between">
-                <div><p className="font-medium">{record.courses?.title || 'Course'}</p><p className="text-sm text-gray-500">{new Date(record.date).toLocaleDateString()}</p></div>
-                <span className={`px-2 py-1 rounded-full text-xs ${record.status === 'present' ? 'bg-green-100 text-green-800' : record.status === 'absent' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>{record.status}</span>
+                <div>
+                  <p className="font-medium">{courseTitle}</p>
+                  <p className="text-sm text-gray-500">
+                    {new Date(record.date).toLocaleDateString()} &middot; {record.hours_logged}h &middot; {record.type}
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {record.verified ? (
+                    <span className="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">Verified</span>
+                  ) : (
+                    <span className="px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-800">Pending</span>
+                  )}
+                </div>
               </div>
-            )) : <div className="p-8 text-center text-gray-500">No attendance records</div>}
+              );
+            }) : <div className="p-8 text-center text-gray-500">No attendance records yet. Your instructor will log your hours.</div>}
           </div>
         </div>
       </div>

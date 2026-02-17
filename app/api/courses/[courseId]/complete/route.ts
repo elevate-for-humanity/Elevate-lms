@@ -97,37 +97,23 @@ export async function POST(
       );
     }
 
-    // Check for existing certificate or create one
+    // Issue certificate via canonical service
     let certificate = null;
-    const { data: existingCert } = await supabase
-      .from('certificates')
-      .select('*')
-      .eq('user_id', user.id)
-      .eq('course_id', courseId)
-      .single();
-
-    if (existingCert) {
-      certificate = existingCert;
-    } else {
-      // Generate certificate number
-      const certNumber = `EFH-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-
-      const { data: newCert, error: certError } = await supabase
-        .from('certificates')
-        .insert({
-          user_id: user.id,
-          course_id: courseId,
-          enrollment_id: enrollment.id,
-          certificate_number: certNumber,
-          issued_at: new Date().toISOString(),
-          verification_url: `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/verify/${certNumber}`,
-        })
-        .select()
-        .single();
-
-      if (!certError) {
-        certificate = newCert;
+    try {
+      const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
+      const certResult = await issueCertificate({
+        supabase,
+        studentId: user.id,
+        courseId,
+        enrollmentId: enrollment.id,
+        studentName: user.user_metadata?.full_name || user.email || 'Student',
+        courseTitle: course.title,
+      });
+      if (certResult.success && certResult.certificate) {
+        certificate = certResult.certificate;
       }
+    } catch (certErr) {
+      logger.error('Certificate issuance error:', certErr);
     }
 
     // Get user profile for response

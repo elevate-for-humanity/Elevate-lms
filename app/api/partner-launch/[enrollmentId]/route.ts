@@ -58,7 +58,7 @@ const supabase = getSupabaseServerClient();
   const launchUrl = await client.getSsoLaunchUrl({
     accountExternalId: enrollment.metadata?.external_account_id,
     externalEnrollmentId: enrollment.external_enrollment_id,
-    returnTo: `${process.env.NEXT_PUBLIC_APP_URL}/student/dashboard`,
+    returnTo: `${process.env.NEXT_PUBLIC_APP_URL}/learner/dashboard`,
   });
 
   return NextResponse.redirect(launchUrl);

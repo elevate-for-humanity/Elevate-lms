@@ -27,12 +27,16 @@ export async function POST(
 
     const { progress } = await request.json();
 
-    const { error } = await supabase.from('video_progress').upsert({
-      user_id: user.id,
-      lesson_id: lessonId,
-      progress_seconds: progress,
-      last_watched: new Date().toISOString(),
-    });
+    const { error } = await supabase.from('video_progress').upsert(
+      {
+        user_id: user.id,
+        lesson_id: lessonId,
+        progress_seconds: progress,
+        last_watched: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+      { onConflict: 'user_id,lesson_id' }
+    );
 
     if (error) {
       return NextResponse.json({ error: toErrorMessage(error) }, { status: 500 });

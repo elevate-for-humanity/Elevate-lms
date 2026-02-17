@@ -246,7 +246,7 @@ export default async function EnrollmentSuccessPage({
                 Go to My Courses
               </Link>
               <Link
-                href="/student/dashboard"
+                href="/learner/dashboard"
                 className="flex-1 px-6 py-3 border border-gray-300 text-black text-center rounded-lg hover:bg-gray-50 transition-colors font-medium"
               >
                 View Dashboard

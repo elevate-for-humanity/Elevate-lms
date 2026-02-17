@@ -58,16 +58,15 @@ export default async function LearnerDashboardPage() {
     .from('enrollments')
     .select(`
       id,
-      program_id,
+      course_id,
       status,
       progress,
       enrolled_at,
-      programs (
+      courses (
         id,
-        name,
+        title,
         description,
-        duration_weeks,
-        image_url
+        duration_hours
       )
     `)
     .eq('user_id', user.id)
@@ -99,13 +98,41 @@ export default async function LearnerDashboardPage() {
     .order('created_at', { ascending: false })
     .limit(5);
 
-  // Fetch training hours
+  // Fetch certificates
+  const { data: certificates } = await supabase
+    .from('certificates')
+    .select('id, certificate_number, course_title, issued_at, verification_code')
+    .or(`user_id.eq.${user.id},student_id.eq.${user.id}`)
+    .order('issued_at', { ascending: false })
+    .limit(5);
+
+  // Fetch attendance hours
+  const { data: attendanceData } = await supabase
+    .from('attendance_hours')
+    .select('hours_logged, date, type')
+    .eq('enrollment_id', enrollments?.[0]?.id || '00000000-0000-0000-0000-000000000000')
+    .order('date', { ascending: false })
+    .limit(30);
+
+  // Fetch training hours (fallback)
   const { data: hoursData } = await supabase
     .from('training_hours')
     .select('hours')
     .eq('user_id', user.id);
 
-  const totalHours = hoursData?.reduce((sum, h) => sum + (h.hours || 0), 0) || 0;
+  const attendanceHours = attendanceData?.reduce((sum, a) => sum + (a.hours_logged || 0), 0) || 0;
+  const trainingHours = hoursData?.reduce((sum, h) => sum + (h.hours || 0), 0) || 0;
+  const totalHours = attendanceHours || trainingHours;
+
+  // Fetch lesson progress for all enrolled courses
+  const courseIds = enrollments?.map(e => e.course_id).filter(Boolean) || [];
+  const { data: lessonProgress } = courseIds.length > 0
+    ? await supabase
+        .from('lesson_progress')
+        .select('course_id, lesson_id, completed')
+        .eq('user_id', user.id)
+        .in('course_id', courseIds)
+    : { data: null };
 
   // Calculate stats
   const activeEnrollments = enrollments?.filter(e => e.status === 'active') || [];
@@ -226,30 +253,22 @@ export default async function LearnerDashboardPage() {
               </div>
               <div className="divide-y divide-gray-200">
                 {activeEnrollments.length > 0 ? (
-                  activeEnrollments.map((enrollment: any) => (
+                  activeEnrollments.map((enrollment: any) => {
+                    const course = Array.isArray(enrollment.courses) ? enrollment.courses[0] : enrollment.courses;
+                    return (
                     <div key={enrollment.id} className="p-6">
                       <div className="flex gap-4">
                         <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                          {enrollment.programs?.image_url ? (
-                            <Image
-                              src={enrollment.programs.image_url}
-                              alt={enrollment.programs?.name || 'Program'}
-                              width={80}
-                              height={80}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
                             <div className="w-full h-full flex items-center justify-center">
                               <GraduationCap className="w-8 h-8 text-gray-400" />
                             </div>
-                          )}
                         </div>
                         <div className="flex-1">
                           <h3 className="font-semibold text-gray-900 mb-1">
-                            {enrollment.programs?.name || 'Program'}
+                            {course?.title || 'Course'}
                           </h3>
                           <p className="text-sm text-gray-500 mb-3 line-clamp-1">
-                            {enrollment.programs?.description || 'No description available'}
+                            {course?.description || 'No description available'}
                           </p>
                           <div className="flex items-center gap-4">
                             <div className="flex-1">
@@ -265,7 +284,7 @@ export default async function LearnerDashboardPage() {
                               </div>
                             </div>
                             <Link
-                              href={`/lms/programs/${enrollment.program_id}`}
+                              href={`/courses/${enrollment.course_id}/learn`}
                               className="px-4 py-2 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition flex items-center gap-2"
                             >
                               <Play className="w-4 h-4" />
@@ -275,7 +294,8 @@ export default async function LearnerDashboardPage() {
                         </div>
                       </div>
                     </div>
-                  ))
+                  );})
+                  
                 ) : (
                   <div className="p-12 text-center">
                     <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -411,6 +431,85 @@ export default async function LearnerDashboardPage() {
                 <MessageSquare className="w-4 h-4" />
                 Contact Support
               </Link>
+            </div>
+
+            {/* Certificates */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-gray-900">Certificates</h2>
+                  <Link href="/certificates" className="text-sm text-orange-600 hover:text-orange-700">
+                    View All
+                  </Link>
+                </div>
+              </div>
+              <div className="p-6">
+                {certificates && certificates.length > 0 ? (
+                  <div className="space-y-4">
+                    {certificates.map((cert: any) => (
+                      <div key={cert.id} className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                          <Award className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-gray-900 text-sm truncate">
+                            {cert.course_title || 'Certificate'}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {cert.certificate_number} &middot; {cert.issued_at ? new Date(cert.issued_at).toLocaleDateString() : ''}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <Award className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">Complete courses to earn certificates</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Attendance Summary */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200">
+              <div className="p-6 border-b border-gray-200">
+                <h2 className="text-lg font-semibold text-gray-900">Attendance</h2>
+              </div>
+              <div className="p-6">
+                {attendanceData && attendanceData.length > 0 ? (
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Total Hours Logged</span>
+                      <span className="font-semibold text-gray-900">{attendanceHours.toFixed(1)}h</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-500">Sessions This Month</span>
+                      <span className="font-semibold text-gray-900">
+                        {attendanceData.filter((a: any) => {
+                          const d = new Date(a.date);
+                          const now = new Date();
+                          return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+                        }).length}
+                      </span>
+                    </div>
+                    <div className="border-t pt-3 mt-3">
+                      <p className="text-xs text-gray-500 mb-2">Recent Sessions</p>
+                      {attendanceData.slice(0, 3).map((a: any, i: number) => (
+                        <div key={i} className="flex justify-between text-xs py-1">
+                          <span className="text-gray-600">{new Date(a.date).toLocaleDateString()}</span>
+                          <span className="text-gray-900 font-medium">{a.hours_logged}h ({a.type})</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-center py-4">
+                    <Clock className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">No attendance records yet</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

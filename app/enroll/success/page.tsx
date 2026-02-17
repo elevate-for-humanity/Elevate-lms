@@ -173,7 +173,7 @@ export default async function EnrollSuccessPage() {
         {/* Secondary Actions */}
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
-            href="/student/dashboard"
+            href="/learner/dashboard"
             className="flex-1 bg-brand-blue-600 text-white px-6 py-3 rounded-lg font-semibold text-center hover:bg-brand-blue-700 transition"
           >
             Student Dashboard

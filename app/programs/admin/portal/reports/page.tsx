@@ -92,7 +92,7 @@ export default async function ReportsPage() {
               Back to Dashboard
             </Link>
             <Link
-              href="/student/dashboard"
+              href="/learner/dashboard"
               className="bg-white hover:bg-gray-100 text-brand-blue-600 px-8 py-4 rounded-lg text-lg font-semibold transition-colors"
             >
               Back to Dashboard

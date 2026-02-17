@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
     const ssoUrl = await miladyAPI.getSsoLaunchUrl({
       accountExternalId: enrollment.external_student_id || user.id,
       externalEnrollmentId: enrollment.external_enrollment_id || enrollment.id,
-      returnTo: `${process.env.NEXT_PUBLIC_SITE_URL}/student/dashboard`,
+      returnTo: `${process.env.NEXT_PUBLIC_SITE_URL}/learner/dashboard`,
     });
 
     // Update last accessed timestamp

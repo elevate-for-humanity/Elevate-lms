@@ -15,12 +15,14 @@ import { logger } from '@/lib/logger';
 
 export interface IssueCertificateParams {
   supabase: SupabaseClient;
-  enrollmentId: string;
+  enrollmentId?: string;
   studentId: string;
-  programId: string;
+  courseId?: string;
+  programId?: string;
   studentName: string;
-  studentEmail: string;
-  programName: string;
+  studentEmail?: string;
+  courseTitle?: string;
+  programName?: string;
   programHours?: number | null;
 }
 
@@ -49,21 +51,29 @@ export async function issueCertificate(
     supabase,
     enrollmentId,
     studentId,
+    courseId,
     programId,
     studentName,
     studentEmail,
+    courseTitle,
     programName,
     programHours,
   } = params;
 
   try {
-    // IDEMPOTENCY CHECK: Check if certificate already exists for this enrollment
-    const { data: existingCert } = await supabase
+    // IDEMPOTENCY CHECK: Check if certificate already exists
+    let existingQuery = supabase
       .from('certificates')
       .select('*')
-      .eq('student_id', studentId)
-      .eq('program_id', programId)
-      .single();
+      .or(`student_id.eq.${studentId},user_id.eq.${studentId}`);
+
+    if (courseId) {
+      existingQuery = existingQuery.eq('course_id', courseId);
+    } else if (programId) {
+      existingQuery = existingQuery.eq('program_id', programId);
+    }
+
+    const { data: existingCert } = await existingQuery.maybeSingle();
 
     if (existingCert) {
       logger.info('Certificate already exists, returning existing', {
@@ -91,19 +101,28 @@ export async function issueCertificate(
     const certificateNumber = `EFH-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
     const completionDate = new Date().toISOString();
 
+    const displayName = programName || courseTitle || 'Course Completion';
+
     // Create certificate record
     const { data: certificate, error: certError } = await supabase
       .from('certificates')
       .insert({
+        user_id: studentId,
         student_id: studentId,
-        program_id: programId,
+        course_id: courseId || null,
+        program_id: programId || null,
+        enrollment_id: enrollmentId || null,
         certificate_number: certificateNumber,
         student_name: studentName,
-        program_name: programName,
+        course_title: courseTitle || null,
+        program_name: programName || null,
         completion_date: completionDate,
+        issued_date: completionDate.split('T')[0],
         program_hours: programHours,
         issued_at: completionDate,
+        verification_code: certificateNumber.split('-').pop(),
         status: 'active',
+        metadata: { issued_via: 'canonical_issue_certificate' },
       })
       .select()
       .single();
@@ -143,12 +162,13 @@ export async function issueCertificate(
     // Send certificate delivery email
     const certificateUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/certificates/${certificate.id}`;
 
+    if (studentEmail) {
     try {
       const { emailService } = await import('@/lib/notifications/email');
       await emailService.sendCertificateNotification(
         studentEmail,
         studentName,
-        programName,
+        displayName,
         certificateUrl
       );
       logger.info('Certificate delivery email sent', {
@@ -159,6 +179,7 @@ export async function issueCertificate(
       logger.error('Certificate email failed', emailError as Error);
       // Don't fail - certificate is issued
     }
+    } // end if (studentEmail)
 
     // Create in-app notification
     await supabase
@@ -167,7 +188,7 @@ export async function issueCertificate(
         user_id: studentId,
         type: 'achievement',
         title: 'Certificate Issued!',
-        message: `Congratulations! Your certificate for ${programName} is ready.`,
+        message: `Congratulations! Your certificate for ${displayName} is ready.`,
         action_url: certificateUrl,
       });
 
@@ -178,7 +199,7 @@ export async function issueCertificate(
         id: certificate.id,
         certificate_number: certificateNumber,
         student_name: studentName,
-        program_name: programName,
+        program_name: displayName,
         completion_date: completionDate,
         url: certificateUrl,
       },

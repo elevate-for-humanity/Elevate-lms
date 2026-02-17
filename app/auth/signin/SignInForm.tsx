@@ -43,7 +43,7 @@ export default function SignInForm() {
         }
 
         // Redirect to dashboard
-        router.push('/student/dashboard');
+        router.push('/learner/dashboard');
         router.refresh();
       }
     } catch (error) { /* Error handled silently */ 

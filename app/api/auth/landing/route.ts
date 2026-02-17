@@ -69,7 +69,7 @@ const cookieStore = await cookies();
 
     switch (role) {
       case 'student':
-        redirectTo = '/app/student/dashboard';
+        redirectTo = '/app/learner/dashboard';
         break;
       case 'program_holder':
       case 'instructor':
@@ -89,7 +89,7 @@ const cookieStore = await cookies();
         redirectTo = '/app/supersonic';
         break;
       default:
-        redirectTo = '/app/student/dashboard';
+        redirectTo = '/app/learner/dashboard';
     }
 
     return NextResponse.json({ redirectTo });

@@ -51,7 +51,7 @@ export default function StudentProgressWidget() {
   useEffect(() => {
     async function fetchDashboard() {
       try {
-        const res = await fetch('/api/student/dashboard');
+        const res = await fetch('/api/learner/dashboard');
         if (!res.ok) {
           if (res.status === 401) {
             setData(null);

@@ -122,31 +122,17 @@ export async function POST(
     // Auto-create certificate if course completed
     let certificate = null;
     if (courseCompleted) {
-      // Check if certificate exists
-      const { data: existingCert } = await supabase
-        .from('certificates')
-        .select('id, certificate_number, issued_at')
-        .eq('user_id', user.id)
-        .eq('course_id', lesson.course_id)
-        .single();
-
-      if (existingCert) {
-        certificate = existingCert;
-      } else {
-        // Create new certificate
-        const certNumber = `EFH-${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
-        const { data: newCert } = await supabase
-          .from('certificates')
-          .insert({
-            user_id: user.id,
-            course_id: lesson.course_id,
-            enrollment_id: enrollment.id,
-            certificate_number: certNumber,
-            issued_at: new Date().toISOString(),
-          })
-          .select()
-          .single();
-        certificate = newCert;
+      const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
+      const certResult = await issueCertificate({
+        supabase,
+        studentId: user.id,
+        courseId: lesson.course_id,
+        enrollmentId: enrollment.id,
+        studentName: user.user_metadata?.full_name || user.email || 'Student',
+        courseTitle: lesson.title,
+      });
+      if (certResult.success && certResult.certificate) {
+        certificate = certResult.certificate;
       }
     }
 

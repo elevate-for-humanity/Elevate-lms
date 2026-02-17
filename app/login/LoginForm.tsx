@@ -46,7 +46,7 @@ export default function LoginForm() {
       } else if (profile?.role === 'instructor') {
         router.push('/instructor/dashboard');
       } else {
-        router.push('/student/dashboard');
+        router.push('/learner/dashboard');
       }
       router.refresh();
     } catch (err: any) {

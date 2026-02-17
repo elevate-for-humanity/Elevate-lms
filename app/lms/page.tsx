@@ -217,7 +217,7 @@ export default async function LMSPage() {
               <div className="bg-white rounded-3xl shadow-sm border p-6">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-bold text-slate-900">My Programs</h2>
-                  <Link href="/student/dashboard" className="text-brand-blue-600 text-sm font-semibold hover:underline">View Dashboard →</Link>
+                  <Link href="/learner/dashboard" className="text-brand-blue-600 text-sm font-semibold hover:underline">View Dashboard →</Link>
                 </div>
                 <div className="space-y-4">
                   {typedProgramEnrollments.map((enrollment: any) => (

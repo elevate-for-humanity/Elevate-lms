@@ -27,10 +27,18 @@ export async function POST(req: Request) {
       .from('enrollments')
       .update({ 
         orientation_completed_at: new Date().toISOString(),
-        status: 'orientation_complete'
+        status: 'orientation_complete',
+        updated_at: new Date().toISOString(),
       })
       .eq('user_id', user.id)
       .is('orientation_completed_at', null);
+
+    // Also update program_enrollments state machine if exists
+    await supabase
+      .from('program_enrollments')
+      .update({ enrollment_state: 'orientation_complete', updated_at: new Date().toISOString() })
+      .eq('user_id', user.id)
+      .eq('enrollment_state', 'confirmed');
 
     if (error) {
       logger.error('Error updating enrollment:', error);

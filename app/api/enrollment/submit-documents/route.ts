@@ -27,10 +27,18 @@ export async function POST(req: Request) {
       .from('enrollments')
       .update({ 
         documents_submitted_at: new Date().toISOString(),
-        status: 'active'
+        status: 'active',
+        updated_at: new Date().toISOString(),
       })
       .eq('user_id', user.id)
       .is('documents_submitted_at', null);
+
+    // Also update program_enrollments state machine if exists
+    await supabase
+      .from('program_enrollments')
+      .update({ enrollment_state: 'active', updated_at: new Date().toISOString() })
+      .eq('user_id', user.id)
+      .eq('enrollment_state', 'documents_complete');
 
     if (error) {
       logger.error('Error updating enrollment:', error);

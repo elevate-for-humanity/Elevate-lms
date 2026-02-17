@@ -97,7 +97,7 @@ export default function SignUpForm() {
           setLoading(false);
         } else {
           setTimeout(() => {
-            router.push('/student/dashboard');
+            router.push('/learner/dashboard');
             router.refresh();
           }, 2000);
         }
@@ -142,7 +142,7 @@ export default function SignUpForm() {
               account.
             </p>
             <Link
-              href="/student/dashboard"
+              href="/learner/dashboard"
               className="inline-block px-6 py-3 bg-brand-orange-600 text-white font-semibold rounded-lg hover:bg-brand-orange-700 transition"
             >
               Go to Dashboard

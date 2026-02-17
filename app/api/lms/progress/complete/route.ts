@@ -117,50 +117,17 @@ export async function POST(req: NextRequest) {
       logger.error("Points award failed", pointsErr instanceof Error ? pointsErr : undefined);
     }
 
-    // Generate certificate
+    // Generate certificate via canonical service
     try {
-      const certificateNumber = `EFH-${Date.now()}-${courseId.substring(0, 8)}`;
-
-      const { error: certError } = await supabase
-        .from('module_certificates')
-        .insert({
-          user_id: user.id,
-          module_id: courseId,
-          certificate_number: certificateNumber,
-          certificate_name: courseDetails?.title || 'Course Completion',
-          issued_by: 'Elevate For Humanity',
-          issued_date: new Date().toISOString().split('T')[0],
-          student_name: profile?.full_name || 'Student',
-        });
-
-      if (certError) {
-        /* Certificate error handled silently */
-      }
-
-      // Send completion email
-      try {
-        await fetch(
-          `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.elevateforhumanity.org'}/api/email/send`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              to: profile?.email || user.email,
-              subject: `Course Completed: ${courseDetails?.title}`,
-              html: `
-              <h2>Congratulations!</h2>
-              <p>You have successfully completed <strong>${courseDetails?.title}</strong>!</p>
-              <p><strong>Certificate Number:</strong> ${certificateNumber}</p>
-              <p>Your certificate is now available in your LMS dashboard.</p>
-              <p><a href="https://www.elevateforhumanity.org/lms/certificates">View Your Certificates</a></p>
-              <p>Best regards,<br>Elevate for Humanity Team</p>
-            `,
-            }),
-          }
-        );
-      } catch (emailErr) {
-        logger.error("Completion email failed", emailErr instanceof Error ? emailErr : undefined);
-      }
+      const { issueCertificate } = await import('@/lib/certificates/issue-certificate');
+      await issueCertificate({
+        supabase,
+        studentId: user.id,
+        courseId,
+        studentName: profile?.full_name || 'Student',
+        studentEmail: profile?.email || user.email || undefined,
+        courseTitle: courseDetails?.title || 'Course Completion',
+      });
     } catch (certError) {
       logger.error("Certificate generation failed", certError instanceof Error ? certError : undefined);
     }

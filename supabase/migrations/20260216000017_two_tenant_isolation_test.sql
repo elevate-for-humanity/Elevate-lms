@@ -23,6 +23,10 @@ DECLARE
   -- We'll use a deterministic UUID for Tenant B test user
   v_user_b uuid := 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee';
 
+  -- Deterministic test course IDs
+  v_course_a uuid := '00000000-0000-0000-0000-00000000c001';
+  v_course_b uuid := '00000000-0000-0000-0000-00000000c002';
+
   v_count_a int;
   v_count_b int;
   v_count_total int;
@@ -40,35 +44,44 @@ BEGIN
   VALUES (v_user_b, v_tenant_b, 'admin', 'Tenant B Test Admin')
   ON CONFLICT (id) DO UPDATE SET tenant_id = v_tenant_b, role = 'admin';
 
+  -- Test courses (required by FK on training_enrollments and certificates)
+  INSERT INTO training_courses (id, course_name)
+  VALUES (v_course_a, 'Test Course A')
+  ON CONFLICT (id) DO NOTHING;
+
+  INSERT INTO training_courses (id, course_name)
+  VALUES (v_course_b, 'Test Course B')
+  ON CONFLICT (id) DO NOTHING;
+
   -- Create test enrollment in Tenant A
-  INSERT INTO training_enrollments (id, user_id, tenant_id, status)
+  INSERT INTO training_enrollments (id, user_id, tenant_id, course_id, status)
   VALUES (
     'aaaa1111-0000-0000-0000-000000000001',
-    v_admin_a, v_tenant_a, 'active'
+    v_admin_a, v_tenant_a, v_course_a, 'active'
   ) ON CONFLICT (id) DO NOTHING;
   v_enrollment_a := 'aaaa1111-0000-0000-0000-000000000001';
 
   -- Create test enrollment in Tenant B
-  INSERT INTO training_enrollments (id, user_id, tenant_id, status)
+  INSERT INTO training_enrollments (id, user_id, tenant_id, course_id, status)
   VALUES (
     'bbbb2222-0000-0000-0000-000000000002',
-    v_user_b, v_tenant_b, 'active'
+    v_user_b, v_tenant_b, v_course_b, 'active'
   ) ON CONFLICT (id) DO NOTHING;
   v_enrollment_b := 'bbbb2222-0000-0000-0000-000000000002';
 
   -- Create test certificate in Tenant A
-  INSERT INTO certificates (id, user_id, tenant_id, enrollment_id, certificate_number, issued_at)
+  INSERT INTO certificates (id, user_id, tenant_id, enrollment_id, course_id, certificate_number, issued_at)
   VALUES (
     'cccc3333-0000-0000-0000-000000000003',
-    v_admin_a, v_tenant_a, v_enrollment_a, 'TEST-CERT-A', now()
+    v_admin_a, v_tenant_a, v_enrollment_a, v_course_a, 'TEST-CERT-A', now()
   ) ON CONFLICT (id) DO NOTHING;
   v_cert_a := 'cccc3333-0000-0000-0000-000000000003';
 
   -- Create test certificate in Tenant B
-  INSERT INTO certificates (id, user_id, tenant_id, enrollment_id, certificate_number, issued_at)
+  INSERT INTO certificates (id, user_id, tenant_id, enrollment_id, course_id, certificate_number, issued_at)
   VALUES (
     'dddd4444-0000-0000-0000-000000000004',
-    v_user_b, v_tenant_b, v_enrollment_b, 'TEST-CERT-B', now()
+    v_user_b, v_tenant_b, v_enrollment_b, v_course_b, 'TEST-CERT-B', now()
   ) ON CONFLICT (id) DO NOTHING;
   v_cert_b := 'dddd4444-0000-0000-0000-000000000004';
 
@@ -78,7 +91,7 @@ BEGIN
     'eeee5555-0000-0000-0000-000000000005',
     v_admin_a, v_tenant_a, v_enrollment_a,
     '00000000-0000-0000-0000-000000000001',
-    '00000000-0000-0000-0000-000000000002'
+    v_course_a
   ) ON CONFLICT (id) DO NOTHING;
 
   INSERT INTO lesson_progress (id, user_id, tenant_id, enrollment_id, lesson_id, course_id)
@@ -86,7 +99,7 @@ BEGIN
     'ffff6666-0000-0000-0000-000000000006',
     v_user_b, v_tenant_b, v_enrollment_b,
     '00000000-0000-0000-0000-000000000003',
-    '00000000-0000-0000-0000-000000000004'
+    v_course_b
   ) ON CONFLICT (id) DO NOTHING;
 
   -- ============================================================
@@ -94,9 +107,9 @@ BEGIN
   -- ============================================================
 
   -- Simulate Tenant A admin
+  -- Simulate via JWT claims only (role switch blocked in SECURITY DEFINER)
   PERFORM set_config('request.jwt.claims',
     json_build_object('sub', v_admin_a::text)::text, true);
-  PERFORM set_config('role', 'authenticated', true);
 
   test_name := 'get_current_tenant_id() for Tenant A admin';
   IF public.get_current_tenant_id() = v_tenant_a THEN
@@ -288,6 +301,7 @@ BEGIN
     'aaaa1111-0000-0000-0000-000000000001',
     'bbbb2222-0000-0000-0000-000000000002'
   );
+  DELETE FROM training_courses WHERE id IN (v_course_a, v_course_b);
   -- Keep the Tenant B profile for future tests
 
   RETURN;

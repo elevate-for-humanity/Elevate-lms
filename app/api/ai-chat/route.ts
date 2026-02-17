@@ -39,9 +39,9 @@ What would you like to know more about?`;
 3. Upload required documents (ID, proof of income)
 4. Schedule your orientation
 
-Training is 100% FREE for eligible participants! Call (317) 314-3757 if you need help.`;
+Training may be available at no cost for eligible participants. Call (317) 314-3757 if you need help.`;
       } else if (userMessage.includes('program') || userMessage.includes('course') || userMessage.includes('training')) {
-        fallbackReply = `We offer FREE training in:
+        fallbackReply = `We offer funded training in:
 
 **Healthcare:** CNA, Phlebotomy, Medical Assistant
 **Skilled Trades:** HVAC, Electrical, CDL Truck Driving
@@ -50,7 +50,7 @@ Training is 100% FREE for eligible participants! Call (317) 314-3757 if you need
 
 All programs include job placement assistance! Visit elevateforhumanity.org/programs for details.`;
       } else if (userMessage.includes('free') || userMessage.includes('cost') || userMessage.includes('pay') || userMessage.includes('money')) {
-        fallbackReply = `Yes! Training is **100% FREE** for eligible participants through:
+        fallbackReply = `Many programs are available at no cost to eligible participants through:
 
 • **WIOA** - For low-income individuals
 • **JRI** - For justice-involved individuals  
@@ -58,7 +58,7 @@ All programs include job placement assistance! Visit elevateforhumanity.org/prog
 
 Check your eligibility at elevateforhumanity.org/wioa-eligibility or call (317) 314-3757.`;
       } else if (userMessage.includes('eligib') || userMessage.includes('qualify')) {
-        fallbackReply = `To qualify for FREE training, you generally need to be:
+        fallbackReply = `To qualify for funded training, you generally need to be:
 
 ✓ Indiana resident
 ✓ 18+ years old

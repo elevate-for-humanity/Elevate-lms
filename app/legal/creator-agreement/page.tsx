@@ -239,10 +239,10 @@ export default function CreatorAgreementPage() {
             <p>
               For questions about this Creator Agreement, contact us at{' '}
               <a
-                href="mailto:info@elevateforhumanity.org"
+                href="/contact"
                 className="text-brand-blue-600 hover:underline"
               >
-                info@elevateforhumanity.org
+                our contact form
               </a>
             </p>
           </section>

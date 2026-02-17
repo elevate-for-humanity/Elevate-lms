@@ -232,7 +232,7 @@ export default function StorePaymentsPage() {
           
           <h3 className="text-lg font-semibold mt-6 mb-3">6.2 Refund Process</h3>
           <ol className="list-decimal pl-6 space-y-2 text-gray-700 mb-4">
-            <li>Request via info@elevateforhumanity.org within policy window</li>
+            <li>Request via our contact form within policy window</li>
             <li>Include order number and reason for refund</li>
             <li>Review completed within 3 business days</li>
             <li>Approved refunds processed within 5-10 business days</li>

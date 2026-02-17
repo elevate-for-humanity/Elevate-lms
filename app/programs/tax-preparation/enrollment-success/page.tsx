@@ -140,10 +140,10 @@ export default function EnrollmentSuccessPage() {
           </a>{' '}
           or email{' '}
           <a
-            href="mailto:info@elevateforhumanity.org"
+            href="/contact"
             className="text-brand-green-600 hover:underline"
           >
-            info@elevateforhumanity.org
+            our contact form
           </a>
         </p>
       </div>

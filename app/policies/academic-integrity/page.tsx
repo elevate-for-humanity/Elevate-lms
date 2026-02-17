@@ -118,7 +118,7 @@ export default function AcademicIntegrityPage() {
               Students, instructors, and staff who suspect academic integrity violations should report them promptly:
             </p>
             <ul className="list-disc pl-6 mb-6 text-black space-y-2">
-              <li>Email: info@elevateforhumanity.org</li>
+              <li>Email: <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a></li>
               <li>Phone: (317) 314-3757</li>
               <li>In-person: Visit the Academic Affairs office</li>
               <li>Anonymous reporting available through student portal</li>
@@ -156,7 +156,7 @@ export default function AcademicIntegrityPage() {
               For questions about this policy or specific situations:
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
-              <li><strong>Email:</strong> info@elevateforhumanity.org</li>
+              <li><strong>Email:</strong> <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a></li>
               <li><strong>Phone:</strong> (317) 314-3757</li>
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>
             </ul>

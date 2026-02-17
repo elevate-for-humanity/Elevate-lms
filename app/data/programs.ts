@@ -391,7 +391,7 @@ export const programs: Program[] = [
       'Registered Apprenticeship Program',
     ],
     fundingOptions: [
-      '100% FREE through WIOA',
+      'No cost for eligible WIOA participants',
       'Workforce Ready Grant',
       'Employer-sponsored apprenticeship',
     ],
@@ -471,7 +471,7 @@ export const programs: Program[] = [
       'CIP Code: 13.1319',
     ],
     fundingOptions: [
-      '100% FREE through WIOA',
+      'No cost for eligible WIOA participants',
       'Workforce Ready Grant',
       'Self-Pay: $4,730',
     ],
@@ -549,7 +549,7 @@ export const programs: Program[] = [
       'Rise Forward Partnership',
     ],
     fundingOptions: [
-      '100% FREE through WIOA',
+      'No cost for eligible WIOA participants',
       'Workforce Ready Grant',
       'Self-Pay: $4,550',
       'Includes business match stipend and laptop kit',
@@ -629,7 +629,7 @@ export const programs: Program[] = [
       'Registered Apprenticeship Program',
     ],
     fundingOptions: [
-      '100% FREE through WIOA',
+      'No cost for eligible WIOA participants',
       'Workforce Ready Grant',
       'Self-Pay: $4,950',
     ],
@@ -712,7 +712,7 @@ export const programs: Program[] = [
       'Non-Licensure Certificate Program',
     ],
     fundingOptions: [
-      '100% FREE through WIOA',
+      'No cost for eligible WIOA participants',
       'Workforce Ready Grant',
       'Self-Pay: $4,575',
     ],
@@ -802,7 +802,7 @@ export const programs: Program[] = [
       'CIP Code: 43.0112',
     ],
     fundingOptions: [
-      '100% FREE through WIOA',
+      'No cost for eligible WIOA participants',
       'Workforce Ready Grant',
       'SNAP Support',
       'Public Assistance Programs',
@@ -897,7 +897,7 @@ export const programs: Program[] = [
       'CIP Code: 52.0302',
     ],
     fundingOptions: [
-      '100% FREE through WIOA',
+      'No cost for eligible WIOA participants',
       'Workforce Ready Grant',
       'Self-Pay: $4,750',
     ],
@@ -987,7 +987,7 @@ export const programs: Program[] = [
       'NHA Approved Training Program',
     ],
     fundingOptions: [
-      '100% FREE through WIOA',
+      'No cost for eligible WIOA participants',
       'Workforce Ready Grant',
       'Self-Pay: $2,800',
       'Payment plans available',

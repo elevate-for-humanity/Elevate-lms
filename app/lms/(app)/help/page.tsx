@@ -155,13 +155,13 @@ export default async function HelpPage() {
                 <div className="text-gray-600">Get Help Online</div>
               </div>
             </a>
-            <a href="mailto:support@elevateforhumanity.org" className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
+            <a href="/contact" className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">
               <div className="w-12 h-12 bg-brand-blue-100 rounded-xl flex items-center justify-center">
                 <Mail className="w-6 h-6 text-brand-blue-600" />
               </div>
               <div>
                 <div className="font-semibold text-gray-900">Email Support</div>
-                <div className="text-gray-600">support@elevateforhumanity.org</div>
+                <div className="text-gray-600">Contact Us</div>
               </div>
             </a>
             <Link href="/lms/messages/new" className="flex items-center gap-4 p-4 rounded-xl hover:bg-gray-50 transition-colors">

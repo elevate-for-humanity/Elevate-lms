@@ -209,7 +209,7 @@ export default function ApplyFormClient() {
             Start Your Application
           </h1>
           <p className="text-base md:text-lg text-black mb-6">
-            Tell us about your goals and we'll match you with the right training program. No phone call needed — complete everything online and get a response within 24 hours for
+            Tell us about your goals and we'll match you with the right training program. Complete everything online and get a response within 24 hours for
             you.
           </p>
           <p className="text-lg text-black mb-6">
@@ -452,7 +452,7 @@ export default function ApplyFormClient() {
                 <p className="text-sm text-black">
                   This will open your email client to send to:{' '}
                   <span className="font-semibold">
-                    info@elevateforhumanity.org
+                    our contact form
                   </span>
                 </p>
                 <p className="text-xs text-slate-500">

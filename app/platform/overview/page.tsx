@@ -933,7 +933,7 @@ export default async function PlatformLicensingPage() {
             (317) 314-3757
             <span className="mx-3">|</span>
             <Mail className="inline w-4 h-4 mr-2" />
-            info@elevateforhumanity.org
+            our contact form
           </p>
         </div>
       </section>

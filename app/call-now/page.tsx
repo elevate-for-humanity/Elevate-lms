@@ -5,7 +5,7 @@ import { ArrowRight, MessageSquare, FileText, HelpCircle, Briefcase, GraduationC
 
 export const metadata: Metadata = {
   title: 'Get Started | Elevate For Humanity',
-  description: 'Get immediate help with enrollment, programs, funding, and support — all self-service, no phone call needed.',
+  description: 'Get immediate help with enrollment, programs, funding, and support — all self-service, start everything online.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/call-now',
   },
@@ -24,7 +24,7 @@ export default function GetStartedPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <MessageSquare className="w-16 h-16 mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold mb-6">How Can We Help?</h1>
-          <p className="text-xl text-brand-blue-100 mb-8">Everything you need is available online — no phone call required. Choose what you need below.</p>
+          <p className="text-xl text-brand-blue-100 mb-8">Everything you need is available online — Choose what you need below.</p>
         </div>
       </section>
 

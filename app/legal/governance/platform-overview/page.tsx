@@ -148,7 +148,7 @@ export default function PlatformOverviewPage() {
               <p className="text-gray-700 mb-3"><strong>Function:</strong> Tax preparation services and optional refund advance products.</p>
               <p className="text-gray-700 mb-3"><strong>Primary Users:</strong> Tax clients (students and community members).</p>
               <p className="text-gray-700 mb-3"><strong>Key Capabilities:</strong> Tax intake, document collection, return preparation, e-filing, refund tracking, optional refund advance application.</p>
-              <p className="text-gray-700"><strong>Legal Entity:</strong> Operated by Supersonic Fast Cash LLC, a separate legal entity. See Tax Preparation and Refund Advance Operations document for complete details.</p>
+              <p className="text-gray-700"><strong>Legal Entity:</strong> Operated under the Supersonic Fast Cash trade name of 2Exclusive LLC-S. See Tax Preparation and Refund Advance Operations document for complete details.</p>
             </div>
           </div>
         </section>
@@ -383,7 +383,7 @@ export default function PlatformOverviewPage() {
           <p><strong>Document ID:</strong> EFH-GOV-001</p>
           <p><strong>Classification:</strong> Internal / Shareable upon request</p>
           <p><strong>Owner:</strong> Executive Leadership, Elevate For Humanity</p>
-          <p><strong>Contact:</strong> info@elevateforhumanity.org</p>
+          <p><strong>Contact:</strong> our contact form</p>
           <p className="mt-4">© 2025 Elevate For Humanity. All rights reserved.</p>
         </footer>
       </div>

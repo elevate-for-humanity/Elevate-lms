@@ -466,7 +466,7 @@ export default async function ProgramHolderLicensePage() {
             Apply Now →
           </Link>
           <p className="mt-6 text-white/80 text-sm">
-            Questions? Email us at info@elevateforhumanity.org or call (317)
+            Questions? Email us at our contact form or call (317)
             314-3757
           </p>
         </div>

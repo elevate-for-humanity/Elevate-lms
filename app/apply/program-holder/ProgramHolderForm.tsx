@@ -41,7 +41,7 @@ export default function ProgramHolderForm() {
         `Email: ${data.email}\nPhone: ${data.phone}\n` +
         `Programs Offered: ${data.programsOffered || 'N/A'}\nGoals: ${data.partnershipGoals || 'N/A'}\n`
       );
-      window.location.href = `mailto:info@elevateforhumanity.org?subject=${subject}&body=${body}`;
+      window.location.href = "/contact";
       setLoading(false);
     }
   }

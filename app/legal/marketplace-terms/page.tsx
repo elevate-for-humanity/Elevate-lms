@@ -101,10 +101,10 @@ export default function MarketplaceTermsPage() {
               Refund requests must be submitted within 7 days of purchase.
               Contact{' '}
               <a
-                href="mailto:info@elevateforhumanity.org"
+                href="/contact"
                 className="text-brand-blue-600 hover:underline"
               >
-                info@elevateforhumanity.org
+                our contact form
               </a>{' '}
               with your order details.
             </p>
@@ -248,10 +248,10 @@ export default function MarketplaceTermsPage() {
             <p className="mt-2">
               <strong>Email:</strong>{' '}
               <a
-                href="mailto:info@elevateforhumanity.org"
+                href="/contact"
                 className="text-brand-blue-600 hover:underline"
               >
-                info@elevateforhumanity.org
+                our contact form
               </a>
             </p>
           </section>

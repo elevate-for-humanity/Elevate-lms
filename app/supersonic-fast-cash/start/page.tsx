@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Start Your Tax Return | Supersonic Fast Cash LLC',
+  title: 'Start Your Tax Return | Supersonic Fast Cash',
   description: 'Begin your tax preparation. Choose how you want to file - online, in-person, or with document upload.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/supersonic-fast-cash/start',

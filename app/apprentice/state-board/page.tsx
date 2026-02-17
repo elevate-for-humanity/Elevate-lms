@@ -365,7 +365,7 @@ export default async function StateBoardExamPage() {
               Call: 317-314-3757
             </a>
             <a
-              href="mailto:info@elevateforhumanity.org"
+              href="/contact"
               className="px-4 py-2 bg-brand-blue-100 text-brand-blue-700 rounded-lg font-medium hover:bg-brand-blue-200"
             >
               Email Support

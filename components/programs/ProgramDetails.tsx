@@ -78,7 +78,7 @@ export function ProgramDetails({ program }: { program: Program }) {
             </div>
 
             <p className="text-xs text-slate-500 italic">
-              *100% free for most students
+              *No cost for most eligible students
             </p>
 
             {isBarberProgram && (

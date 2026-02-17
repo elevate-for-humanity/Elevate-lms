@@ -318,7 +318,7 @@ d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               Apply Now
             </Link>
             <a
-              href="mailto:info@elevateforhumanity.org"
+              href="/contact"
               className="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white/10 transition text-lg"
             >
               Email an Advisor

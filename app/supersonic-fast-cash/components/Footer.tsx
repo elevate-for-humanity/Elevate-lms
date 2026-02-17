@@ -94,9 +94,9 @@ export function SupersonicFooter() {
         {/* Global Disclosure - REQUIRED */}
         <div className="border-t border-gray-800 mt-10 pt-6">
           <p className="text-gray-500 text-xs leading-relaxed max-w-4xl">
-            Supersonic Fast Cash LLC provides tax preparation services. Refund advance options, when available, 
-            are based on an individual's expected tax refund and eligibility requirements. Refund advances are 
-            optional and are repaid from the taxpayer's refund. Supersonic Fast Cash LLC does not provide loans 
+            Supersonic Fast Cash is a trade name of 2Exclusive LLC-S. Tax preparation services are provided by licensed preparers. 
+            Refund advance options, when available, are based on an individual&apos;s expected tax refund and eligibility requirements. 
+            Refund advances are optional and are repaid from the taxpayer&apos;s refund. Supersonic Fast Cash does not provide loans 
             or guarantee refund amounts.
           </p>
         </div>
@@ -104,7 +104,7 @@ export function SupersonicFooter() {
         {/* Copyright */}
         <div className="border-t border-gray-800 mt-6 pt-6 text-center">
           <p className="text-gray-500 text-sm">
-            © {new Date().getFullYear()} Supersonic Fast Cash LLC. All rights reserved.
+            © {new Date().getFullYear()} 2Exclusive LLC-S (d/b/a Supersonic Fast Cash). All rights reserved.
           </p>
         </div>
       </div>

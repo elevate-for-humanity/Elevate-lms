@@ -56,7 +56,7 @@ export default function ContactClient() {
       description:
         'Have a question? Get in touch with our team for any other inquiries.',
       image: '/images/facilities-new/facility-1.jpg',
-      href: 'mailto:info@elevateforhumanity.org',
+      href: '/contact#contact-form',
       icon: '✉️',
       color: ' ',
     },
@@ -178,14 +178,14 @@ export default function ContactClient() {
                 Send us an email
               </h2>
               <p className="text-black mb-6 leading-relaxed">
-                Have a detailed question? Email us and we'll respond within 24
+                Have a detailed question? Fill out our contact form and we&apos;ll respond within 24
                 hours with the information you need.
               </p>
               <a
-                href="mailto:info@elevateforhumanity.org"
+                href="/contact#contact-form"
                 className="inline-flex items-center justify-center bg-zinc-900   text-white px-8 py-4 rounded-2xl font-bold text-lg hover:shadow-xl hover:scale-105 transition-all"
               >
-                Email Us
+                Contact Us
               </a>
             </div>
           </div>

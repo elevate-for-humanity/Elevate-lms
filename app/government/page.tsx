@@ -526,11 +526,11 @@ export default async function GovernmentPage() {
               Get Help Online
             </a>
             <a
-              href="mailto:info@elevateforhumanity.org"
+              href="/contact"
               className="inline-flex items-center justify-center px-8 py-4 bg-brand-blue-700 text-white rounded-lg font-bold hover:bg-brand-blue-800 transition-colors border-2 border-white/30"
             >
               <Mail className="w-5 h-5 mr-2" />
-              info@elevateforhumanity.org
+              our contact form
             </a>
           </div>
         </div>

@@ -75,9 +75,13 @@ export default async function ParentPortalPage() {
               <br />
               <span className="text-pink-300">Stay Connected</span>
             </h1>
-            <p className="text-2xl md:text-3xl text-white/90 mb-8 leading-relaxed font-medium">
-              Monitor your student's progress, attendance, and grades.
+            <p className="text-2xl md:text-3xl text-white/90 mb-4 leading-relaxed font-medium">
+              Monitor your student&apos;s progress, attendance, and grades.
               Communicate with instructors and stay informed.
+            </p>
+            <p className="text-sm text-white/70 mb-8">
+              Available for parents and guardians of minor students enrolled in apprenticeship programs. 
+              Contact your student&apos;s program coordinator for access credentials.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link

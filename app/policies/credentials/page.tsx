@@ -230,7 +230,7 @@ export default function CredentialsPage() {
               <li>Download verification report if needed</li>
             </ol>
             <p className="text-black mb-6">
-              Or contact our registrar office at info@elevateforhumanity.org or (317) 314-3757.
+              Or contact our registrar office at our contact form or (317) 314-3757.
             </p>
 
             <h3 className="text-xl font-bold text-black mt-6 mb-3">Verification Information Provided</h3>
@@ -327,7 +327,7 @@ export default function CredentialsPage() {
               For credential questions or services:
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
-              <li><strong>Email:</strong> info@elevateforhumanity.org</li>
+              <li><strong>Email:</strong> <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a></li>
               <li><strong>Phone:</strong> (317) 314-3757</li>
               <li><strong>Verification Portal:</strong> www.elevateforhumanity.org/verify</li>
               <li><strong>Office Hours:</strong> Monday-Friday, 9:00 AM - 5:00 PM EST</li>

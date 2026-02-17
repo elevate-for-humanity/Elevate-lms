@@ -192,7 +192,7 @@ export default function SecurityStatementPage() {
           </table>
           
           <h3 className="text-lg font-semibold mt-6 mb-3">5.1 Deletion Requests</h3>
-          <p className="text-gray-700">Users may request data deletion by contacting info@elevateforhumanity.org. Requests are processed within 30 days. Some data may be retained for legal compliance (tax records, financial transactions).</p>
+          <p className="text-gray-700">Users may request data deletion by contacting our contact form. Requests are processed within 30 days. Some data may be retained for legal compliance (tax records, financial transactions).</p>
         </section>
 
         <section id="incident" className="mb-12">
@@ -232,9 +232,9 @@ export default function SecurityStatementPage() {
         <section id="contact" className="mb-12">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">8. Contact & Reporting</h2>
           <div className="bg-gray-50 rounded-lg p-6">
-            <p className="mb-2"><strong>Security Issues:</strong> info@elevateforhumanity.org</p>
-            <p className="mb-2"><strong>Privacy Requests:</strong> info@elevateforhumanity.org</p>
-            <p className="mb-2"><strong>Data Protection Officer:</strong> info@elevateforhumanity.org</p>
+            <p className="mb-2"><strong>Security Issues:</strong> our contact form</p>
+            <p className="mb-2"><strong>Privacy Requests:</strong> our contact form</p>
+            <p className="mb-2"><strong>Data Protection Officer:</strong> our contact form</p>
             <p><strong>Phone:</strong> 317-314-3757</p>
           </div>
         </section>

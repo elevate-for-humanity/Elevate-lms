@@ -34,7 +34,7 @@ export default function PayPage() {
             • Check Free Funding First!
           </h2>
           <p className="text-black mb-4">
-            Most students qualify for 100% FREE training through WIOA, WRG, or JRI.
+            Many students qualify for no-cost training through WIOA, WRG, or JRI.
           </p>
           <Link
             href="/apply"

@@ -32,7 +32,7 @@ export default async function SchedulePage() {
           <p className="text-gray-600 mb-8">Book a meeting with an advisor or counselor. Available Monday–Friday, 9 AM – 5 PM EST.</p>
           <div className="bg-white rounded-xl border p-8 text-center">
             <h2 className="text-xl font-bold mb-4">Sign in to schedule your appointment</h2>
-            <p className="text-gray-600 mb-6">Create a free account or sign in to book a time with one of our advisors. No phone call needed — pick a time that works for you.</p>
+            <p className="text-gray-600 mb-6">Create a free account or sign in to book a time with one of our advisors. Pick a time that works for you.</p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/login?redirect=/student-support/schedule" className="bg-brand-blue-600 text-white font-bold px-8 py-3 rounded-lg hover:bg-brand-blue-700 transition">Sign In</Link>
               <Link href="/signup" className="border-2 border-brand-blue-600 text-brand-blue-600 font-bold px-8 py-3 rounded-lg hover:bg-brand-blue-50 transition">Create Free Account</Link>

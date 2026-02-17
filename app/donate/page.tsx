@@ -102,7 +102,7 @@ export default async function DonatePage() {
             Transform Lives Through Career Training
           </h1>
           <p className="text-xl text-teal-100 max-w-3xl mx-auto mb-8">
-            Your donation provides 100% FREE career training, certifications, and job placement 
+            Your donation provides Career training at no cost to eligible participants, certifications, and job placement 
             for individuals facing barriers to employment.
           </p>
         </div>

@@ -171,10 +171,10 @@ export default function SupersonicGovernancePage() {
         <section className="mb-12 bg-amber-50 rounded-xl p-6 border border-amber-200">
           <div className="flex items-center gap-3 mb-4">
             <Building2 className="w-6 h-6 text-amber-700" />
-            <h2 className="text-xl font-bold text-slate-900">Application to Supersonic Fast Cash LLC</h2>
+            <h2 className="text-xl font-bold text-slate-900">Application to Supersonic Fast Cash Tax Services</h2>
           </div>
           <p className="text-slate-700 mb-4">
-            This governance framework applies to all Supersonic Fast Cash LLC services:
+            This governance framework applies to all Supersonic Fast Cash services (operated under 2Exclusive LLC-S):
           </p>
           <ul className="space-y-2 text-slate-700">
             <li>• Tax preparation services</li>

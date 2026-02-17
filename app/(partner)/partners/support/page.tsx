@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 const supportChannels = [
   { icon: Phone, title: 'Partner Support', description: 'Submit a support request and get a response within 24 hours', detail: 'Online Support Portal', href: '/support', cta: 'Get Help' },
-  { icon: Mail, title: 'Email Support', description: 'Send us a detailed message', detail: 'info@elevateforhumanity.org', href: 'mailto:info@elevateforhumanity.org', cta: 'Send Email' },
+  { icon: Mail, title: 'Email Support', description: 'Send us a detailed message', detail: 'Use our contact form', href: '/contact', cta: 'Contact Us' },
   { icon: MessageSquare, title: 'Live Chat', description: 'Chat with support during business hours', detail: 'Mon-Fri 9am-5pm EST', href: '/support/chat', cta: 'Start Chat' },
   { icon: FileText, title: 'Help Center', description: 'Browse guides and documentation', detail: 'Self-service knowledge base', href: '/docs', cta: 'View Docs' },
 ];
@@ -22,7 +22,7 @@ const commonIssues = [
   { title: 'Student data not loading', solution: 'This is usually an RLS policy mismatch or the user is not assigned to a shop. Contact support with the student ID.' },
   { title: 'Cannot access reports', solution: 'Ensure your account has the correct role permissions. Check Settings > Permissions or contact your admin.' },
   { title: 'Attendance not syncing', solution: 'Verify the student is enrolled in an active program. Try refreshing the page or clearing your browser cache.' },
-  { title: 'Payment or funding questions', solution: 'Contact the financial aid team at info@elevateforhumanity.org for funding reconciliation issues.' },
+  { title: 'Payment or funding questions', solution: 'Contact the financial aid team through our contact form for funding reconciliation issues.' },
 ];
 
 export default function PartnerSupportPage() {

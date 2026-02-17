@@ -45,7 +45,7 @@ export default function BrandingAddendumPage() {
               <li>Press releases</li>
             </ul>
             <h2>4. Approval Process</h2>
-            <p>Submit all materials to info@elevateforhumanity.org for review. Approval or revision requests will be provided within 5 business days.</p>
+            <p>Submit all materials to our contact form for review. Approval or revision requests will be provided within 5 business days.</p>
             <h2>5. Term</h2>
             <p>This addendum remains in effect for the duration of the master agreement unless terminated earlier by either party with 30 days written notice.</p>
           </div>

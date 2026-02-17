@@ -261,7 +261,7 @@ export default function FederalCompliancePage() {
               If you have questions about our compliance policies or wish to file a complaint, please contact us:
             </p>
             <div className="space-y-2 text-brand-blue-900">
-              <p><strong>Email:</strong> info@elevateforhumanity.org</p>
+              <p><strong>Email:</strong> our contact form</p>
               <p><strong>Phone:</strong> Get Help Online</p>
               <p><strong>Address:</strong> Indianapolis, IN</p>
             </div>

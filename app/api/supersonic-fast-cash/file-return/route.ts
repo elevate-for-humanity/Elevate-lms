@@ -236,7 +236,7 @@ export async function POST(request: NextRequest) {
 
                 <p>You can view your complete tax return in your <a href="${process.env.NEXT_PUBLIC_SITE_URL}/supersonic-fast-cash/portal">client portal</a>.</p>
 
-                <p>Questions? Reply to this email or call us at (317) (317) 314-3757.</p>
+                <p>Questions? Reply to this email or call us at (317) 314-3757.</p>
 
                 <p>Thank you for choosing SupersonicFastCash!</p>
               </div>

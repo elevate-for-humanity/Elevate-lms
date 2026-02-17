@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Support | Supersonic Fast Cash LLC',
+  title: 'Support | Supersonic Fast Cash',
   description: 'Get help with tax preparation, filing questions, and refund status. Contact our support team.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/supersonic-fast-cash/support',

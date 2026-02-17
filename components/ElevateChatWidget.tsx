@@ -74,7 +74,7 @@ export function ElevateChatWidget() {
               <ul className="text-xs text-black space-y-2 mb-4">
                 <li className="flex items-start gap-2">
                   <span className="text-brand-orange-500">•</span>
-                  <span>Finding 100% FREE training programs</span>
+                  <span>Finding no-cost training programs</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <span className="text-brand-orange-500">•</span>

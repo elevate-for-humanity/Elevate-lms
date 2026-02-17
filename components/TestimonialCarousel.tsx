@@ -33,7 +33,7 @@ const testimonials: Testimonial[] = [
   },
   {
     id: 3,
-    quote: "I was working minimum wage with no future. Now I'm a certified welder making $55,000 a year. The best part? It was 100% free through WIOA.",
+    quote: "I was working minimum wage with no future. Now I'm a certified welder making $55,000 a year. The best part? It was at no cost to me through WIOA.",
     name: "David Rodriguez",
     title: "Welding Graduate, 2024",
     rating: 5,

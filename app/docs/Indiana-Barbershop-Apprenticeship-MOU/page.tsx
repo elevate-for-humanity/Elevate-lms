@@ -191,7 +191,7 @@ export default function MOUPage() {
           <hr className="my-8" />
 
           <p className="text-sm text-gray-600 italic">This document is a template. The official MOU will be provided for electronic signature upon application approval.</p>
-          <p className="text-sm"><strong>Questions?</strong> Contact: info@elevateforhumanity.org | (317) 314-3757</p>
+          <p className="text-sm"><strong>Questions?</strong> Contact: our contact form | (317) 314-3757</p>
 
           <div className="mt-8 text-center text-sm text-gray-500">
             <p>Elevate for Humanity, Inc.</p>

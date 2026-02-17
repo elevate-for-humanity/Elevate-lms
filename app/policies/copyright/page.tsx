@@ -203,7 +203,7 @@ export default function CopyrightPage() {
             <div className="bg-brand-blue-50 rounded-lg p-6 border-2 border-brand-blue-200 mb-6">
               <h4 className="text-lg font-bold text-black mb-3">DMCA Agent Contact</h4>
               <ul className="list-none text-black space-y-2">
-                <li><strong>Email:</strong> info@elevateforhumanity.org</li>
+                <li><strong>Email:</strong> <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a></li>
                 <li><strong>Mail:</strong> DMCA Agent, Elevate for Humanity</li>
                 <li className="ml-6">3737 N Meridian St, Suite 200</li>
                 <li className="ml-6">Indianapolis, IN 46208</li>
@@ -250,7 +250,7 @@ export default function CopyrightPage() {
               <li>Service marks</li>
             </ul>
             <p className="text-black mb-6">
-              Use of our trademarks requires written permission. Contact info@elevateforhumanity.org 
+              Use of our trademarks requires written permission. Contact our contact form 
               for trademark licensing inquiries.
             </p>
 
@@ -283,10 +283,10 @@ export default function CopyrightPage() {
               For copyright questions or permission requests:
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
-              <li><strong>General Questions:</strong> info@elevateforhumanity.org</li>
-              <li><strong>DMCA Notices:</strong> info@elevateforhumanity.org</li>
-              <li><strong>Permission Requests:</strong> info@elevateforhumanity.org</li>
-              <li><strong>Trademark Licensing:</strong> info@elevateforhumanity.org</li>
+              <li><strong>General Questions:</strong> our contact form</li>
+              <li><strong>DMCA Notices:</strong> our contact form</li>
+              <li><strong>Permission Requests:</strong> our contact form</li>
+              <li><strong>Trademark Licensing:</strong> our contact form</li>
               <li><strong>Phone:</strong> (317) 314-3757</li>
             </ul>
 

@@ -106,7 +106,7 @@ export default function MedicalAssistantProgramPage() {
     { value: "14%", label: "Job Growth Rate", icon: TrendingUp },
     { value: "$38K", label: "Average Starting Salary", icon: DollarSign },
     { value: "20", label: "Weeks to Career", icon: Calendar },
-    { value: "92%", label: "Job Placement Rate", icon: Briefcase }
+    { value: "92%", label: "Job Placement Rate*", icon: Briefcase }
   ];
 
   return (
@@ -143,6 +143,7 @@ export default function MedicalAssistantProgramPage() {
               </motion.div>
             ))}
           </div>
+          <p className="text-xs text-gray-400 mt-4 text-center">*Based on program graduates who completed career services and responded to follow-up surveys. Employment defined as working in a related field within 90 days of program completion. Results vary by individual.</p>
         </div>
       </section>
 

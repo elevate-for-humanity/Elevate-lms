@@ -484,10 +484,10 @@ export default function FranchisePage() {
           <p className="mt-6 text-black">
             Email:{' '}
             <a
-              href="mailto:info@elevateforhumanity.org"
+              href="/contact"
               className="text-brand-orange-600 font-bold underline"
             >
-              info@elevateforhumanity.org
+              our contact form
             </a>
           </p>
         </div>

@@ -181,7 +181,7 @@ export default async function SupportPage() {
                 </svg>
               </summary>
               <div className="px-5 pb-5 text-gray-600">
-                For WIOA funding questions, contact your WorkOne case manager directly. For general funding questions, email us at info@elevateforhumanity.org or call Get Help Online.
+                For WIOA funding questions, contact your WorkOne case manager directly. For general funding questions, email us at our contact form or call Get Help Online.
               </div>
             </details>
             
@@ -210,7 +210,7 @@ export default async function SupportPage() {
             </div>
             <div className="text-white">
               <p className="text-sm text-slate-400">Email</p>
-              <a href="mailto:info@elevateforhumanity.org" className="text-lg font-semibold hover:text-brand-blue-400">info@elevateforhumanity.org</a>
+              <a href="/contact" className="text-lg font-semibold hover:text-brand-blue-400">Contact Us</a>
             </div>
           </div>
         </div>

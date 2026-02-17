@@ -132,7 +132,7 @@ export default function TaxServicesPage() {
                 />
                 <div className="absolute bottom-4 left-4">
                   <span className="bg-brand-green-500 text-white px-3 py-1 rounded-full text-sm font-bold">
-                    100% FREE
+                    FREE TAX PREP
                   </span>
                 </div>
               </div>

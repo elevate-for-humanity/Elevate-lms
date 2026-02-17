@@ -49,9 +49,9 @@ export default async function SupportPage() {
     {
       type: 'Email',
       icon: Mail,
-      value: 'info@elevateforhumanity.org',
+      value: 'our contact form',
       description: 'Response within 24 hours',
-      href: 'mailto:info@elevateforhumanity.org',
+      href: 'mailto:our contact form',
       color: 'blue',
     },
     {

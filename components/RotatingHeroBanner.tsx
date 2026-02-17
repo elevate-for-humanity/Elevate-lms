@@ -11,7 +11,7 @@ const slides = [
   {
     image: "/images/hero/admin-hero.jpg",
     title: "From Unemployed to Employed in 4-12 Weeks",
-    subtitle: "100% FREE Career Training Through Government Funding",
+    subtitle: "No-Cost Career Training for Eligible Participants",
     description: "CNA • HVAC • Barber • CDL • Medical Assistant • Building Tech",
     cta1: "Start Free Training",
     cta2: "Check Your Funding",
@@ -95,7 +95,7 @@ export default function RotatingHeroBanner() {
             {/* Animated Badge */}
             <div className="inline-flex items-center gap-2 rounded-full bg-brand-green-500 px-6 py-3 text-sm font-bold text-white mb-6 animate-pulse shadow-lg">
               <span className="text-lg">💯</span>
-              <span>100% FREE TRAINING - GOVERNMENT PAYS EVERYTHING</span>
+              <span>NO-COST TRAINING FOR ELIGIBLE PARTICIPANTS</span>
             </div>
 
             {/* Main Headline */}

@@ -37,8 +37,8 @@ export default function PoliciesLayout({
         <div className="max-w-4xl mx-auto px-4 py-8">
           <p className="text-sm text-black text-center">
             Questions about our policies? Contact us at{' '}
-            <a href="mailto:info@elevateforhumanity.org" className="text-brand-orange-600 hover:text-brand-orange-700">
-              info@elevateforhumanity.org
+            <a href="/contact" className="text-brand-orange-600 hover:text-brand-orange-700">
+              our contact form
             </a>
           </p>
         </div>

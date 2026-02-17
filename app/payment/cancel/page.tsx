@@ -57,7 +57,7 @@ export default async function PaymentCancelPage() {
             <ul className="text-left text-brand-blue-800 space-y-2">
               <li>
                 <DollarSign className="w-5 h-5 inline-block" /> Check if you
-                qualify for 100% FREE funding (WIOA, WRG, JRI)
+                qualify for funded training (WIOA, WRG, JRI)
               </li>
               <li>💳 Try a different payment method</li>
               <li>
@@ -94,10 +94,10 @@ export default async function PaymentCancelPage() {
               </a>{' '}
               or{' '}
               <a
-                href="mailto:info@elevateforhumanity.org"
+                href="/contact"
                 className="text-brand-orange-600 hover:underline"
               >
-                info@elevateforhumanity.org
+                our contact form
               </a>
             </p>
           </div>

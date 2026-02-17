@@ -108,7 +108,7 @@ export default function FERPAPage() {
       </p>
       <p>
         <strong>Registrar's Office</strong><br />
-        Email: info@elevateforhumanity.org<br />
+        Email: <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a><br />
         Phone: (317) 314-3757
       </p>
 

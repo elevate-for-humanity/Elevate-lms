@@ -178,7 +178,7 @@ export default function SLAPage() {
 
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">How to Request a Service Credit</h2>
         <ol className="list-decimal pl-6 mb-6 text-black space-y-2">
-          <li>Email <strong>info@elevateforhumanity.org</strong> within 30 days of the incident</li>
+          <li>Email <strong>Contact Us</strong> within 30 days of the incident</li>
           <li>Include your organization name and account details</li>
           <li>Describe the downtime period (dates and times)</li>
           <li>We will verify the incident and apply credits within 30 days if eligible</li>
@@ -186,8 +186,8 @@ export default function SLAPage() {
 
         <h2 className="text-2xl font-bold text-black mt-8 mb-4">Contact</h2>
         <ul className="list-none mb-6 text-black space-y-2 p-0">
-          <li><strong>General Support:</strong> info@elevateforhumanity.org</li>
-          <li><strong>Billing Questions:</strong> info@elevateforhumanity.org</li>
+          <li><strong>General Support:</strong> our contact form</li>
+          <li><strong>Billing Questions:</strong> our contact form</li>
           <li><strong>Phone:</strong> (317) 314-3757</li>
         </ul>
 

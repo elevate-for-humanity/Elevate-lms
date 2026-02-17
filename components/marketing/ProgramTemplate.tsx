@@ -84,7 +84,7 @@ export function ProgramTemplate({ program }: ProgramTemplateProps) {
             <div className="max-w-3xl">
               <div className="inline-flex items-center gap-2 rounded-full bg-brand-orange-500 px-4 py-2 text-sm font-bold text-white mb-6">
                 <Award size={16} />
-                <span>100% FREE Training</span>
+                <span>No-Cost Training for Eligible Students</span>
               </div>
 
               <h1 className="text-5xl md:text-6xl font-light text-white mb-6 leading-tight">

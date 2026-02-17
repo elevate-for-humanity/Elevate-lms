@@ -133,13 +133,13 @@ export default async function ThankyouPage() {
               </div>
             </a>
             <a 
-              href="mailto:info@elevateforhumanity.org" 
+              href="/contact" 
               className="flex items-center gap-4 bg-gray-50 rounded-xl p-6 hover:bg-gray-100 transition"
             >
               <Mail className="w-8 h-8 text-brand-blue-600" />
               <div>
                 <div className="font-semibold">Email Us</div>
-                <div className="text-gray-600 text-sm">info@elevateforhumanity.org</div>
+                <div className="text-gray-600 text-sm">Contact Us</div>
               </div>
             </a>
             <Link 

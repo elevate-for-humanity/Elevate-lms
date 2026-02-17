@@ -76,10 +76,10 @@ export function ErrorBoundaryUI({
         <div className="text-sm text-gray-500">
           <p>If this problem persists, please contact support:</p>
           <a 
-            href="mailto:support@elevateforhumanity.org" 
+            href="/contact" 
             className="text-brand-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-brand-blue-500"
           >
-            support@elevateforhumanity.org
+            our contact form
           </a>
         </div>
       </div>

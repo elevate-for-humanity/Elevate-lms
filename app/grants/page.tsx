@@ -262,8 +262,8 @@ export default function GrantsPage() {
               Get Help Online
             </a>{' '}
             or email{' '}
-            <a href="mailto:info@elevateforhumanity.org" className="font-semibold text-brand-blue-600 hover:underline">
-              info@elevateforhumanity.org
+            <a href="/contact" className="font-semibold text-brand-blue-600 hover:underline">
+              our contact form
             </a>
           </p>
         </div>

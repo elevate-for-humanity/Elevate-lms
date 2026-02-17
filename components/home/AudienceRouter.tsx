@@ -26,8 +26,8 @@ const AUDIENCES = [
       { value: '85%', label: 'Job placement rate' },
     ],
     objections: [
-      { q: 'Is this actually free?', a: 'Yes. WIOA, WRG, and JRI cover tuition, books, and supplies for eligible students.' },
-      { q: 'Will I get hired?', a: '85% of graduates are employed within 90 days. We connect you directly with hiring employers.' },
+      { q: 'Is this actually free?', a: 'WIOA, WRG, and JRI can cover tuition, books, and supplies for eligible students. Eligibility varies by program.' },
+      { q: 'Will I get hired?', a: 'We connect graduates directly with hiring employers through our career services team. Employment outcomes vary by program and market conditions.' },
       { q: 'How fast can I start?', a: 'Most students begin training within 2–4 weeks of eligibility verification.' },
     ],
   },

@@ -224,7 +224,7 @@ export default function AcceptableUsePage() {
               Report suspected policy violations or security concerns:
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
-              <li><strong>Email:</strong> info@elevateforhumanity.org</li>
+              <li><strong>Email:</strong> <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a></li>
               <li><strong>Phone:</strong> (317) 314-3757</li>
               <li><strong>In-Person:</strong> IT Help Desk or Administrative Office</li>
               <li><strong>Anonymous:</strong> Use the online reporting form in student portal</li>
@@ -235,7 +235,7 @@ export default function AcceptableUsePage() {
               For technical assistance or questions about acceptable use:
             </p>
             <ul className="list-none mb-6 text-black space-y-2">
-              <li><strong>IT Help Desk:</strong> info@elevateforhumanity.org</li>
+              <li><strong>IT Help Desk:</strong> our contact form</li>
               <li><strong>Phone:</strong> (317) 314-3757 ext. 2</li>
               <li><strong>Hours:</strong> Monday-Friday, 8:00 AM - 6:00 PM EST</li>
               <li><strong>Location:</strong> Main Campus, Room 105</li>

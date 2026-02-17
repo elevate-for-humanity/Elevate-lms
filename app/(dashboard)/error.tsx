@@ -64,7 +64,7 @@ export default function DashboardError({
         <div className="mt-6 pt-6 border-t border-gray-200">
           <p className="text-sm text-black">
             Need help?{' '}
-            <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">
+            <a href="/contact" className="text-brand-blue-600 hover:underline">
               Contact Support
             </a>
           </p>

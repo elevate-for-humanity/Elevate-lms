@@ -169,8 +169,8 @@ export default async function AccreditationPage() {
               <div>
                 <h3 className="font-bold text-lg">Funding Eligibility</h3>
                 <p className="text-gray-600">
-                  Students can use WIOA, WRG, JRI, and other funding sources to pay for 
-                  training at no cost.
+                  Eligible students may use WIOA, WRG, JRI, and other funding sources to cover 
+                  training costs.
                 </p>
               </div>
             </div>

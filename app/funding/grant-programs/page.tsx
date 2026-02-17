@@ -207,7 +207,7 @@ export default function GrantProgramsPage() {
 
                   <div className="bg-brand-green-50 rounded p-3 mb-4">
                     <p className="text-sm font-semibold text-brand-green-900 mb-1">
-                      • 100% FREE with:
+                      • Available at no cost with:
                     </p>
                     <ul className="text-xs text-black space-y-1">
                       {program.fundingOptions.slice(0, 3).map((option, idx) => (

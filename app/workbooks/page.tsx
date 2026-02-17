@@ -238,10 +238,10 @@ export default function WorkbooksPage() {
           </p>
           <div className="flex flex-wrap gap-4">
             <a
-              href="mailto:info@elevateforhumanity.org"
+              href="/contact"
               className="text-brand-blue-600 hover:text-brand-blue-700 font-medium"
             >
-              info@elevateforhumanity.org
+              our contact form
             </a>
             <span className="text-slate-400">|</span>
             <a

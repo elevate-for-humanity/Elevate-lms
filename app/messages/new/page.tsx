@@ -17,11 +17,11 @@ export default function NewMessagePage() {
   const [error, setError] = useState('');
 
   const recipients = [
-    { id: '1', name: 'Career Services', email: 'info@elevateforhumanity.org' },
-    { id: '2', name: 'Financial Aid', email: 'info@elevateforhumanity.org' },
-    { id: '3', name: 'Admissions', email: 'info@elevateforhumanity.org' },
-    { id: '4', name: 'Student Support', email: 'info@elevateforhumanity.org' },
-    { id: '5', name: 'My Instructor', email: 'info@elevateforhumanity.org' },
+    { id: '1', name: 'Career Services', email: 'our contact form' },
+    { id: '2', name: 'Financial Aid', email: 'our contact form' },
+    { id: '3', name: 'Admissions', email: 'our contact form' },
+    { id: '4', name: 'Student Support', email: 'our contact form' },
+    { id: '5', name: 'My Instructor', email: 'our contact form' },
   ];
 
   const handleSubmit = async (e: React.FormEvent) => {

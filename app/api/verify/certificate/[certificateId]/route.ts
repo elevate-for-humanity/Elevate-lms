@@ -12,7 +12,7 @@ type Params = { params: Promise<{ certificateId: string }> };
 
 export async function GET(_req: NextRequest, { params }: Params) {
   try {
-    const rateLimited = await applyRateLimit(request, 'api');
+    const rateLimited = await applyRateLimit(_req, 'api');
     if (rateLimited) return rateLimited;
 
     const { certificateId } = await params;

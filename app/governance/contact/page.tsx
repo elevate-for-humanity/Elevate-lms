@@ -19,28 +19,28 @@ const contactCategories = [
   {
     title: 'General Governance Inquiries',
     icon: Building2,
-    email: 'info@elevateforhumanity.org',
+    email: 'our contact form',
     description: 'Questions about platform governance, authoritative documents, or operational controls.',
     responseTime: '2-3 business days',
   },
   {
     title: 'Security & Data Protection',
     icon: Shield,
-    email: 'info@elevateforhumanity.org',
+    email: 'our contact form',
     description: 'Security-related questions, data protection inquiries, or incident reports.',
     responseTime: '1-2 business days',
   },
   {
     title: 'Compliance & Legal',
     icon: Scale,
-    email: 'info@elevateforhumanity.org',
+    email: 'our contact form',
     description: 'Compliance questions, regulatory inquiries, or legal matters.',
     responseTime: '2-3 business days',
   },
   {
     title: 'Diligence Requests',
     icon: FileText,
-    email: 'info@elevateforhumanity.org',
+    email: 'our contact form',
     description: 'Requests for documentation, audits, or partner/buyer due diligence materials.',
     responseTime: '3-5 business days',
   },
@@ -151,11 +151,11 @@ export default function GovernanceContactPage() {
             If you need to report a security incident or vulnerability:
           </p>
           <a 
-            href="mailto:info@elevateforhumanity.org"
+            href="/contact"
             className="inline-flex items-center gap-2 px-4 py-2 bg-brand-red-600 text-white rounded-lg font-medium hover:bg-brand-red-700 transition-colors"
           >
             <Shield className="w-4 h-4" />
-            info@elevateforhumanity.org
+            our contact form
           </a>
           <p className="text-sm text-slate-600 mt-4">
             Security reports are prioritized and reviewed within 24 hours.

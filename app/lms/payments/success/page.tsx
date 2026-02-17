@@ -70,7 +70,7 @@ function SuccessContent() {
 
         <div className="mt-6 text-center text-sm text-gray-600">
           <p>Questions? Contact us at</p>
-          <p className="font-medium">info@elevateforhumanity.org</p>
+          <p className="font-medium">Contact Us</p>
         </div>
       </div>
     </div>

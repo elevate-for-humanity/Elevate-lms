@@ -21,7 +21,7 @@ export default function AdvancedVideoUploader() {
 
   const defaultVoiceoverText = `Transform your career with professional barber training.
 Join hundreds of students who have launched successful careers.
-100% free training with job placement guarantee.
+No-cost training with job placement assistance for eligible participants.
 Apply today and start your journey.`;
 
   const handleProcess = async () => {

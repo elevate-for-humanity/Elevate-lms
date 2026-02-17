@@ -183,7 +183,7 @@ export function OrganizationStructuredData() {
     alternateName: 'EFH',
     url: SITE_URL,
     logo: `${SITE_URL}/images/logo.png`,
-    description: '100% free career training in healthcare, skilled trades, and technology. Get trained, get hired, get paid.',
+    description: 'Career training in healthcare, skilled trades, and technology. Many programs available at no cost to eligible participants through WIOA and state funding.',
     address: {
       '@type': 'PostalAddress',
       streetAddress: '8888 Keystone Crossing Suite 1300',
@@ -193,7 +193,7 @@ export function OrganizationStructuredData() {
       addressCountry: 'US',
     },
     telephone: '+1-317-314-3757',
-    email: 'info@elevateforhumanity.org',
+    email: 'our contact form',
     sameAs: [
       'https://www.linkedin.com/company/elevate-for-humanity',
       'https://www.facebook.com/profile.php?id=61571046346179',

@@ -303,7 +303,7 @@ export default function LicensingPage() {
               {
                 icon: Zap,
                 title: 'Deployment Capability',
-                desc: 'Proven deployment pipeline on Netlify with Cloudflare CDN. Database on Supabase or self-managed PostgreSQL. Your infrastructure, your choice.',
+                desc: 'Proven deployment pipeline. Netlify + Cloudflare (our stack), Vercel, or self-hosted. Database on Supabase or self-managed PostgreSQL. Your infrastructure, your choice.',
               },
             ].map((item, i) => {
               const Icon = item.icon;
@@ -377,7 +377,7 @@ export default function LicensingPage() {
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
           </Link>
           <p className="mt-8 text-sm text-slate-500">
-            Or email directly: <a href="mailto:info@elevateforhumanity.org" className="underline hover:text-white/60">info@elevateforhumanity.org</a>
+            Or email directly: <a href="/contact" className="underline hover:text-white/60">Contact Us</a>
           </p>
         </div>
       </section>

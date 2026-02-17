@@ -6,7 +6,7 @@ import { ArrowRight, GraduationCap, Briefcase, DollarSign, Users, Monitor, Shiel
 
 export const metadata: Metadata = {
   title: 'Platform Features | Elevate for Humanity',
-  description: 'Self-service enrollment, funding verification, career services, and employer connections — all online. No phone calls needed.',
+  description: 'Self-service enrollment, funding verification, career services, and employer connections — all online. Start everything online.',
   alternates: { canonical: 'https://www.elevateforhumanity.org/features' },
 };
 

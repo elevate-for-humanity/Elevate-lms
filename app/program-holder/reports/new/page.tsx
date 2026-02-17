@@ -234,10 +234,10 @@ export default async function NewReportPage() {
                   <strong>Note:</strong> Report submission is currently handled
                   manually. Please contact support at{' '}
                   <a
-                    href="mailto:info@elevateforhumanity.org"
+                    href="/contact"
                     className="underline"
                   >
-                    info@elevateforhumanity.org
+                    our contact form
                   </a>{' '}
                   to submit your report.
                 </p>

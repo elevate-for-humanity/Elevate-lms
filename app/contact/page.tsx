@@ -12,7 +12,7 @@ import FeedbackWidget from '@/components/FeedbackWidget';
 
 const contactInfo = [
   { icon: Phone, title: 'Phone', value: 'Get Help Online', subtitle: 'Mon-Fri 8am-6pm EST', href: 'tel:support center' },
-  { icon: Mail, title: 'Email', value: 'info@elevateforhumanity.org', subtitle: 'We respond within 24 hours', href: 'mailto:info@elevateforhumanity.org' },
+  { icon: Mail, title: 'Email', value: 'Use the form below', subtitle: 'We respond within 24 hours', href: '#contact-form' },
   { icon: MapPin, title: 'Address', value: 'Indianapolis, IN', subtitle: 'Central Indiana', href: null },
   { icon: Clock, title: 'Hours', value: 'Mon-Fri 8am-6pm', subtitle: 'Sat 9am-1pm EST', href: null },
 ];
@@ -128,7 +128,7 @@ export default function ContactPage() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6">
+              <form id="contact-form" onSubmit={handleSubmit} className="space-y-6">
                 {formState === 'error' && (
                   <div className="bg-brand-red-50 border border-brand-red-200 rounded-lg p-4 flex items-start gap-3" role="alert">
                     <AlertCircle className="w-5 h-5 text-brand-red-500 flex-shrink-0 mt-0.5" />
@@ -281,7 +281,7 @@ export default function ContactPage() {
                   const endH = (parseInt(time.split(':')[0]) + 1).toString().padStart(2, '0');
                   const endDT = `${date.replace(/-/g, '')}T${endH}${time.split(':')[1]}00`;
                   const details = `Meeting with ${name} (${email})%0A%0ATopic: ${encodeURIComponent(topic || 'General inquiry')}%0A%0AZoom Link: ${ZOOM_MEETING_URL}`;
-                  const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Elevate for Humanity — Meeting')}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)},${encodeURIComponent('info@elevateforhumanity.org')}&location=Zoom`;
+                  const calUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('Elevate for Humanity — Meeting')}&dates=${startDT}/${endDT}&details=${details}&add=${encodeURIComponent(email)},${encodeURIComponent('elevate4humanityedu@gmail.com')}&location=Zoom`;
 
                   window.open(calUrl, '_blank');
                 }}
@@ -402,7 +402,7 @@ export default function ContactPage() {
       {/* Email Contact */}
       <div className="max-w-4xl mx-auto px-4 py-8 flex justify-center">
         <a
-          href="mailto:info@elevateforhumanity.org"
+          href="/contact"
           className="inline-flex items-center gap-2 bg-slate-900 text-white px-8 py-4 rounded-lg font-semibold hover:bg-slate-800 transition-colors"
         >
           <Mail className="w-5 h-5" />

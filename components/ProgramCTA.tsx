@@ -17,7 +17,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                 Ready to Start Your Career?
               </h2>
               <p className="text-xl mb-8 text-white">
-                Join {programName} and get 100% free training through WIOA funding. No tuition, no debt, just career opportunities.
+                Join {programName} and get training at no cost through WIOA funding for eligible participants. No tuition, no debt — just career opportunities.
               </p>
 
               {/* Highlights with Icons */}
@@ -79,7 +79,7 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
                   href="/support"
                   className="inline-block px-8 py-4 bg-transparent text-white font-bold rounded-full border-2 border-white hover:bg-white hover:text-brand-orange-700 transition-all text-center text-lg"
                 >
-                  Call 317-314-3757
+                  Get Help
                 </a>
               </div>
             </div>
@@ -240,17 +240,17 @@ export default function ProgramCTA({ programName = "this program" }: ProgramCTAP
 
           <div className="grid sm:grid-cols-3 gap-6 mb-8">
             <div className="bg-brand-blue-800 rounded-lg p-6">
-              <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">📞</div>
-              <h3 className="font-bold mb-2 text-white">Call Us</h3>
+              <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">💬</div>
+              <h3 className="font-bold mb-2 text-white">Get Support</h3>
               <a href="/support" className="text-white/90 hover:text-white">
-                317-314-3757
+                Visit Support Center
               </a>
             </div>
             <div className="bg-brand-blue-800 rounded-lg p-6">
               <div className="text-4xl mb-3 text-2xl md:text-3xl lg:text-4xl">✉️</div>
               <h3 className="font-bold mb-2 text-white">Email Us</h3>
-              <a href="mailto:info@elevateforhumanity.org" className="text-white/90 hover:text-white">
-                info@elevateforhumanity.org
+              <a href="/contact" className="text-white/90 hover:text-white">
+                our contact form
               </a>
             </div>
             <div className="bg-brand-blue-800 rounded-lg p-6">

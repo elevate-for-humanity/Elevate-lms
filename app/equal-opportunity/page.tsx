@@ -222,7 +222,7 @@ export default function EqualOpportunityPage() {
                 Contact our Equal Opportunity Officer:
               </p>
               <p className="text-gray-900">
-                Email: <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">info@elevateforhumanity.org</a>
+                Email: <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a>
               </p>
               <p className="text-gray-900">
                 Phone: <a href="/support" className="text-brand-blue-600 hover:underline">Visit Support Center</a>

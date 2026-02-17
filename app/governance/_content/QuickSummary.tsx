@@ -81,7 +81,7 @@ export function QuickSummary({
       {showSupersonicScope && (
         <div className="mt-4 pt-4 border-t border-emerald-200">
           <p className="text-xs text-slate-500">
-            This page applies to Supersonic Fast Cash LLC tax preparation and optional refund-based advance services.
+            This page applies to Supersonic Fast Cash tax preparation and optional refund-based advance services.
           </p>
         </div>
       )}

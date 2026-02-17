@@ -11,7 +11,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'How We Operate | Supersonic Fast Cash LLC',
+  title: 'How We Operate | Supersonic Fast Cash',
   description: 'Transparency about our tax preparation services, data protection, and how we operate.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/supersonic-fast-cash/transparency',
@@ -47,7 +47,7 @@ export default function TransparencyPage() {
               <h2 className="text-2xl font-semibold text-gray-900">What We Provide</h2>
             </div>
             <p className="text-gray-700 mb-4">
-              Supersonic Fast Cash LLC provides professional tax preparation services through 
+              Supersonic Fast Cash provides professional tax preparation services through 
               a guided, secure filing platform. Our primary service is helping individuals 
               prepare and file their tax returns accurately and efficiently.
             </p>

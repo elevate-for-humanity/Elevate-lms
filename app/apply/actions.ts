@@ -111,7 +111,7 @@ async function insertApplication(payload: {
 
     if (error) {
       console.error(`[Application] Insert failed for ${payload.email}:`, error.message);
-      return { success: false, error: 'Failed to save application. Please try again or email info@elevateforhumanity.org.' };
+      return { success: false, error: 'Failed to save application. Please try again or use our contact form at /contact.' };
     }
 
     // Application saved successfully
@@ -140,7 +140,7 @@ async function insertApplication(payload: {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          to: 'info@elevateforhumanity.org',
+          to: 'our contact form',
           subject: `New Application: ${payload.firstName} ${payload.lastName} [${referenceNumber}]`,
           html: [
             `<h3>New ${payload.source.replace(/-/g, ' ')} received</h3>`,

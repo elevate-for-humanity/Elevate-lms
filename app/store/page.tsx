@@ -13,12 +13,16 @@ export default function StorePage() {
   return (
     <div className="bg-white min-h-screen">
 
-      {/* ============ STUDENT REDIRECT NOTICE ============ */}
-      <div className="bg-brand-blue-50 border-b border-brand-blue-200 py-3 px-6 text-center text-sm text-brand-blue-800">
-        Looking for free career training? This page is for organizations licensing our platform.{' '}
-        <Link href="/programs" className="font-semibold underline hover:text-brand-blue-900">
-          Browse tuition-free training programs →
-        </Link>
+      {/* ============ STUDENT REDIRECT BANNER ============ */}
+      <div className="bg-brand-blue-50 border-b border-brand-blue-200">
+        <div className="max-w-7xl mx-auto px-6 py-3 flex flex-wrap items-center justify-between gap-2 text-sm">
+          <p className="text-brand-blue-800">
+            <strong>Looking for training?</strong> Student programs are tuition-free for eligible participants.
+          </p>
+          <Link href="/programs" className="text-brand-blue-700 font-semibold hover:underline flex items-center gap-1">
+            Browse Programs <ArrowRight className="w-3 h-3" />
+          </Link>
+        </div>
       </div>
 
       {/* ============ HERO — Video on the right, pitch on the left ============ */}

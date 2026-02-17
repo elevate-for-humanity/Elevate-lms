@@ -58,7 +58,7 @@ export default function ApplicationSuccessPage() {
                 Get Help Online
               </a>
               <a
-                href="mailto:info@elevateforhumanity.org"
+                href="/contact"
                 className="inline-flex items-center justify-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors text-sm"
               >
                 <Mail className="w-4 h-4" />

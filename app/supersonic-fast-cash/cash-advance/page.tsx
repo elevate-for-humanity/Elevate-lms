@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Tax Refund Cash Advance | Supersonic Fast Cash LLC',
+  title: 'Tax Refund Cash Advance | Supersonic Fast Cash',
   description: 'Learn about optional refund advances. Access a portion of your tax refund early through our banking partners.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/supersonic-fast-cash/cash-advance',

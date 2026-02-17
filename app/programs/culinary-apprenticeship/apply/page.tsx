@@ -155,7 +155,7 @@ export default function ApplyPage() {
           <p className="mb-2">Questions about the program?</p>
           <p className="text-lg">
             Call <a href="/support" className="text-brand-orange-400 font-bold hover:underline">Get Help Online</a> or email{' '}
-            <a href="mailto:info@elevateforhumanity.org" className="text-brand-orange-400 font-bold hover:underline">info@elevateforhumanity.org</a>
+            <a href="/contact" className="text-brand-orange-400 font-bold hover:underline">Contact Us</a>
           </p>
         </div>
 

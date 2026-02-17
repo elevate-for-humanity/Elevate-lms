@@ -16,10 +16,10 @@ export default function StructuredData() {
     },
     image: 'https://www.elevateforhumanity.org/images/heroes/hero-homepage.jpg',
     description:
-      '100% FREE career training in Indianapolis. WIOA-funded programs in HVAC, healthcare, barbering, and trades. No tuition, no debt. Job placement assistance.',
+      'Career training at no cost to eligible participants in Indianapolis. WIOA-funded programs in HVAC, healthcare, barbering, and trades. No tuition, no debt. Job placement assistance.',
     slogan: 'This Is Not Graduation. This Is Elevation.',
     telephone: '+1-317-314-3757',
-    email: 'info@elevateforhumanity.org',
+    email: 'our contact form',
     founder: {
       '@type': 'Person',
       name: 'Elizabeth Lene Greene',
@@ -46,7 +46,7 @@ export default function StructuredData() {
       '@type': 'ContactPoint',
       contactType: 'Customer Service',
       telephone: '+1-317-314-3757',
-      email: 'info@elevateforhumanity.org',
+      email: 'our contact form',
       availableLanguage: ['English', 'Spanish'],
     },
     sameAs: [

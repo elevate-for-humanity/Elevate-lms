@@ -70,10 +70,10 @@ export default function CareerServicesContactPage() {
               <h2 className="text-xl font-bold text-gray-900 mb-2">Email Us</h2>
               <p className="text-gray-600 mb-4">Get a response within 24 hours</p>
               <a
-                href="mailto:info@elevateforhumanity.org"
+                href="/contact"
                 className="text-lg font-bold text-brand-green-600 hover:text-brand-green-700 break-all"
               >
-                info@elevateforhumanity.org
+                our contact form
               </a>
               <p className="text-sm text-gray-500 mt-2">We respond within 1 business day</p>
             </div>

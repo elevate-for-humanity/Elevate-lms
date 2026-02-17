@@ -132,7 +132,7 @@ export default function FAQPage() {
             Call support center
           </a>
           <a
-            href="mailto:info@elevateforhumanity.org"
+            href="/contact"
             className="px-6 py-3 rounded-lg border-2 border-brand-green-600 text-brand-green-600 font-semibold hover:bg-brand-green-50 transition"
           >
             Email Us

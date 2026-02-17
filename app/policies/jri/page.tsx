@@ -131,7 +131,7 @@ export default function JRIPage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">Questions About JRI?</h2>
             <p className="text-gray-600 mb-6">Contact our enrollment team for more information about JRI eligibility and available programs.</p>
             <div className="flex flex-wrap gap-4">
-              <a href="mailto:info@elevateforhumanity.org" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition">
+              <a href="/contact" className="inline-flex items-center gap-2 px-6 py-3 bg-brand-blue-600 text-white rounded-lg font-medium hover:bg-brand-blue-700 transition">
                 <Mail className="w-4 h-4" /> Email Us
               </a>
               <a href="/support" className="inline-flex items-center gap-2 px-6 py-3 border border-gray-300 rounded-lg font-medium hover:bg-gray-50 transition">

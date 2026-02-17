@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Terms of Service | Supersonic Fast Cash LLC',
-  description: 'Terms of service for Supersonic Fast Cash LLC tax preparation services.',
+  title: 'Terms of Service | Supersonic Fast Cash',
+  description: 'Terms of service for Supersonic Fast Cash tax preparation services.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/supersonic-fast-cash/legal/terms',
   },
@@ -23,7 +23,7 @@ export default function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">1. Agreement to Terms</h2>
             <p className="text-gray-700 mb-4">
-              By using the services of Supersonic Fast Cash LLC ("we," "us," or "our"), you agree 
+              By using the services of Supersonic Fast Cash, a trade name of 2Exclusive LLC-S (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;), you agree 
               to these Terms of Service. If you do not agree, do not use our services.
             </p>
           </section>
@@ -122,7 +122,7 @@ export default function TermsOfServicePage() {
           <section className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">11. Contact</h2>
             <p className="text-gray-700">
-              Supersonic Fast Cash LLC<br />
+              2Exclusive LLC-S (d/b/a Supersonic Fast Cash)<br />
               Email: legal@supersonicfastcash.com<br />
               Phone: Get Help Online
             </p>

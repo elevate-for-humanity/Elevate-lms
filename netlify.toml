@@ -151,6 +151,35 @@
   force = true
 
 # ============================================
+# PORTAL URL CANONICALIZATION
+# Collapse duplicate portal paths to one canonical URL each
+# ============================================
+
+[[redirects]]
+  from = "/platform/employer-portal"
+  to = "/employer-portal"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/platform/employer-portal/*"
+  to = "/employer-portal/:splat"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/platform/student-portal"
+  to = "/student-portal"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/platform/student-portal/*"
+  to = "/student-portal/:splat"
+  status = 301
+  force = true
+
+# ============================================
 # API REDIRECTS TO NETLIFY FUNCTIONS
 # ============================================
 

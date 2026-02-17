@@ -245,7 +245,7 @@ export default function LegalGovernancePage() {
               <Mail className="w-4 h-4 text-slate-500" />
               <div>
                 <p className="text-sm text-slate-500">General Inquiries</p>
-                <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">info@elevateforhumanity.org</a>
+                <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a>
               </div>
             </div>
             <div className="flex items-center gap-3">

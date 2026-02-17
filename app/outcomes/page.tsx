@@ -204,8 +204,8 @@ export default function OutcomesMethodologyPage() {
           <p className="text-slate-700 text-sm">
             For questions about outcomes methodology, data requests, or to report a discrepancy, 
             contact us at{' '}
-            <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">
-              info@elevateforhumanity.org
+            <a href="/contact" className="text-brand-blue-600 hover:underline">
+              our contact form
             </a>{' '}
             or call (317) 314-3757.
           </p>

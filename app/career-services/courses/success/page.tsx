@@ -75,8 +75,8 @@ export default async function CourseSuccessPage({
 
         <p className="text-center text-sm text-gray-500 mt-6">
           Questions? Contact us at{' '}
-          <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">
-            info@elevateforhumanity.org
+          <a href="/contact" className="text-brand-blue-600 hover:underline">
+            our contact form
           </a>
         </p>
       </div>

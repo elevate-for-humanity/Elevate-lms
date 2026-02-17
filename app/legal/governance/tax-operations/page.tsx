@@ -78,7 +78,7 @@ export default function TaxOperationsPage() {
           </ul>
           
           <h3 className="text-lg font-semibold mt-6 mb-3">1.3 Operating Entity</h3>
-          <p className="text-gray-700"><strong>Supersonic Fast Cash</strong> operates as a DBA of Elevate For Humanity LLC, registered in Indiana. Tax preparation services are provided by licensed tax preparers with valid PTINs.</p>
+          <p className="text-gray-700"><strong>Supersonic Fast Cash</strong> operates as a trade name of 2Exclusive LLC-S (d/b/a Elevate for Humanity), registered in Indiana. Tax preparation services are provided by licensed tax preparers with valid PTINs.</p>
         </section>
 
         <section id="services" className="mb-12">

@@ -59,7 +59,7 @@ const steps: QuizStep[] = [
   {
     key: 'funding',
     question: 'Do you need help paying for training?',
-    subtitle: 'Most students qualify for 100% free training through state and federal programs.',
+    subtitle: 'Many students qualify for no-cost training through state and federal programs.',
     options: [
       { id: 'free', label: 'Yes — I need free training', icon: <DollarSign className="w-6 h-6" />, description: 'WIOA, WRG, and JRI cover everything' },
       { id: 'self', label: 'I can pay on my own', icon: <DollarSign className="w-6 h-6" />, description: 'Self-pay or employer-sponsored' },

@@ -145,7 +145,7 @@ export function Hero() {
               <ul className="text-sm text-black space-y-1 ml-4 mb-2">
                 <li>• Complete your intake and eligibility assessment</li>
                 <li>• Process all funding paperwork (WIOA, WRG, or JRI)</li>
-                <li>• Verify your eligibility for 100% free training</li>
+                <li>• Check your eligibility for no-cost training</li>
                 <li>• Enroll you in your chosen program</li>
               </ul>
               <p className="text-xs text-slate-500 italic">
@@ -170,7 +170,7 @@ export function Hero() {
                 <li>• Get job placement assistance upon completion</li>
               </ul>
               <p className="text-xs text-slate-500 italic">
-                💡 100% free. No tuition. No debt. Just training and a career!
+                💡 No tuition for eligible students. No debt. Just training and a career!
               </p>
             </div>
           </div>

@@ -221,7 +221,7 @@ export default function SAPPolicyPage() {
               <li>Explain the circumstances that affected your performance</li>
               <li>Provide supporting documentation</li>
               <li>Describe what has changed that will allow you to meet SAP going forward</li>
-              <li>Submit to: Student Services, info@elevateforhumanity.org</li>
+              <li>Submit to: Student Services, our contact form</li>
             </ol>
             
             <p className="text-gray-700 mt-6">
@@ -291,7 +291,7 @@ export default function SAPPolicyPage() {
             <strong>Effective Date:</strong> January 2026
           </p>
           <p className="text-gray-600 text-sm mb-6">
-            Questions about SAP? Contact Student Services at Visit Support Center or info@elevateforhumanity.org
+            Questions about SAP? Contact Student Services at Visit Support Center or our contact form
           </p>
           <div className="flex flex-wrap gap-4 text-sm">
             <Link href="/disclosures" className="text-brand-orange-600 hover:underline">Student Disclosures</Link>

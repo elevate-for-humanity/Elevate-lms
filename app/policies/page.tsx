@@ -134,8 +134,8 @@ export default function PoliciesIndexPage() {
       <div className="bg-brand-blue-50 rounded-xl p-6 text-center">
         <p className="text-gray-700">
           Questions about our policies? Contact us at{' '}
-          <a href="mailto:info@elevateforhumanity.org" className="text-brand-orange-600 hover:underline font-medium">
-            info@elevateforhumanity.org
+          <a href="/contact" className="text-brand-orange-600 hover:underline font-medium">
+            our contact form
           </a>
         </p>
       {/* CTA Section */}

@@ -86,7 +86,7 @@ export default async function InstructorAddStudentPage() {
         <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-lg">
           <h3 className="font-semibold text-black mb-2">Need Help?</h3>
           <p className="text-sm text-black">
-            Contact support at <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">info@elevateforhumanity.org</a> for assistance with student enrollment.
+            Contact support at <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a> for assistance with student enrollment.
           </p>
         </div>
       </div>

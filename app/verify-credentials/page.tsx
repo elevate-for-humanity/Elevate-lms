@@ -324,8 +324,8 @@ export default function VerifyCredentialsPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <a href="mailto:info@elevateforhumanity.org" className="font-medium text-gray-900 hover:text-brand-blue-600">
-                      info@elevateforhumanity.org
+                    <a href="/contact" className="font-medium text-gray-900 hover:text-brand-blue-600">
+                      our contact form
                     </a>
                   </div>
                 </div>

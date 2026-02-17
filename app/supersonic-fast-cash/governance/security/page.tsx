@@ -62,7 +62,7 @@ export default function SupersonicSecurityPage() {
             </div>
           </div>
           <p className="text-emerald-100">
-            Document 2 of 7 • Supersonic Fast Cash LLC & Platform Ecosystem
+            Document 2 of 7 • Supersonic Fast Cash Tax Services
           </p>
           <div className="mt-4 flex flex-wrap gap-4 text-sm text-emerald-300">
             <span>Version: 1.0</span>
@@ -94,7 +94,7 @@ export default function SupersonicSecurityPage() {
               1. Purpose
             </h2>
             <p className="text-slate-700 leading-relaxed">
-              This document defines how Supersonic Fast Cash LLC and its associated platform components 
+              This document defines how Supersonic Fast Cash (a trade name of 2Exclusive LLC-S) and its associated platform components 
               protect personal, financial, and operational data. It exists to provide clear, accurate, 
               and reviewable information to users, partners, regulators, and payment processors regarding 
               security practices and data handling.

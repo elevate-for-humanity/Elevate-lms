@@ -160,8 +160,8 @@ export default async function StudentPortalPage() {
     {
       icon: Mail,
       title: 'Email Support',
-      description: 'info@elevateforhumanity.org',
-      href: 'mailto:info@elevateforhumanity.org',
+      description: 'our contact form',
+      href: 'mailto:our contact form',
     },
     {
       icon: MessageSquare,

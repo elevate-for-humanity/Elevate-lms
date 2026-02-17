@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 
 export const metadata: Metadata = {
-  title: 'Privacy Policy | Supersonic Fast Cash LLC',
-  description: 'Privacy policy for Supersonic Fast Cash LLC tax preparation services.',
+  title: 'Privacy Policy | Supersonic Fast Cash',
+  description: 'Privacy policy for Supersonic Fast Cash tax preparation services.',
   alternates: {
     canonical: 'https://www.elevateforhumanity.org/supersonic-fast-cash/legal/privacy',
   },
@@ -23,7 +23,7 @@ export default function PrivacyPolicyPage() {
           <section className="mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">1. Introduction</h2>
             <p className="text-gray-700 mb-4">
-              Supersonic Fast Cash LLC ("we," "us," or "our") is committed to protecting your privacy. 
+              Supersonic Fast Cash, a trade name of 2Exclusive LLC-S (&ldquo;we,&rdquo; &ldquo;us,&rdquo; or &ldquo;our&rdquo;), is committed to protecting your privacy. 
               This Privacy Policy explains how we collect, use, disclose, and safeguard your information 
               when you use our tax preparation services.
             </p>
@@ -101,7 +101,7 @@ export default function PrivacyPolicyPage() {
               For privacy-related questions or requests, contact us at:
             </p>
             <p className="text-gray-700">
-              Supersonic Fast Cash LLC<br />
+              2Exclusive LLC-S (d/b/a Supersonic Fast Cash)<br />
               Email: privacy@supersonicfastcash.com<br />
               Phone: Get Help Online
             </p>

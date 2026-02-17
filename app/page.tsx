@@ -60,7 +60,7 @@ export default function HomePage() {
             How can we help you?
           </h2>
           <p className="text-center text-slate-600 mb-8 max-w-2xl mx-auto">
-            Choose your path below. Each option takes you directly to the information you need. Have questions? Call us at 317-314-3757.
+            Choose your path below. Each option takes you directly to the information you need — everything starts online.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
@@ -76,7 +76,7 @@ export default function HomePage() {
                 image: '/images/heroes-hq/funding-hero.jpg',
                 alt: 'Workforce funding and financial aid',
                 label: 'I need funding',
-                desc: 'Most programs are 100% free. Check eligibility for WIOA, Workforce Ready Grant, JRI, and other funding sources.',
+                desc: 'Many programs are available at no cost to eligible participants. Check eligibility for WIOA, Workforce Ready Grant, JRI, and other funding sources.',
               },
               {
                 href: '/employer',

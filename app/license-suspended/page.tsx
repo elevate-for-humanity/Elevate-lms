@@ -49,7 +49,7 @@ export default function LicenseSuspendedPage() {
             
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <a
-                href="mailto:support@elevateforhumanity.org"
+                href="/contact"
                 className="flex items-center justify-center gap-2 text-slate-700 hover:text-brand-orange-600 transition"
               >
                 <Mail className="w-4 h-4" />

@@ -184,7 +184,7 @@ export default function NonCompetePage() {
               <p className="text-black">
                 <strong>Elevate for Humanity</strong>
                 <br />
-                Email: info@elevateforhumanity.org
+                Email: our contact form
                 <br />
                 Phone: (317) 314-3757
               </p>

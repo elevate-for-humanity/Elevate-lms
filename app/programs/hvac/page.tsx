@@ -40,7 +40,7 @@ export default function HVACProgramPage() {
     },
     {
       question: "Do you help with job placement?",
-      answer: "Absolutely! We have partnerships with over 50 local HVAC companies actively hiring our graduates. Our career services team helps with resume writing, interview prep, and direct introductions to employers. 85% of our graduates are employed within 30 days."
+      answer: "Absolutely! We have partnerships with over 50 local HVAC companies actively hiring our graduates. Our career services team helps with resume writing, interview prep, and direct introductions to employers. Many of our graduates find employment within 30 days through our employer partnerships."
     },
     {
       question: "What tools and equipment will I need?",
@@ -171,7 +171,7 @@ export default function HVACProgramPage() {
               <p className="text-xl text-brand-blue-100 mb-8 leading-relaxed">
                 Launch your career in one of America's fastest-growing trades. 
                 Learn to install, maintain, and repair heating and cooling systems. 
-                <strong className="text-white"> 100% free with WIOA funding.</strong>
+                <strong className="text-white"> May be available at no cost for eligible WIOA participants.</strong>
               </p>
 
               <div className="flex flex-wrap gap-4 mb-10">

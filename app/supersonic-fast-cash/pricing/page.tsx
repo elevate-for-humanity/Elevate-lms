@@ -3,7 +3,7 @@ import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
 import { Phone, ArrowRight, HelpCircle } from 'lucide-react';
 
 export const metadata = {
-  title: 'Pricing | Supersonic Fast Cash LLC',
+  title: 'Pricing | Supersonic Fast Cash',
   description:
     'Clear, upfront pricing for professional tax preparation services. Choose the plan that fits your tax situation.',
   alternates: {

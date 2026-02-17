@@ -168,7 +168,7 @@ export default function CourseraStyleFooter() {
             </div>
 
             <div className="text-xs text-black">
-              <strong>Contact:</strong> (317) 314-3757 | <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:underline">info@elevateforhumanity.org</a> | Serving 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240
+              <strong>Contact:</strong> (317) 314-3757 | <a href="/contact" className="text-brand-blue-600 hover:underline">Contact Us</a> | Serving 8888 Keystone Crossing Suite 1300, Indianapolis, IN 46240
             </div>
           </div>
         </div>

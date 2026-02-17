@@ -90,7 +90,7 @@ export default function EmploymentPage() {
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-2xl md:text-3xl font-bold mb-4">Ready to Start Your Career?</h2>
           <p className="text-brand-blue-100 mb-8 text-lg">
-            Enroll in a training program and get access to all employment services at no cost.
+            Enroll in a training program and get access to employment services at no cost to eligible participants.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
             <Link

@@ -347,7 +347,7 @@ export default function PrivacyNoticePage() {
           To exercise your privacy rights:
         </p>
         <ol>
-          <li>Submit a request to info@elevateforhumanity.org</li>
+          <li>Submit a request to our contact form</li>
           <li>Verify your identity (for security purposes)</li>
           <li>Specify the right you wish to exercise</li>
           <li>We will respond within 30 days (or as required by law)</li>
@@ -431,8 +431,8 @@ export default function PrivacyNoticePage() {
           <h3 className="mt-0">Privacy Office</h3>
           <p className="mb-2">
             <strong>Email:</strong>{' '}
-            <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:text-brand-blue-800">
-              info@elevateforhumanity.org
+            <a href="/contact" className="text-brand-blue-600 hover:text-brand-blue-800">
+              our contact form
             </a>
           </p>
           <p className="mb-2">
@@ -453,8 +453,8 @@ export default function PrivacyNoticePage() {
         <h3>Data Protection Officer</h3>
         <p>
           For questions about data protection and privacy compliance, contact our Data Protection Officer at{' '}
-          <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:text-brand-blue-800">
-            info@elevateforhumanity.org
+          <a href="/contact" className="text-brand-blue-600 hover:text-brand-blue-800">
+            our contact form
           </a>
         </p>
 
@@ -501,8 +501,8 @@ export default function PrivacyNoticePage() {
         <p className="text-lg font-semibold text-brand-green-900 mb-2">Questions About Your Privacy?</p>
         <p className="text-brand-green-800 mb-0">
           We're here to help. Contact our Privacy Office at{' '}
-          <a href="mailto:info@elevateforhumanity.org" className="text-brand-green-900 font-semibold hover:underline">
-            info@elevateforhumanity.org
+          <a href="/contact" className="text-brand-green-900 font-semibold hover:underline">
+            our contact form
           </a>{' '}
           or call{' '}
           <a href="/support" className="text-brand-green-900 font-semibold hover:underline">

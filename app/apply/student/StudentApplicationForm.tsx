@@ -54,7 +54,7 @@ export default function StudentApplicationForm({ initialProgram = '' }: { initia
         `Education: ${data.educationLevel || 'N/A'}\n` +
         `Goals: ${data.goals || 'N/A'}\n`
       );
-      window.location.href = `mailto:info@elevateforhumanity.org?subject=${subject}&body=${body}`;
+      window.location.href = "/contact";
       setLoading(false);
     }
   }

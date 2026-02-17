@@ -135,10 +135,10 @@ async function getCategories() {
 }
 
 const roadmap = [
-  { step: '01', title: 'Check Eligibility', desc: 'Complete a quick assessment to see if you qualify for free training through WIOA or other programs.' },
+  { step: '01', title: 'Check Eligibility', desc: 'Complete a quick assessment to see if you qualify for funded training through WIOA or other programs.' },
   { step: '02', title: 'Choose Your Path', desc: 'Select from healthcare, trades, technology, or other career programs based on your interests.' },
   { step: '03', title: 'Get Approved', desc: 'Our team helps you complete enrollment paperwork and get approved for funding.' },
-  { step: '04', title: 'Start Training', desc: 'Begin your program with all materials, books, and supplies provided at no cost.' },
+  { step: '04', title: 'Start Training', desc: 'Begin your program. Materials, books, and supplies may be included depending on your funding source.' },
   { step: '05', title: 'Earn Credentials', desc: 'Complete industry-recognized certifications that employers are looking for.' },
   { step: '06', title: 'Launch Career', desc: 'Get job placement support including resume help, interview prep, and employer connections.' },
 ];
@@ -196,7 +196,7 @@ export default async function ProgramsPage() {
         <div className="flex animate-marquee whitespace-nowrap will-change-transform">
           {[...Array(2)].map((_, i) => (
             <div key={i} className="flex items-center gap-8 mx-4">
-              {['Healthcare', 'Skilled Trades', 'Technology', 'CDL', 'Barbering', 'Business', 'Free Training'].map((text, j) => (
+              {['Healthcare', 'Skilled Trades', 'Technology', 'CDL', 'Barbering', 'Business', 'Funded Training'].map((text, j) => (
                 <span key={j} className="text-white/80 text-base font-medium flex items-center gap-4">
                   {text}<span className="text-brand-red-500">★</span>
                 </span>
@@ -277,11 +277,11 @@ export default async function ProgramsPage() {
       </section>
 
       {/* SCROLLING TEXT */}
-      <section className="py-6 bg-brand-blue-600 overflow-hidden">
+      <section className="py-6 bg-brand-blue-600 overflow-hidden" aria-hidden="true">
         <div className="flex animate-marquee-reverse whitespace-nowrap">
-          {[...Array(4)].map((_, i) => (
+          {[...Array(2)].map((_, i) => (
             <span key={i} className="text-4xl md:text-5xl font-black text-white/70 mx-6">
-              Free Training • Real Careers • No Debt • Job Placement • 
+              Funded Training • Real Careers • No Debt • Job Placement Assistance • 
             </span>
           ))}
         </div>

@@ -155,8 +155,8 @@ export default async function FerpaHelpPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <a href="mailto:info@elevateforhumanity.org" className="text-brand-blue-600 hover:text-brand-blue-700">
-                      info@elevateforhumanity.org
+                    <a href="/contact" className="text-brand-blue-600 hover:text-brand-blue-700">
+                      our contact form
                     </a>
                   </div>
                 </div>

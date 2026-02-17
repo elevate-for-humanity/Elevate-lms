@@ -32,7 +32,7 @@ export default async function SettingsPage() {
             <h2 className="text-lg font-semibold mb-4">General Settings</h2>
             <div className="space-y-4">
               <div><label className="block text-sm font-medium text-gray-700 mb-2">Site Name</label><input type="text" className="w-full border rounded-lg px-3 py-2" defaultValue="Elevate For Humanity" /></div>
-              <div><label className="block text-sm font-medium text-gray-700 mb-2">Support Email</label><input type="email" className="w-full border rounded-lg px-3 py-2" defaultValue="support@elevateforhumanity.org" /></div>
+              <div><label className="block text-sm font-medium text-gray-700 mb-2">Support Email</label><input type="email" className="w-full border rounded-lg px-3 py-2" defaultValue="elevate4humanityedu@gmail.com" /></div>
             </div>
           </div>
           <div className="bg-white rounded-lg shadow-sm border p-6">

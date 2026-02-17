@@ -8,7 +8,7 @@ export default function Hero() {
           <div className="max-w-2xl">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-100 text-brand-700 text-sm font-semibold mb-6">
               <span>🎓</span>
-              <span>100% FREE Training • Marion County</span>
+              <span>No-Cost Training for Eligible Students • Marion County</span>
             </div>
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-black leading-tight mb-6">
               Ignite Your Future:{' '}

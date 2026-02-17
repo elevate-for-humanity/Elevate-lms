@@ -117,7 +117,7 @@ export async function POST(req: Request) {
     .maybeSingle();
 
   if (profErr)
-    return NextResponse.json({ error: profErr.message }, { status: 500 });
+    return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
 
   const wioa_start_date = profile?.wioa_start_date ?? null; // YYYY-MM-DD
   const post_cert_date = profile?.post_cert_date ?? null;
@@ -172,7 +172,7 @@ export async function POST(req: Request) {
     .lt('log_date', week_end_iso);
 
   if (totErr)
-    return NextResponse.json({ error: totErr.message }, { status: 500 });
+    return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
 
   const existingMinutesTotal = (totals ?? []).reduce(
     (s, r) => s + (r.minutes ?? 0),
@@ -226,7 +226,7 @@ export async function POST(req: Request) {
     .single();
 
   if (insErr)
-    return NextResponse.json({ error: insErr.message }, { status: 500 });
+    return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
   return NextResponse.json({ ok: true, entry: created });
 }
 

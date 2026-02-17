@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
   } catch (error) { 
     logger.error('Federal forms error:', error);
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: 'Operation failed' },
       { status: 500 }
     );
   }

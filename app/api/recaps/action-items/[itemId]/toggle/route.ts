@@ -60,7 +60,7 @@ export async function POST(
       .single();
 
     if (itemErr) {
-      return NextResponse.json({ error: itemErr.message }, { status: 404 });
+      return NextResponse.json({ error: 'Operation failed' }, { status: 404 });
     }
 
     // Check organization access
@@ -78,7 +78,7 @@ export async function POST(
       .eq('id', item.id);
 
     if (updErr) {
-      return NextResponse.json({ error: updErr.message }, { status: 500 });
+      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
     }
 
     return NextResponse.json(

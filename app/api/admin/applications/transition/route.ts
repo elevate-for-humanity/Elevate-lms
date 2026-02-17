@@ -97,7 +97,7 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       return NextResponse.json(
-        { error: "Failed to update state", details: updateError.message },
+        { error: "Failed to update state", details: 'Database error' },
         { status: 500 }
       );
     }

@@ -58,7 +58,7 @@ export async function PATCH(
       .single();
 
     if (rowErr) {
-      return NextResponse.json({ error: rowErr.message }, { status: 404 });
+      return NextResponse.json({ error: 'Operation failed' }, { status: 404 });
     }
 
     if (row.organization_id !== profile.organization_id) {
@@ -85,7 +85,7 @@ export async function PATCH(
       .eq('id', row.id);
 
     if (updErr) {
-      return NextResponse.json({ error: updErr.message }, { status: 500 });
+      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
     }
 
     return NextResponse.json({ ok: true }, { status: 200 });

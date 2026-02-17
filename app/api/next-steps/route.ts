@@ -78,7 +78,7 @@ const supabase = await createClient();
       .single();
 
     if (createErr)
-      return NextResponse.json({ error: createErr.message }, { status: 500 });
+      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
 
     return NextResponse.json({
       ...created,

@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 
     if (protocolsError) {
       return NextResponse.json(
-        { error: protocolsError.message },
+        { error: 'Operation failed' },
         { status: 500 }
       );
     }
@@ -65,7 +65,7 @@ export async function GET(request: Request) {
 
     if (ticketsError) {
       return NextResponse.json(
-        { error: ticketsError.message },
+        { error: 'Operation failed' },
         { status: 500 }
       );
     }

@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       return NextResponse.json(
-        { error: 'Failed to accept student', details: updateError.message },
+        { error: 'Failed to accept student', details: 'Database error' },
         { status: 500 }
       );
     }

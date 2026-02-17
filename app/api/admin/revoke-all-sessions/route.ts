@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
 
     if (signOutError) {
       return NextResponse.json(
-        { error: 'Failed to revoke sessions', details: signOutError.message },
+        { error: 'Failed to revoke sessions', details: 'Session error' },
         { status: 500 }
       );
     }

@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
 
       if (licenseError) {
         return NextResponse.json(
-          { error: licenseError.message },
+          { error: 'Operation failed' },
           { status: 500 }
         );
       }
@@ -135,7 +135,7 @@ export async function POST(request: NextRequest) {
 
     if (licenseError) {
       return NextResponse.json(
-        { error: licenseError.message },
+        { error: 'Operation failed' },
         { status: 500 }
       );
     }

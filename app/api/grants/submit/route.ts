@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
   } catch (error) { 
     logger.error('Submission tracking error:', error);
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: 'Operation failed' },
       { status: 500 }
     );
   }
@@ -130,7 +130,7 @@ export async function GET(req: NextRequest) {
   } catch (error) { 
     logger.error('Error fetching submission:', error);
     return NextResponse.json(
-      { error: (error as Error).message },
+      { error: 'Operation failed' },
       { status: 500 }
     );
   }

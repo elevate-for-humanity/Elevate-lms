@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     if (updateError) {
       return NextResponse.json(
-        { error: 'Failed to decline student', details: updateError.message },
+        { error: 'Failed to decline student', details: 'Database error' },
         { status: 500 }
       );
     }

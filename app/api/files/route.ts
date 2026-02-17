@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
     .upload(fileName, file);
 
   if (uploadError) {
-    return NextResponse.json({ error: uploadError.message }, { status: 500 });
+    return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
   }
 
   // Get public URL

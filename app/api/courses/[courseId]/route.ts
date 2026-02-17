@@ -46,7 +46,7 @@ export async function GET(
       : await query.eq('slug', courseId).single();
 
     if (courseError) {
-      return NextResponse.json({ error: courseError.message }, { status: 404 });
+      return NextResponse.json({ error: 'Operation failed' }, { status: 404 });
     }
 
     // Sort lessons by order_index

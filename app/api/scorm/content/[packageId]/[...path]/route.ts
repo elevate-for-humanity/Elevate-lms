@@ -60,7 +60,7 @@ const { packageId, path } = await ctx.params;
 
   if (error || !data) {
     return NextResponse.json(
-      { error: 'SCORM content not found', filePath, details: error?.message },
+      { error: 'SCORM content not found', filePath, details: 'Not found' },
       { status: 404 }
     );
   }

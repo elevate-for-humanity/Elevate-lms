@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 
     if (pageViewsError) {
       return NextResponse.json(
-        { error: pageViewsError.message },
+        { error: 'Operation failed' },
         { status: 500 }
       );
     }
@@ -61,7 +61,7 @@ export async function GET(request: Request) {
 
     if (conversionsError) {
       return NextResponse.json(
-        { error: conversionsError.message },
+        { error: 'Operation failed' },
         { status: 500 }
       );
     }

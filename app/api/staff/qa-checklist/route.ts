@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 
     if (checklistsError) {
       return NextResponse.json(
-        { error: checklistsError.message },
+        { error: 'Operation failed' },
         { status: 500 }
       );
     }
@@ -59,7 +59,7 @@ export async function GET(request: Request) {
 
     if (completionsError) {
       return NextResponse.json(
-        { error: completionsError.message },
+        { error: 'Operation failed' },
         { status: 500 }
       );
     }
@@ -142,7 +142,7 @@ export async function POST(request: Request) {
 
     if (completionError) {
       return NextResponse.json(
-        { error: completionError.message },
+        { error: 'Operation failed' },
         { status: 500 }
       );
     }

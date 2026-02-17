@@ -182,8 +182,8 @@ export default function HVACTechnicianPage() {
             </div>
             <div className="relative h-80 lg:h-96 rounded-2xl overflow-hidden shadow-2xl">
               <Image 
-                src="/images/trades/program-hvac-technician.jpg" 
-                alt="HVAC technician working on unit" 
+                src="/images/programs-hq/hvac-technician.jpg" 
+                alt="HVAC training classroom with equipment" 
                 fill sizes="100vw"
                 className="object-cover" 
               />

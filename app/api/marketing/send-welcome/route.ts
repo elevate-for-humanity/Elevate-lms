@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+// AUTH: Intentionally public — no authentication required
 
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;

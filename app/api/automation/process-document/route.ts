@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+// AUTH: Stub route (503) — auth guard deferred until implementation
 
 export const dynamic = 'force-dynamic';
 

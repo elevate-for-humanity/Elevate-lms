@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+// AUTH: Intentionally public — no authentication required
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';

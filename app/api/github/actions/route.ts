@@ -6,12 +6,16 @@ import { gh, parseRepo, getUserOctokit } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 // List workflows and runs
 export async function GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
 const userToken = req.headers.get('x-gh-token');
   const repo = req.nextUrl.searchParams.get('repo');
   const type = req.nextUrl.searchParams.get('type') || 'runs';
@@ -125,6 +129,10 @@ const userToken = req.headers.get('x-gh-token');
 export async function POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
+
 
   const userToken = req.headers.get('x-gh-token');
 
@@ -201,7 +209,8 @@ export async function POST(req: NextRequest) {
     logger.error('GitHub actions trigger error:', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Failed to trigger action', message: toErrorMessage(error) },
-      { status: 500 }
+      {
+ status: 500 }
     );
   }
 }
@@ -211,6 +220,9 @@ export async function PUT(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
 const userToken = req.headers.get('x-gh-token');
 
   try {

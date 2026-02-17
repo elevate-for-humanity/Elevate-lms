@@ -5,11 +5,15 @@ export const runtime = 'edge';
 export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 export async function POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+
+    const auth = await requireAuth(request);
+    if (auth.error) return auth.error;
 
     const body = await request.json();
     const { priceId, courseId, courseName, successUrl, cancelUrl } = body;

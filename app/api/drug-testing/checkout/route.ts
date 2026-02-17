@@ -5,6 +5,7 @@ export const runtime = 'nodejs';
 export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 const stripe = getStripe();
 
@@ -12,6 +13,9 @@ export async function POST(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
+
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
 
     if (!stripe) {
       return NextResponse.json(

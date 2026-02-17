@@ -1,6 +1,7 @@
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
+// AUTH: Intentionally public — no authentication required
 
 import { NextResponse } from 'next/server';
 import { logger } from '@/lib/logger';

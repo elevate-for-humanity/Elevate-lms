@@ -6,11 +6,15 @@ import { gh, parseRepo } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 export async function GET(req: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
 
     const { searchParams } = new URL(req.url);
     const repo = searchParams.get('repo') || 'elevateforhumanity/fix2';

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 
 import { NextRequest, NextResponse } from 'next/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 // WebSocket upgrade endpoint info
 // Note: Next.js App Router doesn't support WebSocket upgrades directly
@@ -11,6 +12,9 @@ export async function GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
 return NextResponse.json({
     message: 'WebSocket terminal available',
     wsUrl: process.env.TERMINAL_WS_URL || 'ws://localhost:3001',

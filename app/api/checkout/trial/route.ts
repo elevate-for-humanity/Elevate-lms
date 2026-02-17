@@ -3,6 +3,7 @@ import { getStripe } from '@/lib/stripe/client';
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 // Codebase license configurations (one-time purchase, not trial)
 const LICENSES: Record<string, { 
@@ -31,6 +32,9 @@ export async function GET(request: NextRequest) {
   
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+
+    const auth = await requireAuth(request);
+    if (auth.error) return auth.error;
 const searchParams = request.nextUrl.searchParams;
   const licenseSlug = searchParams.get('license');
   const email = searchParams.get('email');

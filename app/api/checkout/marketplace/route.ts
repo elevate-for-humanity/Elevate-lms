@@ -11,10 +11,14 @@ import {
 } from '@/lib/rateLimit';
 import { toError, toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 export async function POST(req: Request) {
     const rateLimited = await applyRateLimit(req, 'contact');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
 
   // Rate limiting: 10 checkouts per minute per IP
   const identifier = getClientIdentifier(req.headers);

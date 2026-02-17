@@ -1,6 +1,7 @@
 
 export const runtime = 'edge';
 export const maxDuration = 60;
+// AUTH: Intentionally public — no authentication required
 
 import { NextRequest, NextResponse } from 'next/server';
 import { gh, parseRepo } from '@/lib/github';

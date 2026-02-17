@@ -1,5 +1,6 @@
 export const runtime = 'nodejs';
 export const maxDuration = 60;
+// AUTH: Intentionally public — no authentication required
 
 // app/api/lti/config/route.ts
 import { NextResponse } from 'next/server';

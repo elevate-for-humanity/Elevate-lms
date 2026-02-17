@@ -1,4 +1,5 @@
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+// AUTH: Intentionally public — no authentication required
 /**
  * DEPRECATED: Use /api/license/webhook instead
  * 

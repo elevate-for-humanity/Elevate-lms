@@ -6,6 +6,7 @@ import { gh, parseRepo, getUserOctokit } from '@/lib/github';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 // Git stash operations via GitHub API
 // Note: GitHub API doesn't have native stash support, so we simulate it
@@ -15,6 +16,9 @@ export async function GET(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
 const userToken = req.headers.get('x-gh-token');
   const userId = req.headers.get('x-user-id');
   const repo = req.nextUrl.searchParams.get('repo');
@@ -57,6 +61,10 @@ const userToken = req.headers.get('x-gh-token');
 export async function POST(req: NextRequest) {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
+
 
   const userToken = req.headers.get('x-gh-token');
 
@@ -115,7 +123,8 @@ export async function POST(req: NextRequest) {
     logger.error('Git stash create error:', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
       { error: 'Failed to create stash', message: toErrorMessage(error) },
-      { status: 500 }
+      {
+ status: 500 }
     );
   }
 }
@@ -125,6 +134,9 @@ export async function PUT(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
 const userToken = req.headers.get('x-gh-token');
 
   try {
@@ -185,7 +197,8 @@ const userToken = req.headers.get('x-gh-token');
   } catch (error) {
     logger.error('Git stash apply error:', error instanceof Error ? error : new Error(String(error)));
     return NextResponse.json(
-      { error: 'Failed to apply stash', message: toErrorMessage(error) },
+      {
+ error: 'Failed to apply stash', message: toErrorMessage(error) },
       { status: 500 }
     );
   }
@@ -196,6 +209,9 @@ export async function DELETE(req: NextRequest) {
   
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(req);
+    if (auth.error) return auth.error;
+
 const userToken = req.headers.get('x-gh-token');
 
   try {

@@ -13,6 +13,7 @@ import { parseBody } from '@/lib/api-helpers';
 import fs from 'fs';
 import path from 'path';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireAuth } from '@/lib/api/requireAuth';
 
 export const dynamic = 'force-dynamic';
 
@@ -96,6 +97,9 @@ export async function GET(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(request);
+    if (auth.error) return auth.error;
+
 
     const state = loadState();
     return NextResponse.json(state);
@@ -112,6 +116,10 @@ export async function POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(request);
+    if (auth.error) return auth.error;
+
+
 
     const body = await parseBody<Record<string, any>>(request);
     const state = loadState();
@@ -155,7 +163,8 @@ export async function POST(request: NextRequest) {
   } catch (error) { 
     return NextResponse.json(
       { error: 'Failed to process request' },
-      { status: 500 }
+      {
+ status: 500 }
     );
   }
 }
@@ -165,6 +174,9 @@ export async function DELETE(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
+    const auth = await requireAuth(request);
+    if (auth.error) return auth.error;
+
 
     const { searchParams } = new URL(request.url);
     const taskId = searchParams.get('taskId');

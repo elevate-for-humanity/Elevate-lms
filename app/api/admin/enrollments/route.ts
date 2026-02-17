@@ -3,6 +3,8 @@ import { EnrollmentCreateSchema } from '@/lib/validators/course';
 import { createEnrollment, listEnrollments } from '@/lib/db/courses';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { sendCourseEnrollmentEmail } from '@/lib/email-course-notifications';
+import { logger } from '@/lib/logger';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -50,6 +52,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid input', details: parsed.error.flatten() }, { status: 400 });
     }
     const data = await createEnrollment(parsed.data);
+
+    // Send enrollment confirmation email (fire-and-forget)
+    sendCourseEnrollmentEmail({
+      studentEmail: parsed.data.email || '',
+      studentName: parsed.data.studentName || 'Student',
+      courseName: parsed.data.courseName || 'Course',
+      courseSlug: parsed.data.courseSlug || '',
+      enrollmentDate: new Date().toISOString(),
+    }).catch((err) => logger.error('Failed to send enrollment email', err));
+
     return NextResponse.json({ data }, { status: 201 });
   } catch (error: any) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

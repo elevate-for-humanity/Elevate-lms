@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+// AUTH: Intentionally public — no authentication required
 
 export const runtime = 'edge';
 export const maxDuration = 60;

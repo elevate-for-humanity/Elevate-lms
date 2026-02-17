@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 
     if (protocolsError) {
       return NextResponse.json(
-        { error: 'Operation failed' },
+        { error: 'Failed to fetch data' },
         { status: 500 }
       );
     }
@@ -65,7 +65,7 @@ export async function GET(request: Request) {
 
     if (ticketsError) {
       return NextResponse.json(
-        { error: 'Operation failed' },
+        { error: 'Failed to fetch tickets' },
         { status: 500 }
       );
     }

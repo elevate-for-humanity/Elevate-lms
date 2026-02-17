@@ -31,7 +31,7 @@ export const POST = withAuth(
       .upload(fileName, file);
 
     if (uploadError) {
-      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
+      return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
     }
 
     // Get public URL
@@ -56,7 +56,7 @@ export const POST = withAuth(
       .single();
 
     if (dbError) {
-      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
+      return NextResponse.json({ error: 'Database operation failed' }, { status: 500 });
     }
 
     return NextResponse.json({

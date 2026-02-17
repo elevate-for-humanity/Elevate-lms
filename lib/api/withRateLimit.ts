@@ -1,12 +1,17 @@
 import { NextResponse } from 'next/server';
-import { contactRateLimit, strictRateLimit, apiRateLimit, createRateLimitHeaders } from '@/lib/rate-limit';
+import { contactRateLimit, strictRateLimit, apiRateLimit, authRateLimit, paymentRateLimit, createRateLimitHeaders } from '@/lib/rate-limit';
 
-type Tier = 'strict' | 'contact' | 'api';
+type Tier = 'strict' | 'contact' | 'api' | 'auth' | 'payment';
+
+// Tiers that must fail closed (return 503) when Redis is unavailable
+const FAIL_CLOSED_TIERS: Set<Tier> = new Set(['auth', 'payment', 'strict']);
 
 const limiters: Record<Tier, { get: () => any }> = {
-  strict: strictRateLimit,   // 3 req / 5 min
-  contact: contactRateLimit, // 3 req / 1 min
-  api: apiRateLimit,         // 100 req / 1 min
+  strict: strictRateLimit,     // 3 req / 5 min
+  contact: contactRateLimit,   // 3 req / 1 min
+  api: apiRateLimit,           // 100 req / 1 min
+  auth: authRateLimit,         // 5 req / 1 min
+  payment: paymentRateLimit,   // 10 req / 1 min
 };
 
 function getIP(request: Request): string {
@@ -30,7 +35,16 @@ export async function applyRateLimit(
   tier: Tier = 'contact'
 ): Promise<NextResponse | null> {
   const limiter = limiters[tier]?.get();
-  if (!limiter) return null; // Redis not configured — allow
+  if (!limiter) {
+    // For auth/payment/strict tiers, fail closed when Redis is unavailable
+    if (FAIL_CLOSED_TIERS.has(tier)) {
+      return NextResponse.json(
+        { error: 'Rate limiting service unavailable. Please try again later.' },
+        { status: 503 }
+      );
+    }
+    return null; // Other tiers: fail open
+  }
 
   const id = getIP(request);
 
@@ -50,7 +64,13 @@ export async function applyRateLimit(
       );
     }
   } catch {
-    // Redis error — fail open
+    // Redis error — fail closed for sensitive tiers
+    if (FAIL_CLOSED_TIERS.has(tier)) {
+      return NextResponse.json(
+        { error: 'Rate limiting service unavailable. Please try again later.' },
+        { status: 503 }
+      );
+    }
     return null;
   }
 

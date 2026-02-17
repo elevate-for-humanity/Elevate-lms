@@ -67,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     if (courseError) {
       logger.error('Course creation error:', courseError);
-      return NextResponse.json({ error: 'Operation failed' }, { status: 400 });
+      return NextResponse.json({ error: 'Course operation failed' }, { status: 400 });
     }
 
     // Insert modules and lessons
@@ -108,7 +108,7 @@ export async function POST(request: NextRequest) {
       course: {
         id: course.id,
         slug: course.slug,
-        title: course.course_name,
+        title: course.title,
       },
     });
   } catch (error) { 

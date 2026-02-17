@@ -45,7 +45,7 @@ export async function POST(req: Request) {
       .single();
 
     if (tenantError) {
-      return NextResponse.json({ error: 'Operation failed' }, { status: 400 });
+      return NextResponse.json({ error: 'Tenant creation failed' }, { status: 400 });
     }
 
     // Create license

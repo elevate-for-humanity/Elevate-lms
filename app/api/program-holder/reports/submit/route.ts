@@ -85,7 +85,7 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       return NextResponse.json(
-        { error: 'Failed to submit report', details: 'Database error' },
+        { error: 'Failed to submit report' },
         { status: 500 }
       );
     }

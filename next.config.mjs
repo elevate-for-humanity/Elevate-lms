@@ -502,7 +502,7 @@ const nextConfig = {
       },
       {
         key: 'X-Frame-Options',
-        value: 'DENY',
+        value: 'SAMEORIGIN',
       },
       {
         key: 'X-Content-Type-Options',
@@ -534,11 +534,23 @@ const nextConfig = {
           "frame-src 'self' https://www.youtube.com https://player.vimeo.com https://js.stripe.com https://us06web.zoom.us",
           "media-src 'self' data: blob: https://pub-23811be4d3844e45a8bc2d3dc5e7aaec.r2.dev https://cms-artifacts.artlist.io",
           "worker-src 'self' blob:",
+          "object-src 'none'",
           "base-uri 'self'",
           "form-action 'self' https://js.stripe.com",
           "frame-ancestors 'none'",
           "upgrade-insecure-requests",
+          // CSP violation reporting endpoint
+          "report-uri /api/csp-report",
+          "report-to csp-endpoint",
         ].join('; '),
+      },
+      {
+        key: 'Report-To',
+        value: JSON.stringify({
+          group: 'csp-endpoint',
+          max_age: 86400,
+          endpoints: [{ url: '/api/csp-report' }],
+        }),
       },
     ];
 

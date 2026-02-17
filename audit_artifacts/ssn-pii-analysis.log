@@ -1,0 +1,41 @@
+=== SSN / PII HANDLING ANALYSIS ===
+
+SSN HASHING (lib/security/ssn.ts):
+- Uses SHA-256 with SSN_SALT from environment — GOOD
+- No hardcoded fallback salt — GOOD
+- Throws error if SSN_SALT missing — GOOD (fails safely)
+- Stores ssn_hash + ssn_last4, never full SSN — GOOD
+
+SSN ENCRYPTION (lib/security/ssn-helper.ts):
+- Uses AES-256-CBC with SSN_ENCRYPTION_KEY from environment — GOOD
+- Random IV per encryption — GOOD
+- Throws error if key missing — GOOD
+- Used for tax filing where SSN must be recoverable for IRS submission
+
+SSN LOGGING:
+- Zero instances of SSN values being logged — GOOD
+
+FERPA AUDIT LOGGING:
+- Audit log system exists (lib/auditLog.ts) — GOOD
+- Only 1 of 17 SSN-handling routes has audit logging — HIGH RISK
+- 16 SSN-handling routes have NO audit trail:
+  - identity/verify-ssn — SSN verification with no audit
+  - hr/payroll — payroll with SSN, no audit
+  - supersonic-fast-cash/* — 6 tax routes with SSN, no audit
+  - reports/wioa — WIOA reports with SSN, no audit
+  - reports/rapids/export — RAPIDS export with SSN, no audit
+  - franchise/clients — client data with SSN, no audit
+  - tax/* — 3 tax routes with SSN, no audit
+- Only 58 of 917 API routes (6.3%) have audit logging
+
+PII AT REST:
+- SSN: Hashed (SHA-256) or encrypted (AES-256-CBC) — GOOD
+- DOB, address, email, phone: Stored in plaintext in Supabase — MEDIUM
+  - Supabase provides disk encryption at rest
+  - No column-level encryption for PII fields
+  - Gov auditors may require column-level encryption for FERPA compliance
+
+SEVERITY:
+- HIGH: 16/17 SSN-handling routes lack audit logging (FERPA violation)
+- HIGH: Only 6.3% of API routes have audit logging
+- MEDIUM: PII fields (DOB, address, phone) stored without column-level encryption

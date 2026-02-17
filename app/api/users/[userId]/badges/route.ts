@@ -29,7 +29,7 @@ const { userId } = await params;
       .eq('user_id', userId);
 
     if (badgeError) {
-      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
+      return NextResponse.json({ error: 'Badge operation failed' }, { status: 500 });
     }
 
     return NextResponse.json(userBadges || []);

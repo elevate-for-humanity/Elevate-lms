@@ -84,7 +84,7 @@ export async function POST(req: Request) {
 
     if (uploadError) {
       return NextResponse.json(
-        { error: `Upload failed: ${uploadError.message}` },
+        { error: 'Upload failed' },
         { status: 500 }
       );
     }
@@ -121,7 +121,7 @@ export async function POST(req: Request) {
         .remove([uploadData.path]);
 
       return NextResponse.json(
-        { error: `Database error: ${dbError.message}` },
+        { error: 'Database operation failed' },
         { status: 500 }
       );
     }

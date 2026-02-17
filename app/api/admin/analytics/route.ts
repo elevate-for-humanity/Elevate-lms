@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 
     if (pageViewsError) {
       return NextResponse.json(
-        { error: 'Operation failed' },
+        { error: 'Failed to fetch analytics' },
         { status: 500 }
       );
     }
@@ -61,7 +61,7 @@ export async function GET(request: Request) {
 
     if (conversionsError) {
       return NextResponse.json(
-        { error: 'Operation failed' },
+        { error: 'Failed to fetch analytics' },
         { status: 500 }
       );
     }

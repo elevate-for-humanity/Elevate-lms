@@ -57,7 +57,7 @@ export async function POST(req: Request) {
 
     if (uploadError) {
       // Error: $1
-      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
+      return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
     }
 
     // Save document record
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
 
     if (dbError) {
       // Error: $1
-      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
+      return NextResponse.json({ error: 'Database operation failed' }, { status: 500 });
     }
 
     return NextResponse.json({ success: true });

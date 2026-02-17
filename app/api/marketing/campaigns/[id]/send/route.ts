@@ -88,7 +88,7 @@ export async function POST(
       err instanceof Error ? err : new Error(String(err))
     );
     return NextResponse.json(
-      { error: (err as Error).message || 'Failed to queue campaign' },
+      { error: 'Failed to queue campaign' },
       { status: 500 }
     );
   }

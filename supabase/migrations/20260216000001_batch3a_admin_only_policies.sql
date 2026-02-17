@@ -13,3 +13,5 @@
 
 -- See APPLY_20260216_combined.sql for the tenant-scoped core table policies.
 -- This file documents the broader admin policy sweep.
+
+SELECT 1; -- no-op: admin-only policies were applied manually

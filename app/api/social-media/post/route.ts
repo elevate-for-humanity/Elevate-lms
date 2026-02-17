@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
 
       if (scheduleError) {
         return NextResponse.json(
-          { error: 'Failed to schedule post', details: 'Scheduling error' },
+          { error: 'Failed to schedule post' },
           { status: 500 }
         );
       }

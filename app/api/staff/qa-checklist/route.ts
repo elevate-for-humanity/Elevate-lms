@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 
     if (checklistsError) {
       return NextResponse.json(
-        { error: 'Operation failed' },
+        { error: 'Failed to fetch checklists' },
         { status: 500 }
       );
     }
@@ -59,7 +59,7 @@ export async function GET(request: Request) {
 
     if (completionsError) {
       return NextResponse.json(
-        { error: 'Operation failed' },
+        { error: 'Failed to fetch completions' },
         { status: 500 }
       );
     }

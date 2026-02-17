@@ -167,34 +167,6 @@ export async function getAuthUser(): Promise<AuthUser | null> {
 }
 
 // =====================================================
-// DEMO MODE - DISABLED IN PRODUCTION
-// =====================================================
-
-// Demo mode is permanently disabled for compliance
-// All users must authenticate through proper channels
-function isDemoMode(): boolean {
-  return false; // NEVER enable demo mode in production
-}
-
-// Placeholder session for dead demo-mode code paths.
-// isDemoMode() always returns false, so this is never used at runtime,
-// but it must exist to prevent a ReferenceError if the guard is ever toggled.
-const DEMO_SESSION = {
-  access_token: 'demo',
-  refresh_token: 'demo',
-  expires_in: 0,
-  token_type: 'bearer' as const,
-  user: {
-    id: 'demo-user',
-    email: 'demo@example.com',
-    app_metadata: {},
-    user_metadata: {},
-    aud: 'authenticated',
-    created_at: '',
-  },
-} as any;
-
-// =====================================================
 // ROLE CHECKING
 // =====================================================
 
@@ -213,11 +185,6 @@ export class APIAuthError extends Error {
  * Use this in API routes instead of requireAuth()
  */
 export async function requireApiAuth() {
-  // DEMO MODE: Return mock session
-  if (isDemoMode()) {
-    return DEMO_SESSION;
-  }
-  
   const session = await getSession();
   if (!session) {
     throw new APIAuthError('Auth session missing!');
@@ -229,11 +196,6 @@ export async function requireApiAuth() {
  * Require auth for pages - redirects to login if not authenticated
  */
 export async function requireAuth() {
-  // DEMO MODE: Return mock session
-  if (isDemoMode()) {
-    return DEMO_SESSION;
-  }
-  
   const session = await getSession();
   if (!session) {
     redirect('/login');
@@ -242,11 +204,6 @@ export async function requireAuth() {
 }
 
 export async function requireRole(allowedRoles: UserRole | UserRole[]) {
-  // DEMO MODE: Return admin role
-  if (isDemoMode()) {
-    return { session: DEMO_SESSION, role: 'admin' as UserRole };
-  }
-  
   const session = await requireAuth();
   const role = await getUserRole();
 
@@ -260,38 +217,22 @@ export async function requireRole(allowedRoles: UserRole | UserRole[]) {
 }
 
 export async function requireStudent() {
-  if (isDemoMode()) {
-    return { session: DEMO_SESSION, role: 'student' as UserRole };
-  }
   return requireRole('student');
 }
 
 export async function requireAdmin() {
-  if (isDemoMode()) {
-    return { session: DEMO_SESSION, role: 'admin' as UserRole };
-  }
-  // Allow admin, super_admin, and staff roles to access admin panel
   return requireRole(['admin', 'super_admin', 'staff']);
 }
 
 export async function requireProgramHolder() {
-  if (isDemoMode()) {
-    return { session: DEMO_SESSION, role: 'program_holder' as UserRole };
-  }
   return requireRole('program_holder');
 }
 
 export async function requireDelegate() {
-  if (isDemoMode()) {
-    return { session: DEMO_SESSION, role: 'delegate' as UserRole };
-  }
   return requireRole('delegate');
 }
 
 export async function requireAdminOrDelegate() {
-  if (isDemoMode()) {
-    return { session: DEMO_SESSION, role: 'admin' as UserRole };
-  }
   return requireRole(['admin', 'delegate']);
 }
 

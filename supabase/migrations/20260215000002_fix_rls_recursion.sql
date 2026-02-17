@@ -8,3 +8,5 @@
 --
 -- All policies use SECURITY DEFINER helpers to avoid recursive profiles lookups.
 -- Run in Supabase SQL Editor. Already applied to production 2026-02-15.
+
+SELECT 1; -- no-op: RLS recursion fix was applied manually

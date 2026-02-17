@@ -7,7 +7,7 @@
 DROP TABLE IF EXISTS license_agreement_acceptances CASCADE;
 
 -- Create the canonical agreement acceptances table
-CREATE TABLE license_agreement_acceptances (
+CREATE TABLE IF NOT EXISTS license_agreement_acceptances (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id UUID NOT NULL REFERENCES auth.users(id) ON DELETE RESTRICT,
   
@@ -92,7 +92,7 @@ CREATE POLICY "No deletes allowed"
 
 DROP TABLE IF EXISTS agreement_versions CASCADE;
 
-CREATE TABLE agreement_versions (
+CREATE TABLE IF NOT EXISTS agreement_versions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   agreement_type TEXT NOT NULL UNIQUE,
   current_version TEXT NOT NULL DEFAULT '1.0',

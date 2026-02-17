@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-// AUTH: Intentionally public — no authentication required
 
 // Using Node.js runtime for email compatibility
 export const maxDuration = 60;
@@ -39,7 +38,7 @@ export async function POST(req: NextRequest) {
       err instanceof Error ? err : new Error(String(err))
     );
     return NextResponse.json(
-      { error: (err as Error).message || 'Failed to send email' },
+      { error: 'Failed to send email' },
       { status: 500 }
     );
   }

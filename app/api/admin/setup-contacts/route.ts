@@ -260,7 +260,7 @@ export const POST = withAuth(
       );
       return NextResponse.json(
         {
-          error: (err as Error).message || 'Setup failed',
+          error: 'Setup failed',
           details: err.toString(),
         },
         { status: 500 }

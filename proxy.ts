@@ -138,6 +138,69 @@ export async function proxy(request: NextRequest) {
     if (!isWebhook && origin && !allowedOrigins.includes(origin)) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+
+    // ============================================
+    // API ROUTE AUTH ENFORCEMENT
+    // Protect /api/admin/*, /api/staff/*, /api/instructor/* at proxy level
+    // Individual routes still have their own checks as defense-in-depth
+    // ============================================
+    const isWebhookRoute = pathname.includes('/webhook');
+    const PROTECTED_API_PREFIXES = ['/api/admin/', '/api/staff/', '/api/instructor/'];
+    const isProtectedApi = PROTECTED_API_PREFIXES.some(prefix => pathname.startsWith(prefix));
+
+    if (isProtectedApi && !isWebhookRoute) {
+      const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+      if (!supabaseUrl || !supabaseKey) {
+        return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+      }
+
+      const apiSupabase = createServerClient(supabaseUrl, supabaseKey, {
+        cookies: {
+          getAll() { return request.cookies.getAll(); },
+          setAll() { /* read-only for API auth check */ },
+        },
+      });
+
+      const { data: { user: apiUser } } = await apiSupabase.auth.getUser();
+      if (!apiUser) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+
+      // For admin API routes, verify admin/super_admin/staff role
+      if (pathname.startsWith('/api/admin/')) {
+        const { data: apiProfile } = await apiSupabase
+          .from('profiles')
+          .select('role')
+          .eq('id', apiUser.id)
+          .single();
+
+        if (!apiProfile?.role || !['admin', 'super_admin', 'staff'].includes(apiProfile.role)) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+      }
+
+      // For instructor API routes, verify instructor/admin role
+      if (pathname.startsWith('/api/instructor/')) {
+        const { data: apiProfile } = await apiSupabase
+          .from('profiles')
+          .select('role')
+          .eq('id', apiUser.id)
+          .single();
+
+        if (!apiProfile?.role || !['instructor', 'admin', 'super_admin'].includes(apiProfile.role)) {
+          return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+        }
+      }
+    }
+
+    // Non-protected API routes pass through
+    if (!isProtectedApi) {
+      return NextResponse.next();
+    }
+    // Protected API routes that passed auth check also pass through
+    return NextResponse.next();
   }
 
   // ============================================
@@ -514,6 +577,35 @@ export async function proxy(request: NextRequest) {
   }
   response.headers.set('x-user-id', user.id);
   response.headers.set('x-user-role', userRole);
+
+  // ============================================
+  // SERVER-SIDE IDLE TIMEOUT (NIST 800-63B)
+  // Signs out users after 30 minutes of inactivity.
+  // ============================================
+  const IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+  const ACTIVITY_COOKIE = 'efh_last_activity';
+  const now = Date.now();
+  const lastActivity = request.cookies.get(ACTIVITY_COOKIE)?.value;
+
+  if (lastActivity) {
+    const lastActivityTime = parseInt(lastActivity, 10);
+    if (!isNaN(lastActivityTime) && (now - lastActivityTime) > IDLE_TIMEOUT_MS) {
+      await supabase.auth.signOut();
+      const idleUrl = new URL('/login', request.url);
+      idleUrl.searchParams.set('reason', 'idle');
+      const idleResponse = NextResponse.redirect(idleUrl, { status: 307 });
+      idleResponse.cookies.delete(ACTIVITY_COOKIE);
+      return idleResponse;
+    }
+  }
+
+  response.cookies.set(ACTIVITY_COOKIE, now.toString(), {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    path: '/',
+    maxAge: IDLE_TIMEOUT_MS / 1000,
+  });
 
   return response;
 }

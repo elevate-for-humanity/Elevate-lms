@@ -94,7 +94,7 @@ export async function POST(request: Request) {
     if (dbError) {
       // Cleanup uploaded file if database insert fails
       await supabase.storage.from('documents').remove([filePath]);
-      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
+      return NextResponse.json({ error: 'Database operation failed' }, { status: 500 });
     }
 
     return NextResponse.json({

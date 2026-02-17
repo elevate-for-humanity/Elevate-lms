@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
 
     if (appError) {
       return NextResponse.json(
-        { error: 'Failed to save application', details: 'Database error' },
+        { error: 'Failed to save application' },
         { status: 500 }
       );
     }

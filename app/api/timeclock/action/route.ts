@@ -188,7 +188,7 @@ export async function POST(request: NextRequest) {
         if (insertError) {
           logger.error('[Timeclock] clock_in insert error:', insertError);
           return NextResponse.json(
-            { error: 'Failed to clock in', details: 'Database error' },
+            { error: 'Failed to clock in' },
             { status: 500 }
           );
         }

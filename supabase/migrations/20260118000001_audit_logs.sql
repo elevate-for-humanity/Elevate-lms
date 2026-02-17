@@ -6,7 +6,7 @@
 DROP TABLE IF EXISTS audit_logs CASCADE;
 
 -- Create the table
-CREATE TABLE audit_logs (
+CREATE TABLE IF NOT EXISTS audit_logs (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   action TEXT NOT NULL,
   actor_id UUID REFERENCES auth.users(id),

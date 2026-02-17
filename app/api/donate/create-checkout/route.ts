@@ -4,15 +4,11 @@ export const runtime = 'edge';
 export const maxDuration = 60;
 import { stripe } from '@/lib/stripe/client';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { requireAuth } from '@/lib/api/requireAuth';
 
 export async function POST(request: NextRequest) {
   try {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-    const auth = await requireAuth(request);
-    if (auth.error) return auth.error;
-
 
     if (!stripe) {
       return NextResponse.json(
@@ -60,7 +56,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ sessionId: session.id, url: session.url });
   } catch (err: any) {
     return NextResponse.json(
-      { error: (err as Error).message || 'Failed to create checkout session' },
+      { error: 'Failed to create checkout session' },
       { status: 500 }
     );
   }

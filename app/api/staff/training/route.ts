@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 
     if (modulesError) {
       return NextResponse.json(
-        { error: 'Operation failed' },
+        { error: 'Failed to fetch modules' },
         { status: 500 }
       );
     }
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
 
     if (progressError) {
       return NextResponse.json(
-        { error: 'Operation failed' },
+        { error: 'Failed to fetch progress' },
         { status: 500 }
       );
     }
@@ -128,7 +128,7 @@ export async function POST(request: Request) {
 
     if (progressError) {
       return NextResponse.json(
-        { error: 'Operation failed' },
+        { error: 'Failed to fetch progress' },
         { status: 500 }
       );
     }

@@ -1,0 +1,45 @@
+=== AUTHENTICATION / SESSION POLICY ANALYSIS ===
+
+AUTH PROVIDER: Supabase Auth (JWT-based)
+SESSION MODEL: JWT tokens stored in cookies via @supabase/ssr
+
+TOKEN EXPIRY:
+- Supabase default: 1 hour access token, 7 day refresh token
+- No custom expiry configuration found in codebase
+- Token refresh handled by Supabase client library automatically
+- ISSUE: No server-side session revocation mechanism found
+  (Supabase JWTs are valid until expiry even after signOut)
+
+IDLE TIMEOUT:
+- Implementation: lib/auth/idle-timeout.ts — 30 minutes (NIST 800-63B compliant)
+- Component: components/auth/IdleTimeoutGuard.tsx
+- ISSUE: Only used in app/lms/(app)/layout.tsx
+  - Admin portal: NO idle timeout — HIGH
+  - Instructor portal: NO idle timeout — HIGH
+  - Staff portal: NO idle timeout — HIGH
+  - Workforce board: NO idle timeout — HIGH
+- ISSUE: Client-side only enforcement — can be bypassed by disabling JavaScript
+  - No server-side session timeout enforcement
+
+PASSWORD POLICY:
+- Minimum 8 characters — GOOD (NIST 800-63B)
+- Common password blocklist (25 entries) — GOOD but small
+- No composition rules (per NIST recommendation) — GOOD
+- Sequential/repeated character check — GOOD
+- ISSUE: Password validation only enforced client-side in signup forms
+  - app/api/auth/signup/route.ts only checks length >= 8, not full validation
+  - No server-side common password check
+  - No breached password database check (NIST recommends HIBP integration)
+
+AUTH GUARD PATTERNS:
+- Server-side: requireAdmin(), requireAuth(), requireRole() in lib/auth.ts — GOOD
+- Client-side: useEffect + supabase.auth.getUser() in LMS layout — WEAK
+- API routes: Mix of getSession(), getAuthUser(), createClient() — INCONSISTENT
+- Demo mode: isDemoMode() returns false always — GOOD (disabled)
+
+SEVERITY:
+- HIGH: Idle timeout only in LMS, not admin/instructor/staff portals
+- HIGH: Client-side only idle timeout (no server enforcement)
+- MEDIUM: Password validation not fully enforced server-side
+- MEDIUM: No server-side session revocation
+- LOW: Small common password blocklist

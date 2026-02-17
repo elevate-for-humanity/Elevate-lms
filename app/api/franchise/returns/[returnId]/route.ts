@@ -173,7 +173,7 @@ export async function PATCH(
       .single();
 
     if (updateError) {
-      throw new Error(`Failed to update return: ${updateError.message}`);
+      throw new Error(`Failed to update return: ${'Update failed'}`);
     }
 
     return NextResponse.json(updated);

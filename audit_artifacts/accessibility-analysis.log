@@ -1,0 +1,39 @@
+=== ACCESSIBILITY (WCAG 2.1 AA) ANALYSIS ===
+
+SKIP NAVIGATION:
+- Root layout: SkipToContent component present — GOOD
+- PublicLayout: Skip link present — GOOD
+- Admin layout: NO skip link — MISSING
+- LMS layout: NO skip link — MISSING
+- Target id="main-content" exists in 3 layout components — GOOD
+
+ARIA ATTRIBUTES:
+- aria-label: 523 instances — MODERATE coverage
+- role attributes: 116 instances — LOW coverage
+- htmlFor (label association): 286 instances — MODERATE
+- tabIndex: 5 instances — VERY LOW
+
+FOCUS MANAGEMENT:
+- focus-visible/focus styles: 1,417 instances — GOOD coverage
+- Tailwind focus: classes widely used — GOOD
+
+FORM ACCESSIBILITY:
+- ~1,455 <input> elements lack explicit aria-label, htmlFor, or id association
+- Many are likely associated via parent <label> wrapping, but this needs verification
+- Checkbox inputs using sr-only pattern (toggle switches) — acceptable pattern
+
+AUTOMATED SCAN:
+- No Playwright/axe-core installed for automated scanning
+- No Lighthouse CI configured
+- Manual evidence only (grep-based)
+
+KNOWN ISSUES:
+1. Admin and LMS layouts lack skip navigation links
+2. Large number of inputs without explicit label association (needs manual review)
+3. No automated a11y testing in CI pipeline
+4. Only 5 tabIndex usages suggests limited keyboard navigation optimization
+
+SEVERITY:
+- MEDIUM: Missing skip-nav in admin/LMS layouts
+- MEDIUM: No automated a11y testing
+- LOW: Input label associations need manual verification

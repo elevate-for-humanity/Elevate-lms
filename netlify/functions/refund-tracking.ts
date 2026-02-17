@@ -11,13 +11,26 @@
 import type { Handler } from "@netlify/functions";
 import { createClient } from "@supabase/supabase-js";
 
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "Content-Type",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Cache-Control": "no-store, no-cache, must-revalidate",
-  Pragma: "no-cache",
-};
+const ALLOWED_ORIGINS = [
+  "https://www.elevateforhumanity.org",
+  "https://elevateforhumanity.org",
+  "https://supersonicfastermoney.com",
+  "https://www.supersonicfastermoney.com",
+];
+
+function getCorsHeaders(origin?: string) {
+  const allowedOrigin = origin && ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+  return {
+    "Access-Control-Allow-Origin": allowedOrigin,
+    "Access-Control-Allow-Headers": "Content-Type",
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Cache-Control": "no-store, no-cache, must-revalidate",
+    Pragma: "no-cache",
+    Vary: "Origin",
+  };
+}
+
+const CORS_HEADERS = getCorsHeaders();
 
 // In-memory rate limiting (per function instance)
 const ipLimits = new Map<string, { count: number; resetTime: number }>();
@@ -39,23 +52,26 @@ function checkRateLimit(key: string): boolean {
 const delay = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // Generic not-found response (anti-enumeration)
-function notFound() {
+function notFound(headers: Record<string, string> = getCorsHeaders()) {
   return {
     statusCode: 404,
-    headers: CORS_HEADERS,
+    headers,
     body: JSON.stringify({ error: "Not found" }),
   };
 }
 
 export const handler: Handler = async (event) => {
+  const origin = event.headers?.origin || event.headers?.Origin;
+  const corsHeaders = getCorsHeaders(origin);
+
   if (event.httpMethod === "OPTIONS") {
-    return { statusCode: 204, headers: CORS_HEADERS, body: "" };
+    return { statusCode: 204, headers: corsHeaders, body: "" };
   }
 
   if (event.httpMethod !== "POST") {
     return {
       statusCode: 405,
-      headers: CORS_HEADERS,
+      headers: corsHeaders,
       body: JSON.stringify({ error: "Method Not Allowed" }),
     };
   }
@@ -70,7 +86,7 @@ export const handler: Handler = async (event) => {
     await delay(FAILURE_DELAY_MS);
     return {
       statusCode: 429,
-      headers: CORS_HEADERS,
+      headers: corsHeaders,
       body: JSON.stringify({ error: "Too many requests" }),
     };
   }
@@ -82,7 +98,7 @@ export const handler: Handler = async (event) => {
     if (!supabaseUrl || !anonKey) {
       return {
         statusCode: 500,
-        headers: CORS_HEADERS,
+        headers: corsHeaders,
         body: JSON.stringify({ error: "Server configuration error" }),
       };
     }
@@ -93,7 +109,7 @@ export const handler: Handler = async (event) => {
     // Validate format (must start with SFC-)
     if (!trackingCode || !trackingCode.startsWith("SFC-")) {
       await delay(FAILURE_DELAY_MS);
-      return notFound();
+      return notFound(corsHeaders);
     }
 
     // Rate limit by tracking code
@@ -101,7 +117,7 @@ export const handler: Handler = async (event) => {
       await delay(FAILURE_DELAY_MS);
       return {
         statusCode: 429,
-        headers: CORS_HEADERS,
+        headers: corsHeaders,
         body: JSON.stringify({ error: "Too many requests" }),
       };
     }
@@ -119,7 +135,7 @@ export const handler: Handler = async (event) => {
 
     if (error || !data) {
       await delay(FAILURE_DELAY_MS);
-      return notFound();
+      return notFound(corsHeaders);
     }
 
     // Map status to user-friendly message
@@ -133,7 +149,7 @@ export const handler: Handler = async (event) => {
 
     return {
       statusCode: 200,
-      headers: CORS_HEADERS,
+      headers: corsHeaders,
       body: JSON.stringify({
         status: data.status,
         statusMessage: statusMessages[data.status] || "Status update pending.",
@@ -145,6 +161,6 @@ export const handler: Handler = async (event) => {
     };
   } catch {
     await delay(FAILURE_DELAY_MS);
-    return notFound();
+    return notFound(corsHeaders);
   }
 };

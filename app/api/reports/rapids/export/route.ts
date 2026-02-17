@@ -2,6 +2,7 @@ import { logger } from '@/lib/logger';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { auditPiiAccess } from '@/lib/auditLog';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -179,6 +180,8 @@ export async function GET(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
 
+    await auditPiiAccess({ action: 'PII_ACCESS', entity: 'pii', req: request, metadata: { route: '/api/reports/rapids/export' } });
+
     const supabase = await createClient();
     
     // Check auth
@@ -302,7 +305,7 @@ export async function GET(request: NextRequest) {
         programName: a.program_slug || 'Barber Apprenticeship',
         occupationCode: a.occupation_code || '39-5011.00',
         occupationTitle: a.occupation_title || 'Barber',
-        sponsorName: process.env.NEXT_PUBLIC_RAPIDS_SPONSOR_NAME || '2Exclusive LLC-S',
+        sponsorName: process.env.NEXT_PUBLIC_RAPIDS_SPONSOR_NAME || '2Exclusive LLC',
         rapidsId: a.rapids_id || '',
         registrationDate: formatDate(a.registration_date || a.started_at || a.created_at),
         expectedCompletionDate: formatDate(a.expected_completion_date),
@@ -331,7 +334,7 @@ export async function GET(request: NextRequest) {
         exportDate: new Date().toISOString(),
         exportType: type,
         recordCount: rapidsData2.length,
-        sponsorName: process.env.NEXT_PUBLIC_RAPIDS_SPONSOR_NAME || '2Exclusive LLC-S',
+        sponsorName: process.env.NEXT_PUBLIC_RAPIDS_SPONSOR_NAME || '2Exclusive LLC',
         programNumber: process.env.NEXT_PUBLIC_RAPIDS_PROGRAM_NUMBER || '2025-IN-132301',
         apprentices: rapidsData2,
       });

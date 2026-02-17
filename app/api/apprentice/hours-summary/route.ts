@@ -159,7 +159,7 @@ const supabase = await createClient();
   } catch (error: any) {
     logger.error('Error in hours-summary:', error);
     return NextResponse.json(
-      { error: error?.message || 'Failed to fetch hour summary' },
+      { error: 'Failed to fetch hour summary' },
       { status: 500 }
     );
   }

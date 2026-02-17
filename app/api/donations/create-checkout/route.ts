@@ -72,7 +72,7 @@ export async function POST(request: Request) {
 
     if (donationError) {
       return NextResponse.json(
-        { error: 'Operation failed' },
+        { error: 'Donation processing failed' },
         { status: 500 }
       );
     }

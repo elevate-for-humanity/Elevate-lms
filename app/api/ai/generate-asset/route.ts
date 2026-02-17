@@ -5,14 +5,10 @@ export const maxDuration = 60;
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
-import { requireAuth } from '@/lib/api/requireAuth';
 
 export async function POST(request: NextRequest) {
     const rateLimited = await applyRateLimit(request, 'api');
     if (rateLimited) return rateLimited;
-
-    const auth = await requireAuth(request);
-    if (auth.error) return auth.error;
 
   const openaiKey = process.env.OPENAI_API_KEY;
   if (!openaiKey) {
@@ -58,7 +54,7 @@ export async function POST(request: NextRequest) {
       if (!response.ok) {
         const error = await response.json();
         return NextResponse.json(
-          { error: error.error?.message || 'DALL-E API error' },
+          { error: 'DALL-E API error' },
           { status: 500 }
         );
       }
@@ -101,7 +97,7 @@ export async function POST(request: NextRequest) {
       if (!response.ok) {
         const error = await response.json();
         return NextResponse.json(
-          { error: error.error?.message || 'OpenAI API error' },
+          { error: 'OpenAI API error' },
           { status: 500 }
         );
       }

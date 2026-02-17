@@ -4,6 +4,7 @@ import { supersonicTaxEngine } from '@/lib/integrations/supersonic-tax';
 import { Resend } from 'resend';
 import { prepareSSNForStorage } from '@/lib/security/ssn';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { auditPiiAccess } from '@/lib/auditLog';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -80,6 +81,9 @@ export async function POST(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const taxReturn: TaxReturnBody = await request.json();
+
+    await auditPiiAccess({ action: 'PII_ACCESS', entity: 'tax_return', req: request, metadata: { route: '/api/supersonic-fast-cash/file-return' } });
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
     // Securely hash SSN before storage

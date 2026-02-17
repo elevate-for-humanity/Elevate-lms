@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation';
 import { createClient } from '@/lib/supabase/server';
 import Link from 'next/link';
 import { BookOpen, Users, BarChart, Settings, Home, MessageSquare } from 'lucide-react';
+import { IdleTimeoutGuard } from '@/components/auth/IdleTimeoutGuard';
 
 export const dynamic = 'force-dynamic';
 
@@ -59,6 +60,7 @@ export default async function InstructorLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <IdleTimeoutGuard />
       {/* Top navigation bar */}
       <nav className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4">

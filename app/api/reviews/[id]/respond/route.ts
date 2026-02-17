@@ -61,7 +61,7 @@ export async function POST(
       .single();
 
     if (updateError) {
-      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
+      return NextResponse.json({ error: 'Update failed' }, { status: 500 });
     }
 
     if (!review) {

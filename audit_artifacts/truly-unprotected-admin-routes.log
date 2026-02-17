@@ -1,0 +1,2 @@
+app/api/admin/applications/[id]/approve/route.ts
+app/api/admin/send-reminder/route.ts

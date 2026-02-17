@@ -6,6 +6,7 @@ export const maxDuration = 60;
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
 import { parseBody } from '@/lib/api-helpers';
+import { auditPiiAccess } from '@/lib/auditLog';
 import { logger } from '@/lib/logger';
 import { toErrorMessage } from '@/lib/safe';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
@@ -38,6 +39,17 @@ export async function GET(request: NextRequest) {
     if (rateLimited) return rateLimited;
 
     const supabase = await createClient();
+
+    // FERPA audit: log payroll PII access
+    const { data: { user: payrollUser } } = await supabase.auth.getUser();
+    await auditPiiAccess({
+      actor_user_id: payrollUser?.id,
+      action: 'PII_ACCESS',
+      entity: 'payroll',
+      req: request,
+      metadata: { route: '/api/hr/payroll', method: 'GET' },
+    });
+
     const searchParams = request.nextUrl.searchParams;
 
     const year = searchParams.get('year');

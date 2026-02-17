@@ -10,7 +10,10 @@ export type AuditAction =
   | 'LOGOUT'
   | 'APPROVE'
   | 'REJECT'
-  | 'SUBMIT';
+  | 'SUBMIT'
+  | 'PII_ACCESS'
+  | 'PII_VERIFY'
+  | 'PII_EXPORT';
 
 export type AuditEntity =
   | 'referral'
@@ -25,9 +28,13 @@ export type AuditEntity =
   | 'audit_snapshot'
   | 'employer_onboarding'
   | 'license_purchase'
-  | 'tenant';
+  | 'tenant'
+  | 'ssn'
+  | 'tax_return'
+  | 'payroll'
+  | 'pii';
 
-export type ActorRole = 'sponsor' | 'employer' | 'workone' | 'admin' | 'system';
+export type ActorRole = 'sponsor' | 'employer' | 'workone' | 'admin' | 'system' | 'staff' | 'preparer';
 
 export interface AuditLogParams {
   actor_user_id?: string;
@@ -268,3 +275,36 @@ export async function auditExport(
     req,
   });
 }
+
+/**
+ * Log PII/SSN access for FERPA compliance.
+ * Call this in any route that reads, writes, or verifies SSN data.
+ */
+export async function auditPiiAccess({
+  actor_user_id,
+  actor_role = 'system',
+  action = 'PII_ACCESS',
+  entity = 'ssn',
+  entity_id,
+  req,
+  metadata,
+}: {
+  actor_user_id?: string;
+  actor_role?: ActorRole;
+  action?: 'PII_ACCESS' | 'PII_VERIFY' | 'PII_EXPORT';
+  entity?: AuditEntity;
+  entity_id?: string;
+  req?: Request;
+  metadata?: Record<string, any>;
+}) {
+  return auditLog({
+    actor_user_id,
+    actor_role,
+    action,
+    entity,
+    entity_id,
+    req,
+    metadata,
+  });
+}
+

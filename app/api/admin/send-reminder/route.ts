@@ -5,6 +5,8 @@ export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 import { createAdminClient } from '@/lib/supabase/admin';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
+import { requireApiAuth } from '@/lib/auth';
+import { createClient } from '@/lib/supabase/server';
 
 async function sendSMS(phone: string, message: string): Promise<boolean> {
   if (
@@ -46,6 +48,26 @@ export async function POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
     if (rateLimited) return rateLimited;
+
+    // Auth guard: require authenticated admin user
+    try {
+      await requireApiAuth();
+      const supabase = await createClient();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+      if (!profile?.role || !['admin', 'super_admin', 'staff'].includes(profile.role)) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
+    } catch {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
 
     const body = await req.json();
     const { application_id, reminder_type } = body;

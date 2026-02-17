@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         results.push({
           migration: table,
           status: 'ERROR',
-          error: e.message
+          error: 'Operation failed'
         });
       }
     }

@@ -57,7 +57,7 @@ const { id } = await params;
       .eq('user_id', user.id);
 
     if (deleteError) {
-      return NextResponse.json({ error: 'Operation failed' }, { status: 500 });
+      return NextResponse.json({ error: 'Delete failed' }, { status: 500 });
     }
 
     return NextResponse.json({

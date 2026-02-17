@@ -201,7 +201,7 @@ Legacy Seeds:
 - `20251228_add_scorm_tables.sql` - SCORM support
 - `20260101_document_upload_system.sql` - Documents
 - `20260101_id_verification_system.sql` - ID verification
-- `20260101_drake_training_system.sql` - SupersonicFastCash tax training
+- `20260101_eps_training_system.sql` - SupersonicFastCash tax training
 
 ### Seeds (Use Master)
 - `supabase/seeds/000_master_seed.sql` - USE THIS

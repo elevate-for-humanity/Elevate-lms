@@ -294,7 +294,7 @@ All 9 pages that were fixed to remove login walls remain fixed:
 
 ### Build Warnings
 - `[Sezzle] Not configured - missing env vars` (5 occurrences)
-- `Drake Software credentials not configured` (3 occurrences)
+- `EPS credentials not configured` (3 occurrences)
 - `Using edge runtime disables static generation` (1 page)
 
 ### HTTP Status on Key Pages

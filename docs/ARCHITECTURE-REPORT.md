@@ -193,7 +193,7 @@ Three domains route through `proxy.ts`:
 | **Auth** | Supabase Auth, Google OAuth, Facebook OAuth, GitHub OAuth, Azure AD, SAML, LDAP |
 | **Email** | Resend (primary), SendGrid, Mailchimp, SMTP |
 | **AI** | OpenAI, ElevenLabs, HeyGen, Synthesia, Suno, Runway, D-ID |
-| **Tax/IRS** | Drake Software, IRS MeF (SOAP), CareerSafe, Certiport |
+| **Tax/IRS** | EPS (Electronic Processing System), IRS MeF (SOAP), CareerSafe, Certiport |
 | **Government** | SAM.gov, Grants.gov, RAPIDS, WOTC |
 | **CRM** | HubSpot, Salesforce |
 | **Communication** | Twilio (SMS), Zoom, Jitsi, Tawk, Tidio, Zendesk, Intercom |

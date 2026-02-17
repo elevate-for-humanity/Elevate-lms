@@ -1,3 +1,4 @@
+/** @deprecated Use '@/lib/supabase/server' instead. */
 // Server-only Supabase client (no session persistence)
 import { createClient } from '@supabase/supabase-js';
 

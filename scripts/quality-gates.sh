@@ -97,7 +97,25 @@ done
 echo ""
 
 # =============================================================================
-# CHECK 5: Console.log in production code
+# CHECK 5: Malformed imports (e.g. two import statements merged on one line)
+# =============================================================================
+echo "Checking for malformed import lines..."
+
+MALFORMED_IMPORTS=$(grep -rn "^import {.*from.*import\|^import.*};.*} from" --include="*.ts" --include="*.tsx" app/ lib/ 2>/dev/null || true)
+
+if [ -n "$MALFORMED_IMPORTS" ]; then
+  echo -e "${RED}❌ FAIL:${NC} Malformed import lines found (likely bad merge/codegen):"
+  echo "$MALFORMED_IMPORTS" | while read line; do
+    echo "   $line"
+  done
+  ERRORS=$((ERRORS + 1))
+else
+  echo -e "${GREEN}✅ No malformed imports detected${NC}"
+fi
+echo ""
+
+# =============================================================================
+# CHECK 6: Console.log in production code
 # =============================================================================
 echo "Checking for console.log statements..."
 

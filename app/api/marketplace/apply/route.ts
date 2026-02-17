@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
   // Rate limiting: 3 applications per hour per IP
   const identifier = getClientIdentifier(req.headers);
-  const rateLimitResult = rateLimit(identifier, {
+  const rateLimitResult = await rateLimit(identifier, {
     limit: 3,
     window: 60 * 60 * 1000,
   });

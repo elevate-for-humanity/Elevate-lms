@@ -114,7 +114,7 @@ export async function POST(request: Request) {
 
     // Rate limiting
     const identifier = `upload:${user.id}`;
-    const rateLimitResult = rateLimit(identifier, UPLOAD_RATE_LIMIT);
+    const rateLimitResult = await rateLimit(identifier, UPLOAD_RATE_LIMIT);
 
     if (!rateLimitResult.ok) {
       return NextResponse.json(

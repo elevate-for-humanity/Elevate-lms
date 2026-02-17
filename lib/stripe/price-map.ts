@@ -44,6 +44,8 @@ export const STRIPE_PRICE_IDS: Record<string, string> = {
   "barber-license": process.env.STRIPE_PRICE_BARBER || "price_1Ss3bDIRNf5vPH3AQh4x3gYn",
   "cosmetology-license": process.env.STRIPE_PRICE_COSMETOLOGY || "price_1Ss3bXIRNf5vPH3AdF9ISYBO",
   "tax-preparation": process.env.STRIPE_PRICE_TAX_PREP || "price_1Ss3bPIRNf5vPH3AOz1FyRZ0",
+  "tax-prep-financial-services": "price_1SzM1VIRNf5vPH3APvgSpKRU", // $0 WIOA
+  "tax-prep-financial-services-full": "price_1SsY60IRNf5vPH3ApAUmWGJ9", // $4,950 self-pay
   
   // Technology Courses
   "it-support-specialist": process.env.STRIPE_PRICE_IT_SUPPORT || "price_1Ss3bOIRNf5vPH3ArNQHT9HZ",
@@ -244,6 +246,11 @@ export const PAYMENT_LINKS = {
   // WIOA PROGRAMS ($0 Free Enrollment)
   // ============================================================================
   
+  // Tax Preparation & Financial Services - FREE (WIOA)
+  taxPrep: {
+    free: "https://buy.stripe.com/28EdRa7xwcPJdpsd0z8EN0N",
+  },
+
   // HVAC Technician - FREE (WIOA)
   hvac: {
     free: "https://buy.stripe.com/fZu3cw3hg2b5bhk0dN8EN0B",

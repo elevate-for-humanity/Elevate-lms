@@ -40,6 +40,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Cache TypeScript build info
+        uses: actions/cache@v3
+        with:
+          path: .tsbuildinfo
+          key: ${{ runner.os }}-tsbuildinfo-${{ hashFiles('tsconfig.json', 'pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-tsbuildinfo-
+
       - name: Run linter
         run: pnpm run lint
         continue-on-error: false
@@ -54,7 +62,6 @@ jobs:
 
       - name: Type check
         run: pnpm run typecheck
-        continue-on-error: true  # Keep as warning until TypeScript strict mode enabled
 
       - name: Archetype + Quality Gates
         run: pnpm run archetype:check

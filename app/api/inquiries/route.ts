@@ -12,6 +12,7 @@ import {
 } from '@/lib/rateLimit';
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 
+// Public endpoint — anonymous inquiry submissions
 export async function POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'strict');
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
 
     // Rate limiting
     const identifier = getClientIdentifier(req.headers);
-    const rateLimitResult = rateLimit(
+    const rateLimitResult = await rateLimit(
       `inquiries:${identifier}`,
       RATE_LIMITS.APPLICATION_FORM
     );

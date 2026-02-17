@@ -13,6 +13,7 @@ import {
 import { applyRateLimit } from '@/lib/api/withRateLimit';
 import { logger } from '@/lib/logger';
 
+// Public endpoint — anonymous application submissions
 export async function POST(req: Request) {
   try {
     const rateLimited = await applyRateLimit(req, 'api');
@@ -20,7 +21,7 @@ export async function POST(req: Request) {
 
     // Rate limiting: 3 requests per minute per IP
     const identifier = getClientIdentifier(req.headers);
-    const rateLimitResult = rateLimit(
+    const rateLimitResult = await rateLimit(
       `applications:${identifier}`,
       RATE_LIMITS.APPLICATION_FORM
     );

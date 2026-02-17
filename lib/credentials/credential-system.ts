@@ -79,6 +79,23 @@ export interface CourseCredential {
  * All Available Credentials
  */
 export const CREDENTIALS: Record<string, Credential> = {
+  // IRS VITA/TCE Certification
+  'irs-vita-tce': {
+    id: 'irs-vita-tce',
+    name: 'IRS VITA/TCE Certification',
+    type: 'Industry - Recognized Certification',
+    provider: 'Internal Revenue Service',
+    description:
+      'IRS Volunteer Income Tax Assistance / Tax Counseling for the Elderly certification. Qualifies holder to prepare federal tax returns at IRS-approved VITA sites.',
+    externalId: 'IRS-VITA-TCE',
+    verificationUrl: 'https://apps.irs.gov/app/vita/',
+    expirationMonths: 12, // Annual recertification required
+    requiresRenewal: true,
+    stackable: true,
+    industryRecognized: true,
+    nationallyRecognized: true,
+  },
+
   // Rise Up Credentials
   'rise-up-certificate': {
     id: 'rise-up-certificate',

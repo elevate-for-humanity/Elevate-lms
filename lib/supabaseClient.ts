@@ -1,3 +1,8 @@
+/**
+ * @deprecated Use '@/lib/supabase/client' instead.
+ * This file is kept for backward compatibility.
+ */
+
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 let _supabase: SupabaseClient | null = null;

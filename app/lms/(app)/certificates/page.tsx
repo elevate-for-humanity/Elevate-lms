@@ -6,6 +6,8 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import CertificateDownload from '@/components/CertificateDownload';
 import CertificateGenerator from '@/components/CertificateGenerator';
+import { CertificateTemplate } from '@/components/lms/CertificateTemplate';
+import { GenerateCertificateButton } from '@/components/lms/GenerateCertificateButton';
 
 export const metadata: Metadata = {
   alternates: {
@@ -76,11 +78,19 @@ export default async function CertificatesPage() {
 
         {certificates && certificates.length > 0 ? (
           <div className="space-y-8">
-            {certificates.map((cert) => (
-              <CertificateDownload
-                key={cert.id}
-                certificateId={cert.id}
-              />
+            {certificates.map((cert: any) => (
+              <div key={cert.id} className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+                <CertificateTemplate
+                  studentName={profile?.first_name ? `${profile.first_name} ${profile.last_name || ''}` : user.email || 'Student'}
+                  courseName={cert.courses?.title || cert.course_name || 'Course'}
+                  completionDate={cert.issued_at}
+                  certificateId={cert.id}
+                />
+                <div className="p-4 border-t border-slate-100 flex justify-end gap-3">
+                  <GenerateCertificateButton certificateId={cert.id} />
+                  <CertificateDownload certificateId={cert.id} />
+                </div>
+              </div>
             ))}
           </div>
         ) : (

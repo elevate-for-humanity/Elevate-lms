@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
+import AnalyticsDashboard from '@/components/admin/AnalyticsDashboard';
 import {
   BookOpen,
   FileText,
@@ -177,6 +178,11 @@ export default async function AdminHubPage() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Analytics Overview */}
+        <div className="mb-10">
+          <AnalyticsDashboard />
         </div>
 
         {/* Section Grid */}

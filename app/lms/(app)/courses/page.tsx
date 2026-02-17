@@ -5,6 +5,8 @@ import { redirect } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Clock, Users, Star } from 'lucide-react';
+import { CourseCard } from '@/components/lms/CourseCard';
+import { EnrollButton } from '@/components/lms/EnrollButton';
 
 export const metadata: Metadata = {
   title: 'Interactive Courses | LMS',
@@ -149,68 +151,20 @@ export default async function InteractiveCoursesPage() {
           ) : (
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {displayCourses.map((course: any) => {
-              const isEnrolled = enrolledCourseIds.has(course.id);
               const enrollment = enrollmentMap.get(course.id);
-              
+
               return (
-                <div
+                <CourseCard
                   key={course.id}
-                  className="bg-white rounded-xl shadow-md overflow-hidden border border-gray-100 hover:shadow-lg transition"
-                >
-                  <div className="relative h-44">
-                    <Image
-                      src={course.image}
-                      alt={course.title}
-                      fill
-                      className="object-cover"
-                    />
-                    <div className="absolute top-3 left-3">
-                      <span className="bg-brand-blue-600 text-white px-2 py-1 rounded text-xs font-medium">
-                        {course.level}
-                      </span>
-                    </div>
-                    {isEnrolled && (
-                      <div className="absolute top-3 right-3">
-                        <span className="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">
-                          Enrolled
-                        </span>
-                      </div>
-                    )}
-                    <div className="absolute bottom-3 right-3 bg-slate-800 text-white px-2 py-1 rounded text-sm flex items-center gap-1">
-                      <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                      {course.rating}
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-slate-900 mb-2">{course.title}</h3>
-                    <p className="text-slate-600 text-sm mb-3 line-clamp-2">{course.description}</p>
-                    <div className="flex items-center gap-4 text-sm text-slate-500 mb-4">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        {course.duration}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        {(course.students || 0).toLocaleString()}
-                      </span>
-                    </div>
-                    {isEnrolled ? (
-                      <Link
-                        href={`/lms/courses/${course.id}`}
-                        className="block w-full bg-green-600 hover:bg-green-700 text-white text-center py-2 rounded-lg font-medium transition"
-                      >
-                        Continue Learning ({enrollment?.progress || 0}%)
-                      </Link>
-                    ) : (
-                      <Link
-                        href={`/lms/courses/${course.id}`}
-                        className="block w-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white text-center py-2 rounded-lg font-medium transition"
-                      >
-                        View Course
-                      </Link>
-                    )}
-                  </div>
-                </div>
+                  slug={course.id}
+                  title={course.title}
+                  level={course.level}
+                  thumbnailUrl={course.image}
+                  rating={course.rating}
+                  duration={course.duration}
+                  enrollments={course.students}
+                  progress={enrollment?.progress}
+                />
               );
             })}
           </div>

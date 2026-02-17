@@ -7,6 +7,8 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/client';
 import { Clock, XCircle, FileText, ArrowRight } from 'lucide-react';
+import { EnrollmentStatusTracker } from '@/components/enrollment/EnrollmentStatusTracker';
+import { FundingPathwayBadge } from '@/components/enrollment/FundingPathwayBadge';
 
 interface Application {
   id: string;
@@ -181,6 +183,22 @@ export default function ApplicationStatusPage() {
           )}
         </div>
       </div>
+
+      {/* Enrollment Progress Tracker */}
+      {application && (
+        <div className="mt-8 max-w-2xl mx-auto">
+          <EnrollmentStatusTracker
+            currentStep={application.status === 'approved' ? 'enrolled' : application.status === 'pending' ? 'applied' : 'applied'}
+            enrollmentId={application.id}
+          />
+          <div className="mt-4">
+            <FundingPathwayBadge
+              pathway="wioa"
+              status={application.status as any}
+            />
+          </div>
+        </div>
+      )}
 
       <div className="mt-6 text-center">
         <p className="text-gray-600">

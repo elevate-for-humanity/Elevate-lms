@@ -39,6 +39,11 @@ import { ApprenticeProgressWidget } from '@/components/apprenticeship/Apprentice
 import { MiladyAccessCard } from '@/components/apprenticeship/MiladyAccessCard';
 import { TutorialSystem } from '@/components/TutorialSystem';
 import PeerTutoringMarketplace from '@/components/PeerTutoringMarketplace';
+import { NotificationBell } from '@/components/lms/NotificationBell';
+import { GlobalSearch } from '@/components/lms/GlobalSearch';
+import { CertificationTracker } from '@/components/lms/CertificationTracker';
+import { RequirementsChecklist } from '@/components/lms/RequirementsChecklist';
+import { RecommendedCourses } from '@/components/lms/RecommendedCourses';
 
 /**
  * STUDENT PORTAL - ORCHESTRATED
@@ -185,9 +190,13 @@ export default async function StudentDashboardOrchestrated() {
 
   return (
     <>
-      {/* Breadcrumbs */}
-      <div className="mb-6">
+      {/* Top Bar: Breadcrumbs + Search + Notifications */}
+      <div className="mb-6 flex items-center justify-between gap-4">
         <Breadcrumbs items={[{ label: 'LMS', href: '/lms' }, { label: 'Dashboard' }]} />
+        <div className="flex items-center gap-3">
+          <GlobalSearch />
+          <NotificationBell />
+        </div>
       </div>
 
       {/* Hero Welcome Banner */}
@@ -276,6 +285,25 @@ export default async function StudentDashboardOrchestrated() {
           <PointsDisplay userId={user.id} />
           <StreakTracker userId={user.id} />
           <BadgeShowcase userId={user.id} limit={3} />
+        </div>
+
+        {/* Certification Progress & Requirements */}
+        {activeEnrollment && (
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            <CertificationTracker
+              programId={activeEnrollment.program_id || activeEnrollment.partner_lms_course_id || ''}
+              userId={user.id}
+            />
+            <RequirementsChecklist
+              requirements={[]}
+              enrollmentId={activeEnrollment.id}
+            />
+          </div>
+        )}
+
+        {/* Recommended Courses */}
+        <div className="mb-8">
+          <RecommendedCourses />
         </div>
 
         {/* Beauty Apprenticeship Widgets - Show for beauty industry programs */}

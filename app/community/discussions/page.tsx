@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Metadata } from 'next';
 import { MessageSquare, Clock, ChevronRight, Plus } from 'lucide-react';
 import { Breadcrumbs } from '@/components/ui/Breadcrumbs';
+import DiscussionForums from '@/components/forums/DiscussionForums';
 
 export const metadata: Metadata = {
   title: 'Community Discussions | Elevate For Humanity',
@@ -160,6 +161,11 @@ export default async function DiscussionsPage() {
                 </Link>
               </div>
             )}
+          </div>
+
+          {/* Full Discussion Forums Component */}
+          <div className="mt-12">
+            <DiscussionForums />
           </div>
         </div>
       </div>

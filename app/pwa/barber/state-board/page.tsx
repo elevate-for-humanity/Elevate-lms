@@ -2,50 +2,41 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { 
+import { createClient } from '@/lib/supabase/client';
+import {
   ArrowLeft, BookOpen, Clock, Play,
   FileText, Award, AlertCircle, Loader2, Lock,
-  ChevronRight, Scissors, TrendingUp, Target
+  ChevronRight, TrendingUp, Target
 } from 'lucide-react';
 
 interface PracticeTest {
   id: string;
   title: string;
-  questions: number;
-  duration: string;
-  completed: boolean;
-  score?: number;
-  passingScore: number;
+  question_count: number;
+  time_limit_minutes: number | null;
+  passing_score: number;
+  category: string;
+}
+
+interface TestAttempt {
+  test_id: string;
+  score: number;
+  passed: boolean;
+  completed_at: string | null;
 }
 
 interface StudyTopic {
   id: string;
   title: string;
-  description: string;
-  lessons: number;
-  completed: number;
-  category: 'theory' | 'practical' | 'sanitation' | 'laws';
+  content: string | null;
+  category: string;
+  resources: any[];
+  sort_order: number;
 }
 
-const PRACTICE_TESTS: PracticeTest[] = [
-  { id: '1', title: 'Written Exam Practice 1', questions: 50, duration: '60 min', completed: true, score: 84, passingScore: 75 },
-  { id: '2', title: 'Written Exam Practice 2', questions: 50, duration: '60 min', completed: true, score: 88, passingScore: 75 },
-  { id: '3', title: 'Written Exam Practice 3', questions: 75, duration: '90 min', completed: false, passingScore: 75 },
-  { id: '4', title: 'Full Mock Exam', questions: 100, duration: '120 min', completed: false, passingScore: 75 },
-];
-
-const STUDY_TOPICS: StudyTopic[] = [
-  { id: '1', title: 'Sanitation & Infection Control', description: 'Sterilization, disinfection, safety protocols', lessons: 12, completed: 12, category: 'sanitation' },
-  { id: '2', title: 'Hair Structure & Chemistry', description: 'Hair anatomy, chemical processes', lessons: 8, completed: 6, category: 'theory' },
-  { id: '3', title: 'Cutting Techniques', description: 'Clipper cuts, shears, razors', lessons: 15, completed: 10, category: 'practical' },
-  { id: '4', title: 'Shaving & Facial Hair', description: 'Straight razor, beard trimming', lessons: 10, completed: 4, category: 'practical' },
-  { id: '5', title: 'Indiana State Laws', description: 'Licensing requirements, regulations', lessons: 6, completed: 2, category: 'laws' },
-  { id: '6', title: 'Business & Ethics', description: 'Client relations, professional conduct', lessons: 5, completed: 0, category: 'theory' },
-];
-
-const CATEGORY_COLORS = {
+const CATEGORY_COLORS: Record<string, { bg: string; text: string }> = {
   theory: { bg: 'bg-brand-blue-500/20', text: 'text-brand-blue-400' },
-  practical: { bg: 'bg-brand-blue-500/20', text: 'text-brand-blue-400' },
+  practical: { bg: 'bg-purple-500/20', text: 'text-purple-400' },
   sanitation: { bg: 'bg-green-500/20', text: 'text-green-400' },
   laws: { bg: 'bg-amber-500/20', text: 'text-amber-400' },
 };
@@ -53,10 +44,38 @@ const CATEGORY_COLORS = {
 export default function StateBoardPrepPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'study' | 'practice'>('study');
-  const [hoursComplete, setHoursComplete] = useState(847);
+  const [tests, setTests] = useState<PracticeTest[]>([]);
+  const [attempts, setAttempts] = useState<TestAttempt[]>([]);
+  const [topics, setTopics] = useState<StudyTopic[]>([]);
+  const [totalHours, setTotalHours] = useState(0);
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 500);
+    const supabase = createClient();
+
+    async function load() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) { setLoading(false); return; }
+
+        const [testsRes, attemptsRes, topicsRes, hoursRes] = await Promise.all([
+          supabase.from('practice_tests').select('*').eq('is_active', true).order('created_at'),
+          supabase.from('practice_test_attempts').select('test_id, score, passed, completed_at').eq('user_id', user.id),
+          supabase.from('study_topics').select('*').eq('is_active', true).order('sort_order'),
+          supabase.from('hour_entries').select('hours').eq('user_id', user.id).eq('status', 'approved'),
+        ]);
+
+        setTests(testsRes.data || []);
+        setAttempts(attemptsRes.data || []);
+        setTopics(topicsRes.data || []);
+        setTotalHours((hoursRes.data || []).reduce((sum, h) => sum + (Number(h.hours) || 0), 0));
+      } catch {
+        // Fail gracefully — show empty state
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
   }, []);
 
   if (loading) {
@@ -67,47 +86,64 @@ export default function StateBoardPrepPage() {
     );
   }
 
-  const totalLessons = STUDY_TOPICS.reduce((sum, t) => sum + t.lessons, 0);
-  const completedLessons = STUDY_TOPICS.reduce((sum, t) => sum + t.completed, 0);
-  const studyProgress = Math.round((completedLessons / totalLessons) * 100);
-  
-  const completedTests = PRACTICE_TESTS.filter(t => t.completed).length;
-  const avgScore = PRACTICE_TESTS.filter(t => t.completed && t.score)
-    .reduce((sum, t, _, arr) => sum + (t.score || 0) / arr.length, 0);
+  // Best attempt per test
+  const bestAttempts = new Map<string, TestAttempt>();
+  attempts.forEach(a => {
+    const existing = bestAttempts.get(a.test_id);
+    if (!existing || a.score > existing.score) bestAttempts.set(a.test_id, a);
+  });
 
-  const isEligible = hoursComplete >= 1500;
+  const completedTests = tests.filter(t => bestAttempts.get(t.id)?.passed).length;
+  const avgScore = attempts.length > 0
+    ? Math.round(attempts.reduce((sum, a) => sum + a.score, 0) / attempts.length)
+    : 0;
+  const isEligible = totalHours >= 1500;
 
   return (
     <div className="min-h-screen bg-slate-900 pb-20">
-      <header className="bg-indigo-600 px-4 pt-12 pb-6 safe-area-inset-top">
+      <header className="bg-brand-blue-600 px-4 pt-12 pb-6 safe-area-inset-top">
         <div className="flex items-center gap-4 mb-4">
-          <Link href="/pwa/barber/training" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+          <Link href="/pwa/barber" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
             <ArrowLeft className="w-5 h-5 text-white" />
           </Link>
           <div>
             <h1 className="text-xl font-bold text-white">State Board Prep</h1>
-            <p className="text-indigo-200 text-sm">Indiana Barber Exam</p>
+            <p className="text-brand-blue-200 text-sm">Indiana Barber License Exam</p>
           </div>
         </div>
 
-        {/* Eligibility Status */}
-        <div className={`rounded-xl p-4 ${isEligible ? 'bg-green-500/20' : 'bg-amber-500/20'}`}>
+        {/* Eligibility banner */}
+        <div className={`rounded-xl p-3 ${isEligible ? 'bg-green-500/20' : 'bg-amber-500/20'}`}>
           <div className="flex items-center gap-3">
             {isEligible ? (
-              <span className="text-slate-400 flex-shrink-0">•</span>
+              <Award className="w-6 h-6 text-green-400" />
             ) : (
               <AlertCircle className="w-6 h-6 text-amber-400" />
             )}
             <div>
               <p className={`font-medium ${isEligible ? 'text-green-300' : 'text-amber-300'}`}>
-                {isEligible ? 'Eligible to Take Exam' : 'Not Yet Eligible'}
+                {isEligible ? 'Eligible for State Board Exam' : `${Math.round(totalHours).toLocaleString()} / 1,500 hours`}
               </p>
-              <p className="text-white/70 text-sm">
-                {isEligible 
-                  ? 'You have enough hours to schedule your state board exam'
-                  : `${1500 - hoursComplete} more hours needed (1,500 required)`}
+              <p className="text-xs text-white/60">
+                {isEligible ? 'You meet the hour requirement' : `${(1500 - totalHours).toLocaleString()} hours remaining`}
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-3 gap-3 mt-4">
+          <div className="bg-white/10 rounded-xl p-3 text-center">
+            <p className="text-2xl font-bold text-white">{topics.length}</p>
+            <p className="text-brand-blue-200 text-xs">Topics</p>
+          </div>
+          <div className="bg-white/10 rounded-xl p-3 text-center">
+            <p className="text-2xl font-bold text-white">{completedTests}/{tests.length}</p>
+            <p className="text-brand-blue-200 text-xs">Tests Passed</p>
+          </div>
+          <div className="bg-white/10 rounded-xl p-3 text-center">
+            <p className="text-2xl font-bold text-white">{avgScore}%</p>
+            <p className="text-brand-blue-200 text-xs">Avg Score</p>
           </div>
         </div>
       </header>
@@ -118,200 +154,115 @@ export default function StateBoardPrepPage() {
           <button
             onClick={() => setActiveTab('study')}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === 'study' ? 'bg-indigo-500 text-white' : 'text-slate-400'
+              activeTab === 'study' ? 'bg-brand-blue-600 text-white' : 'text-slate-400'
             }`}
           >
-            Study Materials
+            <BookOpen className="w-4 h-4 inline mr-1" />
+            Study Topics
           </button>
           <button
             onClick={() => setActiveTab('practice')}
             className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === 'practice' ? 'bg-indigo-500 text-white' : 'text-slate-400'
+              activeTab === 'practice' ? 'bg-brand-blue-600 text-white' : 'text-slate-400'
             }`}
           >
+            <FileText className="w-4 h-4 inline mr-1" />
             Practice Tests
           </button>
         </div>
       </div>
 
-      <main className="px-4 space-y-6">
+      {/* Content */}
+      <div className="px-4 space-y-3">
         {activeTab === 'study' ? (
-          <>
-            {/* Study Progress */}
-            <div className="bg-slate-800 rounded-xl p-4">
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-slate-400 text-sm">Study Progress</span>
-                <span className="text-white font-bold">{studyProgress}%</span>
-              </div>
-              <div className="h-3 bg-slate-700 rounded-full overflow-hidden">
-                <div 
-                  className="h-full bg-indigo-500 rounded-full"
-                  style={{ width: `${studyProgress}%` }}
-                />
-              </div>
-              <p className="text-slate-500 text-sm mt-2">
-                {completedLessons} of {totalLessons} lessons completed
-              </p>
+          topics.length === 0 ? (
+            <div className="text-center py-12">
+              <BookOpen className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+              <p className="text-slate-400">No study topics available yet.</p>
             </div>
-
-            {/* Study Topics */}
-            <div className="space-y-3">
-              {STUDY_TOPICS.map((topic) => {
-                const progress = (topic.completed / topic.lessons) * 100;
-                const colors = CATEGORY_COLORS[topic.category];
-                
-                return (
-                  <Link
-                    key={topic.id}
-                    href={`/pwa/barber/training?topic=${topic.id}`}
-                    className="block bg-slate-800 rounded-xl p-4"
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${colors.bg}`}>
-                        {progress === 100 ? (
-                          <span className="text-slate-400 flex-shrink-0">•</span>
-                        ) : (
-                          <BookOpen className={`w-5 h-5 ${colors.text}`} />
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-white font-medium">{topic.title}</h3>
-                        <p className="text-slate-500 text-sm">{topic.description}</p>
-                        <div className="mt-2">
-                          <div className="flex justify-between text-xs mb-1">
-                            <span className="text-slate-500">{topic.completed}/{topic.lessons} lessons</span>
-                            <span className={colors.text}>{Math.round(progress)}%</span>
-                          </div>
-                          <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
-                            <div 
-                              className={`h-full rounded-full ${colors.bg.replace('/20', '')}`}
-                              style={{ width: `${progress}%` }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-5 h-5 text-slate-500" />
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </>
-        ) : (
-          <>
-            {/* Test Stats */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-slate-800 rounded-xl p-4 text-center">
-                <Target className="w-6 h-6 text-indigo-400 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-white">{completedTests}/{PRACTICE_TESTS.length}</p>
-                <p className="text-slate-500 text-sm">Tests Completed</p>
-              </div>
-              <div className="bg-slate-800 rounded-xl p-4 text-center">
-                <Award className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                <p className="text-2xl font-bold text-white">{avgScore > 0 ? `${Math.round(avgScore)}%` : '--'}</p>
-                <p className="text-slate-500 text-sm">Average Score</p>
-              </div>
-            </div>
-
-            {/* Practice Tests */}
-            <div className="space-y-3">
-              {PRACTICE_TESTS.map((test) => (
-                <div
-                  key={test.id}
-                  className={`bg-slate-800 rounded-xl p-4 ${!isEligible && !test.completed ? 'opacity-60' : ''}`}
-                >
-                  <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                      test.completed 
-                        ? test.score && test.score >= test.passingScore 
-                          ? 'bg-green-500/20' 
-                          : 'bg-red-500/20'
-                        : 'bg-slate-700'
-                    }`}>
-                      {test.completed ? (
-                        test.score && test.score >= test.passingScore ? (
-                          <span className="text-slate-400 flex-shrink-0">•</span>
-                        ) : (
-                          <AlertCircle className="w-6 h-6 text-red-400" />
-                        )
-                      ) : !isEligible ? (
-                        <Lock className="w-5 h-5 text-slate-500" />
-                      ) : (
-                        <FileText className="w-6 h-6 text-slate-400" />
-                      )}
-                    </div>
+          ) : (
+            topics.map(topic => {
+              const colors = CATEGORY_COLORS[topic.category] || CATEGORY_COLORS.theory;
+              return (
+                <div key={topic.id} className="bg-slate-800 rounded-xl p-4 border border-slate-700">
+                  <div className="flex items-start justify-between">
                     <div className="flex-1">
-                      <h3 className="text-white font-medium">{test.title}</h3>
-                      <p className="text-slate-500 text-sm">
-                        {test.questions} questions • {test.duration}
-                      </p>
-                      {test.completed && test.score && (
-                        <p className={`text-sm mt-1 ${
-                          test.score >= test.passingScore ? 'text-green-400' : 'text-red-400'
-                        }`}>
-                          Score: {test.score}% {test.score >= test.passingScore ? '(Passed)' : '(Need 75%)'}
-                        </p>
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className={`px-2 py-0.5 rounded text-xs font-medium ${colors.bg} ${colors.text}`}>
+                          {topic.category}
+                        </span>
+                      </div>
+                      <h3 className="font-bold text-white">{topic.title}</h3>
+                      {topic.content && (
+                        <p className="text-sm text-slate-400 mt-1 line-clamp-2">{topic.content}</p>
+                      )}
+                      {topic.resources && topic.resources.length > 0 && (
+                        <p className="text-xs text-slate-500 mt-2">{topic.resources.length} resources</p>
                       )}
                     </div>
-                    {!test.completed && isEligible && (
-                      <button className="bg-indigo-500 text-white px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2">
-                        <Play className="w-4 h-4" />
-                        Start
-                      </button>
-                    )}
-                    {test.completed && (
-                      <button className="text-indigo-400 text-sm font-medium">
-                        Retake
-                      </button>
-                    )}
+                    <ChevronRight className="w-5 h-5 text-slate-500 mt-1" />
                   </div>
                 </div>
-              ))}
+              );
+            })
+          )
+        ) : (
+          tests.length === 0 ? (
+            <div className="text-center py-12">
+              <FileText className="w-12 h-12 text-slate-600 mx-auto mb-3" />
+              <p className="text-slate-400">No practice tests available yet.</p>
             </div>
-
-            {/* Exam Info */}
-            <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-4">
-              <h3 className="text-indigo-300 font-medium mb-2">About the Indiana State Board Exam</h3>
-              <ul className="text-slate-400 text-sm space-y-2">
-                <li>• Written exam: 100 questions, 75% to pass</li>
-                <li>• Practical exam: Demonstrate cutting, shaving, sanitation</li>
-                <li>• Must complete 1,500 hours before scheduling</li>
-                <li>• Exam fee: $50 (written) + $75 (practical)</li>
-              </ul>
-              <a 
-                href="https://www.in.gov/pla/professions/barber-board/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-block mt-3 text-indigo-400 text-sm font-medium"
-              >
-                Visit Indiana PLA Website →
-              </a>
-            </div>
-          </>
+          ) : (
+            tests.map(test => {
+              const best = bestAttempts.get(test.id);
+              const passed = best?.passed;
+              return (
+                <div key={test.id} className={`bg-slate-800 rounded-xl p-4 border ${
+                  passed ? 'border-green-500/30' : 'border-slate-700'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex-1">
+                      <h3 className="font-bold text-white">{test.title}</h3>
+                      <div className="flex items-center gap-4 mt-2 text-sm text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <FileText className="w-4 h-4" />
+                          {test.question_count} questions
+                        </span>
+                        {test.time_limit_minutes && (
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-4 h-4" />
+                            {test.time_limit_minutes} min
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <Target className="w-4 h-4" />
+                          {test.passing_score}% to pass
+                        </span>
+                      </div>
+                      {best && (
+                        <div className="mt-2">
+                          <span className={`text-sm font-medium ${passed ? 'text-green-400' : 'text-amber-400'}`}>
+                            Best: {best.score}% {passed ? '✓ Passed' : '— Not passed'}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                    <button className={`w-12 h-12 rounded-full flex items-center justify-center ${
+                      passed ? 'bg-green-500/20' : 'bg-brand-blue-600'
+                    }`}>
+                      {passed ? (
+                        <TrendingUp className="w-5 h-5 text-green-400" />
+                      ) : (
+                        <Play className="w-5 h-5 text-white" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              );
+            })
+          )
         )}
-      </main>
-
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 bg-slate-800 border-t border-slate-700 px-6 py-3 safe-area-inset-bottom">
-        <div className="flex justify-around">
-          <Link href="/pwa/barber" className="flex flex-col items-center gap-1 text-slate-400">
-            <Scissors className="w-6 h-6" />
-            <span className="text-xs">Home</span>
-          </Link>
-          <Link href="/pwa/barber/log-hours" className="flex flex-col items-center gap-1 text-slate-400">
-            <Clock className="w-6 h-6" />
-            <span className="text-xs">Log</span>
-          </Link>
-          <Link href="/pwa/barber/training" className="flex flex-col items-center gap-1 text-slate-400">
-            <BookOpen className="w-6 h-6" />
-            <span className="text-xs">Learn</span>
-          </Link>
-          <Link href="/pwa/barber/progress" className="flex flex-col items-center gap-1 text-slate-400">
-            <TrendingUp className="w-6 h-6" />
-            <span className="text-xs">Progress</span>
-          </Link>
-        </div>
-      </nav>
+      </div>
     </div>
   );
 }

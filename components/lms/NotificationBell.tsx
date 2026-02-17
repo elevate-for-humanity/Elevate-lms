@@ -2,9 +2,10 @@
 
 import React from 'react';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Bell, BookOpen, Award, X } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
+import { subscribeToNotifications, markNotificationRead, markAllNotificationsRead } from '@/lib/realtime/notifications';
 
 interface Notification {
   id: string;
@@ -21,6 +22,24 @@ export function NotificationBell() {
 
   useEffect(() => {
     fetchNotifications();
+
+    // Subscribe to realtime notifications
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      const unsubscribe = subscribeToNotifications(user.id, (payload) => {
+        const newNotif = payload as any;
+        setNotifications((prev) => [{
+          id: newNotif.id,
+          type: newNotif.type || 'system',
+          title: newNotif.title || 'New notification',
+          message: newNotif.message || '',
+          time: 'Just now',
+          read: false,
+        }, ...prev]);
+      });
+      return () => unsubscribe();
+    });
   }, []);
 
   const fetchNotifications = async () => {
@@ -65,9 +84,7 @@ export function NotificationBell() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const markAsRead = async (id: string) => {
-    const supabase = createClient();
-    await supabase.from('notifications').update({ read: true }).eq('id', id);
-
+    await markNotificationRead(id);
     setNotifications(
       notifications.map((n) => (n.id === id ? { ...n, read: true } : n))
     );
@@ -75,18 +92,9 @@ export function NotificationBell() {
 
   const markAllAsRead = async () => {
     const supabase = createClient();
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-
+    const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
-
-    await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('user_id', user.id)
-      .eq('read', false);
-
+    await markAllNotificationsRead(user.id);
     setNotifications(notifications.map((n) => ({ ...n, read: true })));
   };
 
